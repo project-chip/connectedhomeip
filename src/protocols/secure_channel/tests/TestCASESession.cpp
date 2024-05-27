@@ -27,7 +27,6 @@
 #include <crypto/DefaultSessionKeystore.h>
 #include <errno.h>
 #include <gtest/gtest.h>
-#include <ios>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/DataModelTypes.h>
@@ -36,7 +35,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/UnitTestPigweedUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
@@ -342,18 +341,15 @@ CHIP_ERROR InitCredentialSets()
 
 void TestCASESession::SetUpTestSuite()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     LoopbackMessagingContext::SetUpTestSuite();
 
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    ASSERT_EQ(err, CHIP_NO_ERROR) << "Init CHIP stack failed: " << std::hex << err.Format();
+    ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-    err =
-        InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr, &gCommissionerOpCertStore);
-    ASSERT_EQ(err, CHIP_NO_ERROR) << "InitFabricTable failed: " << std::hex << err.Format();
+    ASSERT_EQ(
+        InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr, &gCommissionerOpCertStore),
+        CHIP_NO_ERROR);
 
-    err = InitCredentialSets();
-    ASSERT_EQ(err, CHIP_NO_ERROR) << "InitCredentialSets failed: " << std::hex << err.Format();
+    ASSERT_EQ(InitCredentialSets(), CHIP_NO_ERROR);
 
     chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
 }
@@ -679,11 +675,11 @@ TEST_F(TestCASESession, DestinationIdTest)
     memset(destinationIdSpan.data(), 0, destinationIdSpan.size());
 
     // Test changing input: should yield different
-    err = GenerateCaseDestinationId(ByteSpan(kIpkOperationalGroupKeyFromSpec), ByteSpan(kInitiatorRandomFromSpec),
-                                    ByteSpan(kRootPubKeyFromSpec), kFabricIdFromSpec,
-                                    kNodeIdFromSpec + 1, // <--- Change node ID
-                                    destinationIdSpan);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(GenerateCaseDestinationId(ByteSpan(kIpkOperationalGroupKeyFromSpec), ByteSpan(kInitiatorRandomFromSpec),
+                                        ByteSpan(kRootPubKeyFromSpec), kFabricIdFromSpec,
+                                        kNodeIdFromSpec + 1, // <--- Change node ID
+                                        destinationIdSpan),
+              CHIP_NO_ERROR);
     EXPECT_EQ(destinationIdSpan.size(), sizeof(destinationIdBuf));
     EXPECT_FALSE(destinationIdSpan.data_equal(ByteSpan(kExpectedDestinationIdFromSpec)));
 }
@@ -744,8 +740,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
     do                                                                                                                             \
     {                                                                                                                              \
         MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
-        CHIP_ERROR err = EncodeSigma1<params>(buf);                                                                                \
-        EXPECT_EQ(err, CHIP_NO_ERROR);                                                                                             \
+        EXPECT_EQ(EncodeSigma1<params>(buf), CHIP_NO_ERROR);                                                                       \
                                                                                                                                    \
         TLV::ContiguousBufferTLVReader reader;                                                                                     \
         reader.Init(buf);                                                                                                          \
@@ -758,9 +753,9 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
         ByteSpan resumptionId;                                                                                                     \
         ByteSpan initiatorResumeMIC;                                                                                               \
         CASESession session;                                                                                                       \
-        err = session.ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,                  \
-                                  resumptionRequested, resumptionId, initiatorResumeMIC);                                          \
-        EXPECT_EQ(err == CHIP_NO_ERROR, params::expectSuccess);                                                                    \
+        EXPECT_EQ(session.ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,              \
+                                      resumptionRequested, resumptionId, initiatorResumeMIC) == CHIP_NO_ERROR,                     \
+                  params::expectSuccess);                                                                                          \
         if (params::expectSuccess)                                                                                                 \
         {                                                                                                                          \
             EXPECT_EQ(resumptionRequested, params::resumptionIdLen != 0 && params::initiatorResumeMICLen != 0);                    \
@@ -1103,8 +1098,7 @@ private:
         EXPECT_TRUE(payloadHeader.HasMessageType(MsgType::StatusReport));
 
         SecureChannel::StatusReport statusReport;
-        CHIP_ERROR err = statusReport.Parse(std::move(buf));
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(statusReport.Parse(std::move(buf)), CHIP_NO_ERROR);
 
         EXPECT_EQ(statusReport.GetProtocolId(), SecureChannel::Id);
         EXPECT_EQ(statusReport.GetGeneralCode(), GeneralStatusCode::kFailure);
@@ -1131,8 +1125,7 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
 
     MutableByteSpan buf(data->Start(), data->AvailableDataLength());
     // This uses a bogus destination id that is not going to match anything in practice.
-    CHIP_ERROR err = EncodeSigma1<Sigma1Params>(buf);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(EncodeSigma1<Sigma1Params>(buf), CHIP_NO_ERROR);
     data->SetDataLength(static_cast<uint16_t>(buf.size()));
 
     Optional<SessionHandle> session = sessionManager.CreateUnauthenticatedSession(GetAliceAddress(), GetDefaultMRPConfig());
@@ -1141,19 +1134,17 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
     TestCASESecurePairingDelegate caseDelegate;
     CASESession caseSession;
     caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
-    err = caseSession.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &caseDelegate,
-                                                     ScopedNodeId(), NullOptional);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(caseSession.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &caseDelegate,
+                                                         ScopedNodeId(), NullOptional),
+              CHIP_NO_ERROR);
 
-    err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1, &caseSession);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1, &caseSession), CHIP_NO_ERROR);
 
     ExpectErrorExchangeDelegate delegate(SecureChannel::kProtocolCodeNoSharedRoot);
     ExchangeContext * exchange = GetExchangeManager().NewContext(session.Value(), &delegate);
     ASSERT_NE(exchange, nullptr);
 
-    err = exchange->SendMessage(MsgType::CASE_Sigma1, std::move(data), SendMessageFlags::kExpectResponse);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(exchange->SendMessage(MsgType::CASE_Sigma1, std::move(data), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
     ServiceEvents();
 

@@ -341,15 +341,6 @@ static_library("test_utils") {
   ]
 }
 
-pw_source_set("pw_test_utils") {
-  output_dir = "${root_out_dir}/lib"
-  public_deps = [
-    "$dir_pw_log:impl",
-    "$dir_pw_unit_test",
-  ]
-  sources = [ "UnitTestPigweedUtils.h" ]
-}
-
 pw_static_library("pw_tests_wrapper") {
   if (chip_device_platform == "esp32") {
     complete_static_lib = true

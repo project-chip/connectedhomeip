@@ -57,8 +57,7 @@ TEST_F(TestStatusReport, NoData)
     EXPECT_FALSE(msgBuf.IsNull());
 
     StatusReport reportToParse;
-    CHIP_ERROR err = reportToParse.Parse(std::move(msgBuf));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(reportToParse.Parse(std::move(msgBuf)), CHIP_NO_ERROR);
     EXPECT_EQ(reportToParse.GetGeneralCode(), generalCode);
     EXPECT_EQ(reportToParse.GetProtocolId(), protocolId);
     EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);
@@ -86,8 +85,7 @@ TEST_F(TestStatusReport, WithData)
     EXPECT_FALSE(msgBuf.IsNull());
 
     StatusReport reportToParse;
-    CHIP_ERROR err = reportToParse.Parse(std::move(msgBuf));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(reportToParse.Parse(std::move(msgBuf)), CHIP_NO_ERROR);
     EXPECT_EQ(reportToParse.GetGeneralCode(), generalCode);
     EXPECT_EQ(reportToParse.GetProtocolId(), protocolId);
     EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);
@@ -122,8 +120,7 @@ TEST_F(TestStatusReport, TestMakeBusyStatusReport)
     EXPECT_FALSE(handle.IsNull());
 
     StatusReport reportToParse;
-    CHIP_ERROR err = reportToParse.Parse(std::move(handle));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(reportToParse.Parse(std::move(handle)), CHIP_NO_ERROR);
     EXPECT_EQ(reportToParse.GetGeneralCode(), generalCode);
     EXPECT_EQ(reportToParse.GetProtocolId(), protocolId);
     EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);

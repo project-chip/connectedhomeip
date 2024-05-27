@@ -76,8 +76,6 @@ struct TestMessageCounterManager : public chip::Test::LoopbackMessagingContext, 
 TEST_F(TestMessageCounterManager, MessageCounterSyncProcess)
 {
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     SessionHandle localSession = GetSessionBobToAlice();
     SessionHandle peerSession  = GetSessionAliceToBob();
 
@@ -85,8 +83,7 @@ TEST_F(TestMessageCounterManager, MessageCounterSyncProcess)
     Transport::SecureSession * peerState  = GetSecureSessionManager().GetSecureSession(peerSession);
 
     localState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
-    err = GetMessageCounterManager().SendMsgCounterSyncReq(localSession, localState);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(GetMessageCounterManager().SendMsgCounterSyncReq(localSession, localState), CHIP_NO_ERROR);
 
     MessageCounter & peerCounter      = peerState->GetSessionMessageCounter().GetLocalMessageCounter();
     PeerMessageCounter & localCounter = localState->GetSessionMessageCounter().GetPeerMessageCounter();
@@ -96,8 +93,6 @@ TEST_F(TestMessageCounterManager, MessageCounterSyncProcess)
 
 TEST_F(TestMessageCounterManager, CheckReceiveMessage)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     SessionHandle peerSession            = GetSessionAliceToBob();
     Transport::SecureSession * peerState = GetSecureSessionManager().GetSecureSession(peerSession);
     peerState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
@@ -112,9 +107,9 @@ TEST_F(TestMessageCounterManager, CheckReceiveMessage)
     Messaging::ExchangeContext * ec = NewExchangeToAlice(nullptr);
     EXPECT_NE(ec, nullptr);
 
-    err = ec->SendMessage(chip::Protocols::Echo::MsgType::EchoRequest, std::move(msgBuf),
-                          Messaging::SendFlags{ Messaging::SendMessageFlags::kNoAutoRequestAck });
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(ec->SendMessage(chip::Protocols::Echo::MsgType::EchoRequest, std::move(msgBuf),
+                              Messaging::SendFlags{ Messaging::SendMessageFlags::kNoAutoRequestAck }),
+              CHIP_NO_ERROR);
     EXPECT_TRUE(peerState->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized());
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 1);
 }
