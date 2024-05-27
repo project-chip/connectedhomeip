@@ -74,14 +74,14 @@ static_assert(OPENTHREAD_API_VERSION >= 219, "OpenThread version too old");
 
 // Network commissioning
 namespace {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
 NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
 app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
 #endif
 
 void initNetworkCommissioningThreadDriver(void)
 {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
     sThreadNetworkCommissioningInstance.Init();
 #endif
 }
