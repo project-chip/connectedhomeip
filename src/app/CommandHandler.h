@@ -358,13 +358,13 @@ public:
     }
 
     /**
-     * API for adding a data response.  The template parameter T is generally
-     * expected to be a ClusterName::Commands::CommandName::Type struct, but any
-     * object that can be encoded using the DataModel::Encode machinery and
-     * exposes the right command id will work.
+     * API for adding a data response.  The encoded is generally expected to encode
+     * a ClusterName::Commands::CommandName::Type struct, but any
+     * object should work.
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
+     * @param [in] commandId the command whose content is being encoded.
      * @param [in] aData the data for the response.
      */
     CHIP_ERROR AddResponseDataViaEncoder(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
@@ -399,6 +399,9 @@ public:
 
     /**
      * API for adding a response with a given encoder of TLV data.
+     *
+     * The encoder would generally encode a ClusterName::Commands::CommandName::Type with
+     * the corresponding `GetCommandId` call.
      */
     void AddResponseViaEncoder(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder)
     {
