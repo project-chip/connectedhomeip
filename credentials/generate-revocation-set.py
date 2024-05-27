@@ -84,7 +84,7 @@ def parse_vid_pid_from_distinguished_name(distinguished_name):
 
     # Fallback method to get the VID/PID, encoded in CN as "Mvid:FFFF Mpid:1234"
     if vid is None and pid is None:
-        cn = distinguished_name.get_attributes_for_oid(x509.ObjectIdentifier(NameOID.COMMON_NAME))[0].value
+        cn = distinguished_name.get_attributes_for_oid(x509.NameOID.COMMON_NAME)[0].value
         vid = extract_fallback_tag_from_common_name(cn, 'Mvid:')
         pid = extract_fallback_tag_from_common_name(cn, 'Mpid:')
 
