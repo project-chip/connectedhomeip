@@ -22,7 +22,7 @@ import("${chip_root}/src/platform/device.gni")
 chip_test_suite("data_model") {
   output_name = "libDataModelTests"
 
-  if (chip_device_platform != "mbed" && chip_device_platform != "efr32" &&
+  if (chip_device_platform != "mbed" &&
       chip_device_platform != "esp32" && chip_device_platform != "fake") {
     test_sources = [ "TestCommands.cpp" ]
     test_sources += [ "TestWrite.cpp" ]

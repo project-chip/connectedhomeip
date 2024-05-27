@@ -84,39 +84,34 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
-    if (current_os != "zephyr" && current_os != "mbed" &&
-        chip_device_platform != "efr32") {
+    if (current_os != "zephyr" && current_os != "mbed") {
       tests += [
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]
     }
 
-    # Skip on efr32 due to flash and/or ram limitations.
-    if (chip_device_platform != "efr32") {
-      tests += [
-        "${chip_root}/src/app/tests",
-        "${chip_root}/src/credentials/tests",
-        "${chip_root}/src/lib/format/tests",
-        "${chip_root}/src/lib/support/tests",
-        "${chip_root}/src/protocols/secure_channel/tests",
-        "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
-        "${chip_root}/src/system/tests",
-        "${chip_root}/src/transport/tests",
-      ]
+    tests += [
+      "${chip_root}/src/app/tests",
+      "${chip_root}/src/credentials/tests",
+      "${chip_root}/src/lib/format/tests",
+      "${chip_root}/src/lib/support/tests",
+      "${chip_root}/src/protocols/secure_channel/tests",
+      "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
+      "${chip_root}/src/system/tests",
+      "${chip_root}/src/transport/tests",
+    ]
 
-      if (matter_enable_tracing_support &&
-          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
-        tests += [ "${chip_root}/src/tracing/tests" ]
-      }
+    if (matter_enable_tracing_support &&
+        matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
+      tests += [ "${chip_root}/src/tracing/tests" ]
     }
 
     if (chip_device_platform != "none") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
-    if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
-        chip_device_platform != "ameba") {
+    if (chip_device_platform != "esp32" && chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 
@@ -126,9 +121,7 @@ if (chip_build_tests) {
 
     # On nrfconnect, the controller tests run into
     # https://github.com/project-chip/connectedhomeip/issues/9630
-    if (chip_device_platform != "nrfconnect" &&
-        chip_device_platform != "efr32") {
-      # Doesn't compile on ef32. Multiple definitions issues with attribute storage and overflows flash memory.
+    if (chip_device_platform != "nrfconnect") {
       tests += [ "${chip_root}/src/controller/tests/data_model" ]
 
       # Skip controller test for Open IoT SDK
@@ -149,6 +142,205 @@ if (chip_build_tests) {
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
     }
+  }
+
+  chip_test_group("tests_app_interaction-model") {
+    tests = [
+      "${chip_root}/src/app/interaction-model/tests",
+    ]
+  }
+
+  chip_test_group("tests_access") {
+    tests = [
+      "${chip_root}/src/access/tests",
+    ]
+  }
+
+  chip_test_group("tests_crypto") {
+    tests = [
+      "${chip_root}/src/crypto/tests",
+    ]
+  }
+
+  chip_test_group("tests_inet") {
+    tests = [
+      "${chip_root}/src/inet/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_address_resolve") {
+    tests = [
+      "${chip_root}/src/lib/address_resolve/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_asn1") {
+    tests = [
+      "${chip_root}/src/lib/asn1/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_core") {
+    tests = [
+      "${chip_root}/src/lib/core/tests",
+    ]
+  }
+
+  chip_test_group("tests_messaging") {
+    tests = [
+      "${chip_root}/src/messaging/tests",
+    ]
+  }
+
+  chip_test_group("tests_protocols_bdx") {
+    tests = [
+      "${chip_root}/src/protocols/bdx/tests",
+    ]
+  }
+
+  chip_test_group("tests_protocols_interaction_model") {
+    tests = [
+      "${chip_root}/src/protocols/interaction_model/tests",
+    ]
+  }
+
+  chip_test_group("tests_protocols_user_directed_commissioning") {
+    tests = [
+      "${chip_root}/src/protocols/user_directed_commissioning/tests",
+    ]
+  }
+
+  chip_test_group("tests_transport_retransmit") {
+    tests = [
+      "${chip_root}/src/transport/retransmit/tests",
+    ]
+  }
+
+  chip_test_group("tests_app_icd_server") {
+    tests = [
+      "${chip_root}/src/app/icd/server/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_dnssd_minimal_mdns_core") {
+    tests = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_dnssd_minimal_mdns_responders") {
+    tests = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_dnssd_minimal_mdns_records") {
+    tests = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_dnssd_minimal_mdns") {
+    tests = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_dnssd") {
+    tests = [
+      "${chip_root}/src/lib/dnssd/tests",
+    ]
+  }
+
+  chip_test_group("tests_ble") {
+    tests = [
+      "${chip_root}/src/ble/tests",
+    ]
+  }
+
+  chip_test_group("tests_setup_payload") {
+    tests = [
+      "${chip_root}/src/setup_payload/tests",
+    ]
+  }
+
+  chip_test_group("tests_transport_raw") {
+    tests = [
+      "${chip_root}/src/transport/raw/tests",
+    ]
+  }
+
+  chip_test_group("tests_app") {
+    tests = [
+      "${chip_root}/src/app/tests",
+    ]
+  }
+
+  chip_test_group("tests_credentials") {
+    tests = [
+      "${chip_root}/src/credentials/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_format") {
+    tests = [
+      "${chip_root}/src/lib/format/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_support") {
+    tests = [
+      "${chip_root}/src/lib/support/tests",
+    ]
+  }
+
+  chip_test_group("tests_protocols_secure_channel") {
+    tests = [
+      "${chip_root}/src/protocols/secure_channel/tests",
+    ]
+  }
+
+  chip_test_group("tests_system") {
+    tests = [
+      "${chip_root}/src/system/tests",
+    ]
+  }
+
+  chip_test_group("tests_transport") {
+    tests = [
+      "${chip_root}/src/transport/tests",
+    ]
+  }
+
+  chip_test_group("tests_platform") {
+    tests = [
+      "${chip_root}/src/platform/tests",
+    ]
+  }
+
+  # Note: this has multiple definitions issues with attribute storage.
+  chip_test_group("tests_controller_data_model") {
+    tests = [
+      "${chip_root}/src/controller/tests/data_model",
+    ]
+  }
+
+  chip_test_group("tests_controller") {
+    tests = [
+      "${chip_root}/src/controller/tests",
+    ]
+  }
+
+  chip_test_group("tests_lib_shell") {
+    tests = [
+      "${chip_root}/src/lib/shell/tests",
+    ]
+  }
+
+  chip_test_group("tests_tracing") {
+    tests = [
+      "${chip_root}/src/tracing/tests",
+    ]
   }
 
   chip_test_group("fake_platform_tests") {

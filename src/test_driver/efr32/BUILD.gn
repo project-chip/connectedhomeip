@@ -63,10 +63,10 @@ efr32_sdk("sdk") {
   ]
 }
 
-silabs_executable("efr32_device_tests") {
-  output_name = "matter-silabs-device_tests.out"
-
+source_set("efr32-device-tests-common") {
+  #QUESTION: Does this belong in the source_set or in each silabs_executable, or both?
   defines = [ "PW_RPC_ENABLED" ]
+
   sources = [
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
@@ -83,7 +83,6 @@ silabs_executable("efr32_device_tests") {
     "$dir_pw_unit_test:rpc_service",
     "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
     "${chip_root}/examples/common/pigweed:system_rpc_server",
-    "${chip_root}/src:tests",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:pw_tests_wrapper",
     "${chip_root}/src/lib/support:testing_nlunit",
@@ -110,7 +109,91 @@ silabs_executable("efr32_device_tests") {
 
   deps += pw_build_LINK_DEPS
 
-  include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
+  #QUESTION: Does this belong in the source_set or in each silabs_executable, or both?
+  include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]in each 
+
+  #QUESTION: Does this belong in the source_set or in each silabs_executable, or both?
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+
+  #QUESTION: Does this belong in the source_set or in each silabs_executable, or both?
+  inputs = [ ldscript ]
+
+  #QUESTION: Does this belong in the source_set or in each silabs_executable, or both?
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,--no-warn-rwx-segment",
+  ]
+}
+
+silabs_executable("efr32_device_tests_bin1") {
+  output_name = "matter-silabs-device_tests.out"
+
+  defines = [ "PW_RPC_ENABLED" ]
+
+  deps = [
+    ":efr32-device-tests-common",
+    "${chip_root}/src:tests_app_interaction-model",
+    "${chip_root}/src:tests_access",
+    "${chip_root}/src:tests_crypto",
+    "${chip_root}/src:tests_inet",
+    "${chip_root}/src:tests_lib_address_resolve",
+    "${chip_root}/src:tests_lib_asn1",
+    "${chip_root}/src:tests_messaging",
+    "${chip_root}/src:tests_protocols_bdx",
+    "${chip_root}/src:tests_protocols_interaction_model",
+    "${chip_root}/src:tests_protocols_user_directed_commissioning",
+    "${chip_root}/src:tests_transport_retransmit",
+    "${chip_root}/src:tests_app_icd_server",
+    "${chip_root}/src:tests_lib_dnssd_minimal_mdns_core",
+    "${chip_root}/src:tests_lib_dnssd_minimal_mdns_responders",
+    "${chip_root}/src:tests_lib_dnssd_minimal_mdns_records",
+    "${chip_root}/src:tests_lib_dnssd_minimal_mdns",
+    "${chip_root}/src:tests_lib_dnssd",
+  ]
+
+  if (chip_config_network_layer_ble) {
+    deps += [ "${chip_root}/src:tests_ble" ]
+  }
+
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,--no-warn-rwx-segment",
+  ]
+
+  output_dir = root_out_dir
+}
+
+silabs_executable("efr32_device_tests_bin2") {
+  output_name = "matter-silabs-device_tests.out"
+
+  defines = [ "PW_RPC_ENABLED" ]
+
+  deps = [
+    ":efr32-device-tests-common",
+    "${chip_root}/src:tests_setup_payload",
+    "${chip_root}/src:tests_transport_raw",
+    "${chip_root}/src:tests_app",
+    "${chip_root}/src:tests_credentials",
+    "${chip_root}/src:tests_lib_format",
+    "${chip_root}/src:tests_lib_support",
+    "${chip_root}/src:tests_protocols_secure_channel",
+    "${chip_root}/src:tests_system",
+    "${chip_root}/src:tests_transport",  # TestSecureSessionTable is large.
+    "${chip_root}/src:tests_platform",
+    "${chip_root}/src:tests_controller_data_model",
+    "${chip_root}/src:tests_controller",
+    "${chip_root}/src:tests_lib_shell",
+    "${chip_root}/src:tests_lib_core",  # TestTLVVectorWriter requires a large amount of heap for multiple unfragmented 10k buffers
+  ]
+
+  if (matter_enable_tracing_support &&
+      matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
+    deps += [ "${chip_root}/src:tests_tracing" ]
+  }
 
   ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
 
@@ -125,7 +208,8 @@ silabs_executable("efr32_device_tests") {
 }
 
 group("efr32") {
-  deps = [ ":efr32_device_tests" ]
+  deps = [ ":efr32_device_tests_bin1" ],
+  deps = [ ":efr32_device_tests_bin2" ],
 }
 
 group("runner") {
