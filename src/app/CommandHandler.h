@@ -66,9 +66,11 @@ public:
 
     virtual CHIP_ERROR Encode(TLV::TLVWriter &, TLV::Tag tag) = 0;
 };
-/// Defines an abstract class of something that can be encoded
-/// into a TLV with a given data tag
 
+/// An `EncoderToTLV` the uses `DataModel::Encode` to encode things.
+///
+/// Generally useful to encode things like <ClusterName>::Commands::<CommandName>::Type
+/// structures.
 template <typename T>
 class DataModelEncoderToTLV : public EncoderToTLV
 {
@@ -349,6 +351,8 @@ public:
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
      * @param [in] aData the data for the response.
+     *
+     * NOTE: this is a convenience function for `AddResponseDataViaEncoder`
      */
     template <typename CommandData>
     inline CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
@@ -365,7 +369,11 @@ public:
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
      * @param [in] commandId the command whose content is being encoded.
-     * @param [in] aData the data for the response.
+     * @param [in] encoder - an encoder that places the command data structure for `commandId`
+     *             into a TLV Writer.
+     *
+     * Most applications are likely to use `AddResponseData` as a more convenient
+     * one-call that auto-sets command ID and creates the underlying encoders.
      */
     CHIP_ERROR AddResponseDataViaEncoder(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
                                          EncoderToTLV & encoder)
