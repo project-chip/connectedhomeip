@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+from typing import Callable
 import xml.etree.ElementTree as ElementTree
 
 from conformance_support import (ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated, disallowed,
@@ -24,7 +25,7 @@ from matter_testing_support import MatterBaseTest, default_matter_test_main
 from mobly import asserts
 
 
-def basic_test(xml: str, cls: callable) -> None:
+def basic_test(xml: str, cls: Callable) -> None:
     et = ElementTree.fromstring(xml)
     xml_callable = parse_basic_callable_from_xml(et)
     asserts.assert_true(isinstance(xml_callable, cls), "Unexpected class parsed from basic conformance")
