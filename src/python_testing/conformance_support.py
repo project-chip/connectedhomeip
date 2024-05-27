@@ -407,10 +407,10 @@ def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callabl
         # actually exposed anywhere ON the device other than through the presence of the cluster. So for now, treat any attribute conditions that are cluster conditions
         # as just optional, because it's optional to implement any device type feature.
         # Device types also have some marked as "condition" that are similarly optional
-        except ConformanceException as e:
+        except ConformanceException:
             if element.tag == ATTRIBUTE_TAG or element.tag == CONDITION_TAG or element.tag == FEATURE_TAG:
                 return device_feature(element.attrib['name'])
-            raise e
+            raise
 
     ops = []
     for sub in element:
