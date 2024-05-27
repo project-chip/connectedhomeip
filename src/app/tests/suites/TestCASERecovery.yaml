@@ -42,6 +42,7 @@ tests:
     - label: "Re-get our session, but without expiring sesssions"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      timeout: 20
       arguments:
           values:
               - name: "nodeId"

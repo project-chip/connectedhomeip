@@ -338,7 +338,7 @@ class WaitForCommissioneeAction(BaseAction):
         super().__init__(test_step)
         self._expire_existing_session = False
         # This is the default when no timeout is provided.
-        _DEFAULT_TIMEOUT_MS = 20 * 1000
+        _DEFAULT_TIMEOUT_MS = 10 * 1000
         self._timeout_ms = _DEFAULT_TIMEOUT_MS
 
         if test_step.arguments is None:
