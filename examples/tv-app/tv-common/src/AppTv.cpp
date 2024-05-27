@@ -158,6 +158,16 @@ class MyAppInstallationService : public AppInstallationService
     {
         return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
     }
+
+    CommissionerDeclaration::CdError GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) override 
+    {
+        ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
+        return factory->GetAppInstallationStatus(vendorId, productId);
+
+        // ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
+        // factory->InstallContentApp(vendorId, productId);
+        // return CommissionerDeclaration::CdError::kAppInstallConsentPending;
+    }
 };
 
 MyAppInstallationService gMyAppInstallationService;
@@ -625,6 +635,29 @@ bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t prod
         index++;
     }
     return false;
+}
+
+void ContentAppFactoryImpl::SetAppInstallationStatus(uint16_t vendorId, uint16_t productId, CommissionerDeclaration::CdError status)
+{
+    std::map<uint16_t, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
+    it = mAppInstallationStatus.find(vendorId);
+    if (it != mAppInstallationStatus.end()) {
+        mAppInstallationStatus[vendorId] = status;
+        return;
+    }
+
+    mAppInstallationStatus.insert({vendorId, status});
+}
+
+CommissionerDeclaration::CdError ContentAppFactoryImpl::GetAppInstallationStatus(uint16_t vendorId, uint16_t productId)
+{
+    std::map<uint16_t, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
+    it = mAppInstallationStatus.find(vendorId);
+    if (it != mAppInstallationStatus.end()) {
+        return mAppInstallationStatus[vendorId];
+    }
+
+    return CommissionerDeclaration::CdError::kAppInstallConsentPending;
 }
 
 Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)

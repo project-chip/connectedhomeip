@@ -230,11 +230,6 @@ void CommissionerDiscoveryController::InternalOk()
     {
         ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
 
-        // notify client that app will be installed
-        CommissionerDeclaration cd;
-        cd.SetErrorCode(CommissionerDeclaration::CdError::kAppInstallConsentPending);
-        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
-
         // dialog
         ChipLogDetail(Controller, "------PROMPT USER: %s is requesting to install app on this TV. vendorId=%d, productId=%d",
                       client->GetDeviceName(), client->GetVendorId(), client->GetProductId());
@@ -244,6 +239,15 @@ void CommissionerDiscoveryController::InternalOk()
             mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
         }
         ChipLogDetail(Controller, "------Via Shell Enter: app install <pid> <vid>");
+
+        CommissionerDeclaration::CdError appInstallStatus = mAppInstallationService->GetInstallationStatusOfApp(client->GetVendorId(), client->GetProductId());
+
+        if (appInstallStatus != CommissionerDeclaration::CdError::kNoError) {
+            // notify client the current app's installation status
+            CommissionerDeclaration cd;
+            cd.SetErrorCode(appInstallStatus);
+            mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        }
         return;
     }
 

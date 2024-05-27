@@ -235,6 +235,18 @@ public:
      */
     virtual bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) = 0;
 
+    /**
+     * @brief
+     *   Called to check app's installation status. 
+     *
+     * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) = 0;
+
     virtual ~AppInstallationService() = default;
 };
 

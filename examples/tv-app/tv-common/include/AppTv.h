@@ -147,10 +147,16 @@ public:
     void InstallContentApp(uint16_t vendorId, uint16_t productId);
     // Remove the app from the list of mContentApps
     bool UninstallContentApp(uint16_t vendorId, uint16_t productId);
+    // Set App's Installation Status
+    void SetAppInstallationStatus(uint16_t vendorId, uint16_t productId, 
+                                  Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError status);
+    // Get App's Installation Status
+    Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError GetAppInstallationStatus(uint16_t vendorId, uint16_t productId);
 
 protected:
     std::vector<std::unique_ptr<ContentAppImpl>> mContentApps;
     std::vector<uint16_t> mAdminVendorIds{};
+    std::map<uint16_t, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError> mAppInstallationStatus{};
 };
 
 } // namespace AppPlatform

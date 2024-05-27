@@ -292,6 +292,25 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 
         return CHIP_NO_ERROR;
     }
+    else if (strcmp(argv[0], "setinstallstatus") == 0)
+    {
+        if (argc < 3)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+
+        uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
+        uint16_t pid = (uint16_t) strtol(argv[2], &eptr, 10);
+        uint16_t appInstallationStatus = (uint16_t) strtol(argv[3], &eptr, 10);
+
+        ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
+        factory->SetAppInstallationStatus(vid, pid, static_cast<Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>(appInstallationStatus));
+
+        ChipLogProgress(DeviceLayer, "set app installation status");
+
+        return CHIP_NO_ERROR;
+    }
     else if (strcmp(argv[0], "add") == 0)
     {
         if (argc < 2)
