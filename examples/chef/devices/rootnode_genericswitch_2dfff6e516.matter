@@ -1464,7 +1464,7 @@ endpoint 1 {
     persist  attribute batVoltage;
     persist  attribute batPercentRemaining default = 100;
     persist  attribute batTimeRemaining;
-    persist  attribute batChargeLevel default = 0;
+    persist  attribute batChargeLevel;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     ram      attribute batPresent;
@@ -1480,14 +1480,17 @@ endpoint 1 {
   }
 
   server cluster Switch {
-    emits event SwitchLatched;
-    persist  attribute numberOfPositions default = 5;
+    emits event InitialPress;
+    emits event LongPress;
+    emits event ShortRelease;
+    emits event LongRelease;
+    persist  attribute numberOfPositions default = 3;
     persist  attribute currentPosition default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 0xE;
     ram      attribute clusterRevision default = 1;
   }
 }
