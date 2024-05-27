@@ -41,7 +41,7 @@
  *    void testFunction();
  * };
  *
- * TEST_F_FROM_FIXTURE(TestClass, testFunction)
+ * TEST_F_FROM_FIXTURE(TestCtx, testFunction)
  * {
  *   Foo foo;
  *   EXPECT_TRUE(foo.privateFunction());
