@@ -257,7 +257,6 @@ class MyAppInstallationService : public AppInstallationService
 
 MyAppInstallationService gMyAppInstallationService;
 
-
 class MyPostCommissioningListener : public PostCommissioningListener
 {
     void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
