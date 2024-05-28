@@ -49,6 +49,12 @@ void AppContext::SetUpTestSuite()
 
 void AppContext::TearDownTestSuite()
 {
+    // Adding a DrainAndServiceIO call fixes the teardown for some tests (TestAclAttribute and TestReportScheduler); these were
+    // triggering failures in tests that follow them when running on nRF CI (Zephyr native_posix where all Unit Tests are compiled
+    // into a single file)
+    // TODO: understand this more and solve underlying issue
+    LoopbackMessagingContext::DrainAndServiceIO();
+
     chip::DeviceLayer::PlatformMgr().Shutdown();
     LoopbackMessagingContext::TearDownTestSuite();
 }

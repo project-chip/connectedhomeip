@@ -147,6 +147,7 @@ chip_test_suite("tests") {
     "WriteHandlerTestAccess.h",
   ]
   test_sources = [
+    "TestAclAttribute.cpp",
     "TestAclEvent.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
@@ -159,10 +160,6 @@ chip_test_suite("tests") {
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
-
-  # TestAclAttribute is a test that causes failures in TestAclEvent or TestReadInteraction if it is run before them on Zephyr Native_Posix used by Nordic CI.
-  ##TODO  resolve this test to make sure its teardown does not cause failures in those tests. and put it in the above test_sources list
-  test_sources += [ "TestAclAttribute.cpp" ]
 
   if (!chip_fake_platform) {
     test_sources += [ "TestFailSafeContext.cpp" ]
@@ -242,11 +239,12 @@ chip_test_suite_using_nltest("tests_nltest") {
 
   # The platform manager is not properly clearing queues in test teardown, which results in
   # DrainIO calls not being able to run in expected time (5seconds) if unprocessed reported engine
-  # runs are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
+  # runs are remaining, causing tests to crash in Open IoT SDK since they are
   # running all tests in one file. We need to figure out how to properly clean the event queues
   # before enabling this test for these platforms.
-  if (chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "openiotsdk") {
+  # Update: This was fixed for Nordic Zephyr Tests by calling DrainAndServiceIO in AppContext::TearDownTestSuite()
+  # TODO: check if above solution works for openiotsdk as well
+  if (chip_device_platform != "openiotsdk") {
     test_sources += [ "TestReportScheduler.cpp" ]
   }
 
