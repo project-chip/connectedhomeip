@@ -3063,6 +3063,70 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:clusterPathToRemoveAttributesFrom.endpoint clusterID:clusterPathToRemoveAttributesFrom.cluster];
 }
 
+- (void) _pruneOrphanedEndpoints:(NSDictionary *)previousPartsListValue
+            newPartsListValue:(NSDictionary *)newPartsListValue
+{
+    // If the parts list changed and one or more endpoints were removed, remove all the clusters in _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those endpoints.
+    // Also remove it from the data store.
+    NSMutableSet * toBeRemovedEndpoints = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _dataValueWithoutDataVersion:previousPartsListValue]]];
+    NSSet * endpointsOnDevice = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newPartsListValue]];
+    [toBeRemovedEndpoints minusSet:endpointsOnDevice];
+
+    for (NSNumber * endpoint in toBeRemovedEndpoints) {
+        NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
+        for (MTRClusterPath * path in _persistedClusters) {
+            if ([path.endpoint isEqualToNumber:endpoint]) {
+                [clusterPathsToRemove addObject:path];
+            }
+        }
+        [self _removeClusters:[clusterPathsToRemove copy]];
+        [self.deviceController.controllerDataStore removeEndpointFromEndpointIndex:endpoint forNodeID:self.nodeID];
+    }
+}
+
+- (void) _pruneOrphanedClusters:(MTRAttributePath *)attributePath
+        previousServerListValue:(NSDictionary *)previousServerListValue
+             newServerListValue:(NSDictionary *)newServerListValue
+{
+    // If the server list changed and clusters were removed, remove the clusters from the _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those clusters.
+    // Also remove it from the data store.
+    NSMutableSet<NSNumber *> * toBeRemovedClusters = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _dataValueWithoutDataVersion:previousServerListValue]]];
+    NSSet<NSNumber *> * clustersStillOnEndpoint = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newServerListValue]];
+    [toBeRemovedClusters minusSet:clustersStillOnEndpoint];
+
+    NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
+    for (NSNumber * cluster in toBeRemovedClusters) {
+        for (MTRClusterPath * path in _persistedClusters) {
+            if ([path.endpoint isEqualToNumber:attributePath.endpoint] && [path.cluster isEqualToNumber:cluster]) {
+                [clusterPathsToRemove addObject:path];
+            }
+        }
+    }
+    [self _removeClusters:[clusterPathsToRemove copy]];
+}
+
+- (void) _pruneOrphanedAttributes:(MTRAttributePath *)attributePath
+            newAttributeListValue:(NSDictionary *)newAttributeListValue
+{
+    // If the attribute list changed and attributes were removed, remove the attributes from the _clusterDataToPersist for that cluster and endpoint.
+    // Clear out the _peristedClusterData and data store cluster data. Update the data storage with updated cluster data.
+    NSMutableSet<NSNumber *> * toBeRemovedAttributes = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _cachedAttributeValueForPath:attributePath]]];
+    NSSet<NSNumber *> * attributesStillInCluster = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newAttributeListValue]];
+
+    [toBeRemovedAttributes minusSet:attributesStillInCluster];
+    MTRClusterPath * clusterPathToRemoveAttributesFrom;
+    for (MTRClusterPath * path in _persistedClusters) {
+        if ([path.endpoint isEqualToNumber:attributePath.endpoint] && [path.cluster isEqualToNumber:attributePath.cluster]) {
+            clusterPathToRemoveAttributesFrom = path;
+            break;
+        }
+    }
+    [self _removeAttributes:[toBeRemovedAttributes copy] fromCluster:clusterPathToRemoveAttributesFrom];
+    [self.deviceController.controllerDataStore removeAttributes:[toBeRemovedAttributes copy] fromCluster:clusterPathToRemoveAttributesFrom forNodeID:self.nodeID];
+}
+
+
+
 - (void)_pruneOrphanedEndpointsAndClusters:(MTRAttributePath *)attributePath
                              previousValue:(NSDictionary *)previousValue
                         attributeDataValue:(NSDictionary *)attributeDataValue
@@ -3078,60 +3142,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // If yes, we might need to prune any deleted endpoints, clusters or attributes from the storage and persisted cluster data.
     if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID) {
         if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributePartsListID && [attributePath.endpoint isEqualToNumber:rootEndpoint]) {
-
-            // If the parts list changed and one or more endpoints were removed, remove all the clusters in _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those endpoints.
-            // Also remove it from the data store.
-            NSMutableSet * toBeRemovedEndpoints = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousValue]];
-            NSSet * endpointsOnDevice = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:attributeDataValue]];
-            [toBeRemovedEndpoints minusSet:endpointsOnDevice];
-
-            for (NSNumber * endpoint in toBeRemovedEndpoints) {
-                NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
-                for (MTRClusterPath * path in _persistedClusters) {
-                    if ([path.endpoint isEqualToNumber:endpoint]) {
-                        [clusterPathsToRemove addObject:path];
-                    }
-                }
-                [self _removeClusters:[clusterPathsToRemove copy]];
-                [self.deviceController.controllerDataStore removeEndpointFromEndpointIndex:endpoint forNodeID:self.nodeID];
-            }
+            [self _pruneOrphanedEndpoints:previousValue newPartsListValue:attributeDataValue];
         } else if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID) {
-
-            // If the server list changed and clusters were removed, remove the clusters from the _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those clusters.
-            // Also remove it from the data store.
-            NSMutableSet<NSNumber *> * toBeRemovedClusters = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _dataValueWithoutDataVersion:previousValue]]];
-            NSSet<NSNumber *> * clustersStillOnEndpoint = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:attributeDataValue]];
-            [toBeRemovedClusters minusSet:clustersStillOnEndpoint];
-
-            NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
-            for (NSNumber * cluster in toBeRemovedClusters) {
-                for (MTRClusterPath * path in _persistedClusters) {
-                    if ([path.endpoint isEqualToNumber:attributePath.endpoint] && [path.cluster isEqualToNumber:cluster]) {
-                        [clusterPathsToRemove addObject:path];
-                    }
-                }
-            }
-            [self _removeClusters:[clusterPathsToRemove copy]];
+            [self _pruneOrphanedClusters:attributePath previousServerListValue:previousValue newServerListValue:attributeDataValue];
         }
     }
 
     if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeAttributeListID) {
-
-        // If the attribute list changed and attributes were removed, remove the attributes from the _clusterDataToPersist for that cluster and endpoint.
-        // Clear out the _peristedClusterData and data store cluster data. Update the data storage with updated cluster data.
-        NSMutableSet<NSNumber *> * toBeRemovedAttributes = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _cachedAttributeValueForPath:attributePath]]];
-        NSSet<NSNumber *> * attributesStillInCluster = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:attributeDataValue]];
-
-        [toBeRemovedAttributes minusSet:attributesStillInCluster];
-        MTRClusterPath * clusterPathToRemoveAttributesFrom;
-        for (MTRClusterPath * path in _persistedClusters) {
-            if ([path.endpoint isEqualToNumber:attributePath.endpoint] && [path.cluster isEqualToNumber:attributePath.cluster]) {
-                clusterPathToRemoveAttributesFrom = path;
-                break;
-            }
-        }
-        [self _removeAttributes:[toBeRemovedAttributes copy] fromCluster:clusterPathToRemoveAttributesFrom];
-        [self.deviceController.controllerDataStore removeAttributes:[toBeRemovedAttributes copy] fromCluster:clusterPathToRemoveAttributesFrom forNodeID:self.nodeID];
+        [self _pruneOrphanedAttributes:attributePath newAttributeListValue:attributeDataValue];
     }
 }
 

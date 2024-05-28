@@ -736,7 +736,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
                 MTR_LOG_ERROR("clearStoredClusterDataForNodeID: _storeClusterIndex failed for node 0x%016llX endpoint %u", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
             }
         }
-        MTR_LOG_INFO("clearStoredClusterDataForNodeID: Deleted endpoint %u cluster 0x%08lX for node 0x%016llX successfully", endpointID.unsignedShortValue, clusterID.unsignedLongValue, nodeID.unsignedLongLongValue);
+        MTR_LOG("clearStoredClusterDataForNodeID: Deleted endpoint %u cluster 0x%08lX for node 0x%016llX successfully", endpointID.unsignedShortValue, clusterID.unsignedLongValue, nodeID.unsignedLongLongValue);
     });
 }
 

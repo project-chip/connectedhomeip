@@ -2362,7 +2362,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // 1. Get the data version and attribute value of the parts list for endpoint 0 to inject a fake report. The attribute report will delete endpoint 2.
     //    That should cause the endpoint and its corresponding clusters to be removed from data storage.
     // 2. The data store is populated with cluster index and cluster data for endpoints 0, 1 and 2 initially.
-    // 3. After the fake attribute report is injected with deleted endpoint 2, make sure the data store is still populated with cluster index and cluster data for endpoints 0 and 1 but not 2.
+    // 3. After the fake attribute report is injected with deleted endpoint 2, make sure the data store is still populated with cluster index and cluster data
+    // for endpoints 0 and 1 but not 2.
     __block NSDictionary * testDataForPartsList;
     __block NSMutableArray * testClusterDataValueForPartsList;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
