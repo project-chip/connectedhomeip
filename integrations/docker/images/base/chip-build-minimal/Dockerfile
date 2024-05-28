@@ -1,5 +1,5 @@
 # This minimal build image is intentionally not based on chip-build
-FROM ubuntu:focal
+FROM ubuntu:24.04
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
 # ARG NINJA_VERSION=v1.11.1

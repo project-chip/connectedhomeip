@@ -1,5 +1,5 @@
 # Stage 1: Setup dependencies (based on chip-build).
-FROM ubuntu:22.04 as chip-build-cert
+FROM ubuntu:24.04 as chip-build-cert
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
