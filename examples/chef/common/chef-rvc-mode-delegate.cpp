@@ -290,9 +290,8 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::End
                                                                        const EmberAfAttributeMetadata * attributeMetadata,
                                                                        uint8_t * buffer, uint16_t maxReadLength)
 {
-    uint8_t m = gRvcCleanModeInstance->GetCurrentMode();
-    memcpy(buffer, &m, sizeof(m));
-
+    VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
+    buffer[0] = gRvcCleanModeInstance->GetCurrentMode();
     return chip::Protocols::InteractionModel::Status::Success;
 }
 

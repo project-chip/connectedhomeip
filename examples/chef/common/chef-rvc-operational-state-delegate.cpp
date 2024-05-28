@@ -35,10 +35,10 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
 DataModel::Nullable<uint32_t> RvcOperationalStateDelegate::GetCountdownTime()
 {
-    if (mCountDownTime.IsNull())
+    if (mRunningTime > mPhaseDuration.Value())
         return DataModel::NullNullable;
 
-    return DataModel::MakeNullable((uint32_t) (mCountDownTime.Value() - mRunningTime));
+    return DataModel::MakeNullable((uint32_t) (mPhaseDuration.Value() - mRunningTime));
 }
 
 CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
@@ -203,7 +203,7 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(c
         {
             break;
         }
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
+        ret = chip::Protocols::InteractionModel::Status::ConstraintError;
         ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
     }
     break;
@@ -214,7 +214,7 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(c
         {
             break;
         }
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
+        ret = chip::Protocols::InteractionModel::Status::ConstraintError;
         ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
     }
     break;
@@ -231,10 +231,30 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(ch
                                                                               const EmberAfAttributeMetadata * attributeMetadata,
                                                                               uint8_t * buffer, uint16_t maxReadLength)
 {
-    app::DataModel::Nullable<uint8_t> m = gRvcOperationalStateInstance->GetCurrentPhase();
-    memcpy(buffer, &m, sizeof(m));
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+    chip::AttributeId attributeId = attributeMetadata->attributeId;
+    switch(attributeId) {
+        case chip::app::Clusters::RvcOperationalState::Attributes::CurrentPhase::Id: {
 
-    return chip::Protocols::InteractionModel::Status::Success;
+            app::DataModel::Nullable<uint8_t> currentPhase = gRvcOperationalStateInstance->GetCurrentPhase();
+            if(currentPhase.IsNull())
+            {
+                ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
+                break;
+            }
+            *buffer = currentPhase.Value();
+        }
+        break;
+        case chip::app::Clusters::RvcOperationalState::Attributes::OperationalState::Id: {
+            *buffer = gRvcOperationalStateInstance->GetCurrentOperationalState();
+        }
+        break;
+        default:
+            ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+            break;
+    }
+
+    return ret;
 }
 
 void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
@@ -247,7 +267,6 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     gRvcOperationalStateInstance        = new RvcOperationalState::Instance(gRvcOperationalStateDelegate, operationalStateEndpoint);
 
     gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-
     gRvcOperationalStateInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER

@@ -95,7 +95,7 @@ public:
 
     uint32_t mRunningTime = 0;
     uint32_t mPausedTime  = 0;
-    app::DataModel::Nullable<uint32_t> mCountDownTime;
+    app::DataModel::Nullable<uint32_t> mPhaseDuration;
 
 private:
     Span<const OperationalState::GenericOperationalState> mOperationalStateList;
