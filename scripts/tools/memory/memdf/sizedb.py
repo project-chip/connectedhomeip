@@ -105,10 +105,10 @@ class SizeDatabase(memdf.util.sqlite.Database):
         for frame in ['section', 'region']:
             for i in r['frames'].get(frame, []):
                 r['sizes'].append({
-                'name': i[frame],
-                'size': i['size'],
-                'kind': frame
-            })
+                    'name': i[frame],
+                    'size': i['size'],
+                    'kind': frame
+                })
         # Add segment sizes.
         for i in r['frames'].get('wr', []):
             r['sizes'].append({
