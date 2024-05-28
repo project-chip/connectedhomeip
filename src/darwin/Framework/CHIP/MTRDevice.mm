@@ -3041,8 +3041,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     [_persistedClusters minusSet:clusterPathsToRemove];
 
-    for (MTRClusterPath * path in clusterPathsToRemove)
-    {
+    for (MTRClusterPath * path in clusterPathsToRemove) {
         [_persistedClusterData removeObjectForKey:path];
         [_persistedClusters removeObject:path];
         [_clusterDataToPersist removeObjectForKey:path];
@@ -3052,14 +3051,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)_removeAttributes:(NSSet *)toBeRemovedAttributes fromCluster:(MTRClusterPath *)clusterPathToRemoveAttributesFrom
 {
-    if (toBeRemovedAttributes == nil || clusterPathToRemoveAttributesFrom == nil)
-    {
+    if (toBeRemovedAttributes == nil || clusterPathToRemoveAttributesFrom == nil) {
         return;
     }
     os_unfair_lock_assert_owner(&self->_lock);
 
-    for (NSNumber * attribute in toBeRemovedAttributes)
-    {
+    for (NSNumber * attribute in toBeRemovedAttributes) {
         [self _removeCachedAttribute:attribute fromCluster:clusterPathToRemoveAttributesFrom];
     }
     [_persistedClusterData removeObjectForKey:clusterPathToRemoveAttributesFrom];
@@ -3098,9 +3095,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [self _removeClusters:[clusterPathsToRemove copy]];
                 [self.deviceController.controllerDataStore removeEndpointFromEndpointIndex:endpoint forNodeID:self.nodeID];
             }
-        }
-        else if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID)
-        {
+        } else if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID) {
 
             // If the server list changed and clusters were removed, remove the clusters from the _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those clusters.
             // Also remove it from the data store.

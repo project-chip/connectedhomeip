@@ -2342,7 +2342,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     [endpoints addObjectsFromArray:[device arrayOfNumbersFromAttributeValue:[device _dataValueWithoutDataVersion:partsList]]];
     return endpoints;
-
 }
 
 - (void)test011_testDataStorageUpdatesWhenRemovingEndpoints
@@ -2385,7 +2384,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         }
     };
 
-    __block NSMutableDictionary<NSNumber * , NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableDictionary alloc] init];
+    __block NSMutableDictionary<NSNumber *, NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableDictionary alloc] init];
     __block NSMutableArray * testEndpoints;
 
     delegate.onReportEnd = ^{
@@ -2399,8 +2398,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         dispatch_sync(self->_storageQueue, ^{
             XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
             // Populate the initialClusterIndex to use as a reference for all cluster paths later.
-            for (NSNumber * endpoint in testEndpoints)
-            {
+            for (NSNumber * endpoint in testEndpoints) {
                 [initialClusterIndex setObject:[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:endpoint] forKey:endpoint];
             }
             XCTAssertNotNil(initialClusterIndex);
@@ -2605,12 +2603,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         dispatch_sync(self->_storageQueue, ^{
             XCTAssertFalse([[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint] containsObject:toBeDeletedCluster]);
             for (NSNumber * cluster in initialClusterIndex) {
-                if ([cluster isEqualToNumber:toBeDeletedCluster])
-                {
+                if ([cluster isEqualToNumber:toBeDeletedCluster]) {
                     XCTAssertNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:testEndpoint clusterID:cluster]);
-                }
-                else
-                {
+                } else {
                     XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:testEndpoint clusterID:cluster]);
                 }
             }
@@ -2682,7 +2677,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         XCTAssertNotNil(testClusterDataValue);
 
         dispatch_sync(self->_storageQueue, ^{
-
             initialClusterIndex = [[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint] mutableCopy];
             XCTAssertNotNil(initialClusterIndex);
 
@@ -2693,7 +2687,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                 // We will be paged in the cluster data from storage to check the above.
                 MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:testEndpoint clusterID:cluster];
 
-                 if ([cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)]) {
+                if ([cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)]) {
                     MTRDeviceClusterData * data = [device _getClusterDataForPath:path];
                     XCTAssertNotNil(data);
                     XCTAssertNotNil(data.attributes);
@@ -2709,7 +2703,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                     }
                 }
             }
-
         });
 
         [subscriptionExpectation fulfill];
@@ -2741,7 +2734,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     };
 
     delegate.onReportEnd = ^{
-
         // Make sure that the cluster data in the data storage is populated with cluster data for MTRClusterIDTypeIdentifyID cluster
         // and has all attributes except attribute 1 which was deleted.
         // We will be paged in the cluster data from storage to check the above.

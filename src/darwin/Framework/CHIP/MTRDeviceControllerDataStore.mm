@@ -446,7 +446,6 @@ static NSString * sAttributeCacheEndpointIndexKeyPrefix = @"attrCacheEndpointInd
     return [self _storeAttributeCacheValue:endpointIndex forKey:[self _endpointIndexKeyForNodeID:nodeID]];
 }
 
-
 - (void)removeEndpointFromEndpointIndex:(NSNumber *)endpointID forNodeID:(NSNumber *)nodeID
 {
     if (!endpointID || !nodeID) {
@@ -461,8 +460,7 @@ static NSString * sAttributeCacheEndpointIndexKeyPrefix = @"attrCacheEndpointInd
 
         [endpointIndex removeObject:endpointID];
         BOOL success = [self _storeEndpointIndex:endpointIndex forNodeID:nodeID];
-        if (!success)
-        {
+        if (!success) {
             MTR_LOG_ERROR("removeEndpointFromEndpointIndex: _storeEndpointIndex for node 0x%016llX", nodeID.unsignedLongLongValue);
         }
     });
@@ -745,12 +743,10 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 - (void)removeAttributes:(NSSet<NSNumber *> *)attributes fromCluster:(MTRClusterPath *)path forNodeID:(NSNumber *)nodeID
 {
     MTRDeviceClusterData * clusterData = [self getStoredClusterDataForNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
-    if (clusterData == nil)
-    {
+    if (clusterData == nil) {
         return;
     }
-    for (NSNumber * attribute in attributes)
-    {
+    for (NSNumber * attribute in attributes) {
         [clusterData removeValueForAttribute:attribute];
     }
     [self _storeClusterData:clusterData forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
