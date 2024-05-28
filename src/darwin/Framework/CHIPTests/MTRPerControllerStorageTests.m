@@ -2598,7 +2598,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     };
 
     delegate.onReportEnd = ^{
-
         // Make sure that the cluster data does not have cluster ID - MTRClusterIDTypeIdentifyID in the cluster index for endpoint 1
         // and cluster data for MTRClusterIDTypeIdentifyID is nil.
         // We do not need to check _persistedClusterData here. _persistedClusterData will be paged in from storage when needed so
@@ -2737,7 +2736,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     };
 
     delegate.onReportEnd = ^{
-
         // Make sure that the cluster data in the data storage is populated with cluster data for MTRClusterIDTypeIdentifyID cluster
         // and has all attributes except attribute 1 which was deleted.
         // We will page in the cluster data from storage to check the above.
