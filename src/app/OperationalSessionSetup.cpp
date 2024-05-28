@@ -792,6 +792,11 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
         // but in practice for old devices BUSY often sends some hardcoded value
         // that tells us nothing about when the other side will decide it has
         // timed out.
+        //
+        // Unfortunately, we do not have the MRP config for the other side here,
+        // but in practice if the other side is using its local config to
+        // compute Sigma2 response timeouts, then it's also returning useful
+        // values with BUSY, so we will wait long enough.
         auto additionalTimeout = CASESession::ComputeSigma2ResponseTimeout(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         actualTimerDelay += additionalTimeout;
     }
