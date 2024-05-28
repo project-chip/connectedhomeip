@@ -232,26 +232,27 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(ch
                                                                               uint8_t * buffer, uint16_t maxReadLength)
 {
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
-    chip::AttributeId attributeId = attributeMetadata->attributeId;
-    switch(attributeId) {
-        case chip::app::Clusters::RvcOperationalState::Attributes::CurrentPhase::Id: {
+    chip::AttributeId attributeId                 = attributeMetadata->attributeId;
+    switch (attributeId)
+    {
+    case chip::app::Clusters::RvcOperationalState::Attributes::CurrentPhase::Id: {
 
-            app::DataModel::Nullable<uint8_t> currentPhase = gRvcOperationalStateInstance->GetCurrentPhase();
-            if(currentPhase.IsNull())
-            {
-                ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
-                break;
-            }
-            *buffer = currentPhase.Value();
-        }
-        break;
-        case chip::app::Clusters::RvcOperationalState::Attributes::OperationalState::Id: {
-            *buffer = gRvcOperationalStateInstance->GetCurrentOperationalState();
-        }
-        break;
-        default:
-            ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        app::DataModel::Nullable<uint8_t> currentPhase = gRvcOperationalStateInstance->GetCurrentPhase();
+        if (currentPhase.IsNull())
+        {
+            ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
             break;
+        }
+        *buffer = currentPhase.Value();
+    }
+    break;
+    case chip::app::Clusters::RvcOperationalState::Attributes::OperationalState::Id: {
+        *buffer = gRvcOperationalStateInstance->GetCurrentOperationalState();
+    }
+    break;
+    default:
+        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        break;
     }
 
     return ret;
