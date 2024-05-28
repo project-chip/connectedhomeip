@@ -1891,13 +1891,13 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // Do not persist new values for Changes Omitted Quality (aka C Quality)
         // attributes unless they're part of a Priming Report or from a read response.
         // (removals are OK)
-        
+
         // log when a device violates expectations for Changes Omitted Quality attributes.
         using namespace chip::Tracing::DarwinFramework;
         MATTER_LOG_METRIC_BEGIN(kMetricUnexpectedCQualityUpdate);
         [self _addInformationalAttributesToCurrentMetricScope];
         MATTER_LOG_METRIC_END(kMetricUnexpectedCQualityUpdate);
-        
+
         return;
     }
 
@@ -3655,13 +3655,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath {
     auto * cachedData = [self _cachedAttributeValueForPath:attributePath];
-    
+
     auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
         MTRAttributePathKey : attributePath,
         MTRDataKey : cachedData,
     } error:nil];
     // REVIEWERS:  is it worth logging the `error` above?
-    
+
     return attrReport.value;
 }
 
@@ -3669,7 +3669,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     auto * vendorIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
                                                                           clusterID:@(MTRClusterIDTypeBasicInformationID)
                                                                         attributeID:@(MTRClusterBasicAttributeVendorIDID)];
-    
+
     return [self _informationalNumberAtAttributePath:vendorIDPath];
 }
 
@@ -3677,7 +3677,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     auto * productIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
                                                                           clusterID:@(MTRClusterIDTypeBasicInformationID)
                                                                         attributeID:@(MTRClusterBasicAttributeProductIDID)];
-    
+
     return [self _informationalNumberAtAttributePath:productIDPath];
 }
 
