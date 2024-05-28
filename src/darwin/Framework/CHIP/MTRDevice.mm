@@ -3038,9 +3038,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)_removeClusters:(NSSet *)clusterPathsToRemove
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    
+
     [_persistedClusters minusSet:clusterPathsToRemove];
-    
+
     for (MTRClusterPath * path in clusterPathsToRemove)
     {
         [_persistedClusterData removeObjectForKey:path];
@@ -3057,7 +3057,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return;
     }
     os_unfair_lock_assert_owner(&self->_lock);
-    
+
     for (NSNumber * attribute in toBeRemovedAttributes)
     {
         [self _removeCachedAttribute:attribute fromCluster:clusterPathToRemoveAttributesFrom];
@@ -3071,7 +3071,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                         attributeDataValue:(NSDictionary *)attributeDataValue
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    
+
     NSNumber * rootEndpoint = @0;
 
     if (_persistedClusters == nil || _persistedClusterData == nil || !previousValue.count) {
@@ -3081,7 +3081,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // If yes, we might need to prune any deleted endpoints, clusters or attributes from the storage and persisted cluster data.
     if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID) {
         if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributePartsListID && [attributePath.endpoint isEqualToNumber:rootEndpoint]) {
-            
+
             // If the parts list changed and one or more endpoints were removed, remove all the clusters in _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those endpoints.
             // Also remove it from the data store.
             NSMutableSet * toBeRemovedEndpoints = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousValue]];
@@ -3101,7 +3101,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
         else if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID)
         {
-            
+
             // If the server list changed and clusters were removed, remove the clusters from the _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those clusters.
             // Also remove it from the data store.
             NSMutableSet<NSNumber *> * toBeRemovedClusters = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _dataValueWithoutDataVersion:previousValue]]];
@@ -3121,7 +3121,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeAttributeListID) {
-        
+
         // If the attribute list changed and attributes were removed, remove the attributes from the _clusterDataToPersist for that cluster and endpoint.
         // Clear out the _peristedClusterData and data store cluster data. Update the data storage with updated cluster data.
         NSMutableSet<NSNumber *> * toBeRemovedAttributes = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _cachedAttributeValueForPath:attributePath]]];

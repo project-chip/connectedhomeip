@@ -458,7 +458,7 @@ static NSString * sAttributeCacheEndpointIndexKeyPrefix = @"attrCacheEndpointInd
         if (endpointIndex == nil) {
             return;
         }
-        
+
         [endpointIndex removeObject:endpointID];
         BOOL success = [self _storeEndpointIndex:endpointIndex forNodeID:nodeID];
         if (!success)
