@@ -61,11 +61,12 @@ class SizeDatabase(memdf.util.sqlite.Database):
             UNIQUE(thing_id, hash, parent, pr, time, artifact)
         )
         """, """
-        -- A ‘size’ entry gives the size of a section for a particular build.
+        -- A ‘size’ entry gives the size of an area for a particular build.
         CREATE TABLE IF NOT EXISTS size (
             build_id    INTEGER REFERENCES build(id),
-            name        TEXT NOT NULL,      -- Section name
-            size        INTEGER NOT NULL,   -- Section size in bytes
+            kind        TEXT NOT NULL,      -- Area kind
+            name        TEXT NOT NULL,      -- Area name
+            size        INTEGER NOT NULL,   -- Size in bytes
             PRIMARY KEY (build_id, name)
         )
         """
@@ -100,15 +101,20 @@ class SizeDatabase(memdf.util.sqlite.Database):
         r = origin.copy()
         r.update(json.loads(s))
         r['sizes'] = []
-        # Add section sizes.
-        for i in r['frames'].get('section', []):
-            r['sizes'].append({'name': i['section'], 'size': i['size']})
+        # Add section and region sizes.
+        for frame in ['section', 'region']:
+            for i in r['frames'].get(frame, []):
+                r['sizes'].append({
+                'name': i[frame],
+                'size': i['size'],
+                'kind': frame
+            })
         # Add segment sizes.
         for i in r['frames'].get('wr', []):
             r['sizes'].append({
                 'name': ('(read only)', '(read/write)')[int(i['wr'])],
-                'size':
-                i['size']
+                'size': i['size'],
+                'kind': 'wr'
             })
         self.add_sizes(**r)
 
