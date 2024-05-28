@@ -240,6 +240,22 @@ class MyPincodeService : public PasscodeService
 };
 MyPincodeService gMyPincodeService;
 
+class MyAppInstallationService : public AppInstallationService
+{
+    bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) override
+    {
+        return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
+    }
+
+    CommissionerDeclaration::CdError GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) override
+    {
+        return CommissionerDeclaration::CdError::kAppInstallConsentPending;
+    }
+};
+
+MyAppInstallationService gMyAppInstallationService;
+
+
 class MyPostCommissioningListener : public PostCommissioningListener
 {
     void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
@@ -373,6 +389,7 @@ void TvAppJNI::InitializeCommissioner(JNIMyUserPrompter * userPrompter)
     {
         cdc->SetPasscodeService(&gMyPincodeService);
         cdc->SetUserPrompter(userPrompter);
+        cdc->SetAppInstallationService(&gMyAppInstallationService);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }
 
