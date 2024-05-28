@@ -200,3 +200,8 @@ RUN case ${TARGETPLATFORM} in \
 # Protoc goes from 108M to 4.6M
 RUN strip /usr/local/bin/protoc*
 
+# Cleanup unused bits
+RUN set -x \
+    && DEBIAN_FRONTEND=noninteractive apt-get remove python3-scipy -fy --fix-missing \
+    && DEBIAN_FRONTEND=noninteractive apt-get autoremove -fy --fix-missing \
+    && : # last line
