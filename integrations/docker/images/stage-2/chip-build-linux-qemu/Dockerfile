@@ -32,7 +32,9 @@ RUN set -x \
 	libguestfs-tools \
 	linux-image-generic \
 	ncurses-dev \
-	qemu \
+	qemu-user \
+	qemu-system \
+	qemu-system-x86 \
 	xz-utils \
 	zstd \
 	&& apt-get clean \
