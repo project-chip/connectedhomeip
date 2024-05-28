@@ -39,40 +39,66 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_3(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
+                     "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event"),
-            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event. Verify Event EEVSE.S.E00(EVConnected) sent"),
+            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event.",
+                     "Verify Event EEVSE.S.E00(EVConnected) sent"),
             TestStep("5", "TH sends command ClearTargets"),
-            TestStep("5a", "TH reads from the DUT the NextChargeStartTime attribute. Verify value is null"),
-            TestStep("5b", "TH reads from the DUT the NextChargeTargetTime attribute. Verify value is null"),
-            TestStep("5c", "TH reads from the DUT the NextChargeRequiredEnergy attribute. Verify value is null"),
-            TestStep("5d", "TH reads from the DUT the NextChargeTargetSoC attribute. Verify value is null"),
-            TestStep("6", "TH sends command GetTargets. Verify that the GetTargetsResponse is sent with no targets defined"),
+            TestStep("5a", "TH reads from the DUT the NextChargeStartTime attribute.",
+                     "Verify value is null"),
+            TestStep("5b", "TH reads from the DUT the NextChargeTargetTime attribute.",
+                     "Verify value is null"),
+            TestStep("5c", "TH reads from the DUT the NextChargeRequiredEnergy attribute.",
+                     "Verify value is null"),
+            TestStep("5d", "TH reads from the DUT the NextChargeTargetSoC attribute.",
+                     "Verify value is null"),
+            TestStep("6", "TH sends command GetTargets.",
+                     "Verify that the GetTargetsResponse is sent with no targets defined"),
             TestStep(
                 "7", "TH sends command SetTargets with DayOfWeekForSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1439,TargetSoC=null,AddedEnergy=25000000}. Assumes testing is carried out enough time before 11:59pm to attempt charging"),
-            TestStep("7a", "TH reads from the DUT the NextChargeStartTime attribute. Verify value is before the next TargetTime above"),
-            TestStep("7b", "TH reads from the DUT the NextChargeTargetTime attribute. Verify value is next TargetTime above"),
-            TestStep("7c", "TH reads from the DUT the NextChargeRequiredEnergy attribute. Verify value is AddedEnergy above"),
-            TestStep("7d", "TH reads from the DUT the NextChargeTargetSoC attribute. Verify value is null"),
-            TestStep("8", "TH sends command GetTargets. Verify that the GetTargetsResponse is sent with targets equivalent to the above (Note 1)"),
+            TestStep("7a", "TH reads from the DUT the NextChargeStartTime attribute.",
+                     "Verify value is before the next TargetTime above"),
+            TestStep("7b", "TH reads from the DUT the NextChargeTargetTime attribute.",
+                     "Verify value is next TargetTime above"),
+            TestStep("7c", "TH reads from the DUT the NextChargeRequiredEnergy attribute.",
+                     "Verify value is AddedEnergy above"),
+            TestStep("7d", "TH reads from the DUT the NextChargeTargetSoC attribute.",
+                     "Verify value is null"),
+            TestStep("8", "TH sends command GetTargets.",
+                     "Verify that the GetTargetsResponse is sent with targets equivalent to the above (Note 1)"),
             TestStep(
                 "9", "TH sends command SetTargets with DayOfWeekForSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1,TargetSoC=100,AddedEnergy=null}. Assumes testing is carried out enough time before 11:59pm to attempt charging"),
-            TestStep("9a", "TH reads from the DUT the NextChargeStartTime attribute. Verify value is before the next TargetTime above"),
-            TestStep("9b", "TH reads from the DUT the NextChargeTargetTime attribute. Verify value is TargetTime above"),
-            TestStep("9c", "TH reads from the DUT the NextChargeRequiredEnergy attribute. Verify value is null"),
-            TestStep("9d", "TH reads from the DUT the NextChargeTargetSoC attribute. Verify value is 100"),
-            TestStep("10", "TH sends command GetTargets. Verify that the GetTargetsResponse is sent with targets equivalent to the above (Note 1)"),
+            TestStep("9a", "TH reads from the DUT the NextChargeStartTime attribute.",
+                     "Verify value is before the next TargetTime above"),
+            TestStep("9b", "TH reads from the DUT the NextChargeTargetTime attribute.",
+                     "Verify value is TargetTime above"),
+            TestStep("9c", "TH reads from the DUT the NextChargeRequiredEnergy attribute.",
+                     "Verify value is null"),
+            TestStep("9d", "TH reads from the DUT the NextChargeTargetSoC attribute.",
+                     "Verify value is 100"),
+            TestStep("10", "TH sends command GetTargets.",
+                     "Verify that the GetTargetsResponse is sent with targets equivalent to the above (Note 1)"),
             TestStep("11", "TH sends command SetTargets with DayOfWeekForSequence=0x40 (i.e. having Saturday set) and 10 ChargingTargets with TargetTimes=60,180,300,420,540,660,780,900,1020,1140 and all with TargetSoC=null, AddedEnergy=25000000}."),
-            TestStep("12", "TH sends command SetTargets with DayOfWeekForSequence=0x01 (i.e. having Sunday set) and no ChargingTargets"),
-            TestStep("13", "TH sends command GetTargets. Verify that the GetTargetsResponse is sent with 1 targets for each day Monday to Friday equivalent to step 9 (Note 1), 10 targets for Saturday as step 11, and no targets for Sunday."),
+            TestStep(
+                "12", "TH sends command SetTargets with DayOfWeekForSequence=0x01 (i.e. having Sunday set) and no ChargingTargets"),
+            TestStep("13", "TH sends command GetTargets.",
+                     "Verify that the GetTargetsResponse is sent with 1 targets for each day Monday to Friday equivalent to step 9 (Note 1), 10 targets for Saturday as step 11, and no targets for Sunday."),
             TestStep("14", "TH sends command ClearTargets"),
-            TestStep("14a", "TH reads from the DUT the NextChargeStartTime attribute. Verify value is null"),
-            TestStep("14b", "TH reads from the DUT the NextChargeTargetTime attribute. Verify value is null"),
-            TestStep("14c", "TH reads from the DUT the NextChargeRequiredEnergy attribute. Verify value is null"),
-            TestStep("14d", "TH reads from the DUT the NextChargeTargetSoC attribute. Verify value is null"),
-            TestStep("15", "TH sends command GetTargets. Verify that the GetTargetsResponse is sent with no targets defined"),
-            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear. Verify Event EEVSE.S.E01(EVNotDetected) sent"),
+            TestStep("14a", "TH reads from the DUT the NextChargeStartTime attribute.",
+                     "Verify value is null"),
+            TestStep("14b", "TH reads from the DUT the NextChargeTargetTime attribute.",
+                     "Verify value is null"),
+            TestStep("14c", "TH reads from the DUT the NextChargeRequiredEnergy attribute.",
+                     "Verify value is null"),
+            TestStep("14d", "TH reads from the DUT the NextChargeTargetSoC attribute.",
+                     "Verify value is null"),
+            TestStep("15", "TH sends command GetTargets.",
+                     "Verify that the GetTargetsResponse is sent with no targets defined"),
+            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear.",
+                     "Verify Event EEVSE.S.E01(EVNotDetected) sent"),
             TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear."),
         ]
 
@@ -81,7 +107,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
     def log_get_targets_response(self, get_targets_response):
         logger.info(f" Rx'd: {get_targets_response}")
         for index, entry in enumerate(get_targets_response.chargingTargetSchedules):
-            logger.info(f"   [{index}] DayOfWeekForSequence: {entry.dayOfWeekForSequence:02x}")
+            logger.info(
+                f"   [{index}] DayOfWeekForSequence: {entry.dayOfWeekForSequence:02x}")
             for sub_index, sub_entry in enumerate(entry.chargingTargets):
                 logger.info(
                     f"    - [{sub_index}] TargetTime: {sub_entry.targetTimeMinutesPastMidnight} TargetSoC: {sub_entry.targetSoC} AddedEnergy: {sub_entry.addedEnergy}")
@@ -106,7 +133,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("4")
         await self.send_test_event_trigger_pluggedin()
-        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVConnected)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EVConnected)
         session_id = event_data.sessionID
 
         self.step("5")
@@ -127,7 +155,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("6")
         get_targets_response = await self.send_get_targets_command()
         self.log_get_targets_response(get_targets_response)
-        empty_targets_response = Clusters.EnergyEvse.Commands.GetTargetsResponse(chargingTargetSchedules=[])
+        empty_targets_response = Clusters.EnergyEvse.Commands.GetTargetsResponse(
+            chargingTargetSchedules=[])
         asserts.assert_equal(get_targets_response, empty_targets_response,
                              f"Unexpected 'GetTargets' response value - expected {empty_targets_response}, was {get_targets_response}")
 
@@ -190,16 +219,26 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("11")
         # This should modify Sat (0x40) with 10 targets throughout the day
         daily_targets_step_11 = [
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=60, addedEnergy=25000000),
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=180, addedEnergy=25000000),
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=300, addedEnergy=25000000),
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=420, addedEnergy=25000000),
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=540, addedEnergy=25000000),
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=660, addedEnergy=25000000),
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=780, addedEnergy=25000000),
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=900, addedEnergy=25000000),
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=1020, addedEnergy=25000000),
-            Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=1140, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=60, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=180, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=300, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=420, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=540, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=660, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=780, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=900, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=1020, addedEnergy=25000000),
+            Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+                targetTimeMinutesPastMidnight=1140, addedEnergy=25000000),
         ]
         targets_step_11 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
             dayOfWeekForSequence=0x40, chargingTargets=daily_targets_step_11)]
@@ -220,9 +259,9 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         # [1] This should be (Sat) = 0x40 with 10 TargetTimes and added Energy 25kWh (from step 11)
         # [2] This should be (Sun) = 0x01 with NO Targets (from step 12)
         asserts.assert_equal(len(get_targets_response.chargingTargetSchedules), 3,
-                             f"'GetTargets' response should have 3 entries")
+                             "'GetTargets' response should have 3 entries")
         asserts.assert_equal(get_targets_response.chargingTargetSchedules[0].dayOfWeekForSequence, 0x3e,
-                             f"'GetTargets' response entry 0 should have DayOfWeekForSequence = 0x3e (62)")
+                             "'GetTargets' response entry 0 should have DayOfWeekForSequence = 0x3e (62)")
         asserts.assert_equal(get_targets_response.chargingTargetSchedules[0].chargingTargets, daily_targets_step_9,
                              f"'GetTargets' response entry 0 should have chargingTargets = {daily_targets_step_9})")
         asserts.assert_equal(get_targets_response.chargingTargetSchedules[1], targets_step_11[0],
@@ -253,9 +292,11 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("16")
         await self.send_test_event_trigger_pluggedin_clear()
-        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVNotDetected)
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EVNotDetected)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand
-        self.validate_ev_not_detected_event(event_data, session_id, expected_state, expected_duration=0, expected_charged=0)
+        self.validate_ev_not_detected_event(
+            event_data, session_id, expected_state, expected_duration=0, expected_charged=0)
 
         self.step("17")
         await self.send_test_event_trigger_basic_clear()
