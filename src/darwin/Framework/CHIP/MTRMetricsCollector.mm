@@ -113,7 +113,7 @@ using MetricEvent = chip::Tracing::MetricEvent;
 void StartupMetricsCollection()
 {
     if ([MTRMetricsCollector sharedInstance]) {
-        MTR_LOG_INFO("Initialized metrics collection backend for Darwin");
+        MTR_LOG("Initialized metrics collection backend for Darwin");
 
         [[MTRMetricsCollector sharedInstance] registerTracingBackend];
     }
@@ -167,7 +167,7 @@ void ShutdownMetricsCollection()
     // Register only once
     if (!_tracingBackendRegistered) {
         chip::Tracing::Register(_tracingBackend);
-        MTR_LOG_INFO("Registered tracing backend with the registry");
+        MTR_LOG("Registered tracing backend with the registry");
         _tracingBackendRegistered = TRUE;
     }
 }
@@ -179,7 +179,7 @@ void ShutdownMetricsCollection()
     // Unregister only if registered before
     if (_tracingBackendRegistered) {
         chip::Tracing::Unregister(_tracingBackend);
-        MTR_LOG_INFO("Unregistered tracing backend with the registry");
+        MTR_LOG("Unregistered tracing backend with the registry");
         _tracingBackendRegistered = FALSE;
     }
 }

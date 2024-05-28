@@ -18,8 +18,7 @@
 
 #pragma once
 
-#include "../common/CHIPCommand.h"
-
+#include <commands/common/CHIPCommand.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <lib/support/CHIPMem.h>
 

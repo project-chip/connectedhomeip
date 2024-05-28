@@ -94,6 +94,8 @@ def main():
         "-d", "--debug", help="Set default logging level to debug.", action="store_true")
     parser.add_argument(
         "-t", "--trust-store", help="Path to the PAA trust store.", action="store", default="./credentials/development/paa-root-certs")
+    parser.add_argument(
+        "-b", "--ble-adapter", help="Set the Bluetooth adapter index.", type=int, default=None)
     args = parser.parse_args()
 
     if not os.path.exists(args.trust_store):
@@ -128,7 +130,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
         # nothing we can do ... things will NOT work
         return
 
-    chip.native.Init()
+    chip.native.Init(bluetoothAdapter=args.ble_adapter)
 
     global certificateAuthorityManager
     global chipStack
