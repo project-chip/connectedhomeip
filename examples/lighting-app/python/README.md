@@ -32,17 +32,6 @@ cd examples/lighting-app/python
 python lighting.py
 ```
 
-Control the Python lighting matter device:
+Control the Python lighting matter device using the Python controller REPL:
 
-```shell
-source ./out/python_env/bin/activate
-
-chip-device-ctrl
-
-chip-device-ctrl > connect -ble 3840 20202021 12344321
-chip-device-ctrl > zcl NetworkCommissioning AddOrUpdateWiFiNetwork 12344321 0 0 ssid=str:YOUR_SSID credentials=str:YOUR_PASSWORD breadcrumb=0
-chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 12344321 0 0 networkID=str:YOUR_SSID breadcrumb=0
-chip-device-ctrl > close-ble
-chip-device-ctrl > resolve 5544332211 1 (pass appropriate fabric ID and node ID, you can get this from get-fabricid)
-chip-device-ctrl > zcl OnOff Toggle 12344321 1 0
-```
+[Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
