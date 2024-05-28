@@ -74,8 +74,10 @@ enum class WiFiStatsCountType
     kWiFiOverrunCount
 };
 
+#if defined(__GLIBC__)
 // Static variable to store the maximum heap size
 static size_t maxHeapHighWatermark = 0;
+#endif
 
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 {
@@ -287,10 +289,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
     // value of the CurrentHeapUsed.
 
+#if defined(__GLIBC__)
     // Get the current amount of heap memory, in bytes, that are being used by
     // the current running program and reset the max heap high watermark to current heap amount.
     struct mallinfo mallocInfo = mallinfo();
     maxHeapHighWatermark       = mallocInfo.uordblks;
+#endif
 
     return CHIP_NO_ERROR;
 }
