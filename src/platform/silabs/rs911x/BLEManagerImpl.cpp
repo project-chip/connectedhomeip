@@ -58,12 +58,6 @@ extern "C" {
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <string.h>
 
-#ifdef SLI_SI91X_MCU_INTERFACE
-extern "C" {
-#include "sl_si91x_trng.h"
-}
-#endif // SLI_SI91X_MCU_INTERFACE
-
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
@@ -92,22 +86,11 @@ using namespace ::chip::DeviceLayer::Internal;
 void sl_ble_init()
 {
     uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
-#if SLI_SI91X_MCU_INTERFACE
-    sl_status_t sl_status;
-    //! Get Random number of desired length
-    sl_status = sl_si91x_trng_get_random_num((uint32_t *) randomAddrBLE, RSI_BLE_ADDR_LENGTH);
-    if (sl_status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, " TRNG Random number generation Failed ");
-        return;
-    }
+    uint64_t randomAddr                        = chip::Crypto::GetRandU64();
+    memcpy(randomAddrBLE, &randomAddr, RSI_BLE_ADDR_LENGTH);
     // Set the two least significant bits as the first 2 bits of the address has to be '11' to ensure the address is a random
     // non-resolvable private address
-    randomAddrBLE[5] |= 0xC0;
-#else
-    uint64_t randomAddr = chip::Crypto::GetRandU64();
-    memcpy(randomAddrBLE, &randomAddr, RSI_BLE_ADDR_LENGTH);
-#endif // SLI_SI91X_MCU_INTERFACE
+    randomAddrBLE[(RSI_BLE_ADDR_LENGTH - 1)] |= 0xC0;
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
