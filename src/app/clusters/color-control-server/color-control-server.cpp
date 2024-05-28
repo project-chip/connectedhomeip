@@ -227,9 +227,9 @@ public:
 
         // Initialize action attributes to default values in case they are not in the scene
         ColorControl::EnhancedColorMode targetColorMode = ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation;
-        uint8_t loopActiveValue    = 0x00;
-        uint8_t loopDirectionValue = 0x00;
-        uint16_t loopTimeValue     = 0x0019; // Default loop time value according to spec
+        uint8_t loopActiveValue                         = 0x00;
+        uint8_t loopDirectionValue                      = 0x00;
+        uint16_t loopTimeValue                          = 0x0019; // Default loop time value according to spec
 
         while (pair_iterator.Next())
         {
@@ -606,7 +606,7 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
  * @param endpoint
  * @param newColorMode
  */
-void ColorControlServer::handleModeSwitch(EndpointId endpoint,  ColorControl::EnhancedColorMode newColorMode)
+void ColorControlServer::handleModeSwitch(EndpointId endpoint, ColorControl::EnhancedColorMode newColorMode)
 {
     uint8_t oldColorMode = 0;
     Attributes::ColorMode::Get(endpoint, &oldColorMode);
