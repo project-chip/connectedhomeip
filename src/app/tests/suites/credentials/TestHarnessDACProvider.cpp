@@ -177,7 +177,8 @@ bool ReadValue(Json::Value jsonValue)
     return false;
 }
 
-uint16_t ReadUint16(Json::Value jsonValue){
+uint16_t ReadUint16(Json::Value jsonValue)
+{
     return static_cast<uint16_t>(jsonValue.asUInt());
 }
 
