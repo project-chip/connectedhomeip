@@ -27,19 +27,21 @@
 namespace chip {
 namespace Controller {
 
-static bool SameExceptOrder(const chip::Span<const Inet::IPAddress> & source, const chip::Span<const Inet::IPAddress> & destination)
+static bool SameExceptOrder(const chip::Span<const Inet::IPAddress> & v1, const chip::Span<const Inet::IPAddress> & v2)
 {
     std::bitset<chip::Dnssd::CommonResolutionData::kMaxIPAddresses> addressUsed;
-    if (source.size() != destination.size())
+
+    VerifyOrDie(v1.size() <= Dnssd::CommissionNodeData::kMaxIPAddresses && v2.size() <= Dnssd::CommissionNodeData::kMaxIPAddresses);
+    if (v1.size() != v2.size())
     {
         return false;
     }
 
-    for (size_t s = 0; s < source.size(); s++)
+    for (size_t s = 0; s < v1.size(); s++)
     {
-        for (size_t d = 0; d < destination.size(); d++)
+        for (size_t d = 0; d < v2.size(); d++)
         {
-            if (!addressUsed[d] && source[s] == destination[d])
+            if (!addressUsed[d] && v1[s] == v2[d])
             {
                 // Change the user flag so that the compared target is no longer used
                 addressUsed.set(d, true);
@@ -47,7 +49,7 @@ static bool SameExceptOrder(const chip::Span<const Inet::IPAddress> & source, co
             }
         }
     }
-    return addressUsed.count() == destination.size();
+    return addressUsed.count() == v2.size();
 }
 
 void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & discNodeData)
