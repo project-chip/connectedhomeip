@@ -22,6 +22,9 @@ from dataclasses import dataclass
 
 @dataclass
 class BuilderOptions:
+    # Generate a link map file
+    enable_link_map_file: bool = True
+
     # Enable flashbundle generation stage
     enable_flashbundle: bool = False
 

@@ -366,6 +366,9 @@ class AndroidBuilder(Builder):
             if self.options.pw_command_launcher:
                 gn_args["pw_command_launcher"] = self.options.pw_command_launcher
 
+            if self.options.enable_link_map_file:
+                gn_args["chip_generate_link_map_file"] = True
+
             if exampleName == "chip-test":
                 gn_args["chip_build_tests"] = True
             if self.profile != AndroidProfile.DEBUG:
