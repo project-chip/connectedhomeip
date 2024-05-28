@@ -247,7 +247,7 @@ class MyAppInstallationService : public AppInstallationService
         return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
     }
 
-    // TODO: Dummy code for Android OS, needs to be updated with package manager 
+    // TODO: Dummy code for Android OS, needs to be updated with package manager
     // retrieving correct app's installation status
     CommissionerDeclaration::CdError GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) override
     {
