@@ -26,6 +26,7 @@
 #include <app/MessageDef/EventDataIB.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/ember-test-compatibility.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -47,7 +48,6 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::ClusterId kTestClusterId1    = 100;
 chip::ClusterId kTestClusterId2    = 7;
 chip::EndpointId kTestEndpointId   = 1;
 chip::EventId kTestEventIdDebug    = 1;
@@ -61,7 +61,7 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const chip::Access::RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        if (requestPath.cluster == kTestClusterId1)
+        if (requestPath.cluster == chip::Test::kTestDeniedClusterId2)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -104,7 +104,7 @@ void GenerateEvents()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
     chip::app::EventOptions options1;
-    options1.mPath     = { kTestEndpointId, kTestClusterId1, kTestEventIdDebug };
+    options1.mPath     = { kTestEndpointId, chip::Test::kTestDeniedClusterId2, kTestEventIdDebug };
     options1.mPriority = chip::app::PriorityLevel::Info;
 
     chip::app::EventOptions options2;
@@ -215,7 +215,6 @@ public:
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-
         chip::app::EventManagement::DestroyEventManagement();
         mpTestContext->TearDown();
     }
@@ -248,7 +247,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     {
         chip::app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = kTestClusterId1;
+        eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
         eventPathParams[0].mEventId    = kTestEventIdDebug;
 
         ReadPrepareParams readPrepareParams(mpTestContext->GetSessionBobToAlice());
@@ -280,7 +279,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     {
         chip::app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = kTestClusterId1;
+        eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
 
         ReadPrepareParams readPrepareParams(mpTestContext->GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
@@ -337,7 +336,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     {
         chip::app::EventPathParams eventPathParams[2];
         eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = kTestClusterId1;
+        eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
         eventPathParams[0].mEventId    = kTestEventIdDebug;
         eventPathParams[1].mEndpointId = kTestEndpointId;
         eventPathParams[1].mClusterId  = kTestClusterId2;
