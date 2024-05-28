@@ -225,9 +225,7 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-#ifndef __GLIBC__
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#else
+#if defined(__GLIBC__)
     struct mallinfo mallocInfo = mallinfo();
 
     // Get the current amount of heap memory, in bytes, that are not being utilized
@@ -235,14 +233,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
     currentHeapFree = mallocInfo.fordblks;
 
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-#ifndef __GLIBC__
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#else
+#if defined(__GLIBC__)
     struct mallinfo mallocInfo = mallinfo();
 
     // Get the current amount of heap memory, in bytes, that are being used by
@@ -255,14 +253,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
         maxHeapHighWatermark = currentHeapUsed;
     }
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-#ifndef __GLIBC__
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#else
+#if defined(__GLIBC__)
     struct mallinfo mallocInfo = mallinfo();
 
     // The usecase of this function is embedded devices,on which we would need to intercept
@@ -281,6 +279,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     currentHeapHighWatermark = maxHeapHighWatermark;
 
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
