@@ -157,7 +157,8 @@ RUN set -x \
     && strip bin/include-what-you-use \
     && make install \
     # Save clang-18 files, so we can restore them after build dependencies cleanup
-    && tar -cf clang-18-files.tar $(dpkg -L libclang-common-18-dev |grep /include) /usr/lib/llvm-18/lib/libLLVM-18.so.1 \
+    # AWK logic converts 'libLLVM.so.18.1 => /usr/lib/llvm-18/lib/libLLVM.so.18.1 (0x00007f781ede6000)' to '/usr/lib/llvm-18/lib/libLLVM.so.18.1'
+    && tar -cf clang-18-files.tar $(dpkg -L libclang-common-18-dev |grep /include) $(ldd bin/include-what-you-use | grep /usr/lib/llvm | awk '{print $3}') /usr/lib/llvm-18/lib/libLLVM.so.1 \
     # Cleanup build dependencies
     && apt autopurge -fy clang-18 libclang-18-dev \
     && rm -rf /var/lib/apt/lists/ \
