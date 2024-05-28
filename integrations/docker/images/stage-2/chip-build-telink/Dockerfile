@@ -35,7 +35,7 @@ RUN set -x \
     && apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
-    && pip3 install --no-cache-dir --user -r /opt/telink/zephyrproject/zephyr/scripts/requirements.txt \
+    && pip3 install --break-system-packages --no-cache-dir --user -r /opt/telink/zephyrproject/zephyr/scripts/requirements.txt \
     && : # last line
 
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr

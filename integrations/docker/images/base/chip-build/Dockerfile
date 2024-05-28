@@ -119,7 +119,7 @@ RUN set -x \
 #       we should migrate to venvs for packages we do not directly have
 #       provided by the system
 RUN set -x \
-    && pip3 install --no-cache-dir --break-system-packages \
+    && pip3 install --break-system-packages --no-cache-dir --break-system-packages \
     attrs \
     cxxfilt \
     ghapi \
@@ -202,6 +202,8 @@ RUN strip /usr/local/bin/protoc*
 
 # Cleanup unused bits
 RUN set -x \
-    && DEBIAN_FRONTEND=noninteractive apt-get remove python3-scipy -fy --fix-missing \
+    && DEBIAN_FRONTEND=noninteractive apt-get remove -fy --fix-missing \
+    python3-scipy \
+    libllvm17t64 \
     && DEBIAN_FRONTEND=noninteractive apt-get autoremove -fy --fix-missing \
     && : # last line

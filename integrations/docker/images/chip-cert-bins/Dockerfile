@@ -292,12 +292,12 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_env python_env
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/scripts/tests/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 # PIP requires MASON package compilation, which seems to require a JDK
 RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get install -fy openjdk-8-jdk
 
-RUN pip install --no-cache-dir python_lib/controller/python/chip*.whl
+RUN pip install --break-system-packages --no-cache-dir python_lib/controller/python/chip*.whl
