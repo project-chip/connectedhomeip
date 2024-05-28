@@ -1437,29 +1437,29 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
 
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
-    XCTestExpectation * gotClusterDataPersisted = nil;
-    if (!disableStorageBehaviorOptimization) {
-        gotClusterDataPersisted = [self expectationWithDescription:@"Cluster data persisted"];
-    }
 
     delegate.onReportEnd = ^{
         [subscriptionExpectation fulfill];
     };
-    delegate.onClusterDataPersisted = ^{
-        [gotClusterDataPersisted fulfill];
+
+    __block BOOL onDeviceCachePrimedCalled = NO;
+    delegate.onDeviceCachePrimed = ^{
+        onDeviceCachePrimedCalled = YES;
     };
 
     // Verify that initially (before we have ever subscribed while using this
     // datastore) the device has no estimate for subscription latency.
     XCTAssertNil(device.estimatedSubscriptionLatency);
 
+    // And that the device cache is not primed.
+    XCTAssertFalse(device.deviceCachePrimed);
+
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
-    if (!disableStorageBehaviorOptimization) {
-        [self waitForExpectations:@[ gotClusterDataPersisted ] timeout:60];
-    }
+    XCTAssertTrue(device.deviceCachePrimed);
+    XCTAssertTrue(onDeviceCachePrimedCalled);
 
     NSUInteger dataStoreValuesCount = 0;
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
@@ -1498,6 +1498,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // Check that the new device has an estimated subscription latency.
     XCTAssertNotNil(device.estimatedSubscriptionLatency);
 
+    // And that it's already primed.
+    XCTAssertTrue(device.deviceCachePrimed);
+
     // Check that this estimate is positive, since subscribing must have taken
     // some time.
     XCTAssertGreaterThan(device.estimatedSubscriptionLatency.doubleValue, 0);
@@ -1518,6 +1521,11 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         [newDeviceGotClusterDataPersisted fulfill];
     };
 
+    __block BOOL newOnDeviceCachePrimedCalled = NO;
+    newDelegate.onDeviceCachePrimed = ^{
+        newOnDeviceCachePrimedCalled = YES;
+    };
+
     [newDevice setDelegate:newDelegate queue:queue];
 
     [self waitForExpectations:@[ newDeviceSubscriptionExpectation ] timeout:60];
@@ -1525,6 +1533,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         [self waitForExpectations:@[ newDeviceGotClusterDataPersisted ] timeout:60];
     }
     newDelegate.onReportEnd = nil;
+
+    XCTAssertFalse(newOnDeviceCachePrimedCalled);
 
     // 1) MTRDevice actually gets some attributes reported more than once
     // 2) Some attributes do change on resubscribe
