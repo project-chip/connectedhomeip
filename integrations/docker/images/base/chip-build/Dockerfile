@@ -41,7 +41,7 @@ RUN set -x \
     cmake \
     curl \
     flex \
-    g++-10 \
+    g++ \
     generate-ninja \
     git \
     git-lfs \
