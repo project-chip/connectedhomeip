@@ -38,9 +38,6 @@ struct ChipBleUUID
     uint8_t bytes[16];
 };
 
-// UUID of CHIP BLE service. Exposed for use in scan filter.
-extern const ChipBleUUID CHIP_BLE_SVC_ID;
-
 namespace {
 constexpr bool isValidHexChar(char c)
 {
@@ -93,18 +90,24 @@ constexpr std::pair<bool, ChipBleUUID> StringToUUID(const char (&str)[N])
 }
 
 #define StringToUUIDConstexpr(str)                                                                                                 \
-    [&]() {                                                                                                                        \
-        constexpr std::pair<bool, ChipBleUUID> res = StringToUUID(str);                                                            \
+    []() {                                                                                                                         \
+        constexpr std::pair<bool, ::chip::Ble::ChipBleUUID> res = ::chip::Ble::StringToUUID(str);                                  \
         static_assert(res.first, "Argument: \"" #str "\" is not valid hex string");                                                \
         return res.second;                                                                                                         \
     }();
 
-#define StringToUUIDConstexprGlobal(str)                                                                                           \
-    []() {                                                                                                                         \
-        constexpr std::pair<bool, ChipBleUUID> res = StringToUUID(str);                                                            \
-        static_assert(res.first, "Argument: \"" #str "\" is not valid hex string");                                                \
-        return res.second;                                                                                                         \
-    }();
+// UUID of CHIP BLE service. Exposed for use in scan filter.
+
+inline constexpr char CHIP_BLE_DESC_SHORT_UUID_STR[]    = "2902";
+inline constexpr char CHIP_BLE_SERVICE_SHORT_UUID_STR[] = "FFF6";
+inline constexpr char CHIP_BLE_SERVICE_LONG_UUID_STR[]  = "0000FFF6-0000-1000-8000-00805F9B34FB";
+inline constexpr char CHIP_BLE_CHAR_1_UUID_STR[]        = "18EE2EF5-263D-4559-959F-4F9C429F9D11";
+inline constexpr char CHIP_BLE_CHAR_2_UUID_STR[]        = "18EE2EF5-263D-4559-959F-4F9C429F9D12";
+inline constexpr char CHIP_BLE_CHAR_3_UUID_STR[]        = "64630238-8772-45F2-B87D-748A83218F04";
+inline constexpr ChipBleUUID CHIP_BLE_SVC_ID            = StringToUUIDConstexpr("0000FFF6-0000-1000-8000-00805F9B34FB");
+inline constexpr ChipBleUUID CHIP_BLE_CHAR_1_UUID       = StringToUUIDConstexpr("18EE2EF5-263D-4559-959F-4F9C429F9D11");
+inline constexpr ChipBleUUID CHIP_BLE_CHAR_2_UUID       = StringToUUIDConstexpr("18EE2EF5-263D-4559-959F-4F9C429F9D12");
+inline constexpr ChipBleUUID CHIP_BLE_CHAR_3_UUID       = StringToUUIDConstexpr("64630238-8772-45F2-B87D-748A83218F04");
 
 } /* namespace Ble */
 } /* namespace chip */

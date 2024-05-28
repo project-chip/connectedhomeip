@@ -26,10 +26,6 @@
 namespace chip {
 namespace Ble {
 
-const ChipBleUUID CHIP_BLE_SVC_ID = { { // 0000FFF6-0000-1000-8000-00805F9B34FB
-                                        0x00, 0x00, 0xFF, 0xF6, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34,
-                                        0xFB } };
-
 bool UUIDsMatch(const ChipBleUUID * idOne, const ChipBleUUID * idTwo)
 {
     if ((idOne == nullptr) || (idTwo == nullptr))
