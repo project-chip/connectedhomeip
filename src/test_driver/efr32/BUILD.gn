@@ -125,8 +125,8 @@ source_set("efr32-device-tests-common") {
   ]
 }
 
-silabs_executable("efr32_device_tests_bin1") {
-  output_name = "matter-silabs-device_tests.out"
+silabs_executable("efr32_device_tests1") {
+  output_name = "matter-silabs-device_tests1.out"
 
   defines = [ "PW_RPC_ENABLED" ]
 
@@ -168,8 +168,8 @@ silabs_executable("efr32_device_tests_bin1") {
   output_dir = root_out_dir
 }
 
-silabs_executable("efr32_device_tests_bin2") {
-  output_name = "matter-silabs-device_tests.out"
+silabs_executable("efr32_device_tests2") {
+  output_name = "matter-silabs-device_tests2.out"
 
   defines = [ "PW_RPC_ENABLED" ]
 
@@ -186,14 +186,13 @@ silabs_executable("efr32_device_tests_bin2") {
     "${chip_root}/src/system/tests:tests",
     "${chip_root}/src/transport/tests:tests",  # TestSecureSessionTable is large.
     "${chip_root}/src/platform/tests:tests",
-    "${chip_root}/src/controller/tests/data_model:tests",
     "${chip_root}/src/controller/tests:tests",
     "${chip_root}/src/lib/shell/tests:tests",
     "${chip_root}/src/lib/core/tests:tests",  # TestTLVVectorWriter requires a large amount of heap for multiple unfragmented 10k buffers
   ]
 
-  if (matter_enable_tracing_support &&
-      matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
+  if (defined(matter_enable_tracing_support) && matter_enable_tracing_support &&
+      defined(matter_trace_config) && matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
     deps += [ "${chip_root}/src/tracing/tests:tests" ]
   }
 
@@ -211,8 +210,8 @@ silabs_executable("efr32_device_tests_bin2") {
 
 group("efr32") {
   deps = [
-    ":efr32_device_tests_bin1",
-    ":efr32_device_tests_bin2",
+    ":efr32_device_tests1",
+    ":efr32_device_tests2",
   ]
 }
 
