@@ -174,7 +174,7 @@ RUN case ${TARGETPLATFORM} in \
     && git clone --depth=1 --branch=$GLIB_VERSION https://github.com/GNOME/glib.git \
     && CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib -Dtests=false \
     && DESTDIR=../build-image ninja -C glib/build install \
-    && mv glib/build-image/usr/local/lib/x86_64-linux-gnu/lib* $LD_LIBRARY_PATH_TSAN \
+    && mv glib/build-image/usr/local/lib64/lib* $LD_LIBRARY_PATH_TSAN \
     && rm -rf glib \
     ;; \
     "linux/arm64") \
