@@ -2,9 +2,6 @@
 FROM ubuntu:24.04
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
-# ARG NINJA_VERSION=v1.11.1
-ARG GN_HASH=5a004f9427a050c6c393c07ddb85cba8ff3849fa
-
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \

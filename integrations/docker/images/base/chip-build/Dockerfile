@@ -29,7 +29,7 @@ RUN case ${TARGETPLATFORM} in \
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing --no-install-recommends \
     autoconf \
     automake \
     bison \
@@ -200,10 +200,3 @@ RUN case ${TARGETPLATFORM} in \
 # Protoc goes from 108M to 4.6M
 RUN strip /usr/local/bin/protoc*
 
-# Cleanup unused bits
-RUN set -x \
-    && DEBIAN_FRONTEND=noninteractive apt-get remove -fy --fix-missing \
-    python3-scipy \
-    libllvm17t64 \
-    && DEBIAN_FRONTEND=noninteractive apt-get autoremove -fy --fix-missing \
-    && : # last line
