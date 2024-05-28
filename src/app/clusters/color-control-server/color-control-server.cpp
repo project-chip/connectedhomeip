@@ -35,31 +35,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ColorControl;
 using chip::Protocols::InteractionModel::Status;
 
-// These constants are NOT currently spec compliant
-// These should be changed once we have real specification enumeration
-// names.
-// namespace chip {
-// namespace app {
-// namespace Clusters {
-// namespace ColorControl {
-
-// namespace EnhancedColorMode {
-// constexpr uint8_t kCurrentHueAndCurrentSaturation = ColorControlServer::EnhancedColorMode::kCurrentHueAndCurrentSaturation;
-// constexpr uint8_t kCurrentXAndCurrentY            = ColorControlServer::EnhancedColorMode::kCurrentXAndCurrentY;
-// constexpr uint8_t kColorTemperature               = ColorControlServer::EnhancedColorMode::kColorTemperature;
-// constexpr uint8_t kEnhancedCurrentHueAndCurrentSaturation =
-//     ColorControlServer::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation;
-// } // namespace EnhancedColorMode
-
-// namespace Options {
-// constexpr uint8_t kExecuteIfOff = 1;
-// } // namespace Options
-
-// } // namespace ColorControl
-// } // namespace Clusters
-// } // namespace app
-// } // namespace chip
-
 #if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
