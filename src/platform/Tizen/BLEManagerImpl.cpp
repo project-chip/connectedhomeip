@@ -1135,21 +1135,20 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         }
         break;
     case DeviceEventType::kPlatformTizenBLEWriteComplete: {
-        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &Ble::CHIP_BLE_SVC_ID,
-                                &Ble::CHIP_BLE_CHAR_1_UUID);
+        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID);
         break;
     }
     case DeviceEventType::kPlatformTizenBLESubscribeOpComplete: {
         if (apEvent->Platform.BLESubscribeOpComplete.mIsSubscribed)
-            HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &chip::Ble::CHIP_BLE_SVC_ID,
+            HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &Ble::CHIP_BLE_SVC_ID,
                                     &chip::Ble::CHIP_BLE_CHAR_2_UUID);
         else
-            HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &chip::Ble::CHIP_BLE_SVC_ID,
+            HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &Ble::CHIP_BLE_SVC_ID,
                                       &chip::Ble::CHIP_BLE_CHAR_2_UUID);
         break;
     }
     case DeviceEventType::kPlatformTizenBLEIndicationReceived: {
-        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &chip::Ble::CHIP_BLE_SVC_ID,
+        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &Ble::CHIP_BLE_SVC_ID,
                                  &chip::Ble::CHIP_BLE_CHAR_2_UUID,
                                  System::PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
@@ -1166,24 +1165,24 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kCHIPoBLESubscribe:
         ChipLogProgress(DeviceLayer, "CHIPoBLESubscribe");
 
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &chip::Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         NotifyBLEConnectionEstablished(event->CHIPoBLESubscribe.ConId, CHIP_NO_ERROR);
         break;
     case DeviceEventType::kCHIPoBLEUnsubscribe:
         ChipLogProgress(DeviceLayer, "CHIPoBLEUnsubscribe");
 
-        HandleUnsubscribeReceived(event->CHIPoBLESubscribe.ConId, &chip::Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
+        HandleUnsubscribeReceived(event->CHIPoBLESubscribe.ConId, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
     case DeviceEventType::kCHIPoBLEWriteReceived:
         ChipLogProgress(DeviceLayer, "CHIPoBLEWriteReceived");
 
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &chip::Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             System::PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         ChipLogProgress(DeviceLayer, "CHIPoBLEIndicateConfirm");
 
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &chip::Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
     case DeviceEventType::kCHIPoBLEConnectionError:
         ChipLogProgress(DeviceLayer, "CHIPoBLEConnectionError");
@@ -1239,7 +1238,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     ChipLogProgress(DeviceLayer, "UnSubscribeCharacteristic");
 
     VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
-    VerifyOrExit(Ble::UUIDsMatch(svcId, &chip::Ble::CHIP_BLE_SVC_ID),
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &cBle::CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "UnSubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
                  ChipLogError(DeviceLayer, "UnSubscribeCharacteristic() called with invalid characteristic ID"));
@@ -1320,7 +1319,7 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     ChipLogProgress(DeviceLayer, "SendWriteRequest");
 
     VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
-    VerifyOrExit(Ble::UUIDsMatch(svcId, &chip::Ble::CHIP_BLE_SVC_ID),
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_1_UUID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));

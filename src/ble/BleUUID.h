@@ -96,8 +96,7 @@ constexpr std::pair<bool, ChipBleUUID> StringToUUID(const char (&str)[N])
         return res.second;                                                                                                         \
     }();
 
-// UUID of CHIP BLE service. Exposed for use in scan filter.
-
+// UUID of CHIP BLE service.
 inline constexpr char CHIP_BLE_DESC_SHORT_UUID_STR[]    = "2902";
 inline constexpr char CHIP_BLE_SERVICE_SHORT_UUID_STR[] = "FFF6";
 inline constexpr char CHIP_BLE_SERVICE_LONG_UUID_STR[]  = "0000FFF6-0000-1000-8000-00805F9B34FB";
