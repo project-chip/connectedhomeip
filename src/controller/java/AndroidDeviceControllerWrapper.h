@@ -214,6 +214,10 @@ public:
 
     CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
 
+    void StartDnssd();
+
+    void StopDnssd();
+
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 

@@ -18,11 +18,10 @@
 
 #pragma once
 
-#include "../common/CHIPCommand.h"
+#include <commands/common/CHIPCommand.h>
+#include <commands/common/CredentialIssuerCommands.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
-
-#include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 

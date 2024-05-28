@@ -70,6 +70,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/../common/clusters/low-power/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/media-input/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/media-playback/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/switch/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/target-navigator/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/wake-on-lan/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
