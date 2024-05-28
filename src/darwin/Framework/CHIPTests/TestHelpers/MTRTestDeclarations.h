@@ -47,9 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice (Test)
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
-- (MTRDeviceClusterData *)_getPersistedClusterDataForPath:(MTRClusterPath *)path;
-- (NSMutableSet<MTRClusterPath *> *)_getPersistedClusters;
-- (BOOL)_persistedClusterContains:(MTRClusterPath *)path;
+- (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path;
+- (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path;
+- (NSDictionary *)_dataValueWithoutDataVersion:(NSDictionary *)attributeValue;
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(NSDictionary *)dataDictionary;
 @end
 
