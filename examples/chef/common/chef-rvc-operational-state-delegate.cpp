@@ -28,8 +28,8 @@ using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
 using chip::Protocols::InteractionModel::Status;
 
-static RvcOperationalState::Instance * gRvcOperationalStateInstance = nullptr;
-static RvcOperationalStateDelegate * gRvcOperationalStateDelegate   = nullptr;
+static std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
+static std::unique_ptr<RvcOperationalState::Instance > gRvcOperationalStateInstance;
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data);
 
@@ -141,7 +141,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 {
     RvcOperationalStateDelegate * delegate = reinterpret_cast<RvcOperationalStateDelegate *>(data);
 
-    OperationalState::Instance * instance = gRvcOperationalStateInstance;
+    OperationalState::Instance * instance = gRvcOperationalStateInstance.get();
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
 
@@ -171,16 +171,8 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
 void RvcOperationalState::Shutdown()
 {
-    if (gRvcOperationalStateInstance != nullptr)
-    {
-        delete gRvcOperationalStateInstance;
-        gRvcOperationalStateInstance = nullptr;
-    }
-    if (gRvcOperationalStateDelegate != nullptr)
-    {
-        delete gRvcOperationalStateDelegate;
-        gRvcOperationalStateDelegate = nullptr;
-    }
+    gRvcOperationalStateInstance.reset();
+    gRvcOperationalStateDelegate.reset();
 }
 
 chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(chip::EndpointId endpointId,
@@ -261,13 +253,10 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(ch
 void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcOperationalStateInstance == nullptr && gRvcOperationalStateDelegate == nullptr);
+    VerifyOrDie(!gRvcOperationalStateDelegate && !gRvcOperationalStateInstance);
 
-    gRvcOperationalStateDelegate        = new chip::app::Clusters::RvcOperationalState::RvcOperationalStateDelegate();
-    EndpointId operationalStateEndpoint = 0x01;
-    gRvcOperationalStateInstance        = new RvcOperationalState::Instance(gRvcOperationalStateDelegate, operationalStateEndpoint);
-
-    gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    gRvcOperationalStateDelegate = std::make_unique<RvcOperationalStateDelegate>();
+    gRvcOperationalStateInstance = std::make_unique<RvcOperationalState::Instance>(gRvcOperationalStateDelegate.get(), endpointId);
     gRvcOperationalStateInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
