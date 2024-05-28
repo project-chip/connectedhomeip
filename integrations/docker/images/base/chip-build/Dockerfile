@@ -126,7 +126,7 @@ RUN set -x \
     && mkdir -p bloaty/build \
     && cd bloaty/build \
     && cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../ \
-    && make -j8 \
+    && make -j$(nproc) \
     && strip bloaty \
     && make install \
     && cd ../.. \
@@ -143,7 +143,7 @@ RUN set -x \
     && mkdir -p include-what-you-use/build \
     && cd include-what-you-use/build \
     && cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/lib/llvm-18 -DIWYU_LINK_CLANG_DYLIB=OFF .. \
-    && make -j8 \
+    && make -j$(nproc) \
     && strip bin/include-what-you-use \
     && make install \
     # Save clang-18 files, so we can restore them after build dependencies cleanup
