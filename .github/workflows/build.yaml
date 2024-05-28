@@ -333,7 +333,7 @@ jobs:
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
                   pip3 install -r src/setup_payload/python/requirements.txt
-                  python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool
+                  python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
