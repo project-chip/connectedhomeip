@@ -15,8 +15,8 @@
 #    limitations under the License.
 #
 
-from typing import Callable
 import xml.etree.ElementTree as ElementTree
+from typing import Callable
 
 from conformance_support import (ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated, disallowed,
                                  mandatory, optional, parse_basic_callable_from_xml, parse_callable_from_xml,
