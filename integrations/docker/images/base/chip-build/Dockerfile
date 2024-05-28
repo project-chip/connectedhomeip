@@ -204,6 +204,5 @@ RUN strip /usr/local/bin/protoc*
 RUN set -x \
     && DEBIAN_FRONTEND=noninteractive apt-get remove -fy --fix-missing \
     python3-scipy \
-    libllvm17t64 \
     && DEBIAN_FRONTEND=noninteractive apt-get autoremove -fy --fix-missing \
     && : # last line
