@@ -3653,35 +3653,40 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 #pragma mark Log Help
 
-- (NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath {
+- (NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath
+{
     auto * cachedData = [self _cachedAttributeValueForPath:attributePath];
 
     auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
         MTRAttributePathKey : attributePath,
         MTRDataKey : cachedData,
-    } error:nil];
+    }
+                                                                    error:nil];
     // REVIEWERS:  is it worth logging the `error` above?
 
     return attrReport.value;
 }
 
-- (NSNumber *)_informationalVendorID {
+- (NSNumber *)_informationalVendorID
+{
     auto * vendorIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
-                                                                          clusterID:@(MTRClusterIDTypeBasicInformationID)
-                                                                        attributeID:@(MTRClusterBasicAttributeVendorIDID)];
+                                                              clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                            attributeID:@(MTRClusterBasicAttributeVendorIDID)];
 
     return [self _informationalNumberAtAttributePath:vendorIDPath];
 }
 
-- (NSNumber *)_informationalProductID {
+- (NSNumber *)_informationalProductID
+{
     auto * productIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
-                                                                          clusterID:@(MTRClusterIDTypeBasicInformationID)
-                                                                        attributeID:@(MTRClusterBasicAttributeProductIDID)];
+                                                               clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                             attributeID:@(MTRClusterBasicAttributeProductIDID)];
 
     return [self _informationalNumberAtAttributePath:productIDPath];
 }
 
-- (void)_addInformationalAttributesToCurrentMetricScope {
+- (void)_addInformationalAttributesToCurrentMetricScope
+{
     using namespace chip::Tracing::DarwinFramework;
     MATTER_LOG_METRIC(kMetricDeviceVendorID, [self _informationalVendorID].unsignedShortValue);
     MATTER_LOG_METRIC(kMetricDeviceProductID, [self _informationalProductID].unsignedShortValue);
