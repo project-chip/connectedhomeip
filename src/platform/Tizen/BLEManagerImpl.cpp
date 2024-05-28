@@ -1238,7 +1238,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     ChipLogProgress(DeviceLayer, "UnSubscribeCharacteristic");
 
     VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
-    VerifyOrExit(Ble::UUIDsMatch(svcId, &cBle::CHIP_BLE_SVC_ID),
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "UnSubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
                  ChipLogError(DeviceLayer, "UnSubscribeCharacteristic() called with invalid characteristic ID"));
