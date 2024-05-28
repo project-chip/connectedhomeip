@@ -55,6 +55,7 @@ tests:
     - label: "Read an attribute again"
       command: "readAttribute"
       attribute: "DataModelRevision"
+      timeout: 20
       response:
           error: FAILURE
 
