@@ -475,6 +475,7 @@ static NSString * sAttributeCacheEndpointIndexKeyPrefix = @"attrCacheEndpointInd
         return NO;
     }
 
+
     return [self _removeAttributeCacheValueForKey:[self _endpointIndexKeyForNodeID:nodeID]];
 }
 
@@ -559,6 +560,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         MTR_LOG_ERROR("%s: unexpected nil input", __func__);
         return NO;
     }
+
     return [self _removeAttributeCacheValueForKey:[self _clusterDataKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID]];
 }
 
@@ -749,7 +751,11 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     for (NSNumber * attribute in attributes) {
         [clusterData removeValueForAttribute:attribute];
     }
-    [self _storeClusterData:clusterData forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
+    BOOL success = [self _storeClusterData:clusterData forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
+    if (!success) {
+        MTR_LOG_ERROR("removeAttributes: _storeClusterData failed for node 0x%016llX endpoint %u", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue);
+    }
+    MTR_LOG("removeAttributes: Deleted attributes %@ from endpoint %u cluster 0x%08lX for node 0x%016llX successfully", attributes, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue, nodeID.unsignedLongLongValue);
 }
 
 - (void)clearAllStoredClusterData

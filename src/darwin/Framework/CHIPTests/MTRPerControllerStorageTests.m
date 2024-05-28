@@ -2398,6 +2398,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         // just checking data storage should suffice here.
         dispatch_sync(self->_storageQueue, ^{
             XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+
             // Populate the initialClusterIndex to use as a reference for all cluster paths later.
             for (NSNumber * endpoint in testEndpoints) {
                 [initialClusterIndex setObject:[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:endpoint] forKey:endpoint];
@@ -2420,7 +2421,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // Inject a fake attribute report deleting endpoint 2 from the parts list at the root endpoint.
     dataVersionForPartsList = [NSNumber numberWithUnsignedLongLong:(dataVersionForPartsList.unsignedLongLongValue + 1)];
 
-    // Delete the last endpoint from the attribute value in parts list.
+    // Delete endpoint 2 from the attribute value in parts list.
     NSNumber * toBeDeletedEndpoint = @2;
     __block id endpointData =
         @{
@@ -2450,7 +2451,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
             MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
             XCTAssertNotNil(attributePath);
-            // Get the new updated parts list value to get the test endpoints.
+
+            // Get the new updated parts list value to get the new test endpoints.
             if ([attributePath.endpoint isEqualToNumber:rootEndpoint] && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributePartsListID) {
                 testDataForPartsList = attributeDict[MTRDataKey];
                 XCTAssertNotNil(testDataForPartsList);
@@ -2466,7 +2468,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         XCTAssertNotNil(testClusterDataValueForPartsList);
         testEndpoints = [self getEndpointArrayFromPartsList:testDataForPartsList forDevice:device];
 
-        // Make sure that the cluster data in the data storage for the cluster for endpoints 0 and 1 are present but not for endpoint 2.
+        // Make sure that the cluster data in the data storage for endpoints 0 and 1 are present but not for endpoint 2.
         // We do not need to check _persistedClusterData here. _persistedClusterData will be paged in from storage when needed so
         // just checking data storage should suffice here.
         dispatch_sync(self->_storageQueue, ^{
@@ -2518,11 +2520,10 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     // This test will do the following -
     // 1. Get the data version and attribute value of the server list for endpoint 1 to inject a fake report. The attribute report will delete cluster ID - MTRClusterIDTypeIdentifyID.
-    //    That should cause the cluster to be removed from cluster index and cluster data for that cluster to be removed from data storage.
-    // 2. The data store is populated with MTRClusterIDTypeIdentifyID in the cluster index and cluster data initially.
-    //    Also _persistedClusters and _persistedClusterData has the cluster path and cluster data for cluster ID - MTRClusterIDTypeIdentifyID.
+    //    That should cause the cluster to be removed from cluster index for endpoint 1 and the cluster data for the removed cluster should be cleared from data storage.
+    // 2. The data store is populated with MTRClusterIDTypeIdentifyID in the cluster index and cluster data for endpoint 1 initially.
     // 3. After the fake attribute report is injected with deleted cluster ID - MTRClusterIDTypeIdentifyID, make sure the data store is still populated with cluster index and
-    //    cluster data for other clusters at endpoint 1 but not the deleted cluster.
+    //    cluster data for all other clusters at endpoint 1 but not the deleted cluster.
     __block NSMutableArray * testClusterDataValue;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
         attributeReportsReceived += attributeReport.count;
@@ -2558,7 +2559,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         XCTAssertNotNil(testClusterDataValue);
 
         // Make sure that the cluster data in the data storage has cluster ID - MTRClusterIDTypeIdentifyID in the cluster index for endpoint 1
-        // and cluster data for MTRClusterIDTypeIdentifyID exists
+        // and cluster data for MTRClusterIDTypeIdentifyID exists.
         // We do not need to check _persistedClusterData here. _persistedClusterData will be paged in from storage when needed so
         // just checking data storage should suffice here.
         dispatch_sync(self->_storageQueue, ^{
@@ -2597,6 +2598,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     };
 
     delegate.onReportEnd = ^{
+
         // Make sure that the cluster data does not have cluster ID - MTRClusterIDTypeIdentifyID in the cluster index for endpoint 1
         // and cluster data for MTRClusterIDTypeIdentifyID is nil.
         // We do not need to check _persistedClusterData here. _persistedClusterData will be paged in from storage when needed so
@@ -2648,9 +2650,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     __block NSMutableArray * testClusterDataValue;
 
     // This test will do the following -
-    // 1. Get the data version and attribute value of the attribute list for endpoint 1 to inject a fake report with attribute 1 removed.
+    // 1. Get the data version and attribute value of the attribute list for endpoint 1 to inject a fake report with attribute 1 removed from MTRClusterIDTypeIdentifyID.
     // 2. The data store is populated with cluster data for MTRClusterIDTypeIdentifyID cluster and has all attributes including attribute 1.
-    // 3. After the fake attribute report is injected, make sure the data store is populated with cluster data for MTRClusterIDTypeIdentifyID
+    // 3. After the fake attribute report is injected, make sure the data store is populated with cluster data for all attributes in MTRClusterIDTypeIdentifyID
     //    cluster except for attribute 1 which has been deleted.
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
         attributeReportsReceived += attributeReport.count;
@@ -2685,7 +2687,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
                 // Make sure that the cluster data in the data storage is populated with cluster data for MTRClusterIDTypeIdentifyID cluster
                 // and has all attributes including attribute 1.
-                // We will be paged in the cluster data from storage to check the above.
+                // We will page in the cluster data from storage to check the above.
                 MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:testEndpoint clusterID:cluster];
 
                 if ([cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)]) {
@@ -2735,9 +2737,10 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     };
 
     delegate.onReportEnd = ^{
+
         // Make sure that the cluster data in the data storage is populated with cluster data for MTRClusterIDTypeIdentifyID cluster
         // and has all attributes except attribute 1 which was deleted.
-        // We will be paged in the cluster data from storage to check the above.
+        // We will page in the cluster data from storage to check the above.
         dispatch_sync(self->_storageQueue, ^{
             initialClusterIndex = [[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint] mutableCopy];
             XCTAssertNotNil(initialClusterIndex);
