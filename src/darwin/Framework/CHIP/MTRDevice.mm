@@ -3063,8 +3063,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:clusterPathToRemoveAttributesFrom.endpoint clusterID:clusterPathToRemoveAttributesFrom.cluster];
 }
 
-- (void) _pruneOrphanedEndpoints:(NSDictionary *)previousPartsListValue
-            newPartsListValue:(NSDictionary *)newPartsListValue
+- (void)_pruneOrphanedEndpoints:(NSDictionary *)previousPartsListValue
+              newPartsListValue:(NSDictionary *)newPartsListValue
 {
     // If the parts list changed and one or more endpoints were removed, remove all the clusters in _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those endpoints.
     // Also remove it from the data store.
@@ -3084,9 +3084,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 }
 
-- (void) _pruneOrphanedClusters:(MTRAttributePath *)attributePath
-        previousServerListValue:(NSDictionary *)previousServerListValue
-             newServerListValue:(NSDictionary *)newServerListValue
+- (void)_pruneOrphanedClusters:(MTRAttributePath *)attributePath
+       previousServerListValue:(NSDictionary *)previousServerListValue
+            newServerListValue:(NSDictionary *)newServerListValue
 {
     // If the server list changed and clusters were removed, remove the clusters from the _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those clusters.
     // Also remove it from the data store.
@@ -3105,8 +3105,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self _removeClusters:[clusterPathsToRemove copy]];
 }
 
-- (void) _pruneOrphanedAttributes:(MTRAttributePath *)attributePath
-            newAttributeListValue:(NSDictionary *)newAttributeListValue
+- (void)_pruneOrphanedAttributes:(MTRAttributePath *)attributePath
+           newAttributeListValue:(NSDictionary *)newAttributeListValue
 {
     // If the attribute list changed and attributes were removed, remove the attributes from the _clusterDataToPersist for that cluster and endpoint.
     // Clear out the _peristedClusterData and data store cluster data. Update the data storage with updated cluster data.
@@ -3124,8 +3124,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self _removeAttributes:[toBeRemovedAttributes copy] fromCluster:clusterPathToRemoveAttributesFrom];
     [self.deviceController.controllerDataStore removeAttributes:[toBeRemovedAttributes copy] fromCluster:clusterPathToRemoveAttributesFrom forNodeID:self.nodeID];
 }
-
-
 
 - (void)_pruneOrphanedEndpointsAndClusters:(MTRAttributePath *)attributePath
                              previousValue:(NSDictionary *)previousValue
