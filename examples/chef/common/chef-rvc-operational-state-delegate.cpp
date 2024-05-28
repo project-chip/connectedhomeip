@@ -29,7 +29,7 @@ using namespace chip::app::Clusters::RvcOperationalState;
 using chip::Protocols::InteractionModel::Status;
 
 static std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
-static std::unique_ptr<RvcOperationalState::Instance > gRvcOperationalStateInstance;
+static std::unique_ptr<RvcOperationalState::Instance> gRvcOperationalStateInstance;
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data);
 
