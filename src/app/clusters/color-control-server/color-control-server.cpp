@@ -38,27 +38,27 @@ using chip::Protocols::InteractionModel::Status;
 // These constants are NOT currently spec compliant
 // These should be changed once we have real specification enumeration
 // names.
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ColorControl {
+// namespace chip {
+// namespace app {
+// namespace Clusters {
+// namespace ColorControl {
 
-namespace EnhancedColorMode {
-constexpr uint8_t kCurrentHueAndCurrentSaturation = ColorControlServer::EnhancedColorMode::kCurrentHueAndCurrentSaturation;
-constexpr uint8_t kCurrentXAndCurrentY            = ColorControlServer::EnhancedColorMode::kCurrentXAndCurrentY;
-constexpr uint8_t kColorTemperature               = ColorControlServer::EnhancedColorMode::kColorTemperature;
-constexpr uint8_t kEnhancedCurrentHueAndCurrentSaturation =
-    ColorControlServer::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation;
-} // namespace EnhancedColorMode
+// namespace EnhancedColorMode {
+// constexpr uint8_t kCurrentHueAndCurrentSaturation = ColorControlServer::EnhancedColorMode::kCurrentHueAndCurrentSaturation;
+// constexpr uint8_t kCurrentXAndCurrentY            = ColorControlServer::EnhancedColorMode::kCurrentXAndCurrentY;
+// constexpr uint8_t kColorTemperature               = ColorControlServer::EnhancedColorMode::kColorTemperature;
+// constexpr uint8_t kEnhancedCurrentHueAndCurrentSaturation =
+//     ColorControlServer::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation;
+// } // namespace EnhancedColorMode
 
-namespace Options {
-constexpr uint8_t kExecuteIfOff = 1;
-} // namespace Options
+// namespace Options {
+// constexpr uint8_t kExecuteIfOff = 1;
+// } // namespace Options
 
-} // namespace ColorControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+// } // namespace ColorControl
+// } // namespace Clusters
+// } // namespace app
+// } // namespace chip
 
 #if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
@@ -174,12 +174,12 @@ public:
             AddAttributeValuePair<uint16_t>(pairs, Attributes::ColorTemperatureMireds::Id, temperatureValue, attributeCount);
         }
 
-        uint8_t modeValue;
+        ColorControl::EnhancedColorMode modeValue;
         if (Status::Success != Attributes::EnhancedColorMode::Get(endpoint, &modeValue))
         {
             modeValue = ColorControl::EnhancedColorMode::kCurrentXAndCurrentY; // Default mode value according to spec
         }
-        AddAttributeValuePair<uint8_t>(pairs, Attributes::EnhancedColorMode::Id, modeValue, attributeCount);
+        AddAttributeValuePair(pairs, Attributes::EnhancedColorMode::Id, to_underlying(modeValue), attributeCount);
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs, attributeCount);
 
@@ -226,7 +226,7 @@ public:
 #endif
 
         // Initialize action attributes to default values in case they are not in the scene
-        uint8_t targetColorMode    = 0x00;
+        ColorControl::EnhancedColorMode targetColorMode = ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation;
         uint8_t loopActiveValue    = 0x00;
         uint8_t loopDirectionValue = 0x00;
         uint16_t loopTimeValue     = 0x0019; // Default loop time value according to spec
@@ -293,7 +293,7 @@ public:
                 if (decodePair.valueUnsigned8.Value() <=
                     static_cast<uint8_t>(ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
                 {
-                    targetColorMode = decodePair.valueUnsigned8.Value();
+                    targetColorMode =static_cast<ColorControl::EnhancedColorMode>(decodePair.valueUnsigned8.Value());
                 }
                 break;
             default:
@@ -361,7 +361,7 @@ public:
     }
 
 private:
-    bool SupportsColorMode(EndpointId endpoint, uint8_t mode)
+    bool SupportsColorMode(EndpointId endpoint, ColorControl::EnhancedColorMode mode)
     {
         switch (mode)
         {
@@ -549,7 +549,7 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
         return true;
     }
 
-    uint8_t options = 0x00;
+    chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions> options = 0x00;
     Attributes::Options::Get(endpoint, &options);
 
     bool on = true;
@@ -581,18 +581,18 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
         // 0xFF are the default values passed to the command handler when
         // the payload is not present - in that case there is use of option
         // attribute to decide execution of the command
-        return READBITS(options, ColorControl::Options::kExecuteIfOff);
+        return options.GetField(ColorControl::ColorControlOptions::kExecuteIfOff);
     }
     // ---------- The above is to distinguish if the payload is present or not
 
-    if (READBITS(optionMask, ColorControl::Options::kExecuteIfOff))
+    if (READBITS(optionMask, static_cast<uint8_t>(ColorControl::ColorControlOptions::kExecuteIfOff)))
     {
         // Mask is present and set in the command payload, this indicates
         // use the override as temporary option
-        return READBITS(optionOverride, ColorControl::Options::kExecuteIfOff);
+        return READBITS(optionOverride, static_cast<uint8_t>(ColorControl::ColorControlOptions::kExecuteIfOff));
     }
     // if we are here - use the option attribute bits
-    return (READBITS(options, ColorControl::Options::kExecuteIfOff));
+    return options.GetField(ColorControl::ColorControlOptions::kExecuteIfOff);
 }
 
 /**
@@ -606,14 +606,14 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
  * @param endpoint
  * @param newColorMode
  */
-void ColorControlServer::handleModeSwitch(EndpointId endpoint, uint8_t newColorMode)
+void ColorControlServer::handleModeSwitch(EndpointId endpoint,  ColorControl::EnhancedColorMode newColorMode)
 {
     uint8_t oldColorMode = 0;
     Attributes::ColorMode::Get(endpoint, &oldColorMode);
 
     uint8_t colorModeTransition;
 
-    if (oldColorMode == newColorMode)
+    if (oldColorMode == static_cast<uint8_t>(newColorMode))
     {
         return;
     }
@@ -625,9 +625,9 @@ void ColorControlServer::handleModeSwitch(EndpointId endpoint, uint8_t newColorM
         // EnhancedColorMode
         newColorMode = ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation;
     }
-    Attributes::ColorMode::Set(endpoint, newColorMode);
+    Attributes::ColorMode::Set(endpoint, static_cast<uint8_t>(newColorMode));
 
-    colorModeTransition = static_cast<uint8_t>((newColorMode << 4) + oldColorMode);
+    colorModeTransition = static_cast<uint8_t>((static_cast<uint8_t>(newColorMode) << 4) + static_cast<uint8_t>(oldColorMode));
 
     // Note:  It may be OK to not do anything here.
     switch (colorModeTransition)
@@ -1350,11 +1350,11 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
     // Handle color mode transition, if necessary.
     if (isEnhanced)
     {
-        handleModeSwitch(endpoint, EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation);
+        handleModeSwitch(endpoint, ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation);
     }
     else
     {
-        handleModeSwitch(endpoint, EnhancedColorMode::kCurrentHueAndCurrentSaturation);
+        handleModeSwitch(endpoint, ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation);
     }
 
     // now, kick off the state machine.
@@ -2293,7 +2293,7 @@ Status ColorControlServer::moveToColor(uint16_t colorX, uint16_t colorY, uint16_
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, EnhancedColorMode::kCurrentXAndCurrentY);
+    handleModeSwitch(endpoint, ColorControl::EnhancedColorMode::kCurrentXAndCurrentY);
 
     // now, kick off the state machine.
     Attributes::CurrentX::Get(endpoint, &(colorXTransitionState->initialValue));
@@ -2724,11 +2724,10 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                 if (status == Status::Success)
                 {
                     // Set ColorMode attributes to reflect ColorTemperature.
-                    uint8_t updateColorMode = ColorControl::EnhancedColorMode::kColorTemperature;
+                    uint8_t updateColorMode = static_cast<uint8_t>(ColorControl::EnhancedColorMode::kColorTemperature);
                     Attributes::ColorMode::Set(endpoint, updateColorMode);
 
-                    updateColorMode = ColorControl::EnhancedColorMode::kColorTemperature;
-                    Attributes::EnhancedColorMode::Set(endpoint, updateColorMode);
+                    Attributes::EnhancedColorMode::Set(endpoint, static_cast<ColorControl::EnhancedColorMode>(updateColorMode));
                 }
             }
         }
@@ -3061,7 +3060,7 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
     uint8_t colorMode = 0;
     Attributes::ColorMode::Get(endpoint, &colorMode);
 
-    if (colorMode == ColorControl::EnhancedColorMode::kColorTemperature)
+    if (static_cast<ColorControl::EnhancedColorMode>(colorMode) == ColorControl::EnhancedColorMode::kColorTemperature)
     {
         app::DataModel::Nullable<uint8_t> currentLevel;
         Status status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
