@@ -1605,7 +1605,8 @@ CHIP_ERROR EnergyEvseDelegate::SetNextChargeStartTime(DataModel::Nullable<uint32
         }
         else
         {
-            ChipLogDetail(AppServer, "NextChargeStartTime updated to %d", mNextChargeStartTime.Value());
+            ChipLogDetail(AppServer, "NextChargeStartTime updated to %lu",
+                          static_cast<unsigned long int>(mNextChargeStartTime.Value()));
         }
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeStartTime::Id);
     }
@@ -1629,7 +1630,8 @@ CHIP_ERROR EnergyEvseDelegate::SetNextChargeTargetTime(DataModel::Nullable<uint3
         }
         else
         {
-            ChipLogDetail(AppServer, "NextChargeTargetTime updated to %d", mNextChargeTargetTime.Value());
+            ChipLogDetail(AppServer, "NextChargeTargetTime updated to %lu",
+                          static_cast<unsigned long int>(mNextChargeTargetTime.Value()));
         }
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeTargetTime::Id);
     }
