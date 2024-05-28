@@ -110,7 +110,7 @@ source_set("efr32-device-tests-common") {
   deps += pw_build_LINK_DEPS
 
   #QUESTION: Does this belong in the source_set or in each silabs_executable, or both?
-  include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]in each 
+  include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
 
   #QUESTION: Does this belong in the source_set or in each silabs_executable, or both?
   ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
@@ -132,27 +132,28 @@ silabs_executable("efr32_device_tests_bin1") {
 
   deps = [
     ":efr32-device-tests-common",
-    "${chip_root}/src:tests_app_interaction-model",
-    "${chip_root}/src:tests_access",
-    "${chip_root}/src:tests_crypto",
-    "${chip_root}/src:tests_inet",
-    "${chip_root}/src:tests_lib_address_resolve",
-    "${chip_root}/src:tests_lib_asn1",
-    "${chip_root}/src:tests_messaging",
-    "${chip_root}/src:tests_protocols_bdx",
-    "${chip_root}/src:tests_protocols_interaction_model",
-    "${chip_root}/src:tests_protocols_user_directed_commissioning",
-    "${chip_root}/src:tests_transport_retransmit",
-    "${chip_root}/src:tests_app_icd_server",
-    "${chip_root}/src:tests_lib_dnssd_minimal_mdns_core",
-    "${chip_root}/src:tests_lib_dnssd_minimal_mdns_responders",
-    "${chip_root}/src:tests_lib_dnssd_minimal_mdns_records",
-    "${chip_root}/src:tests_lib_dnssd_minimal_mdns",
-    "${chip_root}/src:tests_lib_dnssd",
+
+    "${chip_root}/src/app/interaction-model/tests:tests",
+    "${chip_root}/src/access/tests:tests",
+    "${chip_root}/src/crypto/tests:tests",
+    "${chip_root}/src/inet/tests:tests",
+    "${chip_root}/src/lib/address_resolve/tests:tests",
+    "${chip_root}/src/lib/asn1/tests:tests",
+    "${chip_root}/src/messaging/tests:tests",
+    "${chip_root}/src/protocols/bdx/tests:tests",
+    "${chip_root}/src/protocols/interaction_model/tests:tests",
+    "${chip_root}/src/protocols/user_directed_commissioning/tests:tests",
+    "${chip_root}/src/transport/retransmit/tests:tests",
+    "${chip_root}/src/app/icd/server/tests:tests",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests:tests",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests:tests",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests:tests",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/tests:tests",
+    "${chip_root}/src/lib/dnssd/tests:tests",
   ]
 
   if (chip_config_network_layer_ble) {
-    deps += [ "${chip_root}/src:tests_ble" ]
+    deps += [ "${chip_root}/src/ble/tests:tests" ]
   }
 
   ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
@@ -174,25 +175,26 @@ silabs_executable("efr32_device_tests_bin2") {
 
   deps = [
     ":efr32-device-tests-common",
-    "${chip_root}/src:tests_setup_payload",
-    "${chip_root}/src:tests_transport_raw",
-    "${chip_root}/src:tests_app",
-    "${chip_root}/src:tests_credentials",
-    "${chip_root}/src:tests_lib_format",
-    "${chip_root}/src:tests_lib_support",
-    "${chip_root}/src:tests_protocols_secure_channel",
-    "${chip_root}/src:tests_system",
-    "${chip_root}/src:tests_transport",  # TestSecureSessionTable is large.
-    "${chip_root}/src:tests_platform",
-    "${chip_root}/src:tests_controller_data_model",
-    "${chip_root}/src:tests_controller",
-    "${chip_root}/src:tests_lib_shell",
-    "${chip_root}/src:tests_lib_core",  # TestTLVVectorWriter requires a large amount of heap for multiple unfragmented 10k buffers
+
+    "${chip_root}/src/setup_payload/tests:tests",
+    "${chip_root}/src/transport/raw/tests:tests",
+    "${chip_root}/src/app/tests:tests",
+    "${chip_root}/src/credentials/tests:tests",
+    "${chip_root}/src/lib/format/tests:tests",
+    "${chip_root}/src/lib/support/tests:tests",
+    "${chip_root}/src/protocols/secure_channel/tests:tests",
+    "${chip_root}/src/system/tests:tests",
+    "${chip_root}/src/transport/tests:tests",  # TestSecureSessionTable is large.
+    "${chip_root}/src/platform/tests:tests",
+    "${chip_root}/src/controller/tests/data_model:tests",
+    "${chip_root}/src/controller/tests:tests",
+    "${chip_root}/src/lib/shell/tests:tests",
+    "${chip_root}/src/lib/core/tests:tests",  # TestTLVVectorWriter requires a large amount of heap for multiple unfragmented 10k buffers
   ]
 
   if (matter_enable_tracing_support &&
       matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
-    deps += [ "${chip_root}/src:tests_tracing" ]
+    deps += [ "${chip_root}/src/tracing/tests:tests" ]
   }
 
   ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
@@ -208,8 +210,10 @@ silabs_executable("efr32_device_tests_bin2") {
 }
 
 group("efr32") {
-  deps = [ ":efr32_device_tests_bin1" ],
-  deps = [ ":efr32_device_tests_bin2" ],
+  deps = [
+    ":efr32_device_tests_bin1",
+    ":efr32_device_tests_bin2",
+  ]
 }
 
 group("runner") {
