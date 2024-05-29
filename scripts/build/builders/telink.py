@@ -229,15 +229,14 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
     def build_outputs(self):
-        return {
+        items = {
             '%s.elf' %
             self.app.AppNamePrefix(): os.path.join(
                 self.output_dir,
                 'zephyr',
                 'zephyr.elf'),
-            '%s.map' %
-            self.app.AppNamePrefix(): os.path.join(
-                self.output_dir,
-                'zephyr',
-                'zephyr.map'),
         }
+        if self.options.enable_link_map_file:
+            items[f'{self.app.AppNamePrefix()}.map'] = os.path.join(
+                self.output_dir, 'zephyr', 'zephyr.map')
+        return items

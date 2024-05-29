@@ -256,12 +256,14 @@ class Esp32Builder(Builder):
 
             return result
 
-        return {
+        items = {
             self.app.AppNamePrefix + '.elf':
                 os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
-            self.app.AppNamePrefix + '.map':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.map'),
         }
+        if self.options.enable_link_map_file:
+            map_file = f'{self.app.AppNamePrefix}.map'
+            items[map_file] = os.path.join(self.output_dir, map_file)
+        return items
 
     def flashbundle(self):
         if not self.app.FlashBundleName:

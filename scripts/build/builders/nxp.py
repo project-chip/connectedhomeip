@@ -129,7 +129,10 @@ class NxpBuilder(GnBuilder):
 
     def build_outputs(self):
         name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
-        return {
+        items = {
             '%s.elf' % name: os.path.join(self.output_dir, name),
-            '%s.map' % name: os.path.join(self.output_dir, '%s.map' % name)
         }
+        if self.options.enable_link_map_file:
+            map_file = f'{name}.map'
+            items[map_file] = os.path.join(self.output_dir, map_file)
+        return items

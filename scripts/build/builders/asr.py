@@ -182,9 +182,8 @@ class ASRBuilder(GnBuilder):
             '%s.out' % self.app.AppNamePrefix():
                 os.path.join(self.output_dir, '%s.out' %
                              self.app.AppNamePrefix()),
-            '%s.out.map' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir,
-                             '%s.out.map' % self.app.AppNamePrefix()),
         }
-
+        if self.options.enable_link_map_file:
+            map_file = f'{self.app.AppNamePrefix()}.out.map'
+            items[map_file] = os.path.join( self.output_dir, map_file)
         return items

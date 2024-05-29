@@ -121,13 +121,14 @@ class TIBuilder(GnBuilder):
                 or self.app == TIApp.LIGHTING
                 or self.app == TIApp.PUMP
                     or self.app == TIApp.PUMP_CONTROLLER):
-                extensions = [".out", ".out.map", "-mcuboot.hex"]
+                extensions = [".out", "-mcuboot.hex"]
 
             else:
-                extensions = [".out", ".out.map"]
-
+                extensions = [".out"]
         else:
-            extensions = [".out", ".out.map"]
+            extensions = [".out"]
+        if self.options.enable_link_map_file:
+            extensions.append(".out.map")
 
         for extension in extensions:
             name = '%s%s' % (self.app.AppNamePrefix(self.board), extension)

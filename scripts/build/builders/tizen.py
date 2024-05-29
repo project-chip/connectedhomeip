@@ -21,8 +21,8 @@ from xml.etree import ElementTree as ET
 from .gn import GnBuilder
 
 Board = namedtuple('Board', ['target_cpu'])
-App = namedtuple('App', ['name', 'source', 'outputs'])
-Tool = namedtuple('Tool', ['name', 'source', 'outputs'])
+App = namedtuple('App', ['name', 'source', 'output', 'link_map'])
+Tool = namedtuple('Tool', ['name', 'source', 'output', 'link_map'])
 TestDriver = namedtuple('TestDriver', ['name', 'source'])
 
 
@@ -36,24 +36,24 @@ class TizenApp(Enum):
     ALL_CLUSTERS = App(
         'chip-all-clusters-app',
         'examples/all-clusters-app/tizen',
-        ('chip-all-clusters-app',
-         'chip-all-clusters-app.map'))
+        'chip-all-clusters-app',
+        'chip-all-clusters-app.map')
     ALL_CLUSTERS_MINIMAL = App(
         'chip-all-clusters-minimal-app',
         'examples/all-clusters-minimal-app/tizen',
-        ('chip-all-clusters-minimal-app',
-         'chip-all-clusters-minimal-app.map'))
+        'chip-all-clusters-minimal-app',
+        'chip-all-clusters-minimal-app.map')
     LIGHT = App(
         'chip-lighting-app',
         'examples/lighting-app/tizen',
-        ('chip-lighting-app',
-         'chip-lighting-app.map'))
+        'chip-lighting-app',
+        'chip-lighting-app.map')
 
     CHIP_TOOL = Tool(
         'chip-tool',
         'examples/chip-tool',
-        ('chip-tool',
-         'chip-tool.map'))
+        'chip-tool',
+        'chip-tool.map')
 
     TESTS = TestDriver(
         'tests',
@@ -154,10 +154,12 @@ class TizenBuilder(GnBuilder):
             self._Execute(cmd, title='Packaging ' + self.identifier)
 
     def build_outputs(self):
-        return {
-            output: os.path.join(self.output_dir, output)
-            for output in self.app.value.outputs
+        items = {
+            self.app.value.output: os.path.join(self.output_dir, self.app.value.output),
         }
+        if self.options.enable_link_map_file:
+            items[self.app.value.link_map]: os.path.join(self.output_dir, self.app.value.link_map)
+        return items
 
     def flashbundle(self):
         if not self.app.is_tpk:

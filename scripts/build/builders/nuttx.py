@@ -90,9 +90,8 @@ class NuttXBuilder(Builder):
             '%s.out' % self.app.AppNamePrefix(self.chip_name):
                 os.path.join(self.output_dir, '%s.out' %
                              self.app.AppNamePrefix(self.chip_name)),
-            '%s.out.map' % self.app.AppNamePrefix(self.chip_name):
-                os.path.join(self.output_dir,
-                             '%s.out.map' % self.app.AppNamePrefix(self.chip_name)),
         }
-
+        if self.options.enable_link_map_file:
+            map_file = f'{self.app.AppNamePrefix(self.chip_name)}.out.map'
+            items[map_file] = os.path.join(self.output_dir, map_file)
         return items

@@ -102,8 +102,11 @@ class Cyw30739Builder(GnBuilder):
         return args
 
     def build_outputs(self):
+        extensions = ["elf"]
+        if self.options.enable_link_map_file:
+            extensions.append("elf.map")
         items = {}
-        for extension in ["elf", "elf.map"]:
+        for extension in extensions:
             name = "%s-%s.%s" % (self.app.AppNamePrefix(), self.board.GnArgName(), extension)
             items[name] = os.path.join(self.output_dir, name)
         return items

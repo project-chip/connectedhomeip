@@ -64,12 +64,14 @@ class cc32xxBuilder(GnBuilder):
     def build_outputs(self):
         items = {}
         if (self.app == cc32xxApp.LOCK):
-            extensions = [".out", ".bin", ".out.map"]
+            extensions = [".out", ".bin"]
         elif (self.app == cc32xxApp.AIR_PURIFIER):
-            extensions = [".out", ".bin", ".out.map"]
-
+            extensions = [".out", ".bin"]
         else:
             raise Exception('Unknown app type: %r' % self.app)
+
+        if self.options.enable_link_map_file:
+            extension.append(".out.map")
 
         for extension in extensions:
             name = '%s%s' % (self.app.AppNamePrefix(), extension)

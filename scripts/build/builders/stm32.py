@@ -78,8 +78,11 @@ class stm32Builder(GnBuilder):
         return self.extra_gn_options
 
     def build_outputs(self):
+        extensions = ["out", "out.hex"]
+        if self.options.enable_link_map_file:
+            extensions.append("out.map")
         items = {}
-        for extension in ["out", "out.map", "out.hex"]:
+        for extension in extensions:
             name = '%s.%s' % (self.app.AppNamePrefix(), extension)
             items[name] = os.path.join(self.output_dir, name)
 

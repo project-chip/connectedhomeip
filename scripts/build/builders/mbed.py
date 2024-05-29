@@ -147,12 +147,13 @@ class MbedBuilder(Builder):
                       title='Building ' + self.identifier)
 
     def build_outputs(self):
-        return {
+        items = {
             self.app.AppNamePrefix + '.elf':
                 os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
             self.app.AppNamePrefix + '.hex':
                 os.path.join(self.output_dir, self.app.AppNamePrefix + '.hex'),
-            self.app.AppNamePrefix + '.map':
-                os.path.join(self.output_dir,
-                             self.app.AppNamePrefix + '.elf.map'),
         }
+        if self.options.enable_link_map_file:
+            map_file = f'{self.app.AppNamePrefix}.elf.map'
+            items[map_file] = os.path.join(self.output_dir, map_file)
+        return items

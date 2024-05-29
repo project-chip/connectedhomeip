@@ -567,6 +567,8 @@ class HostBuilder(GnBuilder):
         outputs = {}
 
         for name in self.app.OutputNames():
+            if not self.options.enable_link_map_file and name.endswith(".map"):
+                continue
             path = os.path.join(self.output_dir, name)
             if os.path.isdir(path):
                 for root, dirs, files in os.walk(path):

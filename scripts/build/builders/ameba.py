@@ -89,11 +89,9 @@ class AmebaBuilder(Builder):
                       title='Building ' + self.identifier)
 
     def build_outputs(self):
-        return {
+        outputs = {
             self.app.AppNamePrefix + '.axf':
                 os.path.join(self.output_dir, 'asdk', 'target_image2.axf'),
-            self.app.AppNamePrefix + '.map':
-                os.path.join(self.output_dir, 'asdk', 'target_image2.map'),
             'km0_boot_all.bin':
                 os.path.join(self.output_dir, 'asdk',
                              'bootloader', 'km0_boot_all.bin'),
@@ -104,3 +102,7 @@ class AmebaBuilder(Builder):
                 os.path.join(self.output_dir, 'asdk',
                              'image', 'km0_km4_image2.bin'),
         }
+        if self.options.enable_link_map_file:
+            outputs[f'{self.app.AppNamePrefix}.map'] = os.path.join(
+                self.output_dir, 'asdk', 'target_image2.map')
+        return outputs
