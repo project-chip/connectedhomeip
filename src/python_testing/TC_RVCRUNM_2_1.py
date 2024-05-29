@@ -133,7 +133,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
                 print("Change to RVC Run mode Cleaning")
                 await self.send_change_to_mode_cmd(newMode=1)
             else:
-                input("Press Enter when done.\n")
+                self.wait_for_user_input(prompt_msg="Manually put the device in a state from which it will FAIL to transition to mode %d, and press Enter when ready." % (self.mode_fail))
 
             self.print_step(6, "Read CurrentMode attribute")
             old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
@@ -163,7 +163,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         if self.is_ci:
             print("Continuing...")
         else:
-            input("Press Enter when done.\n")
+            self.wait_for_user_input(prompt_msg="Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d, and press Enter when ready." % (self.mode_ok))
 
         self.print_step(10, "Read CurrentMode attribute")
         old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)

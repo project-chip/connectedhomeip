@@ -122,7 +122,7 @@ class TC_OPSTATE_BASE():
             self.write_to_app_pipe(command)
             time.sleep(0.1)
         else:
-            input("Press Enter when done.\n")
+            self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
 
     def send_manual_or_pipe_command(self, device: str, name: str, operation: str, param: Any = None):
         command = {
@@ -1113,7 +1113,7 @@ class TC_OPSTATE_BASE():
             # In CI environment, the STOP coommand (step 8) already resets the variables. Only ask for
             # reboot outside CI environment.
             if not self.is_ci:
-                input("Press Enter when done.\n")
+                self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
 
             # STEP 12: TH waits for {PIXIT.WAITTIME.REBOOT}
             self.step(12)
