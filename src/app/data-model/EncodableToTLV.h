@@ -41,7 +41,7 @@ public:
 /// particular, types like <ClusterName>::Commands::<CommandName>::Type
 /// can be used as a type here.
 template <typename T>
-class DirectEncodableToTLV : public EncodableToTLV
+class EncodableType : public EncodableToTLV
 {
 public:
     /// Encodes the given value via `DataModel::Encode` when the underlying
@@ -49,7 +49,7 @@ public:
     ///
     /// LIFETIME NOTE: uses a reference to value, so value must live longer than
     ///                this object.
-    DirectEncodableToTLV(const T & value) : mValue(value) {}
+    EncodableType(const T & value) : mValue(value) {}
 
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) override { return DataModel::Encode(writer, tag, mValue); }
 
