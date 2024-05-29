@@ -7654,6 +7654,26 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Functionality to retrieve operational information about a managed Wi-Fi network. */
+cluster WiFiNetworkManagement = 1105 {
+  revision 1;
+
+  readonly attribute nullable octet_string<32> ssid = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct NetworkPassphraseResponse = 1 {
+    octet_string<64> passphrase = 0;
+  }
+
+  /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
+  command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
+}
+
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
   revision 1;
