@@ -242,7 +242,7 @@ public:
      * Adds the given command status and returns any failures in adding statuses (e.g. out
      * of buffer space) to the caller
      */
-    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::Status aStatus,
                                  const char * context = nullptr);
 
     /**
@@ -252,9 +252,9 @@ public:
     void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                    const char * context = nullptr);
 
-    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
+    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus);
 
-    CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
+    CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus);
 
     /**
      * This adds a new CommandDataIB element into InvokeResponses for the associated
@@ -645,11 +645,11 @@ private:
      * Callers should snapshot as needed before calling this function, and roll back
      * as needed afterward.
      *
-     * @param [in] aCommandPath the concrete path of the command we are responding to
+     * @param [in] aRequestCommandPath the concrete path of the command we are responding to
      * @param [in] aResponseCommandId the id of the command to encode
      * @param [in] aEncodable the data to encode for the given aResponseCommandId
      */
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aCommandPath, CommandId aResponseCommandId,
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                   DataModel::EncodableToTLV & aEncodable);
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);

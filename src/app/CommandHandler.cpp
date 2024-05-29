@@ -113,7 +113,7 @@ Status CommandHandler::OnInvokeCommandRequest(CommandHandlerExchangeInterface & 
     return status;
 }
 
-CHIP_ERROR CommandHandler::TryAddResponseData(const ConcreteCommandPath & aCommandPath, CommandId aResponseCommandId,
+CHIP_ERROR CommandHandler::TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                               DataModel::EncodableToTLV & aEncodable)
 {
     ConcreteCommandPath responseCommandPath = { aCommandPath.mEndpointId, aCommandPath.mClusterId, aResponseCommandId };
