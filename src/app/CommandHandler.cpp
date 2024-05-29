@@ -116,14 +116,15 @@ Status CommandHandler::OnInvokeCommandRequest(CommandHandlerExchangeInterface & 
 CHIP_ERROR CommandHandler::TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                               DataModel::EncodableToTLV & aEncodable)
 {
-    ConcreteCommandPath responseCommandPath = { aCommandPath.mEndpointId, aCommandPath.mClusterId, aResponseCommandId };
+    ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
+                                                aResponseCommandId };
 
     InvokeResponseParameters prepareParams(aRequestCommandPath);
     prepareParams.SetStartOrEndDataStruct(false);
 
     {
         ScopedChange<bool> internalCallToAddResponse(mInternalCallToAddResponseData, true);
-        ReturnErrorOnFailure(PrepareInvokeResponseCommand(aResponseCommandPath, prepareParams));
+        ReturnErrorOnFailure(PrepareInvokeResponseCommand(responseCommandPath, prepareParams));
     }
 
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
