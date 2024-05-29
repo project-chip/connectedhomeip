@@ -34,16 +34,16 @@ class TC_BOOLCFG_2_1(MatterBaseTest):
 
     def steps_TC_BOOLCFG_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read attribute list to determine supported attributes"),
-            TestStep(3, "Read SupportedSensitivityLevels attribute, if supported"),
-            TestStep(4, "Read CurrentSensitivityLevel attribute, if supported"),
-            TestStep(5, "Read DefaultSensitivityLevel attribute, if supported"),
-            TestStep(6, "Read AlarmsActive attribute, if supported"),
-            TestStep(7, "Read AlarmsSuppressed attribute, if supported"),
-            TestStep(8, "Read AlarmsEnabled attribute, if supported"),
-            TestStep(9, "Read AlarmsSupported attribute, if supported"),
-            TestStep(10, "Read SensorFault attribute, if supported"),
+            TestStep(1, "{comDutTH}.", "", is_commissioning=True),
+            TestStep(2, "{THread} _AttributeList_ attribute.", "{DUTreply} the _AttributeList_ attribute."),
+            TestStep(3, "{ifAttrIsSupported}, {THread} _{A_SUPPORTEDSENSITIVITYLEVELS}_ attribute. {storeValueAs} numberOfSupportedLevels.", "{DUTreply} an uint8 value. {valrange} 2 and 10."),
+            TestStep(4, "{ifAttrIsSupported}, {THread} _{A_CURRENTSENSITIVITYLEVEL}_ attribute.", "{DUTreply} an uint8 value. {valrange} 0 and the value of numberOfSupportedLevels."),
+            TestStep(5, "{ifAttrIsSupported}, {THread} _{A_DEFAULTSENSITIVITYLEVEL}_ attribute.", "{DUTreply} an uint8 value. {valrange} 0 and the value of numberOfSupportedLevels."),
+            TestStep(6, "{ifAttrIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.", "{DUTreply} an map8 value. {valrange} 0 and 3."),
+            TestStep(7, "{ifAttrIsSupported}, {THread} _{A_ALARMSSUPPRESSED}_ attribute.", "{DUTreply} an map8 value. {valrange} 0 and 3."),
+            TestStep(8, "{ifAttrIsSupported}, {THread} _{A_ALARMSENABLED}_ attribute.", "{DUTreply} an map8 value. {valrange} 0 and 3."),
+            TestStep(9, "{ifAttrIsSupported}, {THread} _{A_ALARMSSUPPORTED}_ attribute.", "{DUTreply} an map8 value. {valrange} 0 and 3."),
+            TestStep(10, "{ifAttrIsSupported}, {THread} _{A_SENSORFAULT}_ attribute.", "{DUTreply} an map8 value. {valrange} 0 and 1."),
         ]
         return steps
 
