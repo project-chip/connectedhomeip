@@ -700,15 +700,7 @@ private:
      *             responding to.
      * @param [in] aData the data for the response.
      */
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder)
-    {
-        ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, commandId };
-        ReturnErrorOnFailure(TryAddResponseDataPreEncode(aRequestCommandPath, responseCommandPath));
-        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(encoder.Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
-        return FinishCommand(/* aEndDataStruct = */ false);
-    }
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder);
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 
