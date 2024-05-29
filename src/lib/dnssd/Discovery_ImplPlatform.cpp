@@ -96,15 +96,14 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         auto & ipAddress = services[i].mAddress;
 
         // mType(service name) exactly matches with operational service name
-        bool isOperationalBrowse = (strncmp(services[i].mType, kOperationalServiceName, sizeof(services[i].mType)) == 0 &&
-                                    strlen(services[i].mType) == strlen(kOperationalServiceName));
+        bool isOperationalBrowse = strcmp(services[i].mType, kOperationalServiceName) == 0;
 
         // For operational browse result we currently don't need IP address hence skip resolution and handle differently.
         if (isOperationalBrowse)
         {
             HandleNodeOperationalBrowse(context, &services[i], error);
         }
-        // if SRV, TXT and AAAA records were received in DNS responses
+        // check whether SRV, TXT and AAAA records were received in DNS responses
         else if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value())
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
