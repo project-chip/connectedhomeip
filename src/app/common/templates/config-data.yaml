@@ -23,6 +23,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Scenes Management
     - RVC Run Mode
     - RVC Clean Mode
+    - Service Area
     - Dishwasher Mode
     - Laundry Washer Mode
     - Oven Mode

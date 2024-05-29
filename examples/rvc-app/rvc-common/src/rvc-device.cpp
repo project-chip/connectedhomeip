@@ -6,10 +6,74 @@ using namespace chip::app::Clusters;
 
 void RvcDevice::Init()
 {
+    mServiceAreaInstance.Init();
     mRunModeInstance.Init();
     mCleanModeInstance.Init();
     mOperationalStateInstance.Init();
+
+    // hardcoded fill of SUPPORTED MAPS for prototyping
+    uint8_t supportedMapId_XX  = 3;
+    uint8_t supportedMapId_YY  = 245;
+
+    mServiceAreaInstance.AddSupportedMap(supportedMapId_XX, CharSpan::fromCharString("My Map XX"));
+    mServiceAreaInstance.AddSupportedMap(supportedMapId_YY, CharSpan::fromCharString("My Map YY"));
+
+
+    // hardcoded fill of SUPPORTED LOCATIONS for prototyping
+    uint32_t supportedLocationId_A  = 7;
+    uint32_t supportedLocationId_B  = 1234567;
+    uint32_t supportedLocationId_C  = 10050;
+    uint32_t supportedLocationId_D  = 0x88888888;
+
+
+    // Location A has name, floor number, uses map XX
+    mServiceAreaInstance.AddSupportedLocation(  supportedLocationId_A, 
+                                                DataModel::Nullable<uint_fast8_t>(supportedMapId_XX),
+                                                CharSpan::fromCharString("My Location A"),
+                                                DataModel::Nullable<int16_t>(4),
+                                                DataModel::Nullable<ServiceArea::AreaTypeTag>(),
+                                                DataModel::Nullable<ServiceArea::LandmarkTag>(),
+                                                DataModel::Nullable<ServiceArea::PositionTag>(),
+                                                DataModel::Nullable<ServiceArea::FloorSurfaceTag>() );
+
+
+    // Location B has name, uses map XX
+    mServiceAreaInstance.AddSupportedLocation(  supportedLocationId_B, 
+                                                DataModel::Nullable<uint_fast8_t>(supportedMapId_XX),
+                                                CharSpan::fromCharString("My Location B"),
+                                                DataModel::Nullable<int16_t>(),
+                                                DataModel::Nullable<ServiceArea::AreaTypeTag>(),
+                                                DataModel::Nullable<ServiceArea::LandmarkTag>(),
+                                                DataModel::Nullable<ServiceArea::PositionTag>(),
+                                                DataModel::Nullable<ServiceArea::FloorSurfaceTag>() );
+
+
+
+
+   // Location C has full SemData, no name, Map YY
+    mServiceAreaInstance.AddSupportedLocation(  supportedLocationId_C, 
+                                                DataModel::Nullable<uint_fast8_t>(supportedMapId_YY),
+                                                CharSpan(),
+                                                DataModel::Nullable<int16_t>(-1),
+                                                DataModel::Nullable<ServiceArea::AreaTypeTag>(ServiceArea::AreaTypeTag::kPlayRoom),
+                                                DataModel::Nullable<ServiceArea::LandmarkTag>(ServiceArea::LandmarkTag::kBackDoor),
+                                                DataModel::Nullable<ServiceArea::PositionTag>(ServiceArea::PositionTag::kNextTo),
+                                                DataModel::Nullable<ServiceArea::FloorSurfaceTag>(ServiceArea::FloorSurfaceTag::kConcrete) );
+
+    // Location D has null values for all HomeLocationStruct fields, Map YY
+    mServiceAreaInstance.AddSupportedLocation(   supportedLocationId_D, 
+                                                DataModel::Nullable<uint_fast8_t>(supportedMapId_YY),
+                                                CharSpan::fromCharString("My Location D"),
+                                                DataModel::Nullable<int16_t>(),
+                                                DataModel::Nullable<ServiceArea::AreaTypeTag>(),
+                                                DataModel::Nullable<ServiceArea::LandmarkTag>(ServiceArea::LandmarkTag::kCouch),
+                                                DataModel::Nullable<ServiceArea::PositionTag>(ServiceArea::PositionTag::kNextTo),
+                                                DataModel::Nullable<ServiceArea::FloorSurfaceTag>(ServiceArea::FloorSurfaceTag::kHardwood) );
+
+
+    mServiceAreaInstance.SetCurrentLocation(supportedLocationId_C);
 }
+
 
 void RvcDevice::SetDeviceToIdleState()
 {
@@ -158,6 +222,35 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
     }
+}
+
+bool RvcDevice::HandleIsSetSelectedLocationCallback(std::string & locationText)
+{
+    bool canSet;
+
+    switch(mRunModeInstance.GetCurrentMode())
+    {
+    case RvcRunMode::ModeIdle:
+        canSet = true;
+        break;
+
+    case RvcRunMode::ModeCleaning:
+        canSet = false;
+        locationText = "SelectLocations command - cannot select locations while cleaning";
+        break;
+
+    case RvcRunMode::ModeMapping:
+        canSet = false;
+        locationText = "SelectLocations command - cannot select locations while mapping";
+        break;
+
+    default:
+        canSet = false;
+        locationText = "SelectLocations command - cannot select locations - unknown mode";
+        break;
+    }
+
+    return canSet;
 }
 
 void RvcDevice::HandleChargedMessage()

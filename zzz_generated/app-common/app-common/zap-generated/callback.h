@@ -5974,18 +5974,6 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::DecodableType & commandData);
 /**
- * @brief Service Area Cluster SelectLocations Command callback (from client)
- */
-bool emberAfServiceAreaClusterSelectLocationsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ServiceArea::Commands::SelectLocations::DecodableType & commandData);
-/**
- * @brief Service Area Cluster SkipCurrent Command callback (from client)
- */
-bool emberAfServiceAreaClusterSkipCurrentCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ServiceArea::Commands::SkipCurrent::DecodableType & commandData);
-/**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(

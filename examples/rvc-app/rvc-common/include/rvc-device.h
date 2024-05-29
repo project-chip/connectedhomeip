@@ -2,6 +2,7 @@
 
 #include "rvc-mode-delegates.h"
 #include "rvc-operational-state-delegate.h"
+#include "rvc-service-area-delegate.h"
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 
@@ -23,6 +24,9 @@ private:
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
     RvcOperationalState::Instance mOperationalStateInstance;
 
+    ServiceArea::RvcServiceAreaDelegate mServiceAreaDelegate;
+    ServiceArea::Instance mServiceAreaInstance;
+
     bool mDocked   = false;
     bool mCharging = false;
 
@@ -37,7 +41,8 @@ public:
     explicit RvcDevice(EndpointId aRvcClustersEndpoint) :
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
-        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint)
+        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint),
+        mServiceAreaInstance(&mServiceAreaDelegate, aRvcClustersEndpoint, BitMask<ServiceArea::Feature>(0))
     {
         // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
@@ -51,6 +56,7 @@ public:
         mOperationalStateDelegate.SetPauseCallback(&RvcDevice::HandleOpStatePauseCallback, this);
         mOperationalStateDelegate.SetResumeCallback(&RvcDevice::HandleOpStateResumeCallback, this);
         mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
+        mServiceAreaDelegate.SetIsSetSelectedLocationCallback(&RvcDevice::HandleIsSetSelectedLocationCallback, this);
     }
 
     /**
@@ -88,6 +94,13 @@ public:
      * Handles the RvcOperationalState GoHome command.
      */
     void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
+
+    /**
+     * @brief Handles the check to see if the Selected Locations can be changed
+     * @param locationText if failure description of mode or condition prohibiting change
+     * @return true if Selected Locations can be changed
+    */
+    bool HandleIsSetSelectedLocationCallback(std::string & locationText);
 
     /**
      * Updates the state machine when the device becomes fully-charged.
