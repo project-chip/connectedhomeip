@@ -32,7 +32,7 @@ class EncodableToTLV
 public:
     virtual ~EncodableToTLV() = default;
 
-    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) = 0;
+    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const = 0;
 };
 
 /// An `EncodableToTLV` that uses `DataModel::Encode` to encode things in one call.
@@ -51,7 +51,7 @@ public:
     ///                this object.
     EncodableType(const T & value) : mValue(value) {}
 
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) override { return DataModel::Encode(writer, tag, mValue); }
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override { return DataModel::Encode(writer, tag, mValue); }
 
 private:
     const T & mValue;
