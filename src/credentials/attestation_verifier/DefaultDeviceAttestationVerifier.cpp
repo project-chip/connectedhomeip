@@ -613,7 +613,6 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     return CHIP_NO_ERROR;
 }
 
-
 // This method parses the below JSON Scheme
 // [
 //  {
