@@ -2571,6 +2571,19 @@ enum class OptOutStateEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
+// Enum for PowerAdjustReasonEnum
+enum class PowerAdjustReasonEnum : uint8_t
+{
+    kNoAdjustment                = 0x00,
+    kLocalOptimizationAdjustment = 0x01,
+    kGridOptimizationAdjustment  = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -2651,11 +2664,12 @@ enum class SupplyStateEnum : uint8_t
     kDischargingEnabled  = 0x02,
     kDisabledError       = 0x03,
     kDisabledDiagnostics = 0x04,
+    kEnabled             = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 6,
 };
 
 // Bitmap for Feature

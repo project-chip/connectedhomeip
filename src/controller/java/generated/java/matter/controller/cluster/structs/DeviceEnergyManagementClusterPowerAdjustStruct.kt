@@ -26,7 +26,8 @@ class DeviceEnergyManagementClusterPowerAdjustStruct(
   val minPower: Long,
   val maxPower: Long,
   val minDuration: UInt,
-  val maxDuration: UInt
+  val maxDuration: UInt,
+  val cause: UByte
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterPowerAdjustStruct {\n")
@@ -34,6 +35,7 @@ class DeviceEnergyManagementClusterPowerAdjustStruct(
     append("\tmaxPower : $maxPower\n")
     append("\tminDuration : $minDuration\n")
     append("\tmaxDuration : $maxDuration\n")
+    append("\tcause : $cause\n")
     append("}\n")
   }
 
@@ -44,6 +46,7 @@ class DeviceEnergyManagementClusterPowerAdjustStruct(
       put(ContextSpecificTag(TAG_MAX_POWER), maxPower)
       put(ContextSpecificTag(TAG_MIN_DURATION), minDuration)
       put(ContextSpecificTag(TAG_MAX_DURATION), maxDuration)
+      put(ContextSpecificTag(TAG_CAUSE), cause)
       endStructure()
     }
   }
@@ -53,6 +56,7 @@ class DeviceEnergyManagementClusterPowerAdjustStruct(
     private const val TAG_MAX_POWER = 1
     private const val TAG_MIN_DURATION = 2
     private const val TAG_MAX_DURATION = 3
+    private const val TAG_CAUSE = 4
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementClusterPowerAdjustStruct {
       tlvReader.enterStructure(tlvTag)
@@ -60,6 +64,7 @@ class DeviceEnergyManagementClusterPowerAdjustStruct(
       val maxPower = tlvReader.getLong(ContextSpecificTag(TAG_MAX_POWER))
       val minDuration = tlvReader.getUInt(ContextSpecificTag(TAG_MIN_DURATION))
       val maxDuration = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_DURATION))
+      val cause = tlvReader.getUByte(ContextSpecificTag(TAG_CAUSE))
 
       tlvReader.exitContainer()
 
@@ -67,7 +72,8 @@ class DeviceEnergyManagementClusterPowerAdjustStruct(
         minPower,
         maxPower,
         minDuration,
-        maxDuration
+        maxDuration,
+        cause
       )
     }
   }

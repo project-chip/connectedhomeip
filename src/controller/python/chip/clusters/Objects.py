@@ -24252,6 +24252,16 @@ class DeviceEnergyManagement(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 4,
 
+        class PowerAdjustReasonEnum(MatterIntEnum):
+            kNoAdjustment = 0x00
+            kLocalOptimizationAdjustment = 0x01
+            kGridOptimizationAdjustment = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 3,
+
     class Bitmaps:
         class Feature(IntFlag):
             kPowerAdjustment = 0x1
@@ -24291,7 +24301,7 @@ class DeviceEnergyManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="defaultDuration", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="elapsedSlotTime", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="remainingSlotTime", Tag=4, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="slotIsPauseable", Tag=5, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="slotIsPausable", Tag=5, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="minPauseDuration", Tag=6, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="maxPauseDuration", Tag=7, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="manufacturerESAState", Tag=8, Type=typing.Optional[uint]),
@@ -24311,7 +24321,7 @@ class DeviceEnergyManagement(Cluster):
             defaultDuration: 'uint' = 0
             elapsedSlotTime: 'uint' = 0
             remainingSlotTime: 'uint' = 0
-            slotIsPauseable: 'typing.Optional[bool]' = None
+            slotIsPausable: 'typing.Optional[bool]' = None
             minPauseDuration: 'typing.Optional[uint]' = None
             maxPauseDuration: 'typing.Optional[uint]' = None
             manufacturerESAState: 'typing.Optional[uint]' = None
@@ -24337,7 +24347,7 @@ class DeviceEnergyManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="endTime", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="earliestStartTime", Tag=4, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="latestEndTime", Tag=5, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="isPauseable", Tag=6, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="isPausable", Tag=6, Type=bool),
                         ClusterObjectFieldDescriptor(Label="slots", Tag=7, Type=typing.List[DeviceEnergyManagement.Structs.SlotStruct]),
                         ClusterObjectFieldDescriptor(Label="forecastUpdateReason", Tag=8, Type=DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum),
                     ])
@@ -24348,7 +24358,7 @@ class DeviceEnergyManagement(Cluster):
             endTime: 'uint' = 0
             earliestStartTime: 'typing.Union[None, Nullable, uint]' = None
             latestEndTime: 'typing.Optional[uint]' = None
-            isPauseable: 'bool' = False
+            isPausable: 'bool' = False
             slots: 'typing.List[DeviceEnergyManagement.Structs.SlotStruct]' = field(default_factory=lambda: [])
             forecastUpdateReason: 'DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum' = 0
 
@@ -24381,12 +24391,14 @@ class DeviceEnergyManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="maxPower", Tag=1, Type=int),
                         ClusterObjectFieldDescriptor(Label="minDuration", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="maxDuration", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="cause", Tag=4, Type=DeviceEnergyManagement.Enums.PowerAdjustReasonEnum),
                     ])
 
             minPower: 'int' = 0
             maxPower: 'int' = 0
             minDuration: 'uint' = 0
             maxDuration: 'uint' = 0
+            cause: 'DeviceEnergyManagement.Enums.PowerAdjustReasonEnum' = 0
 
         @dataclass
         class SlotAdjustmentStruct(ClusterObject):
@@ -24395,12 +24407,12 @@ class DeviceEnergyManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="slotIndex", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="nominalPower", Tag=1, Type=int),
+                        ClusterObjectFieldDescriptor(Label="nominalPower", Tag=1, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="duration", Tag=2, Type=uint),
                     ])
 
             slotIndex: 'uint' = 0
-            nominalPower: 'int' = 0
+            nominalPower: 'typing.Optional[int]' = None
             duration: 'uint' = 0
 
     class Commands:
@@ -24962,11 +24974,12 @@ class EnergyEvse(Cluster):
             kDischargingEnabled = 0x02
             kDisabledError = 0x03
             kDisabledDiagnostics = 0x04
+            kEnabled = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 5,
+            kUnknownEnumValue = 6,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -25007,12 +25020,12 @@ class EnergyEvse(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="dayOfWeekForSequence", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="chargingTargets", Tag=1, Type=typing.List[EnergyEvse.Structs.ChargingTargetStruct]),
+                        ClusterObjectFieldDescriptor(Label="dayOfWeekForSequence", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="chargingTargets", Tag=1, Type=typing.Optional[typing.List[EnergyEvse.Structs.ChargingTargetStruct]]),
                     ])
 
-            dayOfWeekForSequence: 'uint' = 0
-            chargingTargets: 'typing.List[EnergyEvse.Structs.ChargingTargetStruct]' = field(default_factory=lambda: [])
+            dayOfWeekForSequence: 'typing.Optional[uint]' = None
+            chargingTargets: 'typing.Optional[typing.List[EnergyEvse.Structs.ChargingTargetStruct]]' = None
 
     class Commands:
         @dataclass
@@ -25694,11 +25707,13 @@ class EnergyEvse(Cluster):
                         ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="state", Tag=1, Type=EnergyEvse.Enums.StateEnum),
                         ClusterObjectFieldDescriptor(Label="maximumCurrent", Tag=2, Type=int),
+                        ClusterObjectFieldDescriptor(Label="maximumDischargingCurrent", Tag=3, Type=typing.Optional[int]),
                     ])
 
             sessionID: 'uint' = 0
             state: 'EnergyEvse.Enums.StateEnum' = 0
             maximumCurrent: 'int' = 0
+            maximumDischargingCurrent: 'typing.Optional[int]' = None
 
         @dataclass
         class EnergyTransferStopped(ClusterEvent):
@@ -25718,12 +25733,14 @@ class EnergyEvse(Cluster):
                         ClusterObjectFieldDescriptor(Label="state", Tag=1, Type=EnergyEvse.Enums.StateEnum),
                         ClusterObjectFieldDescriptor(Label="reason", Tag=2, Type=EnergyEvse.Enums.EnergyTransferStoppedReasonEnum),
                         ClusterObjectFieldDescriptor(Label="energyTransferred", Tag=4, Type=int),
+                        ClusterObjectFieldDescriptor(Label="energyDischarged", Tag=5, Type=typing.Optional[int]),
                     ])
 
             sessionID: 'uint' = 0
             state: 'EnergyEvse.Enums.StateEnum' = 0
             reason: 'EnergyEvse.Enums.EnergyTransferStoppedReasonEnum' = 0
             energyTransferred: 'int' = 0
+            energyDischarged: 'typing.Optional[int]' = None
 
         @dataclass
         class Fault(ClusterEvent):

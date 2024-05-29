@@ -3164,12 +3164,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.remainingSlotTime, value["remainingSlotTime"]));
     valueCopy.removeMember("remainingSlotTime");
 
-    if (value.isMember("slotIsPauseable"))
+    if (value.isMember("slotIsPausable"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "slotIsPauseable");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.slotIsPauseable, value["slotIsPauseable"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "slotIsPausable");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.slotIsPausable, value["slotIsPausable"]));
     }
-    valueCopy.removeMember("slotIsPauseable");
+    valueCopy.removeMember("slotIsPausable");
 
     if (value.isMember("minPauseDuration"))
     {
@@ -3270,7 +3270,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DeviceEnergyManagement
     ComplexArgumentParser::Finalize(request.defaultDuration);
     ComplexArgumentParser::Finalize(request.elapsedSlotTime);
     ComplexArgumentParser::Finalize(request.remainingSlotTime);
-    ComplexArgumentParser::Finalize(request.slotIsPauseable);
+    ComplexArgumentParser::Finalize(request.slotIsPausable);
     ComplexArgumentParser::Finalize(request.minPauseDuration);
     ComplexArgumentParser::Finalize(request.maxPauseDuration);
     ComplexArgumentParser::Finalize(request.manufacturerESAState);
@@ -3302,7 +3302,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("ForecastStruct.startTime", "startTime", value.isMember("startTime")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ForecastStruct.endTime", "endTime", value.isMember("endTime")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ForecastStruct.isPauseable", "isPauseable", value.isMember("isPauseable")));
+        ComplexArgumentParser::EnsureMemberExist("ForecastStruct.isPausable", "isPausable", value.isMember("isPausable")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ForecastStruct.slots", "slots", value.isMember("slots")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ForecastStruct.forecastUpdateReason", "forecastUpdateReason",
                                                                   value.isMember("forecastUpdateReason")));
@@ -3338,9 +3338,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("latestEndTime");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "isPauseable");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.isPauseable, value["isPauseable"]));
-    valueCopy.removeMember("isPauseable");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "isPausable");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.isPausable, value["isPausable"]));
+    valueCopy.removeMember("isPausable");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "slots");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.slots, value["slots"]));
@@ -3362,7 +3362,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DeviceEnergyManagement
     ComplexArgumentParser::Finalize(request.endTime);
     ComplexArgumentParser::Finalize(request.earliestStartTime);
     ComplexArgumentParser::Finalize(request.latestEndTime);
-    ComplexArgumentParser::Finalize(request.isPauseable);
+    ComplexArgumentParser::Finalize(request.isPausable);
     ComplexArgumentParser::Finalize(request.slots);
     ComplexArgumentParser::Finalize(request.forecastUpdateReason);
 }
@@ -3440,6 +3440,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("PowerAdjustStruct.minDuration", "minDuration", value.isMember("minDuration")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("PowerAdjustStruct.maxDuration", "maxDuration", value.isMember("maxDuration")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PowerAdjustStruct.cause", "cause", value.isMember("cause")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minPower");
@@ -3458,6 +3459,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxDuration, value["maxDuration"]));
     valueCopy.removeMember("maxDuration");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "cause");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.cause, value["cause"]));
+    valueCopy.removeMember("cause");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -3467,6 +3472,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DeviceEnergyManagement
     ComplexArgumentParser::Finalize(request.maxPower);
     ComplexArgumentParser::Finalize(request.minDuration);
     ComplexArgumentParser::Finalize(request.maxDuration);
+    ComplexArgumentParser::Finalize(request.cause);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -3480,8 +3486,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("SlotAdjustmentStruct.slotIndex", "slotIndex", value.isMember("slotIndex")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SlotAdjustmentStruct.nominalPower", "nominalPower",
-                                                                  value.isMember("nominalPower")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("SlotAdjustmentStruct.duration", "duration", value.isMember("duration")));
 
@@ -3490,8 +3494,11 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.slotIndex, value["slotIndex"]));
     valueCopy.removeMember("slotIndex");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nominalPower");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nominalPower, value["nominalPower"]));
+    if (value.isMember("nominalPower"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nominalPower");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nominalPower, value["nominalPower"]));
+    }
     valueCopy.removeMember("nominalPower");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "duration");
@@ -3560,19 +3567,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChargingTargetScheduleStruct.dayOfWeekForSequence",
-                                                                  "dayOfWeekForSequence", value.isMember("dayOfWeekForSequence")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChargingTargetScheduleStruct.chargingTargets", "chargingTargets",
-                                                                  value.isMember("chargingTargets")));
-
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeekForSequence");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeekForSequence, value["dayOfWeekForSequence"]));
+    if (value.isMember("dayOfWeekForSequence"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeekForSequence");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeekForSequence, value["dayOfWeekForSequence"]));
+    }
     valueCopy.removeMember("dayOfWeekForSequence");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "chargingTargets");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.chargingTargets, value["chargingTargets"]));
+    if (value.isMember("chargingTargets"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "chargingTargets");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.chargingTargets, value["chargingTargets"]));
+    }
     valueCopy.removeMember("chargingTargets");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);

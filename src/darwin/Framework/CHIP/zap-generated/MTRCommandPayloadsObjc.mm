@@ -16171,7 +16171,10 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     auto element_0 = (MTRDeviceEnergyManagementClusterSlotAdjustmentStruct *) self.slotAdjustments[i_0];
                     listHolder_0->mList[i_0].slotIndex = element_0.slotIndex.unsignedCharValue;
-                    listHolder_0->mList[i_0].nominalPower = element_0.nominalPower.longLongValue;
+                    if (element_0.nominalPower != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].nominalPower.Emplace();
+                        definedValue_2 = element_0.nominalPower.longLongValue;
+                    }
                     listHolder_0->mList[i_0].duration = element_0.duration.unsignedIntValue;
                 }
                 encodableStruct.slotAdjustments = ListType_0(listHolder_0->mList, self.slotAdjustments.count);
@@ -16493,32 +16496,40 @@ NS_ASSUME_NONNULL_BEGIN
                 auto & entry_0 = iter_0.GetValue();
                 MTREnergyEVSEClusterChargingTargetScheduleStruct * newElement_0;
                 newElement_0 = [MTREnergyEVSEClusterChargingTargetScheduleStruct new];
-                newElement_0.dayOfWeekForSequence = [NSNumber numberWithUnsignedChar:entry_0.dayOfWeekForSequence.Raw()];
-                { // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.chargingTargets.begin();
-                    while (iter_2.Next()) {
-                        auto & entry_2 = iter_2.GetValue();
-                        MTREnergyEVSEClusterChargingTargetStruct * newElement_2;
-                        newElement_2 = [MTREnergyEVSEClusterChargingTargetStruct new];
-                        newElement_2.targetTimeMinutesPastMidnight = [NSNumber numberWithUnsignedShort:entry_2.targetTimeMinutesPastMidnight];
-                        if (entry_2.targetSoC.HasValue()) {
-                            newElement_2.targetSoC = [NSNumber numberWithUnsignedChar:entry_2.targetSoC.Value()];
-                        } else {
-                            newElement_2.targetSoC = nil;
+                if (entry_0.dayOfWeekForSequence.HasValue()) {
+                    newElement_0.dayOfWeekForSequence = [NSNumber numberWithUnsignedChar:entry_0.dayOfWeekForSequence.Value().Raw()];
+                } else {
+                    newElement_0.dayOfWeekForSequence = nil;
+                }
+                if (entry_0.chargingTargets.HasValue()) {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.chargingTargets.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            MTREnergyEVSEClusterChargingTargetStruct * newElement_3;
+                            newElement_3 = [MTREnergyEVSEClusterChargingTargetStruct new];
+                            newElement_3.targetTimeMinutesPastMidnight = [NSNumber numberWithUnsignedShort:entry_3.targetTimeMinutesPastMidnight];
+                            if (entry_3.targetSoC.HasValue()) {
+                                newElement_3.targetSoC = [NSNumber numberWithUnsignedChar:entry_3.targetSoC.Value()];
+                            } else {
+                                newElement_3.targetSoC = nil;
+                            }
+                            if (entry_3.addedEnergy.HasValue()) {
+                                newElement_3.addedEnergy = [NSNumber numberWithLongLong:entry_3.addedEnergy.Value()];
+                            } else {
+                                newElement_3.addedEnergy = nil;
+                            }
+                            [array_3 addObject:newElement_3];
                         }
-                        if (entry_2.addedEnergy.HasValue()) {
-                            newElement_2.addedEnergy = [NSNumber numberWithLongLong:entry_2.addedEnergy.Value()];
-                        } else {
-                            newElement_2.addedEnergy = nil;
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            return err;
                         }
-                        [array_2 addObject:newElement_2];
+                        newElement_0.chargingTargets = array_3;
                     }
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        return err;
-                    }
-                    newElement_0.chargingTargets = array_2;
+                } else {
+                    newElement_0.chargingTargets = nil;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -16919,35 +16930,41 @@ NS_ASSUME_NONNULL_BEGIN
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
                     auto element_0 = (MTREnergyEVSEClusterChargingTargetScheduleStruct *) self.chargingTargetSchedules[i_0];
-                    listHolder_0->mList[i_0].dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].dayOfWeekForSequence)>>(element_0.dayOfWeekForSequence.unsignedCharValue);
-                    {
-                        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].chargingTargets)>;
-                        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                        if (element_0.chargingTargets.count != 0) {
-                            auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.chargingTargets.count);
-                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            listFreer.add(listHolder_2);
-                            for (size_t i_2 = 0; i_2 < element_0.chargingTargets.count; ++i_2) {
-                                if (![element_0.chargingTargets[i_2] isKindOfClass:[MTREnergyEVSEClusterChargingTargetStruct class]]) {
-                                    // Wrong kind of value.
+                    if (element_0.dayOfWeekForSequence != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].dayOfWeekForSequence.Emplace();
+                        definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(element_0.dayOfWeekForSequence.unsignedCharValue);
+                    }
+                    if (element_0.chargingTargets != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].chargingTargets.Emplace();
+                        {
+                            using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
+                            using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                            if (element_0.chargingTargets.count != 0) {
+                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.chargingTargets.count);
+                                if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (MTREnergyEVSEClusterChargingTargetStruct *) element_0.chargingTargets[i_2];
-                                listHolder_2->mList[i_2].targetTimeMinutesPastMidnight = element_2.targetTimeMinutesPastMidnight.unsignedShortValue;
-                                if (element_2.targetSoC != nil) {
-                                    auto & definedValue_4 = listHolder_2->mList[i_2].targetSoC.Emplace();
-                                    definedValue_4 = element_2.targetSoC.unsignedCharValue;
+                                listFreer.add(listHolder_3);
+                                for (size_t i_3 = 0; i_3 < element_0.chargingTargets.count; ++i_3) {
+                                    if (![element_0.chargingTargets[i_3] isKindOfClass:[MTREnergyEVSEClusterChargingTargetStruct class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_3 = (MTREnergyEVSEClusterChargingTargetStruct *) element_0.chargingTargets[i_3];
+                                    listHolder_3->mList[i_3].targetTimeMinutesPastMidnight = element_3.targetTimeMinutesPastMidnight.unsignedShortValue;
+                                    if (element_3.targetSoC != nil) {
+                                        auto & definedValue_5 = listHolder_3->mList[i_3].targetSoC.Emplace();
+                                        definedValue_5 = element_3.targetSoC.unsignedCharValue;
+                                    }
+                                    if (element_3.addedEnergy != nil) {
+                                        auto & definedValue_5 = listHolder_3->mList[i_3].addedEnergy.Emplace();
+                                        definedValue_5 = element_3.addedEnergy.longLongValue;
+                                    }
                                 }
-                                if (element_2.addedEnergy != nil) {
-                                    auto & definedValue_4 = listHolder_2->mList[i_2].addedEnergy.Emplace();
-                                    definedValue_4 = element_2.addedEnergy.longLongValue;
-                                }
+                                definedValue_2 = ListType_3(listHolder_3->mList, element_0.chargingTargets.count);
+                            } else {
+                                definedValue_2 = ListType_3();
                             }
-                            listHolder_0->mList[i_0].chargingTargets = ListType_2(listHolder_2->mList, element_0.chargingTargets.count);
-                        } else {
-                            listHolder_0->mList[i_0].chargingTargets = ListType_2();
                         }
                     }
                 }

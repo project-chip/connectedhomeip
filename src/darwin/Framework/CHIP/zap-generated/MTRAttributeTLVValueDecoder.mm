@@ -8919,6 +8919,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
                     newElement_1.maxPower = [NSNumber numberWithLongLong:entry_1.maxPower];
                     newElement_1.minDuration = [NSNumber numberWithUnsignedInt:entry_1.minDuration];
                     newElement_1.maxDuration = [NSNumber numberWithUnsignedInt:entry_1.maxDuration];
+                    newElement_1.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.cause)];
                     [array_1 addObject:newElement_1];
                 }
                 CHIP_ERROR err = iter_1.GetStatus();
@@ -8943,7 +8944,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
             value = nil;
         } else {
             value = [MTRDeviceEnergyManagementClusterForecastStruct new];
-            value.forecastId = [NSNumber numberWithUnsignedShort:cppValue.Value().forecastId];
+            value.forecastId = [NSNumber numberWithUnsignedInt:cppValue.Value().forecastId];
             if (cppValue.Value().activeSlotNumber.IsNull()) {
                 value.activeSlotNumber = nil;
             } else {
@@ -8965,7 +8966,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
             } else {
                 value.latestEndTime = nil;
             }
-            value.isPauseable = [NSNumber numberWithBool:cppValue.Value().isPauseable];
+            value.isPausable = [NSNumber numberWithBool:cppValue.Value().isPausable];
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = cppValue.Value().slots.begin();
@@ -8978,10 +8979,10 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
                     newElement_2.defaultDuration = [NSNumber numberWithUnsignedInt:entry_2.defaultDuration];
                     newElement_2.elapsedSlotTime = [NSNumber numberWithUnsignedInt:entry_2.elapsedSlotTime];
                     newElement_2.remainingSlotTime = [NSNumber numberWithUnsignedInt:entry_2.remainingSlotTime];
-                    if (entry_2.slotIsPauseable.HasValue()) {
-                        newElement_2.slotIsPauseable = [NSNumber numberWithBool:entry_2.slotIsPauseable.Value()];
+                    if (entry_2.slotIsPausable.HasValue()) {
+                        newElement_2.slotIsPausable = [NSNumber numberWithBool:entry_2.slotIsPausable.Value()];
                     } else {
-                        newElement_2.slotIsPauseable = nil;
+                        newElement_2.slotIsPausable = nil;
                     }
                     if (entry_2.minPauseDuration.HasValue()) {
                         newElement_2.minPauseDuration = [NSNumber numberWithUnsignedInt:entry_2.minPauseDuration.Value()];

@@ -21869,7 +21869,7 @@ enum class Fields : uint8_t
     kDefaultDuration       = 2,
     kElapsedSlotTime       = 3,
     kRemainingSlotTime     = 4,
-    kSlotIsPauseable       = 5,
+    kSlotIsPausable        = 5,
     kMinPauseDuration      = 6,
     kMaxPauseDuration      = 7,
     kManufacturerESAState  = 8,
@@ -21892,7 +21892,7 @@ public:
     uint32_t defaultDuration   = static_cast<uint32_t>(0);
     uint32_t elapsedSlotTime   = static_cast<uint32_t>(0);
     uint32_t remainingSlotTime = static_cast<uint32_t>(0);
-    Optional<bool> slotIsPauseable;
+    Optional<bool> slotIsPausable;
     Optional<uint32_t> minPauseDuration;
     Optional<uint32_t> maxPauseDuration;
     Optional<uint16_t> manufacturerESAState;
@@ -21919,7 +21919,7 @@ public:
     uint32_t defaultDuration   = static_cast<uint32_t>(0);
     uint32_t elapsedSlotTime   = static_cast<uint32_t>(0);
     uint32_t remainingSlotTime = static_cast<uint32_t>(0);
-    Optional<bool> slotIsPauseable;
+    Optional<bool> slotIsPausable;
     Optional<uint32_t> minPauseDuration;
     Optional<uint32_t> maxPauseDuration;
     Optional<uint16_t> manufacturerESAState;
@@ -21948,7 +21948,7 @@ enum class Fields : uint8_t
     kEndTime              = 3,
     kEarliestStartTime    = 4,
     kLatestEndTime        = 5,
-    kIsPauseable          = 6,
+    kIsPausable           = 6,
     kSlots                = 7,
     kForecastUpdateReason = 8,
 };
@@ -21956,13 +21956,13 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint16_t forecastId = static_cast<uint16_t>(0);
+    uint32_t forecastId = static_cast<uint32_t>(0);
     DataModel::Nullable<uint16_t> activeSlotNumber;
     uint32_t startTime = static_cast<uint32_t>(0);
     uint32_t endTime   = static_cast<uint32_t>(0);
     Optional<DataModel::Nullable<uint32_t>> earliestStartTime;
     Optional<uint32_t> latestEndTime;
-    bool isPauseable = static_cast<bool>(0);
+    bool isPausable = static_cast<bool>(0);
     DataModel::List<const Structs::SlotStruct::Type> slots;
     ForecastUpdateReasonEnum forecastUpdateReason = static_cast<ForecastUpdateReasonEnum>(0);
 
@@ -21974,13 +21974,13 @@ public:
 struct DecodableType
 {
 public:
-    uint16_t forecastId = static_cast<uint16_t>(0);
+    uint32_t forecastId = static_cast<uint32_t>(0);
     DataModel::Nullable<uint16_t> activeSlotNumber;
     uint32_t startTime = static_cast<uint32_t>(0);
     uint32_t endTime   = static_cast<uint32_t>(0);
     Optional<DataModel::Nullable<uint32_t>> earliestStartTime;
     Optional<uint32_t> latestEndTime;
-    bool isPauseable = static_cast<bool>(0);
+    bool isPausable = static_cast<bool>(0);
     DataModel::DecodableList<Structs::SlotStruct::DecodableType> slots;
     ForecastUpdateReasonEnum forecastUpdateReason = static_cast<ForecastUpdateReasonEnum>(0);
 
@@ -22026,15 +22026,17 @@ enum class Fields : uint8_t
     kMaxPower    = 1,
     kMinDuration = 2,
     kMaxDuration = 3,
+    kCause       = 4,
 };
 
 struct Type
 {
 public:
-    int64_t minPower     = static_cast<int64_t>(0);
-    int64_t maxPower     = static_cast<int64_t>(0);
-    uint32_t minDuration = static_cast<uint32_t>(0);
-    uint32_t maxDuration = static_cast<uint32_t>(0);
+    int64_t minPower            = static_cast<int64_t>(0);
+    int64_t maxPower            = static_cast<int64_t>(0);
+    uint32_t minDuration        = static_cast<uint32_t>(0);
+    uint32_t maxDuration        = static_cast<uint32_t>(0);
+    PowerAdjustReasonEnum cause = static_cast<PowerAdjustReasonEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -22057,9 +22059,9 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint8_t slotIndex    = static_cast<uint8_t>(0);
-    int64_t nominalPower = static_cast<int64_t>(0);
-    uint32_t duration    = static_cast<uint32_t>(0);
+    uint8_t slotIndex = static_cast<uint8_t>(0);
+    Optional<int64_t> nominalPower;
+    uint32_t duration = static_cast<uint32_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -22722,8 +22724,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
-    DataModel::List<const Structs::ChargingTargetStruct::Type> chargingTargets;
+    Optional<chip::BitMask<TargetDayOfWeekBitmap>> dayOfWeekForSequence;
+    Optional<DataModel::List<const Structs::ChargingTargetStruct::Type>> chargingTargets;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -22733,8 +22735,8 @@ public:
 struct DecodableType
 {
 public:
-    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
-    DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> chargingTargets;
+    Optional<chip::BitMask<TargetDayOfWeekBitmap>> dayOfWeekForSequence;
+    Optional<DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType>> chargingTargets;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -23483,9 +23485,10 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kSessionID      = 0,
-    kState          = 1,
-    kMaximumCurrent = 2,
+    kSessionID                 = 0,
+    kState                     = 1,
+    kMaximumCurrent            = 2,
+    kMaximumDischargingCurrent = 3,
 };
 
 struct Type
@@ -23499,6 +23502,7 @@ public:
     uint32_t sessionID     = static_cast<uint32_t>(0);
     StateEnum state        = static_cast<StateEnum>(0);
     int64_t maximumCurrent = static_cast<int64_t>(0);
+    Optional<int64_t> maximumDischargingCurrent;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -23513,6 +23517,7 @@ public:
     uint32_t sessionID     = static_cast<uint32_t>(0);
     StateEnum state        = static_cast<StateEnum>(0);
     int64_t maximumCurrent = static_cast<int64_t>(0);
+    Optional<int64_t> maximumDischargingCurrent;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -23526,6 +23531,7 @@ enum class Fields : uint8_t
     kState             = 1,
     kReason            = 2,
     kEnergyTransferred = 4,
+    kEnergyDischarged  = 5,
 };
 
 struct Type
@@ -23540,6 +23546,7 @@ public:
     StateEnum state                        = static_cast<StateEnum>(0);
     EnergyTransferStoppedReasonEnum reason = static_cast<EnergyTransferStoppedReasonEnum>(0);
     int64_t energyTransferred              = static_cast<int64_t>(0);
+    Optional<int64_t> energyDischarged;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -23555,6 +23562,7 @@ public:
     StateEnum state                        = static_cast<StateEnum>(0);
     EnergyTransferStoppedReasonEnum reason = static_cast<EnergyTransferStoppedReasonEnum>(0);
     int64_t energyTransferred              = static_cast<int64_t>(0);
+    Optional<int64_t> energyDischarged;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

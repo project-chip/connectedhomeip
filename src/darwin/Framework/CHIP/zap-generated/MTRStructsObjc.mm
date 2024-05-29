@@ -5266,7 +5266,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _remainingSlotTime = @(0);
 
-        _slotIsPauseable = nil;
+        _slotIsPausable = nil;
 
         _minPauseDuration = nil;
 
@@ -5304,7 +5304,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.defaultDuration = self.defaultDuration;
     other.elapsedSlotTime = self.elapsedSlotTime;
     other.remainingSlotTime = self.remainingSlotTime;
-    other.slotIsPauseable = self.slotIsPauseable;
+    other.slotIsPausable = self.slotIsPausable;
     other.minPauseDuration = self.minPauseDuration;
     other.maxPauseDuration = self.maxPauseDuration;
     other.manufacturerESAState = self.manufacturerESAState;
@@ -5323,7 +5323,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minDuration:%@; maxDuration:%@; defaultDuration:%@; elapsedSlotTime:%@; remainingSlotTime:%@; slotIsPauseable:%@; minPauseDuration:%@; maxPauseDuration:%@; manufacturerESAState:%@; nominalPower:%@; minPower:%@; maxPower:%@; nominalEnergy:%@; costs:%@; minPowerAdjustment:%@; maxPowerAdjustment:%@; minDurationAdjustment:%@; maxDurationAdjustment:%@; >", NSStringFromClass([self class]), _minDuration, _maxDuration, _defaultDuration, _elapsedSlotTime, _remainingSlotTime, _slotIsPauseable, _minPauseDuration, _maxPauseDuration, _manufacturerESAState, _nominalPower, _minPower, _maxPower, _nominalEnergy, _costs, _minPowerAdjustment, _maxPowerAdjustment, _minDurationAdjustment, _maxDurationAdjustment];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minDuration:%@; maxDuration:%@; defaultDuration:%@; elapsedSlotTime:%@; remainingSlotTime:%@; slotIsPausable:%@; minPauseDuration:%@; maxPauseDuration:%@; manufacturerESAState:%@; nominalPower:%@; minPower:%@; maxPower:%@; nominalEnergy:%@; costs:%@; minPowerAdjustment:%@; maxPowerAdjustment:%@; minDurationAdjustment:%@; maxDurationAdjustment:%@; >", NSStringFromClass([self class]), _minDuration, _maxDuration, _defaultDuration, _elapsedSlotTime, _remainingSlotTime, _slotIsPausable, _minPauseDuration, _maxPauseDuration, _manufacturerESAState, _nominalPower, _minPower, _maxPower, _nominalEnergy, _costs, _minPowerAdjustment, _maxPowerAdjustment, _minDurationAdjustment, _maxDurationAdjustment];
     return descriptionString;
 }
 
@@ -5346,7 +5346,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _latestEndTime = nil;
 
-        _isPauseable = @(0);
+        _isPausable = @(0);
 
         _slots = [NSArray array];
 
@@ -5365,7 +5365,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.endTime = self.endTime;
     other.earliestStartTime = self.earliestStartTime;
     other.latestEndTime = self.latestEndTime;
-    other.isPauseable = self.isPauseable;
+    other.isPausable = self.isPausable;
     other.slots = self.slots;
     other.forecastUpdateReason = self.forecastUpdateReason;
 
@@ -5374,7 +5374,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; activeSlotNumber:%@; startTime:%@; endTime:%@; earliestStartTime:%@; latestEndTime:%@; isPauseable:%@; slots:%@; forecastUpdateReason:%@; >", NSStringFromClass([self class]), _forecastId, _activeSlotNumber, _startTime, _endTime, _earliestStartTime, _latestEndTime, _isPauseable, _slots, _forecastUpdateReason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; activeSlotNumber:%@; startTime:%@; endTime:%@; earliestStartTime:%@; latestEndTime:%@; isPausable:%@; slots:%@; forecastUpdateReason:%@; >", NSStringFromClass([self class]), _forecastId, _activeSlotNumber, _startTime, _endTime, _earliestStartTime, _latestEndTime, _isPausable, _slots, _forecastUpdateReason];
     return descriptionString;
 }
 
@@ -5431,6 +5431,8 @@ NS_ASSUME_NONNULL_BEGIN
         _minDuration = @(0);
 
         _maxDuration = @(0);
+
+        _cause = @(0);
     }
     return self;
 }
@@ -5443,13 +5445,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.maxPower = self.maxPower;
     other.minDuration = self.minDuration;
     other.maxDuration = self.maxDuration;
+    other.cause = self.cause;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minPower:%@; maxPower:%@; minDuration:%@; maxDuration:%@; >", NSStringFromClass([self class]), _minPower, _maxPower, _minDuration, _maxDuration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minPower:%@; maxPower:%@; minDuration:%@; maxDuration:%@; cause:%@; >", NSStringFromClass([self class]), _minPower, _maxPower, _minDuration, _maxDuration, _cause];
     return descriptionString;
 }
 
@@ -5462,7 +5465,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _slotIndex = @(0);
 
-        _nominalPower = @(0);
+        _nominalPower = nil;
 
         _duration = @(0);
     }
@@ -5632,9 +5635,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _dayOfWeekForSequence = @(0);
+        _dayOfWeekForSequence = nil;
 
-        _chargingTargets = [NSArray array];
+        _chargingTargets = nil;
     }
     return self;
 }
@@ -5733,6 +5736,8 @@ NS_ASSUME_NONNULL_BEGIN
         _state = @(0);
 
         _maximumCurrent = @(0);
+
+        _maximumDischargingCurrent = nil;
     }
     return self;
 }
@@ -5744,13 +5749,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.sessionID = self.sessionID;
     other.state = self.state;
     other.maximumCurrent = self.maximumCurrent;
+    other.maximumDischargingCurrent = self.maximumDischargingCurrent;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; maximumCurrent:%@; >", NSStringFromClass([self class]), _sessionID, _state, _maximumCurrent];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; maximumCurrent:%@; maximumDischargingCurrent:%@; >", NSStringFromClass([self class]), _sessionID, _state, _maximumCurrent, _maximumDischargingCurrent];
     return descriptionString;
 }
 
@@ -5768,6 +5774,8 @@ NS_ASSUME_NONNULL_BEGIN
         _reason = @(0);
 
         _energyTransferred = @(0);
+
+        _energyDischarged = nil;
     }
     return self;
 }
@@ -5780,13 +5788,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.state = self.state;
     other.reason = self.reason;
     other.energyTransferred = self.energyTransferred;
+    other.energyDischarged = self.energyDischarged;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; reason:%@; energyTransferred:%@; >", NSStringFromClass([self class]), _sessionID, _state, _reason, _energyTransferred];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; reason:%@; energyTransferred:%@; energyDischarged:%@; >", NSStringFromClass([self class]), _sessionID, _state, _reason, _energyTransferred, _energyDischarged];
     return descriptionString;
 }
 

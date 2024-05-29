@@ -15607,7 +15607,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kDefaultDuration), defaultDuration);
     encoder.Encode(to_underlying(Fields::kElapsedSlotTime), elapsedSlotTime);
     encoder.Encode(to_underlying(Fields::kRemainingSlotTime), remainingSlotTime);
-    encoder.Encode(to_underlying(Fields::kSlotIsPauseable), slotIsPauseable);
+    encoder.Encode(to_underlying(Fields::kSlotIsPausable), slotIsPausable);
     encoder.Encode(to_underlying(Fields::kMinPauseDuration), minPauseDuration);
     encoder.Encode(to_underlying(Fields::kMaxPauseDuration), maxPauseDuration);
     encoder.Encode(to_underlying(Fields::kManufacturerESAState), manufacturerESAState);
@@ -15657,9 +15657,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, remainingSlotTime);
         }
-        else if (__context_tag == to_underlying(Fields::kSlotIsPauseable))
+        else if (__context_tag == to_underlying(Fields::kSlotIsPausable))
         {
-            err = DataModel::Decode(reader, slotIsPauseable);
+            err = DataModel::Decode(reader, slotIsPausable);
         }
         else if (__context_tag == to_underlying(Fields::kMinPauseDuration))
         {
@@ -15729,7 +15729,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kEndTime), endTime);
     encoder.Encode(to_underlying(Fields::kEarliestStartTime), earliestStartTime);
     encoder.Encode(to_underlying(Fields::kLatestEndTime), latestEndTime);
-    encoder.Encode(to_underlying(Fields::kIsPauseable), isPauseable);
+    encoder.Encode(to_underlying(Fields::kIsPausable), isPausable);
     encoder.Encode(to_underlying(Fields::kSlots), slots);
     encoder.Encode(to_underlying(Fields::kForecastUpdateReason), forecastUpdateReason);
     return encoder.Finalize();
@@ -15773,9 +15773,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, latestEndTime);
         }
-        else if (__context_tag == to_underlying(Fields::kIsPauseable))
+        else if (__context_tag == to_underlying(Fields::kIsPausable))
         {
-            err = DataModel::Decode(reader, isPauseable);
+            err = DataModel::Decode(reader, isPausable);
         }
         else if (__context_tag == to_underlying(Fields::kSlots))
         {
@@ -15859,6 +15859,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kMaxPower), maxPower);
     encoder.Encode(to_underlying(Fields::kMinDuration), minDuration);
     encoder.Encode(to_underlying(Fields::kMaxDuration), maxDuration);
+    encoder.Encode(to_underlying(Fields::kCause), cause);
     return encoder.Finalize();
 }
 
@@ -15891,6 +15892,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMaxDuration))
         {
             err = DataModel::Decode(reader, maxDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kCause))
+        {
+            err = DataModel::Decode(reader, cause);
         }
         else
         {
@@ -16875,6 +16880,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSessionID), sessionID));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kState), state));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMaximumCurrent), maximumCurrent));
+    ReturnErrorOnFailure(
+        DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMaximumDischargingCurrent), maximumDischargingCurrent));
     return aWriter.EndContainer(outer);
 }
 
@@ -16904,6 +16911,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, maximumCurrent);
         }
+        else if (__context_tag == to_underlying(Fields::kMaximumDischargingCurrent))
+        {
+            err = DataModel::Decode(reader, maximumDischargingCurrent);
+        }
         else
         {
         }
@@ -16921,6 +16932,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kState), state));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kReason), reason));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEnergyTransferred), energyTransferred));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEnergyDischarged), energyDischarged));
     return aWriter.EndContainer(outer);
 }
 
@@ -16953,6 +16965,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEnergyTransferred))
         {
             err = DataModel::Decode(reader, energyTransferred);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnergyDischarged))
+        {
+            err = DataModel::Decode(reader, energyDischarged);
         }
         else
         {

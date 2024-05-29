@@ -2806,10 +2806,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("SlotIsPauseable", indent + 1, value.slotIsPauseable);
+        CHIP_ERROR err = LogValue("SlotIsPausable", indent + 1, value.slotIsPausable);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SlotIsPauseable'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SlotIsPausable'");
             return err;
         }
     }
@@ -2968,10 +2968,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("IsPauseable", indent + 1, value.isPauseable);
+        CHIP_ERROR err = LogValue("IsPausable", indent + 1, value.isPausable);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IsPauseable'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IsPausable'");
             return err;
         }
     }
@@ -3080,6 +3080,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxDuration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Cause", indent + 1, value.cause);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cause'");
             return err;
         }
     }
@@ -6519,6 +6527,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("MaximumDischargingCurrent", indent + 1, value.maximumDischargingCurrent);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MaximumDischargingCurrent'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -6556,6 +6572,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'EnergyTransferred'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("EnergyDischarged", indent + 1, value.energyDischarged);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'EnergyDischarged'");
             return err;
         }
     }

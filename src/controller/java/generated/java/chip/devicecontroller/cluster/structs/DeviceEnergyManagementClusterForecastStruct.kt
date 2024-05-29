@@ -25,13 +25,13 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class DeviceEnergyManagementClusterForecastStruct(
-  val forecastId: UInt,
+  val forecastId: ULong,
   val activeSlotNumber: UInt?,
   val startTime: ULong,
   val endTime: ULong,
   val earliestStartTime: Optional<ULong>?,
   val latestEndTime: Optional<ULong>,
-  val isPauseable: Boolean,
+  val isPausable: Boolean,
   val slots: List<DeviceEnergyManagementClusterSlotStruct>,
   val forecastUpdateReason: UInt
 ) {
@@ -43,7 +43,7 @@ class DeviceEnergyManagementClusterForecastStruct(
     append("\tendTime : $endTime\n")
     append("\tearliestStartTime : $earliestStartTime\n")
     append("\tlatestEndTime : $latestEndTime\n")
-    append("\tisPauseable : $isPauseable\n")
+    append("\tisPausable : $isPausable\n")
     append("\tslots : $slots\n")
     append("\tforecastUpdateReason : $forecastUpdateReason\n")
     append("}\n")
@@ -72,7 +72,7 @@ class DeviceEnergyManagementClusterForecastStruct(
         val optlatestEndTime = latestEndTime.get()
         put(ContextSpecificTag(TAG_LATEST_END_TIME), optlatestEndTime)
       }
-      put(ContextSpecificTag(TAG_IS_PAUSEABLE), isPauseable)
+      put(ContextSpecificTag(TAG_IS_PAUSABLE), isPausable)
       startArray(ContextSpecificTag(TAG_SLOTS))
       for (item in slots.iterator()) {
         item.toTlv(AnonymousTag, this)
@@ -90,13 +90,13 @@ class DeviceEnergyManagementClusterForecastStruct(
     private const val TAG_END_TIME = 3
     private const val TAG_EARLIEST_START_TIME = 4
     private const val TAG_LATEST_END_TIME = 5
-    private const val TAG_IS_PAUSEABLE = 6
+    private const val TAG_IS_PAUSABLE = 6
     private const val TAG_SLOTS = 7
     private const val TAG_FORECAST_UPDATE_REASON = 8
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementClusterForecastStruct {
       tlvReader.enterStructure(tlvTag)
-      val forecastId = tlvReader.getUInt(ContextSpecificTag(TAG_FORECAST_ID))
+      val forecastId = tlvReader.getULong(ContextSpecificTag(TAG_FORECAST_ID))
       val activeSlotNumber =
         if (!tlvReader.isNull()) {
           tlvReader.getUInt(ContextSpecificTag(TAG_ACTIVE_SLOT_NUMBER))
@@ -123,7 +123,7 @@ class DeviceEnergyManagementClusterForecastStruct(
         } else {
           Optional.empty()
         }
-      val isPauseable = tlvReader.getBoolean(ContextSpecificTag(TAG_IS_PAUSEABLE))
+      val isPausable = tlvReader.getBoolean(ContextSpecificTag(TAG_IS_PAUSABLE))
       val slots =
         buildList<DeviceEnergyManagementClusterSlotStruct> {
           tlvReader.enterArray(ContextSpecificTag(TAG_SLOTS))
@@ -143,7 +143,7 @@ class DeviceEnergyManagementClusterForecastStruct(
         endTime,
         earliestStartTime,
         latestEndTime,
-        isPauseable,
+        isPausable,
         slots,
         forecastUpdateReason
       )

@@ -1767,6 +1767,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement:
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::PowerAdjustReasonEnum val)
+{
+    using EnumType = DeviceEnergyManagement::PowerAdjustReasonEnum;
+    switch (val)
+    {
+    case EnumType::kNoAdjustment:
+    case EnumType::kLocalOptimizationAdjustment:
+    case EnumType::kGridOptimizationAdjustment:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::EnergyTransferStoppedReasonEnum val)
 {
@@ -1835,6 +1848,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
     case EnumType::kDischargingEnabled:
     case EnumType::kDisabledError:
     case EnumType::kDisabledDiagnostics:
+    case EnumType::kEnabled:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
