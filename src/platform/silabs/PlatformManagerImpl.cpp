@@ -75,7 +75,7 @@ static sl_status_t init_entropy_source()
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
     // Initiate and program the key required for TRNG hardware engine
-    status = sl_si91x_trng_program_key(reinterpret_cast<uint32_t *>(trngKey), TRNGKEY_SIZE);
+    status = sl_si91x_trng_program_key((uint32_t *) (trngKey), TRNGKEY_SIZE);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
     return SL_STATUS_OK;
 }
