@@ -66,7 +66,7 @@ public:
     virtual CHIP_ERROR Encode(TLV::TLVWriter &, TLV::Tag tag) = 0;
 };
 
-/// An `EncoderToTLV` the uses `DataModel::Encode` to encode things.
+/// An `EncoderToTLV` that uses `DataModel::Encode` to encode things.
 ///
 /// Generally useful to encode things like <ClusterName>::Commands::<CommandName>::Type
 /// structures.
@@ -74,6 +74,11 @@ template <typename T>
 class DataModelEncoderToTLV : public EncoderToTLV
 {
 public:
+    /// Encodes the given value via `DataModel::Encode` when the underlying
+    /// encode is called.
+    ///
+    /// LIFETIME NOTE: uses a reference to value, so value must live longer than
+    ///                this object.
     DataModelEncoderToTLV(const T & value) : mValue(value) {}
 
     virtual CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) { return DataModel::Encode(writer, tag, mValue); }
@@ -350,18 +355,16 @@ public:
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
      * @param [in] aData the data for the response.
-     *
-     * NOTE: this is a convenience function for `AddResponseDataViaEncoder`
      */
     template <typename CommandData>
-    inline CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
         DataModelEncoderToTLV<CommandData> encoder(aData);
-        return AddResponseDataViaEncoder(aRequestCommandPath, CommandData::GetCommandId(), encoder);
+        return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), encoder);
     }
 
     /**
-     * API for adding a data response.  The encoded is generally expected to encode
+     * API for adding a data response.  The `encoder` is generally expected to encode
      * a ClusterName::Commands::CommandName::Type struct, but any
      * object should work.
      *
@@ -374,13 +377,13 @@ public:
      * Most applications are likely to use `AddResponseData` as a more convenient
      * one-call that auto-sets command ID and creates the underlying encoders.
      */
-    CHIP_ERROR AddResponseDataViaEncoder(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
                                          EncoderToTLV & encoder)
     {
         // Return early when response should not be sent out.
         VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
         return TryAddingResponse(
-            [&]() -> CHIP_ERROR { return TryAddResponseDataViaEncoder(aRequestCommandPath, commandId, encoder); });
+            [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, commandId, encoder); });
     }
 
     /**
@@ -398,10 +401,10 @@ public:
      * @param [in] aData the data for the response.
      */
     template <typename CommandData>
-    inline void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
         DataModelEncoderToTLV<CommandData> encoder(aData);
-        return AddResponseViaEncoder(aRequestCommandPath, CommandData::GetCommandId(), encoder);
+        return AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encoder);
     }
 
     /**
@@ -410,9 +413,9 @@ public:
      * The encoder would generally encode a ClusterName::Commands::CommandName::Type with
      * the corresponding `GetCommandId` call.
      */
-    void AddResponseViaEncoder(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder)
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder)
     {
-        if (AddResponseDataViaEncoder(aRequestCommandPath, commandId, encoder) != CHIP_NO_ERROR)
+        if (AddResponseData(aRequestCommandPath, commandId, encoder) != CHIP_NO_ERROR)
         {
             AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
         }
@@ -699,7 +702,7 @@ private:
      *             responding to.
      * @param [in] aData the data for the response.
      */
-    CHIP_ERROR TryAddResponseDataViaEncoder(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
                                             EncoderToTLV & encoder)
     {
         ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, commandId };
