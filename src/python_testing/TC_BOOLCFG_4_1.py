@@ -34,7 +34,8 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
         steps = [
             TestStep(1, "{comDutTH}.", "", is_commissioning=True),
             TestStep(2, "{THread} _Featuremap_ attribute.", "{DUTreply} the _Featuremap_ attribute."),
-            TestStep(3, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSSUPPORTED}_ attribute. {storeValueAs} supportedAlarms.", "{resDutSuccess} and that the received value is not 0."),
+            TestStep(3, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSSUPPORTED}_ attribute. {storeValueAs} supportedAlarms.",
+                     "{resDutSuccess} and that the received value is not 0."),
             TestStep("4a", "If the _{F_VIS}_ {featIsSupported}.", "Verify that bit 0 in supportedAlarms is set to 1."),
             TestStep("4b", "If the _{F_VIS}_ {featIsNotSupported}.", "Verify that bit 0 in supportedAlarms is set to 0."),
             TestStep("5a", "If the _{F_AUD}_ {featIsSupported}.", "Verify that bit 1 in supportedAlarms is set to 1."),

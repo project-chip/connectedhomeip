@@ -41,19 +41,23 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
             TestStep("2b", "{THread} _AttributeList_ attribute.", "{DUTreply} the _AttributeList_ attribute."),
             # Enable all supported alarms (if supported)
             TestStep("3a", "If the _{A_ALARMSENABLED}_ {attrIsSupported}, create variable named enabledAlarms", ""),
-            TestStep("3b", "If the _{A_ALARMSENABLED}_ {attrIsSupported} and _{F_VIS}_ {featIsSupported}, set bit 0 in enabledAlarms to 1.", ""),
-            TestStep("3c", "If the _{A_ALARMSENABLED}_ {attrIsSupported} and _{F_AUD}_ {featIsSupported}, set bit 1 in enabledAlarms to 1.", ""),
+            TestStep(
+                "3b", "If the _{A_ALARMSENABLED}_ {attrIsSupported} and _{F_VIS}_ {featIsSupported}, set bit 0 in enabledAlarms to 1.", ""),
+            TestStep(
+                "3c", "If the _{A_ALARMSENABLED}_ {attrIsSupported} and _{F_AUD}_ {featIsSupported}, set bit 1 in enabledAlarms to 1.", ""),
             TestStep("3d", "{ifAttrIsSupported}, {THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
             # Check that the supported alarms are active
             TestStep(4, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorTrigger event.", "{resDutSuccess}."),
-            TestStep(5, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute. {storeValueAs} activeAlarms.", "{resDutSuccess} and that the received value is not 0."),
+            TestStep(5, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute. {storeValueAs} activeAlarms.",
+                     "{resDutSuccess} and that the received value is not 0."),
             TestStep("6a", "If the _{F_VIS}_ {featIsSupported}.", "Verify that bit 0 in activeAlarms is set to 1."),
             TestStep("6b", "If the _{F_VIS}_ {featIsNotSupported}.", "Verify that bit 0 in activeAlarms is set to 0."),
             TestStep("7a", "If the _{F_AUD}_ {featIsSupported}.", "Verify that bit 1 in activeAlarms is set to 1."),
             TestStep("7b", "If the _{F_AUD}_ {featIsNotSupported}.", "Verify that bit 1 in activeAlarms is set to 0."),
             # Check that the supported alarms are no longer active
             TestStep(8, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorUntrigger event.", "{resDutSuccess}."),
-            TestStep(9, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.", "{resDutSuccess} and that the received value is 0."),
+            TestStep(9, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.",
+                     "{resDutSuccess} and that the received value is 0."),
         ]
         return steps
 

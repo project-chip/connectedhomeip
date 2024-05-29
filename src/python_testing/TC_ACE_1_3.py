@@ -51,7 +51,8 @@ class TC_ACE_1_3(MatterBaseTest):
 
     def steps_TC_ACE_1_3(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Precondition: TH0 commissions DUT using admin node ID `N0`", "DUT is commissioned on TH0 fabric", is_commissioning=True),
+            TestStep(1, "Precondition: TH0 commissions DUT using admin node ID `N0`",
+                     "DUT is commissioned on TH0 fabric", is_commissioning=True),
             # Subjects: wildcard
             TestStep(
                 2, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: null\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
@@ -136,7 +137,8 @@ class TC_ACE_1_3(MatterBaseTest):
             TestStep(55, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(56, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(57, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
-            TestStep(58, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute to reset\nit back to the default State.\nValue is list of AccessControlEntryStruct containing 1 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: null", "Result is SUCCESS"),
+            TestStep(
+                58, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute to reset\nit back to the default State.\nValue is list of AccessControlEntryStruct containing 1 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: null", "Result is SUCCESS"),
         ]
         return steps
 

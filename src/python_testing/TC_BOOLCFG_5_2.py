@@ -45,12 +45,17 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
             # Make sure all supported alarms are enabled
             TestStep("5a", "If the _{F_VIS}_ {featIsSupported}, set bit 0 in enabledAlarms to 1.", ""),
             TestStep("5b", "If the _{F_AUD}_ {featIsSupported}, set bit 1 in enabledAlarms to 1.", ""),
-            TestStep("5c", "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
+            TestStep(
+                "5c", "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
             TestStep(6, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorTrigger event.", "{resDutSuccess}."),
-            TestStep(7, "If the _{F_VIS}_ {featIsSupported}, {THcommand} _{C_SUPPRESSALARM}_ command with AlarmsToSuppress field set to 0b01.", "{stSuccess}."),
-            TestStep(8, "If the _{F_VIS}_ {featIsSupported}, {THread} _{A_ALARMSSUPPRESSED}_ attribute.", "{resDutSuccess} and that bit 0 is set to 1, in the received value."),
-            TestStep(9, "If the _{F_AUD}_ {featIsSupported}, {THcommand} _{C_SUPPRESSALARM}_ command with AlarmsToSuppress field set to 0b10.", "{stSuccess}."),
-            TestStep(10, "If the _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSSUPPRESSED}_ attribute.", "{resDutSuccess} and that bit 1 is set to 1, in the received value."),
+            TestStep(
+                7, "If the _{F_VIS}_ {featIsSupported}, {THcommand} _{C_SUPPRESSALARM}_ command with AlarmsToSuppress field set to 0b01.", "{stSuccess}."),
+            TestStep(8, "If the _{F_VIS}_ {featIsSupported}, {THread} _{A_ALARMSSUPPRESSED}_ attribute.",
+                     "{resDutSuccess} and that bit 0 is set to 1, in the received value."),
+            TestStep(
+                9, "If the _{F_AUD}_ {featIsSupported}, {THcommand} _{C_SUPPRESSALARM}_ command with AlarmsToSuppress field set to 0b10.", "{stSuccess}."),
+            TestStep(10, "If the _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSSUPPRESSED}_ attribute.",
+                     "{resDutSuccess} and that bit 1 is set to 1, in the received value."),
             TestStep(11, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorUntrigger event.", "{resDutSuccess}."),
         ]
         return steps

@@ -41,9 +41,11 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
             TestStep(3, "{THread} _{A_SUPPORTEDSENSITIVITYLEVELS}_ attribute. {storeValueAs} numberOfSupportedLevels.", "{resDutSuccess}."),
             TestStep(4, "{ifAttrIsSupported}, {THread} _{A_DEFAULTSENSITIVITYLEVEL}_ attribute. {storeValueAs} defaultLevel.", "{resDutSuccess}."),
             TestStep(5, "{THread} _{A_CURRENTSENSITIVITYLEVEL}_ attribute. {storeValueAs} currentLevel.", "{resDutSuccess}."),
-            TestStep(6, "TH loops through the number of supported sensitivity levels (0 to numberOfSupportedLevels - 1) and\n                {THwrite} each value to the _{A_CURRENTSENSITIVITYLEVEL}_ attribute.", "{resDutSuccess} for all write interactions."),
+            TestStep(
+                6, "TH loops through the number of supported sensitivity levels (0 to numberOfSupportedLevels - 1) and\n                {THwrite} each value to the _{A_CURRENTSENSITIVITYLEVEL}_ attribute.", "{resDutSuccess} for all write interactions."),
             TestStep(7, "If the _{A_DEFAULTSENSITIVITYLEVEL}_ {attrIsSupported}, {THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to a supported value that is NOT the value of defaultLevel.", "{resDutSuccess}."),
-            TestStep(8, "If the _{A_DEFAULTSENSITIVITYLEVEL}_ {attrIsSupported}, {THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to the value of defaultLevel.", "{resDutSuccess}."),
+            TestStep(
+                8, "If the _{A_DEFAULTSENSITIVITYLEVEL}_ {attrIsSupported}, {THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to the value of defaultLevel.", "{resDutSuccess}."),
             TestStep(9, "{THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to numberOfSupportedLevels.", "{resDutConstraintError}."),
             TestStep(10, "{THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to 255.", "{resDutConstraintError}."),
             TestStep(11, "{THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to the value of currentLevel.", "{resDutSuccess}."),

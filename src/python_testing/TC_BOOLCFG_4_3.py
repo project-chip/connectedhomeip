@@ -45,33 +45,43 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
             TestStep(4, "Create variable named enabledAlarms and set the value to 0.", ""),
             # Enable only visual alarming
             TestStep("5a", "If the _{F_VIS}_ {featIsSupported}, set bit 0 in enabledAlarms to 1.", ""),
-            TestStep("5b", "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
+            TestStep(
+                "5b", "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
             # Check that the VIS alarm is active
             TestStep(6, "If the _{F_VIS}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorTrigger event.", "{resDutSuccess}."),
-            TestStep(7, "If the _{F_VIS}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.", "{resDutSuccess} and that bit 0 is set to 1 and bit 1 is set to 0, in the received value."),
+            TestStep(7, "If the _{F_VIS}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.",
+                     "{resDutSuccess} and that bit 0 is set to 1 and bit 1 is set to 0, in the received value."),
             # Check that the VIS alarm is no longer active
             TestStep(8, "If the _{F_VIS}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorUntrigger event.", "{resDutSuccess}."),
-            TestStep(9, "If the _{F_VIS}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.", "{resDutSuccess} and that the received value is 0."),
+            TestStep(9, "If the _{F_VIS}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.",
+                     "{resDutSuccess} and that the received value is 0."),
             TestStep(10, "Set the value of enabledAlarms to 0.", ""),
             # Disable visual alarming
-            TestStep(11, "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
+            TestStep(
+                11, "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
             TestStep(12, "If the _{F_VIS}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorTrigger event.", "{resDutSuccess}."),
-            TestStep(13, "If the _{F_VIS}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.", "{resDutSuccess} and that the received value is 0."),
+            TestStep(13, "If the _{F_VIS}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.",
+                     "{resDutSuccess} and that the received value is 0."),
             TestStep(14, "If the _{F_VIS}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorUntrigger event.", "{resDutSuccess}."),
             # Verify AUD alarms is not being emitted if disabled. Enable only audible alarming (if supported)
             TestStep("15a", "If the _{F_AUD}_ {featIsSupported}, set bit 0 in enabledAlarms to 1.", ""),
-            TestStep("15b", "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
+            TestStep(
+                "15b", "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
             # Check that the VIS alarms is active
             TestStep(16, "If the _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorTrigger event.", "{resDutSuccess}."),
-            TestStep(17, "If the _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.", "{resDutSuccess} and that bit 0 is set to 0 and bit 1 is set to 1, in the received value."),
+            TestStep(17, "If the _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.",
+                     "{resDutSuccess} and that bit 0 is set to 0 and bit 1 is set to 1, in the received value."),
             # Check that the VIS alarms is no longer active
             TestStep(18, "If the _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorUntrigger event.", "{resDutSuccess}."),
-            TestStep(19, "If the _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.", "{resDutSuccess} and that the received value is 0."),
+            TestStep(19, "If the _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.",
+                     "{resDutSuccess} and that the received value is 0."),
             TestStep(20, "Set the value of enabledAlarms to 0.", ""),
             # Disable audible alarming
-            TestStep(21, "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
+            TestStep(
+                21, "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
             TestStep(22, "If the _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorTrigger event.", "{resDutSuccess}."),
-            TestStep(23, "If the _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.", "{resDutSuccess} and that the received value is 0."),
+            TestStep(23, "If the _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.",
+                     "{resDutSuccess} and that the received value is 0."),
             TestStep(24, "If the _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorUntrigger event.", "{resDutSuccess}."),
         ]
         return steps
