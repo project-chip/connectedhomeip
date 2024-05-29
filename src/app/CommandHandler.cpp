@@ -15,21 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file defines object for a CHIP IM Invoke Command Handler
- *
- */
-
-#include "CommandHandler.h"
-#include "InteractionModelEngine.h"
-#include "RequiredPrivilege.h"
-#include "messaging/ExchangeContext.h"
+#include <app/CommandHandler.h>
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/RequiredPrivilege.h>
+#include <app/StatusResponse.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
@@ -37,6 +28,7 @@
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/ExchangeContext.h>
 #include <platform/LockTracker.h>
 #include <protocols/secure_channel/Constants.h>
 

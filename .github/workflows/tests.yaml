@@ -189,6 +189,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/wifi-network-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
