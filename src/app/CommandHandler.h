@@ -340,7 +340,7 @@ public:
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
      * @param [in] aResponseCommandId the command whose content is being encoded.
-     * @param [in] aEncodable - an encodable that places the command data structure 
+     * @param [in] aEncodable - an encodable that places the command data structure
      *             for `aResponseCommandId` into a TLV Writer.
      *
      * Most applications are likely to use `AddResponseData` as a more convenient
