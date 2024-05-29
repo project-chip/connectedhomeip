@@ -23,6 +23,18 @@
 namespace chip {
 namespace app {
 
+/// An implementation of `InterationModel::Model` that relies on code-generation
+/// via zap/ember.
+///
+/// The Ember framework uses generated files (like endpoint-config.h and various
+/// other generated metadata) to provide a cluster model.
+///
+/// This class will use global functions generally residing in `app/util`
+/// as well as application-specific overrides to provide data model functionality.
+///
+/// Given that this relies on global data at link time, there generally can be
+/// only one CodegenDataModel per application (you can create more instances,
+/// however they would share the exact same underlying data and storage).
 class CodegenDataModel : public chip::app::InteractionModel::Model
 {
 public:
