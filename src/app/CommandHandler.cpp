@@ -113,6 +113,16 @@ Status CommandHandler::OnInvokeCommandRequest(CommandHandlerExchangeInterface & 
     return status;
 }
 
+CHIP_ERROR CommandHandler::TryAddResponseData(const ConcreteCommandPath & path, CommandId commandId, EncoderToTLV & encoder)
+{
+    ConcreteCommandPath responseCommandPath = { path.mEndpointId, path.mClusterId, commandId };
+    ReturnErrorOnFailure(TryAddResponseDataPreEncode(path, responseCommandPath));
+    TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(encoder.Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+    return FinishCommand(/* aEndDataStruct = */ false);
+}
+
 CHIP_ERROR CommandHandler::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;

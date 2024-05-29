@@ -696,11 +696,11 @@ private:
      * Callers should snapshot as needed before calling this function, and roll back
      * as needed afterward.
      *
-     * @param [in] aRequestCommandPath the concrete path of the command we are
-     *             responding to.
-     * @param [in] aData the data for the response.
+     * @param [in] path the concrete path of the command we are responding to
+     * @param [in] commandId the id of the command to encode
+     * @param [in] encoder the data to encode for the given commandId
      */
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder);
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & path, CommandId commandId, EncoderToTLV & encoder);
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 
