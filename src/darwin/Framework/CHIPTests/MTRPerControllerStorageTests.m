@@ -29,6 +29,7 @@
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
+#import "MTRTestServerAppRunner.h"
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -1436,29 +1437,29 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
 
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
-    XCTestExpectation * gotClusterDataPersisted = nil;
-    if (!disableStorageBehaviorOptimization) {
-        gotClusterDataPersisted = [self expectationWithDescription:@"Cluster data persisted"];
-    }
 
     delegate.onReportEnd = ^{
         [subscriptionExpectation fulfill];
     };
-    delegate.onClusterDataPersisted = ^{
-        [gotClusterDataPersisted fulfill];
+
+    __block BOOL onDeviceCachePrimedCalled = NO;
+    delegate.onDeviceCachePrimed = ^{
+        onDeviceCachePrimedCalled = YES;
     };
 
     // Verify that initially (before we have ever subscribed while using this
     // datastore) the device has no estimate for subscription latency.
     XCTAssertNil(device.estimatedSubscriptionLatency);
 
+    // And that the device cache is not primed.
+    XCTAssertFalse(device.deviceCachePrimed);
+
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
-    if (!disableStorageBehaviorOptimization) {
-        [self waitForExpectations:@[ gotClusterDataPersisted ] timeout:60];
-    }
+    XCTAssertTrue(device.deviceCachePrimed);
+    XCTAssertTrue(onDeviceCachePrimedCalled);
 
     NSUInteger dataStoreValuesCount = 0;
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
@@ -1497,6 +1498,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // Check that the new device has an estimated subscription latency.
     XCTAssertNotNil(device.estimatedSubscriptionLatency);
 
+    // And that it's already primed.
+    XCTAssertTrue(device.deviceCachePrimed);
+
     // Check that this estimate is positive, since subscribing must have taken
     // some time.
     XCTAssertGreaterThan(device.estimatedSubscriptionLatency.doubleValue, 0);
@@ -1517,6 +1521,11 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         [newDeviceGotClusterDataPersisted fulfill];
     };
 
+    __block BOOL newOnDeviceCachePrimedCalled = NO;
+    newDelegate.onDeviceCachePrimed = ^{
+        newOnDeviceCachePrimedCalled = YES;
+    };
+
     [newDevice setDelegate:newDelegate queue:queue];
 
     [self waitForExpectations:@[ newDeviceSubscriptionExpectation ] timeout:60];
@@ -1524,6 +1533,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         [self waitForExpectations:@[ newDeviceGotClusterDataPersisted ] timeout:60];
     }
     newDelegate.onReportEnd = nil;
+
+    XCTAssertFalse(newOnDeviceCachePrimedCalled);
 
     // 1) MTRDevice actually gets some attributes reported more than once
     // 2) Some attributes do change on resubscribe
@@ -2147,7 +2158,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 }
 
 // TODO: This might also want to go in a separate test file, with some shared setup for commissioning devices per test
-- (void)doTestSubscriptionPoolWithSize:(NSInteger)subscriptionPoolSize
+- (void)doTestSubscriptionPoolWithSize:(NSInteger)subscriptionPoolSize deviceOnboardingPayloads:(NSDictionary<NSNumber *, NSString *> *)deviceOnboardingPayloads
 {
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -2183,15 +2194,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
 
-    // QRCodes generated for discriminators 101~105 and passcodes 1001~1005
     NSArray<NSNumber *> * orderedDeviceIDs = @[ @(101), @(102), @(103), @(104), @(105) ];
-    NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
-        @(101) : @"MT:00000EBQ15IZC900000",
-        @(102) : @"MT:00000MNY16-AD900000",
-        @(103) : @"MT:00000UZ427GOD900000",
-        @(104) : @"MT:00000CQM00Z.D900000",
-        @(105) : @"MT:00000K0V01FDE900000",
-    };
 
     // Commission 5 devices
     for (NSNumber * deviceID in orderedDeviceIDs) {
@@ -2272,8 +2275,27 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
 - (void)testSubscriptionPool
 {
-    [self doTestSubscriptionPoolWithSize:1];
-    [self doTestSubscriptionPoolWithSize:2];
+    // QRCodes generated for discriminators 1111~1115 and passcodes 1001~1005
+    NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
+        @(101) : @"MT:00000UZ427U0D900000",
+        @(102) : @"MT:00000CQM00BED900000",
+        @(103) : @"MT:00000K0V01TRD900000",
+        @(104) : @"MT:00000SC11293E900000",
+        @(105) : @"MT:00000-O913RGE900000",
+    };
+
+    // Start our helper apps.
+    __auto_type * sortedKeys = [[deviceOnboardingPayloads allKeys] sortedArrayUsingSelector:@selector(compare:)];
+    for (NSNumber * deviceID in sortedKeys) {
+        __auto_type * appRunner = [[MTRTestServerAppRunner alloc] initWithAppName:@"all-clusters"
+                                                                        arguments:@[]
+                                                                          payload:deviceOnboardingPayloads[deviceID]
+                                                                         testcase:self];
+        XCTAssertNotNil(appRunner);
+    }
+
+    [self doTestSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];
+    [self doTestSubscriptionPoolWithSize:2 deviceOnboardingPayloads:deviceOnboardingPayloads];
 }
 
 @end

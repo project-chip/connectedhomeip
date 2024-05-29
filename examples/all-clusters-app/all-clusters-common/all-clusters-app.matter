@@ -3334,7 +3334,7 @@ cluster DishwasherAlarm = 93 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster MicrowaveOvenMode = 94 {
+cluster MicrowaveOvenMode = 94 {
   revision 1;
 
   enum ModeTag : enum16 {
@@ -3876,7 +3876,7 @@ cluster ValveConfigurationAndControl = 129 {
 }
 
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
-provisional cluster ElectricalPowerMeasurement = 144 {
+cluster ElectricalPowerMeasurement = 144 {
   revision 1;
 
   enum MeasurementTypeEnum : enum16 {
@@ -3981,7 +3981,7 @@ provisional cluster ElectricalPowerMeasurement = 144 {
 }
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
-provisional cluster ElectricalEnergyMeasurement = 145 {
+cluster ElectricalEnergyMeasurement = 145 {
   revision 1;
 
   enum MeasurementTypeEnum : enum16 {
@@ -4278,7 +4278,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
-provisional cluster EnergyEvse = 153 {
+cluster EnergyEvse = 153 {
   revision 2;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
@@ -4490,7 +4490,7 @@ provisional cluster EnergyPreference = 155 {
 }
 
 /** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
-provisional cluster PowerTopology = 156 {
+cluster PowerTopology = 156 {
   revision 1;
 
   bitmap Feature : bitmap32 {
@@ -4511,7 +4511,7 @@ provisional cluster PowerTopology = 156 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster EnergyEvseMode = 157 {
+cluster EnergyEvseMode = 157 {
   revision 1;
 
   enum ModeTag : enum16 {

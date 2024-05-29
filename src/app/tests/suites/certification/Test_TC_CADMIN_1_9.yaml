@@ -551,7 +551,7 @@ tests:
           [1665484807.015876][5399:5399] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
           [1665484807.016042][5399:5399] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
           [1665484807.016108][5399:5399] CHIP:DL: Inet Layer shutdown
-          [1665484807.016163][5399:5399] CHIP:DL: BLE shutdown
+          [1665484807.016163][5399:5399] CHIP:DL: BLE Layer shutdown
           [1665484807.016215][5399:5399] CHIP:DL: System Layer shutdown
           [1665484807.016460][5399:5399] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:164: CHIP Error 0x00000003: Incorrect state
       cluster: "LogCommands"
@@ -589,7 +589,7 @@ tests:
           [1665484807.015876][5399:5399] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
           [1665484807.016042][5399:5399] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
           [1665484807.016108][5399:5399] CHIP:DL: Inet Layer shutdown
-          [1665484807.016163][5399:5399] CHIP:DL: BLE shutdown
+          [1665484807.016163][5399:5399] CHIP:DL: BLE Layer shutdown
           [1665484807.016215][5399:5399] CHIP:DL: System Layer shutdown
           [1665484807.016460][5399:5399] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:164: CHIP Error 0x00000003: Incorrect state
       cluster: "LogCommands"
