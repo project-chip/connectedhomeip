@@ -129,9 +129,11 @@ class NxpBuilder(GnBuilder):
         super(NxpBuilder, self).generate()
 
     def build_outputs(self):
-        extensions = ["elf"]
+        name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
+        yield BuilderOutput(
+            os.path.join(self.output_dir, name),
+            f'{name}.elf')
         if self.options.enable_link_map_file:
-            extensions.append("map")
-        for ext in extensions:
-            name = f"chip-{self.board.Name()}-{self.app.NameSuffix()}.{ext}"
-            yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            yield BuilderOutput(
+                os.path.join(self.output_dir, f'{name}.map'),
+                f'{name}.map')

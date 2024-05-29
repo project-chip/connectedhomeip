@@ -243,6 +243,6 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
     def bundle_outputs(self):
         if self.app == NrfApp.UNIT_TESTS:
             return
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName)) as f:
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
             for line in filter(None, [x.strip() for x in f.readlines()]):
                 yield BuilderOutput(os.path.join(self.output_dir, line), line)

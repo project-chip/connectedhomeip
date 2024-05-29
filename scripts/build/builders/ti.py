@@ -129,5 +129,5 @@ class TIBuilder(GnBuilder):
         if self.options.enable_link_map_file:
             suffixes.append(".out.map")
         for suffix in suffixes:
-            name = f"{self.app.AppNamePrefix()}{suffix}"
+            name = f"{self.app.AppNamePrefix(self.board)}{suffix}"
             yield BuilderOutput(os.path.join(self.output_dir, name), name)

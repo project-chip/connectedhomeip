@@ -257,7 +257,7 @@ class Esp32Builder(Builder):
         if self.options.enable_link_map_file:
             extensions.append("map")
         for ext in extensions:
-            name = f"{self.app.AppNamePrefix()}.{ext}"
+            name = f"{self.app.AppNamePrefix}.{ext}"
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
     def bundle_outputs(self):

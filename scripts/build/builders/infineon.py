@@ -111,6 +111,6 @@ class InfineonBuilder(GnBuilder):
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
     def bundle_outputs(self):
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName)) as f:
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
             for line in filter(None, [x.strip() for x in f.readlines()]):
                 yield BuilderOutput(os.path.join(self.output_dir, line), line)
