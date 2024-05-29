@@ -118,9 +118,10 @@ class RW61XBuilder(GnBuilder):
         super(RW61XBuilder, self).generate()
 
     def build_outputs(self):
-        extensions = ["elf"]
+        yield BuilderOutput(
+            os.path.join(self.output_dir, self.app.NameSuffix()),
+            f'{self.app.NameSuffix()}.elf')
         if self.options.enable_link_map_file:
-            extensions.append("map")
-        for ext in extensions:
-            name = f"{self.app.NameSuffix()}.{ext}"
-            yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            yield BuilderOutput(
+                os.path.join(self.output_dir, f'{self.app.NameSuffix()}.map'),
+                f'{self.app.NameSuffix()}.map')
