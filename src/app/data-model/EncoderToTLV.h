@@ -56,7 +56,6 @@ private:
     const T & mValue;
 };
 
-
 } // namespace DataModel
 } // namespace app
 } // namespace chip
