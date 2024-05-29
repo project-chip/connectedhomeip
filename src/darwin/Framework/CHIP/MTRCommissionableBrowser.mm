@@ -61,7 +61,11 @@ class CommissionableBrowserInternal : public DiscoverNodeDelegate,
 #endif // CONFIG_NETWORK_LAYER_BLE
 {
 public:
-    CHIP_ERROR Start(id<MTRCommissionableBrowserDelegate> delegate, MTRDeviceController * controller, dispatch_queue_t queue)
+#if CONFIG_NETWORK_LAYER_BLE
+    id mBleScannerDelegateOwner;
+#endif // CONFIG_NETWORK_LAYER_BLE
+
+    CHIP_ERROR Start(id owner, id<MTRCommissionableBrowserDelegate> delegate, MTRDeviceController * controller, dispatch_queue_t queue)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -77,7 +81,10 @@ public:
         ResetCounters();
 
 #if CONFIG_NETWORK_LAYER_BLE
+        mBleScannerDelegateOwner = owner; // retain the owner until OnBleScanStopped is called
         ReturnErrorOnFailure(PlatformMgrImpl().StartBleScan(this));
+#else
+        (void)owner;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
         ReturnErrorOnFailure(Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager()));
@@ -281,6 +288,7 @@ public:
     void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const ChipBLEDeviceIdentificationInfo & info) override
     {
         assertChipStackLockedByCurrentThread();
+        VerifyOrReturn(mDelegate != nil);
 
         auto result = [[MTRCommissionableBrowserResult alloc] init];
         result.instanceName = [NSString stringWithUTF8String:kBleKey];
@@ -303,6 +311,7 @@ public:
     void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) override
     {
         assertChipStackLockedByCurrentThread();
+        VerifyOrReturn(mDelegate != nil);
 
         auto key = [NSString stringWithFormat:@"%@", connObj];
         if ([mDiscoveredResults objectForKey:key] == nil) {
@@ -319,6 +328,12 @@ public:
             [mDelegate controller:mController didFindCommissionableDevice:result];
         });
     }
+
+    void OnBleScanStopped() override
+    {
+        mBleScannerDelegateOwner = nil;
+    }
+
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
@@ -354,7 +369,7 @@ private:
 
 - (BOOL)start
 {
-    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Start(_delegate, _controller, _queue), NO);
+    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Start(self, _delegate, _controller, _queue), NO);
     return YES;
 }
 
