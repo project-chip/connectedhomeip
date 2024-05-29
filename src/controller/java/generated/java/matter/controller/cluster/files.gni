@@ -341,5 +341,6 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ValveConfigurationAndControlCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WakeOnLanCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WiFiNetworkDiagnosticsCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WiFiNetworkManagementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/WindowCoveringCluster.kt",
 ]
