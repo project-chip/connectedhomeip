@@ -138,7 +138,8 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
                 print("Changing mode to Cleaning")
                 await self.send_run_change_to_mode_cmd(1)
             else:
-                self.wait_for_user_input(prompt_msg="Manually put the device in a state from which it will FAIL to transition to mode %d, and press Enter when done" % (self.mode_fail))
+                self.wait_for_user_input(
+                    prompt_msg="Manually put the device in a state from which it will FAIL to transition to mode %d, and press Enter when done" % (self.mode_fail))
 
             self.print_step(6, "Read CurrentMode attribute")
             old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
@@ -169,7 +170,8 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
             print("Changing mode to Idle")
             await self.send_run_change_to_mode_cmd(0)
         else:
-            self.wait_for_user_input(prompt_msg="Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d, and press Enter when done" % (self.mode_ok))
+            self.wait_for_user_input(
+                prompt_msg="Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d, and press Enter when done" % (self.mode_ok))
 
         self.print_step(10, "Read CurrentMode attribute")
         old_current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
