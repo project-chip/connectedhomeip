@@ -13,7 +13,7 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
-# The sources in this directory are TIGHLY coupled with code-generated data models
+# The sources in this directory are TIGHTLY coupled with code-generated data models
 # as generally implemented by `src/app/util`
 #
 # Corresponding functions defined in attribute-storace.cpp/attribute-table.cpp must
