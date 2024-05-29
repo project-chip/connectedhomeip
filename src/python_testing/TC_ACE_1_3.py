@@ -53,72 +53,86 @@ class TC_ACE_1_3(MatterBaseTest):
         steps = [
             TestStep(1, "Precondition: TH0 commissions DUT using admin node ID `N0`", "DUT is commissioned on TH0 fabric", is_commissioning=True),
             # Subjects: wildcard
-            TestStep(2, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: null\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                2, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: null\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(3, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(4, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(5, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             # Subjects: N1
-            TestStep(6, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N1`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                6, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N1`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(7, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(8, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(9, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             # Subjects: N2
-            TestStep(10, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N2`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                10, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N2`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(11, "TH1 reads DUT Endpoint 1 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(12, "TH2 reads DUT Endpoint 1 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(13, "TH3 reads DUT Endpoint 1 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             # Subjects: N3
-            TestStep(14, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N3`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                14, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N3`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(15, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(16, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(17, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             # Subjects: N1, N2
-            TestStep(18, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N1`, `N2`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                18, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N1`, `N2`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(19, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(20, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(21, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             # Subjects: N1, N3
-            TestStep(22, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N1`, `N3`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                22, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N1`, `N3`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(23, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(24, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(25, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             # Subjects: N2, N3
-            TestStep(26, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N2`, `N3`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                26, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N2`, `N3`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(27, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(28, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(29, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             # Subjects: N1, N2, N3
-            TestStep(30, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N1`, `N2`, `N3`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                30, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`N1`, `N2`, `N3`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(31, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(32, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(33, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             # Subjects: CAT1v1
-            TestStep(34, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT1v1_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                34, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT1v1_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(35, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(36, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(37, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             # Subjects: CAT1v2
-            TestStep(38, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT1v2_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                38, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT1v2_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(39, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(40, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(41, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             # Subjects: CAT1v3
-            TestStep(42, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT1v3_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                42, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT1v3_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(43, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(44, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(45, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             # Subjects: CAT2v1
-            TestStep(46, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT2v1_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                46, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT2v1_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(47, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(48, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             TestStep(49, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             # Subjects: CAT2v2
-            TestStep(50, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT2v2_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                50, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT2v2_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(51, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(52, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(53, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is SUCCESS"),
             # Subjects: CAT2v3
-            TestStep(54, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT2v3_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
+            TestStep(
+                54, "TH0 writes DUT Endpoint 0 AccessControl cluster ACL attribute,\nvalue is list of AccessControlEntryStruct containing 2 elements\n\n. struct\n- Privilege field: Administer (5)\n- AuthMode field: CASE (2)\n- Subjects field: [`N0`]\n- Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]\n. struct\n- Privilege field: View (1)\n- AuthMode field: CASE (2)\n- Subjects field: [`CAT2v3_subject`]\n- Targets field: [{Endpoint: 0}]", "Result is SUCCESS"),
             TestStep(55, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(56, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(57, "TH3 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute", "Result is UNSUPPORTED_ACCESS (0x7e)"),
