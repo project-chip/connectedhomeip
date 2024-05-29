@@ -376,7 +376,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 #ifdef DEBUG
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
 #endif
-    BOOL _delegateDeviceCachePrimedCalled;
+
+    // _deviceCachePrimed is true if we have the data that comes from an initial
+    // subscription priming report (whether it came from storage or from our
+    // subscription).
+    BOOL _deviceCachePrimed;
 
     // _persistedClusterData stores data that we have already persisted (when we have
     // cluster data persistence enabled).  Nil when we have no persistence enabled.
@@ -736,11 +740,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
 
-    // If Check if cache is already primed and client hasn't been informed yet, call the -deviceCachePrimed: callback
-    if (!_delegateDeviceCachePrimedCalled && [self _isCachePrimedWithInitialConfigurationData]) {
-        [self _callDelegateDeviceCachePrimed];
-    }
-
     if (setUpSubscription) {
         _initialSubscribeStart = [NSDate now];
         if ([self _deviceUsesThread]) {
@@ -915,7 +914,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)_callDelegateDeviceCachePrimed
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    _delegateDeviceCachePrimedCalled = [self _callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
             [delegate deviceCachePrimed:self];
         }
@@ -992,11 +991,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
     } else {
         [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
-    }
-
-    // As subscription is established, check if the delegate needs to be informed
-    if (!_delegateDeviceCachePrimedCalled) {
-        [self _callDelegateDeviceCachePrimed];
     }
 
     [self _changeState:MTRDeviceStateReachable];
@@ -1480,6 +1474,13 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         return;
     }
 
+    // If we have nothing stored at all yet, store directly, so we move into a
+    // primed state.
+    if (!_deviceCachePrimed) {
+        [self _persistClusterData];
+        return;
+    }
+
     // Ensure there is an array to keep the most recent report times
     if (!_mostRecentReportTimes) {
         _mostRecentReportTimes = [NSMutableArray array];
@@ -1525,7 +1526,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
             // Set current multiplier to [1, MaxMultiplier]
             _reportToPersistenceDelayCurrentMultiplier = 1 + (proportionTowardMinThreshold * (_storageBehaviorConfiguration.reportToPersistenceDelayMaxMultiplier - 1));
-            MTR_LOG("%@ storage behavior: device reporting frequently - setting delay multiplied to %lf", self, _reportToPersistenceDelayCurrentMultiplier);
+            MTR_LOG("%@ storage behavior: device reporting frequently - setting delay multiplier to %lf", self, _reportToPersistenceDelayCurrentMultiplier);
         } else {
             _reportToPersistenceDelayCurrentMultiplier = 1;
         }
@@ -1599,6 +1600,19 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             });
         }
         _deviceConfigurationChanged = NO;
+    }
+
+    // Do this after the _deviceConfigurationChanged check, so that we don't
+    // call deviceConfigurationChanged: immediately after telling our delegate
+    // we are now primed.
+    //
+    // TODO: Maybe we shouldn't dispatch deviceConfigurationChanged: for the
+    // initial priming bits?
+    if (!_deviceCachePrimed) {
+        // This is the end of the priming sequence of data reports, so we have
+        // all the data for the device now.
+        _deviceCachePrimed = YES;
+        [self _callDelegateDeviceCachePrimed];
     }
 
 // For unit testing only
@@ -2158,7 +2172,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                        return;
                    }
 
-                   MTR_LOG("%@ Subscribe with data version list size %lu, reduced by %lu", self, (unsigned long) dataVersions.count, (unsigned long) dataVersionFilterListSizeReduction);
+                   MTR_LOG("%@ Subscribe with data version list size %lu, reduced by %lu", self, static_cast<unsigned long>(dataVersions.count), static_cast<unsigned long>(dataVersionFilterListSizeReduction));
 
                    // Callback and ClusterStateCache and ReadClient will be deleted
                    // when OnDone is called.
@@ -2388,8 +2402,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 auto readItem = readRequestsNext.firstObject;
                 [readRequestsNext removeObjectAtIndex:0];
                 [readRequestsCurrent addObject:readItem];
-                MTR_LOG("Batching read attribute work item [%llu]: added %@ (now %tu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
-                    workItemID, readItem, readRequestsCurrent.count, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                MTR_LOG("Batching read attribute work item [%llu]: added %@ (now %lu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
+                    workItemID, readItem, static_cast<unsigned long>(readRequestsCurrent.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                 outcome = MTRBatchedPartially;
             }
             NSCAssert(readRequestsNext.count == 0, @"should have batched everything or returned early");
@@ -2516,7 +2530,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         if (writeRequestsCurrent.count != 1) {
             // Very unexpected!
-            MTR_LOG_ERROR("Batching write attribute work item [%llu]: Unexpected write request count %tu", workItemID, writeRequestsCurrent.count);
+            MTR_LOG_ERROR("Batching write attribute work item [%llu]: Unexpected write request count %lu", workItemID, static_cast<unsigned long>(writeRequestsCurrent.count));
             return MTRNotBatched;
         }
 
@@ -2551,7 +2565,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         // Make sure to use writeRequests here, because that's what our batching
         // handler will modify as needed.
-        NSCAssert(writeRequests.count == 1, @"Incorrect number of write requests: %tu", writeRequests.count);
+        NSCAssert(writeRequests.count == 1, @"Incorrect number of write requests: %lu", static_cast<unsigned long>(writeRequests.count));
 
         auto * request = writeRequests[0];
         MTRAttributePath * path = request[MTRDeviceWriteRequestFieldPathIndex];
@@ -3165,10 +3179,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [_persistedClusterData setObject:clusterData[clusterPath] forKey:clusterPath];
     }
 
-    // If cache is set from storage and is primed with initial configuration data, then assume the client had beeen informed in the past, and mark that the callback has been called
-    if ([self _isCachePrimedWithInitialConfigurationData]) {
-        _delegateDeviceCachePrimedCalled = YES;
-    }
+    // We have some stored data.  Since we don't store data until the end of the
+    // initial priming report, our device cache must be primed.
+    _deviceCachePrimed = YES;
 }
 
 - (void)_setLastInitialSubscribeLatency:(id)latency
@@ -3218,7 +3231,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (BOOL)deviceCachePrimed
 {
     std::lock_guard lock(_lock);
-    return [self _isCachePrimedWithInitialConfigurationData];
+    return _deviceCachePrimed;
 }
 
 // If value is non-nil, associate with expectedValueID
@@ -3393,47 +3406,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
         [self _reportAttributes:@[ attribute ]];
     }
-}
-
-// This method checks if there is a need to inform delegate that the attribute cache has been "primed"
-- (BOOL)_isCachePrimedWithInitialConfigurationData
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    // Check if root node descriptor exists
-    MTRDeviceDataValueDictionary rootDescriptorPartsListDataValue = [self _cachedAttributeValueForPath:[MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)]];
-    if (!rootDescriptorPartsListDataValue || ![MTRArrayValueType isEqualToString:rootDescriptorPartsListDataValue[MTRTypeKey]]) {
-        return NO;
-    }
-    NSArray * partsList = rootDescriptorPartsListDataValue[MTRValueKey];
-    if (![partsList isKindOfClass:[NSArray class]] || !partsList.count) {
-        MTR_LOG_ERROR("%@ unexpected type %@ for parts list %@", self, [partsList class], partsList);
-        return NO;
-    }
-
-    // Check if we have cached descriptor clusters for each listed endpoint
-    for (NSDictionary * endpointDictionary in partsList) {
-        NSDictionary * endpointDataValue = endpointDictionary[MTRDataKey];
-        if (![endpointDataValue isKindOfClass:[NSDictionary class]]) {
-            MTR_LOG_ERROR("%@ unexpected parts list dictionary %@ data value class %@", self, endpointDictionary, [endpointDataValue class]);
-            continue;
-        }
-        if (![MTRUnsignedIntegerValueType isEqual:endpointDataValue[MTRTypeKey]]) {
-            MTR_LOG_ERROR("%@ unexpected parts list data value %@ item type %@", self, endpointDataValue, endpointDataValue[MTRTypeKey]);
-            continue;
-        }
-        NSNumber * endpoint = endpointDataValue[MTRValueKey];
-        if (![endpoint isKindOfClass:[NSNumber class]]) {
-            MTR_LOG_ERROR("%@ unexpected parts list item value class %@", self, [endpoint class]);
-            continue;
-        }
-        MTRDeviceDataValueDictionary descriptorDeviceTypeListDataValue = [self _cachedAttributeValueForPath:[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)]];
-        if (![MTRArrayValueType isEqualToString:descriptorDeviceTypeListDataValue[MTRTypeKey]] || !descriptorDeviceTypeListDataValue[MTRValueKey]) {
-            return NO;
-        }
-    }
-
-    return YES;
 }
 
 - (MTRBaseDevice *)newBaseDevice
