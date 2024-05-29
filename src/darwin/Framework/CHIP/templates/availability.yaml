@@ -9687,3 +9687,7 @@
 
 - release: "Future"
   versions: "future"
+  provisional:
+      clusters:
+          # Targeting Fall 2024
+          - WiFiNetworkManagement

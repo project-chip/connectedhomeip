@@ -71,6 +71,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x0000007A, DeviceTypeClass::Simple, "Matter Extractor Hood" },
     { 0x0000007B, DeviceTypeClass::Simple, "Matter Oven" },
     { 0x0000007C, DeviceTypeClass::Simple, "Matter Laundry Dryer" },
+    { 0x00000090, DeviceTypeClass::Simple, "Matter Network Infrastructure Manager" },
     { 0x00000100, DeviceTypeClass::Simple, "Matter On/Off Light" },
     { 0x00000101, DeviceTypeClass::Simple, "Matter Dimmable Light" },
     { 0x00000103, DeviceTypeClass::Simple, "Matter On/Off Light Switch" },
@@ -96,7 +97,6 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000510, DeviceTypeClass::Utility, "Matter Electrical Sensor" },
     { 0x00000840, DeviceTypeClass::Simple, "Matter Control Bridge" },
     { 0x00000850, DeviceTypeClass::Simple, "Matter On/Off Sensor" },
-    { 0xFFF10010, DeviceTypeClass::Simple, "Matter Network Infrastructure Manager" },
 };
 
 static_assert(ExtractVendorFromMEI(0xFFF10001) != 0, "Must have class defined for \"Matter Orphan Clusters\" if it's a standard device type");
