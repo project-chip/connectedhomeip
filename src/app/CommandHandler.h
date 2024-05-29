@@ -377,13 +377,11 @@ public:
      * Most applications are likely to use `AddResponseData` as a more convenient
      * one-call that auto-sets command ID and creates the underlying encoders.
      */
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
-                                         EncoderToTLV & encoder)
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder)
     {
         // Return early when response should not be sent out.
         VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
-        return TryAddingResponse(
-            [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, commandId, encoder); });
+        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, commandId, encoder); });
     }
 
     /**
@@ -702,8 +700,7 @@ private:
      *             responding to.
      * @param [in] aData the data for the response.
      */
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
-                                            EncoderToTLV & encoder)
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder)
     {
         ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, commandId };
         ReturnErrorOnFailure(TryAddResponseDataPreEncode(aRequestCommandPath, responseCommandPath));
