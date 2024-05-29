@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen:50
+            image: ghcr.io/project-chip/chip-build-tizen:53
             options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
