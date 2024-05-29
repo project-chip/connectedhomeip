@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -102,20 +103,14 @@ class InfineonBuilder(GnBuilder):
         return self.extra_gn_options
 
     def build_outputs(self):
-        items = {
-            '%s.out' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir, '%s.out' %
-                             self.app.AppNamePrefix()),
-        }
+        extensions = ['out']
         if self.options.enable_link_map_file:
-            map_file = f'{self.app.AppNamePrefix()}.out.map'
-            items[map_file] = os.path.join(self.output_dir, map_file)
+            extensions.append('out.map')
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
-
-        return items
-
-    def flashbundle(self):
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
-            return {
-                line.strip(): os.path.join(self.output_dir, line.strip()) for line in fp.readlines() if line.strip()
-            }
+    def bundle_outputs(self):
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName)) as f:
+            for line in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(os.path.join(self.output_dir, line), line)

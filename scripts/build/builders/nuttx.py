@@ -16,6 +16,7 @@ import logging
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import Builder
 
 
@@ -86,12 +87,9 @@ class NuttXBuilder(Builder):
 
     def build_outputs(self):
         logging.info('Compiling outputs NuttX at %s', self.output_dir)
-        items = {
-            '%s.out' % self.app.AppNamePrefix(self.chip_name):
-                os.path.join(self.output_dir, '%s.out' %
-                             self.app.AppNamePrefix(self.chip_name)),
-        }
+        extensions = ["out"]
         if self.options.enable_link_map_file:
-            map_file = f'{self.app.AppNamePrefix(self.chip_name)}.out.map'
-            items[map_file] = os.path.join(self.output_dir, map_file)
-        return items
+            extensions.append("out.map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix(self.chip_name)}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)

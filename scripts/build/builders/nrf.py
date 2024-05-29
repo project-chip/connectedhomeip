@@ -17,7 +17,7 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder
+from .builder import Builder, BuilderOutput
 
 
 class NrfApp(Enum):
@@ -225,26 +225,24 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
             self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', self.output_dir],
                           title='Run Tests ' + self.identifier)
 
-    def _generate_flashbundle(self):
+    def _bundle(self):
         logging.info(f'Generating flashbundle at {self.output_dir}')
 
         self._Execute(['ninja', '-C', self.output_dir, 'flashing_script'],
                       title='Generating flashable files of ' + self.identifier)
 
     def build_outputs(self):
-        items = {
-            '%s.elf' % self.app.AppNamePrefix(): os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
-        }
+        yield BuilderOutput(
+            os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
+            '%s.elf' % self.app.AppNamePrefix())
         if self.options.enable_link_map_file:
-            items[f'{self.app.AppNamePrefix()}.map'] = os.path.join(
-                self.output_dir, 'zephyr', 'zephyr.map')
-        return items
+            yield BuilderOutput(
+                os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
+                '%s.map' % self.app.AppNamePrefix())
 
-    def flashbundle(self):
+    def bundle_outputs(self):
         if self.app == NrfApp.UNIT_TESTS:
-            return dict()
-
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
-            return {
-                line.strip(): os.path.join(self.output_dir, line.strip()) for line in fp.readlines() if line.strip()
-            }
+            return
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName)) as f:
+            for line in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(os.path.join(self.output_dir, line), line)

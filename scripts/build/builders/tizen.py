@@ -18,11 +18,12 @@ from collections import namedtuple
 from enum import Enum
 from xml.etree import ElementTree as ET
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 Board = namedtuple('Board', ['target_cpu'])
-App = namedtuple('App', ['name', 'source', 'output', 'link_map'])
-Tool = namedtuple('Tool', ['name', 'source', 'output', 'link_map'])
+App = namedtuple('App', ['name', 'source', 'outputs'])
+Tool = namedtuple('Tool', ['name', 'source', 'outputs'])
 TestDriver = namedtuple('TestDriver', ['name', 'source'])
 
 
@@ -36,24 +37,24 @@ class TizenApp(Enum):
     ALL_CLUSTERS = App(
         'chip-all-clusters-app',
         'examples/all-clusters-app/tizen',
-        'chip-all-clusters-app',
-        'chip-all-clusters-app.map')
+        ('chip-all-clusters-app',
+         'chip-all-clusters-app.map'))
     ALL_CLUSTERS_MINIMAL = App(
         'chip-all-clusters-minimal-app',
         'examples/all-clusters-minimal-app/tizen',
-        'chip-all-clusters-minimal-app',
-        'chip-all-clusters-minimal-app.map')
+        ('chip-all-clusters-minimal-app',
+         'chip-all-clusters-minimal-app.map'))
     LIGHT = App(
         'chip-lighting-app',
         'examples/lighting-app/tizen',
-        'chip-lighting-app',
-        'chip-lighting-app.map')
+        ('chip-lighting-app',
+         'chip-lighting-app.map'))
 
     CHIP_TOOL = Tool(
         'chip-tool',
         'examples/chip-tool',
-        'chip-tool',
-        'chip-tool.map')
+        ('chip-tool',
+         'chip-tool.map'))
 
     TESTS = TestDriver(
         'tests',
@@ -147,25 +148,23 @@ class TizenBuilder(GnBuilder):
             'tizen_sdk_sysroot="%s"' % os.environ['TIZEN_SDK_SYSROOT'],
         ]
 
-    def _generate_flashbundle(self):
+    def _bundle(self):
         if self.app.is_tpk:
             logging.info('Packaging %s', self.output_dir)
             cmd = ['ninja', '-C', self.output_dir, self.app.value.name + ':tpk']
             self._Execute(cmd, title='Packaging ' + self.identifier)
 
     def build_outputs(self):
-        items = {
-            self.app.value.output: os.path.join(self.output_dir, self.app.value.output),
-        }
-        if self.options.enable_link_map_file:
-            items[self.app.value.link_map]: os.path.join(self.output_dir, self.app.value.link_map)
-        return items
+        for name in self.app.value.outputs:
+            if not self.options.enable_link_map_file and name.endswith(".map"):
+                continue
+            yield BuilderOutput(
+                os.path.join(self.output_dir, name),
+                name)
 
-    def flashbundle(self):
+    def bundle_outputs(self):
         if not self.app.is_tpk:
-            return {}
-        return {
-            self.app.package: os.path.join(self.output_dir,
-                                           self.app.package_name, 'out',
-                                           self.app.package),
-        }
+            return
+        source = os.path.join(self.output_dir, self.app.package_name,
+                              'out', self.app.package)
+        yield BuilderOutput(source, self.app.package)

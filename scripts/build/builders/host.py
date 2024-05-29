@@ -17,6 +17,7 @@ from enum import Enum, auto
 from platform import uname
 from typing import Optional
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -564,8 +565,6 @@ class HostBuilder(GnBuilder):
             self.createJavaExecutable("kotlin-matter-controller")
 
     def build_outputs(self):
-        outputs = {}
-
         for name in self.app.OutputNames():
             if not self.options.enable_link_map_file and name.endswith(".map"):
                 continue
@@ -573,12 +572,6 @@ class HostBuilder(GnBuilder):
             if os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
                     for file in files:
-                        outputs.update({
-                            file: os.path.join(root, file)
-                        })
+                        yield BuilderOutput(os.path.join(root, file), file)
             else:
-                outputs.update({
-                    name: os.path.join(self.output_dir, name)
-                })
-
-        return outputs
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)

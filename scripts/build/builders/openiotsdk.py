@@ -16,7 +16,7 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder
+from .builder import Builder, BuilderOutput
 
 
 class OpenIotSdkApp(Enum):
@@ -90,11 +90,9 @@ class OpenIotSdkBuilder(Builder):
                       title='Building ' + self.identifier)
 
     def build_outputs(self):
-        items = {
-            self.app.AppNamePrefix + '.elf':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
-        }
+        extensions = ["elf"]
         if self.options.enable_link_map_file:
-            map_file = f'{self.app.AppNamePrefix}.map'
-            items[map_file] = os.path.join(self.output_dir, map_file)
-        return items
+            extensions.append("map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)

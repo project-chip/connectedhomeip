@@ -16,6 +16,7 @@ import os
 from enum import Enum, auto
 from typing import Optional
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -115,23 +116,18 @@ class TIBuilder(GnBuilder):
         return args
 
     def build_outputs(self):
-        items = {}
-        if (self.board == TIBoard.LP_EM_CC1354P10_6):
-            if (self.app == TIApp.LOCK
-                or self.app == TIApp.LIGHTING
-                or self.app == TIApp.PUMP
-                    or self.app == TIApp.PUMP_CONTROLLER):
-                extensions = [".out", "-mcuboot.hex"]
-
+        if self.board == TIBoard.LP_EM_CC1354P10_6:
+            if self.app in [TIApp.LOCK,
+                            TIApp.LIGHTING,
+                            TIApp.PUMP,
+                            TIApp.PUMP_CONTROLLER]:
+                suffixes = [".out", "-mcuboot.hex"]
             else:
-                extensions = [".out"]
+                suffixes = [".out"]
         else:
-            extensions = [".out"]
+            suffixes = [".out"]
         if self.options.enable_link_map_file:
-            extensions.append(".out.map")
-
-        for extension in extensions:
-            name = '%s%s' % (self.app.AppNamePrefix(self.board), extension)
-            items[name] = os.path.join(self.output_dir, name)
-
-        return items
+            suffixes.append(".out.map")
+        for suffix in suffixes:
+            name = f"{self.app.AppNamePrefix()}{suffix}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)

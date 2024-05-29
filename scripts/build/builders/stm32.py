@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -81,16 +82,13 @@ class stm32Builder(GnBuilder):
         extensions = ["out", "out.hex"]
         if self.options.enable_link_map_file:
             extensions.append("out.map")
-        items = {}
-        for extension in extensions:
-            name = '%s.%s' % (self.app.AppNamePrefix(), extension)
-            items[name] = os.path.join(self.output_dir, name)
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
         # Figure out flash bundle files and build accordingly
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
-            for line in f.readlines():
-                name = line.strip()
-                items['flashbundle/%s' %
-                      name] = os.path.join(self.output_dir, name)
-
-        return items
+            for name in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, name),
+                    os.path.join('flashbundle', name))

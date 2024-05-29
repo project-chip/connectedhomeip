@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -117,11 +118,9 @@ class RW61XBuilder(GnBuilder):
         super(RW61XBuilder, self).generate()
 
     def build_outputs(self):
-        name = '%s' % self.app.NameSuffix()
-        items = {
-            '%s.elf' % name: os.path.join(self.output_dir, name),
-        }
+        extensions = ["elf"]
         if self.options.enable_link_map_file:
-            map_file = f'{name}.map'
-            items[map_file] = os.path.join(self.output_dir, map_file)
-        return items
+            extensions.append("map")
+        for ext in extensions:
+            name = f"{self.app.NameSuffix()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
