@@ -63,7 +63,7 @@ class EncoderToTLV
 public:
     virtual ~EncoderToTLV() = default;
 
-    virtual CHIP_ERROR Encode(TLV::TLVWriter &, TLV::Tag tag) = 0;
+    virtual CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) = 0;
 };
 
 /// An `EncoderToTLV` that uses `DataModel::Encode` to encode things.
