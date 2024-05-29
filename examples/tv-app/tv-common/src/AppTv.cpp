@@ -633,7 +633,8 @@ bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t prod
     return false;
 }
 
-std::string createSearchIndex(uint16_t vendorId, uint16_t productId) {
+std::string createSearchIndex(uint16_t vendorId, uint16_t productId)
+{
     // Format the IDs into a string
     std::string formattedString = std::to_string(vendorId) + ":" + std::to_string(productId);
     return formattedString;
