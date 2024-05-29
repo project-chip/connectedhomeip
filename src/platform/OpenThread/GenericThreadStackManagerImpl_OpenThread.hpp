@@ -247,7 +247,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
         }
 
 #if CHIP_DETAIL_LOGGING
+        Impl()->LockThreadStack();
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
+        Impl()->UnlockThreadStack();
 #endif // CHIP_DETAIL_LOGGING
     }
 }
