@@ -4112,7 +4112,7 @@ cluster ValveConfigurationAndControl = 129 {
 }
 
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
-provisional cluster ElectricalPowerMeasurement = 144 {
+cluster ElectricalPowerMeasurement = 144 {
   revision 1;
 
   enum MeasurementTypeEnum : enum16 {
@@ -4217,7 +4217,7 @@ provisional cluster ElectricalPowerMeasurement = 144 {
 }
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
-provisional cluster ElectricalEnergyMeasurement = 145 {
+cluster ElectricalEnergyMeasurement = 145 {
   revision 1;
 
   enum MeasurementTypeEnum : enum16 {
@@ -4803,7 +4803,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
-provisional cluster EnergyEvse = 153 {
+cluster EnergyEvse = 153 {
   revision 2;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
@@ -5015,7 +5015,7 @@ provisional cluster EnergyPreference = 155 {
 }
 
 /** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
-provisional cluster PowerTopology = 156 {
+cluster PowerTopology = 156 {
   revision 1;
 
   bitmap Feature : bitmap32 {
@@ -5036,7 +5036,7 @@ provisional cluster PowerTopology = 156 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster EnergyEvseMode = 157 {
+cluster EnergyEvseMode = 157 {
   revision 1;
 
   enum ModeTag : enum16 {
@@ -7652,6 +7652,26 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Functionality to retrieve operational information about a managed Wi-Fi network. */
+cluster WiFiNetworkManagement = 1105 {
+  revision 1;
+
+  readonly attribute nullable octet_string<32> ssid = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct NetworkPassphraseResponse = 1 {
+    octet_string<64> passphrase = 0;
+  }
+
+  /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
+  command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
