@@ -329,7 +329,7 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        DataModel::ObjectEncodableToTLV<CommandData> encoder(aData);
+        DataModel::DirectEncodableToTLV<CommandData> encoder(aData);
         return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), encoder);
     }
 
@@ -372,7 +372,7 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        DataModel::ObjectEncodableToTLV<CommandData> encodable(aData);
+        DataModel::DirectEncodableToTLV<CommandData> encodable(aData);
         return AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
     }
 

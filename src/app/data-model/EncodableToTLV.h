@@ -35,12 +35,13 @@ public:
     virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) = 0;
 };
 
-/// An `EncodableToTLV` that uses `DataModel::Encode` to encode things.
+/// An `EncodableToTLV` that uses `DataModel::Encode` to encode things in one call.
 ///
-/// Generally useful to encode things like <ClusterName>::Commands::<CommandName>::Type
-/// structures.
+/// Applicable to any type for which `chip::app::DataModel::Encode` works. In
+/// particular, types like <ClusterName>::Commands::<CommandName>::Type
+/// can be used as a type here.
 template <typename T>
-class ObjectEncodableToTLV : public EncodableToTLV
+class DirectEncodableToTLV : public EncodableToTLV
 {
 public:
     /// Encodes the given value via `DataModel::Encode` when the underlying
@@ -48,7 +49,7 @@ public:
     ///
     /// LIFETIME NOTE: uses a reference to value, so value must live longer than
     ///                this object.
-    ObjectEncodableToTLV(const T & value) : mValue(value) {}
+    DirectEncodableToTLV(const T & value) : mValue(value) {}
 
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) override { return DataModel::Encode(writer, tag, mValue); }
 
