@@ -105,7 +105,7 @@ CHIP_ERROR EVSEManufacturer::Shutdown()
 
 CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnightNow_m,
                           DataModel::Nullable<uint32_t> & targetTime_m, DataModel::Nullable<Percent> & targetSoC,
-                          DataModel::Nullable<int64_t> & addedEnergy_mWh)
+                          DataModel::Nullable<int64_t> & addedEnergy_mWh, bool bAllowTargetsInPast)
 {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -114,8 +114,7 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
 
     uint16_t minTimeToTarget_m = 1440; // 24 hours
-    uint16_t timeToTarget_m;
-    bool bFound = false;
+    bool bFound                = false;
 
     EVSEManufacturer * mn = GetEvseManufacturer();
     VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
@@ -131,22 +130,20 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
     {
         if (chargingTargetScheduleEntry.dayOfWeekMap.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F)) & dayOfWeekMap)
         {
-            // We've found today's schedule
+            // We've found today's schedule - iterate through the targets on this day
             for (const EvseChargingTarget & chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
             {
-                if (chargingTarget.targetTimeMinutesPastMidnight < minutesPastMidnightNow_m)
+                if ((chargingTarget.targetTimeMinutesPastMidnight < minutesPastMidnightNow_m) && (bAllowTargetsInPast == false))
                 {
-                    // This target is in the past - ignore it
+                    // This target is in the past so move to the next if there is one
                     continue;
                 }
 
-                timeToTarget_m = chargingTarget.targetTimeMinutesPastMidnight - minutesPastMidnightNow_m;
-
-                if (timeToTarget_m < minTimeToTarget_m)
+                if (chargingTarget.targetTimeMinutesPastMidnight < minTimeToTarget_m)
                 {
-                    // This is the closest target found in the day's targets so far
+                    // This is the earliest target found in the day's targets so far
                     bFound            = true;
-                    minTimeToTarget_m = timeToTarget_m;
+                    minTimeToTarget_m = chargingTarget.targetTimeMinutesPastMidnight;
 
                     targetTime_m.SetNonNull(chargingTarget.targetTimeMinutesPastMidnight);
 
@@ -169,6 +166,12 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
                     }
                 }
             }
+        }
+
+        if (bFound)
+        {
+            // Skip the rest of the search
+            break;
         }
     }
 
@@ -216,14 +219,14 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     targetSoC.SetNull();
     addedEnergy_mWh.SetNull();
 
-    uint8_t dayOffset = 0;
-    while (dayOffset < 2)
+    uint8_t searchDay = 0;
+    while (searchDay < 2)
     {
-        err = FindNextTarget(dayOfWeekMap, minutesPastMidnightNow_m, targetTime_m, targetSoC, addedEnergy_mWh);
+        err = FindNextTarget(dayOfWeekMap, minutesPastMidnightNow_m, targetTime_m, targetSoC, addedEnergy_mWh, (searchDay != 0));
         if (err == CHIP_ERROR_NOT_FOUND)
         {
             // We didn't find one for today, try tomorrow
-            dayOffset++;
+            searchDay++;
             dayOfWeekMap = (dayOfWeekMap << 1) & 0x7f;
             if (dayOfWeekMap == 0x00)
             {
@@ -277,7 +280,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
 
         // A price optimizer can look for cheapest time of day
         // However for now we'll start charging as late as possible
-        int tempStartTime_m = targetTime_m.Value() - chargingDuration_m + (dayOffset * 1440);
+        int tempStartTime_m = targetTime_m.Value() - chargingDuration_m + (searchDay * 1440);
         // if tempStartTime_m is negative it means that it will take more than 24hrs to charge the vehicle
 
         if ((tempStartTime_m < 0) || (tempStartTime_m < static_cast<int>(minutesPastMidnightNow_m)))

@@ -190,24 +190,25 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                              f"Unexpected 'GetTargets' response value - expected {targets}, was {get_targets_response}")
 
         self.step("9")
-        # This should be all days Sun-Sat (0x7F) with an TargetTime 1439 and SoC of 100%
+        # This should be all days Sun-Sat (0x7F) with an TargetTime 1 and SoC of 100%, AddedEnergy= NullValue
         daily_targets_step_9 = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=1,
                                                                                  targetSoC=100)]
         targets_step_9 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
             dayOfWeekForSequence=0x7F, chargingTargets=daily_targets_step_9)]
+        breakpoint()
         await self.send_set_targets_command(chargingTargetSchedules=targets_step_9)
 
         self.step("9a")
-        await self.check_evse_attribute_in_range("NextChargeStartTime", 0, 1438)
+        await self.check_evse_attribute_in_range("NextChargeStartTime", 0, 1439)
 
         self.step("9b")
-        await self.check_evse_attribute("NextChargeTargetTime", 1439)
+        await self.check_evse_attribute("NextChargeTargetTime", 1)
 
         self.step("9c")
-        await self.check_evse_attribute("NextChargeRequiredEnergy", 25000000)
+        await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)
 
         self.step("9d")
-        await self.check_evse_attribute("NextChargeTargetSoC", NullValue)
+        await self.check_evse_attribute("NextChargeTargetSoC", 100)
 
         self.step("10")
         get_targets_response = await self.send_get_targets_command()
@@ -258,6 +259,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         # [0] This should be all days (except Sun & Sat) = 0x3e with an TargetTime 1439 and added Energy 25kWh (from step 9)
         # [1] This should be (Sat) = 0x40 with 10 TargetTimes and added Energy 25kWh (from step 11)
         # [2] This should be (Sun) = 0x01 with NO Targets (from step 12)
+        # TODO - it would be better to iterate through each day and check it matches
         asserts.assert_equal(len(get_targets_response.chargingTargetSchedules), 3,
                              "'GetTargets' response should have 3 entries")
         asserts.assert_equal(get_targets_response.chargingTargetSchedules[0].dayOfWeekForSequence, 0x3e,
