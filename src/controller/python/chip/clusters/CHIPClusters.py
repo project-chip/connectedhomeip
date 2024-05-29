@@ -11535,6 +11535,62 @@ class ChipClusters:
             },
         },
     }
+    _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "WiFiNetworkManagement",
+        "clusterId": 0x00000451,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "NetworkPassphraseRequest",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000001: {
+                "attributeName": "Ssid",
+                "attributeId": 0x00000001,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _WAKE_ON_LAN_CLUSTER_INFO = {
         "clusterName": "WakeOnLan",
         "clusterId": 0x00000503,
@@ -14638,6 +14694,7 @@ class ChipClusters:
         0x0000042D: _PM10_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000042E: _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000042F: _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000451: _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
         0x00000504: _CHANNEL_CLUSTER_INFO,
         0x00000505: _TARGET_NAVIGATOR_CLUSTER_INFO,
@@ -14759,6 +14816,7 @@ class ChipClusters:
         "Pm10ConcentrationMeasurement": _PM10_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "TotalVolatileOrganicCompoundsConcentrationMeasurement": _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "RadonConcentrationMeasurement": _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "WiFiNetworkManagement": _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "Channel": _CHANNEL_CLUSTER_INFO,
         "TargetNavigator": _TARGET_NAVIGATOR_CLUSTER_INFO,

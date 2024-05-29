@@ -139,7 +139,7 @@ exit:
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
-    ChipLogError(DeviceLayer, "Inet Layer shutdown");
+    ChipLogProgress(DeviceLayer, "Inet Layer shutdown");
     UDPEndPointManager()->Shutdown();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -147,11 +147,11 @@ void GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    ChipLogError(DeviceLayer, "BLE shutdown");
+    ChipLogProgress(DeviceLayer, "BLE Layer shutdown");
     BLEMgr().Shutdown();
 #endif
 
-    ChipLogError(DeviceLayer, "System Layer shutdown");
+    ChipLogProgress(DeviceLayer, "System Layer shutdown");
     SystemLayer().Shutdown();
 }
 
