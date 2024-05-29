@@ -34,6 +34,7 @@
 #include <app/CommandPathRegistry.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/EncoderToTLV.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
@@ -55,37 +56,6 @@
 
 namespace chip {
 namespace app {
-
-/// Defines an abstract class of something that can be encoded
-/// into a TLV with a given data tag
-class EncoderToTLV
-{
-public:
-    virtual ~EncoderToTLV() = default;
-
-    virtual CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) = 0;
-};
-
-/// An `EncoderToTLV` that uses `DataModel::Encode` to encode things.
-///
-/// Generally useful to encode things like <ClusterName>::Commands::<CommandName>::Type
-/// structures.
-template <typename T>
-class DataModelEncoderToTLV : public EncoderToTLV
-{
-public:
-    /// Encodes the given value via `DataModel::Encode` when the underlying
-    /// encode is called.
-    ///
-    /// LIFETIME NOTE: uses a reference to value, so value must live longer than
-    ///                this object.
-    DataModelEncoderToTLV(const T & value) : mValue(value) {}
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) override { return DataModel::Encode(writer, tag, mValue); }
-
-private:
-    const T & mValue;
-};
 
 class CommandHandler
 {
@@ -359,7 +329,7 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        DataModelEncoderToTLV<CommandData> encoder(aData);
+        DataModel::ObjectEncoderToTLV<CommandData> encoder(aData);
         return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), encoder);
     }
 
@@ -377,7 +347,8 @@ public:
      * Most applications are likely to use `AddResponseData` as a more convenient
      * one-call that auto-sets command ID and creates the underlying encoders.
      */
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder)
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
+                               DataModel::EncoderToTLV & encoder)
     {
         // Return early when response should not be sent out.
         VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
@@ -401,7 +372,7 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        DataModelEncoderToTLV<CommandData> encoder(aData);
+        DataModel::ObjectEncoderToTLV<CommandData> encoder(aData);
         return AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encoder);
     }
 
@@ -411,7 +382,7 @@ public:
      * The encoder would generally encode a ClusterName::Commands::CommandName::Type with
      * the corresponding `GetCommandId` call.
      */
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder)
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, DataModel::EncoderToTLV & encoder)
     {
         if (AddResponseData(aRequestCommandPath, commandId, encoder) != CHIP_NO_ERROR)
         {
@@ -700,7 +671,7 @@ private:
      * @param [in] commandId the id of the command to encode
      * @param [in] encoder the data to encode for the given commandId
      */
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & path, CommandId commandId, EncoderToTLV & encoder);
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & path, CommandId commandId, DataModel::EncoderToTLV & encoder);
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 
