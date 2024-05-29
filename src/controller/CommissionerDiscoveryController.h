@@ -238,8 +238,8 @@ public:
     /**
      * @brief
      *   Called to check app's installation status.
-     * 
-     * CdError status is designed for CommissionerDeclaration and should be set by using SetErrorCode() and 
+     *
+     * CdError status is designed for CommissionerDeclaration and should be set by using SetErrorCode() and
      * sent back to the client as a CDC Message. It is expected that app installation can have following statuses:
      * kNoError, kAppInstallConsentPending, kAppInstalling, kAppInstallFailed, kAppInstalledRetryNeeded
      *
