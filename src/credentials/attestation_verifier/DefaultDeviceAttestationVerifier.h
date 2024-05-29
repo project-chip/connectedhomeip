@@ -78,6 +78,7 @@ public:
                                  Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
     // Set the path to the device attestation revocation set JSON file.
+    // revocation set can be generated using credentials/generate-revocation-set.py script
     void SetDeviceAttestationRevocationSetPath(const char * path) { mDeviceAttestationRevocationSetPath = path; }
 
     CsaCdKeysTrustStore * GetCertificationDeclarationTrustStore() override { return &mCdKeysTrustStore; }

@@ -613,6 +613,19 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     return CHIP_NO_ERROR;
 }
 
+
+// This method parses the below JSON Scheme
+// [
+//  {
+//    "type": "revocation_set",
+//    "issuer_subject_key_id": "63540E47F64B1C38D13884A462D16C195D8FFB3C",
+//    "issuer_name": "MD0xJTAjBgNVBAMMHE1hdHRlciBEZXYgUEFJIDB4RkZGMSBubyBQSUQxFDASBgorBgEEAYKifAIBDARGRkYx",
+//    "revoked_serial_numbers": [
+//      "69CDF10DE9E54ED1"
+//    ]
+//  }
+// ]
+//
 bool DefaultDACVerifier::IsEntryExistsInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
                                                       const CharSpan & serialNumberHexStr)
 {
