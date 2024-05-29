@@ -452,6 +452,8 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 
     ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore));
 
+    mCredIssuerCmds->SetupDeviceAttestationRevocationSetPath(mDacRevocationSetPath.ValueOr(nullptr));
+
     chip::Crypto::P256Keypair ephemeralKey;
 
     if (fabricId != chip::kUndefinedFabricId)

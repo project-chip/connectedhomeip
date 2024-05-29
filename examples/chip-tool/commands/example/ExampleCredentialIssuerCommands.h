@@ -44,6 +44,17 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+    void SetupDeviceAttestationRevocationSetPath(const char * path) override
+    {
+        if (path)
+        {
+            // As we know that we are using DefaultDACVerifier, we can downcast from
+            // DeviceAttestationVerifier to DefaultDACVerifier to set the revocation set
+            static_cast<chip::Credentials::DefaultDACVerifier *>(mDacVerifier)->SetDeviceAttestationRevocationSetPath(path);
+        }
+    }
+
     chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() override { return &mOpCredsIssuer; }
     void SetCredentialIssuerCATValues(chip::CATValues cats) override { mOpCredsIssuer.SetCATValuesForNextNOCRequest(cats); }
     CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,

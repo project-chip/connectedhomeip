@@ -63,6 +63,15 @@ public:
                                               const chip::Credentials::AttestationTrustStore * trustStore) = 0;
 
     /**
+     * @brief
+     *   This function is used to set the path to Device Attestation revocation set JSON file.
+     *
+     * @param[in] path Path to the JSON file containing list of revoked DACs or PAIs.
+     *                 It can be generated using credentials/generate-revocation-set.py script
+     */
+    virtual void SetupDeviceAttestationRevocationSetPath(const char * path) = 0;
+
+    /**
      * @brief Add a list of additional non-default CD verifying keys (by certificate)
      *
      * Must be called AFTER SetupDeviceAttestation.
