@@ -138,8 +138,6 @@ public:
 //
 static BleEndPointPool sBLEEndPointPool;
 
-// UUIDs used internally by BleLayer:
-
 // BleTransportCapabilitiesRequestMessage implementation:
 
 void BleTransportCapabilitiesRequestMessage::SetSupportedProtocolVersion(uint8_t index, uint8_t version)
