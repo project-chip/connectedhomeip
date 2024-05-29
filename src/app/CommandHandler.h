@@ -383,9 +383,9 @@ public:
      * the corresponding `GetCommandId` call.
      */
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     DataModel::EncodableToTLV & encodable)
+                     DataModel::EncodableToTLV & aEncodable)
     {
-        if (AddResponseData(aRequestCommandPath, aResponseCommandId, encodable) != CHIP_NO_ERROR)
+        if (AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable) != CHIP_NO_ERROR)
         {
             AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
         }
