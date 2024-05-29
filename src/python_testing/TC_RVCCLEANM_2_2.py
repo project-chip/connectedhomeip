@@ -63,7 +63,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):
         self.print_step(step_number, instruction)
-        input("Press Enter when done.\n")
+        self.wait_for_user_input(prompt_msg=f"{instruction}, and press Enter when ready.")
 
     def pics_TC_RVCCLEANM_2_2(self) -> list[str]:
         return ["RVCCLEANM.S"]
@@ -101,7 +101,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         if self.is_ci:
             await self.send_run_change_to_mode_cmd(1)
         else:
-            input("Press Enter when done.\n")
+            self.wait_for_user_input(prompt_msg="Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag, and press Enter when done.")
 
         self.print_step(3, "Read the RvcRunMode SupportedModes attribute")
         supported_run_modes = await self.read_run_supported_modes()

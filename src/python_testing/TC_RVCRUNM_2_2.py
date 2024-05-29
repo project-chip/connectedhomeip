@@ -135,12 +135,12 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         # Ensure that the device is in the correct state
         if self.is_ci:
             self.write_to_app_pipe('{"Name": "Reset"}')
-
-        self.print_step(2, "Manually put the device in a RVC Run Mode cluster mode with "
+        test_step = ("Manually put the device in a RVC Run Mode cluster mode with "
                            "the Idle(0x4000) mode tag and in a device state that allows changing to either "
                            "of these modes: %i, %i" % (self.mode_a, self.mode_b))
+        self.print_step(2, test_step)
         if not self.is_ci:
-            input("Press Enter when done.\n")
+            self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
 
         self.print_step(3, "Read the RvcRunMode SupportedModes attribute")
         supported_run_modes = await self.read_run_supported_modes()
@@ -206,11 +206,10 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe('{"Name": "ChargerFound"}')
             else:
-                input("Press Enter when done.\n")
+                self.wait_for_user_input(prompt_msg="Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42), and press Enter when ready.\n")
 
             self.print_step(10, "Read RVCOPSTATE's OperationalState attribute")
             op_state = await self.read_op_state_operational_state()
-
             asserts.assert_true(op_state in valid_op_states,
                                 "Expected RVCOPSTATE's OperationalState attribute to be one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
 
