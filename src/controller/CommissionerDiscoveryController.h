@@ -238,8 +238,10 @@ public:
     /**
      * @brief
      *   Called to check app's installation status.
-     *
-     * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
+     * 
+     * CdError status is designed for CommissionerDeclaration and should be set by using SetErrorCode() and 
+     * sent back to the client as a CDC Message. It is expected that app installation can have following statuses:
+     * kNoError, kAppInstallConsentPending, kAppInstalling, kAppInstallFailed, kAppInstalledRetryNeeded
      *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.

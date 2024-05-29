@@ -633,26 +633,34 @@ bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t prod
     return false;
 }
 
+std::string createSearchIndex(uint16_t vendorId, uint16_t productId) {
+    // Format the IDs into a string
+    std::string formattedString = std::to_string(vendorId) + ":" + std::to_string(productId);
+    return formattedString;
+}
+
 void ContentAppFactoryImpl::SetAppInstallationStatus(uint16_t vendorId, uint16_t productId, CommissionerDeclaration::CdError status)
 {
-    std::map<uint16_t, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
-    it = mAppInstallationStatus.find(vendorId);
+    std::string searchIndex = createSearchIndex(vendorId, productId);
+    std::map<std::string, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
+    it = mAppInstallationStatus.find(searchIndex);
     if (it != mAppInstallationStatus.end())
     {
-        mAppInstallationStatus[vendorId] = status;
+        mAppInstallationStatus[searchIndex] = status;
         return;
     }
 
-    mAppInstallationStatus.insert({ vendorId, status });
+    mAppInstallationStatus.insert({ searchIndex, status });
 }
 
 CommissionerDeclaration::CdError ContentAppFactoryImpl::GetAppInstallationStatus(uint16_t vendorId, uint16_t productId)
 {
-    std::map<uint16_t, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
-    it = mAppInstallationStatus.find(vendorId);
+    std::string searchIndex = createSearchIndex(vendorId, productId);
+    std::map<std::string, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
+    it = mAppInstallationStatus.find(searchIndex);
     if (it != mAppInstallationStatus.end())
     {
-        return mAppInstallationStatus[vendorId];
+        return mAppInstallationStatus[searchIndex];
     }
 
     return CommissionerDeclaration::CdError::kAppInstallConsentPending;
@@ -715,7 +723,7 @@ CHIP_ERROR AppTvInit()
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
     gFactory.InstallContentApp((uint16_t) 1, (uint16_t) 11);
-    gFactory.InstallContentApp((uint16_t) 65521, (uint16_t) 32768);
+    gFactory.InstallContentApp((uint16_t) 65521, (uint16_t) 32769);
     gFactory.InstallContentApp((uint16_t) 9050, (uint16_t) 22);
     gFactory.InstallContentApp((uint16_t) 1111, (uint16_t) 22);
     uint16_t value;

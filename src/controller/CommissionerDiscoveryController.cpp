@@ -243,14 +243,11 @@ void CommissionerDiscoveryController::InternalOk()
         CommissionerDeclaration::CdError appInstallStatus =
             mAppInstallationService->GetInstallationStatusOfApp(client->GetVendorId(), client->GetProductId());
 
-        if (appInstallStatus != CommissionerDeclaration::CdError::kNoError)
-        {
-            // notify client the current app's installation status
-            CommissionerDeclaration cd;
-            cd.SetErrorCode(appInstallStatus);
-            mUdcServer->SendCDCMessage(cd,
-                                       Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
-        }
+        // notify client the current app's installation status
+        CommissionerDeclaration cd;
+        cd.SetErrorCode(appInstallStatus);
+        mUdcServer->SendCDCMessage(cd,
+                                   Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
         return;
     }
 

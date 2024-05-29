@@ -157,7 +157,7 @@ public:
 protected:
     std::vector<std::unique_ptr<ContentAppImpl>> mContentApps;
     std::vector<uint16_t> mAdminVendorIds{};
-    std::map<uint16_t, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError> mAppInstallationStatus{};
+    std::map<std::string, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError> mAppInstallationStatus{};
 };
 
 } // namespace AppPlatform
