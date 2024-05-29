@@ -57,7 +57,7 @@ CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap);
  */
 uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch);
 
-CHIP_ERROR GetMinutesPastMidnight(uint32_t & minutesPastMidnight);
+CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight);
 
 namespace chip {
 namespace app {

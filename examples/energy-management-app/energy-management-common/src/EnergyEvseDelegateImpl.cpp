@@ -1952,7 +1952,7 @@ CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap)
  *
  * @param   reference to hold the number of minutes past midnight
  */
-CHIP_ERROR GetMinutesPastMidnight(uint32_t & minutesPastMidnight)
+CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight)
 {
     chip::System::Clock::Milliseconds64 cTMs;
     CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
@@ -1968,7 +1968,7 @@ CHIP_ERROR GetMinutesPastMidnight(uint32_t & minutesPastMidnight)
     struct tm local_time;
     localtime_r(&unixEpoch, &local_time);
 
-    minutesPastMidnight = static_cast<uint32_t>((local_time.tm_hour * 60) + local_time.tm_min);
+    minutesPastMidnight = static_cast<uint16_t>((local_time.tm_hour * 60) + local_time.tm_min);
 
     return err;
 }

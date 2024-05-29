@@ -103,8 +103,9 @@ CHIP_ERROR EVSEManufacturer::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint32_t minutesPastMidnight_m, DataModel::Nullable<uint32_t> & targetTime_m,
-                          DataModel::Nullable<Percent> & targetSoC, DataModel::Nullable<int64_t> & addedEnergy_mWh)
+CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnightNow_m,
+                          DataModel::Nullable<uint32_t> & targetTime_m, DataModel::Nullable<Percent> & targetSoC,
+                          DataModel::Nullable<int64_t> & addedEnergy_mWh)
 {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -112,8 +113,8 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint32_t minutesPastMidnig
     EvseTargetEntry chargingTargetScheduleEntry;
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
 
-    int32_t minTimeToTarget_m = 1440; // 24 hours
-    int32_t timeToTarget_m;
+    uint16_t minTimeToTarget_m = 1440; // 24 hours
+    uint16_t timeToTarget_m;
     bool bFound = false;
 
     EVSEManufacturer * mn = GetEvseManufacturer();
@@ -133,18 +134,22 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint32_t minutesPastMidnig
             // We've found today's schedule
             for (const EvseChargingTarget & chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
             {
-                timeToTarget_m = chargingTarget.targetTimeMinutesPastMidnight - minutesPastMidnight_m;
-                if (timeToTarget_m < 0)
+                if (chargingTarget.targetTimeMinutesPastMidnight < minutesPastMidnightNow_m)
                 {
                     // This target is in the past - ignore it
                     continue;
                 }
 
+                timeToTarget_m = chargingTarget.targetTimeMinutesPastMidnight - minutesPastMidnightNow_m;
+
                 if (timeToTarget_m < minTimeToTarget_m)
                 {
                     // This is the closest target found in the day's targets so far
+                    bFound            = true;
                     minTimeToTarget_m = timeToTarget_m;
+
                     targetTime_m.SetNonNull(chargingTarget.targetTimeMinutesPastMidnight);
+
                     if (chargingTarget.targetSoC.HasValue())
                     {
                         targetSoC.SetNonNull(chargingTarget.targetSoC.Value());
@@ -153,6 +158,7 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint32_t minutesPastMidnig
                     {
                         targetSoC.SetNull();
                     }
+
                     if (chargingTarget.addedEnergy.HasValue())
                     {
                         addedEnergy_mWh.SetNonNull(chargingTarget.addedEnergy.Value());
@@ -161,7 +167,6 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint32_t minutesPastMidnig
                     {
                         addedEnergy_mWh.SetNull();
                     }
-                    bFound = true;
                 }
             }
         }
@@ -194,8 +199,8 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     uint8_t dayOfWeekMap = 0;
     ReturnErrorOnFailure(GetDayOfWeekNow(dayOfWeekMap));
 
-    uint32_t minutesPastMidnight_m = 0;
-    ReturnErrorOnFailure(GetMinutesPastMidnight(minutesPastMidnight_m));
+    uint16_t minutesPastMidnightNow_m = 0;
+    ReturnErrorOnFailure(GetMinutesPastMidnight(minutesPastMidnightNow_m));
 
     DataModel::Nullable<uint32_t> startTime_m;
     DataModel::Nullable<uint32_t> targetTime_m;
@@ -214,7 +219,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     uint8_t dayOffset = 0;
     while (dayOffset < 2)
     {
-        err = FindNextTarget(dayOfWeekMap, minutesPastMidnight_m, targetTime_m, targetSoC, addedEnergy_mWh);
+        err = FindNextTarget(dayOfWeekMap, minutesPastMidnightNow_m, targetTime_m, targetSoC, addedEnergy_mWh);
         if (err == CHIP_ERROR_NOT_FOUND)
         {
             // We didn't find one for today, try tomorrow
@@ -241,7 +246,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
             }
             // We don't know the Vehicle SoC so we must charge now
             // TODO make this use the SoC featureMap to determine if this is an error
-            startTime_m.SetNonNull(minutesPastMidnight_m);
+            startTime_m.SetNonNull(minutesPastMidnightNow_m);
         }
         else
         {
@@ -261,8 +266,8 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
             power_W = 7000;
 
             // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
-            // to avoid using floats we multiply by 36 and then divide by 100 (instead of x3600 and dividing by 1000)
-            chargingDuration_s = static_cast<uint32_t>(((addedEnergy_mWh.Value() / power_W) * 36) / 100);
+            // to avoid using floats we multiply by 36 and then divide by 10 (instead of x3600 and dividing by 1000)
+            chargingDuration_s = static_cast<uint32_t>(((addedEnergy_mWh.Value() / power_W) * 36) / 10);
             chargingDuration_m = chargingDuration_s / 60;
 
             // Add in 15 minutes leeway to account for slow starting vehicles
@@ -275,10 +280,10 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
         int tempStartTime_m = targetTime_m.Value() - chargingDuration_m + (dayOffset * 1440);
         // if tempStartTime_m is negative it means that it will take more than 24hrs to charge the vehicle
 
-        if ((tempStartTime_m < 0) || (tempStartTime_m < static_cast<int>(minutesPastMidnight_m)))
+        if ((tempStartTime_m < 0) || (tempStartTime_m < static_cast<int>(minutesPastMidnightNow_m)))
         {
             // we need to turn on the EVSE now - it won't have enough time to reach the target
-            startTime_m.SetNonNull(minutesPastMidnight_m);
+            startTime_m.SetNonNull(minutesPastMidnightNow_m);
             // TODO call function to turn on the EV
         }
         else
