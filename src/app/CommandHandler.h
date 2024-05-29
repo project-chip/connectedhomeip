@@ -81,7 +81,7 @@ public:
     ///                this object.
     DataModelEncoderToTLV(const T & value) : mValue(value) {}
 
-    virtual CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) { return DataModel::Encode(writer, tag, mValue); }
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) override { return DataModel::Encode(writer, tag, mValue); }
 
 private:
     const T & mValue;
