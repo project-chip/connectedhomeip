@@ -745,7 +745,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         if ([self _deviceUsesThread]) {
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
-                [self _setupSubscriptionWithReason:@"delegate is set and subscription is scheduled"];
+                [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
             } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
         } else {
             [self _setupSubscriptionWithReason:@"delegate is set and subscription is needed"];
