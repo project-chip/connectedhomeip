@@ -334,9 +334,8 @@ public:
     }
 
     /**
-     * API for adding a data response.  The `encoder` is generally expected to encode
-     * a ClusterName::Commands::CommandName::Type struct, but any
-     * object should work.
+     * API for adding a data response.  The `aEncodable` is generally expected to encode
+     * a ClusterName::Commands::CommandName::Type struct, however any object should work.
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
