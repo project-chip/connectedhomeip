@@ -38,7 +38,6 @@ struct ChipBleUUID
     uint8_t bytes[16];
 };
 
-namespace {
 constexpr bool isValidHexChar(char c)
 {
     return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
@@ -51,7 +50,6 @@ constexpr uint8_t HexDigitToInt(const char c)
     else
         return static_cast<uint8_t>((c >= 'a' ? c - 'a' : c - 'A') + 10);
 }
-} // namespace
 
 bool UUIDsMatch(const ChipBleUUID * idOne, const ChipBleUUID * idTwo);
 
