@@ -11,8 +11,10 @@
 #include <messaging/ReliableMessageContext.h>
 
 namespace chip {
-uint8_t chip::Test::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-size_t chip::Test::attributeDataTLVLen = 0;
+uint8_t Test::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+size_t Test::attributeDataTLVLen = 0;
+chip::EndpointId Test::numEndpoints;
+
 namespace app {
 
 // was previously in TestWriteInteraction.cpp
@@ -125,3 +127,16 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 } // namespace app
 
 } // namespace chip
+
+// was previously in TestPowerSourceCluster.cpp
+uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                              uint16_t fixedClusterServerEndpointCount)
+{
+    // Very simple mapping here, we're just going to return the endpoint that matches the given endpoint index because the test
+    // uses the endpoints in order.
+    if (endpoint >= chip::Test::numEndpoints)
+    {
+        return kEmberInvalidEndpointIndex;
+    }
+    return endpoint;
+}

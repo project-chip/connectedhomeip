@@ -3,6 +3,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/WriteHandler.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 
@@ -21,6 +22,8 @@ constexpr chip::DataVersion kTestDataVersion1 = 3;
 constexpr chip::DataVersion kRejectedDataVersion = 1;
 extern uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
 extern size_t attributeDataTLVLen;
+
+extern chip::EndpointId numEndpoints;
 
 } // namespace Test
 namespace app {
@@ -44,5 +47,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
                                   CommandHandler * apCommandObj);
 
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
+
 } // namespace app
 } // namespace chip
+
+uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                              uint16_t fixedClusterServerEndpointCount);
