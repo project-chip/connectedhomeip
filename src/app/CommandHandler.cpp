@@ -113,14 +113,22 @@ Status CommandHandler::OnInvokeCommandRequest(CommandHandlerExchangeInterface & 
     return status;
 }
 
-CHIP_ERROR CommandHandler::TryAddResponseData(const ConcreteCommandPath & path, CommandId commandId,
-                                              DataModel::EncoderToTLV & encoder)
+CHIP_ERROR CommandHandler::TryAddResponseData(const ConcreteCommandPath & aCommandPath, CommandId aResponseCommandId,
+                                              DataModel::EncodableToTLV & aEncodable)
 {
-    ConcreteCommandPath responseCommandPath = { path.mEndpointId, path.mClusterId, commandId };
-    ReturnErrorOnFailure(TryAddResponseDataPreEncode(path, responseCommandPath));
+    ConcreteCommandPath responseCommandPath = { aCommandPath.mEndpointId, aCommandPath.mClusterId, aResponseCommandId };
+
+    InvokeResponseParameters prepareParams(aRequestCommandPath);
+    prepareParams.SetStartOrEndDataStruct(false);
+
+    {
+        ScopedChange<bool> internalCallToAddResponse(mInternalCallToAddResponseData, true);
+        ReturnErrorOnFailure(PrepareInvokeResponseCommand(aResponseCommandPath, prepareParams));
+    }
+
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(encoder.Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 

@@ -33,8 +33,8 @@
 #include <app/CommandHandlerExchangeInterface.h>
 #include <app/CommandPathRegistry.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model/EncodableToTLV.h>
 #include <app/data-model/Encode.h>
-#include <app/data-model/EncoderToTLV.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
@@ -329,7 +329,7 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        DataModel::ObjectEncoderToTLV<CommandData> encoder(aData);
+        DataModel::ObjectEncodableToTLV<CommandData> encoder(aData);
         return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), encoder);
     }
 
@@ -340,19 +340,20 @@ public:
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
-     * @param [in] commandId the command whose content is being encoded.
-     * @param [in] encoder - an encoder that places the command data structure for `commandId`
+     * @param [in] aResponseCommandId the command whose content is being encoded.
+     * @param [in] encoder - an encoder that places the command data structure for `aResponseCommandId`
      *             into a TLV Writer.
      *
      * Most applications are likely to use `AddResponseData` as a more convenient
      * one-call that auto-sets command ID and creates the underlying encoders.
      */
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
-                               DataModel::EncoderToTLV & encoder)
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               DataModel::EncodableToTLV & aEncodable)
     {
         // Return early when response should not be sent out.
         VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
-        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, commandId, encoder); });
+        return TryAddingResponse(
+            [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable); });
     }
 
     /**
@@ -372,19 +373,20 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        DataModel::ObjectEncoderToTLV<CommandData> encoder(aData);
-        return AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encoder);
+        DataModel::ObjectEncodableToTLV<CommandData> encodable(aData);
+        return AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
     }
 
     /**
-     * API for adding a response with a given encoder of TLV data.
+     * API for adding a response with a given encodable of TLV data.
      *
-     * The encoder would generally encode a ClusterName::Commands::CommandName::Type with
+     * The encodable would generally encode a ClusterName::Commands::CommandName::Type with
      * the corresponding `GetCommandId` call.
      */
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, DataModel::EncoderToTLV & encoder)
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     DataModel::EncodableToTLV & encodable)
     {
-        if (AddResponseData(aRequestCommandPath, commandId, encoder) != CHIP_NO_ERROR)
+        if (AddResponseData(aRequestCommandPath, aResponseCommandId, encodable) != CHIP_NO_ERROR)
         {
             AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
         }
@@ -639,39 +641,16 @@ private:
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     /**
-     * Non-templated function called before DataModel::Encode when attempting to add a response,
-     * which does all the work needed before encoding the actual type-dependent data into the buffer.
-     *
-     * **Important:** If this function fails, the TLV buffer may be left in an inconsistent state.
-     * Callers should create snapshots as necessary before invoking this function and implement
-     * rollback mechanisms if needed.
-     *
-     * **Usage:** This function is intended to be called exclusively by TryAddResponseData. It was
-     * factored out to optimize code size.
-     *
-     * @param aRequestCommandPath  The concrete path of the command being responded to.
-     * @param aResponseCommandPath The concrete path of the command response.
-     */
-    CHIP_ERROR TryAddResponseDataPreEncode(const ConcreteCommandPath & aRequestCommandPath,
-                                           const ConcreteCommandPath & aResponseCommandPath)
-    {
-        InvokeResponseParameters prepareParams(aRequestCommandPath);
-        prepareParams.SetStartOrEndDataStruct(false);
-
-        ScopedChange<bool> internalCallToAddResponse(mInternalCallToAddResponseData, true);
-        return PrepareInvokeResponseCommand(aResponseCommandPath, prepareParams);
-    }
-
-    /**
      * If this function fails, it may leave our TLV buffer in an inconsistent state.
      * Callers should snapshot as needed before calling this function, and roll back
      * as needed afterward.
      *
-     * @param [in] path the concrete path of the command we are responding to
-     * @param [in] commandId the id of the command to encode
-     * @param [in] encoder the data to encode for the given commandId
+     * @param [in] aCommandPath the concrete path of the command we are responding to
+     * @param [in] aResponseCommandId the id of the command to encode
+     * @param [in] aEncodable the data to encode for the given aResponseCommandId
      */
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & path, CommandId commandId, DataModel::EncoderToTLV & encoder);
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aCommandPath, CommandId aResponseCommandId,
+                                  DataModel::EncodableToTLV & aEncodable);
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 

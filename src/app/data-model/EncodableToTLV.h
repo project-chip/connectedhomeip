@@ -27,20 +27,20 @@ namespace DataModel {
 
 /// Defines an abstract class of something that can be encoded
 /// into a TLV with a given data tag
-class EncoderToTLV
+class EncodableToTLV
 {
 public:
-    virtual ~EncoderToTLV() = default;
+    virtual ~EncodableToTLV() = default;
 
-    virtual CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) = 0;
+    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) = 0;
 };
 
-/// An `EncoderToTLV` that uses `DataModel::Encode` to encode things.
+/// An `EncodableToTLV` that uses `DataModel::Encode` to encode things.
 ///
 /// Generally useful to encode things like <ClusterName>::Commands::<CommandName>::Type
 /// structures.
 template <typename T>
-class ObjectEncoderToTLV : public EncoderToTLV
+class ObjectEncodableToTLV : public EncodableToTLV
 {
 public:
     /// Encodes the given value via `DataModel::Encode` when the underlying
@@ -48,9 +48,9 @@ public:
     ///
     /// LIFETIME NOTE: uses a reference to value, so value must live longer than
     ///                this object.
-    ObjectEncoderToTLV(const T & value) : mValue(value) {}
+    ObjectEncodableToTLV(const T & value) : mValue(value) {}
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) override { return DataModel::Encode(writer, tag, mValue); }
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) override { return DataModel::Encode(writer, tag, mValue); }
 
 private:
     const T & mValue;
