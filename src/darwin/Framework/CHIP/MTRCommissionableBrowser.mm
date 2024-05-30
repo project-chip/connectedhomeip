@@ -65,7 +65,7 @@ public:
     id mBleScannerDelegateOwner;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    CHIP_ERROR Start(id owner, id<MTRCommissionableBrowserDelegate> delegate, MTRDeviceController * controller, dispatch_queue_t queue)
+    CHIP_ERROR Start(id<MTRCommissionableBrowserDelegate> delegate, MTRDeviceController * controller, dispatch_queue_t queue)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -81,10 +81,7 @@ public:
         ResetCounters();
 
 #if CONFIG_NETWORK_LAYER_BLE
-        mBleScannerDelegateOwner = owner; // retain the owner until OnBleScanStopped is called
         ReturnErrorOnFailure(PlatformMgrImpl().StartBleScan(this));
-#else
-        (void) owner;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
         ReturnErrorOnFailure(Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager()));
@@ -97,7 +94,7 @@ public:
             chip::Inet::InterfaceId::Null(), this);
     }
 
-    CHIP_ERROR Stop()
+    CHIP_ERROR Stop(id owner)
     {
         assertChipStackLockedByCurrentThread();
 
@@ -116,7 +113,14 @@ public:
         mDiscoveredResults = nil;
 
 #if CONFIG_NETWORK_LAYER_BLE
-        ReturnErrorOnFailure(PlatformMgrImpl().StopBleScan());
+        mBleScannerDelegateOwner = owner; // retain the owner until OnBleScanStopped is called
+        CHIP_ERROR err = PlatformMgrImpl().StopBleScan();
+        if (err != CHIP_NO_ERROR) {
+            mBleScannerDelegateOwner = nil;
+            return err;
+        }
+#else
+        (void) owner;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
         return ChipDnssdStopBrowse(this);
@@ -369,13 +373,13 @@ private:
 
 - (BOOL)start
 {
-    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Start(self, _delegate, _controller, _queue), NO);
+    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Start(_delegate, _controller, _queue), NO);
     return YES;
 }
 
 - (BOOL)stop
 {
-    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Stop(), NO);
+    VerifyOrReturnValue(CHIP_NO_ERROR == _browser.Stop(self), NO);
     _delegate = nil;
     _controller = nil;
     _queue = nil;
