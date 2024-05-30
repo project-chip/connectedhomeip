@@ -1,5 +1,21 @@
+/*
+ *    Copyright (c) 2024 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include "lib/support/CHIPMem.h"
-#include <app/tests/ember-test-compatibility.h>
+#include <app/tests/test-interaction-model-api.h>
 #include <app/util/basic-types.h>
 
 #include <app/InteractionModelEngine.h>
@@ -13,7 +29,6 @@
 namespace chip {
 uint8_t Test::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
 size_t Test::attributeDataTLVLen = 0;
-chip::EndpointId Test::numEndpoints;
 
 namespace app {
 
@@ -127,16 +142,3 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 } // namespace app
 
 } // namespace chip
-
-// was previously in TestPowerSourceCluster.cpp
-uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                              uint16_t fixedClusterServerEndpointCount)
-{
-    // Very simple mapping here, we're just going to return the endpoint that matches the given endpoint index because the test
-    // uses the endpoints in order.
-    if (endpoint >= chip::Test::numEndpoints)
-    {
-        return kEmberInvalidEndpointIndex;
-    }
-    return endpoint;
-}

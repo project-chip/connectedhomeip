@@ -121,8 +121,10 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
-source_set("app-test-compatibility") {
+source_set("app-test-stubs") {
   sources = [
+    "test-ember-api.cpp",
+    "test-ember-api.h",
     "test-interaction-model-api.cpp",
     "test-interaction-model-api.h",
   ]
@@ -175,8 +177,8 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":app-test-stubs",
     ":binding-test-srcs",
-    ":ember-apptest-compatibility",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":power-cluster-test-srcs",
@@ -239,8 +241,8 @@ chip_test_suite_using_nltest("tests_nltest") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":app-test-stubs",
     ":binding-test-srcs",
-    ":ember-apptest-compatibility",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":time-sync-data-provider-test-srcs",

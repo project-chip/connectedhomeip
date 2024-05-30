@@ -22,7 +22,7 @@
  *
  */
 
-// #include "app/tests/ember-test-compatibility.h"
+#include "app/tests/test-interaction-model-api.h"
 
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
