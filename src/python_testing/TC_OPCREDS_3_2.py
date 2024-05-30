@@ -65,7 +65,7 @@ class TC_OPCREDS_3_2(MatterBaseTest):
         dev_ctrl = self.default_controller
 
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        cr2_vid = 0xFFF1
+        cr2_vid = 0xFFF2
         cr2_fabricId = 2222
         cr2_new_fabric_admin = new_certificate_authority.NewFabricAdmin(
             vendorId=cr2_vid, fabricId=cr2_fabricId)
@@ -85,7 +85,7 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
         self.step(2)
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        cr3_vid = 0xFFF1
+        cr3_vid = 0xFFF3
         cr3_fabricId = 3333
         cr3_new_fabric_admin = new_certificate_authority.NewFabricAdmin(
             vendorId=cr3_vid, fabricId=cr3_fabricId)
