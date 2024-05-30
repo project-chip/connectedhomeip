@@ -209,7 +209,7 @@ static CHIP_ERROR PrintAllCommands()
                     "  app install <vid> <pid>              Install app with given vendor ID  and product ID. Usage: app install "
                     "65521 32768\r\n");
     streamer_printf(sout,
-                    "  app uinstall <vid> <pid>              Uinstall app at given vendor ID  and product ID. Usage: app uninstall "
+                    "  app uninstall <vid> <pid>              Uinstall app at given vendor ID  and product ID. Usage: app uninstall "
                     "65521 32768\r\n");
     streamer_printf(
         sout,
