@@ -4257,9 +4257,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 namespace DriftCompensation {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        chip::app::Clusters::ColorControl::DriftCompensation * value); // DriftCompensation
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensation value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensation value,
+                                        chip::app::Clusters::ColorControl::DriftCompensationEnum * value); // DriftCompensationEnum
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum value,
                                         MarkAttributeDirty markDirty);
 } // namespace DriftCompensation
 
@@ -4282,14 +4282,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 } // namespace ColorMode
 
 namespace Options {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> * value); // OptionsBitmap
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> value);
 Protocols::InteractionModel::Status
-Get(chip::EndpointId endpoint,
-    chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions> * value); // ColorControlOptions
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions> value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions> value,
-                                        MarkAttributeDirty markDirty);
+Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> value, MarkAttributeDirty markDirty);
 } // namespace Options
 
 namespace NumberOfPrimaries {
@@ -4530,9 +4528,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 namespace EnhancedColorMode {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        chip::app::Clusters::ColorControl::EnhancedColorMode * value); // EnhancedColorMode
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorMode value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorMode value,
+                                        chip::app::Clusters::ColorControl::EnhancedColorModeEnum * value); // EnhancedColorModeEnum
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum value,
                                         MarkAttributeDirty markDirty);
 } // namespace EnhancedColorMode
 

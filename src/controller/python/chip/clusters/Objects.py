@@ -33175,7 +33175,7 @@ class ColorControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="remainingTime", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="currentX", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="currentY", Tag=0x00000004, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="driftCompensation", Tag=0x00000005, Type=typing.Optional[ColorControl.Enums.DriftCompensation]),
+                ClusterObjectFieldDescriptor(Label="driftCompensation", Tag=0x00000005, Type=typing.Optional[ColorControl.Enums.DriftCompensationEnum]),
                 ClusterObjectFieldDescriptor(Label="compensationText", Tag=0x00000006, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="colorTemperatureMireds", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorMode", Tag=0x00000008, Type=uint),
@@ -33211,7 +33211,7 @@ class ColorControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="colorPointBY", Tag=0x0000003B, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorPointBIntensity", Tag=0x0000003C, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="enhancedCurrentHue", Tag=0x00004000, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="enhancedColorMode", Tag=0x00004001, Type=ColorControl.Enums.EnhancedColorMode),
+                ClusterObjectFieldDescriptor(Label="enhancedColorMode", Tag=0x00004001, Type=ColorControl.Enums.EnhancedColorModeEnum),
                 ClusterObjectFieldDescriptor(Label="colorLoopActive", Tag=0x00004002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorLoopDirection", Tag=0x00004003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorLoopTime", Tag=0x00004004, Type=typing.Optional[uint]),
@@ -33235,7 +33235,7 @@ class ColorControl(Cluster):
     remainingTime: 'typing.Optional[uint]' = None
     currentX: 'typing.Optional[uint]' = None
     currentY: 'typing.Optional[uint]' = None
-    driftCompensation: 'typing.Optional[ColorControl.Enums.DriftCompensation]' = None
+    driftCompensation: 'typing.Optional[ColorControl.Enums.DriftCompensationEnum]' = None
     compensationText: 'typing.Optional[str]' = None
     colorTemperatureMireds: 'typing.Optional[uint]' = None
     colorMode: 'uint' = None
@@ -33271,7 +33271,7 @@ class ColorControl(Cluster):
     colorPointBY: 'typing.Optional[uint]' = None
     colorPointBIntensity: 'typing.Union[None, Nullable, uint]' = None
     enhancedCurrentHue: 'typing.Optional[uint]' = None
-    enhancedColorMode: 'ColorControl.Enums.EnhancedColorMode' = None
+    enhancedColorMode: 'ColorControl.Enums.EnhancedColorModeEnum' = None
     colorLoopActive: 'typing.Optional[uint]' = None
     colorLoopDirection: 'typing.Optional[uint]' = None
     colorLoopTime: 'typing.Optional[uint]' = None
@@ -33319,9 +33319,9 @@ class ColorControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
 
-        class DriftCompensation(MatterIntEnum):
+        class DriftCompensationEnum(MatterIntEnum):
             kNone = 0x00
-            kOtherUnknown = 0x01
+            kOtherOrUnknown = 0x01
             kTemperaturemonitoring = 0x02
             kOpticalLuminanceMonitoringAndFeedback = 0x03
             kOpticalColorMonitoringAndFeedback = 0x04
@@ -33331,7 +33331,7 @@ class ColorControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 5,
 
-        class EnhancedColorMode(MatterIntEnum):
+        class EnhancedColorModeEnum(MatterIntEnum):
             kCurrentHueAndCurrentSaturation = 0x00
             kCurrentXAndCurrentY = 0x01
             kColorTemperature = 0x02
@@ -33399,9 +33399,6 @@ class ColorControl(Cluster):
             kXYAttributesSupported = 0x8
             kColorTemperatureSupported = 0x10
 
-        class ColorControlOptions(IntFlag):
-            kExecuteIfOff = 0x1
-
         class ColorLoopUpdateFlags(IntFlag):
             kUpdateAction = 0x1
             kUpdateDirection = 0x2
@@ -33414,6 +33411,9 @@ class ColorControl(Cluster):
             kColorLoop = 0x4
             kXy = 0x8
             kColorTemperature = 0x10
+
+        class OptionsBitmap(IntFlag):
+            kExecuteIfOff = 0x1
 
     class Commands:
         @dataclass
@@ -33957,9 +33957,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[ColorControl.Enums.DriftCompensation])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ColorControl.Enums.DriftCompensationEnum])
 
-            value: 'typing.Optional[ColorControl.Enums.DriftCompensation]' = None
+            value: 'typing.Optional[ColorControl.Enums.DriftCompensationEnum]' = None
 
         @dataclass
         class CompensationText(ClusterAttributeDescriptor):
@@ -34533,9 +34533,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ColorControl.Enums.EnhancedColorMode)
+                return ClusterObjectFieldDescriptor(Type=ColorControl.Enums.EnhancedColorModeEnum)
 
-            value: 'ColorControl.Enums.EnhancedColorMode' = 0
+            value: 'ColorControl.Enums.EnhancedColorModeEnum' = 0
 
         @dataclass
         class ColorLoopActive(ClusterAttributeDescriptor):

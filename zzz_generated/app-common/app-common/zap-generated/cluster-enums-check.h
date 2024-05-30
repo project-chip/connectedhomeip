@@ -2627,13 +2627,13 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorMode
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::DriftCompensation val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::DriftCompensationEnum val)
 {
-    using EnumType = ColorControl::DriftCompensation;
+    using EnumType = ColorControl::DriftCompensationEnum;
     switch (val)
     {
     case EnumType::kNone:
-    case EnumType::kOtherUnknown:
+    case EnumType::kOtherOrUnknown:
     case EnumType::kTemperaturemonitoring:
     case EnumType::kOpticalLuminanceMonitoringAndFeedback:
     case EnumType::kOpticalColorMonitoringAndFeedback:
@@ -2642,9 +2642,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::DriftComp
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::EnhancedColorMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::EnhancedColorModeEnum val)
 {
-    using EnumType = ColorControl::EnhancedColorMode;
+    using EnumType = ColorControl::EnhancedColorModeEnum;
     switch (val)
     {
     case EnumType::kCurrentHueAndCurrentSaturation:
