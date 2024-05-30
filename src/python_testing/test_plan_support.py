@@ -42,3 +42,5 @@ def dut_reply_value(typename: str, min: typing.Union[int, str, None], max: stepn
 if_attr_supported = "If the attribute is supported on the cluster"
 
 com_dut_th = "Commission DUT to TH (can be skipped if done in a preceding test)"
+
+store_value_as = "Store the value as"

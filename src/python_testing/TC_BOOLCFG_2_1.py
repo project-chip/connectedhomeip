@@ -22,7 +22,7 @@ from operator import ior
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from test_plan_support import (th_read_attribute, dut_reply_attribute, if_attr_supported, dut_reply_value, com_dut_th)
+from test_plan_support import (th_read_attribute, dut_reply_attribute, if_attr_supported, dut_reply_value, com_dut_th, store_value_as)
 
 
 class TC_BOOLCFG_2_1(MatterBaseTest):
@@ -37,7 +37,7 @@ class TC_BOOLCFG_2_1(MatterBaseTest):
         steps = [
             TestStep(1, f"{com_dut_th}.", "", is_commissioning=True),
             TestStep(2, f"{th_read_attribute('AttributeList')}", f"{dut_reply_attribute('AttributeList')}."),
-            TestStep(3, f"{if_attr_supported}, {th_read_attribute('SupportedSensitivityLevels')}. {storeValueAs} numberOfSupportedLevels.", f"{dut_reply_value('uint8', 2, 10)}."),
+            TestStep(3, f"{if_attr_supported}, {th_read_attribute('SupportedSensitivityLevels')}. {store_value_as} numberOfSupportedLevels.", f"{dut_reply_value('uint8', 2, 10)}."),
             TestStep(4, f"{if_attr_supported}, {th_read_attribute('CurrentSensitivityLevel')}.", f"{dut_reply_value('uint8', 0, 'the value of numberOfSupportedLevels')}."),
             TestStep(5, f"{if_attr_supported}, {th_read_attribute('DefaultSensitivityLevel')}.", f"{dut_reply_value('uint8', 0, 'the value of numberOfSupportedLevels')}."),
             TestStep(6, f"{if_attr_supported}, {th_read_attribute('AlarmsActive')}.", f"{dut_reply_value('map8', 0, 3)}."),
