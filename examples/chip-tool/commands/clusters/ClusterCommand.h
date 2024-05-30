@@ -60,7 +60,7 @@ public:
                            const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Type & value)
     {
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
-        mScopedNodeId = chip::ScopedNodeId(value.checkInNodeID,device->GetSecureSession().Value()->GetFabricIndex());
+        mScopedNodeId = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
         return CHIP_NO_ERROR;
     }
 
@@ -223,6 +223,6 @@ private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
     chip::ScopedNodeId mScopedNodeId;
-    CHIP_ERROR mError              = CHIP_NO_ERROR;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;
 };
