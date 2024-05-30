@@ -141,11 +141,8 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
 {
     if (rpcSocketStream.Connect(rpcServerAddress, rpcServerPort) != PW_STATUS_OK)
     {
-        ChipLogError(NotSpecified, "Failed to connect the Fabric-Admin");
         return CHIP_ERROR_NOT_CONNECTED;
     }
-
-    ChipLogProgress(NotSpecified, "Connectted to the Fabric-Admin\n");
 
     // Start a thread to process incoming packets
     std::thread packet_processor(ProcessPackets);

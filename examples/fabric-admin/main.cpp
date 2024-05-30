@@ -25,33 +25,19 @@
 
 #include <iostream>
 #include <string>
-#include <thread>
 #include <vector>
 
 #if defined(PW_RPC_ENABLED)
-#include <rpc/RpcClient.h>
 #include <rpc/RpcServer.h>
 #endif
 
-#define RETRY_INTERVAL_S (3)
+using namespace chip;
 
 void ApplicationInit()
 {
 #if defined(PW_RPC_ENABLED)
     InitRpcServer(kFabricAdminServerPort);
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
-
-    while (true)
-    {
-        if (InitRpcClient(kFabricBridgeServerPort) == CHIP_NO_ERROR)
-        {
-            ChipLogProgress(NotSpecified, "Connected to Fabric-Bridge");
-            break;
-        }
-
-        ChipLogError(NotSpecified, "Failed to connect to Fabric-Bridge, retry in %d seconds....", RETRY_INTERVAL_S);
-        std::this_thread::sleep_for(std::chrono::seconds(RETRY_INTERVAL_S));
-    }
 #endif
 }
 

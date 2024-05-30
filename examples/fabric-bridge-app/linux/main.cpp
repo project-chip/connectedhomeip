@@ -17,63 +17,33 @@
  */
 
 #include <AppMain.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/EventLogging.h>
-#include <app/reporting/reporting.h>
-#include <app/server/Server.h>
-#include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/endpoint-config-api.h>
-#include <app/util/util.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/ZclString.h>
-#include <platform/CommissionableDataProvider.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
 
 #include "CommissionableInit.h"
 #include "Device.h"
-<<<<<<< HEAD
 #include "DeviceManager.h"
-=======
->>>>>>> 9631848953 (Add bridge_enable_pw_rpc build flag)
+
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <lib/support/ZclString.h>
+
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE)
 #include "RpcClient.h"
 #include "RpcServer.h"
 #endif
 
-#include <cassert>
-#include <chrono>
-#include <iostream>
 #include <string>
 #include <sys/ioctl.h>
 #include <thread>
 
 using namespace chip;
-using namespace chip::app;
-using namespace chip::Credentials;
-using namespace chip::Inet;
-using namespace chip::Transport;
-using namespace chip::DeviceLayer;
-using namespace chip::app::Clusters;
+
+#define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
 
 namespace {
 
 constexpr uint16_t kPollIntervalMs = 100;
 constexpr uint16_t kRetryIntervalS = 3;
-
-EndpointId gCurrentEndpointId;
-EndpointId gFirstDynamicEndpointId;
-Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 
 bool KeyboardHit()
 {
@@ -130,24 +100,8 @@ DeviceManager gDeviceManager;
 
 } // namespace
 
-// REVISION DEFINITIONS:
-// =================================================================================
-
-#define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
-
 void ApplicationInit()
 {
-    // Clear out the device database
-    memset(gDevices, 0, sizeof(gDevices));
-
-    // Set starting endpoint id where dynamic endpoints will be assigned, which
-    // will be the next consecutive endpoint id after the last fixed endpoint.
-    gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
-        static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
-    gCurrentEndpointId = gFirstDynamicEndpointId;
-
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE)
     InitRpcServer(kFabricBridgeServerPort);
 

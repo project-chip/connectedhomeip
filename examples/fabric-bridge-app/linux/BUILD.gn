@@ -37,10 +37,6 @@ executable("fabric-bridge-app") {
     "include/Device.h",
     "DeviceManager.cpp",
     "include/DeviceManager.h",
-    "RpcClient.cpp",
-    "include/RpcClient.h",
-    "RpcServer.cpp",
-    "include/RpcServer.h",
     "main.cpp",
   ]
 
