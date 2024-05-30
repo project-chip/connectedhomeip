@@ -62,8 +62,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     '''
     data = await adminCtrl.ReadAttribute(targetNodeId, [(Clusters.AccessControl.Attributes.Acl)])
     if 0 not in data:
-        raise ValueError(
-            "Did not get back any data (possible cause: controller has no access..")
+        raise ValueError("Did not get back any data (possible cause: controller has no access..")
 
     currentAcls = data[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
@@ -74,14 +73,12 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
         targetSubjects = [grantedCtrl.nodeId]
 
     if (len(targetSubjects) > 4):
-        raise ValueError(
-            f"List of target subjects of len {len(targetSubjects)} exceeeded the minima of 4!")
+        raise ValueError(f"List of target subjects of len {len(targetSubjects)} exceeeded the minima of 4!")
 
     # Step 1: Wipe the subject from all existing ACLs.
     for acl in currentAcls:
         if (acl.subjects != NullValue):
-            acl.subjects = [
-                subject for subject in acl.subjects if subject not in targetSubjects]
+            acl.subjects = [subject for subject in acl.subjects if subject not in targetSubjects]
 
     if (privilege):
         addedPrivilege = False
@@ -110,8 +107,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
             ))
 
     # Step 4: Prune ACLs which have empty subjects.
-    currentAcls = [acl for acl in currentAcls if acl.subjects !=
-                   NullValue and len(acl.subjects) != 0]
+    currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]
 
     logger.info(f'GrantPrivilege: Writing acls: {currentAcls}')
     await adminCtrl.WriteAttribute(targetNodeId, [(0, Clusters.AccessControl.Attributes.Acl(currentAcls))])
@@ -141,8 +137,7 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
     controllerList = []
 
     for nodeId in controllerNodeIds:
-        newController = fabricAdmin.NewController(
-            nodeId=nodeId, paaTrustStorePath=paaTrustStorePath, catTags=catTags)
+        newController = fabricAdmin.NewController(nodeId=nodeId, paaTrustStorePath=paaTrustStorePath, catTags=catTags)
         await GrantPrivilege(adminDevCtrl, newController, privilege, targetNodeId, catTags)
         controllerList.append(newController)
 
@@ -161,7 +156,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
         newNodeId (int): Node ID to use for the target node on the new fabric.
 
     Return:
-        tuple: (bool, nocResp): True if successful, False otherwise, along with nocResp, rcacResp value.
+        tuple:  (bool, Optional[nocResp], Optional[rcacResp]: True if successful, False otherwise, along with nocResp, rcacResp value.
 
     '''
     nocResp = None
