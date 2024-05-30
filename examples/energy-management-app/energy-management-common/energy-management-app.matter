@@ -1514,6 +1514,18 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional int16u currency = 3;
   }
 
+  struct PowerAdjustStruct {
+    power_mw minPower = 0;
+    power_mw maxPower = 1;
+    elapsed_s minDuration = 2;
+    elapsed_s maxDuration = 3;
+  }
+
+  struct PowerAdjustCapabilityStruct {
+    nullable PowerAdjustStruct powerAdjustCapability[] = 0;
+    PowerAdjustReasonEnum cause = 1;
+  }
+
   struct SlotStruct {
     elapsed_s minDuration = 0;
     elapsed_s maxDuration = 1;
@@ -1536,7 +1548,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   struct ForecastStruct {
-    int32u forecastId = 0;
+    int32u forecastID = 0;
     nullable int16u activeSlotNumber = 1;
     epoch_s startTime = 2;
     epoch_s endTime = 3;
@@ -1553,14 +1565,6 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional power_mw nominalPower = 2;
     optional energy_mwh maximumEnergy = 3;
     optional int8s loadControl = 4;
-  }
-
-  struct PowerAdjustStruct {
-    power_mw minPower = 0;
-    power_mw maxPower = 1;
-    elapsed_s minDuration = 2;
-    elapsed_s maxDuration = 3;
-    PowerAdjustReasonEnum cause = 4;
   }
 
   struct SlotAdjustmentStruct {
@@ -1590,7 +1594,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute ESAStateEnum ESAState = 2;
   readonly attribute power_mw absMinPower = 3;
   readonly attribute power_mw absMaxPower = 4;
-  readonly attribute optional nullable PowerAdjustStruct powerAdjustmentCapability[] = 5;
+  readonly attribute optional nullable PowerAdjustCapabilityStruct powerAdjustmentCapability[] = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
   readonly attribute optional OptOutStateEnum optOutState = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1617,7 +1621,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   request struct ModifyForecastRequestRequest {
-    int32u forecastId = 0;
+    int32u forecastID = 0;
     SlotAdjustmentStruct slotAdjustments[] = 1;
     AdjustmentCauseEnum cause = 2;
   }

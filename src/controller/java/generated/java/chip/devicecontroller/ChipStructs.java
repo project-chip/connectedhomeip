@@ -7352,6 +7352,158 @@ public static class DeviceEnergyManagementClusterCostStruct {
     return output.toString();
   }
 }
+public static class DeviceEnergyManagementClusterPowerAdjustStruct {
+  public Long minPower;
+  public Long maxPower;
+  public Long minDuration;
+  public Long maxDuration;
+  private static final long MIN_POWER_ID = 0L;
+  private static final long MAX_POWER_ID = 1L;
+  private static final long MIN_DURATION_ID = 2L;
+  private static final long MAX_DURATION_ID = 3L;
+
+  public DeviceEnergyManagementClusterPowerAdjustStruct(
+    Long minPower,
+    Long maxPower,
+    Long minDuration,
+    Long maxDuration
+  ) {
+    this.minPower = minPower;
+    this.maxPower = maxPower;
+    this.minDuration = minDuration;
+    this.maxDuration = maxDuration;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MIN_POWER_ID, new IntType(minPower)));
+    values.add(new StructElement(MAX_POWER_ID, new IntType(maxPower)));
+    values.add(new StructElement(MIN_DURATION_ID, new UIntType(minDuration)));
+    values.add(new StructElement(MAX_DURATION_ID, new UIntType(maxDuration)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerAdjustStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long minPower = null;
+    Long maxPower = null;
+    Long minDuration = null;
+    Long maxDuration = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MIN_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          minPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MIN_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minDuration = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxDuration = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerAdjustStruct(
+      minPower,
+      maxPower,
+      minDuration,
+      maxDuration
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerAdjustStruct {\n");
+    output.append("\tminPower: ");
+    output.append(minPower);
+    output.append("\n");
+    output.append("\tmaxPower: ");
+    output.append(maxPower);
+    output.append("\n");
+    output.append("\tminDuration: ");
+    output.append(minDuration);
+    output.append("\n");
+    output.append("\tmaxDuration: ");
+    output.append(maxDuration);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DeviceEnergyManagementClusterPowerAdjustCapabilityStruct {
+  public @Nullable ArrayList<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> powerAdjustCapability;
+  public Integer cause;
+  private static final long POWER_ADJUST_CAPABILITY_ID = 0L;
+  private static final long CAUSE_ID = 1L;
+
+  public DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(
+    @Nullable ArrayList<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> powerAdjustCapability,
+    Integer cause
+  ) {
+    this.powerAdjustCapability = powerAdjustCapability;
+    this.cause = cause;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(POWER_ADJUST_CAPABILITY_ID, powerAdjustCapability != null ? ArrayType.generateArrayType(powerAdjustCapability, (elementpowerAdjustCapability) -> elementpowerAdjustCapability.encodeTlv()) : new NullType()));
+    values.add(new StructElement(CAUSE_ID, new UIntType(cause)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerAdjustCapabilityStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable ArrayList<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> powerAdjustCapability = null;
+    Integer cause = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == POWER_ADJUST_CAPABILITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          powerAdjustCapability = castingValue.map((elementcastingValue) -> ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == CAUSE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cause = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(
+      powerAdjustCapability,
+      cause
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerAdjustCapabilityStruct {\n");
+    output.append("\tpowerAdjustCapability: ");
+    output.append(powerAdjustCapability);
+    output.append("\n");
+    output.append("\tcause: ");
+    output.append(cause);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementClusterSlotStruct {
   public Long minDuration;
   public Long maxDuration;
@@ -7654,7 +7806,7 @@ public static class DeviceEnergyManagementClusterSlotStruct {
   }
 }
 public static class DeviceEnergyManagementClusterForecastStruct {
-  public Long forecastId;
+  public Long forecastID;
   public @Nullable Integer activeSlotNumber;
   public Long startTime;
   public Long endTime;
@@ -7663,7 +7815,7 @@ public static class DeviceEnergyManagementClusterForecastStruct {
   public Boolean isPausable;
   public ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotStruct> slots;
   public Integer forecastUpdateReason;
-  private static final long FORECAST_ID_ID = 0L;
+  private static final long FORECAST_I_D_ID = 0L;
   private static final long ACTIVE_SLOT_NUMBER_ID = 1L;
   private static final long START_TIME_ID = 2L;
   private static final long END_TIME_ID = 3L;
@@ -7674,7 +7826,7 @@ public static class DeviceEnergyManagementClusterForecastStruct {
   private static final long FORECAST_UPDATE_REASON_ID = 8L;
 
   public DeviceEnergyManagementClusterForecastStruct(
-    Long forecastId,
+    Long forecastID,
     @Nullable Integer activeSlotNumber,
     Long startTime,
     Long endTime,
@@ -7684,7 +7836,7 @@ public static class DeviceEnergyManagementClusterForecastStruct {
     ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotStruct> slots,
     Integer forecastUpdateReason
   ) {
-    this.forecastId = forecastId;
+    this.forecastID = forecastID;
     this.activeSlotNumber = activeSlotNumber;
     this.startTime = startTime;
     this.endTime = endTime;
@@ -7697,7 +7849,7 @@ public static class DeviceEnergyManagementClusterForecastStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(FORECAST_ID_ID, new UIntType(forecastId)));
+    values.add(new StructElement(FORECAST_I_D_ID, new UIntType(forecastID)));
     values.add(new StructElement(ACTIVE_SLOT_NUMBER_ID, activeSlotNumber != null ? new UIntType(activeSlotNumber) : new NullType()));
     values.add(new StructElement(START_TIME_ID, new UIntType(startTime)));
     values.add(new StructElement(END_TIME_ID, new UIntType(endTime)));
@@ -7714,7 +7866,7 @@ public static class DeviceEnergyManagementClusterForecastStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long forecastId = null;
+    Long forecastID = null;
     @Nullable Integer activeSlotNumber = null;
     Long startTime = null;
     Long endTime = null;
@@ -7724,10 +7876,10 @@ public static class DeviceEnergyManagementClusterForecastStruct {
     ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotStruct> slots = null;
     Integer forecastUpdateReason = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == FORECAST_ID_ID) {
+      if (element.contextTagNum() == FORECAST_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          forecastId = castingValue.value(Long.class);
+          forecastID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == ACTIVE_SLOT_NUMBER_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -7772,7 +7924,7 @@ public static class DeviceEnergyManagementClusterForecastStruct {
       }
     }
     return new DeviceEnergyManagementClusterForecastStruct(
-      forecastId,
+      forecastID,
       activeSlotNumber,
       startTime,
       endTime,
@@ -7788,8 +7940,8 @@ public static class DeviceEnergyManagementClusterForecastStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("DeviceEnergyManagementClusterForecastStruct {\n");
-    output.append("\tforecastId: ");
-    output.append(forecastId);
+    output.append("\tforecastID: ");
+    output.append(forecastID);
     output.append("\n");
     output.append("\tactiveSlotNumber: ");
     output.append(activeSlotNumber);
@@ -7920,112 +8072,6 @@ public static class DeviceEnergyManagementClusterConstraintsStruct {
     output.append("\n");
     output.append("\tloadControl: ");
     output.append(loadControl);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class DeviceEnergyManagementClusterPowerAdjustStruct {
-  public Long minPower;
-  public Long maxPower;
-  public Long minDuration;
-  public Long maxDuration;
-  public Integer cause;
-  private static final long MIN_POWER_ID = 0L;
-  private static final long MAX_POWER_ID = 1L;
-  private static final long MIN_DURATION_ID = 2L;
-  private static final long MAX_DURATION_ID = 3L;
-  private static final long CAUSE_ID = 4L;
-
-  public DeviceEnergyManagementClusterPowerAdjustStruct(
-    Long minPower,
-    Long maxPower,
-    Long minDuration,
-    Long maxDuration,
-    Integer cause
-  ) {
-    this.minPower = minPower;
-    this.maxPower = maxPower;
-    this.minDuration = minDuration;
-    this.maxDuration = maxDuration;
-    this.cause = cause;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(MIN_POWER_ID, new IntType(minPower)));
-    values.add(new StructElement(MAX_POWER_ID, new IntType(maxPower)));
-    values.add(new StructElement(MIN_DURATION_ID, new UIntType(minDuration)));
-    values.add(new StructElement(MAX_DURATION_ID, new UIntType(maxDuration)));
-    values.add(new StructElement(CAUSE_ID, new UIntType(cause)));
-
-    return new StructType(values);
-  }
-
-  public static DeviceEnergyManagementClusterPowerAdjustStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long minPower = null;
-    Long maxPower = null;
-    Long minDuration = null;
-    Long maxDuration = null;
-    Integer cause = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == MIN_POWER_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          minPower = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == MAX_POWER_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          maxPower = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == MIN_DURATION_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          minDuration = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == MAX_DURATION_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          maxDuration = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == CAUSE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          cause = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new DeviceEnergyManagementClusterPowerAdjustStruct(
-      minPower,
-      maxPower,
-      minDuration,
-      maxDuration,
-      cause
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("DeviceEnergyManagementClusterPowerAdjustStruct {\n");
-    output.append("\tminPower: ");
-    output.append(minPower);
-    output.append("\n");
-    output.append("\tmaxPower: ");
-    output.append(maxPower);
-    output.append("\n");
-    output.append("\tminDuration: ");
-    output.append(minDuration);
-    output.append("\n");
-    output.append("\tmaxDuration: ");
-    output.append(maxDuration);
-    output.append("\n");
-    output.append("\tcause: ");
-    output.append(cause);
     output.append("\n");
     output.append("}\n");
     return output.toString();

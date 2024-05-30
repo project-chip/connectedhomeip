@@ -6829,7 +6829,7 @@ class ChipClusters:
                 "commandId": 0x00000005,
                 "commandName": "ModifyForecastRequest",
                 "args": {
-                    "forecastId": "int",
+                    "forecastID": "int",
                     "slotAdjustments": "SlotAdjustmentStruct",
                     "cause": "int",
                 },

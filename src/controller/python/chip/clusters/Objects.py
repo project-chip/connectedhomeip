@@ -24291,6 +24291,36 @@ class DeviceEnergyManagement(Cluster):
             currency: 'typing.Optional[uint]' = None
 
         @dataclass
+        class PowerAdjustStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="minPower", Tag=0, Type=int),
+                        ClusterObjectFieldDescriptor(Label="maxPower", Tag=1, Type=int),
+                        ClusterObjectFieldDescriptor(Label="minDuration", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="maxDuration", Tag=3, Type=uint),
+                    ])
+
+            minPower: 'int' = 0
+            maxPower: 'int' = 0
+            minDuration: 'uint' = 0
+            maxDuration: 'uint' = 0
+
+        @dataclass
+        class PowerAdjustCapabilityStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="powerAdjustCapability", Tag=0, Type=typing.Union[Nullable, typing.List[DeviceEnergyManagement.Structs.PowerAdjustStruct]]),
+                        ClusterObjectFieldDescriptor(Label="cause", Tag=1, Type=DeviceEnergyManagement.Enums.PowerAdjustReasonEnum),
+                    ])
+
+            powerAdjustCapability: 'typing.Union[Nullable, typing.List[DeviceEnergyManagement.Structs.PowerAdjustStruct]]' = NullValue
+            cause: 'DeviceEnergyManagement.Enums.PowerAdjustReasonEnum' = 0
+
+        @dataclass
         class SlotStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24341,7 +24371,7 @@ class DeviceEnergyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="forecastId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="forecastID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="activeSlotNumber", Tag=1, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="startTime", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endTime", Tag=3, Type=uint),
@@ -24352,7 +24382,7 @@ class DeviceEnergyManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="forecastUpdateReason", Tag=8, Type=DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum),
                     ])
 
-            forecastId: 'uint' = 0
+            forecastID: 'uint' = 0
             activeSlotNumber: 'typing.Union[Nullable, uint]' = NullValue
             startTime: 'uint' = 0
             endTime: 'uint' = 0
@@ -24380,25 +24410,6 @@ class DeviceEnergyManagement(Cluster):
             nominalPower: 'typing.Optional[int]' = None
             maximumEnergy: 'typing.Optional[int]' = None
             loadControl: 'typing.Optional[int]' = None
-
-        @dataclass
-        class PowerAdjustStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="minPower", Tag=0, Type=int),
-                        ClusterObjectFieldDescriptor(Label="maxPower", Tag=1, Type=int),
-                        ClusterObjectFieldDescriptor(Label="minDuration", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="maxDuration", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="cause", Tag=4, Type=DeviceEnergyManagement.Enums.PowerAdjustReasonEnum),
-                    ])
-
-            minPower: 'int' = 0
-            maxPower: 'int' = 0
-            minDuration: 'uint' = 0
-            maxDuration: 'uint' = 0
-            cause: 'DeviceEnergyManagement.Enums.PowerAdjustReasonEnum' = 0
 
         @dataclass
         class SlotAdjustmentStruct(ClusterObject):
@@ -24509,12 +24520,12 @@ class DeviceEnergyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="forecastId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="forecastID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="slotAdjustments", Tag=1, Type=typing.List[DeviceEnergyManagement.Structs.SlotAdjustmentStruct]),
                         ClusterObjectFieldDescriptor(Label="cause", Tag=2, Type=DeviceEnergyManagement.Enums.AdjustmentCauseEnum),
                     ])
 
-            forecastId: 'uint' = 0
+            forecastID: 'uint' = 0
             slotAdjustments: 'typing.List[DeviceEnergyManagement.Structs.SlotAdjustmentStruct]' = field(default_factory=lambda: [])
             cause: 'DeviceEnergyManagement.Enums.AdjustmentCauseEnum' = 0
 

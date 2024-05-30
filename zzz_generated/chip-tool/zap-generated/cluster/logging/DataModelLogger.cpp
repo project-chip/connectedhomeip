@@ -2761,6 +2761,74 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("MinPower", indent + 1, value.minPower);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinPower'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxPower", indent + 1, value.maxPower);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxPower'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MinDuration", indent + 1, value.minDuration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinDuration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxDuration", indent + 1, value.maxDuration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxDuration'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PowerAdjustCapability", indent + 1, value.powerAdjustCapability);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerAdjustCapability'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Cause", indent + 1, value.cause);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cause'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::DecodableType & value)
 {
@@ -2920,10 +2988,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("ForecastId", indent + 1, value.forecastId);
+        CHIP_ERROR err = LogValue("ForecastID", indent + 1, value.forecastID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ForecastId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ForecastID'");
             return err;
         }
     }
@@ -3038,56 +3106,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LoadControl'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("MinPower", indent + 1, value.minPower);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinPower'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxPower", indent + 1, value.maxPower);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxPower'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MinDuration", indent + 1, value.minDuration);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinDuration'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxDuration", indent + 1, value.maxDuration);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxDuration'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Cause", indent + 1, value.cause);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cause'");
             return err;
         }
     }
@@ -12839,7 +12857,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         case DeviceEnergyManagement::Attributes::PowerAdjustmentCapability::Id: {
             chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType>>
+                chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType>>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PowerAdjustmentCapability", 1, value);

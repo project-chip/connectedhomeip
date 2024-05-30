@@ -23448,34 +23448,78 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 {
                     auto & entry_1 = iter_value_1.GetValue();
                     jobject newElement_1;
-                    jobject newElement_1_minPower;
-                    std::string newElement_1_minPowerClassName     = "java/lang/Long";
-                    std::string newElement_1_minPowerCtorSignature = "(J)V";
-                    jlong jninewElement_1_minPower                 = static_cast<jlong>(entry_1.minPower);
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_1_minPowerClassName.c_str(),
-                                                                                newElement_1_minPowerCtorSignature.c_str(),
-                                                                                jninewElement_1_minPower, newElement_1_minPower);
-                    jobject newElement_1_maxPower;
-                    std::string newElement_1_maxPowerClassName     = "java/lang/Long";
-                    std::string newElement_1_maxPowerCtorSignature = "(J)V";
-                    jlong jninewElement_1_maxPower                 = static_cast<jlong>(entry_1.maxPower);
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_1_maxPowerClassName.c_str(),
-                                                                                newElement_1_maxPowerCtorSignature.c_str(),
-                                                                                jninewElement_1_maxPower, newElement_1_maxPower);
-                    jobject newElement_1_minDuration;
-                    std::string newElement_1_minDurationClassName     = "java/lang/Long";
-                    std::string newElement_1_minDurationCtorSignature = "(J)V";
-                    jlong jninewElement_1_minDuration                 = static_cast<jlong>(entry_1.minDuration);
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                        newElement_1_minDurationClassName.c_str(), newElement_1_minDurationCtorSignature.c_str(),
-                        jninewElement_1_minDuration, newElement_1_minDuration);
-                    jobject newElement_1_maxDuration;
-                    std::string newElement_1_maxDurationClassName     = "java/lang/Long";
-                    std::string newElement_1_maxDurationCtorSignature = "(J)V";
-                    jlong jninewElement_1_maxDuration                 = static_cast<jlong>(entry_1.maxDuration);
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                        newElement_1_maxDurationClassName.c_str(), newElement_1_maxDurationCtorSignature.c_str(),
-                        jninewElement_1_maxDuration, newElement_1_maxDuration);
+                    jobject newElement_1_powerAdjustCapability;
+                    if (entry_1.powerAdjustCapability.IsNull())
+                    {
+                        newElement_1_powerAdjustCapability = nullptr;
+                    }
+                    else
+                    {
+                        chip::JniReferences::GetInstance().CreateArrayList(newElement_1_powerAdjustCapability);
+
+                        auto iter_newElement_1_powerAdjustCapability_4 = entry_1.powerAdjustCapability.Value().begin();
+                        while (iter_newElement_1_powerAdjustCapability_4.Next())
+                        {
+                            auto & entry_4 = iter_newElement_1_powerAdjustCapability_4.GetValue();
+                            jobject newElement_4;
+                            jobject newElement_4_minPower;
+                            std::string newElement_4_minPowerClassName     = "java/lang/Long";
+                            std::string newElement_4_minPowerCtorSignature = "(J)V";
+                            jlong jninewElement_4_minPower                 = static_cast<jlong>(entry_4.minPower);
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                                newElement_4_minPowerClassName.c_str(), newElement_4_minPowerCtorSignature.c_str(),
+                                jninewElement_4_minPower, newElement_4_minPower);
+                            jobject newElement_4_maxPower;
+                            std::string newElement_4_maxPowerClassName     = "java/lang/Long";
+                            std::string newElement_4_maxPowerCtorSignature = "(J)V";
+                            jlong jninewElement_4_maxPower                 = static_cast<jlong>(entry_4.maxPower);
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                                newElement_4_maxPowerClassName.c_str(), newElement_4_maxPowerCtorSignature.c_str(),
+                                jninewElement_4_maxPower, newElement_4_maxPower);
+                            jobject newElement_4_minDuration;
+                            std::string newElement_4_minDurationClassName     = "java/lang/Long";
+                            std::string newElement_4_minDurationCtorSignature = "(J)V";
+                            jlong jninewElement_4_minDuration                 = static_cast<jlong>(entry_4.minDuration);
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                                newElement_4_minDurationClassName.c_str(), newElement_4_minDurationCtorSignature.c_str(),
+                                jninewElement_4_minDuration, newElement_4_minDuration);
+                            jobject newElement_4_maxDuration;
+                            std::string newElement_4_maxDurationClassName     = "java/lang/Long";
+                            std::string newElement_4_maxDurationCtorSignature = "(J)V";
+                            jlong jninewElement_4_maxDuration                 = static_cast<jlong>(entry_4.maxDuration);
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                                newElement_4_maxDurationClassName.c_str(), newElement_4_maxDurationCtorSignature.c_str(),
+                                jninewElement_4_maxDuration, newElement_4_maxDuration);
+
+                            jclass powerAdjustStructStructClass_5;
+                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                                env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementClusterPowerAdjustStruct",
+                                powerAdjustStructStructClass_5);
+                            if (err != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(Zcl,
+                                             "Could not find class ChipStructs$DeviceEnergyManagementClusterPowerAdjustStruct");
+                                return nullptr;
+                            }
+
+                            jmethodID powerAdjustStructStructCtor_5;
+                            err = chip::JniReferences::GetInstance().FindMethod(
+                                env, powerAdjustStructStructClass_5, "<init>",
+                                "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V",
+                                &powerAdjustStructStructCtor_5);
+                            if (err != CHIP_NO_ERROR || powerAdjustStructStructCtor_5 == nullptr)
+                            {
+                                ChipLogError(
+                                    Zcl, "Could not find ChipStructs$DeviceEnergyManagementClusterPowerAdjustStruct constructor");
+                                return nullptr;
+                            }
+
+                            newElement_4 =
+                                env->NewObject(powerAdjustStructStructClass_5, powerAdjustStructStructCtor_5, newElement_4_minPower,
+                                               newElement_4_maxPower, newElement_4_minDuration, newElement_4_maxDuration);
+                            chip::JniReferences::GetInstance().AddToList(newElement_1_powerAdjustCapability, newElement_4);
+                        }
+                    }
                     jobject newElement_1_cause;
                     std::string newElement_1_causeClassName     = "java/lang/Integer";
                     std::string newElement_1_causeCtorSignature = "(I)V";
@@ -23484,30 +23528,30 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                newElement_1_causeCtorSignature.c_str(),
                                                                                jninewElement_1_cause, newElement_1_cause);
 
-                    jclass powerAdjustStructStructClass_2;
+                    jclass powerAdjustCapabilityStructStructClass_2;
                     err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                        env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementClusterPowerAdjustStruct",
-                        powerAdjustStructStructClass_2);
+                        env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementClusterPowerAdjustCapabilityStruct",
+                        powerAdjustCapabilityStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$DeviceEnergyManagementClusterPowerAdjustStruct");
+                        ChipLogError(Zcl,
+                                     "Could not find class ChipStructs$DeviceEnergyManagementClusterPowerAdjustCapabilityStruct");
                         return nullptr;
                     }
 
-                    jmethodID powerAdjustStructStructCtor_2;
-                    err = chip::JniReferences::GetInstance().FindMethod(
-                        env, powerAdjustStructStructClass_2, "<init>",
-                        "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;)V",
-                        &powerAdjustStructStructCtor_2);
-                    if (err != CHIP_NO_ERROR || powerAdjustStructStructCtor_2 == nullptr)
+                    jmethodID powerAdjustCapabilityStructStructCtor_2;
+                    err = chip::JniReferences::GetInstance().FindMethod(env, powerAdjustCapabilityStructStructClass_2, "<init>",
+                                                                        "(Ljava/util/ArrayList;Ljava/lang/Integer;)V",
+                                                                        &powerAdjustCapabilityStructStructCtor_2);
+                    if (err != CHIP_NO_ERROR || powerAdjustCapabilityStructStructCtor_2 == nullptr)
                     {
-                        ChipLogError(Zcl, "Could not find ChipStructs$DeviceEnergyManagementClusterPowerAdjustStruct constructor");
+                        ChipLogError(
+                            Zcl, "Could not find ChipStructs$DeviceEnergyManagementClusterPowerAdjustCapabilityStruct constructor");
                         return nullptr;
                     }
 
-                    newElement_1 = env->NewObject(powerAdjustStructStructClass_2, powerAdjustStructStructCtor_2,
-                                                  newElement_1_minPower, newElement_1_maxPower, newElement_1_minDuration,
-                                                  newElement_1_maxDuration, newElement_1_cause);
+                    newElement_1 = env->NewObject(powerAdjustCapabilityStructStructClass_2, powerAdjustCapabilityStructStructCtor_2,
+                                                  newElement_1_powerAdjustCapability, newElement_1_cause);
                     chip::JniReferences::GetInstance().AddToList(value, newElement_1);
                 }
             }
@@ -23528,13 +23572,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             else
             {
-                jobject value_forecastId;
-                std::string value_forecastIdClassName     = "java/lang/Long";
-                std::string value_forecastIdCtorSignature = "(J)V";
-                jlong jnivalue_forecastId                 = static_cast<jlong>(cppValue.Value().forecastId);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_forecastIdClassName.c_str(),
-                                                                            value_forecastIdCtorSignature.c_str(),
-                                                                            jnivalue_forecastId, value_forecastId);
+                jobject value_forecastID;
+                std::string value_forecastIDClassName     = "java/lang/Long";
+                std::string value_forecastIDCtorSignature = "(J)V";
+                jlong jnivalue_forecastID                 = static_cast<jlong>(cppValue.Value().forecastID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_forecastIDClassName.c_str(),
+                                                                            value_forecastIDCtorSignature.c_str(),
+                                                                            jnivalue_forecastID, value_forecastID);
                 jobject value_activeSlotNumber;
                 if (cppValue.Value().activeSlotNumber.IsNull())
                 {
@@ -24020,7 +24064,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                value = env->NewObject(forecastStructStructClass_1, forecastStructStructCtor_1, value_forecastId,
+                value = env->NewObject(forecastStructStructClass_1, forecastStructStructCtor_1, value_forecastID,
                                        value_activeSlotNumber, value_startTime, value_endTime, value_earliestStartTime,
                                        value_latestEndTime, value_isPausable, value_slots, value_forecastUpdateReason);
             }

@@ -47,11 +47,11 @@ class DeviceEnergyManagementCluster(
   private val endpointId: UShort
 ) {
   class PowerAdjustmentCapabilityAttribute(
-    val value: List<DeviceEnergyManagementClusterPowerAdjustStruct>?
+    val value: List<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct>?
   )
 
   sealed class PowerAdjustmentCapabilityAttributeSubscriptionState {
-    data class Success(val value: List<DeviceEnergyManagementClusterPowerAdjustStruct>?) :
+    data class Success(val value: List<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct>?) :
       PowerAdjustmentCapabilityAttributeSubscriptionState()
 
     data class Error(val exception: Exception) :
@@ -232,7 +232,7 @@ class DeviceEnergyManagementCluster(
   }
 
   suspend fun modifyForecastRequest(
-    forecastId: UInt,
+    forecastID: UInt,
     slotAdjustments: List<DeviceEnergyManagementClusterSlotAdjustmentStruct>,
     cause: UByte,
     timedInvokeTimeout: Duration? = null
@@ -242,8 +242,8 @@ class DeviceEnergyManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_FORECAST_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_FORECAST_ID_REQ), forecastId)
+    val TAG_FORECAST_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_FORECAST_I_D_REQ), forecastID)
 
     val TAG_SLOT_ADJUSTMENTS_REQ: Int = 1
     tlvWriter.startArray(ContextSpecificTag(TAG_SLOT_ADJUSTMENTS_REQ))
@@ -750,13 +750,18 @@ class DeviceEnergyManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<DeviceEnergyManagementClusterPowerAdjustStruct>? =
+    val decodedValue: List<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct>? =
       if (!tlvReader.isNull()) {
         if (tlvReader.isNextTag(AnonymousTag)) {
-          buildList<DeviceEnergyManagementClusterPowerAdjustStruct> {
+          buildList<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> {
             tlvReader.enterArray(AnonymousTag)
             while (!tlvReader.isEndOfContainer()) {
-              add(DeviceEnergyManagementClusterPowerAdjustStruct.fromTlv(AnonymousTag, tlvReader))
+              add(
+                DeviceEnergyManagementClusterPowerAdjustCapabilityStruct.fromTlv(
+                  AnonymousTag,
+                  tlvReader
+                )
+              )
             }
             tlvReader.exitContainer()
           }
@@ -812,14 +817,14 @@ class DeviceEnergyManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<DeviceEnergyManagementClusterPowerAdjustStruct>? =
+          val decodedValue: List<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct>? =
             if (!tlvReader.isNull()) {
               if (tlvReader.isNextTag(AnonymousTag)) {
-                buildList<DeviceEnergyManagementClusterPowerAdjustStruct> {
+                buildList<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> {
                   tlvReader.enterArray(AnonymousTag)
                   while (!tlvReader.isEndOfContainer()) {
                     add(
-                      DeviceEnergyManagementClusterPowerAdjustStruct.fromTlv(
+                      DeviceEnergyManagementClusterPowerAdjustCapabilityStruct.fromTlv(
                         AnonymousTag,
                         tlvReader
                       )

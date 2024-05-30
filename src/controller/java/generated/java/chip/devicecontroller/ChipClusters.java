@@ -31198,17 +31198,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastId, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause) {
-      modifyForecastRequest(callback, forecastId, slotAdjustments, cause, 0);
+    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastID, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause) {
+      modifyForecastRequest(callback, forecastID, slotAdjustments, cause, 0);
     }
 
-    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastId, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause, int timedInvokeTimeoutMs) {
+    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastID, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long forecastIdFieldID = 0L;
-      BaseTLVType forecastIdtlvValue = new UIntType(forecastId);
-      elements.add(new StructElement(forecastIdFieldID, forecastIdtlvValue));
+      final long forecastIDFieldID = 0L;
+      BaseTLVType forecastIDtlvValue = new UIntType(forecastID);
+      elements.add(new StructElement(forecastIDFieldID, forecastIDtlvValue));
 
       final long slotAdjustmentsFieldID = 1L;
       BaseTLVType slotAdjustmentstlvValue = ArrayType.generateArrayType(slotAdjustments, (elementslotAdjustments) -> elementslotAdjustments.encodeTlv());
@@ -31267,7 +31267,7 @@ public class ChipClusters {
     }
 
     public interface PowerAdjustmentCapabilityAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> value);
+      void onSuccess(@Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> value);
     }
 
     public interface ForecastAttributeCallback extends BaseAttributeCallback {
@@ -31427,7 +31427,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, POWER_ADJUSTMENT_CAPABILITY_ATTRIBUTE_ID, true);
@@ -31440,7 +31440,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, POWER_ADJUSTMENT_CAPABILITY_ATTRIBUTE_ID, minInterval, maxInterval);

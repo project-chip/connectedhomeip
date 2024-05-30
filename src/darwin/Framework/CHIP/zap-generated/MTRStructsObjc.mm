@@ -5251,6 +5251,72 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDeviceEnergyManagementClusterPowerAdjustStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _minPower = @(0);
+
+        _maxPower = @(0);
+
+        _minDuration = @(0);
+
+        _maxDuration = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterPowerAdjustStruct alloc] init];
+
+    other.minPower = self.minPower;
+    other.maxPower = self.maxPower;
+    other.minDuration = self.minDuration;
+    other.maxDuration = self.maxDuration;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minPower:%@; maxPower:%@; minDuration:%@; maxDuration:%@; >", NSStringFromClass([self class]), _minPower, _maxPower, _minDuration, _maxDuration];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerAdjustCapability = nil;
+
+        _cause = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct alloc] init];
+
+    other.powerAdjustCapability = self.powerAdjustCapability;
+    other.cause = self.cause;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerAdjustCapability:%@; cause:%@; >", NSStringFromClass([self class]), _powerAdjustCapability, _cause];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDeviceEnergyManagementClusterSlotStruct
 - (instancetype)init
 {
@@ -5334,7 +5400,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _forecastId = @(0);
+        _forecastID = @(0);
 
         _activeSlotNumber = nil;
 
@@ -5359,7 +5425,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRDeviceEnergyManagementClusterForecastStruct alloc] init];
 
-    other.forecastId = self.forecastId;
+    other.forecastID = self.forecastID;
     other.activeSlotNumber = self.activeSlotNumber;
     other.startTime = self.startTime;
     other.endTime = self.endTime;
@@ -5374,7 +5440,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; activeSlotNumber:%@; startTime:%@; endTime:%@; earliestStartTime:%@; latestEndTime:%@; isPausable:%@; slots:%@; forecastUpdateReason:%@; >", NSStringFromClass([self class]), _forecastId, _activeSlotNumber, _startTime, _endTime, _earliestStartTime, _latestEndTime, _isPausable, _slots, _forecastUpdateReason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastID:%@; activeSlotNumber:%@; startTime:%@; endTime:%@; earliestStartTime:%@; latestEndTime:%@; isPausable:%@; slots:%@; forecastUpdateReason:%@; >", NSStringFromClass([self class]), _forecastID, _activeSlotNumber, _startTime, _endTime, _earliestStartTime, _latestEndTime, _isPausable, _slots, _forecastUpdateReason];
     return descriptionString;
 }
 
@@ -5414,45 +5480,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; duration:%@; nominalPower:%@; maximumEnergy:%@; loadControl:%@; >", NSStringFromClass([self class]), _startTime, _duration, _nominalPower, _maximumEnergy, _loadControl];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRDeviceEnergyManagementClusterPowerAdjustStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _minPower = @(0);
-
-        _maxPower = @(0);
-
-        _minDuration = @(0);
-
-        _maxDuration = @(0);
-
-        _cause = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDeviceEnergyManagementClusterPowerAdjustStruct alloc] init];
-
-    other.minPower = self.minPower;
-    other.maxPower = self.maxPower;
-    other.minDuration = self.minDuration;
-    other.maxDuration = self.maxDuration;
-    other.cause = self.cause;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minPower:%@; maxPower:%@; minDuration:%@; maxDuration:%@; cause:%@; >", NSStringFromClass([self class]), _minPower, _maxPower, _minDuration, _maxDuration, _cause];
     return descriptionString;
 }
 

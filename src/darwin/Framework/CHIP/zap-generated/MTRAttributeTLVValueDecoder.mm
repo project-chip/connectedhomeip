@@ -8913,12 +8913,32 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
                 auto iter_1 = cppValue.Value().begin();
                 while (iter_1.Next()) {
                     auto & entry_1 = iter_1.GetValue();
-                    MTRDeviceEnergyManagementClusterPowerAdjustStruct * newElement_1;
-                    newElement_1 = [MTRDeviceEnergyManagementClusterPowerAdjustStruct new];
-                    newElement_1.minPower = [NSNumber numberWithLongLong:entry_1.minPower];
-                    newElement_1.maxPower = [NSNumber numberWithLongLong:entry_1.maxPower];
-                    newElement_1.minDuration = [NSNumber numberWithUnsignedInt:entry_1.minDuration];
-                    newElement_1.maxDuration = [NSNumber numberWithUnsignedInt:entry_1.maxDuration];
+                    MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct * newElement_1;
+                    newElement_1 = [MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct new];
+                    if (entry_1.powerAdjustCapability.IsNull()) {
+                        newElement_1.powerAdjustCapability = nil;
+                    } else {
+                        { // Scope for our temporary variables
+                            auto * array_4 = [NSMutableArray new];
+                            auto iter_4 = entry_1.powerAdjustCapability.Value().begin();
+                            while (iter_4.Next()) {
+                                auto & entry_4 = iter_4.GetValue();
+                                MTRDeviceEnergyManagementClusterPowerAdjustStruct * newElement_4;
+                                newElement_4 = [MTRDeviceEnergyManagementClusterPowerAdjustStruct new];
+                                newElement_4.minPower = [NSNumber numberWithLongLong:entry_4.minPower];
+                                newElement_4.maxPower = [NSNumber numberWithLongLong:entry_4.maxPower];
+                                newElement_4.minDuration = [NSNumber numberWithUnsignedInt:entry_4.minDuration];
+                                newElement_4.maxDuration = [NSNumber numberWithUnsignedInt:entry_4.maxDuration];
+                                [array_4 addObject:newElement_4];
+                            }
+                            CHIP_ERROR err = iter_4.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_1.powerAdjustCapability = array_4;
+                        }
+                    }
                     newElement_1.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.cause)];
                     [array_1 addObject:newElement_1];
                 }
@@ -8944,7 +8964,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
             value = nil;
         } else {
             value = [MTRDeviceEnergyManagementClusterForecastStruct new];
-            value.forecastId = [NSNumber numberWithUnsignedInt:cppValue.Value().forecastId];
+            value.forecastID = [NSNumber numberWithUnsignedInt:cppValue.Value().forecastID];
             if (cppValue.Value().activeSlotNumber.IsNull()) {
                 value.activeSlotNumber = nil;
             } else {

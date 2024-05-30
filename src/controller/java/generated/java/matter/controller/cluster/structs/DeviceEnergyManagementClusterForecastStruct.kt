@@ -25,7 +25,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class DeviceEnergyManagementClusterForecastStruct(
-  val forecastId: UInt,
+  val forecastID: UInt,
   val activeSlotNumber: UShort?,
   val startTime: UInt,
   val endTime: UInt,
@@ -37,7 +37,7 @@ class DeviceEnergyManagementClusterForecastStruct(
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterForecastStruct {\n")
-    append("\tforecastId : $forecastId\n")
+    append("\tforecastID : $forecastID\n")
     append("\tactiveSlotNumber : $activeSlotNumber\n")
     append("\tstartTime : $startTime\n")
     append("\tendTime : $endTime\n")
@@ -52,7 +52,7 @@ class DeviceEnergyManagementClusterForecastStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_FORECAST_ID), forecastId)
+      put(ContextSpecificTag(TAG_FORECAST_I_D), forecastID)
       if (activeSlotNumber != null) {
         put(ContextSpecificTag(TAG_ACTIVE_SLOT_NUMBER), activeSlotNumber)
       } else {
@@ -84,7 +84,7 @@ class DeviceEnergyManagementClusterForecastStruct(
   }
 
   companion object {
-    private const val TAG_FORECAST_ID = 0
+    private const val TAG_FORECAST_I_D = 0
     private const val TAG_ACTIVE_SLOT_NUMBER = 1
     private const val TAG_START_TIME = 2
     private const val TAG_END_TIME = 3
@@ -96,7 +96,7 @@ class DeviceEnergyManagementClusterForecastStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementClusterForecastStruct {
       tlvReader.enterStructure(tlvTag)
-      val forecastId = tlvReader.getUInt(ContextSpecificTag(TAG_FORECAST_ID))
+      val forecastID = tlvReader.getUInt(ContextSpecificTag(TAG_FORECAST_I_D))
       val activeSlotNumber =
         if (!tlvReader.isNull()) {
           tlvReader.getUShort(ContextSpecificTag(TAG_ACTIVE_SLOT_NUMBER))
@@ -137,7 +137,7 @@ class DeviceEnergyManagementClusterForecastStruct(
       tlvReader.exitContainer()
 
       return DeviceEnergyManagementClusterForecastStruct(
-        forecastId,
+        forecastID,
         activeSlotNumber,
         startTime,
         endTime,
