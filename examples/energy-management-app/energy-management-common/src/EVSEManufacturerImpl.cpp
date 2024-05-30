@@ -246,7 +246,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
         }
     }
 
-    if (err == CHIP_NO_ERROR && dg->IsEvsePluggedIn())
+    if (err == CHIP_NO_ERROR && dg->IsEvsePluggedIn() && dg->GetSupplyState() == SupplyStateEnum::kChargingEnabled)
     {
         /* Set the target Time in epoch_s format*/
         tempTargetTime_epoch_s =
@@ -277,8 +277,11 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
             // We use V (not mV) and compute power to the nearest Watt
             power_W = static_cast<uint32_t>((230 * dg->GetMaximumChargeCurrent()) /
                                             1000); // TODO don't use 230V - not all markets will use that
-            // TODO resolve GetMaximumChargeCurrent not allowed to be 0!
-            power_W = 7000;
+            if (power_W == 0)
+            {
+                ChipLogError(AppServer, "EVSE Error: MaxCurrent = 0Amp - Can't schedule charging");
+                return CHIP_ERROR_INTERNAL;
+            }
 
             // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
             // to avoid using floats we multiply by 36 and then divide by 10 (instead of x3600 and dividing by 1000)
@@ -693,10 +696,12 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
     {
     case EVSECallbackType::StateChanged:
         ChipLogProgress(AppServer, "EVSE callback - state changed");
+        pClass->ComputeChargingSchedule();
         break;
     case EVSECallbackType::ChargeCurrentChanged:
         ChipLogProgress(AppServer, "EVSE callback - maxChargeCurrent changed to %ld",
                         static_cast<long>(cb->ChargingCurrent.maximumChargeCurrent));
+        pClass->ComputeChargingSchedule();
         break;
     case EVSECallbackType::EnergyMeterReadingRequested:
         ChipLogProgress(AppServer, "EVSE callback - EnergyMeterReadingRequested");
