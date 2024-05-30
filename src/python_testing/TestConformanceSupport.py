@@ -17,7 +17,7 @@
 
 import xml.etree.ElementTree as ElementTree
 
-from conformance_support import ConformanceDecision, ConformanceParseParameters, parse_callable_from_xml
+from conformance_support import ConformanceDecision, ConformanceException, ConformanceParseParameters, parse_callable_from_xml
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -615,6 +615,61 @@ class TestConformanceSupport(MatterBaseTest):
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.PROVISIONAL)
         asserts.assert_equal(str(xml_callable), 'AB & !CD, P')
+
+    def test_conformance_greater(self):
+        # AB, [CD]
+        xml = ('<mandatoryConform>'
+               '<greaterTerm>'
+               '<attribute name="attr1" />'
+               '<literal value="1" />'
+               '</greaterTerm>'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        # TODO: switch this to check greater than once the update to the base is done (#33422)
+        asserts.assert_equal(xml_callable(0x00, [], []), ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(str(xml_callable), 'attr1 > 1')
+
+        # Ensure that we can only have greater terms with exactly 2 value
+        xml = ('<mandatoryConform>'
+               '<greaterTerm>'
+               '<attribute name="attr1" />'
+               '<attribute name="attr2" />'
+               '<literal value="1" />'
+               '</greaterTerm>'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        try:
+            xml_callable = parse_callable_from_xml(et, self.params)
+            asserts.fail("Incorrectly parsed bad greaterTerm XML with > 2 values")
+        except ConformanceException:
+            pass
+
+        xml = ('<mandatoryConform>'
+               '<greaterTerm>'
+               '<attribute name="attr1" />'
+               '</greaterTerm>'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        try:
+            xml_callable = parse_callable_from_xml(et, self.params)
+            asserts.fail("Incorrectly parsed bad greaterTerm XML with < 2 values")
+        except ConformanceException:
+            pass
+
+        # Only attributes and literals allowed because arithmetic operations require values
+        xml = ('<mandatoryConform>'
+               '<greaterTerm>'
+               '<feature name="AB" />'
+               '<literal value="1" />'
+               '</greaterTerm>'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        try:
+            xml_callable = parse_callable_from_xml(et, self.params)
+            asserts.fail("Incorrectly parsed greater term with feature value")
+        except ConformanceException:
+            pass
 
 
 if __name__ == "__main__":

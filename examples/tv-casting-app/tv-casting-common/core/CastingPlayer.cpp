@@ -29,9 +29,7 @@ namespace core {
 
 CastingPlayer * CastingPlayer::mTargetCastingPlayer = nullptr;
 
-// TODO: Verify why commissioningWindowTimeoutSec is a "unsigned long long int" type. Seems too big.
-void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks,
-                                                unsigned long long int commissioningWindowTimeoutSec,
+void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks, uint16_t commissioningWindowTimeoutSec,
                                                 IdentificationDeclarationOptions idOptions)
 {
     ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() called");
@@ -70,6 +68,25 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
         ChipLogProgress(
             AppServer,
             "CastingPlayer::VerifyOrEstablishConnection() CommissionerDeclarationCallback not provided in ConnectionCallbacks");
+    }
+
+    ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() verifying User Directed Commissioning (UDC) state");
+    mIdOptions.LogDetail();
+    if (!GetSupportsCommissionerGeneratedPasscode() && mIdOptions.mCommissionerPasscode)
+    {
+        ChipLogError(AppServer,
+                     "CastingPlayer::VerifyOrEstablishConnection() the target CastingPlayer doesn't support Commissioner-Generated "
+                     "passcode yet IdentificationDeclarationOptions.mCommissionerPasscode is set to true");
+        SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    if (!matter::casting::core::CommissionerDeclarationHandler::GetInstance()->HasCommissionerDeclarationCallback() &&
+        mIdOptions.mCommissionerPasscode)
+    {
+        ChipLogError(
+            AppServer,
+            "CastingPlayer::VerifyOrEstablishConnection() the CommissionerDeclarationHandler CommissionerDeclaration message "
+            "callback has not been set, yet IdentificationDeclarationOptions.mCommissionerPasscode is set to true");
+        SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // If *this* CastingPlayer was previously connected to, its nodeId, fabricIndex and other attributes should be present
@@ -138,28 +155,11 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
     }
     else
     {
-        ChipLogProgress(AppServer,
-                        "CastingPlayer::VerifyOrEstablishConnection() verifying User Directed Commissioning (UDC) state");
-        mIdOptions.LogDetail();
-        SuccessOrExit(err = support::ChipDeviceEventHandler::SetUdcStatus(true));
-
-        if (!GetSupportsCommissionerGeneratedPasscode() && mIdOptions.mCommissionerPasscode)
-        {
-            ChipLogError(
-                AppServer,
-                "CastingPlayer::VerifyOrEstablishConnection() the target CastingPlayer doesn't support Commissioner-Generated "
-                "passcode yet IdentificationDeclarationOptions.mCommissionerPasscode is set to true");
-            SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
-        }
-        if (!matter::casting::core::CommissionerDeclarationHandler::GetInstance()->HasCommissionerDeclarationCallback() &&
-            mIdOptions.mCommissionerPasscode)
-        {
-            ChipLogError(AppServer,
-                         "CastingPlayer::VerifyOrEstablishConnection() the CommissionerDeclaration message callback has not been "
-                         "set yet IdentificationDeclarationOptions.mCommissionerPasscode is set to true");
-            SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
-        }
-
+        // We need to call OpenBasicCommissioningWindow() for both Commissionee-Generated passcode commissioning flow and
+        // Commissioner-Generated passcode commissioning flow. Per the Matter spec (UserDirectedCommissioning), even if the
+        // Commissionee sends an IdentificationDeclaration with CommissionerPasscode set to true, the Commissioner will first
+        // attempt to use AccountLogin in order to obtain Passcode using rotatingID. If no Passcode is obtained, Commissioner
+        // displays a Passcode.
         ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() calling OpenBasicCommissioningWindow()");
         SuccessOrExit(err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
                           chip::System::Clock::Seconds16(mCommissioningWindowTimeoutSec)));
@@ -178,33 +178,19 @@ exit:
     }
 }
 
-void CastingPlayer::ContinueConnecting(ConnectionCallbacks connectionCallbacks,
-                                       unsigned long long int commissioningWindowTimeoutSec)
+void CastingPlayer::ContinueConnecting()
 {
     ChipLogProgress(AppServer, "CastingPlayer::ContinueConnecting()");
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SuccessOrExit(err = support::ChipDeviceEventHandler::SetUdcStatus(true));
-    VerifyOrExit(
-        connectionCallbacks.mOnConnectionComplete != nullptr,
-        ChipLogError(AppServer, "CastingPlayer::ContinueConnecting() ConnectionCallbacks.mOnConnectionComplete was not provided"));
-    mConnectionState               = CASTING_PLAYER_CONNECTING;
-    mOnCompleted                   = connectionCallbacks.mOnConnectionComplete;
-    mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
-    mTargetCastingPlayer           = this;
-
-    // Register the handler for Commissioner's CommissionerDeclaration messages. The CommissionerDeclaration messages provide
-    // information indicating the Commissioner's pre-commissioning state.
-    if (connectionCallbacks.mCommissionerDeclarationCallback != nullptr)
+    // Verify that mOnCompleted is not nullptr.
+    VerifyOrExit(mOnCompleted != nullptr, ChipLogError(AppServer, "CastingPlayer::ContinueConnecting() mOnCompleted == nullptr"));
+    if (!matter::casting::core::CommissionerDeclarationHandler::GetInstance()->HasCommissionerDeclarationCallback())
     {
-        matter::casting::core::CommissionerDeclarationHandler::GetInstance()->SetCommissionerDeclarationCallback(
-            connectionCallbacks.mCommissionerDeclarationCallback);
+        ChipLogProgress(AppServer,
+                        "CastingPlayer::ContinueConnecting() CommissionerDeclaration message callback has not been set.");
     }
-    else
-    {
-        ChipLogProgress(
-            AppServer,
-            "CastingPlayer::VerifyOrEstablishConnection() CommissionerDeclarationCallback not provided in ConnectionCallbacks");
-    }
+    mConnectionState     = CASTING_PLAYER_CONNECTING;
+    mTargetCastingPlayer = this;
 
     ChipLogProgress(AppServer, "CastingPlayer::ContinueConnecting() calling OpenBasicCommissioningWindow()");
     SuccessOrExit(err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
@@ -271,6 +257,8 @@ CHIP_ERROR CastingPlayer::SendUserDirectedCommissioningRequest()
                         ChipLogError(AppServer, "No IP Address found to send UDC request to"));
 
     chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration id = mIdOptions.buildIdentificationDeclarationMessage();
+
+    ReturnErrorOnFailure(support::ChipDeviceEventHandler::SetUdcStatus(true));
 
     ReturnErrorOnFailure(chip::Server::GetInstance().SendUserDirectedCommissioningRequest(
         chip::Transport::PeerAddress::UDP(*ipAddressToUse, mAttributes.port, mAttributes.interfaceId), id));
@@ -399,6 +387,26 @@ void CastingPlayer::LogDetail() const
     {
         ChipLogDetail(AppServer, "\tFabric Index: %u", mAttributes.fabricIndex);
     }
+}
+
+CastingPlayer::CastingPlayer(const CastingPlayer & other) :
+    std::enable_shared_from_this<CastingPlayer>(other), mEndpoints(other.mEndpoints), mConnectionState(other.mConnectionState),
+    mAttributes(other.mAttributes), mIdOptions(other.mIdOptions),
+    mCommissioningWindowTimeoutSec(other.mCommissioningWindowTimeoutSec), mOnCompleted(other.mOnCompleted)
+{}
+
+CastingPlayer & CastingPlayer::operator=(const CastingPlayer & other)
+{
+    if (this != &other)
+    {
+        mAttributes                    = other.mAttributes;
+        mEndpoints                     = other.mEndpoints;
+        mConnectionState               = other.mConnectionState;
+        mIdOptions                     = other.mIdOptions;
+        mCommissioningWindowTimeoutSec = other.mCommissioningWindowTimeoutSec;
+        mOnCompleted                   = other.mOnCompleted;
+    }
+    return *this;
 }
 
 ConnectionContext::ConnectionContext(void * clientContext, core::CastingPlayer * targetCastingPlayer,

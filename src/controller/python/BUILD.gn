@@ -417,10 +417,7 @@ chip_python_wheel_action("chip-clusters") {
 }
 
 chip_python_wheel_action("chip-repl") {
-  py_scripts = [
-    "chip-device-ctrl.py",
-    "chip-repl.py",
-  ]
+  py_scripts = [ "chip-repl.py" ]
 
   py_manifest_files = [
     {
