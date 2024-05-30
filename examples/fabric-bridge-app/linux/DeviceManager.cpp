@@ -29,14 +29,8 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/util.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ZclString.h>
-#include <platform/CommissionableDataProvider.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
 
 #include <cstdio>
 #include <string>
@@ -50,45 +44,40 @@ using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
 namespace {
-
-EndpointId gCurrentEndpointId;
-EndpointId gFirstDynamicEndpointId;
-Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
-
+constexpr uint8_t kMaxRetries = 10;
 } // namespace
 
-// REVISION DEFINITIONS:
-// =================================================================================
-
-#define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
-
-// ---------------------------------------------------------------------------
-
-int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId)
+DeviceManager::DeviceManager()
 {
-    uint8_t index        = 0;
-    const int maxRetries = 10; // Set the maximum number of retries
+    memset(mDevices, 0, sizeof(mDevices));
+    mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
+        static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
+    mCurrentEndpointId = mFirstDynamicEndpointId;
+}
+
+int DeviceManager::AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep,
+                                     const chip::Span<const EmberAfDeviceType> & deviceTypeList,
+                                     const chip::Span<chip::DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId)
+{
+    uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        if (nullptr == gDevices[index])
+        if (nullptr == mDevices[index])
         {
-            gDevices[index] = dev;
+            mDevices[index] = dev;
             CHIP_ERROR err;
             int retryCount = 0;
-            while (retryCount < maxRetries)
+            while (retryCount < kMaxRetries)
             {
                 DeviceLayer::StackLock lock;
-                dev->SetEndpointId(gCurrentEndpointId);
+                dev->SetEndpointId(mCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
                 err =
-                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
+                    emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
                 if (err == CHIP_NO_ERROR)
                 {
                     ChipLogProgress(NotSpecified, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
-                                    gCurrentEndpointId, index);
+                                    mCurrentEndpointId, index);
                     return index;
                 }
                 if (err != CHIP_ERROR_ENDPOINT_EXISTS)
@@ -96,13 +85,13 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                     return -1; // Return error as endpoint addition failed due to an error other than endpoint already exists
                 }
                 // Increment the endpoint ID and handle wrap condition
-                if (++gCurrentEndpointId < gFirstDynamicEndpointId)
+                if (++mCurrentEndpointId < mFirstDynamicEndpointId)
                 {
-                    gCurrentEndpointId = gFirstDynamicEndpointId;
+                    mCurrentEndpointId = mFirstDynamicEndpointId;
                 }
                 retryCount++;
             }
-            ChipLogError(NotSpecified, "Failed to add dynamic endpoint after %d retries", maxRetries);
+            ChipLogError(NotSpecified, "Failed to add dynamic endpoint after %d retries", kMaxRetries);
             return -1; // Return error as all retries are exhausted
         }
         index++;
@@ -111,18 +100,18 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
     return -1;
 }
 
-int RemoveDeviceEndpoint(Device * dev)
+int DeviceManager::RemoveDeviceEndpoint(Device * dev)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        if (gDevices[index] == dev)
+        if (mDevices[index] == dev)
         {
             DeviceLayer::StackLock lock;
             // Silence complaints about unused ep when progress logging
             // disabled.
             [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
-            gDevices[index]                = nullptr;
+            mDevices[index]                = nullptr;
             ChipLogProgress(NotSpecified, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             return index;
         }
@@ -131,91 +120,11 @@ int RemoveDeviceEndpoint(Device * dev)
     return -1;
 }
 
-Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::AttributeId attributeId,
-                                                                          uint8_t * buffer, uint16_t maxReadLength)
+Device * DeviceManager::GetDevice(uint16_t index) const
 {
-    using namespace BridgedDeviceBasicInformation::Attributes;
-
-    ChipLogProgress(NotSpecified, "HandleReadBridgedDeviceBasicAttribute: attrId=%d, maxReadLength=%d", attributeId, maxReadLength);
-
-    if ((attributeId == Reachable::Id) && (maxReadLength == 1))
+    if (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        *buffer = dev->IsReachable() ? 1 : 0;
+        return mDevices[index];
     }
-    else if ((attributeId == NodeLabel::Id) && (maxReadLength == 32))
-    {
-        MutableByteSpan zclNameSpan(buffer, maxReadLength);
-        MakeZclCharString(zclNameSpan, dev->GetName());
-    }
-    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
-    {
-        uint16_t rev = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
-        memcpy(buffer, &rev, sizeof(rev));
-    }
-    else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
-    {
-        uint32_t featureMap = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP;
-        memcpy(buffer, &featureMap, sizeof(featureMap));
-    }
-    else
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
-    return Protocols::InteractionModel::Status::Success;
-}
-
-Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                                         const EmberAfAttributeMetadata * attributeMetadata,
-                                                                         uint8_t * buffer, uint16_t maxReadLength)
-{
-    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
-
-    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Failure;
-
-    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != nullptr))
-    {
-        Device * dev = gDevices[endpointIndex];
-
-        if (clusterId == BridgedDeviceBasicInformation::Id)
-        {
-            ret = HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
-        }
-    }
-
-    return ret;
-}
-
-Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                                          const EmberAfAttributeMetadata * attributeMetadata,
-                                                                          uint8_t * buffer)
-{
-    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
-
-    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Failure;
-
-    if (endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-    {
-        Device * dev = gDevices[endpointIndex];
-
-        if (dev->IsReachable())
-        {
-            ChipLogProgress(NotSpecified, "emberAfExternalAttributeWriteCallback: ep=%d, clusterId=%d", endpoint, clusterId);
-            ret = Protocols::InteractionModel::Status::Success;
-        }
-    }
-
-    return ret;
-}
-
-void DeviceManagerInit()
-{
-    // Clear out the device database
-    memset(gDevices, 0, sizeof(gDevices));
-
-    // Set starting endpoint id where dynamic endpoints will be assigned, which
-    // will be the next consecutive endpoint id after the last fixed endpoint.
-    gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
-        static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
-    gCurrentEndpointId = gFirstDynamicEndpointId;
+    return nullptr;
 }
