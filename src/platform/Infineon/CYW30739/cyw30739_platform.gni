@@ -20,7 +20,7 @@ import("${chip_root}/src/platform/Infineon/CYW30739/args.gni")
 cyw30739_platform_dir = "${chip_root}/src/platform/Infineon/CYW30739"
 
 template("cyw30739_platform") {
-  forward_variables_from(invoker, [ "chip_family" ])
+  forward_variables_from(invoker, [ "board" ])
 
   static_library(target_name) {
     sources = [
@@ -29,6 +29,7 @@ template("cyw30739_platform") {
       "${cyw30739_platform_dir}/ConfigurationManagerImpl.cpp",
       "${cyw30739_platform_dir}/DiagnosticDataProviderImpl.cpp",
       "${cyw30739_platform_dir}/EventFlags.cpp",
+      "${cyw30739_platform_dir}/FactoryDataProvider.cpp",
       "${cyw30739_platform_dir}/Logging.cpp",
       "${cyw30739_platform_dir}/OTAImageProcessorImpl.cpp",
       "${cyw30739_platform_dir}/PlatformManagerImpl.cpp",
@@ -40,8 +41,14 @@ template("cyw30739_platform") {
       sources += [ "${cyw30739_platform_dir}/ThreadStackManagerImpl.cpp" ]
     }
 
-    configs +=
-        [ "${matter_wpan_sdk_build_root}:wpan_sdk-${chip_family}-config" ]
+    if (invoker.board_use_optiga) {
+      sources += [
+        "${cyw30739_platform_dir}/OptigaFactoryDataProvider.cpp",
+        "${cyw30739_platform_dir}/UnprovisionedOptigaFactoryDataProvider.cpp",
+      ]
+    }
+
+    configs += [ "${matter_wpan_sdk_build_root}:${board}-config" ]
 
     deps = [
       "${chip_root}/src/platform:platform",

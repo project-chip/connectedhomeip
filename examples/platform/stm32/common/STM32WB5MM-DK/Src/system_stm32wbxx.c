@@ -124,7 +124,55 @@
 /**
  * @}
  */
-
+#if (OTA_SUPPORT == 1)
+/* Note: Following vector table addresses must be defined in line with linker
+ configuration. */
+/*!< Uncomment the following line if you need to relocate CPU1 CM4 and/or CPU2
+ CM0+ vector table anywhere in Sram or Flash. Else vector table will be kept
+ at address 0x00 which correspond to automatic remap of boot address selected */
+#define USER_VECT_TAB_ADDRESS
+#if defined(USER_VECT_TAB_ADDRESS)
+#ifdef CORE_CM0PLUS
+/*!< Uncomment this line for user vector table remap in Sram else user remap
+     will be done in Flash. */
+/* #define VECT_TAB_SRAM */
+#if defined(VECT_TAB_SRAM)
+#define VECT_TAB_BASE_ADDRESS                                                                                                      \
+    SRAM2_BASE /*!< Vector Table base address field.                                                                               \
+                    This value must be a multiple of 0x100. */
+#define VECT_TAB_OFFSET                                                                                                            \
+    0x00008000U /*!< Vector Table base offset field.                                                                               \
+                     This value must be a multiple of 0x100. */
+#else
+#define VECT_TAB_BASE_ADDRESS                                                                                                      \
+    FLASH_BASE /*!< Vector Table base address field.                                                                               \
+                    This value must be a multiple of 0x100. */
+#define VECT_TAB_OFFSET                                                                                                            \
+    0x00020000U /*!< Vector Table base offset field.                                                                               \
+                  This value must be a multiple of 0x100. */
+#endif
+#else
+/*!< Uncomment this line for user vector table remap in Sram else user remap
+ will be done in Flash. */
+/* #define VECT_TAB_SRAM */
+#if defined(VECT_TAB_SRAM)
+#define VECT_TAB_BASE_ADDRESS                                                                                                      \
+    SRAM1_BASE /*!< Vector Table base address field.                                                                               \
+                    This value must be a multiple of 0x200. */
+#define VECT_TAB_OFFSET                                                                                                            \
+    0x00000000U /*!< Vector Table base offset field.                                                                               \
+                     This value must be a multiple of 0x200. */
+#else
+#define VECT_TAB_BASE_ADDRESS                                                                                                      \
+    FLASH_BASE /*!< Vector Table base address field.                                                                               \
+                    This value must be a multiple of 0x200. */
+#define VECT_TAB_OFFSET                                                                                                            \
+    0x00000000U /*!< Vector Table base offset field.                                                                               \
+                     This value must be a multiple of 0x200. */
+#endif
+#endif
+#endif
+#endif
 /** @addtogroup STM32WBxx_System_Private_Macros
  * @{
  */
@@ -137,12 +185,12 @@
  * @{
  */
 /* The SystemCoreClock variable is updated in three ways:
-      1) by calling CMSIS function SystemCoreClockUpdate()
-      2) by calling HAL API function HAL_RCC_GetHCLKFreq()
-      3) each time HAL_RCC_ClockConfig() is called to configure the system clock frequency
-         Note: If you use this function to configure the system clock; then there
-               is no need to call the 2 first functions listed above, since SystemCoreClock
-               variable is updated automatically.
+ 1) by calling CMSIS function SystemCoreClockUpdate()
+ 2) by calling HAL API function HAL_RCC_GetHCLKFreq()
+ 3) each time HAL_RCC_ClockConfig() is called to configure the system clock frequency
+ Note: If you use this function to configure the system clock; then there
+ is no need to call the 2 first functions listed above, since SystemCoreClock
+ variable is updated automatically.
  */
 uint32_t SystemCoreClock = 4000000UL; /*CPU1: M4 on MSI clock after startup (4MHz)*/
 
@@ -177,6 +225,18 @@ const uint32_t SmpsPrescalerTable[4UL][6UL] = { { 1UL, 3UL, 2UL, 2UL, 1UL, 2UL }
 /** @addtogroup STM32WBxx_System_Private_Functions
  * @{
  */
+#if (OTA_SUPPORT == 1)
+#if defined(__ICCARM__)
+extern uint32_t __vector_table;
+#define INTVECT_START ((uint32_t) &__vector_table)
+#elif defined(__CC_ARM) || defined(__ARMCC_VERSION)
+extern void * __Vectors;
+#define INTVECT_START ((uint32_t) &__Vectors)
+#elif defined(__GNUC__)
+extern void * g_pfnVectors;
+#define INTVECT_START ((uint32_t) &g_pfnVectors)
+#endif
+#endif
 
 /**
  * @brief  Setup the microcontroller system.
@@ -187,10 +247,46 @@ void SystemInit(void)
 {
     OTP_ID0_t * p_otp;
 
+#if (OTA_SUPPORT == 1)
+#if defined(USER_VECT_TAB_ADDRESS)
+    /* Configure the Vector Table location add offset address ------------------*/
+    /* Reuse information from map file */
+    SCB->VTOR = INTVECT_START; /* Vector Table Relocation in Internal FLASH */
+#endif
+#endif
     /* FPU settings ------------------------------------------------------------*/
 #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
     SCB->CPACR |= ((3UL << (10UL * 2UL)) | (3UL << (11UL * 2UL))); /* set CP10 and CP11 Full Access */
 #endif
+    /* Reset the RCC clock configuration to the default reset state ------------*/
+    /* Set MSION bit */
+    RCC->CR |= RCC_CR_MSION;
+
+    /* Reset CFGR register */
+    RCC->CFGR = 0x00070000U;
+
+    /* Reset PLLSAI1ON, PLLON, HSECSSON, HSEON, HSION, and MSIPLLON bits */
+    RCC->CR &= (uint32_t) 0xFAF6FEFBU;
+
+    /*!< Reset LSI1 and LSI2 bits */
+    RCC->CSR &= (uint32_t) 0xFFFFFFFAU;
+
+    /*!< Reset HSI48ON  bit */
+    RCC->CRRCR &= (uint32_t) 0xFFFFFFFEU;
+
+    /* Reset PLLCFGR register */
+    RCC->PLLCFGR = 0x22041000U;
+
+#if defined(STM32WB55xx) || defined(STM32WB5Mxx)
+    /* Reset PLLSAI1CFGR register */
+    RCC->PLLSAI1CFGR = 0x22041000U;
+#endif
+
+    /* Reset HSEBYP bit */
+    RCC->CR &= 0xFFFBFFFFU;
+
+    /* Disable all interrupts */
+    RCC->CIER = 0x00000000;
 
     /**
      * Read HSE_Tuning from OTP
@@ -296,7 +392,7 @@ void SystemCoreClockUpdate(void)
 
     case 0x0C: /* PLL used as system clock  source */
         /* PLL_VCO = (HSE_VALUE or HSI_VALUE or MSI_VALUE/ PLLM) * PLLN
- SYSCLK = PLL_VCO / PLLR
+         SYSCLK = PLL_VCO / PLLR
          */
         pllsource = (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC);
         pllm      = ((RCC->PLLCFGR & RCC_PLLCFGR_PLLM) >> RCC_PLLCFGR_PLLM_Pos) + 1UL;

@@ -42,7 +42,7 @@ using namespace chip::Credentials;
                                            validityPeriod:(NSDateInterval *)validityPeriod
                                                     error:(NSError * __autoreleasing *)error
 {
-    MTR_LOG_DEFAULT("Generating root certificate");
+    MTR_LOG("Generating root certificate");
     NSData * rootCert = nil;
     CHIP_ERROR err
         = MTROperationalCredentialsDelegate::GenerateRootCertificate(keypair, issuerID, fabricID, validityPeriod, &rootCert);
@@ -74,7 +74,7 @@ using namespace chip::Credentials;
                                                    validityPeriod:(NSDateInterval *)validityPeriod
                                                             error:(NSError * __autoreleasing *)error
 {
-    MTR_LOG_DEFAULT("Generating intermediate certificate");
+    MTR_LOG("Generating intermediate certificate");
     NSData * intermediate = nil;
     CHIP_ERROR err = MTROperationalCredentialsDelegate::GenerateIntermediateCertificate(
         rootKeypair, rootCertificate, intermediatePublicKey, issuerID, fabricID, validityPeriod, &intermediate);
@@ -115,7 +115,7 @@ using namespace chip::Credentials;
                                                   validityPeriod:(NSDateInterval *)validityPeriod
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
-    MTR_LOG_DEFAULT("Generating operational certificate");
+    MTR_LOG("Generating operational certificate");
     NSData * opcert = nil;
     CHIP_ERROR err = MTROperationalCredentialsDelegate::GenerateOperationalCertificate(
         signingKeypair, signingCertificate, operationalPublicKey, fabricID, nodeID, caseAuthenticatedTags, validityPeriod, &opcert);
@@ -250,7 +250,7 @@ using namespace chip::Credentials;
         return nil;
     }
 
-    MTR_LOG_INFO("convertX509Certificate: Success");
+    MTR_LOG_DEBUG("convertX509Certificate: Success");
 
     return AsData(chipCertBytes);
 }

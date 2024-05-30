@@ -72,7 +72,9 @@ public:
     void Shutdown() override;
 
 protected:
-    bool IsPeerLIT() { return mIsPeerLIT.ValueOr(false); }
+    bool IsPeerLIT();
+
+    chip::NodeId GetDestinationId() const { return mDestinationId; }
 
     chip::Optional<uint16_t> mTimeout;
 

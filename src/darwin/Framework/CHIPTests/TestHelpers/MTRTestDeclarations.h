@@ -60,9 +60,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice (TestDebug)
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
-- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
 - (void)unitTestClearClusterData;
+- (MTRInternalDeviceState)_getInternalState;
+- (void)unitTestSetReportToPersistenceDelayTime:(NSTimeInterval)reportToPersistenceDelayTime
+                reportToPersistenceDelayTimeMax:(NSTimeInterval)reportToPersistenceDelayTimeMax
+                      recentReportTimesMaxCount:(NSUInteger)recentReportTimesMaxCount
+            timeBetweenReportsTooShortThreshold:(NSTimeInterval)timeBetweenReportsTooShortThreshold
+         timeBetweenReportsTooShortMinThreshold:(NSTimeInterval)timeBetweenReportsTooShortMinThreshold
+          reportToPersistenceDelayMaxMultiplier:(double)reportToPersistenceDelayMaxMultiplier
+    deviceReportingExcessivelyIntervalThreshold:(NSTimeInterval)deviceReportingExcessivelyIntervalThreshold;
+- (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
 @end
 #endif
 

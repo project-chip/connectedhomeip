@@ -61,7 +61,7 @@ void ModelCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManage
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
     OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
-    CHIP_ERROR err = command->SendCommand(&device, command->mEndPointId);
+    CHIP_ERROR err = command->SendCommand(&device, command->minEndPointId);
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
@@ -84,5 +84,11 @@ void ModelCommand::Shutdown()
 
 void ClearICDEntry(const chip::ScopedNodeId & nodeId);
 {
-    ChipLogError(chipTool, "ClearICDEntry is not implemented");
+    ChipLogError(chipTool, "ClearICDEntry is not implemented in tv-casting-app");
+}
+
+bool ModelCommand::IsPeerLIT()
+{
+    // Does not support tv-casting-app
+    return false;
 }
