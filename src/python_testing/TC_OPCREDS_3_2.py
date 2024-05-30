@@ -108,20 +108,18 @@ class TC_OPCREDS_3_2(MatterBaseTest):
                                                                               node_id=cr2_dut_node_id,
                                                                               cluster=opcreds,
                                                                               attribute=opcreds.Attributes.CurrentFabricIndex)
-        if fabric_index_CR2 == cr2_read_fabricIndex:
-            print("Success fabric_index_CR2 is equal to read fabricIndex from CR2")
-        else:
-            print("Fail fabric_index_CR2 is not equal to read fabricIndex from CR2")
+
+        asserts.assert_equal(fabric_index_CR2, cr2_read_fabricIndex,
+                             "Fail fabric_index_CR2 is not equal to read fabricIndex from CR2")
 
         self.step(4)
         cr3_read_fabricIndex = await self.read_single_attribute_check_success(dev_ctrl=cr3_new_admin_ctrl,
                                                                               node_id=cr3_dut_node_id,
                                                                               cluster=opcreds,
                                                                               attribute=opcreds.Attributes.CurrentFabricIndex)
-        if fabric_index_CR3 == cr3_read_fabricIndex:
-            print("Success fabric_index_CR3 is equal to read fabricIndex from CR3")
-        else:
-            print("Fail fabric_index_CR3 is not equal to read fabricIndex from CR3")
+
+        asserts.assert_equal(fabric_index_CR3, cr3_read_fabricIndex,
+                             "Fail fabric_index_CR3 is not equal to read fabricIndex from CR3")
 
         self.step(5)
         cr2_fabric = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl,
