@@ -113,7 +113,7 @@ void CommandResponseSender::StartSendingCommandResponses()
     }
 }
 
-void CommandResponseSender::OnDone(CommandHandler & apCommandObj)
+void CommandResponseSender::OnDone(CommandHandlerImpl & apCommandObj)
 {
     if (mState == State::ErrorSentDelayCloseUntilOnDone)
     {
@@ -125,7 +125,7 @@ void CommandResponseSender::OnDone(CommandHandler & apCommandObj)
     StartSendingCommandResponses();
 }
 
-void CommandResponseSender::DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+void CommandResponseSender::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                             TLV::TLVReader & apPayload)
 {
     VerifyOrReturn(mpCommandHandlerCallback);

@@ -36,13 +36,13 @@ using namespace chip::app;
 
 namespace example {
 
-// Dummy class to satisfy the CommandHandler::Callback interface.
-class CommandHandlerCallback : public CommandHandler::Callback
+// Dummy class to satisfy the CommandHandlerImpl::Callback interface.
+class CommandHandlerImplCallback : public CommandHandlerImpl::Callback
 {
 public:
     using Status = Protocols::InteractionModel::Status;
-    void OnDone(CommandHandler & apCommandObj) {}
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
+    void OnDone(CommandHandlerImpl & apCommandObj) {}
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
     Status CommandExists(const ConcreteCommandPath & aCommandPath) { return Status::Success; }
 };
 
@@ -188,8 +188,10 @@ gboolean DBusInterface::OnColorTemperatureChanged(LightAppColorControl * colorCo
     // Do not handle on-change event if it was triggered by internal set
     VerifyOrReturnValue(!self->mInternalSet, G_DBUS_METHOD_INVOCATION_HANDLED);
 
-    CommandHandlerCallback callback;
-    CommandHandler handler(&callback);
+    // TODO: creating such a complex object seems odd here
+    //       as handler seems not used to send back any response back anywhere.
+    CommandHandlerImplCallback callback;
+    CommandHandlerImpl handler(&callback);
 
     ConcreteCommandPath path{ self->mEndpointId, Clusters::ColorControl::Id, 0 };
 

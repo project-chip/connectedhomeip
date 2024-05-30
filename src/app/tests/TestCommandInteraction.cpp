@@ -301,11 +301,12 @@ public:
     bool mResponseDropped = false;
 };
 
-class MockCommandHandlerCallback : public CommandHandler::Callback
+class MockCommandHandlerCallback : public CommandHandlerImpl::Callback
 {
 public:
-    void OnDone(CommandHandler & apCommandHandler) final { onFinalCalledTimes++; }
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) final
+    void OnDone(CommandHandlerImpl & apCommandHandler) final { onFinalCalledTimes++; }
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                         TLV::TLVReader & apPayload) final
     {
         DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
     }
@@ -386,16 +387,18 @@ private:
      * we want to test APIs that cluster code uses, we need to inject entries into the
      * CommandPathRegistry directly.
      */
-    class CommandHandlerWithUnrespondedCommand : public app::CommandHandler
+    class CommandHandlerWithUnrespondedCommand : public app::CommandHandlerImpl
     {
     public:
-        CommandHandlerWithUnrespondedCommand(CommandHandler::Callback * apCallback, const ConcreteCommandPath & aRequestCommandPath,
-                                             const Optional<uint16_t> & aRef) :
-            CommandHandler(apCallback)
+        CommandHandlerWithUnrespondedCommand(CommandHandlerImpl::Callback * apCallback,
+                                             const ConcreteCommandPath & aRequestCommandPath, const Optional<uint16_t> & aRef) :
+            CommandHandlerImpl(apCallback)
         {
             GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional());
             SetExchangeInterface(&mMockCommandResponder);
         }
+        virtual ~CommandHandlerWithUnrespondedCommand() = default;
+
         MockCommandResponder mMockCommandResponder;
     };
 
@@ -629,8 +632,8 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSui
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
-    CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };

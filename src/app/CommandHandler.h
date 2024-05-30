@@ -243,13 +243,13 @@ public:
          * Method that signals to a registered callback that this object
          * has completed doing useful work and is now safe for release/destruction.
          */
-        virtual void OnDone(CommandHandler & apCommandObj) = 0;
+        virtual void OnDone(CommandHandlerImpl & apCommandObj) = 0;
 
         /*
          * Upon processing of a CommandDataIB, this method is invoked to dispatch the command
          * to the right server-side handler provided by the application.
          */
-        virtual void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+        virtual void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                      TLV::TLVReader & apPayload) = 0;
 
         /*
