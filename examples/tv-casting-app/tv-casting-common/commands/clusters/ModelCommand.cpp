@@ -61,7 +61,7 @@ void ModelCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManage
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
     OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
-    CHIP_ERROR err = command->SendCommand(&device, command->minEndPointId);
+    CHIP_ERROR err = command->SendCommand(&device, command->mEndPointId);
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
@@ -82,7 +82,7 @@ void ModelCommand::Shutdown()
     mOnDeviceConnectionFailureCallback.Cancel();
 }
 
-void ClearICDEntry(const chip::ScopedNodeId & nodeId);
+void ModelCommand::ClearICDEntry(const chip::ScopedNodeId & nodeId)
 {
     ChipLogError(chipTool, "ClearICDEntry is not implemented in tv-casting-app");
 }

@@ -57,10 +57,17 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
                            chip::CommandId commandId,
+                           const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Type & value)
+    {
+        ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
+        mScopedNodeId = chip::ScopedNodeId(value.checkInNodeID,device->GetSecureSession().Value()->GetFabricIndex());
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                           chip::CommandId commandId,
                            const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type & value)
     {
-        mPeerNodeId  = device->GetDeviceId();
-        mFabricIndex = device->GetSecureSession().Value()->GetFabricIndex();
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
 
         if (value.transferFileDesignator.HasValue() &&
@@ -114,7 +121,7 @@ public:
         if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
             (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Id))
         {
-            ModelCommand::ClearICDEntry(chip::ScopedNodeId(mPeerNodeId, mFabricIndex));
+            ModelCommand::ClearICDEntry(mScopedNodeId);
         }
     }
 
@@ -215,8 +222,7 @@ protected:
 private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
-    chip::FabricIndex mFabricIndex = 0;
-    chip::NodeId mPeerNodeId       = 0;
+    chip::ScopedNodeId mScopedNodeId;
     CHIP_ERROR mError              = CHIP_NO_ERROR;
     CustomArgument mPayload;
 };

@@ -67,7 +67,7 @@ public:
 
     virtual CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) { return CHIP_ERROR_BAD_REQUEST; };
 
-    void ClearICDEntry(const chip::ScopedNodeId & nodeId) override;
+    virtual void ClearICDEntry(const chip::ScopedNodeId & nodeId);
 
     void Shutdown() override;
 
