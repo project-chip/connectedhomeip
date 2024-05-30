@@ -70,6 +70,7 @@ enum
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     kDeviceOption_SecuredCommissionerPort = 0x100c,
+    kCommissionerOption_FabricID          = 0x1020,
 #endif
     kDeviceOption_Command                               = 0x100d,
     kDeviceOption_PICS                                  = 0x100e,
@@ -90,7 +91,6 @@ enum
     kOptionCSRResponseAttestationSignatureInvalid       = 0x101d,
     kOptionCSRResponseCSRExistingKeyPair                = 0x101e,
     kDeviceOption_TestEventTriggerEnableKey             = 0x101f,
-    kCommissionerOption_FabricID                        = 0x1020,
     kTraceTo                                            = 0x1021,
     kOptionSimulateNoInternalTime                       = 0x1022,
 #if defined(PW_RPC_ENABLED)
@@ -137,6 +137,7 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
+    { "commissioner-fabric-id", kArgumentRequired, kCommissionerOption_FabricID },
 #endif
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
@@ -156,7 +157,6 @@ OptionDef sDeviceOptionDefs[] = {
     { "cert_error_attestation_signature_incorrect_type", kNoArgument, kOptionCSRResponseAttestationSignatureIncorrectType },
     { "cert_error_attestation_signature_invalid", kNoArgument, kOptionCSRResponseAttestationSignatureInvalid },
     { "enable-key", kArgumentRequired, kDeviceOption_TestEventTriggerEnableKey },
-    { "commissioner-fabric-id", kArgumentRequired, kCommissionerOption_FabricID },
 #if ENABLE_TRACING
     { "trace-to", kArgumentRequired, kTraceTo },
 #endif
@@ -239,15 +239,15 @@ const char * sDeviceOptionHelp =
     "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
     "\n"
 #endif
-#if CHIP_DEVICE_ENABLE_PORT_PARAMS
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     "  --secured-commissioner-port <port>\n"
     "       A 16-bit unsigned integer specifying the listen port to use for secure commissioner messages (default is 5552). Only "
     "valid when app is both device and commissioner\n"
     "\n"
-#endif
     "  --commissioner-fabric-id <fabricid>\n"
     "       The fabric ID to be used when this device is a commissioner (default in code is 1).\n"
     "\n"
+#endif
     "  --command <command-name>\n"
     "       A name for a command to execute during startup.\n"
     "\n"
@@ -476,6 +476,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SecuredCommissionerPort:
         LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
         break;
+    case kCommissionerOption_FabricID: {
+        char * eptr;
+        LinuxDeviceOptions::GetInstance().commissionerFabricId = (chip::FabricId) strtoull(aValue, &eptr, 0);
+        break;
+    }
 #endif
 
     case kDeviceOption_Command:
@@ -548,11 +553,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             retval = false;
         }
 
-        break;
-    }
-    case kCommissionerOption_FabricID: {
-        char * eptr;
-        LinuxDeviceOptions::GetInstance().commissionerFabricId = (chip::FabricId) strtoull(aValue, &eptr, 0);
         break;
     }
 #if ENABLE_TRACING
