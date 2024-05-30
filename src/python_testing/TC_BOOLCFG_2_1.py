@@ -22,6 +22,7 @@ from operator import ior
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from test_plan_support import (th_read_attribute, dut_reply_attribute, if_attr_supported, dut_reply_value, com_dut_th)
 
 
 class TC_BOOLCFG_2_1(MatterBaseTest):
@@ -34,24 +35,16 @@ class TC_BOOLCFG_2_1(MatterBaseTest):
 
     def steps_TC_BOOLCFG_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "{comDutTH}.", "", is_commissioning=True),
-            TestStep(2, "{THread} _AttributeList_ attribute.", "{DUTreply} the _AttributeList_ attribute."),
-            TestStep(3, "{ifAttrIsSupported}, {THread} _{A_SUPPORTEDSENSITIVITYLEVELS}_ attribute. {storeValueAs} numberOfSupportedLevels.",
-                     "{DUTreply} an uint8 value. {valrange} 2 and 10."),
-            TestStep(4, "{ifAttrIsSupported}, {THread} _{A_CURRENTSENSITIVITYLEVEL}_ attribute.",
-                     "{DUTreply} an uint8 value. {valrange} 0 and the value of numberOfSupportedLevels."),
-            TestStep(5, "{ifAttrIsSupported}, {THread} _{A_DEFAULTSENSITIVITYLEVEL}_ attribute.",
-                     "{DUTreply} an uint8 value. {valrange} 0 and the value of numberOfSupportedLevels."),
-            TestStep(6, "{ifAttrIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.",
-                     "{DUTreply} an map8 value. {valrange} 0 and 3."),
-            TestStep(7, "{ifAttrIsSupported}, {THread} _{A_ALARMSSUPPRESSED}_ attribute.",
-                     "{DUTreply} an map8 value. {valrange} 0 and 3."),
-            TestStep(8, "{ifAttrIsSupported}, {THread} _{A_ALARMSENABLED}_ attribute.",
-                     "{DUTreply} an map8 value. {valrange} 0 and 3."),
-            TestStep(9, "{ifAttrIsSupported}, {THread} _{A_ALARMSSUPPORTED}_ attribute.",
-                     "{DUTreply} an map8 value. {valrange} 0 and 3."),
-            TestStep(10, "{ifAttrIsSupported}, {THread} _{A_SENSORFAULT}_ attribute.",
-                     "{DUTreply} an map8 value. {valrange} 0 and 1."),
+            TestStep(1, f"{com_dut_th}.", "", is_commissioning=True),
+            TestStep(2, f"{th_read_attribute('AttributeList')}", f"{dut_reply_attribute('AttributeList')}."),
+            TestStep(3, f"{if_attr_supported}, {th_read_attribute('SupportedSensitivityLevels')}. {storeValueAs} numberOfSupportedLevels.", f"{dut_reply_value('uint8', 2, 10)}."),
+            TestStep(4, f"{if_attr_supported}, {th_read_attribute('CurrentSensitivityLevel')}.", f"{dut_reply_value('uint8', 0, 'the value of numberOfSupportedLevels')}."),
+            TestStep(5, f"{if_attr_supported}, {th_read_attribute('DefaultSensitivityLevel')}.", f"{dut_reply_value('uint8', 0, 'the value of numberOfSupportedLevels')}."),
+            TestStep(6, f"{if_attr_supported}, {th_read_attribute('AlarmsActive')}.", f"{dut_reply_value('map8', 0, 3)}."),
+            TestStep(7, f"{if_attr_supported}, {th_read_attribute('AlarmsSuppressed')}.", f"{dut_reply_value('map8', 0, 3)}."),
+            TestStep(8, f"{if_attr_supported}, {th_read_attribute('AlarmsEnabled')}.", f"{dut_reply_value('map8', 0, 3)}."),
+            TestStep(9, f"{if_attr_supported}, {th_read_attribute('AlarmsSupported')}.", f"{dut_reply_value('map8', 0, 3)}."),
+            TestStep(10, f"{if_attr_supported}, {th_read_attribute('SensorFault')}.", f"{dut_reply_value('map8', 0, 1)}."),
         ]
         return steps
 
