@@ -32,6 +32,7 @@ RUN set -x \
 	libguestfs-tools \
 	linux-image-generic \
 	ncurses-dev \
+  patch \
 	qemu-user \
 	qemu-system \
 	qemu-system-x86 \
