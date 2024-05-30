@@ -114,7 +114,7 @@ planned operation.">
 
     <command source="client" code="0x05" name="ModifyForecastRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to modify a Forecast within the limits allowed by the ESA.</description>
-      <arg id="0" name="ForecastId" type="int32u"/>
+      <arg id="0" name="ForecastID" type="int32u"/>
       <arg id="1" name="SlotAdjustments" array="true" type="SlotAdjustmentStruct" length="10"/>
       <arg id="2" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
     </command>
@@ -248,7 +248,7 @@ planned operation.">
 
   <struct name="ForecastStruct" apiMaturity="provisional">
     <cluster code="0x0098"/>
-    <item fieldId="0" name="ForecastId" type="int32u" default="0"/>
+    <item fieldId="0" name="ForecastID" type="int32u" default="0"/>
     <item fieldId="1" name="ActiveSlotNumber" type="int16u" isNullable="true" default="0"/>
     <item fieldId="2" name="StartTime" type="epoch_s"/>
     <item fieldId="3" name="EndTime" type="epoch_s"/>
