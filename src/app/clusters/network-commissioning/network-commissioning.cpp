@@ -18,7 +18,10 @@
 
 #include <limits>
 
+#include "lib/core/TLVTypes.h"
+#include "lib/support/CodeUtils.h"
 #include "network-commissioning.h"
+#include "platform/NetworkCommissioning.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -26,12 +29,14 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
+#include <app/data-model/EncodableToTLV.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SortUtils.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -114,6 +119,115 @@ BitFlags<Feature> WiFiFeatures(WiFiDriver * driver)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     return features;
 }
+
+class ThreadScanResponseToTLV : chip::app::DataModel::EncodableToTLV
+{
+public:
+    virtual ~ThreadScanResponseToTLV() = default;
+
+    CHIP_ERROR Init(Status status, CharSpan debugText, ThreadScanResponseIterator * networks)
+    {
+        mStatus    = status;
+        mDebugText = debugText;
+
+        if ((status == Status::kSuccess) && (networks->Count() > 0))
+        {
+            VerifyOrReturnError(mScanResponseArray.Alloc(chip::min(networks->Count(), kMaxNetworksInScanResponse)),
+                                CHIP_ERROR_NO_MEMORY);
+
+            chip::DeviceLayer::NetworkCommissioning::ThreadScanResponse scanResponse;
+            for (; networks != nullptr && networks->Next(scanResponse);)
+            {
+                if ((mScanResponseArrayFill == kMaxNetworksInScanResponse) &&
+                    (mScanResponseArray[mScanResponseArrayFill - 1].rssi > scanResponse.rssi))
+                {
+                    continue;
+                }
+
+                bool isDuplicated = false;
+
+                for (size_t i = 0; i < mScanResponseArrayFill; i++)
+                {
+                    if ((mScanResponseArray[i].panId == scanResponse.panId) &&
+                        (mScanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
+                    {
+                        if (mScanResponseArray[i].rssi < scanResponse.rssi)
+                        {
+                            mScanResponseArray[i] = mScanResponseArray[--mScanResponseArrayFill];
+                        }
+                        else
+                        {
+                            isDuplicated = true;
+                        }
+                        break;
+                    }
+                }
+
+                if (isDuplicated)
+                {
+                    continue;
+                }
+
+                if (mScanResponseArrayFill < kMaxNetworksInScanResponse)
+                {
+                    mScanResponseArrayFill++;
+                }
+                mScanResponseArray[mScanResponseArrayFill - 1] = scanResponse;
+                Sorting::InsertionSort(
+                    mScanResponseArray.Get(), mScanResponseArrayFill,
+                    [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+    {
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outerType));
+
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), mStatus));
+        if (mDebugText.size() > 0)
+        {
+            ReturnErrorOnFailure(
+                DataModel::Encode(writer, TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kDebugText), mDebugText));
+        }
+
+        {
+
+            TLV::TLVType listContainerType;
+            ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kThreadScanResults),
+                                                       TLV::TLVType::kTLVType_Array, listContainerType));
+
+            for (size_t i = 0; i < mScanResponseArrayFill; i++)
+            {
+                Structs::ThreadInterfaceScanResultStruct::Type result;
+                Encoding::BigEndian::Put64(extendedAddressBuffer, mScanResponseArray[i].extendedAddress);
+                result.panId           = mScanResponseArray[i].panId;
+                result.extendedPanId   = mScanResponseArray[i].extendedPanId;
+                result.networkName     = CharSpan(mScanResponseArray[i].networkName, mScanResponseArray[i].networkNameLen);
+                result.channel         = mScanResponseArray[i].channel;
+                result.version         = mScanResponseArray[i].version;
+                result.extendedAddress = ByteSpan(extendedAddressBuffer);
+                result.rssi            = mScanResponseArray[i].rssi;
+                result.lqi             = mScanResponseArray[i].lqi;
+
+                SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
+            }
+
+            ReturnErrorOnFailure(writer.EndContainer(listContainerType));
+        }
+
+        return writer.EndContainer(outerType);
+    }
+
+private:
+    Status mStatus;
+    CharSpan mDebugText;
+    size_t mScanResponseArrayFill = 0;
+    Platform::ScopedMemoryBuffer<ThreadScanResponse> mScanResponseArray;
+};
 
 } // namespace
 
