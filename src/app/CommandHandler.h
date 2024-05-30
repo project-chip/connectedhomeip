@@ -15,19 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      A handler for incoming Invoke interactions.
- *
- *      Allows adding responses to be sent in an InvokeResponse: see the various
- *      "Add*" methods.
- *
- *      Allows adding the responses asynchronously.  See the documentation
- *      for the CommandHandler::Handle class below.
- *
- */
-
 #pragma once
 
 #include <app/CommandHandlerExchangeInterface.h>
@@ -57,36 +44,18 @@
 namespace chip {
 namespace app {
 
+/**
+ *  A handler for incoming Invoke interactions.
+ *
+ *  Allows adding responses to be sent in an InvokeResponse: see the various
+ *  "Add*" methods.
+ *
+ *  Allows adding the responses asynchronously.
+ */
 class CommandHandler
 {
 public:
-    class Callback
-    {
-    public:
-        virtual ~Callback() = default;
-
-        /*
-         * Method that signals to a registered callback that this object
-         * has completed doing useful work and is now safe for release/destruction.
-         */
-        virtual void OnDone(CommandHandler & apCommandObj) = 0;
-
-        /*
-         * Upon processing of a CommandDataIB, this method is invoked to dispatch the command
-         * to the right server-side handler provided by the application.
-         */
-        virtual void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
-                                     TLV::TLVReader & apPayload) = 0;
-
-        /*
-         * Check to see if a command implementation exists for a specific
-         * concrete command path.  If it does, Success will be returned.  If
-         * not, one of UnsupportedEndpoint, UnsupportedCluster, or
-         * UnsupportedCommand will be returned, depending on how the command
-         * fails to exist.
-         */
-        virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
-    };
+    ~CommandHandler() = default;
 
     /**
      * Class that allows asynchronous command processing before sending a
@@ -156,6 +125,143 @@ public:
         CommandHandler * mpHandler = nullptr;
     };
 
+    /**
+     * Adds the given command status and returns any failures in adding statuses (e.g. out
+     * of buffer space) to the caller
+     */
+    virtual CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
+                                         const Protocols::InteractionModel::Status aStatus, const char * context = nullptr) = 0;
+
+    /**
+     * Adds a status when the caller is unable to handle any failures. Logging is performed
+     * and failure to register the status is checked with VerifyOrDie.
+     */
+    virtual void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                           const char * context = nullptr);
+
+    virtual CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus);
+
+    virtual CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus);
+
+    /**
+     * GetAccessingFabricIndex() may only be called during synchronous command
+     * processing.  Anything that runs async (while holding a
+     * CommandHandler::Handle or equivalent) must not call this method, because
+     * it will not work right if the session we're using was evicted.
+     */
+    virtual FabricIndex GetAccessingFabricIndex() const = 0;
+
+    /**
+     * API for adding a data response.  The `aEncodable` is generally expected to encode
+     * a ClusterName::Commands::CommandName::Type struct, however any object should work.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aResponseCommandId the command whose content is being encoded.
+     * @param [in] aEncodable - an encodable that places the command data structure
+     *             for `aResponseCommandId` into a TLV Writer.
+     *
+     * Most applications are likely to use `AddResponseData` as a more convenient
+     * one-call that auto-sets command ID and creates the underlying encoders.
+     */
+    virtual CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                       DataModel::EncodableToTLV & aEncodable) = 0;
+
+    virtual void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                             DataModel::EncodableToTLV & aEncodable) = 0;
+
+    /**
+     * Check whether the InvokeRequest we are handling is a timed invoke.
+     */
+    virtual bool IsTimedInvoke() const = 0;
+
+    /**
+     * @brief Flush acks right away for a slow command
+     *
+     * Some commands that do heavy lifting of storage/crypto should
+     * ack right away to improve reliability and reduce needless retries. This
+     * method can be manually called in commands that are especially slow to
+     * immediately schedule an acknowledgement (if needed) since the delayed
+     * stand-alone ack timer may actually not hit soon enough due to blocking command
+     * execution.
+     *
+     */
+    virtual void FlushAcksRightAwayOnSlowCommand() = 0;
+
+    virtual Access::SubjectDescriptor GetSubjectDescriptor() const = 0;
+
+    // actual impls
+
+    /**
+     * API for adding a data response.  The template parameter T is generally
+     * expected to be a ClusterName::Commands::CommandName::Type struct, but any
+     * object that can be encoded using the DataModel::Encode machinery and
+     * exposes the right command id will work.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aData the data for the response.
+     */
+    template <typename CommandData>
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    {
+        DataModel::EncodableType<CommandData> encoder(aData);
+        return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), encoder);
+    }
+
+    /**
+     * API for adding a response.  This will try to encode a data response (response command), and if that fails will encode a a
+     * Protocols::InteractionModel::Status::Failure status response instead.
+     *
+     * The template parameter T is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object that
+     * can be encoded using the DataModel::Encode machinery and exposes the right command id will work.
+     *
+     * Since the function will call AddStatus when it fails to encode the data, it cannot send any response when it fails to encode
+     * a status code since another AddStatus call will also fail. The error from AddStatus will just be logged.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aData the data for the response.
+     */
+    template <typename CommandData>
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    {
+        DataModel::EncodableType<CommandData> encodable(aData);
+        return AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
+    }
+};
+
+class CommandHandlerImpl : public CommandHandler
+{
+public:
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+
+        /*
+         * Method that signals to a registered callback that this object
+         * has completed doing useful work and is now safe for release/destruction.
+         */
+        virtual void OnDone(CommandHandler & apCommandObj) = 0;
+
+        /*
+         * Upon processing of a CommandDataIB, this method is invoked to dispatch the command
+         * to the right server-side handler provided by the application.
+         */
+        virtual void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                     TLV::TLVReader & apPayload) = 0;
+
+        /*
+         * Check to see if a command implementation exists for a specific
+         * concrete command path.  If it does, Success will be returned.  If
+         * not, one of UnsupportedEndpoint, UnsupportedCluster, or
+         * UnsupportedCommand will be returned, depending on how the command
+         * fails to exist.
+         */
+        virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
+    };
+
     // Previously we kept adding arguments with default values individually as parameters. This is because there
     // is legacy code outside of the SDK that would call PrepareCommand. With the new PrepareInvokeResponseCommand
     // replacing PrepareCommand, we took this opportunity to create a new parameter structure to make it easier to
@@ -190,31 +296,53 @@ public:
      *
      * The callback passed in has to outlive this CommandHandler object.
      */
-    CommandHandler(Callback * apCallback);
+    CommandHandlerImpl(Callback * apCallback);
 
     /*
      * Destructor.
      *
-     * The call will also invalidate all Handles created for this CommandHandler.
+     * The call will also invalidate all Handles created for this CommandHandlerImpl.
      *
      */
-    ~CommandHandler();
+    ~CommandHandlerImpl();
 
     /*
      * Constructor to override the number of supported paths per invoke and command responder.
      *
      * The callback and any pointers passed via TestOnlyOverrides must outlive this
-     * CommandHandler object.
+     * CommandHandlerImpl object.
      *
      * For testing purposes.
      */
-    CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apCallback);
+    CommandHandlerImpl(TestOnlyOverrides & aTestOverride, Callback * apCallback);
+
+    /**************** CommandHandler interface implementation ***********************/
+
+    void FlushAcksRightAwayOnSlowCommand() override;
+
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::Status aStatus,
+                                 const char * context = nullptr) override;
+    void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+                   const char * context = nullptr) override;
+    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override;
+    CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override;
+
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               DataModel::EncodableToTLV & aEncodable) override;
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     DataModel::EncodableToTLV & aEncodable) override;
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override;
+    FabricIndex GetAccessingFabricIndex() const override;
+    bool IsTimedInvoke() const override;
+
+    /**************** Implementation-specific logic ***********************/
 
     /*
      * Main entrypoint for this class to handle an InvokeRequestMessage.
      *
      * This function MAY call the registered OnDone callback before returning.
-     * To prevent immediate OnDone invocation, callers can wrap their CommandHandler instance
+     * To prevent immediate OnDone invocation, callers can wrap their CommandHandlerImpl instance
      * within a CommandHandler::Handle.
      *
      * isTimedInvoke is true if and only if this is part of a Timed Invoke
@@ -237,24 +365,6 @@ public:
      * to with the data required as per spec.
      */
     CHIP_ERROR ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage);
-
-    /**
-     * Adds the given command status and returns any failures in adding statuses (e.g. out
-     * of buffer space) to the caller
-     */
-    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::Status aStatus,
-                                 const char * context = nullptr);
-
-    /**
-     * Adds a status when the caller is unable to handle any failures. Logging is performed
-     * and failure to register the status is checked with VerifyOrDie.
-     */
-    void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                   const char * context = nullptr);
-
-    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus);
-
-    CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus);
 
     /**
      * This adds a new CommandDataIB element into InvokeResponses for the associated
@@ -309,94 +419,6 @@ public:
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
 
     /**
-     * GetAccessingFabricIndex() may only be called during synchronous command
-     * processing.  Anything that runs async (while holding a
-     * CommandHandler::Handle or equivalent) must not call this method, because
-     * it will not work right if the session we're using was evicted.
-     */
-    FabricIndex GetAccessingFabricIndex() const;
-
-    /**
-     * API for adding a data response.  The template parameter T is generally
-     * expected to be a ClusterName::Commands::CommandName::Type struct, but any
-     * object that can be encoded using the DataModel::Encode machinery and
-     * exposes the right command id will work.
-     *
-     * @param [in] aRequestCommandPath the concrete path of the command we are
-     *             responding to.
-     * @param [in] aData the data for the response.
-     */
-    template <typename CommandData>
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
-    {
-        DataModel::EncodableType<CommandData> encoder(aData);
-        return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), encoder);
-    }
-
-    /**
-     * API for adding a data response.  The `aEncodable` is generally expected to encode
-     * a ClusterName::Commands::CommandName::Type struct, however any object should work.
-     *
-     * @param [in] aRequestCommandPath the concrete path of the command we are
-     *             responding to.
-     * @param [in] aResponseCommandId the command whose content is being encoded.
-     * @param [in] aEncodable - an encodable that places the command data structure
-     *             for `aResponseCommandId` into a TLV Writer.
-     *
-     * Most applications are likely to use `AddResponseData` as a more convenient
-     * one-call that auto-sets command ID and creates the underlying encoders.
-     */
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                               DataModel::EncodableToTLV & aEncodable)
-    {
-        // Return early when response should not be sent out.
-        VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
-        return TryAddingResponse(
-            [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable); });
-    }
-
-    /**
-     * API for adding a response.  This will try to encode a data response (response command), and if that fails will encode a a
-     * Protocols::InteractionModel::Status::Failure status response instead.
-     *
-     * The template parameter T is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object that
-     * can be encoded using the DataModel::Encode machinery and exposes the right command id will work.
-     *
-     * Since the function will call AddStatus when it fails to encode the data, it cannot send any response when it fails to encode
-     * a status code since another AddStatus call will also fail. The error from AddStatus will just be logged.
-     *
-     * @param [in] aRequestCommandPath the concrete path of the command we are
-     *             responding to.
-     * @param [in] aData the data for the response.
-     */
-    template <typename CommandData>
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
-    {
-        DataModel::EncodableType<CommandData> encodable(aData);
-        return AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
-    }
-
-    /**
-     * API for adding a response with a given encodable of TLV data.
-     *
-     * The encodable would generally encode a ClusterName::Commands::CommandName::Type with
-     * the corresponding `GetCommandId` call.
-     */
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     DataModel::EncodableToTLV & aEncodable)
-    {
-        if (AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable) != CHIP_NO_ERROR)
-        {
-            AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
-        }
-    }
-
-    /**
-     * Check whether the InvokeRequest we are handling is a timed invoke.
-     */
-    bool IsTimedInvoke() const { return mTimedRequest; }
-
-    /**
      * Gets the inner exchange context object, without ownership.
      *
      * WARNING: This is dangerous, since it is directly interacting with the
@@ -411,38 +433,6 @@ public:
     {
         VerifyOrDie(mpResponder);
         return mpResponder->GetExchangeContext();
-    }
-
-    /**
-     * @brief Flush acks right away for a slow command
-     *
-     * Some commands that do heavy lifting of storage/crypto should
-     * ack right away to improve reliability and reduce needless retries. This
-     * method can be manually called in commands that are especially slow to
-     * immediately schedule an acknowledgement (if needed) since the delayed
-     * stand-alone ack timer may actually not hit soon enough due to blocking command
-     * execution.
-     *
-     */
-    void FlushAcksRightAwayOnSlowCommand()
-    {
-        if (mpResponder)
-        {
-            mpResponder->HandlingSlowCommand();
-        }
-    }
-
-    /**
-     * GetSubjectDescriptor() may only be called during synchronous command
-     * processing.  Anything that runs async (while holding a
-     * CommandHandler::Handle or equivalent) must not call this method, because
-     * it might not work right if the session we're using was evicted.
-     */
-    Access::SubjectDescriptor GetSubjectDescriptor() const
-    {
-        VerifyOrDie(!mGoneAsync);
-        VerifyOrDie(mpResponder);
-        return mpResponder->GetSubjectDescriptor();
     }
 
 #if CHIP_WITH_NLFAULTINJECTION
