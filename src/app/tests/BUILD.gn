@@ -121,10 +121,10 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
-source_set("ember-apptest-compatibility") {
+source_set("app-test-compatibility") {
   sources = [
-    "ember-test-compatibility.cpp",
-    "ember-test-compatibility.h",
+    "test-interaction-model-api.cpp",
+    "test-interaction-model-api.h",
   ]
   public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
 
@@ -163,6 +163,15 @@ chip_test_suite("tests") {
     test_sources += [ "TestFailSafeContext.cpp" ]
   }
 
+  # DefaultICDClientStorage assumes that raw AES key is used by the application
+  if (chip_crypto != "psa") {
+    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
+  }
+
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
@@ -182,11 +191,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
   ]
-
-  # DefaultICDClientStorage assumes that raw AES key is used by the application
-  if (chip_crypto != "psa") {
-    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
-  }
 }
 
 chip_test_suite_using_nltest("tests_nltest") {
@@ -270,9 +274,5 @@ chip_test_suite_using_nltest("tests_nltest") {
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
-  }
-
-  if (chip_persist_subscriptions) {
-    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
   }
 }

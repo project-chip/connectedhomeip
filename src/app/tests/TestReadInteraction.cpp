@@ -303,55 +303,6 @@ using ReadHandlerNode     = chip::app::reporting::ReportScheduler::ReadHandlerNo
 namespace chip {
 namespace app {
 
-// CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-//                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-//                                  AttributeEncodeState * apEncoderState)
-// {
-//     if (aPath.mClusterId >= Test::kMockEndpointMin)
-//     {
-//         return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
-//     }
-
-//     if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
-//     {
-//         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-//         ReturnErrorOnFailure(aAttributeReports.GetError());
-//         ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aPath.mClusterId,
-//         aPath.mAttributeId);
-
-//         AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-//         ReturnErrorOnFailure(attributeReport.GetError());
-//         AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
-//         ReturnErrorOnFailure(attributeStatus.GetError());
-
-//         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-//         ReturnErrorOnFailure(attributePath.GetError());
-//         StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-//         ReturnErrorOnFailure(attributeStatus.GetError());
-//         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
-//         ReturnErrorOnFailure(errorStatus.GetError());
-//         ReturnErrorOnFailure(attributeStatus.EndOfAttributeStatusIB());
-//         return attributeReport.EndOfAttributeReportIB();
-//     }
-
-//     return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(kTestFieldValue1);
-// }
-
-// bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-// {
-//     if (kTestDataVersion1 == aRequiredVersion)
-//     {
-//         return true;
-//     }
-
-//     return false;
-// }
-
-// bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-// {
-//     return false;
-// }
-
 class TestReadInteraction
 {
     using Seconds16      = System::Clock::Seconds16;
@@ -1372,8 +1323,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 
