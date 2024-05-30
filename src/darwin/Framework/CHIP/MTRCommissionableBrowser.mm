@@ -114,11 +114,7 @@ public:
 
 #if CONFIG_NETWORK_LAYER_BLE
         mBleScannerDelegateOwner = owner; // retain the owner until OnBleScanStopped is called
-        CHIP_ERROR err = PlatformMgrImpl().StopBleScan();
-        if (err != CHIP_NO_ERROR) {
-            mBleScannerDelegateOwner = nil;
-            return err;
-        }
+        PlatformMgrImpl().StopBleScan(); // doesn't actually fail, and if it did we'd want to carry on regardless
 #else
         (void) owner;
 #endif // CONFIG_NETWORK_LAYER_BLE
