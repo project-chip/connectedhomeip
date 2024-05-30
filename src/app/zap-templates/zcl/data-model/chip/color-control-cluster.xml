@@ -82,12 +82,12 @@ limitations under the License.
     <item name="ActivateFromEnhancedCurrentHue" value="0x02"/>
   </enum>
 
-  <bitmap name="ColorControlOptions" type="bitmap8">
+  <bitmap name="OptionsBitmap" type="bitmap8">
     <cluster code="0x0300"/>
     <field name="ExecuteIfOff" mask="0x1"/>
   </bitmap>
 
-  <enum name="EnhancedColorMode" type="enum8">
+  <enum name="EnhancedColorModeEnum" type="enum8">
     <cluster code="0x0300"/>
     <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
     <item name="CurrentXAndCurrentY" value="0x01"/>
@@ -95,10 +95,10 @@ limitations under the License.
     <item name="EnhancedCurrentHueAndCurrentSaturation" value="0x03"/>
   </enum>
 
-  <enum name="DriftCompensation" type="enum8">
+  <enum name="DriftCompensationEnum" type="enum8">
     <cluster code="0x0300"/>
     <item name="None" value="0x00"/>
-    <item name="Other/Unknown" value="0x01"/>
+    <item name="OtherOrUnknown" value="0x01"/>
     <item name="Temperaturemonitoring" value="0x02"/>
     <item name="OpticalLuminanceMonitoringAndFeedback" value="0x03"/>
     <item name="OpticalColorMonitoringAndFeedback" value="0x04"/>
@@ -150,7 +150,7 @@ limitations under the License.
     <!-- CURRENT_X -->
     <attribute side="server" code="0x0004" define="COLOR_CONTROL_CURRENT_Y" type="int16u" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x607D" optional="true">CurrentY</attribute>
     <!-- CURRENT_Y -->
-    <attribute side="server" code="0x0005" define="COLOR_CONTROL_DRIFT_COMPENSATION" type="DriftCompensation" min="0x00" max="0x04" writable="false" optional="true">DriftCompensation</attribute>
+    <attribute side="server" code="0x0005" define="COLOR_CONTROL_DRIFT_COMPENSATION" type="DriftCompensationEnum" min="0x00" max="0x04" writable="false" optional="true">DriftCompensation</attribute>
     <!-- DRIFT_COMPENSATION -->
     <attribute side="server" code="0x0006" define="COLOR_CONTROL_COMPENSATION_TEXT" type="char_string" length="254" writable="false" optional="true">CompensationText</attribute>
     <!-- COMPENSATION_TEXT -->
@@ -158,7 +158,7 @@ limitations under the License.
     <!-- COLOR_TEMPERATURE -->
     <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="enum8" min="0x00" max="0x02" writable="false" default="0x01">ColorMode</attribute>
     <!-- COLOR_MODE -->
-    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="ColorControlOptions" writable="true" default="0x00">Options</attribute>
+    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="OptionsBitmap" writable="true" default="0x00">Options</attribute>
     <!-- COLOR_CONTROL_OPTIONS -->
     <attribute side="server" code="0x0010" define="COLOR_CONTROL_NUMBER_OF_PRIMARIES" type="int8u" min="0x00" max="0x06" isNullable="true" writable="false">NumberOfPrimaries</attribute>
     <!-- NUMBER_OF_PRIMARIES -->
@@ -390,7 +390,7 @@ limitations under the License.
 
   <clusterExtension code="0x0300">
     <attribute side="server" code="0x4000" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">EnhancedCurrentHue</attribute>
-    <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="EnhancedColorMode" min="0x00" max="0xFF" writable="false" default="0x01">EnhancedColorMode</attribute>
+    <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="EnhancedColorModeEnum" min="0x00" max="0xFF" writable="false" default="0x01">EnhancedColorMode</attribute>
     <attribute side="server" code="0x4002" define="COLOR_CONTROL_COLOR_LOOP_ACTIVE" type="int8u" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">ColorLoopActive</attribute>
     <attribute side="server" code="0x4003" define="COLOR_CONTROL_COLOR_LOOP_DIRECTION" type="int8u" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">ColorLoopDirection</attribute>
     <attribute side="server" code="0x4004" define="COLOR_CONTROL_COLOR_LOOP_TIME" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0019" optional="true">ColorLoopTime</attribute>

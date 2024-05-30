@@ -20221,7 +20221,7 @@ typedef NS_ENUM(uint8_t, MTRColorControlColorMode) {
 
 typedef NS_ENUM(uint8_t, MTRColorControlDriftCompensation) {
     MTRColorControlDriftCompensationNone MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRColorControlDriftCompensationOtherUnknown MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRColorControlDriftCompensationOtherOrUnknown MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRColorControlDriftCompensationTemperaturemonitoring MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRColorControlDriftCompensationOpticalLuminanceMonitoringAndFeedback MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRColorControlDriftCompensationOpticalColorMonitoringAndFeedback MTR_PROVISIONALLY_AVAILABLE = 0x04,
@@ -20271,10 +20271,6 @@ typedef NS_OPTIONS(uint16_t, MTRColorControlColorCapabilities) {
     MTRColorControlColorCapabilitiesColorTemperatureSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_OPTIONS(uint8_t, MTRColorControlOptions) {
-    MTRColorControlOptionsExecuteIfOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_OPTIONS(uint8_t, MTRColorControlColorLoopUpdateFlags) {
     MTRColorControlColorLoopUpdateFlagsUpdateAction MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRColorControlColorLoopUpdateFlagsUpdateDirection MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
@@ -20289,6 +20285,10 @@ typedef NS_OPTIONS(uint32_t, MTRColorControlFeature) {
     MTRColorControlFeatureXY MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
     MTRColorControlFeatureColorTemperature MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_OPTIONS(uint8_t, MTRColorControlOptionsBitmap) {
+    MTRColorControlOptionsBitmapExecuteIfOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint8_t, MTRBallastConfigurationBallastStatusBitmap) {
     MTRBallastConfigurationBallastStatusBitmapBallastNonOperational MTR_PROVISIONALLY_AVAILABLE = 0x1,

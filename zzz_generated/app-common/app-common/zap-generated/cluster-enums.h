@@ -4381,11 +4381,11 @@ enum class ColorMode : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for DriftCompensation
-enum class DriftCompensation : uint8_t
+// Enum for DriftCompensationEnum
+enum class DriftCompensationEnum : uint8_t
 {
     kNone                                  = 0x00,
-    kOtherUnknown                          = 0x01,
+    kOtherOrUnknown                        = 0x01,
     kTemperaturemonitoring                 = 0x02,
     kOpticalLuminanceMonitoringAndFeedback = 0x03,
     kOpticalColorMonitoringAndFeedback     = 0x04,
@@ -4396,8 +4396,8 @@ enum class DriftCompensation : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for EnhancedColorMode
-enum class EnhancedColorMode : uint8_t
+// Enum for EnhancedColorModeEnum
+enum class EnhancedColorModeEnum : uint8_t
 {
     kCurrentHueAndCurrentSaturation         = 0x00,
     kCurrentXAndCurrentY                    = 0x01,
@@ -4484,12 +4484,6 @@ enum class ColorCapabilities : uint16_t
     kColorTemperatureSupported = 0x10,
 };
 
-// Bitmap for ColorControlOptions
-enum class ColorControlOptions : uint8_t
-{
-    kExecuteIfOff = 0x1,
-};
-
 // Bitmap for ColorLoopUpdateFlags
 enum class ColorLoopUpdateFlags : uint8_t
 {
@@ -4507,6 +4501,12 @@ enum class Feature : uint32_t
     kColorLoop        = 0x4,
     kXy               = 0x8,
     kColorTemperature = 0x10,
+};
+
+// Bitmap for OptionsBitmap
+enum class OptionsBitmap : uint8_t
+{
+    kExecuteIfOff = 0x1,
 };
 } // namespace ColorControl
 
