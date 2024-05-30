@@ -37,13 +37,20 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
     def steps_TC_EEM_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads Accuracy attribute. Verify that the DUT response contains a MeasurementAccuracyStruct value."),
-            TestStep("3", "TH reads CumulativeEnergyImported attribute. Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
-            TestStep("4", "TH reads CumulativeEnergyExported attribute. Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
-            TestStep("5", "TH reads PeriodicEnergyImported attribute. Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
-            TestStep("6", "TH reads PeriodicEnergyExported attribute. Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
-            TestStep("7", "TH reads CumulativeEnergyReset attribute. Verify that the DUT response contains either null or an CumulativeEnergyResetStruct value."),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads Accuracy attribute",
+                     "Verify that the DUT response contains a MeasurementAccuracyStruct value."),
+            TestStep("3", "TH reads CumulativeEnergyImported attribute",
+                     "Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
+            TestStep("4", "TH reads CumulativeEnergyExported attribute",
+                     "Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
+            TestStep("5", "TH reads PeriodicEnergyImported attribute",
+                     "Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
+            TestStep("6", "TH reads PeriodicEnergyExported attribute",
+                     "Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
+            TestStep("7", "TH reads CumulativeEnergyReset attribute",
+                     "Verify that the DUT response contains either null or an CumulativeEnergyResetStruct value."),
         ]
 
         return steps
@@ -57,29 +64,34 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         self.step("2")
         accuracy = await self.read_eem_attribute_expect_success("Accuracy")
         logger.info(f"Rx'd Accuracy: {accuracy}")
-        asserts.assert_not_equal(accuracy, NullValue, "Accuracy is not allowed to be null")
+        asserts.assert_not_equal(
+            accuracy, NullValue, "Accuracy is not allowed to be null")
         asserts.assert_equal(accuracy.measurementType, Clusters.ElectricalEnergyMeasurement.Enums.MeasurementTypeEnum.kElectricalEnergy,
                              "Accuracy measurementType must be ElectricalEnergy")
 
         self.step("3")
         if self.pics_guard(self.check_pics("EEM.S.A0001")):
             cumulativeEnergyImported = await self.read_eem_attribute_expect_success("CumulativeEnergyImported")
-            logger.info(f"Rx'd CumulativeEnergyImported: {cumulativeEnergyImported}")
+            logger.info(
+                f"Rx'd CumulativeEnergyImported: {cumulativeEnergyImported}")
 
         self.step("4")
         if self.pics_guard(self.check_pics("EEM.S.A0002")):
             cumulativeEnergyExported = await self.read_eem_attribute_expect_success("CumulativeEnergyExported")
-            logger.info(f"Rx'd CumulativeEnergyExported: {cumulativeEnergyExported}")
+            logger.info(
+                f"Rx'd CumulativeEnergyExported: {cumulativeEnergyExported}")
 
         self.step("5")
         if self.pics_guard(self.check_pics("EEM.S.A0003")):
             periodicEnergyImported = await self.read_eem_attribute_expect_success("PeriodicEnergyImported")
-            logger.info(f"Rx'd PeriodicEnergyImported: {periodicEnergyImported}")
+            logger.info(
+                f"Rx'd PeriodicEnergyImported: {periodicEnergyImported}")
 
         self.step("6")
         if self.pics_guard(self.check_pics("EEM.S.A0004")):
             periodicEnergyExported = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
-            logger.info(f"Rx'd PeriodicEnergyExported: {periodicEnergyExported}")
+            logger.info(
+                f"Rx'd PeriodicEnergyExported: {periodicEnergyExported}")
 
         self.step("7")
         if self.pics_guard(self.check_pics("EEM.S.A0005")):
