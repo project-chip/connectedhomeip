@@ -18,6 +18,7 @@
 import logging
 
 import chip.clusters as Clusters
+from datetime import datetime, timedelta, timezone
 from chip.clusters.Types import NullValue
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -113,6 +114,42 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                 logger.info(
                     f"    - [{sub_index}] TargetTime: {sub_entry.targetTimeMinutesPastMidnight} TargetSoC: {sub_entry.targetSoC} AddedEnergy: {sub_entry.addedEnergy}")
 
+    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
+        delta_from_epoch = timedelta(seconds=epoch_s)
+        matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
+
+        return matter_epoch + delta_from_epoch
+
+    def compute_expected_target_time_as_epoch_s(self, minutes_past_midnight):
+        """Takes minutes past midnight and assumes local timezone, returns the value in Matter Epoch_S"""
+        # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
+        # Get the current midnight + minutesPastMidnight as epoch_s
+        # NOTE that MinutesPastMidnight is in LOCAL time not UTC so it reflects
+        # the charging time based on where the consumer is.
+        target_time = datetime.now()     # Get time in local time
+        target_time = target_time.replace(hour=int(minutes_past_midnight / 60),
+                                          minute=(minutes_past_midnight % 60), second=0,
+                                          microsecond=0)  # Align to minutes past midnight
+
+        if (target_time < datetime.now()):
+            # This is in the past - so we need to add 1 day
+            # We can get away with this in this test scenario - but should
+            # really look at the next target on this day to see if that is in the future
+            target_time = target_time + timedelta(days=1)
+
+        # Shift to UTC so we can use timezone aware subtraction from Matter epoch in UTC
+        target_time = target_time.astimezone(timezone.utc)
+
+        logger.info(
+            f"minutesPastMidnight = {minutes_past_midnight} => "
+            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight%60)}"
+            f" Expected target_time = {target_time}")
+
+        target_time_delta = target_time - \
+            datetime(2000, 1, 1, 0, 0, 0, 0).astimezone(timezone.utc)
+        expected_target_time_epoch_s = int(target_time_delta.total_seconds())
+        return expected_target_time_epoch_s
+
     @async_test_body
     async def test_TC_EEVSE_2_3(self):
 
@@ -163,7 +200,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("7")
         # The targets is a list of up to 7x ChargingTargetScheduleStruct's (one per day)
         # each containing a list of up to 10x targets per day
-        dailyTargets = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=1439,
+        minutes_past_midnight = 1439
+        dailyTargets = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=minutes_past_midnight,
                                                                          # targetSoc not sent
                                                                          addedEnergy=25000000)]
         targets = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
@@ -172,10 +210,24 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_set_targets_command(chargingTargetSchedules=targets)
 
         self.step("7a")
-        await self.check_evse_attribute_in_range("NextChargeStartTime", 0, 1438)
+        next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
+        logger.info(
+            f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
 
         self.step("7b")
-        await self.check_evse_attribute("NextChargeTargetTime", 1439)
+        next_target_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeTargetTime")
+        logger.info(
+            f"Received NextChargeTargetTime: {next_target_time_epoch_s} = {self.convert_epoch_s_to_time(next_target_time_epoch_s, tz=None)}")
+
+        # This should be the next MinutesPastMidnight converted to realtime as epoch_s
+        expected_target_time_epoch_s = self.compute_expected_target_time_as_epoch_s(
+            minutes_past_midnight)
+
+        asserts.assert_less(next_start_time_epoch_s, next_target_time_epoch_s,
+                            f"Unexpected 'NextChargeStartTime' response value - expected this to be < {next_target_time_epoch_s}, was {next_start_time_epoch_s}")
+
+        asserts.assert_equal(next_target_time_epoch_s, expected_target_time_epoch_s,
+                             f"Unexpected 'NextChargeTargetTime' response value - expected {expected_target_time_epoch_s} = {self.convert_epoch_s_to_time(expected_target_time_epoch_s, tz=None)}, was {next_target_time_epoch_s} = {self.convert_epoch_s_to_time(next_target_time_epoch_s, tz=None)}")
 
         self.step("7c")
         await self.check_evse_attribute("NextChargeRequiredEnergy", 25000000)
@@ -191,18 +243,34 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("9")
         # This should be all days Sun-Sat (0x7F) with an TargetTime 1 and SoC of 100%, AddedEnergy= NullValue
-        daily_targets_step_9 = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=1,
+        minutes_past_midnight = 1
+        daily_targets_step_9 = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=minutes_past_midnight,
                                                                                  targetSoC=100)]
         targets_step_9 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
             dayOfWeekForSequence=0x7F, chargingTargets=daily_targets_step_9)]
+
         breakpoint()
         await self.send_set_targets_command(chargingTargetSchedules=targets_step_9)
 
         self.step("9a")
-        await self.check_evse_attribute_in_range("NextChargeStartTime", 0, 1439)
+        next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
+        logger.info(
+            f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
 
         self.step("9b")
-        await self.check_evse_attribute("NextChargeTargetTime", 1)
+        next_target_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeTargetTime")
+        logger.info(
+            f"Received NextChargeTargetTime: {next_target_time_epoch_s} = {self.convert_epoch_s_to_time(next_target_time_epoch_s, tz=None)}")
+
+        # This should be the next MinutesPastMidnight converted to realtime as epoch_s
+        expected_target_time_epoch_s = self.compute_expected_target_time_as_epoch_s(
+            minutes_past_midnight)
+
+        asserts.assert_less(next_start_time_epoch_s, next_target_time_epoch_s,
+                            f"Unexpected 'NextChargeStartTime' response value - expected this to be < {next_target_time_epoch_s}, was {next_start_time_epoch_s}")
+
+        asserts.assert_equal(next_target_time_epoch_s, expected_target_time_epoch_s,
+                             f"Unexpected 'NextChargeTargetTime' response value - expected {expected_target_time_epoch_s} = {self.convert_epoch_s_to_time(expected_target_time_epoch_s, tz=None)}, was {next_target_time_epoch_s} = {self.convert_epoch_s_to_time(next_target_time_epoch_s, tz=None)}")
 
         self.step("9c")
         await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)

@@ -103,9 +103,9 @@ CHIP_ERROR EVSEManufacturer::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnightNow_m,
-                          DataModel::Nullable<uint32_t> & targetTime_m, DataModel::Nullable<Percent> & targetSoC,
-                          DataModel::Nullable<int64_t> & addedEnergy_mWh, bool bAllowTargetsInPast)
+CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnightNow_m, uint16_t & targetTimeMinutesPastMidnight_m,
+                          DataModel::Nullable<Percent> & targetSoC, DataModel::Nullable<int64_t> & addedEnergy_mWh,
+                          bool bAllowTargetsInPast)
 {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -145,7 +145,7 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
                     bFound            = true;
                     minTimeToTarget_m = chargingTarget.targetTimeMinutesPastMidnight;
 
-                    targetTime_m.SetNonNull(chargingTarget.targetTimeMinutesPastMidnight);
+                    targetTimeMinutesPastMidnight_m = chargingTarget.targetTimeMinutesPastMidnight;
 
                     if (chargingTarget.targetSoC.HasValue())
                     {
@@ -205,24 +205,31 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     uint16_t minutesPastMidnightNow_m = 0;
     ReturnErrorOnFailure(GetMinutesPastMidnight(minutesPastMidnightNow_m));
 
-    DataModel::Nullable<uint32_t> startTime_m;
-    DataModel::Nullable<uint32_t> targetTime_m;
+    uint32_t now_epoch_s = 0;
+    ReturnErrorOnFailure(GetEpochTS(now_epoch_s));
+
+    DataModel::Nullable<uint32_t> startTime_epoch_s;
+    DataModel::Nullable<uint32_t> targetTime_epoch_s;
     DataModel::Nullable<Percent> targetSoC;
     DataModel::Nullable<int64_t> addedEnergy_mWh;
 
     uint32_t power_W;
     uint32_t chargingDuration_s;
-    uint32_t chargingDuration_m;
+    uint32_t tempTargetTime_epoch_s;
+    uint32_t tempStartTime_epoch_s;
+    uint16_t targetTimeMinutesPastMidnight_m;
 
     // Initialise the values to Null - if the FindNextTarget finds one, then it will update the value
-    startTime_m.SetNull();
+    targetTime_epoch_s.SetNull();
     targetSoC.SetNull();
     addedEnergy_mWh.SetNull();
+    startTime_epoch_s.SetNull(); // If we FindNextTarget this will be computed below and set to a non null value
 
     uint8_t searchDay = 0;
     while (searchDay < 2)
     {
-        err = FindNextTarget(dayOfWeekMap, minutesPastMidnightNow_m, targetTime_m, targetSoC, addedEnergy_mWh, (searchDay != 0));
+        err = FindNextTarget(dayOfWeekMap, minutesPastMidnightNow_m, targetTimeMinutesPastMidnight_m, targetSoC, addedEnergy_mWh,
+                             (searchDay != 0));
         if (err == CHIP_ERROR_NOT_FOUND)
         {
             // We didn't find one for today, try tomorrow
@@ -241,6 +248,11 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
 
     if (err == CHIP_NO_ERROR && dg->IsEvsePluggedIn())
     {
+        /* Set the target Time in epoch_s format*/
+        tempTargetTime_epoch_s =
+            ((now_epoch_s / 60) + targetTimeMinutesPastMidnight_m + (searchDay * 1440) - minutesPastMidnightNow_m) * 60;
+        targetTime_epoch_s.SetNonNull(tempTargetTime_epoch_s);
+
         if (!targetSoC.IsNull())
         {
             if (targetSoC.Value() != 100)
@@ -249,7 +261,7 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
             }
             // We don't know the Vehicle SoC so we must charge now
             // TODO make this use the SoC featureMap to determine if this is an error
-            startTime_m.SetNonNull(minutesPastMidnightNow_m);
+            startTime_epoch_s.SetNonNull(now_epoch_s);
         }
         else
         {
@@ -271,34 +283,33 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
             // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
             // to avoid using floats we multiply by 36 and then divide by 10 (instead of x3600 and dividing by 1000)
             chargingDuration_s = static_cast<uint32_t>(((addedEnergy_mWh.Value() / power_W) * 36) / 10);
-            chargingDuration_m = chargingDuration_s / 60;
 
             // Add in 15 minutes leeway to account for slow starting vehicles
             // that need to condition the battery or if it is cold etc
-            chargingDuration_m += 15;
-        }
+            chargingDuration_s += (15 * 60);
 
-        // A price optimizer can look for cheapest time of day
-        // However for now we'll start charging as late as possible
-        int tempStartTime_m = targetTime_m.Value() - chargingDuration_m + (searchDay * 1440);
-        // if tempStartTime_m is negative it means that it will take more than 24hrs to charge the vehicle
+            // A price optimizer can look for cheapest time of day
+            // However for now we'll start charging as late as possible
+            tempStartTime_epoch_s = tempTargetTime_epoch_s - chargingDuration_s;
 
-        if ((tempStartTime_m < 0) || (tempStartTime_m < static_cast<int>(minutesPastMidnightNow_m)))
-        {
-            // we need to turn on the EVSE now - it won't have enough time to reach the target
-            startTime_m.SetNonNull(minutesPastMidnightNow_m);
-            // TODO call function to turn on the EV
-        }
-        else
-        {
-            // we turn off the EVSE for now
-            startTime_m.SetNonNull(tempStartTime_m);
+            if (tempStartTime_epoch_s < now_epoch_s)
+            {
+                // we need to turn on the EVSE now - it won't have enough time to reach the target
+                startTime_epoch_s.SetNonNull(now_epoch_s);
+                // TODO call function to turn on the EV
+            }
+            else
+            {
+                // we turn off the EVSE for now
+                startTime_epoch_s.SetNonNull(tempStartTime_epoch_s);
+                // TODO have a periodic timer which checks if we should turn on the charger now
+            }
         }
     }
 
     // Update the attributes to allow a UI to inform the user
-    dg->SetNextChargeStartTime(startTime_m);
-    dg->SetNextChargeTargetTime(targetTime_m);
+    dg->SetNextChargeStartTime(startTime_epoch_s);
+    dg->SetNextChargeTargetTime(targetTime_epoch_s);
     dg->SetNextChargeRequiredEnergy(addedEnergy_mWh);
     dg->SetNextChargeTargetSoC(targetSoC);
 
