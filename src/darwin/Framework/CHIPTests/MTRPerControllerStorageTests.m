@@ -2297,7 +2297,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     [self doTestSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];
     [self doTestSubscriptionPoolWithSize:2 deviceOnboardingPayloads:deviceOnboardingPayloads];
 }
-}
 
 - (MTRDevice *)getMTRDevice:(NSNumber *)deviceID
 {
@@ -2489,7 +2488,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     [self waitForExpectations:@[ attributeDataReceivedExpectation, reportEndExpectation ] timeout:60];
 
     [controller.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
     XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
     [controller removeDevice:device];
@@ -2614,7 +2613,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     [self waitForExpectations:@[ attributeDataReceivedExpectation, reportEndExpectation ] timeout:60];
 
     [controller.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
     XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
     [controller removeDevice:device];
@@ -2683,10 +2682,10 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                     XCTAssertNotNil(data);
                     XCTAssertNotNil(data.attributes);
 
-                    NSDictionary * dict = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
+                    MTRDeviceDataValueDictionary dict = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
                     XCTAssertNotNil(dict);
 
-                    NSMutableArray * persistedAttributes = [device arrayOfNumbersFromAttributeValue:dict];
+                    NSMutableArray<NSNumber *> * persistedAttributes = [device arrayOfNumbersFromAttributeValue:dict];
                     initialTestAttributes = [device arrayOfNumbersFromAttributeValue:@ { MTRTypeKey : MTRArrayValueType, MTRValueKey : testClusterDataValue }];
                     XCTAssertNotNil(persistedAttributes);
                     for (NSNumber * attribute in initialTestAttributes) {
@@ -2770,7 +2769,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     [self waitForExpectations:@[ attributeDataReceivedExpectation, reportEndExpectation ] timeout:60];
 
     [controller.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
     XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
     [controller removeDevice:device];
