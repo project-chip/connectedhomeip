@@ -3136,7 +3136,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         MTR_LOG_DEBUG("%@ No data store to prune from", self);
         return;
     }
-    
+
     // Check if parts list changed or server list changed for the descriptor cluster or the attribute list changed for a cluster.
     // If yes, we might need to prune any deleted endpoints, clusters or attributes from the storage and persisted cluster data.
     if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID) {
@@ -3144,7 +3144,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             [self _pruneEndpointsIn:[self _cachedAttributeValueForPath:attributePath] missingFrom:newAttributeDataValue];
             return;
         }
-        
+
         if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID) {
             [self _pruneClustersIn:[self _cachedAttributeValueForPath:attributePath] missingFrom:newAttributeDataValue forEndpoint:attributePath.endpoint];
             return;

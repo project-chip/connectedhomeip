@@ -723,9 +723,9 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         if (!success) {
             MTR_LOG_ERROR("removeEndpointFromEndpointIndex for endpointID %u failed for node 0x%016llX", endpointID.unsignedShortValue, nodeID.unsignedLongLongValue);
         }
-        
+
         NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
-        
+
         for (NSNumber * cluster in clusterIndex)
         {
             success = [self _deleteClusterDataForNodeID:nodeID endpointID:endpointID clusterID:cluster];
@@ -733,7 +733,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
                 MTR_LOG_ERROR("Delete failed for clusterData for node 0x%016llX endpoint %u cluster 0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, cluster.unsignedLongValue);
             }
         }
-        
+
         success = [self _deleteClusterIndexForNodeID:nodeID endpointID:endpointID];
         if (!success) {
             MTR_LOG_ERROR("Delete failed for clusterIndex for node 0x%016llX endpoint %u", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
@@ -777,7 +777,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     for (NSNumber * attribute in attributes) {
         [clusterData removeValueForAttribute:attribute];
     }
-    
+
     dispatch_async(_storageDelegateQueue, ^{
         BOOL success = [self _storeClusterData:clusterData forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
         if (!success) {
