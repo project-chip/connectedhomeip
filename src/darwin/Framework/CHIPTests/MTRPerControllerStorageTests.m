@@ -2157,9 +2157,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     MTRSetMessageReliabilityParameters(nil, nil, nil, nil);
 }
 
-static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
-static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
-
 // TODO: This might also want to go in a separate test file, with some shared setup for commissioning devices per test
 - (void)doTestSubscriptionPoolWithSize:(NSInteger)subscriptionPoolSize deviceOnboardingPayloads:(NSDictionary<NSNumber *, NSString *> *)deviceOnboardingPayloads
 {
@@ -2339,7 +2336,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
     return device;
 }
 
-- (NSMutableArray<NSNumber *> *)getEndpointArrayFromPartsList:(NSDictionary *)partsList forDevice:(MTRDevice *)device
+- (NSMutableArray<NSNumber *> *)getEndpointArrayFromPartsList:(MTRDeviceDataValueDictionary)partsList forDevice:(MTRDevice *)device
 {
     // Initialize the endpoint array with endpoint 0.
     NSMutableArray<NSNumber *> * endpoints = [NSMutableArray arrayWithObject:@0];
@@ -2368,7 +2365,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
     // 3. After the fake attribute report is injected with deleted endpoint 2, make sure the data store is still populated with cluster index and cluster data
     // for endpoints 0 and 1 but not 2.
     __block MTRDeviceDataValueDictionary testDataForPartsList;
-    __block NSMutableArray<NSNumber *> * testClusterDataValueForPartsList;
+    __block id testClusterDataValueForPartsList;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
         XCTAssertGreaterThan(attributeReport.count, 0);
 
@@ -2523,7 +2520,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
     // 2. The data store is populated with MTRClusterIDTypeIdentifyID in the cluster index and cluster data for endpoint 1 initially.
     // 3. After the fake attribute report is injected with deleted cluster ID - MTRClusterIDTypeIdentifyID, make sure the data store is still populated with cluster index and
     //    cluster data for all other clusters at endpoint 1 but not the deleted cluster.
-    __block NSMutableArray<NSNumber *> * testClusterDataValue;
+    __block id testClusterDataValue;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
         XCTAssertGreaterThan(attributeReport.count, 0);
 
@@ -2642,7 +2639,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
     __block NSNumber * dataVersionForIdentify;
     __block NSNumber * testEndpoint = @(1);
     __block NSNumber * toBeDeletedAttribute = @(1);
-    __block NSMutableArray<NSNumber *> * testClusterDataValue;
+    __block id testClusterDataValue;
 
     // This test will do the following -
     // 1. Get the data version and attribute value of the attribute list for endpoint 1 to inject a fake report with attribute 1 removed from MTRClusterIDTypeIdentifyID.

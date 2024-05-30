@@ -3035,6 +3035,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 - (void)_removeClusters:(NSSet<MTRClusterPath *> *)clusterPathsToRemove
+                doRemoveFromDataStore:(BOOL)doRemoveFromDataStore
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -3043,19 +3044,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     for (MTRClusterPath * path in clusterPathsToRemove) {
         [_persistedClusterData removeObjectForKey:path];
         [_clusterDataToPersist removeObjectForKey:path];
-        [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:path.endpoint clusterID:path.cluster];
-    }
-}
-
-- (void)_removeClustersFromCache:(NSSet<MTRClusterPath *> *)clusterPathsToRemove
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    [_persistedClusters minusSet:clusterPathsToRemove];
-
-    for (MTRClusterPath * path in clusterPathsToRemove) {
-        [_persistedClusterData removeObjectForKey:path];
-        [_clusterDataToPersist removeObjectForKey:path];
+        if (doRemoveFromDataStore)
+        {
+            [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:path.endpoint clusterID:path.cluster];
+        }
     }
 }
 
@@ -3088,7 +3080,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [clusterPathsToRemove addObject:path];
             }
         }
-        [self _removeClustersFromCache:clusterPathsToRemove];
+        [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:NO];
         [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:endpoint];
     }
 }
@@ -3111,7 +3103,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
         }
     }
-    [self _removeClusters:clusterPathsToRemove];
+    [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:YES];
 }
 
 - (void)_pruneAttributesIn:(MTRDeviceDataValueDictionary)previousAttributeListValue
