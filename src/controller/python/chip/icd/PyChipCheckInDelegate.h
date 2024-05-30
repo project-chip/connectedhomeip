@@ -23,7 +23,7 @@
 class PyChipCheckInDelegate : public chip::app::DefaultCheckInDelegate
 {
 public:
-    using OnCheckInCompleteCallback = void(uint8_t fabricIndex, uint64_t nodeId);
+    using OnCheckInCompleteCallback = void(chip::ScopedNodeId);
 
     virtual ~PyChipCheckInDelegate() = default;
 

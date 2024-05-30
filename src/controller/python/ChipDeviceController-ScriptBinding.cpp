@@ -152,9 +152,8 @@ PyChipError pychip_DeviceController_SetDSTOffset(int32_t offset, uint64_t validS
 PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP);
 PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, chip::EndpointId endpoint);
 PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check);
-PyChipError pychip_DeviceController_SetIcdRegistrationParameters(chip::Controller::DeviceCommissioner * devCtrl, bool enabled,
-                                                                 uint8_t * icdSymmetricKeyOrNull, uint64_t icdCheckInNodeIdOrZero,
-                                                                 uint64_t icdMonitoredSubjectOrZero, uint32_t icdStayActiveMsec);
+struct IcdRegistrationParameters;
+PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, const IcdRegistrationParameters * params);
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
@@ -580,42 +579,51 @@ PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check)
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_DeviceController_SetIcdRegistrationParameters(chip::Controller::DeviceCommissioner * devCtrl, bool enabled,
-                                                                 uint8_t * icdSymmetricKeyOrNull, uint64_t icdCheckInNodeIdOrZero,
-                                                                 uint64_t icdMonitoredSubjectOrZero, uint32_t icdStayActiveMsec)
+struct IcdRegistrationParameters
+{
+    uint8_t * symmetricKey;
+    size_t symmetricKeyLength;
+    uint64_t checkInNodeId;
+    uint64_t monitoredSubject;
+    uint32_t stayActiveMsec;
+};
+
+PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, const IcdRegistrationParameters * params)
 {
     if (!enabled)
     {
+        sCommissioningParameters.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
         return ToPyChipError(CHIP_NO_ERROR);
     }
 
-    sCommissioningParameters.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+    if (params == nullptr)
+    {
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
-    if (icdSymmetricKeyOrNull != nullptr)
+    if (params->symmetricKey == nullptr || params->symmetricKeyLength != sizeof(sICDSymmetricKey))
     {
-        memcpy(sICDSymmetricKey, icdSymmetricKeyOrNull, sizeof(sICDSymmetricKey));
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
     }
-    else
+
+    if (params->checkInNodeId == 0)
     {
-        chip::Crypto::DRBG_get_bytes(sICDSymmetricKey, sizeof(sICDSymmetricKey));
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
     }
-    if (icdCheckInNodeIdOrZero == 0)
+    if (params->monitoredSubject == 0)
     {
-        icdCheckInNodeIdOrZero = devCtrl->GetNodeId();
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
     }
-    if (icdMonitoredSubjectOrZero == 0)
-    {
-        icdMonitoredSubjectOrZero = icdCheckInNodeIdOrZero;
-    }
-    // These Optionals must have values now.
-    // The commissioner will verify these values.
+
+    memcpy(sICDSymmetricKey, params->symmetricKey, sizeof(sICDSymmetricKey));
     sCommissioningParameters.SetICDSymmetricKey(ByteSpan(sICDSymmetricKey));
-    if (icdStayActiveMsec != 0)
+    if (params->stayActiveMsec != 0)
     {
-        sCommissioningParameters.SetICDStayActiveDurationMsec(icdStayActiveMsec);
+        sCommissioningParameters.SetICDStayActiveDurationMsec(params->stayActiveMsec);
     }
-    sCommissioningParameters.SetICDCheckInNodeId(icdCheckInNodeIdOrZero);
-    sCommissioningParameters.SetICDMonitoredSubject(icdMonitoredSubjectOrZero);
+    sCommissioningParameters.SetICDCheckInNodeId(params->checkInNodeId);
+    sCommissioningParameters.SetICDMonitoredSubject(params->monitoredSubject);
+    sCommissioningParameters.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
