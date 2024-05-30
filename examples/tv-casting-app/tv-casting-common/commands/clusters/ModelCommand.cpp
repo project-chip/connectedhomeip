@@ -81,3 +81,8 @@ void ModelCommand::Shutdown()
     mOnDeviceConnectedCallback.Cancel();
     mOnDeviceConnectionFailureCallback.Cancel();
 }
+
+void ClearICDEntry(const chip::ScopedNodeId & nodeId);
+{
+    ChipLogError(chipTool, "ClearICDEntry is not implemented");
+}

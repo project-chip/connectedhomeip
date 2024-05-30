@@ -114,11 +114,7 @@ public:
         if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
             (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Id))
         {
-            CHIP_ERROR deleteEntryError = CHIPCommand::sICDClientStorage.DeleteEntry(chip::ScopedNodeId(mPeerNodeId, mFabricIndex));
-            if (deleteEntryError != CHIP_NO_ERROR)
-            {
-                ChipLogError(chipTool, "Failed to delete ICD entry: %s", chip::ErrorStr(deleteEntryError));
-            }
+            ModelCommand::ClearICDEntry(chip::ScopedNodeId(mPeerNodeId, mFabricIndex));
         }
     }
 

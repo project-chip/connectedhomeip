@@ -76,6 +76,15 @@ void ModelCommand::Shutdown()
     CHIPCommand::Shutdown();
 }
 
+void ModelCommand::ClearICDEntry(const chip::ScopedNodeId & nodeId)
+{
+    CHIP_ERROR deleteEntryError = CHIPCommand::sICDClientStorage.DeleteEntry(nodeId);
+    if (deleteEntryError != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "Failed to delete ICD entry: %" CHIP_ERROR_FORMAT, deleteEntryError.Format());
+    }
+}
+
 void ModelCommand::CheckPeerICDType()
 {
     if (mIsPeerLIT.HasValue())
