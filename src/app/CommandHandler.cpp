@@ -97,7 +97,7 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-Status CommandHandlerImpl::OnInvokeCommandRequest(CommandHandlerImplExchangeInterface & commandResponder,
+Status CommandHandlerImpl::OnInvokeCommandRequest(CommandHandlerExchangeInterface & commandResponder,
                                                   System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "state should be Idle");
@@ -887,7 +887,7 @@ CHIP_ERROR CommandHandlerImpl::FinalizeInvokeResponseMessage(bool aHasMoreChunks
     return CHIP_NO_ERROR;
 }
 
-void CommandHandlerImpl::SetExchangeInterface(CommandHandlerImplExchangeInterface * commandResponder)
+void CommandHandlerImpl::SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder)
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "CommandResponseSender can only be set in idle state");
     mpResponder = commandResponder;
@@ -995,7 +995,7 @@ CHIP_ERROR TestOnlyExtractCommandPathFromNextInvokeRequest(TLV::TLVReader & invo
 // This method intentionally duplicates code from other sections. While code consolidation
 // is generally preferred, here we prioritize generating a clear crash message to aid in
 // troubleshooting test failures.
-void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandHandlerImplExchangeInterface & commandResponder,
+void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandHandlerExchangeInterface & commandResponder,
                                                                         System::PacketBufferHandle && payload, bool isTimedInvoke,
                                                                         NlFaultInjectionType faultType)
 {
