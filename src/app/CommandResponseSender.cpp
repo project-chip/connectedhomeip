@@ -231,7 +231,7 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
 void CommandResponseSender::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
                                                                            System::PacketBufferHandle && payload,
                                                                            bool isTimedInvoke,
-                                                                           CommandHandler::NlFaultInjectionType faultType)
+                                                                           CommandHandlerImpl::NlFaultInjectionType faultType)
 {
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement,

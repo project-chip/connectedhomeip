@@ -55,7 +55,7 @@ namespace app {
 class CommandHandler
 {
 public:
-    ~CommandHandler() = default;
+    virtual ~CommandHandler() = default;
 
     /**
      * Class that allows asynchronous command processing before sending a
@@ -292,19 +292,14 @@ public:
     };
 
     /*
-     * Constructor.
-     *
      * The callback passed in has to outlive this CommandHandler object.
      */
     CommandHandlerImpl(Callback * apCallback);
 
     /*
-     * Destructor.
-     *
-     * The call will also invalidate all Handles created for this CommandHandlerImpl.
-     *
+     * The destructor will also invalidate all Handles created for this CommandHandlerImpl.
      */
-    ~CommandHandlerImpl();
+    virtual ~CommandHandlerImpl();
 
     /*
      * Constructor to override the number of supported paths per invoke and command responder.

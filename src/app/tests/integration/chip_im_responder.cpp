@@ -106,7 +106,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 
         chip::TLV::TLVWriter * writer;
 
-        const CommandHandler::InvokeResponseParameters prepareParams(aRequestCommandPath);
+        const CommandHandlerImpl::InvokeResponseParameters prepareParams(aRequestCommandPath);
         ReturnOnFailure(apCommandObj->PrepareInvokeResponseCommand(path, prepareParams));
 
         writer = apCommandObj->GetCommandDataIBTLVWriter();

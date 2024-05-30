@@ -199,7 +199,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
         }
         else
         {
-            const CommandHandler::InvokeResponseParameters prepareParams(aRequestCommandPath);
+            const CommandHandlerImpl::InvokeResponseParameters prepareParams(aRequestCommandPath);
             const ConcreteCommandPath responseCommandPath = aRequestCommandPath;
             apCommandObj->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
             chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataIBTLVWriter();
@@ -611,7 +611,7 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
     }
     else
     {
-        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+        const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
         ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, aResponseCommandId };
         err = apCommandHandler->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -710,7 +710,7 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
         // be handle already acquired on the callers behalf.
         CommandHandler::Handle handle(&commandHandler);
 
-        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+        const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
         err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
@@ -753,7 +753,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
         // be handle already acquired on the callers behalf.
         CommandHandler::Handle handle(&commandHandler);
 
-        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+        const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
         err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = commandHandler.FinishCommand();
@@ -1333,7 +1333,7 @@ void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingDirectPrep
     // responder is present. This aligns with the design decision to promote AddStatus and AddResponseData
     // usage in such scenarios. See GitHub issue #32486 for discussions on phasing out external use of
     // these primitives.
-    const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+    const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
     ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
     CHIP_ERROR err                          = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);

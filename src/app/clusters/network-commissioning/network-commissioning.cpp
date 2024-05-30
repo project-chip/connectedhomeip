@@ -1006,7 +1006,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     size_t scanResponseArrayLength = 0;
     uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
-    const CommandHandler::InvokeResponseParameters prepareParams(mPath);
+    const CommandHandlerImpl::InvokeResponseParameters prepareParams(mPath);
     SuccessOrExit(
         err = commandHandle->PrepareInvokeResponseCommand(
             ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id), prepareParams));
@@ -1127,7 +1127,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     WiFiScanResponse scanResponse;
     size_t networksEncoded = 0;
 
-    const CommandHandler::InvokeResponseParameters prepareParams(mPath);
+    const CommandHandlerImpl::InvokeResponseParameters prepareParams(mPath);
     SuccessOrExit(
         err = commandHandle->PrepareInvokeResponseCommand(
             ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id), prepareParams));

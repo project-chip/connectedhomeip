@@ -149,7 +149,7 @@ public:
      * @param faultType The specific type of fault to inject into the response.
      */
     void TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
-                                                        bool isTimedInvoke, CommandHandler::NlFaultInjectionType faultType);
+                                                        bool isTimedInvoke, CommandHandlerImpl::NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
 
 private:
