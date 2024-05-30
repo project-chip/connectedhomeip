@@ -726,8 +726,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
         NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
 
-        for (NSNumber * cluster in clusterIndex)
-        {
+        for (NSNumber * cluster in clusterIndex) {
             success = [self _deleteClusterDataForNodeID:nodeID endpointID:endpointID clusterID:cluster];
             if (!success) {
                 MTR_LOG_ERROR("Delete failed for clusterData for node 0x%016llX endpoint %u cluster 0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, cluster.unsignedLongValue);

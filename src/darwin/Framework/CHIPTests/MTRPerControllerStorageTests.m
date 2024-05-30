@@ -35,7 +35,7 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
-//static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
+static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -2157,7 +2157,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     MTRSetMessageReliabilityParameters(nil, nil, nil, nil);
 }
 
-/*static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
+static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
 static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 
 // TODO: This might also want to go in a separate test file, with some shared setup for commissioning devices per test
@@ -2300,7 +2300,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
     [self doTestSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];
     [self doTestSubscriptionPoolWithSize:2 deviceOnboardingPayloads:deviceOnboardingPayloads];
 }
-}*/
+}
 
 - (MTRDevice *)getMTRDevice:(NSNumber *)deviceID
 {
@@ -2674,7 +2674,6 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
         XCTAssertNotNil(testClusterDataValue);
 
         dispatch_sync(self->_storageQueue, ^{
-
             for (NSNumber * cluster in [controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint]) {
 
                 // Make sure that the cluster data in the data storage is populated with cluster data for MTRClusterIDTypeIdentifyID cluster
@@ -2740,7 +2739,6 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
         // and has all attributes except attribute 1 which was deleted.
         // We will page in the cluster data from storage to check the above.
         dispatch_sync(self->_storageQueue, ^{
-
             for (NSNumber * cluster in [controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint]) {
                 MTRDeviceClusterData * clusterData = [controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:testEndpoint clusterID:cluster];
                 XCTAssertNotNil(clusterData);

@@ -3077,7 +3077,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // If the parts list changed and one or more endpoints were removed, remove all the
     // clusters for all those endpoints from our data structures.
     // Also remove those endpoints from the data store.
-    NSMutableSet<NSNumber*> * toBeRemovedEndpoints = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousPartsListValue]];
+    NSMutableSet<NSNumber *> * toBeRemovedEndpoints = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousPartsListValue]];
     NSSet<NSNumber *> * endpointsOnDevice = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newPartsListValue]];
     [toBeRemovedEndpoints minusSet:endpointsOnDevice];
 
@@ -3095,7 +3095,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)_pruneClustersIn:(MTRDeviceDataValueDictionary)previousServerListValue
              missingFrom:(MTRDeviceDataValueDictionary)newServerListValue
-              forEndpoint:(NSNumber *)endpointID
+             forEndpoint:(NSNumber *)endpointID
 {
     // If the server list changed and clusters were removed, remove those clusters from our data structures.
     // Also remove it from the data store.
