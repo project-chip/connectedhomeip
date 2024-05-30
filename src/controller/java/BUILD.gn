@@ -262,7 +262,11 @@ kotlin_library("tlv") {
     "src/matter/tlv/values.kt",
   ]
 
-  kotlinc_flags = [ "-Xlint:deprecation" ]
+  kotlinc_flags = [
+    "-Xlint:deprecation",
+    "-module-name",
+    "com.matter.tlv",
+  ]
 }
 
 kotlin_library("tlv_reader_test") {
@@ -323,7 +327,11 @@ kotlin_library("jsontlv") {
     "src/matter/jsontlv/types.kt",
   ]
 
-  kotlinc_flags = [ "-Xlint:deprecation" ]
+  kotlinc_flags = [
+    "-Xlint:deprecation",
+    "-module-name",
+    "com.matter.matterjson",
+  ]
 }
 
 kotlin_library("json_to_tlv_to_json_test") {
@@ -362,6 +370,10 @@ kotlin_library("onboarding_payload") {
     "src/matter/onboardingpayload/VendorId.kt",
     "src/matter/onboardingpayload/Verhoeff.kt",
     "src/matter/onboardingpayload/Verhoeff10.kt",
+  ]
+  kotlinc_flags = [
+    "-module-name",
+    "com.matter.onboarding",
   ]
 }
 
@@ -404,7 +416,11 @@ kotlin_library("chipcluster") {
   sources = structs_sources
   sources += eventstructs_sources
 
-  kotlinc_flags = [ "-Xlint:deprecation" ]
+  kotlinc_flags = [
+    "-Xlint:deprecation",
+    "-module-name",
+    "com.matter.chipcluster",
+  ]
 }
 
 kotlin_library("chipcluster_test") {

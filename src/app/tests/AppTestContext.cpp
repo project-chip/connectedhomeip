@@ -49,10 +49,16 @@ void AppContext::SetUpTestSuite()
 
 void AppContext::TearDownTestSuite()
 {
-    // Adding a DrainAndServiceIO call fixes the teardown for some tests (TestAclAttribute and TestReportScheduler); these were
-    // triggering failures in tests that follow them when running on nRF CI (Zephyr native_posix where all Unit Tests are compiled
-    // into a single file)
-    // TODO: understand this more and solve underlying issue
+    // Some test suites finish with unprocessed work left in the platform manager event queue.
+    // This can particularly be a problem when this unprocessed work involves reporting engine runs,
+    // since those can take a while and cause later tests to not reach their queued work before
+    // their timeouts hit.  This is only an issue in setups where all unit tests are compiled into
+    // a single file (e.g. nRF CI (Zephyr native_posix)).
+    //
+    // Work around this issue by doing a DrainAndServiceIO() here to attempt to flush out any queued-up work.
+    //
+    // TODO: Solve the underlying issue where test suites leave unprocessed work.  Or is this actually
+    // the right solution?
     LoopbackMessagingContext::DrainAndServiceIO();
 
     chip::DeviceLayer::PlatformMgr().Shutdown();

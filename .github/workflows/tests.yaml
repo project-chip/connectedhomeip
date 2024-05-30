@@ -49,7 +49,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:50
+            image: ghcr.io/project-chip/chip-build:53
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -189,6 +189,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/wifi-network-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
@@ -439,7 +440,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:50
+            image: ghcr.io/project-chip/chip-build:53
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
