@@ -22,7 +22,9 @@
 #error "Please include <ble/Ble.h> instead!"
 #endif
 
+#include <cstddef>
 #include <cstdint>
+#include <utility>
 
 namespace chip {
 namespace Ble {
@@ -36,11 +38,73 @@ struct ChipBleUUID
     uint8_t bytes[16];
 };
 
-// UUID of CHIP BLE service. Exposed for use in scan filter.
-extern const ChipBleUUID CHIP_BLE_SVC_ID;
+constexpr bool isValidHexChar(char c)
+{
+    return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+}
+
+constexpr uint8_t HexDigitToInt(const char c)
+{
+    if (c >= '0' && c <= '9')
+        return static_cast<uint8_t>(c - '0');
+    else
+        return static_cast<uint8_t>((c >= 'a' ? c - 'a' : c - 'A') + 10);
+}
 
 bool UUIDsMatch(const ChipBleUUID * idOne, const ChipBleUUID * idTwo);
-bool StringToUUID(const char * str, ChipBleUUID & uuid);
+
+/*
+ * StringToUUID converts a string representation of a UUID to a binary UUID.
+ * The string representation must be in the format "0000FFF6-0000-1000-8000-00805F9B34FB".
+ * The function returns a pair of a boolean indicating whether the conversion was successful
+ * and the binary UUID.
+ *
+ */
+template <size_t N>
+constexpr std::pair<bool, ChipBleUUID> StringToUUID(const char (&str)[N])
+{
+    constexpr size_t UUID_LEN         = 16;
+    constexpr size_t NUM_UUID_NIBBLES = UUID_LEN * 2;
+    static_assert(N >= NUM_UUID_NIBBLES);
+    ChipBleUUID uuid{};
+
+    size_t nibbleId = 0;
+    for (size_t i = 0; i < N - 1; ++i)
+    {
+        if (str[i] == '-')
+            continue;
+        if (!isValidHexChar(str[i]))
+            return { false, {} };
+        if (nibbleId >= NUM_UUID_NIBBLES)
+            return { false, {} };
+        uint8_t & byte = uuid.bytes[nibbleId / 2];
+        if (nibbleId % 2 == 0)
+            byte = static_cast<uint8_t>(HexDigitToInt(str[i]) << 4);
+        else
+            byte = static_cast<uint8_t>(byte | HexDigitToInt(str[i]));
+        ++nibbleId;
+    }
+    return { nibbleId == NUM_UUID_NIBBLES, uuid };
+}
+
+#define StringToUUIDConstexpr(str)                                                                                                 \
+    []() {                                                                                                                         \
+        constexpr std::pair<bool, ::chip::Ble::ChipBleUUID> res = ::chip::Ble::StringToUUID(str);                                  \
+        static_assert(res.first, "Argument: \"" #str "\" is not valid hex string");                                                \
+        return res.second;                                                                                                         \
+    }();
+
+// UUID of CHIP BLE service.
+inline constexpr char CHIP_BLE_DESC_SHORT_UUID_STR[]    = "2902";
+inline constexpr char CHIP_BLE_SERVICE_SHORT_UUID_STR[] = "FFF6";
+inline constexpr char CHIP_BLE_SERVICE_LONG_UUID_STR[]  = "0000FFF6-0000-1000-8000-00805F9B34FB";
+inline constexpr char CHIP_BLE_CHAR_1_UUID_STR[]        = "18EE2EF5-263D-4559-959F-4F9C429F9D11";
+inline constexpr char CHIP_BLE_CHAR_2_UUID_STR[]        = "18EE2EF5-263D-4559-959F-4F9C429F9D12";
+inline constexpr char CHIP_BLE_CHAR_3_UUID_STR[]        = "64630238-8772-45F2-B87D-748A83218F04";
+inline constexpr ChipBleUUID CHIP_BLE_SVC_ID            = StringToUUIDConstexpr("0000FFF6-0000-1000-8000-00805F9B34FB");
+inline constexpr ChipBleUUID CHIP_BLE_CHAR_1_UUID       = StringToUUIDConstexpr("18EE2EF5-263D-4559-959F-4F9C429F9D11");
+inline constexpr ChipBleUUID CHIP_BLE_CHAR_2_UUID       = StringToUUIDConstexpr("18EE2EF5-263D-4559-959F-4F9C429F9D12");
+inline constexpr ChipBleUUID CHIP_BLE_CHAR_3_UUID       = StringToUUIDConstexpr("64630238-8772-45F2-B87D-748A83218F04");
 
 } /* namespace Ble */
 } /* namespace chip */

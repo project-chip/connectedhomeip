@@ -94,7 +94,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
             if (service != nullptr)
             {
                 if ((BluezIsServiceOnDevice(service, mDevice.get())) == TRUE &&
-                    (strcmp(bluez_gatt_service1_get_uuid(service), CHIP_BLE_UUID_SERVICE_STRING) == 0))
+                    (strcmp(bluez_gatt_service1_get_uuid(service), Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0))
                 {
                     mService.reset(service);
                     break;
@@ -111,18 +111,18 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
             if (char1 != nullptr)
             {
                 if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
-                    (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C1_STRING) == 0))
+                    (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0))
                 {
                     mC1.reset(char1);
                 }
                 else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
-                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C2_STRING) == 0))
+                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0))
                 {
                     mC2.reset(char1);
                 }
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
                 else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
-                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C3_STRING) == 0))
+                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_3_UUID_STR) == 0))
                 {
                     mC3.reset(char1);
                 }
