@@ -280,7 +280,7 @@ void CommandHandlerImpl::Close()
     MoveToState(State::AwaitingDestruction);
 
     // We must finish all async work before we can shut down a CommandHandlerImpl. The actual CommandHandlerImpl MUST finish their
-    // work in reasonable time or there is a bug. The only case for releasing CommandHandlerImpl without CommandHandlerImpl::Handle
+    // work in reasonable time or there is a bug. The only case for releasing CommandHandlerImpl without CommandHandler::Handle
     // releasing its reference is the stack shutting down, in which case Close() is not called. So the below check should always
     // pass.
     VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandlerImpl::Close() called with %u unfinished async work items",
@@ -815,7 +815,7 @@ FabricIndex CommandHandlerImpl::GetAccessingFabricIndex() const
     return mpResponder->GetAccessingFabricIndex();
 }
 
-void CommandHandlerImpl::Handle::Init(CommandHandlerImpl * handler)
+void CommandHandler::Handle::Init(CommandHandler * handler)
 {
     if (handler != nullptr)
     {
@@ -824,7 +824,7 @@ void CommandHandlerImpl::Handle::Init(CommandHandlerImpl * handler)
     }
 }
 
-CommandHandlerImpl * CommandHandlerImpl::Handle::Get()
+CommandHandler * CommandHandler::Handle::Get()
 {
     // Not safe to work with CommandHandlerImpl in parallel with other Matter work.
     assertChipStackLockedByCurrentThread();
@@ -832,7 +832,7 @@ CommandHandlerImpl * CommandHandlerImpl::Handle::Get()
     return mpHandler;
 }
 
-void CommandHandlerImpl::Handle::Release()
+void CommandHandler::Handle::Release()
 {
     if (mpHandler != nullptr)
     {
@@ -841,7 +841,7 @@ void CommandHandlerImpl::Handle::Release()
     }
 }
 
-CommandHandlerImpl::Handle::Handle(CommandHandlerImpl * handler)
+CommandHandler::Handle::Handle(CommandHandler * handler)
 {
     Init(handler);
 }

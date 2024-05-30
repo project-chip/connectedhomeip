@@ -229,6 +229,21 @@ public:
         DataModel::EncodableType<CommandData> encodable(aData);
         return AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
     }
+
+protected:
+    /**
+     * IncrementHoldOff will increase the inner refcount of the CommandHandler.
+     *
+     * Users should use CommandHandler::Handle for management the lifespan of the CommandHandler.
+     * DefRef should be released in reasonable time, and Close() should only be called when the refcount reached 0.
+     */
+    virtual void IncrementHoldOff(Handle * apHandle) {}
+
+    /**
+     * DecrementHoldOff is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
+     * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
+     */
+    virtual void DecrementHoldOff(Handle * apHandle) {}
 };
 
 class CommandHandlerImpl : public CommandHandler
@@ -460,6 +475,12 @@ public:
                                                         NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
 
+protected:
+    // Lifetime management for CommandHandler::Handle
+
+    void IncrementHoldOff(Handle * apHandle) override;
+    void DecrementHoldOff(Handle * apHandle) override;
+
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
@@ -545,20 +566,6 @@ private:
      * message payloads.
      */
     void Abort();
-
-    /**
-     * IncrementHoldOff will increase the inner refcount of the CommandHandler.
-     *
-     * Users should use CommandHandler::Handle for management the lifespan of the CommandHandler.
-     * DefRef should be released in reasonable time, and Close() should only be called when the refcount reached 0.
-     */
-    void IncrementHoldOff(Handle * apHandle);
-
-    /**
-     * DecrementHoldOff is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
-     * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
-     */
-    void DecrementHoldOff(Handle * apHandle);
 
     /*
      * Allocates a packet buffer used for encoding an invoke response payload.
