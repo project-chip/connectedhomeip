@@ -84,7 +84,7 @@ public:
         mBleScannerDelegateOwner = owner; // retain the owner until OnBleScanStopped is called
         ReturnErrorOnFailure(PlatformMgrImpl().StartBleScan(this));
 #else
-        (void)owner;
+        (void) owner;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
         ReturnErrorOnFailure(Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager()));
