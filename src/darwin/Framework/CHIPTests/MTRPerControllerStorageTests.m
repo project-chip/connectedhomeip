@@ -35,7 +35,7 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
-static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
+//static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -2157,6 +2157,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     MTRSetMessageReliabilityParameters(nil, nil, nil, nil);
 }
 
+/*static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
+static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
+
 // TODO: This might also want to go in a separate test file, with some shared setup for commissioning devices per test
 - (void)doTestSubscriptionPoolWithSize:(NSInteger)subscriptionPoolSize deviceOnboardingPayloads:(NSDictionary<NSNumber *, NSString *> *)deviceOnboardingPayloads
 {
@@ -2297,6 +2300,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     [self doTestSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];
     [self doTestSubscriptionPoolWithSize:2 deviceOnboardingPayloads:deviceOnboardingPayloads];
 }
+}*/
 
 - (MTRDevice *)getMTRDevice:(NSNumber *)deviceID
 {
@@ -2340,11 +2344,11 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // Initialize the endpoint array with endpoint 0.
     NSMutableArray<NSNumber *> * endpoints = [NSMutableArray arrayWithObject:@0];
 
-    [endpoints addObjectsFromArray:[device arrayOfNumbersFromAttributeValue:[device _dataValueWithoutDataVersion:partsList]]];
+    [endpoints addObjectsFromArray:[device arrayOfNumbersFromAttributeValue:partsList]];
     return endpoints;
 }
 
-- (void)test011_testDataStorageUpdatesWhenRemovingEndpoints
+- (void)testDataStorageUpdatesWhenRemovingEndpoints
 {
     NSNumber * deviceID = @(17);
     __auto_type * device = [self getMTRDevice:deviceID];
@@ -2354,7 +2358,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
 
-    __block unsigned attributeReportsReceived = 0;
     __block NSNumber * dataVersionForPartsList;
     __block NSNumber * rootEndpoint = @0;
 
@@ -2364,11 +2367,10 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // 2. The data store is populated with cluster index and cluster data for endpoints 0, 1 and 2 initially.
     // 3. After the fake attribute report is injected with deleted endpoint 2, make sure the data store is still populated with cluster index and cluster data
     // for endpoints 0 and 1 but not 2.
-    __block NSDictionary * testDataForPartsList;
-    __block NSMutableArray * testClusterDataValueForPartsList;
+    __block MTRDeviceDataValueDictionary testDataForPartsList;
+    __block NSMutableArray<NSNumber *> * testClusterDataValueForPartsList;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
-        attributeReportsReceived += attributeReport.count;
-        XCTAssert(attributeReportsReceived > 0);
+        XCTAssertGreaterThan(attributeReport.count, 0);
 
         for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
             MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
@@ -2386,7 +2388,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     };
 
     __block NSMutableDictionary<NSNumber *, NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableDictionary alloc] init];
-    __block NSMutableArray * testEndpoints;
+    __block NSMutableArray<NSNumber *> * testEndpoints;
 
     delegate.onReportEnd = ^{
         XCTAssertNotNil(dataVersionForPartsList);
@@ -2403,7 +2405,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
             for (NSNumber * endpoint in testEndpoints) {
                 [initialClusterIndex setObject:[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:endpoint] forKey:endpoint];
             }
-            XCTAssertNotNil(initialClusterIndex);
 
             for (NSNumber * endpoint in testEndpoints) {
                 for (NSNumber * cluster in [initialClusterIndex objectForKey:endpoint]) {
@@ -2423,7 +2424,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     // Delete endpoint 2 from the attribute value in parts list.
     NSNumber * toBeDeletedEndpoint = @2;
-    __block id endpointData =
+    id endpointData =
         @{
             MTRDataKey : @ {
                 MTRTypeKey : MTRUnsignedIntegerValueType,
@@ -2445,8 +2446,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     XCTestExpectation * attributeDataReceivedExpectation = [self expectationWithDescription:@"Injected Attribute data received"];
     XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected Attribute data report ended"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
-        attributeReportsReceived += attributeReport.count;
-        XCTAssert(attributeReportsReceived > 0);
+        XCTAssertGreaterThan(attributeReport.count, 0);
 
         for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
             MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
@@ -2504,7 +2504,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     XCTAssertFalse([controller isRunning]);
 }
 
-- (void)test012_testDataStorageUpdatesWhenRemovingClusters
+- (void)testDataStorageUpdatesWhenRemovingClusters
 {
     NSNumber * deviceID = @(17);
     __auto_type * device = [self getMTRDevice:deviceID];
@@ -2514,7 +2514,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
 
-    __block unsigned attributeReportsReceived = 0;
     __block NSNumber * dataVersionForServerList;
     __block NSNumber * testEndpoint = @1;
 
@@ -2524,17 +2523,16 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // 2. The data store is populated with MTRClusterIDTypeIdentifyID in the cluster index and cluster data for endpoint 1 initially.
     // 3. After the fake attribute report is injected with deleted cluster ID - MTRClusterIDTypeIdentifyID, make sure the data store is still populated with cluster index and
     //    cluster data for all other clusters at endpoint 1 but not the deleted cluster.
-    __block NSMutableArray * testClusterDataValue;
+    __block NSMutableArray<NSNumber *> * testClusterDataValue;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
-        attributeReportsReceived += attributeReport.count;
-        XCTAssert(attributeReportsReceived > 0);
+        XCTAssertGreaterThan(attributeReport.count, 0);
 
         for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
             MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
             XCTAssertNotNil(attributePath);
 
             if ([attributePath.endpoint isEqualToNumber:testEndpoint] && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID) {
-                NSDictionary * data = attributeDict[MTRDataKey];
+                MTRDeviceDataValueDictionary data = attributeDict[MTRDataKey];
                 XCTAssertNotNil(data);
                 dataVersionForServerList = data[MTRDataVersionKey];
                 id dataValue = data[MTRValueKey];
@@ -2546,13 +2544,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     __block NSMutableArray<NSNumber *> * initialClusterIndex = [[NSMutableArray alloc] init];
     __block NSNumber * toBeDeletedCluster = @(MTRClusterIDTypeIdentifyID);
-    __block id identifyClusterData =
-        @{
-            MTRDataKey : @ {
-                MTRTypeKey : MTRUnsignedIntegerValueType,
-                MTRValueKey : toBeDeletedCluster,
-            }
-        };
 
     delegate.onReportEnd = ^{
         XCTAssertNotNil(dataVersionForServerList);
@@ -2578,6 +2569,13 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     // Inject a fake attribute report after removing cluster ID - MTRClusterIDTypeIdentifyID from endpoint 1 to the server list.
     dataVersionForServerList = [NSNumber numberWithUnsignedLongLong:(dataVersionForServerList.unsignedLongLongValue + 1)];
+    id identifyClusterData =
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : toBeDeletedCluster,
+            }
+        };
     [testClusterDataValue removeObject:identifyClusterData];
 
     NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
@@ -2592,8 +2590,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     XCTestExpectation * attributeDataReceivedExpectation = [self expectationWithDescription:@"Injected Attribute data received"];
     XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected Attribute data report ended"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
-        attributeReportsReceived += attributeReport.count;
-        XCTAssert(attributeReportsReceived > 0);
+        XCTAssertGreaterThan(attributeReport.count, 0);
         [attributeDataReceivedExpectation fulfill];
     };
 
@@ -2632,7 +2629,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     XCTAssertFalse([controller isRunning]);
 }
 
-- (void)test013_testDataStorageUpdatesWhenRemovingAttributes
+- (void)testDataStorageUpdatesWhenRemovingAttributes
 {
     NSNumber * deviceID = @(17);
     __auto_type * device = [self getMTRDevice:deviceID];
@@ -2642,11 +2639,10 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
 
-    __block unsigned attributeReportsReceived = 0;
     __block NSNumber * dataVersionForIdentify;
     __block NSNumber * testEndpoint = @(1);
     __block NSNumber * toBeDeletedAttribute = @(1);
-    __block NSMutableArray * testClusterDataValue;
+    __block NSMutableArray<NSNumber *> * testClusterDataValue;
 
     // This test will do the following -
     // 1. Get the data version and attribute value of the attribute list for endpoint 1 to inject a fake report with attribute 1 removed from MTRClusterIDTypeIdentifyID.
@@ -2654,15 +2650,14 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // 3. After the fake attribute report is injected, make sure the data store is populated with cluster data for all attributes in MTRClusterIDTypeIdentifyID
     //    cluster except for attribute 1 which has been deleted.
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
-        attributeReportsReceived += attributeReport.count;
-        XCTAssert(attributeReportsReceived > 0);
+        XCTAssertGreaterThan(attributeReport.count, 0);
 
         for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
             MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
             XCTAssertNotNil(attributePath);
 
             if ([attributePath.endpoint isEqualToNumber:testEndpoint] && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeIdentifyID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeAttributeListID) {
-                NSDictionary * data = attributeDict[MTRDataKey];
+                MTRDeviceDataValueDictionary data = attributeDict[MTRDataKey];
                 XCTAssertNotNil(data);
                 dataVersionForIdentify = data[MTRDataVersionKey];
                 id dataValue = data[MTRValueKey];
@@ -2672,17 +2667,15 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         }
     };
 
-    __block NSMutableArray<NSNumber *> * initialClusterIndex = [[NSMutableArray alloc] init];
+    __block NSMutableArray<NSNumber *> * initialTestAttributes = [[NSMutableArray alloc] init];
 
     delegate.onReportEnd = ^{
         XCTAssertNotNil(dataVersionForIdentify);
         XCTAssertNotNil(testClusterDataValue);
 
         dispatch_sync(self->_storageQueue, ^{
-            initialClusterIndex = [[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint] mutableCopy];
-            XCTAssertNotNil(initialClusterIndex);
 
-            for (NSNumber * cluster in initialClusterIndex) {
+            for (NSNumber * cluster in [controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint]) {
 
                 // Make sure that the cluster data in the data storage is populated with cluster data for MTRClusterIDTypeIdentifyID cluster
                 // and has all attributes including attribute 1.
@@ -2698,9 +2691,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                     XCTAssertNotNil(dict);
 
                     NSMutableArray * persistedAttributes = [device arrayOfNumbersFromAttributeValue:dict];
-                    NSMutableArray * testAttributes = [device arrayOfNumbersFromAttributeValue:@ { MTRTypeKey : MTRArrayValueType, MTRValueKey : testClusterDataValue }];
+                    initialTestAttributes = [device arrayOfNumbersFromAttributeValue:@ { MTRTypeKey : MTRArrayValueType, MTRValueKey : testClusterDataValue }];
                     XCTAssertNotNil(persistedAttributes);
-                    for (NSNumber * attribute in testAttributes) {
+                    for (NSNumber * attribute in initialTestAttributes) {
                         XCTAssertTrue([persistedAttributes containsObject:attribute]);
                     }
                 }
@@ -2715,8 +2708,15 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
     dataVersionForIdentify = [NSNumber numberWithUnsignedLongLong:(dataVersionForIdentify.unsignedLongLongValue + 1)];
+    id attributeData =
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : toBeDeletedAttribute,
+            }
+        };
 
-    [testClusterDataValue removeObjectAtIndex:1];
+    [testClusterDataValue removeObject:attributeData];
 
     NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
         MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:testEndpoint clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
@@ -2730,8 +2730,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     XCTestExpectation * attributeDataReceivedExpectation = [self expectationWithDescription:@"Injected Attribute data received"];
     XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected Attribute data report ended"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
-        attributeReportsReceived += attributeReport.count;
-        XCTAssert(attributeReportsReceived > 0);
+        XCTAssertGreaterThan(attributeReport.count, 0);
+
         [attributeDataReceivedExpectation fulfill];
     };
 
@@ -2740,10 +2740,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         // and has all attributes except attribute 1 which was deleted.
         // We will page in the cluster data from storage to check the above.
         dispatch_sync(self->_storageQueue, ^{
-            initialClusterIndex = [[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint] mutableCopy];
-            XCTAssertNotNil(initialClusterIndex);
 
-            for (NSNumber * cluster in initialClusterIndex) {
+            for (NSNumber * cluster in [controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint]) {
                 MTRDeviceClusterData * clusterData = [controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:testEndpoint clusterID:cluster];
                 XCTAssertNotNil(clusterData);
                 MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:testEndpoint clusterID:cluster];
@@ -2753,13 +2751,12 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                     XCTAssertNotNil(data);
                     XCTAssertNotNil(data.attributes);
 
-                    NSDictionary * dict = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
-                    XCTAssertNotNil(dict);
+                    MTRDeviceDataValueDictionary attributeListValue = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
+                    XCTAssertNotNil(attributeListValue);
 
-                    NSMutableArray * persistedAttributes = [device arrayOfNumbersFromAttributeValue:dict];
-                    NSMutableArray * testAttributes = [device arrayOfNumbersFromAttributeValue:@ { MTRTypeKey : MTRArrayValueType, MTRValueKey : testClusterDataValue }];
+                    NSMutableArray<NSNumber *> * persistedAttributes = [device arrayOfNumbersFromAttributeValue:attributeListValue];
                     XCTAssertNotNil(persistedAttributes);
-                    for (NSNumber * attribute in testAttributes) {
+                    for (NSNumber * attribute in initialTestAttributes) {
                         if ([attribute isEqualToNumber:toBeDeletedAttribute]) {
                             XCTAssertFalse([persistedAttributes containsObject:attribute]);
                         } else {

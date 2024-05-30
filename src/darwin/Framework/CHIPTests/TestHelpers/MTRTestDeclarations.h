@@ -49,8 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
 - (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path;
 - (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path;
-- (NSDictionary *)_dataValueWithoutDataVersion:(NSDictionary *)attributeValue;
-- (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(NSDictionary *)dataDictionary;
+- (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
