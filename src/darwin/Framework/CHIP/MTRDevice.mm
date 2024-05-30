@@ -395,8 +395,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     NSMutableSet<MTRClusterPath *> * _persistedClusters;
 
     // When we last failed to subscribe to the device (either via
-    // _setupSubscription or via the auto-resubscribe behavior of the
-    // ReadClient).  Nil if we have had no such failures.
+    // _setupSubscriptionWithReason or via the auto-resubscribe behavior
+    // of the ReadClient).  Nil if we have had no such failures.
     NSDate * _Nullable _lastSubscriptionFailureTime;
     MTRDeviceConnectivityMonitor * _connectivityMonitor;
 
@@ -745,10 +745,10 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         if ([self _deviceUsesThread]) {
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
-                [self _setupSubscription];
+                [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
             } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
         } else {
-            [self _setupSubscription];
+            [self _setupSubscriptionWithReason:@"delegate is set and subscription is needed"];
         }
     }
 }
@@ -788,14 +788,14 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     MTR_LOG("%@ saw new operational advertisement", self);
 
-    [self _triggerResubscribeWithReason:"operational advertisement seen"
+    [self _triggerResubscribeWithReason:@"operational advertisement seen"
                     nodeLikelyReachable:YES];
 }
 
 // Trigger a resubscribe as needed.  nodeLikelyReachable should be YES if we
 // have reason to suspect the node is now reachable, NO if we have no idea
 // whether it might be.
-- (void)_triggerResubscribeWithReason:(const char *)reason nodeLikelyReachable:(BOOL)nodeLikelyReachable
+- (void)_triggerResubscribeWithReason:(NSString *)reason nodeLikelyReachable:(BOOL)nodeLikelyReachable
 {
     assertChipStackLockedByCurrentThread();
 
@@ -814,7 +814,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // establish a CASE session.  And at that point, our subscription will
     // trigger the state change as needed.
     if (self.reattemptingSubscription) {
-        [self _reattemptSubscriptionNowIfNeeded];
+        [self _reattemptSubscriptionNowIfNeededWithReason:reason];
     } else {
         readClientToResubscribe = self->_currentReadClient;
         subscriptionCallback = self->_currentSubscriptionCallback;
@@ -829,7 +829,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             // here (e.g. still booting up), but should try again reasonably quickly.
             subscriptionCallback->ResetResubscriptionBackoff();
         }
-        readClientToResubscribe->TriggerResubscribeIfScheduled(reason);
+        readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
     }
 }
 
@@ -893,7 +893,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // ReadClient in there.  If the dispatch fails, that's fine; it means our
     // controller has shut down, so nothing to be done.
     [_deviceController asyncDispatchToMatterQueue:^{
-        [self _triggerResubscribeWithReason:"read-through skipped while not subscribed" nodeLikelyReachable:NO];
+        [self _triggerResubscribeWithReason:@"read-through skipped while not subscribed" nodeLikelyReachable:NO];
     }
                                      errorHandler:nil];
 }
@@ -1160,7 +1160,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // this block is run -- if other triggering events had happened, this would become a no-op.
     auto resubscriptionBlock = ^{
         [self->_deviceController asyncDispatchToMatterQueue:^{
-            [self _triggerResubscribeWithReason:"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO];
+            [self _triggerResubscribeWithReason:@"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO];
         } errorHandler:^(NSError * _Nonnull error) {
             // If controller is not running, clear work item from the subscription queue
             MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
@@ -1235,17 +1235,17 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // If we started subscription or session establishment but failed, remove item from the subscription pool so we can re-queue.
     [self _clearSubscriptionPoolWork];
 
-    // Call _reattemptSubscriptionNowIfNeeded when timer fires - if subscription is
+    // Call _reattemptSubscriptionNowIfNeededWithReason when timer fires - if subscription is
     // in a better state at that time this will be a no-op.
     auto resubscriptionBlock = ^{
         os_unfair_lock_lock(&self->_lock);
-        [self _reattemptSubscriptionNowIfNeeded];
+        [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
         os_unfair_lock_unlock(&self->_lock);
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
     if ([self _deviceUsesThread]) {
-        // For Thread-enabled devices, schedule the _reattemptSubscriptionNowIfNeeded call to run in the subscription pool
+        // For Thread-enabled devices, schedule the _reattemptSubscriptionNowIfNeededWithReason call to run in the subscription pool
         [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:@"MTRDevice resubscription"];
     } else {
         // For non-Thread-enabled devices, just call the resubscription block after the specified time
@@ -1253,7 +1253,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     }
 }
 
-- (void)_reattemptSubscriptionNowIfNeeded
+- (void)_reattemptSubscriptionNowIfNeededWithReason:(NSString *)reason
 {
     os_unfair_lock_assert_owner(&self->_lock);
     if (!self.reattemptingSubscription) {
@@ -1262,7 +1262,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     MTR_LOG("%@ reattempting subscription", self);
     self.reattemptingSubscription = NO;
-    [self _setupSubscription];
+    [self _setupSubscriptionWithReason:reason];
 }
 
 - (void)_handleUnsolicitedMessageFromPublisher
@@ -1284,8 +1284,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // reestablishment, this starts the attempt right away
     // TODO: This doesn't really make sense.  If we _don't_ have a live
     // ReadClient how did we get this notification and if we _do_ have an active
-    // ReadClient, this call or _setupSubscription would be no-ops.
-    [self _reattemptSubscriptionNowIfNeeded];
+    // ReadClient, this call or _setupSubscriptionWithReason would be no-ops.
+    [self _reattemptSubscriptionNowIfNeededWithReason:@"got unsolicited message from publisher"];
 }
 
 - (void)_markDeviceAsUnreachableIfNeverSubscribed
@@ -1941,7 +1941,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         self->_connectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:compressedFabricID nodeID:self.nodeID];
         [self->_connectivityMonitor startMonitoringWithHandler:^{
             [self->_deviceController asyncDispatchToMatterQueue:^{
-                [self _triggerResubscribeWithReason:"device connectivity changed" nodeLikelyReachable:YES];
+                [self _triggerResubscribeWithReason:@"device connectivity changed" nodeLikelyReachable:YES];
             }
                                                    errorHandler:nil];
         } queue:self.queue];
@@ -1959,12 +1959,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 }
 
 // assume lock is held
-- (void)_setupSubscription
+- (void)_setupSubscriptionWithReason:(NSString *)reason
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (![self _subscriptionsAllowed]) {
-        MTR_LOG("_setupSubscription: Subscriptions not allowed. Do not set up subscription");
+        MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription", self);
         return;
     }
 
@@ -1985,6 +1985,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     }
 
     [self _changeInternalState:MTRInternalDeviceStateSubscribing];
+
+    MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
 
     // Set up a timer to mark as not reachable if it takes too long to set up a subscription
     MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
@@ -3512,7 +3514,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     MTR_LOG("%@ _deviceMayBeReachable called", self);
 
-    [self _triggerResubscribeWithReason:"SPI client indicated the device may now be reachable"
+    [self _triggerResubscribeWithReason:@"SPI client indicated the device may now be reachable"
                     nodeLikelyReachable:YES];
 }
 
