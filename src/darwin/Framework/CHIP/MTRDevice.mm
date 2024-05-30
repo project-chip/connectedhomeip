@@ -3035,7 +3035,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 - (void)_removeClusters:(NSSet<MTRClusterPath *> *)clusterPathsToRemove
-                doRemoveFromDataStore:(BOOL)doRemoveFromDataStore
+    doRemoveFromDataStore:(BOOL)doRemoveFromDataStore
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -3044,8 +3044,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     for (MTRClusterPath * path in clusterPathsToRemove) {
         [_persistedClusterData removeObjectForKey:path];
         [_clusterDataToPersist removeObjectForKey:path];
-        if (doRemoveFromDataStore)
-        {
+        if (doRemoveFromDataStore) {
             [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:path.endpoint clusterID:path.cluster];
         }
     }
