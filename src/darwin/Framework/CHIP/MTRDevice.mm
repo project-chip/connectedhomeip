@@ -1904,9 +1904,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     if (_clusterDataToPersist == nil) {
         return;
     }
-    auto * clusterData = [_clusterDataToPersist objectForKey:clusterPath];
+    auto * clusterData = _clusterDataToPersist[clusterPath];
     [clusterData removeValueForAttribute:attributeID];
-    [_clusterDataToPersist setObject:clusterData forKey:clusterPath];
 }
 
 - (void)_createDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions dataVersionFilterList:(DataVersionFilter **)dataVersionFilterList count:(size_t *)count sizeReduction:(size_t)sizeReduction
@@ -3035,7 +3034,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return NO;
 }
 
-- (void)_removeClusters:(NSSet *)clusterPathsToRemove
+- (void)_removeClusters:(NSSet<MTRClusterPath *> *)clusterPathsToRemove
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -3049,7 +3048,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 }
 
-- (void)_removeAttributes:(NSSet *)toBeRemovedAttributes fromCluster:(MTRClusterPath *)clusterPathToRemoveAttributesFrom
+- (void)_removeAttributes:(NSSet<NSNumber *> *)attributes fromCluster:(MTRClusterPath *)clusterPath
 {
     if (toBeRemovedAttributes == nil || clusterPathToRemoveAttributesFrom == nil) {
         return;
@@ -3059,15 +3058,17 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     for (NSNumber * attribute in toBeRemovedAttributes) {
         [self _removeCachedAttribute:attribute fromCluster:clusterPathToRemoveAttributesFrom];
     }
+    // Just clear out the NSCache entry for this cluster, so we'll load it from storage as needed.
     [_persistedClusterData removeObjectForKey:clusterPathToRemoveAttributesFrom];
     [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:clusterPathToRemoveAttributesFrom.endpoint clusterID:clusterPathToRemoveAttributesFrom.cluster];
 }
 
-- (void)_pruneOrphanedEndpoints:(NSDictionary *)previousPartsListValue
-              newPartsListValue:(NSDictionary *)newPartsListValue
+- (void)_pruneEndpointsIn:(NSDictionary *)previousPartsListValue
+              missingFrom:(NSDictionary *)newPartsListValue
 {
-    // If the parts list changed and one or more endpoints were removed, remove all the clusters in _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those endpoints.
-    // Also remove it from the data store.
+    // If the parts list changed and one or more endpoints were removed, remove all the
+    // clusters for all those endpoints from our data structures.
+    // Also remove those endpoints from the data store.
     NSMutableSet * toBeRemovedEndpoints = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _dataValueWithoutDataVersion:previousPartsListValue]]];
     NSSet * endpointsOnDevice = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newPartsListValue]];
     [toBeRemovedEndpoints minusSet:endpointsOnDevice];
@@ -3088,7 +3089,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
        previousServerListValue:(NSDictionary *)previousServerListValue
             newServerListValue:(NSDictionary *)newServerListValue
 {
-    // If the server list changed and clusters were removed, remove the clusters from the _persistedClusters, _persistedClusterData and _clusterDataToPersist for all those clusters.
+    // If the server list changed and clusters were removed, remove those clusters from our data structures.
     // Also remove it from the data store.
     NSMutableSet<NSNumber *> * toBeRemovedClusters = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _dataValueWithoutDataVersion:previousServerListValue]]];
     NSSet<NSNumber *> * clustersStillOnEndpoint = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newServerListValue]];
@@ -3108,8 +3109,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)_pruneOrphanedAttributes:(MTRAttributePath *)attributePath
            newAttributeListValue:(NSDictionary *)newAttributeListValue
 {
-    // If the attribute list changed and attributes were removed, remove the attributes from the _clusterDataToPersist for that cluster and endpoint.
-    // Clear out the _peristedClusterData and data store cluster data. Update the data storage with updated cluster data.
+    // If the attribute list changed and attributes were removed, remove the attributes from our
+    // data structures.
     NSMutableSet<NSNumber *> * toBeRemovedAttributes = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _cachedAttributeValueForPath:attributePath]]];
     NSSet<NSNumber *> * attributesStillInCluster = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newAttributeListValue]];
 
@@ -3378,10 +3379,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     std::lock_guard lock(_lock);
 
-    if ([_persistedClusters containsObject:path]) {
-        return YES;
-    }
-    return NO;
+    return [_persistedClusters containsObject:path];
 }
 #endif
 
