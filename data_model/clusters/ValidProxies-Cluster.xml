@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,35 +54,42 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
-
-:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Wi-Fi Network Management" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0044" name="Valid Proxies" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0451" name="Wi"/>
+    <clusterId id="0x0044" name="ValidProxies"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="WIFINM" scope="Endpoint"/>
+  <classification hierarchy="base" role="utility" picsCode="PXVALID" scope="Node"/>
+  <dataTypes>
+    <struct name="ValidProxyStruct">
+      <field id="1" name="NodeID" type="node-id">
+        <access read="true" write="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
   <attributes>
-    <attribute id="0x0001" name="SSID" type="octstr" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+    <attribute id="0x0000" name="ValidProxyList" type="list" default="empty">
+      <entry type="ValidProxyStruct"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="lengthBetween" from="1" to="32"/>
+      <constraint type="allowed" value="N/A"/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="NetworkPassphraseRequest" direction="commandToServer" response="NetworkPassphraseResponse">
-      <access invokePrivilege="admin"/>
+    <command id="0x00" name="GetValidProxiesRequest" direction="commandToServer" response="GetValidProxiesResponse">
+      <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x01" name="NetworkPassphraseResponse" direction="responseFromServer">
+    <command id="0x01" name="GetValidProxiesResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field name="Passphrase" type="octstr">
+      <field id="0" name="ProxyNodeIdList" type="list">
+        <entry type="node-id"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="64"/>
       </field>
     </command>
   </commands>

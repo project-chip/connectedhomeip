@@ -55,18 +55,35 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0041" name="Boolean Sensor" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0042" name="Proxy Configuration" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial release"/>
+    <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
-  <conditions/>
-  <clusters>
-    <cluster id="0x0003" name="Identify" side="server">
+  <clusterIds>
+    <clusterId id="0x0042" name="ProxyConfiguration"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="PXCFG" scope="Node"/>
+  <dataTypes>
+    <struct name="ConfigurationStruct">
+      <field id="1" name="ProxyAllNodes" type="bool" default="false">
+        <access read="true" write="true"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="2" name="SourceList" type="list" default="empty">
+        <entry type="node-id"/>
+        <access read="true" write="true"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="ConfigurationList" type="list" default="empty">
+      <entry type="ConfigurationStruct"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0045" name="Boolean State" side="server">
-      <mandatoryConform/>
-    </cluster>
-  </clusters>
-</deviceType>
+    </attribute>
+  </attributes>
+</cluster>
