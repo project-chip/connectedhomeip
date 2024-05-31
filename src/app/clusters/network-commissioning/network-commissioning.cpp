@@ -222,7 +222,7 @@ private:
     ThreadScanResponseIterator * mNetworks;
 
     /// Fills up scanResponseArray with valid and de-duplicated thread responses from mNetworks.
-    /// Handles sorting and keeping only largers rssi
+    /// Handles sorting and keeping only larger rssi
     ///
     /// Returns the valid list of scan responses into `validResponses`
     CHIP_ERROR LoadResponses(Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
