@@ -105,28 +105,31 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
         self.step(3)
         cr2_read_fabricIndex = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl,
-                                                                              node_id=cr2_dut_node_id,
-                                                                              cluster=opcreds,
-                                                                              attribute=opcreds.Attributes.CurrentFabricIndex)
+            node_id=cr2_dut_node_id,
+            cluster=opcreds,
+            attribute=opcreds.Attributes.CurrentFabricIndex
+        )
 
         asserts.assert_equal(fabric_index_CR2, cr2_read_fabricIndex,
                              "Fail fabric_index_CR2 is not equal to read fabricIndex from CR2")
 
         self.step(4)
         cr3_read_fabricIndex = await self.read_single_attribute_check_success(dev_ctrl=cr3_new_admin_ctrl,
-                                                                              node_id=cr3_dut_node_id,
-                                                                              cluster=opcreds,
-                                                                              attribute=opcreds.Attributes.CurrentFabricIndex)
+            node_id=cr3_dut_node_id,
+            cluster=opcreds,
+            attribute=opcreds.Attributes.CurrentFabricIndex
+        )
 
         asserts.assert_equal(fabric_index_CR3, cr3_read_fabricIndex,
                              "Fail fabric_index_CR3 is not equal to read fabricIndex from CR3")
 
         self.step(5)
         cr2_fabric = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl,
-                                                                    node_id=cr2_dut_node_id,
-                                                                    cluster=opcreds,
-                                                                    attribute=opcreds.Attributes.Fabrics,
-                                                                    fabric_filtered=True)
+            node_id=cr2_dut_node_id,
+            cluster=opcreds,
+            attribute=opcreds.Attributes.Fabrics,
+            fabric_filtered=True
+        )
 
         for fabric in cr2_fabric:
             cr2_fabric_fabricIndex = fabric.fabricIndex
@@ -145,10 +148,11 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
         self.step(6)
         cr3_fabric = await self.read_single_attribute_check_success(dev_ctrl=cr3_new_admin_ctrl,
-                                                                    node_id=cr3_dut_node_id,
-                                                                    cluster=opcreds,
-                                                                    attribute=opcreds.Attributes.Fabrics,
-                                                                    fabric_filtered=True)
+            node_id=cr3_dut_node_id,
+            cluster=opcreds,
+            attribute=opcreds.Attributes.Fabrics,
+            fabric_filtered=True
+        )
 
         for fabric in cr3_fabric:
             cr3_fabric_fabricIndex = fabric.fabricIndex
