@@ -412,7 +412,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
         ChipLogError(DeviceLayer, "Failed to unregister IP event handler");
     }
 
-    err = ESP32Utils::MapError(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent));
+    err =
+        ESP32Utils::MapError(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to unregister wifi event handler");
