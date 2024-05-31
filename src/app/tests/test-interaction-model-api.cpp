@@ -32,7 +32,7 @@ size_t Test::attributeDataTLVLen = 0;
 
 namespace app {
 
-// was previously in TestWriteInteraction.cpp
+// Used by the code in TestWriteInteraction.cpp (and generally tests that interact with the WriteHandler may need this).
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
 {
     // Note: This test does not make use of the real attribute metadata.
@@ -40,7 +40,7 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
     return &stub;
 }
 
-// was previously in TestWriteInteraction.cpp
+// Used by the code in TestWriteInteraction.cpp (and generally tests that interact with the WriteHandler may need this).
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
@@ -56,13 +56,13 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
 }
 
-// was previously in TestAclAttribute.cpp
+// Used by the code in TestAclAttribute.cpp (and generally tests that interact with the InteractionModelEngine may need this).
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
 {
     return aPath.mClusterId != Test::kTestDeniedClusterId1;
 }
 
-// was previously in TestAclAttribute.cpp
+// Used by the code in TestAclAttribute.cpp (and generally tests that interact with the InteractionModelEngine may need this).
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
 {
     if (aPath.mClusterId == Test::kTestDeniedClusterId1)
@@ -88,24 +88,19 @@ __attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPat
                                                         chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {}
 
-// was previously in TestReadInteraction.cpp
+// Used by the code in TestReadInteraction.cpp (and generally tests that interact with the Reporting Engine may need this).
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
 {
-    if (Test::kTestDataVersion1 == aRequiredVersion)
-    {
-        return true;
-    }
-
-    return false;
+    return (Test::kTestDataVersion1 == aRequiredVersion);
 }
 
-// was previously in TestReadInteraction.cpp
+// Used by the code in TestReadInteraction.cpp.
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
     return false;
 }
 
-// was previously in TestReadInteraction.cpp
+// Used by the code in TestReadInteraction.cpp (and generally tests that interact with the Reporting Engine may need this).
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeEncodeState * apEncoderState)

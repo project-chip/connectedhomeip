@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for AttributePersistenceProvider
- *
- */
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <lib/core/StringBuilderAdapters.h>

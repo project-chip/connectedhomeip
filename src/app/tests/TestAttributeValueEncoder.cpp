@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for AttributeValueEncoder
- *
- */
-
 #include <optional>
 
 #include <lib/core/StringBuilderAdapters.h>

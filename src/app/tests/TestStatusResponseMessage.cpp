@@ -16,19 +16,13 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a test for  CHIP Interaction Model Message Def
- *
- */
-
-#include <gtest/gtest.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/AppConfig.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 namespace {

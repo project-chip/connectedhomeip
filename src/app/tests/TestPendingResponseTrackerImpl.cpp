@@ -20,6 +20,7 @@
 #include <vector>
 
 #include <app/PendingResponseTrackerImpl.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
 namespace {
@@ -41,7 +42,7 @@ TEST(TestPendingResponseTrackerImpl, TestPendingResponseTracker_FillEntireTracke
     for (uint16_t commandRef = 0; commandRef < std::numeric_limits<uint16_t>::max(); commandRef++)
     {
         EXPECT_EQ(CHIP_NO_ERROR, pendingResponseTracker.Remove(commandRef));
-        EXPECT_EQ(false, pendingResponseTracker.IsTracked(commandRef));
+        EXPECT_FALSE(pendingResponseTracker.IsTracked(commandRef));
     }
     EXPECT_EQ(0u, pendingResponseTracker.Count());
 }

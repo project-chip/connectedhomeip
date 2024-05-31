@@ -22,7 +22,7 @@
 
 chip::EndpointId chip::Test::numEndpoints = 0;
 
-// was previously in TestPowerSourceCluster.cpp
+// Used by the code in TestPowerSourceCluster.cpp (and generally things using mock ember functions may need this).
 uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                               uint16_t fixedClusterServerEndpointCount)
 {

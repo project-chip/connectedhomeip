@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for AttributeValueDecoder
- *
- */
-
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 

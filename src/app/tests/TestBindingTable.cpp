@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/util/binding-table.h>
@@ -29,12 +30,11 @@ namespace {
 
 void VerifyTableSame(BindingTable & table, const std::vector<EmberBindingTableEntry> & expected)
 {
-    EXPECT_EQ(table.Size(), expected.size());
+    ASSERT_EQ(table.Size(), expected.size());
     auto iter1 = table.begin();
     auto iter2 = expected.begin();
     while (iter2 != expected.end())
     {
-        EXPECT_NE(iter1, table.end());
         EXPECT_EQ(*iter1, *iter2);
         ++iter1;
         ++iter2;

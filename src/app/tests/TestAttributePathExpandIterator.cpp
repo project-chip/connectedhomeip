@@ -22,12 +22,13 @@
 #include <app/EventManagement.h>
 #include <app/util/mock/Constants.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/LinkedList.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;

@@ -17,7 +17,7 @@
 #pragma once
 
 /// test-interaction-model-api was created to consolidate and centralize stub functions that are used by the Interaction Model
-/// during unit-testing and that were previously defined in the unit test-scripts themselves.
+/// during unit-testing.
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <pw_unit_test/framework.h>
 #include <system/SystemPacketBuffer.h>
 

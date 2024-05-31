@@ -56,14 +56,13 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::ClusterId kTestClusterId        = 6;
-chip::ClusterId kTestEventClusterId   = chip::Test::MockClusterId(1);
-chip::ClusterId kInvalidTestClusterId = 7;
-chip::EndpointId kTestEndpointId      = 1;
-chip::EndpointId kTestEventEndpointId = chip::Test::kMockEndpoint1;
-chip::EventId kTestEventIdDebug       = chip::Test::MockEventId(1);
-chip::EventId kTestEventIdCritical    = chip::Test::MockEventId(2);
-// uint8_t kTestFieldValue1                = 1;
+chip::ClusterId kTestClusterId          = 6;
+chip::ClusterId kTestEventClusterId     = chip::Test::MockClusterId(1);
+chip::ClusterId kInvalidTestClusterId   = 7;
+chip::EndpointId kTestEndpointId        = 1;
+chip::EndpointId kTestEventEndpointId   = chip::Test::kMockEndpoint1;
+chip::EventId kTestEventIdDebug         = chip::Test::MockEventId(1);
+chip::EventId kTestEventIdCritical      = chip::Test::MockEventId(2);
 chip::TLV::Tag kTestEventTag            = chip::TLV::ContextTag(1);
 chip::EndpointId kInvalidTestEndpointId = 3;
 chip::DataVersion kTestDataVersion1     = 3;
@@ -1323,8 +1322,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 

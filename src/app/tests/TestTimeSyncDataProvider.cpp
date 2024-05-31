@@ -264,7 +264,7 @@ TEST_F(TestTimeSyncDataProvider, TestDSTOffsetEmpty)
     TimeSyncDataProvider::DSTOffsetObj dstObj;
 
     EXPECT_EQ(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, timeSyncDataProv.LoadDSTOffset(dstObj));
-    EXPECT_FALSE(dstObj.dstOffsetList.begin());
+    EXPECT_TRUE(dstObj.dstOffsetList.empty());
     EXPECT_EQ(dstObj.validSize, 0u);
 }
 

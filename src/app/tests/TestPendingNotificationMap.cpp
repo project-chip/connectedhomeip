@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#include <pw_unit_test/framework.h>
-
 #include <app/clusters/bindings/PendingNotificationMap.h>
 #include <app/util/binding-table.h>
 #include <app/util/config.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <pw_unit_test/framework.h>
 
 using chip::BindingTable;
 using chip::ClusterId;
