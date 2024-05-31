@@ -98,7 +98,7 @@ constexpr std::pair<bool, ChipBleUUID> StringToUUID(const char (&str)[N])
 // NOTE: lower-case string seems to be required at least by bluez when
 //       executing g_variant_lookup_value
 //
-//       BlueZ API https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/org.bluez.Device.rst 
+//       BlueZ API https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/org.bluez.Device.rst
 //       describes ServiceData as "Keys are the UUIDs in string format" however no description
 //       on actual case required
 inline constexpr char CHIP_BLE_DESC_SHORT_UUID_STR[]    = "2902";
