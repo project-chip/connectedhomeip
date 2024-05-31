@@ -22,6 +22,9 @@ from typing import Callable
 
 from chip.tlv import uint
 
+from pics_strings import attribute_pics, accepted_cmd_pics, generated_cmd_pics, feature_pics
+
+
 OTHERWISE_CONFORM = 'otherwiseConform'
 OPTIONAL_CONFORM = 'optionalConform'
 PROVISIONAL_CONFORM = 'provisionalConform'
@@ -76,16 +79,22 @@ def is_disallowed(conformance: Callable):
     # Deprecated and disallowed conformances will come back as disallowed regardless of the implemented features / attributes / etc.
     return conformance(0, [], []) == ConformanceDecision.DISALLOWED
 
+class Conformance:
+    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
+        pass
+    def __str__(self):
+        pass
+    def pics_str(self, pics_base: str) -> str:
+        return str(self)
 
-class zigbee:
+class zigbee(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.NOT_APPLICABLE
 
     def __str__(self):
         return "Zigbee"
 
-
-class mandatory:
+class mandatory(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.MANDATORY
 
@@ -93,7 +102,7 @@ class mandatory:
         return 'M'
 
 
-class optional:
+class optional(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.OPTIONAL
 
@@ -101,7 +110,7 @@ class optional:
         return 'O'
 
 
-class deprecated:
+class deprecated(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.DISALLOWED
 
@@ -109,7 +118,7 @@ class deprecated:
         return 'D'
 
 
-class disallowed:
+class disallowed(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.DISALLOWED
 
@@ -117,7 +126,7 @@ class disallowed:
         return 'X'
 
 
-class provisional:
+class provisional(Conformance):
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.PROVISIONAL
 
@@ -125,7 +134,7 @@ class provisional:
         return 'P'
 
 
-class literal:
+class literal(Conformance):
     def __init__(self, value: str):
         self.value = int(value)
 
@@ -137,7 +146,7 @@ class literal:
         return str(self.value)
 
 
-class feature:
+class feature(Conformance):
     def __init__(self, requiredFeature: uint, code: str):
         self.requiredFeature = requiredFeature
         self.code = code
@@ -151,7 +160,7 @@ class feature:
         return f'{self.code}'
 
 
-class attribute:
+class attribute(Conformance):
     def __init__(self, requiredAttribute: uint, name: str):
         self.requiredAttribute = requiredAttribute
         self.name = name
@@ -164,8 +173,12 @@ class attribute:
     def __str__(self):
         return f'{self.name}'
 
+    def pics_str(self, pics_base: str) -> str:
+        # TODO: Does the pics tool support this, or should this just be optional?
+        return attribute_pics(pics_base, self.requiredAttribute)
 
-class command:
+
+class command(Conformance):
     def __init__(self, requiredCommand: uint, name: str):
         self.requiredCommand = requiredCommand
         self.name = name
@@ -178,6 +191,11 @@ class command:
     def __str__(self):
         return f'{self.name}'
 
+    def pics_str(self, pics_base: str) -> str:
+        # TODO: Does the pics tool support this, or should this just be optional?
+        # I don't think we have any conformance to generated commands
+        return accepted_cmd_pics(pics_base, self.requiredCommand)
+
 
 def strip_outer_parentheses(inner: str) -> str:
     if inner[0] == '(' and inner[-1] == ')':
@@ -185,7 +203,7 @@ def strip_outer_parentheses(inner: str) -> str:
     return inner
 
 
-class optional_wrapper:
+class optional_wrapper(Conformance):
     def __init__(self, op: Callable):
         self.op = op
 
@@ -202,7 +220,7 @@ class optional_wrapper:
         return f'[{strip_outer_parentheses(str(self.op))}]'
 
 
-class mandatory_wrapper:
+class mandatory_wrapper(Conformance):
     def __init__(self, op: Callable):
         self.op = op
 
@@ -213,7 +231,7 @@ class mandatory_wrapper:
         return strip_outer_parentheses(str(self.op))
 
 
-class not_operation:
+class not_operation(Conformance):
     def __init__(self, op: Callable):
         self.op = op
 
@@ -233,9 +251,12 @@ class not_operation:
 
     def __str__(self):
         return f'!{str(self.op)}'
+    
+    def pics_str(self, pics_base: str) -> str:
+        return f'NOT({str(self.op)})'
 
 
-class and_operation:
+class and_operation(Conformance):
     def __init__(self, op_list: list[Callable]):
         self.op_list = op_list
 
@@ -257,8 +278,12 @@ class and_operation:
         op_strs = [str(op) for op in self.op_list]
         return f'({" & ".join(op_strs)})'
 
+    def pics_str(self, pics_base: str) -> str:
+        op_strs = [str(op) for op in self.op_list]
+        return f'({" AND ".join(op_strs)})'
 
-class or_operation:
+
+class or_operation(Conformance):
     def __init__(self, op_list: list[Callable]):
         self.op_list = op_list
 
@@ -281,8 +306,11 @@ class or_operation:
         op_strs = [str(op) for op in self.op_list]
         return f'({" | ".join(op_strs)})'
 
+    def __str__(self):
+        op_strs = [str(op) for op in self.op_list]
+        return f'({" OR ".join(op_strs)})'
 
-class greater_operation:
+class greater_operation(Conformance):
     def _type_ok(self, op: Callable):
         return type(op) == attribute or type(op) == literal
 
@@ -302,7 +330,7 @@ class greater_operation:
         return f'{str(self.op1)} > {str(self.op2)}'
 
 
-class otherwise:
+class otherwise(Conformance):
     def __init__(self, op_list: list[Callable]):
         self.op_list = op_list
 

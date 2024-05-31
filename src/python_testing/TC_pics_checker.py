@@ -22,23 +22,8 @@ from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
                                     MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
+from pics_strings import attattribute_pics, accepted_cmd_pics, generated_cmd_pics, feature_pics
 from spec_parsing_support import build_xml_clusters
-
-
-def attribute_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.A{id:04x}'
-
-
-def accepted_cmd_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02x}.Rsp'
-
-
-def generated_cmd_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02x}.Tx'
-
-
-def feature_pics(pics_base: str, bit: int) -> str:
-    return f'{pics_base}.S.F{bit:02x}'
 
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
