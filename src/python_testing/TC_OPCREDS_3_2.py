@@ -104,7 +104,8 @@ class TC_OPCREDS_3_2(MatterBaseTest):
         rcac_CR3 = tlvReaderRCAC_CR3[9]
 
         self.step(3)
-        cr2_read_fabricIndex = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl,
+        cr2_read_fabricIndex = await self.read_single_attribute_check_success(
+            dev_ctrl=cr2_new_admin_ctrl,
             node_id=cr2_dut_node_id,
             cluster=opcreds,
             attribute=opcreds.Attributes.CurrentFabricIndex
@@ -114,7 +115,8 @@ class TC_OPCREDS_3_2(MatterBaseTest):
                              "Fail fabric_index_CR2 is not equal to read fabricIndex from CR2")
 
         self.step(4)
-        cr3_read_fabricIndex = await self.read_single_attribute_check_success(dev_ctrl=cr3_new_admin_ctrl,
+        cr3_read_fabricIndex = await self.read_single_attribute_check_success(
+            dev_ctrl=cr3_new_admin_ctrl,
             node_id=cr3_dut_node_id,
             cluster=opcreds,
             attribute=opcreds.Attributes.CurrentFabricIndex
@@ -124,7 +126,8 @@ class TC_OPCREDS_3_2(MatterBaseTest):
                              "Fail fabric_index_CR3 is not equal to read fabricIndex from CR3")
 
         self.step(5)
-        cr2_fabric = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl,
+        cr2_fabric = await self.read_single_attribute_check_success(
+            dev_ctrl=cr2_new_admin_ctrl,
             node_id=cr2_dut_node_id,
             cluster=opcreds,
             attribute=opcreds.Attributes.Fabrics,
