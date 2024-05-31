@@ -138,6 +138,8 @@ private:
 /// the exit of the current scope.
 #define DEFER_AUTO_RELEASE(name) AutoRelease autoRelease##__COUNTER__(name)
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP || CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
 /// Handles encoding a WifiScanResponseIterator into a TLV response structure
 class WifiScanResponseToTLV : public chip::app::DataModel::EncodableToTLV
 {
@@ -200,6 +202,10 @@ CHIP_ERROR WifiScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag
 
     return writer.EndContainer(outerType);
 }
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP || CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 class ThreadScanResponseToTLV : public chip::app::DataModel::EncodableToTLV
 {
@@ -324,6 +330,8 @@ CHIP_ERROR ThreadScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag t
 
     return writer.EndContainer(outerType);
 }
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 } // namespace
 
