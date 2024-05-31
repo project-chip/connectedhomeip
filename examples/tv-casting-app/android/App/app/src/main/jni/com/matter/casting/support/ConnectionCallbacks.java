@@ -13,7 +13,6 @@
  */
 package com.matter.casting.support;
 
-
 /** @brief A container struct for User Directed Commissioning (UDC) callbacks. */
 public class ConnectionCallbacks {
 
