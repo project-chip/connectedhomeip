@@ -124,10 +124,10 @@ public:
             }
             AddAttributeValuePair<uint8_t>(pairs, Attributes::ColorLoopActive::Id, loopActiveValue, attributeCount);
 
-            uint8_t loopDirectionValue;
+            ColorControl::ColorLoopDirectionEnum loopDirectionValue;
             if (Status::Success != Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue))
             {
-                loopDirectionValue = 0x00;
+                loopDirectionValue = ColorControl::ColorLoopDirectionEnum::kDecrement;
             }
             AddAttributeValuePair<uint8_t>(pairs, Attributes::ColorLoopDirection::Id, loopDirectionValue, attributeCount);
 
@@ -201,10 +201,10 @@ public:
 #endif
 
         // Initialize action attributes to default values in case they are not in the scene
-        ColorControl::EnhancedColorModeEnum targetColorMode = ColorControl::EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
-        uint8_t loopActiveValue                             = 0x00;
-        uint8_t loopDirectionValue                          = 0x00;
-        uint16_t loopTimeValue                              = 0x0019; // Default loop time value according to spec
+        ColorControl::EnhancedColorModeEnum targetColorMode       = ColorControl::EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
+        uint8_t loopActiveValue                                   = 0x00;
+        ColorControl::ColorLoopDirectionEnum loopDirectionValue   = ColorControl::ColorLoopDirectionEnum::kDecrement;
+        uint16_t loopTimeValue                                    = 0x0019; // Default loop time value according to spec
 
         while (pair_iterator.Next())
         {
@@ -249,7 +249,7 @@ public:
                 break;
             case Attributes::ColorLoopDirection::Id:
                 VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-                loopDirectionValue = decodePair.valueUnsigned8.Value();
+                loopDirectionValue = static_cast<ColorControl::ColorLoopDirectionEnum>(decodePair.valueUnsigned8.Value());
                 break;
             case Attributes::ColorLoopTime::Id:
                 VerifyOrReturnError(decodePair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -583,12 +583,12 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
  */
 void ColorControlServer::handleModeSwitch(EndpointId endpoint, ColorControl::EnhancedColorModeEnum newColorMode)
 {
-    uint8_t oldColorMode = 0;
+    ColorControl::ColorModeEnum oldColorMode = ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation;
     Attributes::ColorMode::Get(endpoint, &oldColorMode);
 
     uint8_t colorModeTransition;
 
-    if (oldColorMode == static_cast<uint8_t>(newColorMode))
+    if (oldColorMode == static_cast<ColorControl::ColorModeEnum>(newColorMode))
     {
         return;
     }
@@ -600,7 +600,7 @@ void ColorControlServer::handleModeSwitch(EndpointId endpoint, ColorControl::Enh
         // EnhancedColorModeEnum
         newColorMode = ColorControl::EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
     }
-    Attributes::ColorMode::Set(endpoint, static_cast<uint8_t>(newColorMode));
+    Attributes::ColorMode::Set(endpoint, static_cast<ColorControl::ColorModeEnum>(newColorMode));
 
     colorModeTransition = static_cast<uint8_t>((static_cast<uint8_t>(newColorMode) << 4) + static_cast<uint8_t>(oldColorMode));
 
@@ -996,7 +996,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
     VerifyOrReturn(colorHueTransitionState != nullptr);
 
-    uint8_t direction = 0;
+    ColorControl::ColorLoopDirectionEnum direction = ColorControl::ColorLoopDirectionEnum::kDecrement;
     Attributes::ColorLoopDirection::Get(endpoint, &direction);
 
     uint16_t time = 0x0019;
@@ -1019,7 +1019,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
 
     colorHueTransitionState->initialEnhancedHue = startHue;
 
-    if (direction == to_underlying(ColorLoopDirection::kIncrementHue))
+    if (direction == ColorLoopDirectionEnum::kIncrement)
     {
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue - 1);
     }
@@ -1028,7 +1028,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue + 1);
     }
 
-    colorHueTransitionState->up     = (direction == to_underlying(ColorLoopDirection::kIncrementHue));
+    colorHueTransitionState->up     = (direction == ColorLoopDirectionEnum::kIncrement);
     colorHueTransitionState->repeat = true;
 
     colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
@@ -1396,7 +1396,7 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
  * @return false Failed
  */
 bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                        HueMoveMode moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride,
+                                        MoveModeEnum moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride,
                                         bool isEnhanced)
 {
     MATTER_TRACE_SCOPE("moveHue", "ColorControl");
@@ -1427,7 +1427,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
     // now, kick off the state machine.
     initHueTransitionState(endpoint, colorHueTransitionState, isEnhanced);
 
-    if (moveMode == HueMoveMode::kStop)
+    if (moveMode == MoveModeEnum::kStop)
     {
         // Per spec any saturation transition must also be cancelled.
         Color16uTransitionState * saturationState = getSaturationTransitionStateByIndex(epIndex);
@@ -1446,7 +1446,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
         handleModeSwitch(endpoint, ColorControl::EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
     }
 
-    if (moveMode == HueMoveMode::kUp)
+    if (moveMode == MoveModeEnum::kUp)
     {
         if (isEnhanced)
         {
@@ -1459,7 +1459,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
 
         colorHueTransitionState->up = true;
     }
-    else if (moveMode == HueMoveMode::kDown)
+    else if (moveMode == MoveModeEnum::kDown)
     {
         if (isEnhanced)
         {
@@ -1496,7 +1496,7 @@ exit:
  *
  * @param[in] endpoint
  * @param[in] hue
- * @param[in] hueMoveMode
+ * @param[in] MoveModeEnum
  * @param[in] transitionTime
  * @param[in] optionsMask
  * @param[in] optionsOverride
@@ -1506,7 +1506,7 @@ exit:
  * @return false Failed
  */
 bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          uint16_t hue, HueDirection moveDirection, uint16_t transitionTime, uint8_t optionsMask,
+                                          uint16_t hue, DirectionEnum moveDirection, uint16_t transitionTime, uint8_t optionsMask,
                                           uint8_t optionsOverride, bool isEnhanced)
 {
     MATTER_TRACE_SCOPE("moveToHue", "ColorControl");
@@ -1514,7 +1514,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
 
     Status status       = Status::Success;
     uint16_t currentHue = 0;
-    HueDirection direction;
+    DirectionEnum direction;
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
 
@@ -1543,33 +1543,33 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     // Convert the ShortestDistance/LongestDistance moveDirection values into Up/Down.
     switch (moveDirection)
     {
-    case HueDirection::kShortestDistance:
+    case DirectionEnum::kShortest:
         if ((isEnhanced && (static_cast<uint16_t>(currentHue - hue) > HALF_MAX_UINT16T)) ||
             (!isEnhanced && (static_cast<uint8_t>(currentHue - hue) > HALF_MAX_UINT8T)))
         {
-            direction = HueDirection::kUp;
+            direction = DirectionEnum::kUp;
         }
         else
         {
-            direction = HueDirection::kDown;
+            direction = DirectionEnum::kDown;
         }
         break;
-    case HueDirection::kLongestDistance:
+    case DirectionEnum::kLongest:
         if ((isEnhanced && (static_cast<uint16_t>(currentHue - hue) > HALF_MAX_UINT16T)) ||
             (!isEnhanced && (static_cast<uint8_t>(currentHue - hue) > HALF_MAX_UINT8T)))
         {
-            direction = HueDirection::kDown;
+            direction = DirectionEnum::kDown;
         }
         else
         {
-            direction = HueDirection::kUp;
+            direction = DirectionEnum::kUp;
         }
         break;
-    case HueDirection::kUp:
-    case HueDirection::kDown:
+    case DirectionEnum::kUp:
+    case DirectionEnum::kDown:
         direction = moveDirection;
         break;
-    case HueDirection::kUnknownEnumValue:
+    case DirectionEnum::kUnknownEnumValue:
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
         /* No default case, so if a new direction value gets added we will just fail
@@ -1612,7 +1612,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     colorHueTransitionState->timeRemaining  = transitionTime;
     colorHueTransitionState->transitionTime = transitionTime;
     colorHueTransitionState->endpoint       = endpoint;
-    colorHueTransitionState->up             = (direction == HueDirection::kUp);
+    colorHueTransitionState->up             = (direction == DirectionEnum::kUp);
     colorHueTransitionState->repeat         = false;
 
     SetHSVRemainingTime(endpoint);
@@ -1682,7 +1682,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
  * @return false Failed
  */
 bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                        HueStepMode stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
+                                        StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
                                         uint8_t optionsOverride, bool isEnhanced)
 {
     MATTER_TRACE_SCOPE("stepHue", "ColorControl");
@@ -1725,12 +1725,12 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     if (isEnhanced)
     {
 
-        if (stepMode == HueStepMode::kUp)
+        if (stepMode == StepModeEnum::kUp)
         {
             colorHueTransitionState->finalEnhancedHue = addEnhancedHue(colorHueTransitionState->currentEnhancedHue, stepSize);
             colorHueTransitionState->up               = true;
         }
-        else if (stepMode == HueStepMode::kDown)
+        else if (stepMode == StepModeEnum::kDown)
         {
             colorHueTransitionState->finalEnhancedHue = subtractEnhancedHue(colorHueTransitionState->currentEnhancedHue, stepSize);
             colorHueTransitionState->up               = false;
@@ -1738,12 +1738,12 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     }
     else
     {
-        if (stepMode == HueStepMode::kUp)
+        if (stepMode == StepModeEnum::kUp)
         {
             colorHueTransitionState->finalHue = addHue(colorHueTransitionState->currentHue, static_cast<uint8_t>(stepSize));
             colorHueTransitionState->up       = true;
         }
-        else if (stepMode == HueStepMode::kDown)
+        else if (stepMode == StepModeEnum::kDown)
         {
             colorHueTransitionState->finalHue = subtractHue(colorHueTransitionState->currentHue, static_cast<uint8_t>(stepSize));
             colorHueTransitionState->up       = false;
@@ -1804,7 +1804,7 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     // now, kick off the state machine.
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
 
-    if (moveMode == SaturationMoveMode::kStop)
+    if (moveMode == MoveModeEnum::kStop)
     {
         // Per spec any hue transition must also be cancelled.
         ColorHueTransitionState * hueState = getColorHueTransitionStateByIndex(epIndex);
@@ -1816,11 +1816,11 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, ColorControl::EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
-    if (moveMode == SaturationMoveMode::kUp)
+    if (moveMode == MoveModeEnum::kUp)
     {
         colorSaturationTransitionState->finalValue = MAX_SATURATION_VALUE;
     }
-    else if (moveMode == SaturationMoveMode::kDown)
+    else if (moveMode == MoveModeEnum::kDown)
     {
         colorSaturationTransitionState->finalValue = MIN_SATURATION_VALUE;
     }
@@ -1918,11 +1918,11 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
     currentSaturation = static_cast<uint8_t>(colorSaturationTransitionState->currentValue);
 
-    if (stepMode == SaturationStepMode::kUp)
+    if (stepMode == StepModeEnum::kUp)
     {
         colorSaturationTransitionState->finalValue = addSaturation(currentSaturation, stepSize);
     }
-    else if (stepMode == SaturationStepMode::kDown)
+    else if (stepMode == StepModeEnum::kDown)
     {
         colorSaturationTransitionState->finalValue = subtractSaturation(currentSaturation, stepSize);
     }
@@ -1965,7 +1965,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
     VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     // Validate the action and direction parameters of the command
-    if (action == ColorLoopAction::kUnknownEnumValue || direction == ColorLoopDirection::kUnknownEnumValue)
+    if (action == ColorLoopActionEnum::kUnknownEnumValue || direction == ColorLoopDirectionEnum::kUnknownEnumValue)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -1983,19 +1983,19 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
         ChipLogError(Zcl, "Failed to retrieve ColorLoopActive value");
     }
 
-    deactiveColorLoop = updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction) && (action == ColorLoopAction::kDeactivate);
+    deactiveColorLoop = updateFlags.Has(UpdateFlagsBitmap::kUpdateAction) && (action == ColorLoopActionEnum::kDeactivate);
 
-    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateDirection))
+    if (updateFlags.Has(UpdateFlagsBitmap::kUpdateDirection))
     {
-        Attributes::ColorLoopDirection::Set(endpoint, to_underlying(direction));
+        Attributes::ColorLoopDirection::Set(endpoint, direction);
 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState->up                 = (direction == ColorLoopDirection::kIncrementHue);
+            colorHueTransitionState->up                 = (direction == ColorLoopDirectionEnum::kIncrement);
             colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
 
-            if (direction == ColorLoopDirection::kIncrementHue)
+            if (direction == ColorLoopDirectionEnum::kIncrement)
             {
                 colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState->initialEnhancedHue - 1);
             }
@@ -2007,7 +2007,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
         }
     }
 
-    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateTime))
+    if (updateFlags.Has(UpdateFlagsBitmap::kUpdateTime))
     {
         Attributes::ColorLoopTime::Set(endpoint, time);
 
@@ -2029,14 +2029,14 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
         }
     }
 
-    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateStartHue))
+    if (updateFlags.Has(UpdateFlagsBitmap::kUpdateStartHue))
     {
         Attributes::ColorLoopStartEnhancedHue::Set(endpoint, startHue);
     }
 
-    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction))
+    if (updateFlags.Has(UpdateFlagsBitmap::kUpdateAction))
     {
-        if (action == ColorLoopAction::kDeactivate)
+        if (action == ColorLoopActionEnum::kDeactivate)
         {
             if (isColorLoopActive)
             {
@@ -2055,11 +2055,11 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
                 // Do Nothing since it's not on
             }
         }
-        else if (action == ColorLoopAction::kActivateFromColorLoopStartEnhancedHue)
+        else if (action == ColorLoopActionEnum::kActivateFromColorLoopStartEnhancedHue)
         {
             startColorLoop(endpoint, true);
         }
-        else if (action == ColorLoopAction::kActivateFromEnhancedCurrentHue)
+        else if (action == ColorLoopActionEnum::kActivateFromEnhancedCurrentHue)
         {
             startColorLoop(endpoint, false);
         }
@@ -2699,7 +2699,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                 if (status == Status::Success)
                 {
                     // Set ColorMode attributes to reflect ColorTemperature.
-                    uint8_t updateColorMode = static_cast<uint8_t>(ColorControl::EnhancedColorModeEnum::kColorTemperature);
+                    ColorControl::ColorModeEnum updateColorMode = ColorControl::ColorModeEnum::kColorTemperature;
                     Attributes::ColorMode::Set(endpoint, updateColorMode);
 
                     Attributes::EnhancedColorMode::Set(endpoint, static_cast<ColorControl::EnhancedColorModeEnum>(updateColorMode));
@@ -2807,7 +2807,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
-    if (moveMode == HueMoveMode::kStop)
+    if (moveMode == MoveModeEnum::kStop)
     {
         commandObj->AddStatus(commandPath, Status::Success);
         return true;
@@ -2835,7 +2835,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::ColorTemperatureMireds::Get(endpoint, &colorTempTransitionState->initialValue);
     colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
-    if (moveMode == HueMoveMode::kUp)
+    if (moveMode == MoveModeEnum::kUp)
     {
         if (tempPhysicalMax > colorTemperatureMaximum)
         {
@@ -2952,7 +2952,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::ColorTemperatureMireds::Get(endpoint, &colorTempTransitionState->initialValue);
     colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
-    if (stepMode == HueStepMode::kUp)
+    if (stepMode == StepModeEnum::kUp)
     {
         uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState->initialValue) + static_cast<uint32_t>(stepSize);
         if (finalValue32u > UINT16_MAX)
@@ -2964,7 +2964,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
             colorTempTransitionState->finalValue = static_cast<uint16_t>(finalValue32u);
         }
     }
-    else if (stepMode == HueStepMode::kDown)
+    else if (stepMode == StepModeEnum::kDown)
     {
         uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState->initialValue) - static_cast<uint32_t>(stepSize);
         if (finalValue32u > UINT16_MAX)
@@ -3032,7 +3032,7 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
         return;
     }
 
-    uint8_t colorMode = 0;
+    ColorControl::ColorModeEnum colorMode = ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation;
     Attributes::ColorMode::Get(endpoint, &colorMode);
 
     if (static_cast<ColorControl::EnhancedColorModeEnum>(colorMode) == ColorControl::EnhancedColorModeEnum::kColorTemperature)

@@ -17,48 +17,35 @@ limitations under the License.
 <configurator>
 
 
-  <enum name="HueDirection" type="enum8">
+  <enum name="DirectionEnum" type="enum8">
     <cluster code="0x0300"/>
-    <item name="ShortestDistance" value="0x0"/>
-    <item name="LongestDistance" value="0x1"/>
+    <item name="Shortest" value="0x0"/>
+    <item name="Longest" value="0x1"/>
     <item name="Up" value="0x2"/>
     <item name="Down" value="0x3"/>
   </enum>
 
-  <enum name="HueMoveMode" type="enum8">
+  <enum name="MoveModeEnum" type="enum8">
     <cluster code="0x0300"/>
     <item name="Stop" value="0x0"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
 
-  <enum name="HueStepMode" type="enum8">
+  <enum name="StepModeEnum" type="enum8">
     <cluster code="0x0300"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
 
-  <enum name="SaturationMoveMode" type="enum8">
-    <cluster code="0x0300"/>
-    <item name="Stop" value="0x0"/>
-    <item name="Up" value="0x1"/>
-    <item name="Down" value="0x3"/>
-  </enum>
-
-  <enum name="SaturationStepMode" type="enum8">
-    <cluster code="0x0300"/>
-    <item name="Up" value="0x1"/>
-    <item name="Down" value="0x3"/>
-  </enum>
-
-  <enum name="ColorMode" type="enum8">
+  <enum name="ColorModeEnum" type="enum8">
     <cluster code="0x0300"/>
     <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
     <item name="CurrentXAndCurrentY" value="0x01"/>
     <item name="ColorTemperature" value="0x02"/>
   </enum>
 
-  <bitmap name="ColorCapabilities" type="bitmap16">
+  <bitmap name="ColorCapabilitiesBitmap" type="bitmap16">
     <cluster code="0x0300"/>
     <field name="HueSaturationSupported" mask="0x0001"/>
     <field name="EnhancedHueSupported" mask="0x0002"/>
@@ -67,7 +54,7 @@ limitations under the License.
     <field name="ColorTemperatureSupported" mask="0x0010"/>
   </bitmap>
 
-  <bitmap name="ColorLoopUpdateFlags" type="bitmap8">
+  <bitmap name="UpdateFlagsBitmap" type="bitmap8">
     <cluster code="0x0300"/>
     <field name="UpdateAction" mask="0x01"/>
     <field name="UpdateDirection" mask="0x02"/>
@@ -75,7 +62,7 @@ limitations under the License.
     <field name="UpdateStartHue" mask="0x08"/>
   </bitmap>
 
-  <enum name="ColorLoopAction" type="enum8">
+  <enum name="ColorLoopActionEnum" type="enum8">
     <cluster code="0x0300"/>
     <item name="Deactivate" value="0x00"/>
     <item name="ActivateFromColorLoopStartEnhancedHue" value="0x01"/>
@@ -104,10 +91,10 @@ limitations under the License.
     <item name="OpticalColorMonitoringAndFeedback" value="0x04"/>
   </enum>
 
-  <enum name="ColorLoopDirection" type="enum8">
+  <enum name="ColorLoopDirectionEnum" type="enum8">
     <cluster code="0x0300"/>
-    <item name="DecrementHue" value="0x00"/>
-    <item name="IncrementHue" value="0x01"/>
+    <item name="Decrement" value="0x00"/>
+    <item name="Increment" value="0x01"/>
   </enum>
 
   <cluster>
@@ -156,7 +143,7 @@ limitations under the License.
     <!-- COMPENSATION_TEXT -->
     <attribute side="server" code="0x0007" define="COLOR_CONTROL_COLOR_TEMPERATURE" type="int16u" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x00FA" optional="true">ColorTemperatureMireds</attribute>
     <!-- COLOR_TEMPERATURE -->
-    <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="enum8" min="0x00" max="0x02" writable="false" default="0x01">ColorMode</attribute>
+    <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="ColorModeEnum" min="0x00" max="0x02" writable="false" default="0x01">ColorMode</attribute>
     <!-- COLOR_MODE -->
     <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="OptionsBitmap" writable="true" default="0x00">Options</attribute>
     <!-- COLOR_CONTROL_OPTIONS -->
@@ -276,7 +263,7 @@ limitations under the License.
         Move to specified hue.
       </description>
       <arg name="Hue" type="int8u"/>
-      <arg name="Direction" type="HueDirection"/>
+      <arg name="Direction" type="DirectionEnum"/>
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="bitmap8"/>
       <arg name="OptionsOverride" type="bitmap8"/>
@@ -286,7 +273,7 @@ limitations under the License.
       <description>
         Move hue up or down at specified rate.
       </description>
-      <arg name="MoveMode" type="HueMoveMode"/>
+      <arg name="MoveMode" type="MoveModeEnum"/>
       <arg name="Rate" type="int8u"/>
       <arg name="OptionsMask" type="bitmap8"/>
       <arg name="OptionsOverride" type="bitmap8"/>
@@ -296,7 +283,7 @@ limitations under the License.
       <description>
         Step hue up or down by specified size at specified rate.
       </description>
-      <arg name="StepMode" type="HueStepMode"/>
+      <arg name="StepMode" type="StepModeEnum"/>
       <arg name="StepSize" type="int8u"/>
       <arg name="TransitionTime" type="int8u"/>
       <arg name="OptionsMask" type="bitmap8"/>
@@ -317,7 +304,7 @@ limitations under the License.
       <description>
         Move saturation up or down at specified rate.
       </description>
-      <arg name="MoveMode" type="SaturationMoveMode"/>
+      <arg name="MoveMode" type="MoveModeEnum"/>
       <arg name="Rate" type="int8u"/>
       <arg name="OptionsMask" type="bitmap8"/>
       <arg name="OptionsOverride" type="bitmap8"/>
@@ -327,7 +314,7 @@ limitations under the License.
       <description>
         Step saturation up or down by specified size at specified rate.
       </description>
-      <arg name="StepMode" type="SaturationStepMode"/>
+      <arg name="StepMode" type="StepModeEnum"/>
       <arg name="StepSize" type="int8u"/>
       <arg name="TransitionTime" type="int8u"/>
       <arg name="OptionsMask" type="bitmap8"/>
@@ -392,11 +379,11 @@ limitations under the License.
     <attribute side="server" code="0x4000" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">EnhancedCurrentHue</attribute>
     <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="EnhancedColorModeEnum" min="0x00" max="0xFF" writable="false" default="0x01">EnhancedColorMode</attribute>
     <attribute side="server" code="0x4002" define="COLOR_CONTROL_COLOR_LOOP_ACTIVE" type="int8u" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">ColorLoopActive</attribute>
-    <attribute side="server" code="0x4003" define="COLOR_CONTROL_COLOR_LOOP_DIRECTION" type="int8u" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">ColorLoopDirection</attribute>
+    <attribute side="server" code="0x4003" define="COLOR_CONTROL_COLOR_LOOP_DIRECTION" type="ColorLoopDirectionEnum" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">ColorLoopDirection</attribute>
     <attribute side="server" code="0x4004" define="COLOR_CONTROL_COLOR_LOOP_TIME" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0019" optional="true">ColorLoopTime</attribute>
     <attribute side="server" code="0x4005" define="COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x2300" optional="true">ColorLoopStartEnhancedHue</attribute>
     <attribute side="server" code="0x4006" define="COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ColorLoopStoredEnhancedHue</attribute>
-    <attribute side="server" code="0x400A" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="bitmap16" min="0x0000" max="0x001F" writable="false" default="0x0000">ColorCapabilities</attribute>
+    <attribute side="server" code="0x400A" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="ColorCapabilitiesBitmap" min="0x0000" max="0x001F" writable="false" default="0x0000">ColorCapabilities</attribute>
     <attribute side="server" code="0x400B" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0x0000" optional="true">ColorTempPhysicalMinMireds</attribute>
     <attribute side="server" code="0x400C" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX" type="int16u" min="0x0000" max="0xFEFF" writable="false" default="0xFEFF" optional="true">ColorTempPhysicalMaxMireds</attribute>
 
@@ -405,7 +392,7 @@ limitations under the License.
         Command description for EnhancedMoveToHue
       </description>
       <arg name="EnhancedHue" type="int16u"/>
-      <arg name="Direction" type="HueDirection"/>
+      <arg name="Direction" type="DirectionEnum"/>
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="bitmap8"/>
       <arg name="OptionsOverride" type="bitmap8"/>
@@ -415,7 +402,7 @@ limitations under the License.
       <description>
         Command description for EnhancedMoveHue
       </description>
-      <arg name="MoveMode" type="HueMoveMode"/>
+      <arg name="MoveMode" type="MoveModeEnum"/>
       <arg name="Rate" type="int16u"/>
       <arg name="OptionsMask" type="bitmap8"/>
       <arg name="OptionsOverride" type="bitmap8"/>
@@ -425,7 +412,7 @@ limitations under the License.
       <description>
         Command description for EnhancedStepHue
       </description>
-      <arg name="StepMode" type="HueStepMode"/>
+      <arg name="StepMode" type="StepModeEnum"/>
       <arg name="StepSize" type="int16u"/>
       <arg name="TransitionTime" type="int16u"/>
       <arg name="OptionsMask" type="bitmap8"/>
@@ -447,9 +434,9 @@ limitations under the License.
       <description>
         Command description for ColorLoopSet
       </description>
-      <arg name="UpdateFlags" type="ColorLoopUpdateFlags"/>
-      <arg name="Action" type="ColorLoopAction"/>
-      <arg name="Direction" type="ColorLoopDirection"/>
+      <arg name="UpdateFlags" type="UpdateFlagsBitmap"/>
+      <arg name="Action" type="ColorLoopActionEnum"/>
+      <arg name="Direction" type="ColorLoopDirectionEnum"/>
       <arg name="Time" type="int16u"/>
       <arg name="StartHue" type="int16u"/>
       <arg name="OptionsMask" type="bitmap8"/>
@@ -468,7 +455,7 @@ limitations under the License.
       <description>
         Command description for MoveColorTemperature
       </description>
-      <arg name="MoveMode" type="HueMoveMode"/>
+      <arg name="MoveMode" type="MoveModeEnum"/>
       <arg name="Rate" type="int16u"/>
       <arg name="ColorTemperatureMinimumMireds" type="int16u"/>
       <arg name="ColorTemperatureMaximumMireds" type="int16u"/>
@@ -480,7 +467,7 @@ limitations under the License.
       <description>
         Command description for StepColorTemperature
       </description>
-      <arg name="StepMode" type="HueStepMode"/>
+      <arg name="StepMode" type="StepModeEnum"/>
       <arg name="StepSize" type="int16u"/>
       <arg name="TransitionTime" type="int16u"/>
       <arg name="ColorTemperatureMinimumMireds" type="int16u"/>

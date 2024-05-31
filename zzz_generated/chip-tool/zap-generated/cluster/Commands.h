@@ -23702,8 +23702,8 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
                                                     WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-temperature-mireds", 0, UINT16_MAX, Attributes::ColorTemperatureMireds::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "color-mode", 0, UINT8_MAX, Attributes::ColorMode::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ColorControl::ColorModeEnum>>(
+            Id, "color-mode", 0, UINT8_MAX, Attributes::ColorMode::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>>>(
             Id, "options", 0, UINT8_MAX, Attributes::Options::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "number-of-primaries", 0, UINT8_MAX,
@@ -23783,8 +23783,9 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
             credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "color-loop-active", 0, UINT8_MAX, Attributes::ColorLoopActive::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "color-loop-direction", 0, UINT8_MAX, Attributes::ColorLoopDirection::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ColorControl::ColorLoopDirectionEnum>>(
+            Id, "color-loop-direction", 0, UINT8_MAX, Attributes::ColorLoopDirection::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-loop-time", 0, UINT16_MAX, Attributes::ColorLoopTime::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-loop-start-enhanced-hue", 0, UINT16_MAX,
@@ -23793,8 +23794,9 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<WriteAttribute<uint16_t>>(Id, "color-loop-stored-enhanced-hue", 0, UINT16_MAX,
                                               Attributes::ColorLoopStoredEnhancedHue::Id, WriteCommandType::kForceWrite,
                                               credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "color-capabilities", 0, UINT16_MAX, Attributes::ColorCapabilities::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>>>(
+            Id, "color-capabilities", 0, UINT16_MAX, Attributes::ColorCapabilities::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-temp-physical-min-mireds", 0, UINT16_MAX,
                                               Attributes::ColorTempPhysicalMinMireds::Id, WriteCommandType::kForceWrite,
                                               credsIssuerConfig), //

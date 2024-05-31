@@ -1715,21 +1715,28 @@ cluster GroupKeyManagement = 63 {
 cluster ColorControl = 768 {
   revision 7;
 
-  enum ColorLoopAction : enum8 {
+  enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;
     kActivateFromColorLoopStartEnhancedHue = 1;
     kActivateFromEnhancedCurrentHue = 2;
   }
 
-  enum ColorLoopDirection : enum8 {
-    kDecrementHue = 0;
-    kIncrementHue = 1;
+  enum ColorLoopDirectionEnum : enum8 {
+    kDecrement = 0;
+    kIncrement = 1;
   }
 
-  enum ColorMode : enum8 {
+  enum ColorModeEnum : enum8 {
     kCurrentHueAndCurrentSaturation = 0;
     kCurrentXAndCurrentY = 1;
     kColorTemperature = 2;
+  }
+
+  enum DirectionEnum : enum8 {
+    kShortest = 0;
+    kLongest = 1;
+    kUp = 2;
+    kDown = 3;
   }
 
   enum DriftCompensationEnum : enum8 {
@@ -1747,48 +1754,23 @@ cluster ColorControl = 768 {
     kEnhancedCurrentHueAndCurrentSaturation = 3;
   }
 
-  enum HueDirection : enum8 {
-    kShortestDistance = 0;
-    kLongestDistance = 1;
-    kUp = 2;
-    kDown = 3;
-  }
-
-  enum HueMoveMode : enum8 {
+  enum MoveModeEnum : enum8 {
     kStop = 0;
     kUp = 1;
     kDown = 3;
   }
 
-  enum HueStepMode : enum8 {
+  enum StepModeEnum : enum8 {
     kUp = 1;
     kDown = 3;
   }
 
-  enum SaturationMoveMode : enum8 {
-    kStop = 0;
-    kUp = 1;
-    kDown = 3;
-  }
-
-  enum SaturationStepMode : enum8 {
-    kUp = 1;
-    kDown = 3;
-  }
-
-  bitmap ColorCapabilities : bitmap16 {
+  bitmap ColorCapabilitiesBitmap : bitmap16 {
     kHueSaturationSupported = 0x1;
     kEnhancedHueSupported = 0x2;
     kColorLoopSupported = 0x4;
     kXYAttributesSupported = 0x8;
     kColorTemperatureSupported = 0x10;
-  }
-
-  bitmap ColorLoopUpdateFlags : bitmap8 {
-    kUpdateAction = 0x1;
-    kUpdateDirection = 0x2;
-    kUpdateTime = 0x4;
-    kUpdateStartHue = 0x8;
   }
 
   bitmap Feature : bitmap32 {
@@ -1803,6 +1785,13 @@ cluster ColorControl = 768 {
     kExecuteIfOff = 0x1;
   }
 
+  bitmap UpdateFlagsBitmap : bitmap8 {
+    kUpdateAction = 0x1;
+    kUpdateDirection = 0x2;
+    kUpdateTime = 0x4;
+    kUpdateStartHue = 0x8;
+  }
+
   readonly attribute optional int8u currentHue = 0;
   readonly attribute optional int8u currentSaturation = 1;
   readonly attribute optional int16u remainingTime = 2;
@@ -1811,7 +1800,7 @@ cluster ColorControl = 768 {
   readonly attribute optional DriftCompensationEnum driftCompensation = 5;
   readonly attribute optional char_string<254> compensationText = 6;
   readonly attribute optional int16u colorTemperatureMireds = 7;
-  readonly attribute enum8 colorMode = 8;
+  readonly attribute ColorModeEnum colorMode = 8;
   attribute OptionsBitmap options = 15;
   readonly attribute nullable int8u numberOfPrimaries = 16;
   readonly attribute optional int16u primary1X = 17;
@@ -1846,11 +1835,11 @@ cluster ColorControl = 768 {
   readonly attribute optional int16u enhancedCurrentHue = 16384;
   readonly attribute EnhancedColorModeEnum enhancedColorMode = 16385;
   readonly attribute optional int8u colorLoopActive = 16386;
-  readonly attribute optional int8u colorLoopDirection = 16387;
+  readonly attribute optional ColorLoopDirectionEnum colorLoopDirection = 16387;
   readonly attribute optional int16u colorLoopTime = 16388;
   readonly attribute optional int16u colorLoopStartEnhancedHue = 16389;
   readonly attribute optional int16u colorLoopStoredEnhancedHue = 16390;
-  readonly attribute bitmap16 colorCapabilities = 16394;
+  readonly attribute ColorCapabilitiesBitmap colorCapabilities = 16394;
   readonly attribute optional int16u colorTempPhysicalMinMireds = 16395;
   readonly attribute optional int16u colorTempPhysicalMaxMireds = 16396;
   readonly attribute optional int16u coupleColorTempToLevelMinMireds = 16397;
@@ -1864,21 +1853,21 @@ cluster ColorControl = 768 {
 
   request struct MoveToHueRequest {
     int8u hue = 0;
-    HueDirection direction = 1;
+    DirectionEnum direction = 1;
     int16u transitionTime = 2;
     bitmap8 optionsMask = 3;
     bitmap8 optionsOverride = 4;
   }
 
   request struct MoveHueRequest {
-    HueMoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     int8u rate = 1;
     bitmap8 optionsMask = 2;
     bitmap8 optionsOverride = 3;
   }
 
   request struct StepHueRequest {
-    HueStepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     int8u transitionTime = 2;
     bitmap8 optionsMask = 3;
@@ -1893,14 +1882,14 @@ cluster ColorControl = 768 {
   }
 
   request struct MoveSaturationRequest {
-    SaturationMoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     int8u rate = 1;
     bitmap8 optionsMask = 2;
     bitmap8 optionsOverride = 3;
   }
 
   request struct StepSaturationRequest {
-    SaturationStepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     int8u transitionTime = 2;
     bitmap8 optionsMask = 3;
@@ -1947,21 +1936,21 @@ cluster ColorControl = 768 {
 
   request struct EnhancedMoveToHueRequest {
     int16u enhancedHue = 0;
-    HueDirection direction = 1;
+    DirectionEnum direction = 1;
     int16u transitionTime = 2;
     bitmap8 optionsMask = 3;
     bitmap8 optionsOverride = 4;
   }
 
   request struct EnhancedMoveHueRequest {
-    HueMoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     int16u rate = 1;
     bitmap8 optionsMask = 2;
     bitmap8 optionsOverride = 3;
   }
 
   request struct EnhancedStepHueRequest {
-    HueStepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int16u stepSize = 1;
     int16u transitionTime = 2;
     bitmap8 optionsMask = 3;
@@ -1977,9 +1966,9 @@ cluster ColorControl = 768 {
   }
 
   request struct ColorLoopSetRequest {
-    ColorLoopUpdateFlags updateFlags = 0;
-    ColorLoopAction action = 1;
-    ColorLoopDirection direction = 2;
+    UpdateFlagsBitmap updateFlags = 0;
+    ColorLoopActionEnum action = 1;
+    ColorLoopDirectionEnum direction = 2;
     int16u time = 3;
     int16u startHue = 4;
     bitmap8 optionsMask = 5;
@@ -1992,7 +1981,7 @@ cluster ColorControl = 768 {
   }
 
   request struct MoveColorTemperatureRequest {
-    HueMoveMode moveMode = 0;
+    MoveModeEnum moveMode = 0;
     int16u rate = 1;
     int16u colorTemperatureMinimumMireds = 2;
     int16u colorTemperatureMaximumMireds = 3;
@@ -2001,7 +1990,7 @@ cluster ColorControl = 768 {
   }
 
   request struct StepColorTemperatureRequest {
-    HueStepMode stepMode = 0;
+    StepModeEnum stepMode = 0;
     int16u stepSize = 1;
     int16u transitionTime = 2;
     int16u colorTemperatureMinimumMireds = 3;
