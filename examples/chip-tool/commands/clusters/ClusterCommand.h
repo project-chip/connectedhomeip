@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
+#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
 
 class ClusterCommand : public InteractionModelCommands, public ModelCommand, public chip::app::CommandSender::Callback
 {
@@ -68,7 +68,7 @@ public:
                            const chip::app::Clusters::IcdManagement::Commands::RegisterClient::Type & value)
     {
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
-        mScopedNodeId = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
+        mScopedNodeId     = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
         mMonitoredSubject = value.monitoredSubject;
         memcpy(mICDSymmetricKey, value.key.data(), value.key.size());
         return CHIP_NO_ERROR;
@@ -254,7 +254,7 @@ private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
     chip::ScopedNodeId mScopedNodeId;
-    uint64_t mMonitoredSubject  = static_cast<uint64_t>(0);
+    uint64_t mMonitoredSubject = static_cast<uint64_t>(0);
     uint8_t mICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
     CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;
