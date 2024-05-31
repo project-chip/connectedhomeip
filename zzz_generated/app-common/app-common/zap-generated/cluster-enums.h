@@ -4311,6 +4311,8 @@ enum class Feature : uint32_t
 
 namespace WiFiNetworkManagement {} // namespace WiFiNetworkManagement
 
+namespace ThreadNetworkDirectory {} // namespace ThreadNetworkDirectory
+
 namespace WakeOnLan {} // namespace WakeOnLan
 
 namespace Channel {

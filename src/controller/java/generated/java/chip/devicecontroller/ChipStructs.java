@@ -9277,6 +9277,82 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
     return output.toString();
   }
 }
+public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
+  public Long extendedPanId;
+  public String networkName;
+  public Integer channel;
+  private static final long EXTENDED_PAN_ID_ID = 0L;
+  private static final long NETWORK_NAME_ID = 1L;
+  private static final long CHANNEL_ID = 2L;
+
+  public ThreadNetworkDirectoryClusterThreadNetworkStruct(
+    Long extendedPanId,
+    String networkName,
+    Integer channel
+  ) {
+    this.extendedPanId = extendedPanId;
+    this.networkName = networkName;
+    this.channel = channel;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(EXTENDED_PAN_ID_ID, new UIntType(extendedPanId)));
+    values.add(new StructElement(NETWORK_NAME_ID, new StringType(networkName)));
+    values.add(new StructElement(CHANNEL_ID, new UIntType(channel)));
+
+    return new StructType(values);
+  }
+
+  public static ThreadNetworkDirectoryClusterThreadNetworkStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long extendedPanId = null;
+    String networkName = null;
+    Integer channel = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == EXTENDED_PAN_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          extendedPanId = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == NETWORK_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          networkName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == CHANNEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          channel = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ThreadNetworkDirectoryClusterThreadNetworkStruct(
+      extendedPanId,
+      networkName,
+      channel
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThreadNetworkDirectoryClusterThreadNetworkStruct {\n");
+    output.append("\textendedPanId: ");
+    output.append(extendedPanId);
+    output.append("\n");
+    output.append("\tnetworkName: ");
+    output.append(networkName);
+    output.append("\n");
+    output.append("\tchannel: ");
+    output.append(channel);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ChannelClusterProgramCastStruct {
   public String name;
   public String role;

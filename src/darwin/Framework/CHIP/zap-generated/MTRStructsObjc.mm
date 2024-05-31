@@ -6884,6 +6884,66 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic coolSetpoint;
 @end
 
+@implementation MTRThreadNetworkDirectoryClusterThreadNetworkStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _extendedPanId = @(0);
+
+        _networkName = @"";
+
+        _channel = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThreadNetworkDirectoryClusterThreadNetworkStruct alloc] init];
+
+    other.extendedPanId = self.extendedPanId;
+    other.networkName = self.networkName;
+    other.channel = self.channel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanId:%@; networkName:%@; channel:%@; >", NSStringFromClass([self class]), _extendedPanId, _networkName, _channel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThreadNetworkDirectoryClusterNetworkChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _extendedPanId = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThreadNetworkDirectoryClusterNetworkChangedEvent alloc] init];
+
+    other.extendedPanId = self.extendedPanId;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanId:%@; >", NSStringFromClass([self class]), _extendedPanId];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRChannelClusterProgramCastStruct
 - (instancetype)init
 {

@@ -5584,6 +5584,52 @@ public static class PumpConfigurationAndControlClusterTurbineOperationEvent {
     return output.toString();
   }
 }
+public static class ThreadNetworkDirectoryClusterNetworkChangedEvent {
+  public Long extendedPanId;
+  private static final long EXTENDED_PAN_ID_ID = 0L;
+
+  public ThreadNetworkDirectoryClusterNetworkChangedEvent(
+    Long extendedPanId
+  ) {
+    this.extendedPanId = extendedPanId;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(EXTENDED_PAN_ID_ID, new UIntType(extendedPanId)));
+
+    return new StructType(values);
+  }
+
+  public static ThreadNetworkDirectoryClusterNetworkChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long extendedPanId = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == EXTENDED_PAN_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          extendedPanId = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new ThreadNetworkDirectoryClusterNetworkChangedEvent(
+      extendedPanId
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThreadNetworkDirectoryClusterNetworkChangedEvent {\n");
+    output.append("\textendedPanId: ");
+    output.append(extendedPanId);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class TargetNavigatorClusterTargetUpdatedEvent {
   public ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList;
   public Integer currentTarget;
