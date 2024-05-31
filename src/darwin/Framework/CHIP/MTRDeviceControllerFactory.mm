@@ -72,7 +72,7 @@ using namespace chip::Tracing::DarwinFramework;
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit()
 {
-    MTR_LOG_INFO("ShutdownOnExit invoked on exit");
+    MTR_LOG("ShutdownOnExit invoked on exit");
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
@@ -239,7 +239,7 @@ MTR_DIRECT_MEMBERS
 - (void)cleanupStartupObjects
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_INFO("Cleaning startup objects in controller factory");
+    MTR_LOG("Cleaning startup objects in controller factory");
 
     // Make sure the deinit order here is the reverse of the init order in
     // startControllerFactory:
@@ -441,7 +441,7 @@ MTR_DIRECT_MEMBERS
     dispatch_sync(_chipWorkQueue, ^{
         VerifyOrReturn(_running);
 
-        MTR_LOG_INFO("Shutting down the Matter controller factory");
+        MTR_LOG("Shutting down the Matter controller factory");
         _controllerFactory->Shutdown();
         [self cleanupStartupObjects];
         _running = NO;
@@ -473,6 +473,7 @@ MTR_DIRECT_MEMBERS
     id<MTROTAProviderDelegate> _Nullable otaProviderDelegate;
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
     NSUInteger concurrentSubscriptionPoolSize = 0;
+    MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
     if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
         MTRDeviceControllerParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
@@ -481,6 +482,7 @@ MTR_DIRECT_MEMBERS
         otaProviderDelegate = params.otaProviderDelegate;
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
         concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
+        storageBehaviorConfiguration = params.storageBehaviorConfiguration;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
@@ -498,7 +500,7 @@ MTR_DIRECT_MEMBERS
 
     if (!_running) { // Note: reading _running from outside of the Matter work queue
         if (storageDelegate != nil) {
-            MTR_LOG_DEFAULT("Auto-starting Matter controller factory in per-controller storage mode");
+            MTR_LOG("Auto-starting Matter controller factory in per-controller storage mode");
             auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
             if (![self _startControllerFactory:params startingController:YES error:error]) {
                 return nil;
@@ -542,7 +544,8 @@ MTR_DIRECT_MEMBERS
                          otaProviderDelegate:otaProviderDelegate
                     otaProviderDelegateQueue:otaProviderDelegateQueue
                             uniqueIdentifier:uniqueIdentifier
-              concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize];
+              concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
+                storageBehaviorConfiguration:storageBehaviorConfiguration];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
@@ -766,7 +769,7 @@ MTR_DIRECT_MEMBERS
         if (!self->_running) {
             MTR_LOG_ERROR("Can't pre-warm, Matter controller factory is not running");
         } else {
-            MTR_LOG_DEFAULT("Pre-warming commissioning session");
+            MTR_LOG("Pre-warming commissioning session");
             self->_controllerFactory->EnsureAndRetainSystemState();
             err = DeviceLayer::PlatformMgrImpl().StartBleScan(&self->_preWarmingDelegate, DeviceLayer::BleScanMode::kPreWarm);
             if (err != CHIP_NO_ERROR) {
@@ -781,7 +784,7 @@ MTR_DIRECT_MEMBERS
 - (void)preWarmCommissioningSessionDone
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_DEFAULT("Pre-warming done");
+    MTR_LOG("Pre-warming done");
     self->_controllerFactory->ReleaseSystemState();
 }
 

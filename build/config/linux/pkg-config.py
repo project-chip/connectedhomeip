@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Copyright (c) 2013 The Chromium Authors. All rights reserved.
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2024 Project CHIP Authors
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -127,6 +127,7 @@ def RewritePath(path, strip_prefix, sysroot):
 def main():
     parser = OptionParser()
     parser.add_option('-d', '--debug', action='store_true')
+    parser.add_option('-o', '--optional', action='store_true')
     parser.add_option('-p', action='store', dest='pkg_config', type='string',
                       default='pkg-config')
     parser.add_option('-v', action='append', dest='strip_out', type='string')
@@ -209,6 +210,10 @@ def main():
     try:
         flag_string = subprocess.check_output(cmd).decode('utf-8')
     except Exception:
+        if options.optional:
+            sys.stderr.write('Ignoring failure to run pkg-config for optional library.\n')
+            print(json.dumps([False]))  # Output a GN array indicating missing optional packages
+            return 0
         sys.stderr.write('Could not run pkg-config.\n')
         return 1
 
@@ -248,10 +253,10 @@ def main():
         else:
             cflags.append(flag)
 
-    # Output a GN array, the first one is the cflags, the second are the libs. The
+    # Output a GN array, indicating success and our output lists.
     # JSON formatter prints GN compatible lists when everything is a list of
     # strings.
-    print(json.dumps([includes, cflags, libs, lib_dirs]))
+    print(json.dumps([True, includes, cflags, libs, lib_dirs]))
     return 0
 
 

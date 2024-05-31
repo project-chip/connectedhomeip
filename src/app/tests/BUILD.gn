@@ -123,6 +123,7 @@ chip_test_suite_using_nltest("tests") {
   output_name = "libAppTests"
 
   test_sources = [
+    "TestAclAttribute.cpp",
     "TestAclEvent.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
@@ -151,6 +152,7 @@ chip_test_suite_using_nltest("tests") {
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
+    "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
@@ -163,8 +165,6 @@ chip_test_suite_using_nltest("tests") {
   if (!chip_fake_platform) {
     test_sources += [ "TestFailSafeContext.cpp" ]
   }
-
-  test_sources += [ "TestAclAttribute.cpp" ]
 
   # DefaultICDClientStorage assumes that raw AES key is used by the application
   if (chip_crypto != "psa") {
@@ -187,16 +187,6 @@ chip_test_suite_using_nltest("tests") {
   if (chip_device_platform != "nrfconnect" &&
       chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
-  }
-
-  # The platform manager is not properly clearing queues in test teardown, which results in
-  # DrainIO calls not being able to run in expected time (5seconds) if unprocessed reported engine
-  # runs are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
-  # running all tests in one file. We need to figure out how to properly clean the event queues
-  # before enabling this test for these platforms.
-  if (chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "openiotsdk") {
-    test_sources += [ "TestReportScheduler.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
