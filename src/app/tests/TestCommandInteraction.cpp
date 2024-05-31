@@ -614,22 +614,8 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
     }
     else
     {
-#if 1
         SimpleTLVPayload payloadWriter;
-        CHIP_ERROR err = apCommandHandler->TryAddResponseData(requestCommandPath, aResponseCommandId, payloadWriter);
-#else
-        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
-        ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, aResponseCommandId };
-        CHIP_ERROR err = apCommandHandler->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        chip::TLV::TLVWriter * writer = apCommandHandler->GetCommandDataIBTLVWriter();
-
-        err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        err = apCommandHandler->FinishCommand();
-#endif
+        CHIP_ERROR err = apCommandHandler->AddResponseData(requestCommandPath, aResponseCommandId, payloadWriter);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 }
