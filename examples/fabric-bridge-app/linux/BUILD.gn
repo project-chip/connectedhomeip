@@ -22,7 +22,9 @@ executable("fabric-bridge-app") {
   sources = [
     "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/include/CHIPProjectAppConfig.h",
     "Device.cpp",
+    "DeviceManager.cpp",
     "include/Device.h",
+    "include/DeviceManager.h",
     "main.cpp",
   ]
 
