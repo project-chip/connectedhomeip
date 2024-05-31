@@ -399,8 +399,7 @@ private:
     {
     public:
         CommandHandlerWithUnrespondedCommand(CommandHandler::Callback * apCallback, const ConcreteCommandPath & aRequestCommandPath,
-                                             const Optional<uint16_t> & aRef) :
-            CommandHandler(apCallback)
+                                             const Optional<uint16_t> & aRef) : CommandHandler(apCallback)
         {
             GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional());
             SetExchangeInterface(&mMockCommandResponder);
@@ -615,8 +614,22 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
     }
     else
     {
+#if 1
         SimpleTLVPayload payloadWriter;
         CHIP_ERROR err = apCommandHandler->TryAddResponseData(requestCommandPath, aResponseCommandId, payloadWriter);
+#else
+        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+        ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, aResponseCommandId };
+        CHIP_ERROR err = apCommandHandler->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        chip::TLV::TLVWriter * writer = apCommandHandler->GetCommandDataIBTLVWriter();
+
+        err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = apCommandHandler->FinishCommand();
+#endif
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 }
