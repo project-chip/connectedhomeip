@@ -275,8 +275,8 @@ CHIP_ERROR ThreadScanResponseToTLV::LoadResponses(Platform::ScopedMemoryBuffer<T
         }
         scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
 
-        // TODO: this is a sort (insertion sort even, so O(n^2)) in a O(n) loop,
-        ///      maybe we should find something better than a O(n^3) to preserve the highest rssi only
+        // TODO: this is a sort (insertion sort even, so O(n^2)) in a O(n) loop.
+        ///      There should be some better alternatives to not have some O(n^3) processing complexity.
         Sorting::InsertionSort(scanResponseArray.Get(), scanResponseArrayLength,
                                [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
     }
