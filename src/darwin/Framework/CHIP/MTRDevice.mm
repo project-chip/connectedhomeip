@@ -3089,15 +3089,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
              forEndpoint:(NSNumber *)endpointID
 {
     // If the server list changed and clusters were removed, remove those clusters from our data structures.
-    // Also remove it from the data store.
+    // Also remove them from the data store.
     NSMutableSet<NSNumber *> * toBeRemovedClusters = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousServerListValue]];
     NSSet<NSNumber *> * clustersStillOnEndpoint = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newServerListValue]];
     [toBeRemovedClusters minusSet:clustersStillOnEndpoint];
 
     NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
-    for (NSNumber * cluster in toBeRemovedClusters) {
-        for (MTRClusterPath * path in _persistedClusters) {
-            if ([path.endpoint isEqualToNumber:endpointID] && [path.cluster isEqualToNumber:cluster]) {
+    for (MTRClusterPath * path in _persistedClusters) {
+        if ([path.endpoint isEqualToNumber:endpointID] && [toBeRemovedClusters containsObject:path.cluster]) 
                 [clusterPathsToRemove addObject:path];
             }
         }
