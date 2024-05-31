@@ -179,7 +179,6 @@ CHIP_ERROR WifiScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag
             size_t networksEncoded = 0;
             while (mNetworks->Next(scanResponse))
             {
-                // NOTE: it is assumed that scanResponse.ssid/bssid lifetime is larger than just within the `next` call
                 Structs::WiFiInterfaceScanResultStruct::Type result;
                 result.security = scanResponse.security;
                 result.ssid     = ByteSpan(scanResponse.ssid, scanResponse.ssidLen);
