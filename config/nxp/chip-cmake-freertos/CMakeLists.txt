@@ -38,7 +38,7 @@ matter_add_gn_arg_string("nxp_nvm_component" ${CONFIG_CHIP_NVM_COMPONENT})
 matter_add_gn_arg_string("nxp_platform" ${CONFIG_CHIP_NXP_PLATFORM})
 matter_add_gn_arg("chip_with_factory_data" ${CONFIG_CHIP_FACTORY_DATA})
 matter_add_gn_arg("chip_enable_secure_dac_private_key_storage" ${CONFIG_CHIP_SECURE_DAC_PRIVATE_KEY_STORAGE})
-matter_add_gn_arg("chip_convert_dac_private_key" ${CONFIG_CHIP_CONVERT_DAC_PRIVATE_KEY})
+matter_add_gn_arg("chip_enable_secure_whole_factory_data" ${CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA})
 
 matter_common_gn_args(
     DEBUG CONFIG_DEBUG
