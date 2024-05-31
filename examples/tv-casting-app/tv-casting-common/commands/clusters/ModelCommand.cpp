@@ -87,6 +87,11 @@ void ModelCommand::ClearICDEntry(const chip::ScopedNodeId & nodeId)
     ChipLogError(chipTool, "ClearICDEntry is not implemented in tv-casting-app");
 }
 
+void ModelCommand::AddICDEntry(chip::app::ICDClientInfo & clientinfo, chip::ByteSpan key)
+{
+    ChipLogError(chipTool, "AddICDEntry is not implemented in tv-casting-app");
+}
+
 bool ModelCommand::IsPeerLIT()
 {
     // Does not support tv-casting-app

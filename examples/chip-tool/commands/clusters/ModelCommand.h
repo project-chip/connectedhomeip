@@ -69,6 +69,7 @@ public:
 
     virtual void ClearICDEntry(const chip::ScopedNodeId & nodeId);
 
+    virtual void AddICDEntry(chip::app::ICDClientInfo & clientinfo, chip::ByteSpan key);
     void Shutdown() override;
 
 protected:
