@@ -29,6 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
+#include <platform/ESP32/ESP32Utils.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
@@ -403,6 +404,19 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
+
+    // Unregistering the wifi and IP event handlers from the esp_default_event_loop()
+    err = ESP32Utils::MapError(esp_event_handler_unregister(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to unregister IP event handler");
+    }
+
+    err = ESP32Utils::MapError(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to unregister wifi event handler");
+    }
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
