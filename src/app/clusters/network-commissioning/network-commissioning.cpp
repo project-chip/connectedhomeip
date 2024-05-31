@@ -1199,7 +1199,6 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     DEFER_AUTO_RELEASE(networks);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    CHIP_ERROR err        = CHIP_NO_ERROR;
     auto commandHandleRef = std::move(mAsyncCommandHandle);
     auto commandHandle    = commandHandleRef.Get();
     if (commandHandle == nullptr)
@@ -1211,99 +1210,9 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
 
     SetLastNetworkingStatusValue(MakeNullable(status));
 
-    TLV::TLVWriter * writer;
-    TLV::TLVType listContainerType;
-    ThreadScanResponse scanResponse;
-    Platform::ScopedMemoryBuffer<ThreadScanResponse> scanResponseArray;
-    size_t scanResponseArrayLength = 0;
-    uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
+    ThreadScanResponseToTLV responseBuilder(status, debugText, networks);
+    commandHandle->AddResponse(mPath, Commands::ScanNetworksResponse::Id, responseBuilder);
 
-    const CommandHandler::InvokeResponseParameters prepareParams(mPath);
-    SuccessOrExit(
-        err = commandHandle->PrepareInvokeResponseCommand(
-            ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id), prepareParams));
-    VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
-    if (debugText.size() != 0)
-    {
-        SuccessOrExit(
-            err = DataModel::Encode(*writer, TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kDebugText), debugText));
-    }
-    SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kThreadScanResults),
-                                               TLV::TLVType::kTLVType_Array, listContainerType));
-
-    // If no network was found, we encode an empty list, don't call a zero-sized alloc.
-    if ((status == Status::kSuccess) && (networks->Count() > 0))
-    {
-        VerifyOrExit(scanResponseArray.Alloc(chip::min(networks->Count(), kMaxNetworksInScanResponse)), err = CHIP_ERROR_NO_MEMORY);
-        for (; networks != nullptr && networks->Next(scanResponse);)
-        {
-            if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
-                (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
-            {
-                continue;
-            }
-
-            bool isDuplicated = false;
-
-            for (size_t i = 0; i < scanResponseArrayLength; i++)
-            {
-                if ((scanResponseArray[i].panId == scanResponse.panId) &&
-                    (scanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
-                {
-                    if (scanResponseArray[i].rssi < scanResponse.rssi)
-                    {
-                        scanResponseArray[i] = scanResponseArray[--scanResponseArrayLength];
-                    }
-                    else
-                    {
-                        isDuplicated = true;
-                    }
-                    break;
-                }
-            }
-
-            if (isDuplicated)
-            {
-                continue;
-            }
-
-            if (scanResponseArrayLength < kMaxNetworksInScanResponse)
-            {
-                scanResponseArrayLength++;
-            }
-            scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
-            Sorting::InsertionSort(
-                scanResponseArray.Get(), scanResponseArrayLength,
-                [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
-        }
-
-        for (size_t i = 0; i < scanResponseArrayLength; i++)
-        {
-            Structs::ThreadInterfaceScanResultStruct::Type result;
-            Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponseArray[i].extendedAddress);
-            result.panId           = scanResponseArray[i].panId;
-            result.extendedPanId   = scanResponseArray[i].extendedPanId;
-            result.networkName     = CharSpan(scanResponseArray[i].networkName, scanResponseArray[i].networkNameLen);
-            result.channel         = scanResponseArray[i].channel;
-            result.version         = scanResponseArray[i].version;
-            result.extendedAddress = ByteSpan(extendedAddressBuffer);
-            result.rssi            = scanResponseArray[i].rssi;
-            result.lqi             = scanResponseArray[i].lqi;
-
-            SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
-        }
-    }
-
-    SuccessOrExit(err = writer->EndContainer(listContainerType));
-    SuccessOrExit(err = commandHandle->FinishCommand());
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to encode response: %" CHIP_ERROR_FORMAT, err.Format());
-    }
     if (status == Status::kSuccess)
     {
         CommitSavedBreadcrumb();
