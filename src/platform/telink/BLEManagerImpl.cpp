@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,9 +45,16 @@
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/telink/wifi/TelinkWiFiDriver.h>
+#endif
+
+// TODO: need common mac_init solution for B9X & W91
+#ifndef CONFIG_BOARD_TLSR9118BDK40D
 extern "C" {
 #include <b9x_bt_flash.h>
 }
+#endif
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
 #include <zephyr/pm/policy.h>
@@ -117,7 +124,10 @@ CHIP_ERROR InitBLEMACAddress()
     int error = 0;
     bt_addr_le_t addr;
 
+// TODO: need common mac_init solution for B9X & W91
+#ifndef CONFIG_BOARD_TLSR9118BDK40D
     b9x_bt_blc_mac_init(addr.a.val);
+#endif
 
     if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
     {
@@ -284,16 +294,19 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest(void)
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    if (ConnectivityMgr().IsThreadProvisioned())
+    if (ConnectivityMgr().IsThreadProvisioned() || ConnectivityMgr().IsWiFiStationProvisioned())
     {
-        ChipLogProgress(DeviceLayer, "Thread provisioned, can't StartAdvertising");
+        ChipLogProgress(DeviceLayer, "Device provisioned, can't StartAdvertising");
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
+// TODO: check if WiFi scanning required for Amazon ecosystem
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     else if (!mBLERadioInitialized)
     {
         ThreadStackMgrImpl().StartThreadScan(mInternalScanCallback);
     }
+#endif
     else
     {
         return StartAdvertisingProcess();
@@ -308,11 +321,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 
     if (!mBLERadioInitialized)
     {
-        /* Switch off Thread */
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        // Deinit Thread
         ThreadStackMgrImpl().SetThreadEnabled(false);
         ThreadStackMgrImpl().SetRadioBlocked(true);
+#endif
 
-        /* Init BLE stack */
+        // Init BLE
         err = bt_enable(NULL);
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
@@ -379,9 +394,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
-    if (ConnectivityMgr().IsThreadProvisioned())
+    if (ConnectivityMgr().IsThreadProvisioned() || ConnectivityMgr().IsWiFiStationProvisioned())
     {
-        ChipLogProgress(DeviceLayer, "Thread provisioned, StopAdvertising done");
+        ChipLogProgress(DeviceLayer, "Device provisioned, StopAdvertising done");
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -928,20 +943,22 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (ThreadStackMgrImpl().IsReadyToAttach())
     {
         SwitchToIeee802154();
     }
+#endif
 
     return CHIP_NO_ERROR;
 }
 
-/* @todo: move to RadioSwitch module */
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void BLEManagerImpl::SwitchToIeee802154(void)
 {
-    ChipLogProgress(DeviceLayer, "SwitchToIeee802154");
+    ChipLogProgress(DeviceLayer, "Switch context from BLE to Thread");
 
-    /* Deinit BLE stack */
+    // Deinit BLE
     bt_disable();
     mBLERadioInitialized = false;
 
@@ -949,10 +966,11 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
 #endif
 
-    /* Init IEEE802154 */
+    // Init Thread
     ThreadStackMgrImpl().SetRadioBlocked(false);
     ThreadStackMgrImpl().SetThreadEnabled(true);
 }
+#endif
 
 } // namespace Internal
 } // namespace DeviceLayer

@@ -76,6 +76,7 @@ public:
     {
         kButtonId_ExampleAction = 1,
         kButtonId_FactoryReset,
+        kButtonId_StartWiFi,
         kButtonId_StartThread,
         kButtonId_StartBleAdv
     } ButtonId;

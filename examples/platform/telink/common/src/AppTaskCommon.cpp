@@ -24,9 +24,9 @@
 #include "LEDManager.h"
 #include "PWMManager.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include "ThreadUtil.h"
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
 #endif
 
@@ -78,7 +78,7 @@ uint8_t sFactoryResetCntr = 0;
 bool sIsCommissioningFailed = false;
 bool sIsNetworkProvisioned  = false;
 bool sIsNetworkEnabled      = false;
-bool sIsThreadAttached      = false;
+bool sIsNetworkAttached     = false;
 bool sHaveBLEConnections    = false;
 
 #if APP_SET_DEVICE_INFO_PROVIDER
@@ -460,7 +460,7 @@ void AppTaskCommon::UpdateStatusLED()
 {
     if (sIsNetworkProvisioned && sIsNetworkEnabled)
     {
-        if (sIsThreadAttached)
+        if (sIsNetworkAttached)
         {
             LedManager::getInstance().setLed(LedManager::EAppLed_Status, 950, 50);
         }
@@ -524,8 +524,8 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
 {
     LOG_INF("StartBleAdvHandler");
 
-    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
-    if (ConnectivityMgr().IsThreadProvisioned())
+    // Don't allow on starting Matter service BLE advertising after device provisioning.
+    if (ConnectivityMgr().IsThreadProvisioned() || ConnectivityMgr().IsWiFiStationProvisioned())
     {
         LOG_INF("Device already commissioned");
         return;
@@ -728,6 +728,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     case DeviceEventType::kWiFiConnectivityChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+        sIsNetworkAttached    = ConnectivityMgr().IsWiFiStationConnected();
 #if CONFIG_CHIP_OTA_REQUESTOR
         if (event->WiFiConnectivityChange.Result == kConnectivity_Established)
         {
