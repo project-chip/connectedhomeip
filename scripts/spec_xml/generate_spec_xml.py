@@ -20,6 +20,8 @@ import os
 import re
 import subprocess
 import sys
+import xml.etree.ElementTree as ElementTree
+from pathlib import Path
 
 import click
 
@@ -34,6 +36,20 @@ DEFAULT_DOCUMENTATION_FILE = os.path.abspath(
 def get_xml_path(filename, output_dir):
     xml = os.path.basename(filename).replace('.adoc', '.xml')
     return os.path.abspath(os.path.join(output_dir, xml))
+
+
+def make_asciidoc(target: str, include_in_progress: bool, spec_dir: str, dry_run: bool) -> str:
+    cmd = ['make', 'PRINT_FILENAMES=1']
+    if include_in_progress:
+        cmd.append('INCLUDE_IN_PROGRESS=1')
+    cmd.append(target)
+    if dry_run:
+        print(cmd)
+        return ''
+    else:
+        ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
+        print(ret)
+        return ret
 
 
 @click.command()
@@ -56,16 +72,21 @@ def get_xml_path(filename, output_dir):
     default=False,
     is_flag=True,
     help='Flag for dry run')
-def main(scraper, spec_root, output_dir, dry_run):
+@click.option(
+    '--include-in-progress',
+    default=True,
+    type=bool,
+    help='Include in-progress items from spec')
+def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
     # Clusters need to be scraped first because the cluster directory is passed to the device type directory
-    scrape_clusters(scraper, spec_root, output_dir, dry_run)
-    scrape_device_types(scraper, spec_root, output_dir, dry_run)
+    scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
+    scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
     if not dry_run:
         dump_versions(scraper, spec_root, output_dir)
         dump_cluster_ids(output_dir)
 
 
-def scrape_clusters(scraper, spec_root, output_dir, dry_run):
+def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress):
     src_dir = os.path.abspath(os.path.join(spec_root, 'src'))
     sdm_clusters_dir = os.path.abspath(
         os.path.join(src_dir, 'service_device_management'))
@@ -74,22 +95,25 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run):
     media_clusters_dir = os.path.abspath(
         os.path.join(app_clusters_dir, 'media'))
     clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
-    dm_clusters_list = ['ACL-Cluster.adoc', 'Binding-Cluster.adoc', 'bridge-clusters.adoc',
-                        'Descriptor-Cluster.adoc', 'Group-Key-Management-Cluster.adoc', 'ICDManagement.adoc',
-                        'Label-Cluster.adoc']
-    sdm_exclude_list = ['AdminAssistedCommissioningFlows.adoc', 'BulkDataExchange.adoc', 'CommissioningFlows.adoc',
-                        'DeviceCommissioningFlows.adoc', 'DistributedComplianceLedger.adoc', 'OTAFileFormat.adoc']
-    app_exclude_list = ['appliances.adoc', 'closures.adoc', 'general.adoc',
-                        'hvac.adoc', 'lighting.adoc', 'meas_and_sense.adoc', 'robots.adoc']
-    media_exclude_list = ['media.adoc', 'VideoPlayerArchitecture.adoc']
 
     if not os.path.exists(clusters_output_dir):
         os.makedirs(clusters_output_dir)
 
+    print('Generating main spec to get file include list - this make take a few minutes')
+    main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
+    print('Generating cluster spec to get file include list - this make take a few minutes')
+    cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
+
     def scrape_cluster(filename: str) -> None:
+        base = Path(filename).stem
+        if base not in main_out and base not in cluster_out:
+            print(f'skipping file: {base} as it is not compiled into the asciidoc')
+            return
         xml_path = get_xml_path(filename, clusters_output_dir)
         cmd = [scraper, 'cluster', '-i', filename, '-o',
-               xml_path, '-nd', '--define', 'in-progress']
+               xml_path, '-nd']
+        if include_in_progress:
+            cmd.extend(['--define', 'in-progress'])
         if dry_run:
             print(cmd)
         else:
@@ -97,19 +121,38 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run):
 
     def scrape_all_clusters(dir: str, exclude_list: list[str] = []) -> None:
         for filename in glob.glob(f'{dir}/*.adoc'):
-            if os.path.basename(filename) in exclude_list:
-                continue
             scrape_cluster(filename)
 
-    scrape_all_clusters(sdm_clusters_dir, sdm_exclude_list)
-    scrape_all_clusters(app_clusters_dir, app_exclude_list)
-    scrape_all_clusters(media_clusters_dir, media_exclude_list)
-    for f in dm_clusters_list:
-        filename = f'{dm_clusters_dir}/{f}'
-        scrape_cluster(filename)
+    scrape_all_clusters(dm_clusters_dir)
+    scrape_all_clusters(sdm_clusters_dir)
+    scrape_all_clusters(app_clusters_dir)
+    scrape_all_clusters(media_clusters_dir)
+
+    for xml_path in glob.glob(f'{clusters_output_dir}/*.xml'):
+        tree = ElementTree.parse(f'{xml_path}')
+        root = tree.getroot()
+        cluster = next(root.iter('cluster'))
+        # If there's no cluster ID table, this isn't a cluster
+        try:
+            next(cluster.iter('clusterIds'))
+        except StopIteration:
+            # If there's no cluster ID table, this isn't a cluster just some kind of intro adoc
+            print(f'Removing file {xml_path} as it does not include any cluster definitions')
+            os.remove(xml_path)
+            continue
+        # For now, we're going to manually remove the word "Cluster" from the cluster name field
+        # to make the diff easier. The update to 1.2.4 of the scraper added this.
+        # TODO: submit a separate PR with JUST this change revered and remove this code.
+        with open(xml_path, 'rb') as input:
+            xml_str = input.read()
+
+        original_name = bytes(cluster.attrib['name'], 'utf-8')
+        replacement_name = bytes(cluster.attrib['name'].removesuffix(" Cluster"), 'utf-8')
+        with open(xml_path, 'wb') as output:
+            output.write(xml_str.replace(original_name, replacement_name))
 
 
-def scrape_device_types(scraper, spec_root, output_dir, dry_run):
+def scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress):
     device_type_dir = os.path.abspath(
         os.path.join(spec_root, 'src', 'device_types'))
     device_types_output_dir = os.path.abspath(
@@ -119,9 +162,16 @@ def scrape_device_types(scraper, spec_root, output_dir, dry_run):
     if not os.path.exists(device_types_output_dir):
         os.makedirs(device_types_output_dir)
 
+    print('Generating device type library to get file include list - this make take a few minutes')
+    device_type_output = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
+
     def scrape_device_type(filename: str) -> None:
+        base = Path(filename).stem
+        if base not in device_type_output:
+            print(f'skipping file: {filename} as it is not compiled into the asciidoc')
+            return
         xml_path = get_xml_path(filename, device_types_output_dir)
-        cmd = [scraper, 'devicetype', '-c', clusters_output_dir,
+        cmd = [scraper, 'devicetype', '-c', '-cls', clusters_output_dir,
                '-nd', '-i', filename, '-o', xml_path]
         if dry_run:
             print(cmd)
@@ -187,7 +237,8 @@ def dump_cluster_ids(output_dir):
 
     json_file = os.path.join(clusters_output_dir, 'cluster_ids.json')
     with open(json_file, "w") as outfile:
-        json.dump(json_dict, outfile, indent=2)
+        json.dump(json_dict, outfile, indent=4)
+        outfile.write('\n')
 
 
 if __name__ == '__main__':

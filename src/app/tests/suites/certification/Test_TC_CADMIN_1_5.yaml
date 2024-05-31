@@ -186,7 +186,7 @@ tests:
 
           [1663841939.843550][13897:13897] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
           [1663841939.843617][13897:13897] CHIP:DL: Inet Layer shutdown
-          [1663841939.843673][13897:13897] CHIP:DL: BLE shutdown
+          [1663841939.843673][13897:13897] CHIP:DL: BLE Layer shutdown
           [1663841939.843727][13897:13897] CHIP:DL: System Layer shutdown
           [1663841939.844009][13897:13897] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/pairing/PairingCommand.cpp:151: CHIP Error 0x00000003: Incorrect state
       cluster: "LogCommands"
