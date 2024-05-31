@@ -84,7 +84,8 @@ class DeviceConformanceTests(BasicCompositionTests):
         # These are clusters that weren't part of the 1.3 spec that landed in the SDK before the branch cut
         provisional_cluster_ids.extend([Clusters.WiFiNetworkManagement.id, Clusters.DemandResponseLoadControl.id])
         # These clusters are zigbee only. I don't even know why they're part of the codegen, but we should get rid of them.
-        provisional_cluster_ids.extend([Clusters.BarrierControl.id, Clusters.OnOffSwitchConfiguration.id, Clusters.BinaryInputBasic.id, Clusters.ElectricalMeasurement.id])
+        provisional_cluster_ids.extend([Clusters.BarrierControl.id, Clusters.OnOffSwitchConfiguration.id,
+                                       Clusters.BinaryInputBasic.id, Clusters.ElectricalMeasurement.id])
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 cluster_location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
