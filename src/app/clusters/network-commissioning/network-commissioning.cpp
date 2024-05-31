@@ -134,7 +134,7 @@ private:
     T * mValue;
 };
 
-/// convenience macor to auto-create a variable for you to release the given name at
+/// Convenience macro to auto-create a variable for you to release the given name at
 /// the exit of the current scope.
 #define DEFER_AUTO_RELEASE(name) AutoRelease autoRelease##__COUNTER__(name)
 
@@ -207,6 +207,7 @@ CHIP_ERROR WifiScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+/// Handles encoding a ThreadScanResponseIterator into a TLV response structure.
 class ThreadScanResponseToTLV : public chip::app::DataModel::EncodableToTLV
 {
 public:
