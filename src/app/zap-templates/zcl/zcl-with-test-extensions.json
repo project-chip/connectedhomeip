@@ -116,6 +116,7 @@
         "thermostat-cluster.xml",
         "thermostat-user-interface-configuration-cluster.xml",
         "thread-network-diagnostics-cluster.xml",
+        "thread-network-directory-cluster.xml",
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
         "timer-cluster.xml",

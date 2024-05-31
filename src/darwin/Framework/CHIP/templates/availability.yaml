@@ -9690,4 +9690,5 @@
   provisional:
       clusters:
           # Targeting Fall 2024
+          - ThreadNetworkDirectory
           - WiFiNetworkManagement
