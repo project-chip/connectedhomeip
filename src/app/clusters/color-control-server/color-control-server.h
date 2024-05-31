@@ -76,14 +76,6 @@ public:
     using DirectionEnum = chip::app::Clusters::ColorControl::DirectionEnum;
     using Feature       = chip::app::Clusters::ColorControl::Feature;
 
-    enum EnhancedColorMode : uint8_t
-    {
-        kCurrentHueAndCurrentSaturation         = 0,
-        kCurrentXAndCurrentY                    = 1,
-        kColorTemperature                       = 2,
-        kEnhancedCurrentHueAndCurrentSaturation = 3,
-    };
-
     enum Conversion
     {
         HSV_TO_HSV                 = 0x00,
