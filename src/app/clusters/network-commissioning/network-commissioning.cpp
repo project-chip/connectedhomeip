@@ -226,11 +226,11 @@ private:
     ///
     /// Returns the valid list of scan responses into `validResponses`
     CHIP_ERROR LoadResponses(Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
-                             Span<ThreadScanResponse> &validResponses) const;
+                             Span<ThreadScanResponse> & validResponses) const;
 };
 
 CHIP_ERROR ThreadScanResponseToTLV::LoadResponses(Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
-                                                  Span<ThreadScanResponse> &validResponses) const
+                                                  Span<ThreadScanResponse> & validResponses) const
 {
     VerifyOrReturnError(scanResponseArray.Alloc(chip::min(mNetworks->Count(), kMaxNetworksInScanResponse)), CHIP_ERROR_NO_MEMORY);
 
