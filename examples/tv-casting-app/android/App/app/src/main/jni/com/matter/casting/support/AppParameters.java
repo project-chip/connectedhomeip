@@ -28,7 +28,8 @@ public class AppParameters {
 
   @NonNull private final DataProvider<byte[]> rotatingDeviceIdUniqueIdProvider;
 
-  @NonNull private final DataProvider<CommissionableData> commissionableDataProvider;
+  // Not final since it needs to be updated during Commissioner-Generated passcode commissioning.
+  @NonNull private DataProvider<CommissionableData> commissionableDataProvider;
 
   @NonNull private final DACProvider dacProvider;
 

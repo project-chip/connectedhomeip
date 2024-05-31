@@ -62,6 +62,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    bool IsSetUp() const { return mCallbackObject.HasValidObjectRef() && mMethod != nullptr; }
+
     void Handle(T responseData)
     {
         ChipLogProgress(AppServer, "MatterCallbackJNI::Handle called");
@@ -89,6 +91,15 @@ class MatterFailureCallbackJNI : public MatterCallbackJNI<CHIP_ERROR>
 {
 public:
     MatterFailureCallbackJNI() : MatterCallbackJNI(matter::casting::support::convertMatterErrorFromCppToJava) {}
+};
+
+class MatterCommissionerDeclarationCallbackJNI
+    : public MatterCallbackJNI<chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration>
+{
+public:
+    MatterCommissionerDeclarationCallbackJNI() :
+        MatterCallbackJNI(matter::casting::support::convertCommissionerDeclarationFromCppToJava)
+    {}
 };
 
 }; // namespace support

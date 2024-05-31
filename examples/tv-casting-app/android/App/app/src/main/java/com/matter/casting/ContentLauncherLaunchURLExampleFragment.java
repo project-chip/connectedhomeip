@@ -39,11 +39,14 @@ public class ContentLauncherLaunchURLExampleFragment extends Fragment {
   private static final Integer SAMPLE_ENDPOINT_VID = 65521;
 
   private final CastingPlayer selectedCastingPlayer;
+  private final Boolean commissionerGeneratedPasscodeExample;
 
   private View.OnClickListener launchUrlButtonClickListener;
 
-  public ContentLauncherLaunchURLExampleFragment(CastingPlayer selectedCastingPlayer) {
+  public ContentLauncherLaunchURLExampleFragment(
+      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
     this.selectedCastingPlayer = selectedCastingPlayer;
+    this.commissionerGeneratedPasscodeExample = commissionerGeneratedPasscodeExample;
   }
 
   /**
@@ -54,8 +57,9 @@ public class ContentLauncherLaunchURLExampleFragment extends Fragment {
    * @return A new instance of fragment ContentLauncherLaunchURLExampleFragment.
    */
   public static ContentLauncherLaunchURLExampleFragment newInstance(
-      CastingPlayer selectedCastingPlayer) {
-    return new ContentLauncherLaunchURLExampleFragment(selectedCastingPlayer);
+      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+    return new ContentLauncherLaunchURLExampleFragment(
+        selectedCastingPlayer, commissionerGeneratedPasscodeExample);
   }
 
   @Override
@@ -68,8 +72,12 @@ public class ContentLauncherLaunchURLExampleFragment extends Fragment {
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     this.launchUrlButtonClickListener =
         v -> {
-          Endpoint endpoint =
-              EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+          Endpoint endpoint;
+          if (commissionerGeneratedPasscodeExample) {
+            endpoint = EndpointSelectorExample.selectFirstEndpoint(selectedCastingPlayer);
+          } else {
+            endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+          }
           if (endpoint == null) {
             Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
             return;

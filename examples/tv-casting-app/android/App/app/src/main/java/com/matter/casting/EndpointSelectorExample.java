@@ -31,4 +31,20 @@ public class EndpointSelectorExample {
     }
     return endpoint;
   }
+
+  /**
+   * Returns the first Endpoint in the list of Endpoints associated with the selectedCastingPlayer.
+   */
+  public static Endpoint selectFirstEndpoint(CastingPlayer selectedCastingPlayer) {
+    Endpoint endpoint = null;
+    if (selectedCastingPlayer != null) {
+      List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
+      if (endpoints == null || endpoints.isEmpty()) {
+        Log.e(TAG, "No Endpoints found on CastingPlayer");
+      } else {
+        endpoint = endpoints.get(0);
+      }
+    }
+    return endpoint;
+  }
 }

@@ -66,9 +66,14 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override
-  public void handleConnectionButtonClicked(CastingPlayer castingPlayer) {
-    Log.i(TAG, "MainActivity.handleConnectionButtonClicked() called");
-    showFragment(ConnectionExampleFragment.newInstance(castingPlayer));
+  public void handleConnectionButtonClicked(
+      CastingPlayer castingPlayer, Boolean useCommissionerGeneratedPasscode) {
+    Log.i(
+        TAG,
+        "MainActivity.handleConnectionButtonClicked() useCommissionerGeneratedPasscode: "
+            + useCommissionerGeneratedPasscode);
+    showFragment(
+        ConnectionExampleFragment.newInstance(castingPlayer, useCommissionerGeneratedPasscode));
   }
 
   @Override
@@ -77,26 +82,38 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override
-  public void handleConnectionComplete(CastingPlayer castingPlayer) {
-    Log.i(TAG, "MainActivity.handleConnectionComplete() called ");
-    showFragment(ActionSelectorFragment.newInstance(castingPlayer));
+  public void handleConnectionComplete(
+      CastingPlayer castingPlayer, Boolean useCommissionerGeneratedPasscode) {
+    Log.i(
+        TAG,
+        "MainActivity.handleConnectionComplete() useCommissionerGeneratedPasscode: "
+            + useCommissionerGeneratedPasscode);
+    showFragment(
+        ActionSelectorFragment.newInstance(castingPlayer, useCommissionerGeneratedPasscode));
   }
 
   @Override
-  public void handleContentLauncherLaunchURLSelected(CastingPlayer selectedCastingPlayer) {
-    showFragment(ContentLauncherLaunchURLExampleFragment.newInstance(selectedCastingPlayer));
+  public void handleContentLauncherLaunchURLSelected(
+      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+    showFragment(
+        ContentLauncherLaunchURLExampleFragment.newInstance(
+            selectedCastingPlayer, commissionerGeneratedPasscodeExample));
   }
 
   @Override
-  public void handleApplicationBasicReadVendorIDSelected(CastingPlayer selectedCastingPlayer) {
-    showFragment(ApplicationBasicReadVendorIDExampleFragment.newInstance(selectedCastingPlayer));
+  public void handleApplicationBasicReadVendorIDSelected(
+      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+    showFragment(
+        ApplicationBasicReadVendorIDExampleFragment.newInstance(
+            selectedCastingPlayer, commissionerGeneratedPasscodeExample));
   }
 
   @Override
   public void handleMediaPlaybackSubscribeToCurrentStateSelected(
-      CastingPlayer selectedCastingPlayer) {
+      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
     showFragment(
-        MediaPlaybackSubscribeToCurrentStateExampleFragment.newInstance(selectedCastingPlayer));
+        MediaPlaybackSubscribeToCurrentStateExampleFragment.newInstance(
+            selectedCastingPlayer, commissionerGeneratedPasscodeExample));
   }
 
   @Override
@@ -148,7 +165,10 @@ public class MainActivity extends AppCompatActivity
   private void showFragment(Fragment fragment, boolean showOnBack) {
     Log.d(
         TAG,
-        "showFragment() called with " + fragment.getClass().getSimpleName() + " and " + showOnBack);
+        "showFragment() called with: "
+            + fragment.getClass().getSimpleName()
+            + ", and showOnBack: "
+            + showOnBack);
     FragmentTransaction fragmentTransaction =
         getSupportFragmentManager()
             .beginTransaction()

@@ -176,9 +176,9 @@ public:
      * 2. Commissioner generated and displayed a passcode.
      * 3. The Commissioner replied with a CommissionerDecelration message with PasscodeDialogDisplayed and CommissionerPasscode set
      * to true.
-     * 3. Client has handled the Commissioner's CommissionerDecelration message.
-     * 4. Client prompted user to input Passcode from Commissioner.
-     * 5. Client has updated the commissioning session's PAKE verifier using the user input Passcode by updating the CastingApps
+     * 4. Client has handled the Commissioner's CommissionerDecelration message.
+     * 5. Client prompted user to input Passcode from Commissioner.
+     * 6. Client has updated the commissioning session's PAKE verifier using the user input Passcode by updating the CastingApp's
      * CommissionableDataProvider
      * (matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(CommissionableDataProvider)).
      *
@@ -186,6 +186,15 @@ public:
      * used.
      */
     void ContinueConnecting();
+
+    /**
+     * @brief This cancels the Commissioner-Generated passcode commissioning flow started via the VerifyOrEstablishConnection() API
+     * above. It constructs and sends an IdentificationDeclaration message to the Commissioner containing CancelPasscode set to
+     * true. It is used to indicate that the Commissionee user has cancelled the commissioning process. This indicates that the
+     * Commissioner can dismiss any dialogs corresponding to commissioning, such as a Passcode input dialog or a Passcode display
+     * dialog.
+     */
+    void StopConnecting();
 
     /**
      * @brief Sets the internal connection state of this CastingPlayer to "disconnected"

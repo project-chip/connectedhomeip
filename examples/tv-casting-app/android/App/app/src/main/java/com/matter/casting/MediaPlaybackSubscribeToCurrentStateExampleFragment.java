@@ -42,12 +42,15 @@ public class MediaPlaybackSubscribeToCurrentStateExampleFragment extends Fragmen
       MediaPlaybackSubscribeToCurrentStateExampleFragment.class.getSimpleName();
 
   private final CastingPlayer selectedCastingPlayer;
+  private final Boolean commissionerGeneratedPasscodeExample;
 
   private View.OnClickListener subscribeButtonClickListener;
   private View.OnClickListener shutdownSubscriptionsButtonClickListener;
 
-  public MediaPlaybackSubscribeToCurrentStateExampleFragment(CastingPlayer selectedCastingPlayer) {
+  public MediaPlaybackSubscribeToCurrentStateExampleFragment(
+      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
     this.selectedCastingPlayer = selectedCastingPlayer;
+    this.commissionerGeneratedPasscodeExample = commissionerGeneratedPasscodeExample;
   }
 
   /**
@@ -58,8 +61,9 @@ public class MediaPlaybackSubscribeToCurrentStateExampleFragment extends Fragmen
    * @return A new instance of fragment MediaPlaybackSubscribeToCurrentStateExampleFragment.
    */
   public static MediaPlaybackSubscribeToCurrentStateExampleFragment newInstance(
-      CastingPlayer selectedCastingPlayer) {
-    return new MediaPlaybackSubscribeToCurrentStateExampleFragment(selectedCastingPlayer);
+      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+    return new MediaPlaybackSubscribeToCurrentStateExampleFragment(
+        selectedCastingPlayer, commissionerGeneratedPasscodeExample);
   }
 
   @Override
@@ -70,7 +74,12 @@ public class MediaPlaybackSubscribeToCurrentStateExampleFragment extends Fragmen
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    Endpoint endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+    Endpoint endpoint;
+    if (commissionerGeneratedPasscodeExample) {
+      endpoint = EndpointSelectorExample.selectFirstEndpoint(selectedCastingPlayer);
+    } else {
+      endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+    }
     if (endpoint == null) {
       Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
       return inflater.inflate(

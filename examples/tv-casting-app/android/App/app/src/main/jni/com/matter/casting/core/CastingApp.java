@@ -46,6 +46,7 @@ public final class CastingApp {
   private AppParameters appParameters;
   private NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
   private ChipAppServer chipAppServer;
+  private AndroidChipPlatform chipPlatform;
 
   private CastingApp() {}
 
@@ -62,7 +63,7 @@ public final class CastingApp {
    * @param appParameters
    */
   public MatterError initialize(AppParameters appParameters) {
-    Log.i(TAG, "CastingApp.initialize called");
+    Log.i(TAG, "CastingApp.initialize() called");
     if (mState != CastingAppState.UNINITIALIZED) {
       return MatterError.CHIP_ERROR_INCORRECT_STATE;
     }
@@ -72,7 +73,7 @@ public final class CastingApp {
         new NsdManagerServiceResolver.NsdManagerResolverAvailState();
 
     Context applicationContext = appParameters.getApplicationContext();
-    AndroidChipPlatform chipPlatform =
+    chipPlatform =
         new AndroidChipPlatform(
             new AndroidBleManager(),
             new PreferencesKeyValueStoreManager(appParameters.getApplicationContext()),
@@ -93,7 +94,8 @@ public final class CastingApp {
             commissionableData.getDiscriminator());
     if (!updated) {
       Log.e(
-          TAG, "CastingApp.initApp failed to updateCommissionableDataProviderData on chipPlatform");
+          TAG,
+          "CastingApp.initialize() failed to (updateCommissionableDataProviderData() on chipPlatform");
       return MatterError.CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -104,6 +106,34 @@ public final class CastingApp {
       mState = CastingAppState.NOT_RUNNING; // initialization done, set state to NOT_RUNNING
     }
     return err;
+  }
+
+  /**
+   * Updates the Android CHIP platform with the CommissionableData. This function retrieves
+   * commissionable data from the AppParameters and updates the Android CHIP platform using this
+   * data. The commissionable data includes information such as the SPAKE2+ verifier, salt,
+   * iteration count, setup passcode, and discriminator.
+   *
+   * @return MatterError.NO_ERROR if the update was successful,
+   *     MatterError.CHIP_ERROR_INVALID_ARGUMENT otherwise.
+   */
+  public MatterError updateAndroidChipPlatformWithCommissionableData() {
+    Log.i(TAG, "CastingApp.updateAndroidChipPlatformWithCommissionableData()");
+    CommissionableData commissionableData = appParameters.getCommissionableDataProvider().get();
+    boolean updated =
+        chipPlatform.updateCommissionableDataProviderData(
+            commissionableData.getSpake2pVerifierBase64(),
+            commissionableData.getSpake2pSaltBase64(),
+            commissionableData.getSpake2pIterationCount(),
+            commissionableData.getSetupPasscode(),
+            commissionableData.getDiscriminator());
+    if (!updated) {
+      Log.e(
+          TAG,
+          "CastingApp.updateAndroidChipPlatformWithCommissionableData() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
+      return MatterError.CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return MatterError.NO_ERROR;
   }
 
   /**

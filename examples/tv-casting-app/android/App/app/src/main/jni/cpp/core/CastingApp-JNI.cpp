@@ -24,6 +24,7 @@
 
 // from tv-casting-common
 #include "core/CastingApp.h"
+#include "core/CommissionerDeclarationHandler.h"
 #include "support/ChipDeviceEventHandler.h"
 
 #include <app/clusters/bindings/BindingManager.h>
@@ -102,6 +103,16 @@ JNI_METHOD(jobject, finishStartup)(JNIEnv *, jobject)
     VerifyOrReturnValue(err == CHIP_NO_ERROR, support::convertMatterErrorFromCppToJava(err),
                         ChipLogError(AppServer, "Failed to register ChipDeviceEventHandler %" CHIP_ERROR_FORMAT, err.Format()));
 
+    ChipLogProgress(AppServer,
+                    "JNI_METHOD CastingAppJNI::finishStartup() calling "
+                    "GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler()");
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // Set a handler for Commissioner's CommissionerDeclaration messages. This is set in
+    // connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
+        CommissionerDeclarationHandler::GetInstance());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 
@@ -109,6 +120,11 @@ JNI_METHOD(jobject, shutdownAllSubscriptions)(JNIEnv * env, jobject)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "JNI_METHOD CastingApp-JNI::shutdownAllSubscriptions called");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->ShutdownAllSubscriptions();
     return support::convertMatterErrorFromCppToJava(err);

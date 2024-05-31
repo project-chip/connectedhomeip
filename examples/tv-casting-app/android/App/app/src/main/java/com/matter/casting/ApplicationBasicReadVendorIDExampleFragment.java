@@ -39,11 +39,14 @@ public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
       ApplicationBasicReadVendorIDExampleFragment.class.getSimpleName();
 
   private final CastingPlayer selectedCastingPlayer;
+  private final Boolean commissionerGeneratedPasscodeExample;
 
   private View.OnClickListener readButtonClickListener;
 
-  public ApplicationBasicReadVendorIDExampleFragment(CastingPlayer selectedCastingPlayer) {
+  public ApplicationBasicReadVendorIDExampleFragment(
+      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
     this.selectedCastingPlayer = selectedCastingPlayer;
+    this.commissionerGeneratedPasscodeExample = commissionerGeneratedPasscodeExample;
   }
 
   /**
@@ -54,8 +57,9 @@ public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
    * @return A new instance of fragment ApplicationBasicReadVendorIDExampleFragment.
    */
   public static ApplicationBasicReadVendorIDExampleFragment newInstance(
-      CastingPlayer selectedCastingPlayer) {
-    return new ApplicationBasicReadVendorIDExampleFragment(selectedCastingPlayer);
+      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+    return new ApplicationBasicReadVendorIDExampleFragment(
+        selectedCastingPlayer, commissionerGeneratedPasscodeExample);
   }
 
   @Override
@@ -68,8 +72,12 @@ public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     this.readButtonClickListener =
         v -> {
-          Endpoint endpoint =
-              EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+          Endpoint endpoint;
+          if (commissionerGeneratedPasscodeExample) {
+            endpoint = EndpointSelectorExample.selectFirstEndpoint(selectedCastingPlayer);
+          } else {
+            endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+          }
           if (endpoint == null) {
             Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
             return;

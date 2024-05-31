@@ -60,6 +60,10 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
     // information indicating the Commissioner's pre-commissioning state.
     if (connectionCallbacks.mCommissionerDeclarationCallback != nullptr)
     {
+        ChipLogProgress(AppServer,
+                        "CastingPlayer::VerifyOrEstablishConnection() Setting CommissionerDeclarationCallback in "
+                        "CommissionerDeclarationHandler");
+        // Set the callback for handling CommissionerDeclaration messages.
         matter::casting::core::CommissionerDeclarationHandler::GetInstance()->SetCommissionerDeclarationCallback(
             connectionCallbacks.mCommissionerDeclarationCallback);
     }
@@ -206,6 +210,33 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "CastingPlayer::ContinueConnecting() failed with %" CHIP_ERROR_FORMAT, err.Format());
+        resetState(err);
+    }
+}
+
+void CastingPlayer::StopConnecting()
+{
+    ChipLogProgress(AppServer, "CastingPlayer::StopConnecting()");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    mIdOptions.resetState();
+    mIdOptions.mCancelPasscode = true;
+
+    ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() calling SendUserDirectedCommissioningRequest()");
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    SuccessOrExit(err = SendUserDirectedCommissioningRequest());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+    support::ChipDeviceEventHandler::SetUdcStatus(false);
+    mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
+    mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
+    mTargetCastingPlayer           = nullptr;
+
+    ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() User Directed Commissioning stopped");
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingPlayer::StopConnecting() failed with %" CHIP_ERROR_FORMAT, err.Format());
         resetState(err);
     }
 }

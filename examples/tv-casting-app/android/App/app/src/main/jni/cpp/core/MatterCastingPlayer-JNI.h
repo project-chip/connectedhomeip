@@ -33,6 +33,7 @@ public:
     MatterCastingPlayerJNI() : mConnectionSuccessHandler([](void *) { return nullptr; }) {}
     support::MatterCallbackJNI<void *> mConnectionSuccessHandler;
     support::MatterFailureCallbackJNI mConnectionFailureHandler;
+    support::MatterCommissionerDeclarationCallbackJNI mCommissionerDeclarationHandler;
 
 private:
     friend MatterCastingPlayerJNI & MatterCastingPlayerJNIMgr();
