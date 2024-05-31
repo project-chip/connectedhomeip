@@ -74,7 +74,7 @@ public:
     using StepModeEnum  = chip::app::Clusters::ColorControl::StepModeEnum;
     using MoveModeEnum  = chip::app::Clusters::ColorControl::MoveModeEnum;
     using DirectionEnum = chip::app::Clusters::ColorControl::DirectionEnum;
-    using Feature      = chip::app::Clusters::ColorControl::Feature;
+    using Feature       = chip::app::Clusters::ColorControl::Feature;
 
     enum EnhancedColorMode : uint8_t
     {
