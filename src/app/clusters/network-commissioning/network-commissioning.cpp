@@ -215,8 +215,8 @@ private:
     CharSpan mDebugText;
     ThreadScanResponseIterator * mNetworks;
 
-    /// parses mNetworks into `buffer` and performs post-processing (sort and dedup)
-    /// on them.
+    /// Fills up scanResponseArray with valid and de-duplicated thread responses from mNetworks.
+    /// Handles sorting and keeping only largers rssi
     ///
     /// Returns the valid list of scan responses into `validResponses`
     CHIP_ERROR LoadResponses(Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray,
@@ -267,10 +267,9 @@ CHIP_ERROR ThreadScanResponseToTLV::LoadResponses(Platform::ScopedMemoryBuffer<T
             scanResponseArrayLength++;
         }
         scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
+        Sorting::InsertionSort(scanResponseArray.Get(), scanResponseArrayLength,
+                               [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
     }
-
-    Sorting::InsertionSort(scanResponseArray.Get(), scanResponseArrayLength,
-                           [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
 
     validResponses = Span<ThreadScanResponse>(scanResponseArray.Get(), scanResponseArrayLength);
 
