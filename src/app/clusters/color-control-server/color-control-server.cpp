@@ -128,7 +128,8 @@ public:
             {
                 loopDirectionValue = ColorControl::ColorLoopDirectionEnum::kDecrement;
             }
-            AddAttributeValuePair(pairs, Attributes::ColorLoopDirection::Id, static_cast<uint32_t>(loopDirectionValue), attributeCount);
+            AddAttributeValuePair(pairs, Attributes::ColorLoopDirection::Id, static_cast<uint32_t>(loopDirectionValue),
+                                  attributeCount);
 
             uint16_t loopTimeValue;
             if (Status::Success != Attributes::ColorLoopTime::Get(endpoint, &loopTimeValue))
@@ -198,10 +199,10 @@ public:
 #endif
 
         // Initialize action attributes to default values in case they are not in the scene
-        ColorControl::EnhancedColorModeEnum targetColorMode       = ColorControl::EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
-        uint8_t loopActiveValue                                   = 0x00;
-        ColorControl::ColorLoopDirectionEnum loopDirectionValue   = ColorControl::ColorLoopDirectionEnum::kDecrement;
-        uint16_t loopTimeValue                                    = 0x0019; // Default loop time value according to spec
+        ColorControl::EnhancedColorModeEnum targetColorMode = ColorControl::EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
+        uint8_t loopActiveValue                             = 0x00;
+        ColorControl::ColorLoopDirectionEnum loopDirectionValue = ColorControl::ColorLoopDirectionEnum::kDecrement;
+        uint16_t loopTimeValue                                  = 0x0019; // Default loop time value according to spec
 
         while (pair_iterator.Next())
         {
