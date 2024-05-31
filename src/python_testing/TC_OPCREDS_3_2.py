@@ -150,7 +150,8 @@ class TC_OPCREDS_3_2(MatterBaseTest):
                              "Unexpected fabricId does not match with CR2 fabricID")
 
         self.step(6)
-        cr3_fabric = await self.read_single_attribute_check_success(dev_ctrl=cr3_new_admin_ctrl,
+        cr3_fabric = await self.read_single_attribute_check_success(
+            dev_ctrl=cr3_new_admin_ctrl,
             node_id=cr3_dut_node_id,
             cluster=opcreds,
             attribute=opcreds.Attributes.Fabrics,
