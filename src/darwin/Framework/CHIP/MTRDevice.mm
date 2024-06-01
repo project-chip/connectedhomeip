@@ -209,6 +209,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _attributes[attribute] = value;
 }
 
+- (void)removeValueForAttribute:(NSNumber *)attribute
+{
+    [_attributes removeObjectForKey:attribute];
+}
+
 - (NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)attributes
 {
     return _attributes;
@@ -670,7 +675,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                                  completion:setDSTOffsetResponseHandler];
 }
 
-- (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(NSDictionary *)dataDictionary
+- (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary
 {
     if (![MTRArrayValueType isEqual:dataDictionary[MTRTypeKey]]) {
         return nil;
@@ -1892,6 +1897,17 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _clusterDataToPersist[clusterPath] = clusterData;
 }
 
+- (void)_removeCachedAttribute:(NSNumber *)attributeID fromCluster:(MTRClusterPath *)clusterPath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (_clusterDataToPersist == nil) {
+        return;
+    }
+    auto * clusterData = _clusterDataToPersist[clusterPath];
+    [clusterData removeValueForAttribute:attributeID];
+}
+
 - (void)_createDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions dataVersionFilterList:(DataVersionFilter **)dataVersionFilterList count:(size_t *)count sizeReduction:(size_t)sizeReduction
 {
     size_t maxDataVersionFilterSize = dataVersions.count;
@@ -2956,7 +2972,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 // Utility to return data value dictionary without data version
-- (NSDictionary *)_dataValueWithoutDataVersion:(NSDictionary *)attributeValue;
+- (NSDictionary *)_dataValueWithoutDataVersion:(NSDictionary *)attributeValue
 {
     // Sanity check for nil - return the same input to fail gracefully
     if (!attributeValue || !attributeValue[MTRTypeKey]) {
@@ -3018,6 +3034,116 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return NO;
 }
 
+- (void)_removeClusters:(NSSet<MTRClusterPath *> *)clusterPathsToRemove
+    doRemoveFromDataStore:(BOOL)doRemoveFromDataStore
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [_persistedClusters minusSet:clusterPathsToRemove];
+
+    for (MTRClusterPath * path in clusterPathsToRemove) {
+        [_persistedClusterData removeObjectForKey:path];
+        [_clusterDataToPersist removeObjectForKey:path];
+        if (doRemoveFromDataStore) {
+            [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:path.endpoint clusterID:path.cluster];
+        }
+    }
+}
+
+- (void)_removeAttributes:(NSSet<NSNumber *> *)attributes fromCluster:(MTRClusterPath *)clusterPath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    for (NSNumber * attribute in attributes) {
+        [self _removeCachedAttribute:attribute fromCluster:clusterPath];
+    }
+    // Just clear out the NSCache entry for this cluster, so we'll load it from storage as needed.
+    [_persistedClusterData removeObjectForKey:clusterPath];
+    [self.deviceController.controllerDataStore removeAttributes:attributes fromCluster:clusterPath forNodeID:self.nodeID];
+}
+
+- (void)_pruneEndpointsIn:(MTRDeviceDataValueDictionary)previousPartsListValue
+              missingFrom:(MTRDeviceDataValueDictionary)newPartsListValue
+{
+    // If the parts list changed and one or more endpoints were removed, remove all the
+    // clusters for all those endpoints from our data structures.
+    // Also remove those endpoints from the data store.
+    NSMutableSet<NSNumber *> * toBeRemovedEndpoints = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousPartsListValue]];
+    NSSet<NSNumber *> * endpointsOnDevice = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newPartsListValue]];
+    [toBeRemovedEndpoints minusSet:endpointsOnDevice];
+
+    for (NSNumber * endpoint in toBeRemovedEndpoints) {
+        NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
+        for (MTRClusterPath * path in _persistedClusters) {
+            if ([path.endpoint isEqualToNumber:endpoint]) {
+                [clusterPathsToRemove addObject:path];
+            }
+        }
+        [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:NO];
+        [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:endpoint];
+    }
+}
+
+- (void)_pruneClustersIn:(MTRDeviceDataValueDictionary)previousServerListValue
+             missingFrom:(MTRDeviceDataValueDictionary)newServerListValue
+             forEndpoint:(NSNumber *)endpointID
+{
+    // If the server list changed and clusters were removed, remove those clusters from our data structures.
+    // Also remove them from the data store.
+    NSMutableSet<NSNumber *> * toBeRemovedClusters = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousServerListValue]];
+    NSSet<NSNumber *> * clustersStillOnEndpoint = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newServerListValue]];
+    [toBeRemovedClusters minusSet:clustersStillOnEndpoint];
+
+    NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
+    for (MTRClusterPath * path in _persistedClusters) {
+        if ([path.endpoint isEqualToNumber:endpointID] && [toBeRemovedClusters containsObject:path.cluster])
+            [clusterPathsToRemove addObject:path];
+    }
+    [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:YES];
+}
+
+- (void)_pruneAttributesIn:(MTRDeviceDataValueDictionary)previousAttributeListValue
+               missingFrom:(MTRDeviceDataValueDictionary)newAttributeListValue
+                forCluster:(MTRClusterPath *)clusterPath
+{
+    // If the attribute list changed and attributes were removed, remove the attributes from our
+    // data structures.
+    NSMutableSet<NSNumber *> * toBeRemovedAttributes = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousAttributeListValue]];
+    NSSet<NSNumber *> * attributesStillInCluster = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newAttributeListValue]];
+
+    [toBeRemovedAttributes minusSet:attributesStillInCluster];
+    [self _removeAttributes:toBeRemovedAttributes fromCluster:clusterPath];
+}
+
+- (void)_pruneStoredDataForPath:(MTRAttributePath *)attributePath
+                    missingFrom:(MTRDeviceDataValueDictionary)newAttributeDataValue
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (![self _dataStoreExists] && !_clusterDataToPersist.count) {
+        MTR_LOG_DEBUG("%@ No data store to prune from", self);
+        return;
+    }
+
+    // Check if parts list changed or server list changed for the descriptor cluster or the attribute list changed for a cluster.
+    // If yes, we might need to prune any deleted endpoints, clusters or attributes from the storage and persisted cluster data.
+    if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID) {
+        if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributePartsListID && [attributePath.endpoint isEqualToNumber:@(kRootEndpointId)]) {
+            [self _pruneEndpointsIn:[self _cachedAttributeValueForPath:attributePath] missingFrom:newAttributeDataValue];
+            return;
+        }
+
+        if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID) {
+            [self _pruneClustersIn:[self _cachedAttributeValueForPath:attributePath] missingFrom:newAttributeDataValue forEndpoint:attributePath.endpoint];
+            return;
+        }
+    }
+
+    if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeAttributeListID) {
+        [self _pruneAttributesIn:[self _cachedAttributeValueForPath:attributePath] missingFrom:newAttributeDataValue forCluster:[MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster]];
+    }
+}
+
 // assume lock is held
 - (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues fromSubscription:(BOOL)isFromSubscription
 {
@@ -3071,13 +3197,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
                 }
 
-                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
+                [self _pruneStoredDataForPath:attributePath missingFrom:attributeDataValue];
+
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
                     if (_deviceConfigurationChanged) {
                         MTR_LOG("Device configuration changed due to changes in attribute %@", attributePath);
                     }
                 }
+
+                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
             }
 
 #ifdef DEBUG
@@ -3229,6 +3358,22 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     [datastore storeDeviceData:[data copy] forNodeID:self.nodeID];
 }
+
+#ifdef DEBUG
+- (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path
+{
+    std::lock_guard lock(_lock);
+
+    return [[self _clusterDataForPath:path] copy];
+}
+
+- (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path
+{
+    std::lock_guard lock(_lock);
+
+    return [_persistedClusters containsObject:path];
+}
+#endif
 
 - (BOOL)deviceCachePrimed
 {
