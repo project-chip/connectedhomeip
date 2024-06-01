@@ -126,8 +126,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -958,6 +958,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
 
         /* BEGIN DRAGONS: This is a huge hack for a specific use case, do not rename, remove or modify behavior here */
+        // TODO: This should only be called for thread devices
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if ([delegate respondsToSelector:@selector(_deviceInternalStateChanged:)]) {
             dispatch_async(_delegateQueue, ^{
@@ -3505,13 +3506,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     std::lock_guard lock(_lock);
 
+    // TODO: This should always return YES for thread devices
     return HaveSubscriptionEstablishedRightNow(_internalDeviceState);
 }
 
 - (void)_deviceMayBeReachable
 {
     MTR_LOG("%@ _deviceMayBeReachable called", self);
-
+    // TODO: This should only be allowed for thread devices
     [_deviceController asyncDispatchToMatterQueue:^{
         [self _triggerResubscribeWithReason:@"SPI client indicated the device may now be reachable"
                         nodeLikelyReachable:YES];
