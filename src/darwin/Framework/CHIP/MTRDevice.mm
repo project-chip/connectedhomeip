@@ -126,8 +126,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -3510,12 +3510,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)_deviceMayBeReachable
 {
-    assertChipStackLockedByCurrentThread();
-
     MTR_LOG("%@ _deviceMayBeReachable called", self);
 
-    [self _triggerResubscribeWithReason:@"SPI client indicated the device may now be reachable"
-                    nodeLikelyReachable:YES];
+    [_deviceController asyncDispatchToMatterQueue:^{
+        [self _triggerResubscribeWithReason:@"SPI client indicated the device may now be reachable"
+                        nodeLikelyReachable:YES];
+    } errorHandler:nil];
 }
 
 /* END DRAGONS */
