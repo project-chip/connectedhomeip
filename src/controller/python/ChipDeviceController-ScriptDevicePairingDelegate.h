@@ -27,6 +27,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningWindowOpener.h>
+#include <controller/python/chip/icd/PyChipCheckInDelegate.h>
 #include <controller/python/chip/native/PyChipError.h>
 
 namespace chip {
@@ -87,8 +88,9 @@ private:
     DevicePairingDelegate_OnFabricCheckFunct mOnFabricCheckCallback                             = nullptr;
     Callback::Callback<Controller::OnOpenCommissioningWindow> mOpenWindowCallback;
     Controller::CommissioningWindowOpener * mWindowOpener = nullptr;
-    bool expectingPairingComplete                         = false;
-    FabricIndex mFabricIndex                              = 0;
+
+    bool expectingPairingComplete = false;
+    FabricIndex mFabricIndex      = 0;
 };
 
 } // namespace Controller

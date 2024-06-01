@@ -36,11 +36,11 @@ source_set("manager") {
 # All sources and configurations used by the CheckInHandler need to go in this source-set
 source_set("handler") {
   sources = [
+    "CheckInDelegate.h",
     "CheckInHandler.cpp",
     "CheckInHandler.h",
     "DefaultCheckInDelegate.cpp",
     "DefaultCheckInDelegate.h",
-    "PyChipCheckInDelegate.h",
     "RefreshKeySender.cpp",
     "RefreshKeySender.h",
   ]

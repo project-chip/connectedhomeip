@@ -18,12 +18,9 @@
 
 #include "PyChipCheckInDelegate.h"
 
-#include <controller/python/chip/native/ChipMainLoopWork.h>
-
 using namespace ::chip;
 using namespace ::chip::app;
-
-PyChipCheckInDelegate PyChipCheckInDelegate::sInstance;
+using namespace ::chip::Controller;
 
 void PyChipCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 {
@@ -33,10 +30,4 @@ void PyChipCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
     {
         mCallback(clientInfo.peer_node);
     }
-}
-
-extern "C" void pychip_CheckInDelegate_SetOnCheckInCompleteCallback(PyChipCheckInDelegate::OnCheckInCompleteCallback * callback)
-{
-    chip::MainLoopWork::ExecuteInMainLoop(
-        [callback]() { PyChipCheckInDelegate::GetInstance().SetOnCheckInCompleteCallback(callback); });
 }

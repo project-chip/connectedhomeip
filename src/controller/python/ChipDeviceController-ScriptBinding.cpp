@@ -60,6 +60,7 @@
 #include <controller/python/ChipDeviceController-StorageDelegate.h>
 #include <controller/python/chip/icd/PyChipCheckInDelegate.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
+#include <controller/python/chip/native/ChipMainLoopWork.h>
 #include <controller/python/chip/native/PyChipError.h>
 
 #include <credentials/GroupDataProviderImpl.h>
@@ -119,6 +120,7 @@ chip::app::CheckInHandler sCheckInHandler;
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
 // knowing its id, because the ID can be learned on the first response that is received.
+chip::Controller::PyChipCheckInDelegate sCheckInDelegate;
 chip::NodeId kDefaultLocalDeviceId = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 uint8_t sICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
@@ -246,6 +248,11 @@ void * pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObjec
                                                chip::Controller::Python::SetGetKeyValueCb getCb,
                                                chip::Controller::Python::SyncDeleteKeyValueCb deleteCb);
 void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * storageAdapter);
+
+//
+// ICD
+//
+void pychip_CheckInDelegate_SetOnCheckInCompleteCallback(PyChipCheckInDelegate::OnCheckInCompleteCallback * callback);
 }
 
 void * pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
@@ -304,10 +311,9 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     DeviceControllerFactory::GetInstance().RetainSystemState();
 
     auto engine = chip::app::InteractionModelEngine::GetInstance();
-    PyReturnErrorOnFailure(ToPyChipError(PyChipCheckInDelegate::GetInstance().Init(&sICDClientStorage, engine)));
-    PyReturnErrorOnFailure(
-        ToPyChipError(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                           &sICDClientStorage, &PyChipCheckInDelegate::GetInstance(), engine)));
+    PyReturnErrorOnFailure(ToPyChipError(sCheckInDelegate.Init(&sICDClientStorage, engine)));
+    PyReturnErrorOnFailure(ToPyChipError(sCheckInHandler.Init(
+        DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(), &sICDClientStorage, &sCheckInDelegate, engine)));
 
     //
     // Finally, start up the main Matter thread. Any further interactions with the stack
@@ -955,4 +961,9 @@ PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFun
     }
     PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
     return ToPyChipError(CHIP_NO_ERROR);
+}
+
+void pychip_CheckInDelegate_SetOnCheckInCompleteCallback(PyChipCheckInDelegate::OnCheckInCompleteCallback * callback)
+{
+    chip::MainLoopWork::ExecuteInMainLoop([callback]() { sCheckInDelegate.SetOnCheckInCompleteCallback(callback); });
 }

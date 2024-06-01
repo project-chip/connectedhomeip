@@ -20,6 +20,9 @@
 
 #include <app/icd/client/DefaultCheckInDelegate.h>
 
+namespace chip {
+namespace Controller {
+
 class PyChipCheckInDelegate : public chip::app::DefaultCheckInDelegate
 {
 public:
@@ -31,10 +34,9 @@ public:
 
     void SetOnCheckInCompleteCallback(OnCheckInCompleteCallback * callback) { mCallback = callback; }
 
-    static PyChipCheckInDelegate & GetInstance() { return sInstance; }
-
 private:
-    static PyChipCheckInDelegate sInstance;
-
     OnCheckInCompleteCallback * mCallback;
 };
+
+} // namespace Controller
+} // namespace chip
