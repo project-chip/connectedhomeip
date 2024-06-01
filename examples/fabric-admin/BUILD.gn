@@ -33,6 +33,7 @@ config("config") {
   include_dirs = [
     ".",
     "${chip_root}/examples/common",
+    "${chip_root}/examples/platform/linux",
     "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
@@ -114,6 +115,8 @@ static_library("fabric-admin-utils") {
     ]
 
     sources += [
+      "${chip_root}/examples/platform/linux/RpcClientProcessor.cpp",
+      "${chip_root}/examples/platform/linux/RpcClientProcessor.h",
       "${chip_root}/examples/platform/linux/system_rpc_server.cc",
       "rpc/RpcClient.cpp",
       "rpc/RpcClient.h",

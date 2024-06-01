@@ -25,7 +25,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <lib/support/ZclString.h>
 
-#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE)
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "RpcClient.h"
 #include "RpcServer.h"
 #endif
@@ -64,15 +64,16 @@ void BridgePollingThread()
                 ChipLogProgress(NotSpecified, "Exiting.....");
                 exit(0);
             }
-#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE)
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             else if (ch == 'o')
             {
-                if (OpenCommissioningWindow(0x1234) != CHIP_NO_ERROR)
+                CHIP_ERROR err = OpenCommissioningWindow(0x1234);
+                if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(NotSpecified, "Failed to call OpenCommissioningWindow RPC");
+                    ChipLogError(NotSpecified, "Failed to call OpenCommissioningWindow RPC: %" CHIP_ERROR_FORMAT, err.Format());
                 }
             }
-#endif
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             continue;
         }
 
@@ -81,7 +82,7 @@ void BridgePollingThread()
     }
 }
 
-#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE)
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
 {
     if (InitRpcClient(kFabricAdminServerPort) == CHIP_NO_ERROR)
@@ -94,7 +95,7 @@ void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
         systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
     }
 }
-#endif
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 
 DeviceManager gDeviceManager;
 
@@ -102,9 +103,8 @@ DeviceManager gDeviceManager;
 
 void ApplicationInit()
 {
-#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE)
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     InitRpcServer(kFabricBridgeServerPort);
-
     AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
 #endif
 

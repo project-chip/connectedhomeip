@@ -22,6 +22,25 @@
 
 constexpr uint16_t kFabricBridgeServerPort = 33002;
 
+/**
+ * @brief Initializes the RPC client with the specified server port.
+ *
+ * This function sets the RPC server port and starts packet processing for the RPC client.
+ *
+ * @param rpcServerPort The port number on which the RPC server is running.
+ * @return CHIP_NO_ERROR on successful initialization, or an appropriate CHIP_ERROR on failure.
+ */
 CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
 
+/**
+ * @brief Adds a synchronized device to the RPC client.
+ *
+ * This function attempts to add a device identified by its `nodeId` to the synchronized device list.
+ * It logs the progress and checks if an `OpenCommissioningWindow` operation is already in progress.
+ * If an operation is in progress, it returns `CHIP_ERROR_BUSY`.
+ *
+ * @param nodeId The Node ID of the device to be added.
+ * @return CHIP_NO_ERROR on success, `CHIP_ERROR_BUSY` if an operation is already in progress,
+ *         or `CHIP_ERROR_INTERNAL` if there is an internal error while activating the RPC call.
+ */
 CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId);

@@ -17,6 +17,7 @@
  */
 
 #include "RpcClient.h"
+#include "RpcClientProcessor.h"
 
 #include <string>
 #include <thread>
@@ -30,108 +31,27 @@
 #include "pw_rpc/client.h"
 #include "pw_stream/socket_stream.h"
 
+using namespace chip;
+
 namespace {
 
-constexpr size_t kMaxTransmissionUnit = 256;
-constexpr uint32_t kRpcTimeoutMs      = 1000;
-const char * rpcServerAddress         = "127.0.0.1";
-
-pw::stream::SocketStream rpcSocketStream;
-
-// Set up the output channel for the pw_rpc client to use.
-pw::hdlc::RpcChannelOutput hdlc_channel_output(rpcSocketStream, pw::hdlc::kDefaultRpcAddress, "HDLC channel");
-
-// An array of RPC channels (channels) is created, each associated with an HDLC channel output.
-// This sets up the communication channels for RPC calls.
-pw::rpc::Channel channels[] = { pw::rpc::Channel::Create<1>(&hdlc_channel_output) };
-
-// Initialize the RPC client with the channels.
-pw::rpc::Client client(channels);
-
-// Generated clients are namespaced with their proto library.
-using FabricAdminClient = chip::rpc::pw_rpc::nanopb::FabricAdmin::Client;
-
-// RPC channel ID on which to make client calls. RPC calls cannot be made on
-// channel 0 (Channel::kUnassignedChannelId).
+// Constants
 constexpr uint32_t kDefaultChannelId = 1;
 
-// Function to process incoming packets
-void ProcessPackets()
-{
-    std::array<std::byte, kMaxTransmissionUnit> inputBuf;
-    pw::hdlc::Decoder decoder(inputBuf);
+// Fabric Admin Client
+rpc::pw_rpc::nanopb::FabricAdmin::Client fabricAdminClient(rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
+pw::rpc::NanopbUnaryReceiver<::chip_rpc_OperationStatus> openCommissioningWindowCall;
 
-    while (true)
-    {
-        std::array<std::byte, kMaxTransmissionUnit> data;
-        auto ret = rpcSocketStream.Read(data);
-        if (!ret.ok())
-        {
-            if (ret.status() == pw::Status::OutOfRange())
-            {
-                // Handle remote disconnect
-                rpcSocketStream.Close();
-                return;
-            }
-            continue;
-        }
-
-        for (std::byte byte : ret.value())
-        {
-            auto result = decoder.Process(byte);
-            if (!result.ok())
-            {
-                // Wait for more bytes that form a complete packet
-                continue;
-            }
-            pw::hdlc::Frame & frame = result.value();
-            if (frame.address() != pw::hdlc::kDefaultRpcAddress)
-            {
-                // Wrong address; ignore the packet
-                continue;
-            }
-
-            client.ProcessPacket(frame.data()).IgnoreError();
-        }
-    }
-}
-
-template <typename CallType>
-CHIP_ERROR WaitForResponse(CallType & call)
-{
-    if (!call.active())
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    // Wait for the response or timeout
-    uint32_t elapsedTimeMs     = 0;
-    const uint32_t sleepTimeMs = 100;
-
-    while (call.active() && elapsedTimeMs < kRpcTimeoutMs)
-    {
-        usleep(sleepTimeMs * 1000);
-        elapsedTimeMs += sleepTimeMs;
-    }
-
-    if (elapsedTimeMs >= kRpcTimeoutMs)
-    {
-        ChipLogError(NotSpecified, "RPC Response timed out!");
-        return CHIP_ERROR_TIMEOUT;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void OperationStatusResponse(const chip_rpc_OperationStatus & response, pw::Status status)
+// Callback function to be called when the RPC response is received
+void OnOpenCommissioningWindowCompleted(const chip_rpc_OperationStatus & response, pw::Status status)
 {
     if (status.ok())
     {
-        ChipLogProgress(NotSpecified, "Received operation status: %d", response.success);
+        ChipLogProgress(NotSpecified, "OpenCommissioningWindow received operation status: %d", response.success);
     }
     else
     {
-        ChipLogProgress(NotSpecified, "RPC call failed with status: %d\n", status.code());
+        ChipLogProgress(NotSpecified, "OpenCommissioningWindow RPC call failed with status: %d\n", status.code());
     }
 }
 
@@ -139,27 +59,30 @@ void OperationStatusResponse(const chip_rpc_OperationStatus & response, pw::Stat
 
 CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
 {
-    if (rpcSocketStream.Connect(rpcServerAddress, rpcServerPort) != PW_STATUS_OK)
-    {
-        return CHIP_ERROR_NOT_CONNECTED;
-    }
-
-    // Start a thread to process incoming packets
-    std::thread packet_processor(ProcessPackets);
-    packet_processor.detach();
-
-    return CHIP_NO_ERROR;
+    rpc::client::SetRpcServerPort(rpcServerPort);
+    return rpc::client::StartPacketProcessing();
 }
 
-CHIP_ERROR OpenCommissioningWindow(chip::NodeId nodeId)
+CHIP_ERROR OpenCommissioningWindow(NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "OpenCommissioningWindow\n");
 
-    FabricAdminClient fabric_admin_client(client, kDefaultChannelId);
+    if (openCommissioningWindowCall.active())
+    {
+        ChipLogError(NotSpecified, "OpenCommissioningWindow is in progress\n");
+        return CHIP_ERROR_BUSY;
+    }
+
     chip_rpc_DeviceInfo device;
     device.node_id = nodeId;
 
-    // The RPC will remain active as long as `call` is alive.
-    auto call = fabric_admin_client.OpenCommissioningWindow(device, OperationStatusResponse);
-    return WaitForResponse(call);
+    // The RPC will remain active as long as `openCommissioningWindowCall` is alive.
+    openCommissioningWindowCall = fabricAdminClient.OpenCommissioningWindow(device, OnOpenCommissioningWindowCompleted);
+
+    if (!openCommissioningWindowCall.active())
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
 }

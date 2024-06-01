@@ -34,8 +34,8 @@ executable("fabric-bridge-app") {
   sources = [
     "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/include/CHIPProjectAppConfig.h",
     "Device.cpp",
-    "include/Device.h",
     "DeviceManager.cpp",
+    "include/Device.h",
     "include/DeviceManager.h",
     "main.cpp",
   ]
@@ -57,6 +57,8 @@ executable("fabric-bridge-app") {
     ]
 
     sources += [
+      "${chip_root}/examples/platform/linux/RpcClientProcessor.cpp",
+      "${chip_root}/examples/platform/linux/RpcClientProcessor.h",
       "${chip_root}/examples/platform/linux/system_rpc_server.cc",
       "RpcClient.cpp",
       "RpcServer.cpp",
@@ -81,7 +83,10 @@ executable("fabric-bridge-app") {
 
     deps += pw_build_LINK_DEPS
 
-    include_dirs += [ "${chip_root}/examples/common" ]
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/platform/linux",
+    ]
   }
 
   output_dir = root_out_dir

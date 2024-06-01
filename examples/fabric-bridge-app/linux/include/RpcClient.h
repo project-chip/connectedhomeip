@@ -22,6 +22,23 @@
 
 constexpr uint16_t kFabricAdminServerPort = 33001;
 
+/**
+ * Initializes the RPC client by setting the server port and starting packet processing.
+ *
+ * @param rpcServerPort The port number of the RPC server.
+ * @return CHIP_ERROR An error code indicating the success or failure of the initialization process.
+ * - CHIP_NO_ERROR: Initialization was successful.
+ * - Other error codes indicating specific failure reasons.
+ */
 CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
 
+/**
+ * Opens a commissioning window for a specified node.
+ *
+ * @param nodeId The identifier of the node for which the commissioning window should be opened.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The commissioning window was successfully opened.
+ * - CHIP_ERROR_BUSY: Another commissioning window is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred.
+ */
 CHIP_ERROR OpenCommissioningWindow(chip::NodeId nodeId);
