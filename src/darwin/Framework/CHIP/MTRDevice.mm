@@ -3099,9 +3099,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         if ([path.endpoint isEqualToNumber:endpointID] && [toBeRemovedClusters containsObject:path.cluster])
             [clusterPathsToRemove addObject:path];
     }
-}
-}
-[self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:YES];
+    [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:YES];
 }
 
 - (void)_pruneAttributesIn:(MTRDeviceDataValueDictionary)previousAttributeListValue
