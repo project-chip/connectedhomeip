@@ -1682,6 +1682,30 @@ namespace SetScheduledContentRatingThreshold {
 static constexpr CommandId Id = 0x0000000A;
 } // namespace SetScheduledContentRatingThreshold
 
+namespace AddBlockChannels {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace AddBlockChannels
+
+namespace RemoveBlockChannels {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace RemoveBlockChannels
+
+namespace AddBlockApplications {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace AddBlockApplications
+
+namespace RemoveBlockApplications {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace RemoveBlockApplications
+
+namespace SetBlockContentTimeWindow {
+static constexpr CommandId Id = 0x0000000F;
+} // namespace SetBlockContentTimeWindow
+
+namespace RemoveBlockContentTimeWindow {
+static constexpr CommandId Id = 0x00000010;
+} // namespace RemoveBlockContentTimeWindow
+
 } // namespace Commands
 } // namespace ContentControl
 

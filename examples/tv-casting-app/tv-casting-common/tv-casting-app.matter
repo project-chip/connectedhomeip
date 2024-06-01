@@ -1636,25 +1636,30 @@ cluster Channel = 1284 {
     kRecordProgram = 0x8;
   }
 
-  bitmap RecordingFlagBitmap : bitmap32 {
+  bitmap RecordingFlagBitmap : bitmap8 {
     kScheduled = 0x1;
     kRecordSeries = 0x2;
     kRecorded = 0x4;
   }
 
-  struct ProgramCastStruct {
+  struct AdditionalInfoStruct {
     char_string name = 0;
-    char_string role = 1;
+    char_string value = 1;
+  }
+
+  struct ProgramCastStruct {
+    long_char_string<256> name = 0;
+    long_char_string<256> role = 1;
   }
 
   struct ProgramCategoryStruct {
-    char_string category = 0;
-    optional char_string subCategory = 1;
+    long_char_string<256> category = 0;
+    optional long_char_string<256> subCategory = 1;
   }
 
   struct SeriesInfoStruct {
-    char_string season = 0;
-    char_string episode = 1;
+    long_char_string<256> season = 0;
+    long_char_string<256> episode = 1;
   }
 
   struct ChannelInfoStruct {
@@ -1668,41 +1673,36 @@ cluster Channel = 1284 {
   }
 
   struct ProgramStruct {
-    char_string identifier = 0;
+    char_string<255> identifier = 0;
     ChannelInfoStruct channel = 1;
     epoch_s startTime = 2;
     epoch_s endTime = 3;
-    char_string title = 4;
-    optional char_string subtitle = 5;
-    optional char_string description = 6;
+    char_string<255> title = 4;
+    optional char_string<255> subtitle = 5;
+    optional long_char_string<8192> description = 6;
     optional char_string audioLanguages[] = 7;
     optional char_string ratings[] = 8;
-    optional char_string thumbnailUrl = 9;
-    optional char_string posterArtUrl = 10;
-    optional char_string dvbiUrl = 11;
-    optional char_string releaseDate = 12;
-    optional char_string parentalGuidanceText = 13;
+    optional long_char_string<8192> thumbnailUrl = 9;
+    optional long_char_string<8192> posterArtUrl = 10;
+    optional long_char_string<8192> dvbiUrl = 11;
+    optional char_string<30> releaseDate = 12;
+    optional char_string<255> parentalGuidanceText = 13;
     optional RecordingFlagBitmap recordingFlag = 14;
     optional nullable SeriesInfoStruct seriesInfo = 15;
     optional ProgramCategoryStruct categoryList[] = 16;
     optional ProgramCastStruct castList[] = 17;
-    optional ProgramCastStruct externalIDList[] = 18;
+    optional AdditionalInfoStruct externalIDList[] = 18;
   }
 
   struct PageTokenStruct {
     optional int16u limit = 0;
-    optional char_string after = 1;
-    optional char_string before = 2;
+    optional long_char_string<8192> after = 1;
+    optional long_char_string<8192> before = 2;
   }
 
   struct ChannelPagingStruct {
     optional nullable PageTokenStruct previousToken = 0;
     optional nullable PageTokenStruct nextToken = 1;
-  }
-
-  struct AdditionalInfoStruct {
-    char_string name = 0;
-    char_string value = 1;
   }
 
   struct LineupInfoStruct {
@@ -1741,13 +1741,13 @@ cluster Channel = 1284 {
   }
 
   request struct GetProgramGuideRequest {
-    optional epoch_s startTime = 0;
-    optional epoch_s endTime = 1;
+    epoch_s startTime = 0;
+    epoch_s endTime = 1;
     optional ChannelInfoStruct channelList[] = 2;
-    optional PageTokenStruct pageToken = 3;
-    optional RecordingFlagBitmap recordingFlag = 4;
+    optional nullable PageTokenStruct pageToken = 3;
+    optional nullable RecordingFlagBitmap recordingFlag = 4;
     optional AdditionalInfoStruct externalIDList[] = 5;
-    optional octet_string data = 6;
+    optional octet_string<8092> data = 6;
   }
 
   response struct ProgramGuideResponse = 5 {
@@ -1756,17 +1756,17 @@ cluster Channel = 1284 {
   }
 
   request struct RecordProgramRequest {
-    char_string programIdentifier = 0;
+    char_string<255> programIdentifier = 0;
     boolean shouldRecordSeries = 1;
-    AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    optional AdditionalInfoStruct externalIDList[] = 2;
+    optional octet_string<8092> data = 3;
   }
 
   request struct CancelRecordProgramRequest {
-    char_string programIdentifier = 0;
+    char_string<255> programIdentifier = 0;
     boolean shouldRecordSeries = 1;
-    AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    optional AdditionalInfoStruct externalIDList[] = 2;
+    optional octet_string<8092> data = 3;
   }
 
   /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
@@ -1799,9 +1799,9 @@ cluster TargetNavigator = 1285 {
   }
 
   info event TargetUpdated = 0 {
-    TargetInfoStruct targetList[] = 0;
-    int8u currentTarget = 1;
-    octet_string data = 2;
+    optional TargetInfoStruct targetList[] = 0;
+    optional int8u currentTarget = 1;
+    optional octet_string data = 2;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
@@ -1878,12 +1878,13 @@ cluster MediaPlayback = 1286 {
 
   struct TrackAttributesStruct {
     char_string<32> languageCode = 0;
-    optional nullable char_string displayName = 1;
+    optional nullable CharacteristicEnum characteristics[] = 1;
+    optional nullable long_char_string<256> displayName = 2;
   }
 
   struct TrackStruct {
     char_string<32> id = 0;
-    nullable TrackAttributesStruct trackAttributes = 1;
+    TrackAttributesStruct trackAttributes = 1;
   }
 
   struct PlaybackPositionStruct {
@@ -1893,14 +1894,14 @@ cluster MediaPlayback = 1286 {
 
   info event StateChanged = 0 {
     PlaybackStateEnum currentState = 0;
-    EPOCH_US startTime = 1;
-    INT64U duration = 2;
-    PlaybackPositionStruct sampledPosition = 3;
-    single playbackSpeed = 4;
-    INT64U seekRangeEnd = 5;
-    INT64U seekRangeStart = 6;
-    optional OCTET_STRING data = 7;
-    boolean audioAdvanceUnmuted = 8;
+    optional epoch_us startTime = 1;
+    optional int64u duration = 2;
+    optional PlaybackPositionStruct sampledPosition = 3;
+    optional single playbackSpeed = 4;
+    optional int64u seekRangeEnd = 5;
+    optional int64u seekRangeStart = 6;
+    optional octet_string data = 7;
+    optional boolean audioAdvanceUnmuted = 8;
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
@@ -1947,12 +1948,12 @@ cluster MediaPlayback = 1286 {
   }
 
   request struct ActivateAudioTrackRequest {
-    CHAR_STRING trackID = 0;
-    INT8U audioOutputIndex = 1;
+    char_string<32> trackID = 0;
+    optional nullable int8u audioOutputIndex = 1;
   }
 
   request struct ActivateTextTrackRequest {
-    CHAR_STRING trackID = 0;
+    char_string<32> trackID = 0;
   }
 
   /** Upon receipt, this SHALL play media. */
@@ -1987,7 +1988,7 @@ cluster MediaPlayback = 1286 {
 
 /** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 cluster MediaInput = 1287 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum InputTypeEnum : enum8 {
     kInternal = 0;
@@ -2045,7 +2046,7 @@ cluster MediaInput = 1287 {
 
 /** This cluster provides an interface for managing low power mode on a device. */
 cluster LowPower = 1288 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2060,7 +2061,7 @@ cluster LowPower = 1288 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 cluster KeypadInput = 1289 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
@@ -2184,7 +2185,7 @@ cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 1;
+  revision 2;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -2243,9 +2244,9 @@ cluster ContentLauncher = 1290 {
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
-    kAdvancedSeek = 0x3;
-    kTextTracks = 0x4;
-    kAudioTracks = 0x5;
+    kAdvancedSeek = 0x4;
+    kTextTracks = 0x8;
+    kAudioTracks = 0x10;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -2261,24 +2262,24 @@ cluster ContentLauncher = 1290 {
 
   struct TrackPreferenceStruct {
     char_string<32> languageCode = 0;
-    optional CharacteristicEnum characteristics[] = 1;
-    int8u audioOutputIndex = 2;
+    optional nullable CharacteristicEnum characteristics[] = 1;
+    optional nullable int8u audioOutputIndex = 2;
   }
 
   struct PlaybackPreferencesStruct {
-    int64u playbackPosition = 0;
-    TrackPreferenceStruct textTrack = 1;
-    optional TrackPreferenceStruct audioTracks[] = 2;
+    optional nullable int64u playbackPosition = 0;
+    optional nullable TrackPreferenceStruct textTrack = 1;
+    optional nullable TrackPreferenceStruct audioTracks[] = 2;
   }
 
   struct AdditionalInfoStruct {
-    char_string<256> name = 0;
-    char_string<8192> value = 1;
+    long_char_string<256> name = 0;
+    long_char_string<8192> value = 1;
   }
 
   struct ParameterStruct {
     ParameterEnum type = 0;
-    char_string<1024> value = 1;
+    long_char_string<1024> value = 1;
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
@@ -2287,13 +2288,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformationStruct {
-    optional char_string<8192> imageURL = 0;
+    optional long_char_string<8192> imageURL = 0;
     optional char_string<9> color = 1;
     optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
-    char_string<256> providerName = 0;
+    long_char_string<256> providerName = 0;
     optional StyleInformationStruct background = 1;
     optional StyleInformationStruct logo = 2;
     optional StyleInformationStruct progressBar = 3;
@@ -2322,6 +2323,7 @@ cluster ContentLauncher = 1290 {
     char_string contentURL = 0;
     optional char_string displayString = 1;
     optional BrandingInformationStruct brandingInformation = 2;
+    optional PlaybackPreferencesStruct playbackPreferences = 3;
   }
 
   response struct LauncherResponse = 2 {
@@ -2384,7 +2386,7 @@ cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -2443,7 +2445,7 @@ cluster ApplicationLauncher = 1292 {
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
@@ -2477,8 +2479,9 @@ cluster ApplicationBasic = 1293 {
 cluster AccountLogin = 1294 {
   revision 2;
 
-  critical event LoggedOut = 0 {
+  fabric_sensitive critical event access(read: administer) LoggedOut = 0 {
     optional node_id node = 0;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2516,7 +2519,17 @@ cluster AccountLogin = 1294 {
 
 /** This cluster is used for managing the content control (including "parental control") settings on a media device such as a TV, or Set-top Box. */
 provisional cluster ContentControl = 1295 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
+
+  bitmap DayOfWeekBitmap : bitmap8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
 
   bitmap Feature : bitmap32 {
     kScreenTime = 0x1;
@@ -2526,12 +2539,40 @@ provisional cluster ContentControl = 1295 {
     kScheduledContentRating = 0x10;
   }
 
+  struct TimePeriodStruct {
+    int8u startHour = 0;
+    int8u startMinute = 1;
+    int8u endHour = 2;
+    int8u endMinute = 3;
+  }
+
+  struct TimeWindowStruct {
+    nullable int16u timeWindowIndex = 0;
+    DayOfWeekBitmap dayOfWeek = 1;
+    TimePeriodStruct timePeriod[] = 2;
+  }
+
+  struct AppInfoStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
+  }
+
+  struct BlockChannelStruct {
+    nullable int16u blockChannelIndex = 0;
+    int16u majorNumber = 1;
+    int16u minorNumber = 2;
+    optional char_string identifier = 3;
+  }
+
   struct RatingNameStruct {
-    char_string ratingName = 0;
-    optional char_string ratingNameDesc = 1;
+    char_string<8> ratingName = 0;
+    optional char_string<64> ratingNameDesc = 1;
   }
 
   info event RemainingScreenTimeExpired = 0 {
+  }
+
+  info event EnteringBlockContentTimeWindow = 1 {
   }
 
   readonly attribute boolean enabled = 0;
@@ -2541,7 +2582,10 @@ provisional cluster ContentControl = 1295 {
   readonly attribute optional char_string<8> scheduledContentRatingThreshold = 4;
   readonly attribute optional elapsed_s screenDailyTime = 5;
   readonly attribute optional elapsed_s remainingScreenTime = 6;
-  readonly attribute boolean blockUnrated = 7;
+  readonly attribute optional boolean blockUnrated = 7;
+  readonly attribute optional BlockChannelStruct blockChannelList[] = 8;
+  readonly attribute optional AppInfoStruct blockApplicationList[] = 9;
+  readonly attribute optional TimeWindowStruct blockContentTimeWindow[] = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2550,8 +2594,8 @@ provisional cluster ContentControl = 1295 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct UpdatePINRequest {
-    optional char_string oldPIN = 0;
-    char_string newPIN = 1;
+    char_string<6> oldPIN = 0;
+    char_string<6> newPIN = 1;
   }
 
   response struct ResetPINResponse = 2 {
@@ -2559,8 +2603,8 @@ provisional cluster ContentControl = 1295 {
   }
 
   request struct AddBonusTimeRequest {
-    optional char_string PINCode = 0;
-    optional elapsed_s bonusTime = 1;
+    optional char_string<6> PINCode = 0;
+    elapsed_s bonusTime = 1;
   }
 
   request struct SetScreenDailyTimeRequest {
@@ -2568,38 +2612,74 @@ provisional cluster ContentControl = 1295 {
   }
 
   request struct SetOnDemandRatingThresholdRequest {
-    char_string rating = 0;
+    char_string<8> rating = 0;
   }
 
   request struct SetScheduledContentRatingThresholdRequest {
-    char_string rating = 0;
+    char_string<8> rating = 0;
+  }
+
+  request struct AddBlockChannelsRequest {
+    BlockChannelStruct channels[] = 0;
+  }
+
+  request struct RemoveBlockChannelsRequest {
+    int16u channelIndexes[] = 0;
+  }
+
+  request struct AddBlockApplicationsRequest {
+    AppInfoStruct applications[] = 0;
+  }
+
+  request struct RemoveBlockApplicationsRequest {
+    AppInfoStruct applications[] = 0;
+  }
+
+  request struct SetBlockContentTimeWindowRequest {
+    TimeWindowStruct timeWindow = 0;
+  }
+
+  request struct RemoveBlockContentTimeWindowRequest {
+    int16u timeWindowIndexes[] = 0;
   }
 
   /** The purpose of this command is to update the PIN used for protecting configuration of the content control settings. Upon success, the old PIN SHALL no longer work. The PIN is used to ensure that only the Node (or User) with the PIN code can make changes to the Content Control settings, for example, turn off Content Controls or modify the ScreenDailyTime. The PIN is composed of a numeric string of up to 6 human readable characters (displayable) . Upon receipt of this command, the media device SHALL check if the OldPIN field of this command is the same as the current PIN. If the PINs are the same, then the PIN code SHALL be set to NewPIN. Otherwise a response with InvalidPINCode error status SHALL be returned. The media device MAY provide a default PIN to the User via an out of band mechanism. For security reasons, it is recommended that a client encourage the user to update the PIN from its default value when performing configuration of the Content Control settings exposed by this cluster. The ResetPIN command can also be used to obtain the default PIN. */
-  command UpdatePIN(UpdatePINRequest): DefaultSuccess = 0;
+  timed command access(invoke: manage) UpdatePIN(UpdatePINRequest): DefaultSuccess = 0;
   /** The purpose of this command is to reset the PIN. If this command is executed successfully, a ResetPINResponse command with a new PIN SHALL be returned. */
-  command ResetPIN(): ResetPINResponse = 1;
+  timed command access(invoke: administer) ResetPIN(): ResetPINResponse = 1;
   /** The purpose of this command is to turn on the Content Control feature on a media device. On receipt of the Enable command, the media device SHALL set the Enabled attribute to TRUE. */
-  command Enable(): DefaultSuccess = 3;
+  timed command access(invoke: manage) Enable(): DefaultSuccess = 3;
   /** The purpose of this command is to turn off the Content Control feature on a media device. On receipt of the Disable command, the media device SHALL set the Enabled attribute to FALSE. */
-  command Disable(): DefaultSuccess = 4;
+  timed command access(invoke: manage) Disable(): DefaultSuccess = 4;
   /** The purpose of this command is to add the extra screen time for the user. If a client with Operate privilege invokes this command, the media device SHALL check whether the PINCode passed in the command matches the current PINCode value. If these match, then the RemainingScreenTime attribute SHALL be increased by the specified BonusTime value. If the PINs do not match, then a response with InvalidPINCode error status SHALL be returned, and no changes SHALL be made to RemainingScreenTime. If a client with Manage privilege or greater invokes this command, the media device SHALL ignore the PINCode field and directly increase the RemainingScreenTime attribute by the specified BonusTime value. A server that does not support the PM feature SHALL respond with InvalidPINCode to clients that only have Operate privilege unless: It has been provided with the PIN value to expect via an out of band mechanism, and The client has provided a PINCode that matches the expected PIN value. */
   command AddBonusTime(AddBonusTimeRequest): DefaultSuccess = 5;
   /** The purpose of this command is to set the ScreenDailyTime attribute. On receipt of the SetScreenDailyTime command, the media device SHALL set the ScreenDailyTime attribute to the ScreenTime value. */
-  command SetScreenDailyTime(SetScreenDailyTimeRequest): DefaultSuccess = 6;
+  command access(invoke: manage) SetScreenDailyTime(SetScreenDailyTimeRequest): DefaultSuccess = 6;
   /** The purpose of this command is to specify whether programs with no Content rating must be blocked by this media device. On receipt of the BlockUnratedContent command, the media device SHALL set the BlockUnrated attribute to TRUE. */
-  command BlockUnratedContent(): DefaultSuccess = 7;
+  command access(invoke: manage) BlockUnratedContent(): DefaultSuccess = 7;
   /** The purpose of this command is to specify whether programs with no Content rating must be blocked by this media device. On receipt of the UnblockUnratedContent command, the media device SHALL set the BlockUnrated attribute to FALSE. */
-  command UnblockUnratedContent(): DefaultSuccess = 8;
+  command access(invoke: manage) UnblockUnratedContent(): DefaultSuccess = 8;
   /** The purpose of this command is to set the OnDemandRatingThreshold attribute. On receipt of the SetOnDemandRatingThreshold command, the media device SHALL check if the Rating field is one of values present in the OnDemandRatings attribute. If not, then a response with InvalidRating error status SHALL be returned. */
-  command SetOnDemandRatingThreshold(SetOnDemandRatingThresholdRequest): DefaultSuccess = 9;
+  command access(invoke: manage) SetOnDemandRatingThreshold(SetOnDemandRatingThresholdRequest): DefaultSuccess = 9;
   /** The purpose of this command is to set ScheduledContentRatingThreshold attribute. On receipt of the SetScheduledContentRatingThreshold command, the media device SHALL check if the Rating field is one of values present in the ScheduledContentRatings attribute. If not, then a response with InvalidRating error status SHALL be returned. */
-  command SetScheduledContentRatingThreshold(SetScheduledContentRatingThresholdRequest): DefaultSuccess = 10;
+  command access(invoke: manage) SetScheduledContentRatingThreshold(SetScheduledContentRatingThresholdRequest): DefaultSuccess = 10;
+  /** The purpose of this command is to set BlockChannelList attribute. */
+  command access(invoke: manage) AddBlockChannels(AddBlockChannelsRequest): DefaultSuccess = 11;
+  /** The purpose of this command is to remove channels from the BlockChannelList attribute. */
+  command access(invoke: manage) RemoveBlockChannels(RemoveBlockChannelsRequest): DefaultSuccess = 12;
+  /** The purpose of this command is to set applications to the BlockApplicationList attribute. */
+  command access(invoke: manage) AddBlockApplications(AddBlockApplicationsRequest): DefaultSuccess = 13;
+  /** The purpose of this command is to remove applications from the BlockApplicationList attribute. */
+  command access(invoke: manage) RemoveBlockApplications(RemoveBlockApplicationsRequest): DefaultSuccess = 14;
+  /** The purpose of this command is to set the BlockContentTimeWindow attribute. */
+  command access(invoke: manage) SetBlockContentTimeWindow(SetBlockContentTimeWindowRequest): DefaultSuccess = 15;
+  /** The purpose of this command is to remove the selected time windows from the BlockContentTimeWindow attribute. */
+  command access(invoke: manage) RemoveBlockContentTimeWindow(RemoveBlockContentTimeWindowRequest): DefaultSuccess = 16;
 }
 
 /** This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse. */
 provisional cluster ContentAppObserver = 1296 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -2614,14 +2694,14 @@ provisional cluster ContentAppObserver = 1296 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ContentAppMessageRequest {
-    optional char_string data = 0;
-    char_string encodingHint = 1;
+    long_char_string<500> data = 0;
+    optional char_string<100> encodingHint = 1;
   }
 
   response struct ContentAppMessageResponse = 1 {
     StatusEnum status = 0;
-    optional char_string data = 1;
-    optional char_string encodingHint = 2;
+    optional long_char_string<500> data = 1;
+    optional char_string<100> encodingHint = 2;
   }
 
   /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */

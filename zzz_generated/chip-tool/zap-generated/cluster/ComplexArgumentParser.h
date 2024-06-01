@@ -455,6 +455,11 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ProgramCastStruct::Type & request,
                         Json::Value & value);
 
@@ -489,11 +494,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Struct
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type & request,
                         Json::Value & value);
@@ -576,6 +576,26 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLaun
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::TimePeriodStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentControl::Structs::TimePeriodStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::TimeWindowStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentControl::Structs::TimeWindowStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::AppInfoStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentControl::Structs::AppInfoStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::BlockChannelStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentControl::Structs::BlockChannelStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::RatingNameStruct::Type & request,
                         Json::Value & value);

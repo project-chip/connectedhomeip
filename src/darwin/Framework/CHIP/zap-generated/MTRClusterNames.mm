@@ -7834,6 +7834,18 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"BlockUnrated";
             break;
 
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockChannelListID:
+            result = @"BlockChannelList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockApplicationListID:
+            result = @"BlockApplicationList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockContentTimeWindowID:
+            result = @"BlockContentTimeWindow";
+            break;
+
         case MTRAttributeIDTypeClusterContentControlAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

@@ -25,9 +25,9 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ContentLauncherClusterPlaybackPreferencesStruct(
-  val playbackPosition: ULong,
-  val textTrack: ContentLauncherClusterTrackPreferenceStruct,
-  val audioTracks: Optional<List<ContentLauncherClusterTrackPreferenceStruct>>
+  val playbackPosition: Optional<ULong>?,
+  val textTrack: Optional<ContentLauncherClusterTrackPreferenceStruct>?,
+  val audioTracks: Optional<List<ContentLauncherClusterTrackPreferenceStruct>>?
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterPlaybackPreferencesStruct {\n")
@@ -40,15 +40,33 @@ class ContentLauncherClusterPlaybackPreferencesStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_PLAYBACK_POSITION), playbackPosition)
-      textTrack.toTlv(ContextSpecificTag(TAG_TEXT_TRACK), this)
-      if (audioTracks.isPresent) {
-        val optaudioTracks = audioTracks.get()
-        startArray(ContextSpecificTag(TAG_AUDIO_TRACKS))
-        for (item in optaudioTracks.iterator()) {
-          item.toTlv(AnonymousTag, this)
+      if (playbackPosition != null) {
+        if (playbackPosition.isPresent) {
+          val optplaybackPosition = playbackPosition.get()
+          put(ContextSpecificTag(TAG_PLAYBACK_POSITION), optplaybackPosition)
         }
-        endArray()
+      } else {
+        putNull(ContextSpecificTag(TAG_PLAYBACK_POSITION))
+      }
+      if (textTrack != null) {
+        if (textTrack.isPresent) {
+          val opttextTrack = textTrack.get()
+          opttextTrack.toTlv(ContextSpecificTag(TAG_TEXT_TRACK), this)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_TEXT_TRACK))
+      }
+      if (audioTracks != null) {
+        if (audioTracks.isPresent) {
+          val optaudioTracks = audioTracks.get()
+          startArray(ContextSpecificTag(TAG_AUDIO_TRACKS))
+          for (item in optaudioTracks.iterator()) {
+            item.toTlv(AnonymousTag, this)
+          }
+          endArray()
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_AUDIO_TRACKS))
       }
       endStructure()
     }
@@ -64,25 +82,51 @@ class ContentLauncherClusterPlaybackPreferencesStruct(
       tlvReader: TlvReader
     ): ContentLauncherClusterPlaybackPreferencesStruct {
       tlvReader.enterStructure(tlvTag)
-      val playbackPosition = tlvReader.getULong(ContextSpecificTag(TAG_PLAYBACK_POSITION))
-      val textTrack =
-        ContentLauncherClusterTrackPreferenceStruct.fromTlv(
-          ContextSpecificTag(TAG_TEXT_TRACK),
-          tlvReader
-        )
-      val audioTracks =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_TRACKS))) {
-          Optional.of(
-            buildList<ContentLauncherClusterTrackPreferenceStruct> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_TRACKS))
-              while (!tlvReader.isEndOfContainer()) {
-                add(ContentLauncherClusterTrackPreferenceStruct.fromTlv(AnonymousTag, tlvReader))
-              }
-              tlvReader.exitContainer()
-            }
-          )
+      val playbackPosition =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PLAYBACK_POSITION))) {
+            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_PLAYBACK_POSITION)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_PLAYBACK_POSITION))
+          null
+        }
+      val textTrack =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEXT_TRACK))) {
+            Optional.of(
+              ContentLauncherClusterTrackPreferenceStruct.fromTlv(
+                ContextSpecificTag(TAG_TEXT_TRACK),
+                tlvReader
+              )
+            )
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_TEXT_TRACK))
+          null
+        }
+      val audioTracks =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_TRACKS))) {
+            Optional.of(
+              buildList<ContentLauncherClusterTrackPreferenceStruct> {
+                tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_TRACKS))
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ContentLauncherClusterTrackPreferenceStruct.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            )
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_TRACKS))
+          null
         }
 
       tlvReader.exitContainer()

@@ -5585,17 +5585,17 @@ public static class PumpConfigurationAndControlClusterTurbineOperationEvent {
   }
 }
 public static class TargetNavigatorClusterTargetUpdatedEvent {
-  public ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList;
-  public Integer currentTarget;
-  public byte[] data;
+  public Optional<ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct>> targetList;
+  public Optional<Integer> currentTarget;
+  public Optional<byte[]> data;
   private static final long TARGET_LIST_ID = 0L;
   private static final long CURRENT_TARGET_ID = 1L;
   private static final long DATA_ID = 2L;
 
   public TargetNavigatorClusterTargetUpdatedEvent(
-    ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList,
-    Integer currentTarget,
-    byte[] data
+    Optional<ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct>> targetList,
+    Optional<Integer> currentTarget,
+    Optional<byte[]> data
   ) {
     this.targetList = targetList;
     this.currentTarget = currentTarget;
@@ -5604,9 +5604,9 @@ public static class TargetNavigatorClusterTargetUpdatedEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(TARGET_LIST_ID, ArrayType.generateArrayType(targetList, (elementtargetList) -> elementtargetList.encodeTlv())));
-    values.add(new StructElement(CURRENT_TARGET_ID, new UIntType(currentTarget)));
-    values.add(new StructElement(DATA_ID, new ByteArrayType(data)));
+    values.add(new StructElement(TARGET_LIST_ID, targetList.<BaseTLVType>map((nonOptionaltargetList) -> ArrayType.generateArrayType(nonOptionaltargetList, (elementnonOptionaltargetList) -> elementnonOptionaltargetList.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(CURRENT_TARGET_ID, currentTarget.<BaseTLVType>map((nonOptionalcurrentTarget) -> new UIntType(nonOptionalcurrentTarget)).orElse(new EmptyType())));
+    values.add(new StructElement(DATA_ID, data.<BaseTLVType>map((nonOptionaldata) -> new ByteArrayType(nonOptionaldata)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -5615,24 +5615,24 @@ public static class TargetNavigatorClusterTargetUpdatedEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList = null;
-    Integer currentTarget = null;
-    byte[] data = null;
+    Optional<ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct>> targetList = Optional.empty();
+    Optional<Integer> currentTarget = Optional.empty();
+    Optional<byte[]> data = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == TARGET_LIST_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          targetList = castingValue.map((elementcastingValue) -> ChipStructs.TargetNavigatorClusterTargetInfoStruct.decodeTlv(elementcastingValue));
+          targetList = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.TargetNavigatorClusterTargetInfoStruct.decodeTlv(elementcastingValue)));
         }
       } else if (element.contextTagNum() == CURRENT_TARGET_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          currentTarget = castingValue.value(Integer.class);
+          currentTarget = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == DATA_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          data = castingValue.value(byte[].class);
+          data = Optional.of(castingValue.value(byte[].class));
         }
       }
     }
@@ -5654,7 +5654,7 @@ public static class TargetNavigatorClusterTargetUpdatedEvent {
     output.append(currentTarget);
     output.append("\n");
     output.append("\tdata: ");
-    output.append(Arrays.toString(data));
+    output.append(data.isPresent() ? Arrays.toString(data.get()) : "");
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -5662,14 +5662,14 @@ public static class TargetNavigatorClusterTargetUpdatedEvent {
 }
 public static class MediaPlaybackClusterStateChangedEvent {
   public Integer currentState;
-  public Long startTime;
-  public Long duration;
-  public ChipStructs.MediaPlaybackClusterPlaybackPositionStruct sampledPosition;
-  public Float playbackSpeed;
-  public Long seekRangeEnd;
-  public Long seekRangeStart;
+  public Optional<Long> startTime;
+  public Optional<Long> duration;
+  public Optional<ChipStructs.MediaPlaybackClusterPlaybackPositionStruct> sampledPosition;
+  public Optional<Float> playbackSpeed;
+  public Optional<Long> seekRangeEnd;
+  public Optional<Long> seekRangeStart;
   public Optional<byte[]> data;
-  public Boolean audioAdvanceUnmuted;
+  public Optional<Boolean> audioAdvanceUnmuted;
   private static final long CURRENT_STATE_ID = 0L;
   private static final long START_TIME_ID = 1L;
   private static final long DURATION_ID = 2L;
@@ -5682,14 +5682,14 @@ public static class MediaPlaybackClusterStateChangedEvent {
 
   public MediaPlaybackClusterStateChangedEvent(
     Integer currentState,
-    Long startTime,
-    Long duration,
-    ChipStructs.MediaPlaybackClusterPlaybackPositionStruct sampledPosition,
-    Float playbackSpeed,
-    Long seekRangeEnd,
-    Long seekRangeStart,
+    Optional<Long> startTime,
+    Optional<Long> duration,
+    Optional<ChipStructs.MediaPlaybackClusterPlaybackPositionStruct> sampledPosition,
+    Optional<Float> playbackSpeed,
+    Optional<Long> seekRangeEnd,
+    Optional<Long> seekRangeStart,
     Optional<byte[]> data,
-    Boolean audioAdvanceUnmuted
+    Optional<Boolean> audioAdvanceUnmuted
   ) {
     this.currentState = currentState;
     this.startTime = startTime;
@@ -5705,14 +5705,14 @@ public static class MediaPlaybackClusterStateChangedEvent {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CURRENT_STATE_ID, new UIntType(currentState)));
-    values.add(new StructElement(START_TIME_ID, new UIntType(startTime)));
-    values.add(new StructElement(DURATION_ID, new UIntType(duration)));
-    values.add(new StructElement(SAMPLED_POSITION_ID, sampledPosition.encodeTlv()));
-    values.add(new StructElement(PLAYBACK_SPEED_ID, new FloatType(playbackSpeed)));
-    values.add(new StructElement(SEEK_RANGE_END_ID, new UIntType(seekRangeEnd)));
-    values.add(new StructElement(SEEK_RANGE_START_ID, new UIntType(seekRangeStart)));
+    values.add(new StructElement(START_TIME_ID, startTime.<BaseTLVType>map((nonOptionalstartTime) -> new UIntType(nonOptionalstartTime)).orElse(new EmptyType())));
+    values.add(new StructElement(DURATION_ID, duration.<BaseTLVType>map((nonOptionalduration) -> new UIntType(nonOptionalduration)).orElse(new EmptyType())));
+    values.add(new StructElement(SAMPLED_POSITION_ID, sampledPosition.<BaseTLVType>map((nonOptionalsampledPosition) -> nonOptionalsampledPosition.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(PLAYBACK_SPEED_ID, playbackSpeed.<BaseTLVType>map((nonOptionalplaybackSpeed) -> new FloatType(nonOptionalplaybackSpeed)).orElse(new EmptyType())));
+    values.add(new StructElement(SEEK_RANGE_END_ID, seekRangeEnd.<BaseTLVType>map((nonOptionalseekRangeEnd) -> new UIntType(nonOptionalseekRangeEnd)).orElse(new EmptyType())));
+    values.add(new StructElement(SEEK_RANGE_START_ID, seekRangeStart.<BaseTLVType>map((nonOptionalseekRangeStart) -> new UIntType(nonOptionalseekRangeStart)).orElse(new EmptyType())));
     values.add(new StructElement(DATA_ID, data.<BaseTLVType>map((nonOptionaldata) -> new ByteArrayType(nonOptionaldata)).orElse(new EmptyType())));
-    values.add(new StructElement(AUDIO_ADVANCE_UNMUTED_ID, new BooleanType(audioAdvanceUnmuted)));
+    values.add(new StructElement(AUDIO_ADVANCE_UNMUTED_ID, audioAdvanceUnmuted.<BaseTLVType>map((nonOptionalaudioAdvanceUnmuted) -> new BooleanType(nonOptionalaudioAdvanceUnmuted)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -5722,14 +5722,14 @@ public static class MediaPlaybackClusterStateChangedEvent {
       return null;
     }
     Integer currentState = null;
-    Long startTime = null;
-    Long duration = null;
-    ChipStructs.MediaPlaybackClusterPlaybackPositionStruct sampledPosition = null;
-    Float playbackSpeed = null;
-    Long seekRangeEnd = null;
-    Long seekRangeStart = null;
+    Optional<Long> startTime = Optional.empty();
+    Optional<Long> duration = Optional.empty();
+    Optional<ChipStructs.MediaPlaybackClusterPlaybackPositionStruct> sampledPosition = Optional.empty();
+    Optional<Float> playbackSpeed = Optional.empty();
+    Optional<Long> seekRangeEnd = Optional.empty();
+    Optional<Long> seekRangeStart = Optional.empty();
     Optional<byte[]> data = Optional.empty();
-    Boolean audioAdvanceUnmuted = null;
+    Optional<Boolean> audioAdvanceUnmuted = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CURRENT_STATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5739,32 +5739,32 @@ public static class MediaPlaybackClusterStateChangedEvent {
       } else if (element.contextTagNum() == START_TIME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          startTime = castingValue.value(Long.class);
+          startTime = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          duration = castingValue.value(Long.class);
+          duration = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == SAMPLED_POSITION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          sampledPosition = ChipStructs.MediaPlaybackClusterPlaybackPositionStruct.decodeTlv(castingValue);
+          sampledPosition = Optional.of(ChipStructs.MediaPlaybackClusterPlaybackPositionStruct.decodeTlv(castingValue));
         }
       } else if (element.contextTagNum() == PLAYBACK_SPEED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Float) {
           FloatType castingValue = element.value(FloatType.class);
-          playbackSpeed = castingValue.value(Float.class);
+          playbackSpeed = Optional.of(castingValue.value(Float.class));
         }
       } else if (element.contextTagNum() == SEEK_RANGE_END_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          seekRangeEnd = castingValue.value(Long.class);
+          seekRangeEnd = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == SEEK_RANGE_START_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          seekRangeStart = castingValue.value(Long.class);
+          seekRangeStart = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == DATA_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -5774,7 +5774,7 @@ public static class MediaPlaybackClusterStateChangedEvent {
       } else if (element.contextTagNum() == AUDIO_ADVANCE_UNMUTED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          audioAdvanceUnmuted = castingValue.value(Boolean.class);
+          audioAdvanceUnmuted = Optional.of(castingValue.value(Boolean.class));
         }
       }
     }
@@ -5828,17 +5828,22 @@ public static class MediaPlaybackClusterStateChangedEvent {
 }
 public static class AccountLoginClusterLoggedOutEvent {
   public Optional<Long> node;
+  public Integer fabricIndex;
   private static final long NODE_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public AccountLoginClusterLoggedOutEvent(
-    Optional<Long> node
+    Optional<Long> node,
+    Integer fabricIndex
   ) {
     this.node = node;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(NODE_ID, node.<BaseTLVType>map((nonOptionalnode) -> new UIntType(nonOptionalnode)).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -5848,16 +5853,23 @@ public static class AccountLoginClusterLoggedOutEvent {
       return null;
     }
     Optional<Long> node = Optional.empty();
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           node = Optional.of(castingValue.value(Long.class));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new AccountLoginClusterLoggedOutEvent(
-      node
+      node,
+      fabricIndex
     );
   }
 
@@ -5867,6 +5879,9 @@ public static class AccountLoginClusterLoggedOutEvent {
     output.append("AccountLoginClusterLoggedOutEvent {\n");
     output.append("\tnode: ");
     output.append(node);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -5896,6 +5911,34 @@ public static class ContentControlClusterRemainingScreenTimeExpiredEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ContentControlClusterRemainingScreenTimeExpiredEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentControlClusterEnteringBlockContentTimeWindowEvent {
+
+  public ContentControlClusterEnteringBlockContentTimeWindowEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static ContentControlClusterEnteringBlockContentTimeWindowEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new ContentControlClusterEnteringBlockContentTimeWindowEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentControlClusterEnteringBlockContentTimeWindowEvent {\n");
     output.append("}\n");
     return output.toString();
   }

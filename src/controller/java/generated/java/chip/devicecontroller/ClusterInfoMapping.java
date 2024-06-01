@@ -19107,6 +19107,69 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedContentControlClusterBlockChannelListAttributeCallback implements ChipClusters.ContentControlCluster.BlockChannelListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ContentControlClusterBlockChannelStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ContentControlClusterBlockChannelStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedContentControlClusterBlockApplicationListAttributeCallback implements ChipClusters.ContentControlCluster.BlockApplicationListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ContentControlClusterAppInfoStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ContentControlClusterAppInfoStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedContentControlClusterBlockContentTimeWindowAttributeCallback implements ChipClusters.ContentControlCluster.BlockContentTimeWindowAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ContentControlClusterTimeWindowStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ContentControlClusterTimeWindowStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedContentControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.ContentControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -26572,15 +26635,15 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> channelgetProgramGuideCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo channelgetProgramGuidestartTimeCommandParameterInfo = new CommandParameterInfo("startTime", Optional.class, Long.class);
+    CommandParameterInfo channelgetProgramGuidestartTimeCommandParameterInfo = new CommandParameterInfo("startTime", Long.class, Long.class);
     channelgetProgramGuideCommandParams.put("startTime",channelgetProgramGuidestartTimeCommandParameterInfo);
 
-    CommandParameterInfo channelgetProgramGuideendTimeCommandParameterInfo = new CommandParameterInfo("endTime", Optional.class, Long.class);
+    CommandParameterInfo channelgetProgramGuideendTimeCommandParameterInfo = new CommandParameterInfo("endTime", Long.class, Long.class);
     channelgetProgramGuideCommandParams.put("endTime",channelgetProgramGuideendTimeCommandParameterInfo);
 
 
 
-    CommandParameterInfo channelgetProgramGuiderecordingFlagCommandParameterInfo = new CommandParameterInfo("recordingFlag", Optional.class, Long.class);
+    CommandParameterInfo channelgetProgramGuiderecordingFlagCommandParameterInfo = new CommandParameterInfo("recordingFlag", Optional.class, Integer.class);
     channelgetProgramGuideCommandParams.put("recordingFlag",channelgetProgramGuiderecordingFlagCommandParameterInfo);
 
 
@@ -26590,10 +26653,10 @@ public class ClusterInfoMapping {
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ChannelCluster) cluster)
           .getProgramGuide((ChipClusters.ChannelCluster.ProgramGuideResponseCallback) callback
-           , (Optional<Long>)
+           , (Long)
              commandArguments.get("startTime")
 
-           , (Optional<Long>)
+           , (Long)
              commandArguments.get("endTime")
 
            , (Optional<ArrayList<ChipStructs.ChannelClusterChannelInfoStruct>>)
@@ -26602,7 +26665,7 @@ public class ClusterInfoMapping {
            , (Optional<ChipStructs.ChannelClusterPageTokenStruct>)
              commandArguments.get("pageToken")
 
-           , (Optional<Long>)
+           , (Optional<Integer>)
              commandArguments.get("recordingFlag")
 
            , (Optional<ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>>)
@@ -26627,7 +26690,7 @@ public class ClusterInfoMapping {
     channelrecordProgramCommandParams.put("shouldRecordSeries",channelrecordProgramshouldRecordSeriesCommandParameterInfo);
 
 
-    CommandParameterInfo channelrecordProgramdataCommandParameterInfo = new CommandParameterInfo("data", byte[].class, byte[].class);
+    CommandParameterInfo channelrecordProgramdataCommandParameterInfo = new CommandParameterInfo("data", Optional.class, byte[].class);
     channelrecordProgramCommandParams.put("data",channelrecordProgramdataCommandParameterInfo);
     InteractionInfo channelrecordProgramInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -26637,9 +26700,9 @@ public class ClusterInfoMapping {
         commandArguments.get("programIdentifier")
         , (Boolean)
         commandArguments.get("shouldRecordSeries")
-        , (ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>)
+        , (Optional<ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>>)
         commandArguments.get("externalIDList")
-        , (byte[])
+        , (Optional<byte[]>)
         commandArguments.get("data")
         );
       },
@@ -26657,7 +26720,7 @@ public class ClusterInfoMapping {
     channelcancelRecordProgramCommandParams.put("shouldRecordSeries",channelcancelRecordProgramshouldRecordSeriesCommandParameterInfo);
 
 
-    CommandParameterInfo channelcancelRecordProgramdataCommandParameterInfo = new CommandParameterInfo("data", byte[].class, byte[].class);
+    CommandParameterInfo channelcancelRecordProgramdataCommandParameterInfo = new CommandParameterInfo("data", Optional.class, byte[].class);
     channelcancelRecordProgramCommandParams.put("data",channelcancelRecordProgramdataCommandParameterInfo);
     InteractionInfo channelcancelRecordProgramInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -26667,9 +26730,9 @@ public class ClusterInfoMapping {
         commandArguments.get("programIdentifier")
         , (Boolean)
         commandArguments.get("shouldRecordSeries")
-        , (ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>)
+        , (Optional<ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>>)
         commandArguments.get("externalIDList")
-        , (byte[])
+        , (Optional<byte[]>)
         commandArguments.get("data")
         );
       },
@@ -26877,7 +26940,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo mediaPlaybackactivateAudioTracktrackIDCommandParameterInfo = new CommandParameterInfo("trackID", String.class, String.class);
     mediaPlaybackactivateAudioTrackCommandParams.put("trackID",mediaPlaybackactivateAudioTracktrackIDCommandParameterInfo);
 
-    CommandParameterInfo mediaPlaybackactivateAudioTrackaudioOutputIndexCommandParameterInfo = new CommandParameterInfo("audioOutputIndex", Integer.class, Integer.class);
+    CommandParameterInfo mediaPlaybackactivateAudioTrackaudioOutputIndexCommandParameterInfo = new CommandParameterInfo("audioOutputIndex", Optional.class, Integer.class);
     mediaPlaybackactivateAudioTrackCommandParams.put("audioOutputIndex",mediaPlaybackactivateAudioTrackaudioOutputIndexCommandParameterInfo);
     InteractionInfo mediaPlaybackactivateAudioTrackInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -26885,7 +26948,7 @@ public class ClusterInfoMapping {
         .activateAudioTrack((DefaultClusterCallback) callback
         , (String)
         commandArguments.get("trackID")
-        , (Integer)
+        , (Optional<Integer>)
         commandArguments.get("audioOutputIndex")
         );
       },
@@ -27078,6 +27141,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo contentLauncherlaunchURLdisplayStringCommandParameterInfo = new CommandParameterInfo("displayString", Optional.class, String.class);
     contentLauncherlaunchURLCommandParams.put("displayString",contentLauncherlaunchURLdisplayStringCommandParameterInfo);
 
+
     InteractionInfo contentLauncherlaunchURLInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentLauncherCluster) cluster)
@@ -27090,6 +27154,9 @@ public class ClusterInfoMapping {
 
            , (Optional<ChipStructs.ContentLauncherClusterBrandingInformationStruct>)
              commandArguments.get("brandingInformation")
+
+           , (Optional<ChipStructs.ContentLauncherClusterPlaybackPreferencesStruct>)
+             commandArguments.get("playbackPreferences")
 
             );
         },
@@ -27275,7 +27342,7 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> contentControlupdatePINCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo contentControlupdatePINoldPINCommandParameterInfo = new CommandParameterInfo("oldPIN", Optional.class, String.class);
+    CommandParameterInfo contentControlupdatePINoldPINCommandParameterInfo = new CommandParameterInfo("oldPIN", String.class, String.class);
     contentControlupdatePINCommandParams.put("oldPIN",contentControlupdatePINoldPINCommandParameterInfo);
 
     CommandParameterInfo contentControlupdatePINnewPINCommandParameterInfo = new CommandParameterInfo("newPIN", String.class, String.class);
@@ -27284,10 +27351,10 @@ public class ClusterInfoMapping {
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentControlCluster) cluster)
         .updatePIN((DefaultClusterCallback) callback
-        , (Optional<String>)
+        , (String)
         commandArguments.get("oldPIN")
         , (String)
-        commandArguments.get("newPIN")
+        commandArguments.get("newPIN"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -27300,7 +27367,7 @@ public class ClusterInfoMapping {
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentControlCluster) cluster)
           .resetPIN((ChipClusters.ContentControlCluster.ResetPINResponseCallback) callback
-            );
+            , 10000);
         },
         () -> new DelegatedContentControlClusterResetPINResponseCallback(),
         contentControlresetPINCommandParams
@@ -27311,7 +27378,7 @@ public class ClusterInfoMapping {
     InteractionInfo contentControlenableInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentControlCluster) cluster)
-        .enable((DefaultClusterCallback) callback
+        .enable((DefaultClusterCallback) callback, 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -27323,7 +27390,7 @@ public class ClusterInfoMapping {
     InteractionInfo contentControldisableInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentControlCluster) cluster)
-        .disable((DefaultClusterCallback) callback
+        .disable((DefaultClusterCallback) callback, 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -27336,7 +27403,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo contentControladdBonusTimePINCodeCommandParameterInfo = new CommandParameterInfo("PINCode", Optional.class, String.class);
     contentControladdBonusTimeCommandParams.put("PINCode",contentControladdBonusTimePINCodeCommandParameterInfo);
 
-    CommandParameterInfo contentControladdBonusTimebonusTimeCommandParameterInfo = new CommandParameterInfo("bonusTime", Optional.class, Long.class);
+    CommandParameterInfo contentControladdBonusTimebonusTimeCommandParameterInfo = new CommandParameterInfo("bonusTime", Long.class, Long.class);
     contentControladdBonusTimeCommandParams.put("bonusTime",contentControladdBonusTimebonusTimeCommandParameterInfo);
     InteractionInfo contentControladdBonusTimeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -27344,7 +27411,7 @@ public class ClusterInfoMapping {
         .addBonusTime((DefaultClusterCallback) callback
         , (Optional<String>)
         commandArguments.get("PINCode")
-        , (Optional<Long>)
+        , (Long)
         commandArguments.get("bonusTime")
         );
       },
@@ -27428,25 +27495,119 @@ public class ClusterInfoMapping {
     );
     contentControlClusterInteractionInfoMap.put("setScheduledContentRatingThreshold", contentControlsetScheduledContentRatingThresholdInteractionInfo);
 
+    Map<String, CommandParameterInfo> contentControladdBlockChannelsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo contentControladdBlockChannelsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .addBlockChannels((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.ContentControlClusterBlockChannelStruct>)
+        commandArguments.get("channels")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControladdBlockChannelsCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("addBlockChannels", contentControladdBlockChannelsInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControlremoveBlockChannelsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo contentControlremoveBlockChannelschannelIndexesCommandParameterInfo = new CommandParameterInfo("channelIndexes", ArrayList.class, ArrayList.class);
+    contentControlremoveBlockChannelsCommandParams.put("channelIndexes",contentControlremoveBlockChannelschannelIndexesCommandParameterInfo);
+    InteractionInfo contentControlremoveBlockChannelsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .removeBlockChannels((DefaultClusterCallback) callback
+        , (ArrayList<Integer>)
+        commandArguments.get("channelIndexes")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControlremoveBlockChannelsCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("removeBlockChannels", contentControlremoveBlockChannelsInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControladdBlockApplicationsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo contentControladdBlockApplicationsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .addBlockApplications((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.ContentControlClusterAppInfoStruct>)
+        commandArguments.get("applications")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControladdBlockApplicationsCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("addBlockApplications", contentControladdBlockApplicationsInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControlremoveBlockApplicationsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo contentControlremoveBlockApplicationsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .removeBlockApplications((DefaultClusterCallback) callback
+        , (ArrayList<ChipStructs.ContentControlClusterAppInfoStruct>)
+        commandArguments.get("applications")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControlremoveBlockApplicationsCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("removeBlockApplications", contentControlremoveBlockApplicationsInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControlsetBlockContentTimeWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    InteractionInfo contentControlsetBlockContentTimeWindowInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .setBlockContentTimeWindow((DefaultClusterCallback) callback
+        , (ChipStructs.ContentControlClusterTimeWindowStruct)
+        commandArguments.get("timeWindow")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControlsetBlockContentTimeWindowCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("setBlockContentTimeWindow", contentControlsetBlockContentTimeWindowInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentControlremoveBlockContentTimeWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo contentControlremoveBlockContentTimeWindowtimeWindowIndexesCommandParameterInfo = new CommandParameterInfo("timeWindowIndexes", ArrayList.class, ArrayList.class);
+    contentControlremoveBlockContentTimeWindowCommandParams.put("timeWindowIndexes",contentControlremoveBlockContentTimeWindowtimeWindowIndexesCommandParameterInfo);
+    InteractionInfo contentControlremoveBlockContentTimeWindowInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentControlCluster) cluster)
+        .removeBlockContentTimeWindow((DefaultClusterCallback) callback
+        , (ArrayList<Integer>)
+        commandArguments.get("timeWindowIndexes")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentControlremoveBlockContentTimeWindowCommandParams
+    );
+    contentControlClusterInteractionInfoMap.put("removeBlockContentTimeWindow", contentControlremoveBlockContentTimeWindowInteractionInfo);
+
     commandMap.put("contentControl", contentControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> contentAppObserverClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> contentAppObservercontentAppMessageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo contentAppObservercontentAppMessagedataCommandParameterInfo = new CommandParameterInfo("data", Optional.class, String.class);
+    CommandParameterInfo contentAppObservercontentAppMessagedataCommandParameterInfo = new CommandParameterInfo("data", String.class, String.class);
     contentAppObservercontentAppMessageCommandParams.put("data",contentAppObservercontentAppMessagedataCommandParameterInfo);
 
-    CommandParameterInfo contentAppObservercontentAppMessageencodingHintCommandParameterInfo = new CommandParameterInfo("encodingHint", String.class, String.class);
+    CommandParameterInfo contentAppObservercontentAppMessageencodingHintCommandParameterInfo = new CommandParameterInfo("encodingHint", Optional.class, String.class);
     contentAppObservercontentAppMessageCommandParams.put("encodingHint",contentAppObservercontentAppMessageencodingHintCommandParameterInfo);
     InteractionInfo contentAppObservercontentAppMessageInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentAppObserverCluster) cluster)
           .contentAppMessage((ChipClusters.ContentAppObserverCluster.ContentAppMessageResponseCallback) callback
-           , (Optional<String>)
+           , (String)
              commandArguments.get("data")
 
-           , (String)
+           , (Optional<String>)
              commandArguments.get("encodingHint")
 
             );

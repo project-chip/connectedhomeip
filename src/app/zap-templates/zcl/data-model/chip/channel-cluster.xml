@@ -69,35 +69,35 @@ limitations under the License.
 
     <command source="client" code="0x04" name="GetProgramGuide" response="ProgramGuideResponse" optional="true">
       <description>This command retrieves the program guide. It accepts several filter parameters to return specific schedule and program information from a content app. The command shall receive in response a ProgramGuideResponse.</description>
-      <arg name="StartTime" type="epoch_s" optional="true"/>
-      <arg name="EndTime" type="epoch_s" optional="true"/>
-      <arg name="ChannelList" type="ChannelInfoStruct" array="true" optional="true"/>
-      <arg name="PageToken" type="PageTokenStruct" optional="true"/>
-      <arg name="RecordingFlag" type="RecordingFlagBitmap" optional="true"/>
-      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
-      <arg name="Data" type="octet_string" optional="true"/>
+      <arg id="0" name="StartTime" type="epoch_s"/>
+      <arg id="1" name="EndTime" type="epoch_s"/>
+      <arg id="2" name="ChannelList" type="ChannelInfoStruct" array="true" optional="true" length="255"/>
+      <arg id="3" name="PageToken" type="PageTokenStruct" optional="true" isNullable="true"/>
+      <arg id="5" name="RecordingFlag" type="RecordingFlagBitmap" optional="true" isNullable="true" min="0x00" max="0x07"/>
+      <arg id="6" name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true" length="255"/>
+      <arg id="7" name="Data" type="octet_string" optional="true" length="8092"/>
     </command>
 
-    <command source="server" code="0x05" name="ProgramGuideResponse" optional="true" apiMaturity="provisional">
+    <command source="server" code="0x05" name="ProgramGuideResponse" optional="true" apiMaturity="provisional" disableDefaultResponse="true">
       <description>This command is a response to the GetProgramGuide command.</description>
-      <arg name="Paging" type="ChannelPagingStruct"/>
-      <arg name="ProgramList" type="ProgramStruct" array="true"/>
+      <arg id="0" name="Paging" type="ChannelPagingStruct"/>
+      <arg id="1" name="ProgramList" type="ProgramStruct" array="true"/>
     </command>
 
     <command source="client" code="0x06" name="RecordProgram" optional="true">
       <description>Record a specific program or series when it goes live. This functionality enables DVR recording features.</description>
-      <arg name="ProgramIdentifier" type="char_string"/>
-      <arg name="ShouldRecordSeries" type="boolean"/>
-      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true"/>
-      <arg name="Data" type="octet_string"/>
+      <arg id="0" name="ProgramIdentifier" type="char_string" length="255"/>
+      <arg id="1" name="ShouldRecordSeries" type="boolean"/>
+      <arg id="2" name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true" length="255"/>
+      <arg id="3" name="Data" type="octet_string" optional="true" length="8092"/>
     </command>
 
     <command source="client" code="0x07" name="CancelRecordProgram" optional="true">
       <description>Cancel recording for a specific program or series.</description>
-      <arg name="ProgramIdentifier" type="char_string"/>
-      <arg name="ShouldRecordSeries" type="boolean"/>
-      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true"/>
-      <arg name="Data" type="octet_string"/>
+      <arg id="0" name="ProgramIdentifier" type="char_string" length="255"/>
+      <arg id="1" name="ShouldRecordSeries" type="boolean"/>
+      <arg id="2" name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true" length="255"/>
+      <arg id="3" name="Data" type="octet_string" optional="true" length="8092"/>
     </command>
 
   </cluster>
@@ -123,50 +123,50 @@ limitations under the License.
 
   <struct name="ProgramStruct">
     <cluster code="0x0504"/>
-    <item name="Identifier" type="char_string" max="255" optional="false"/>
-    <item name="Channel" type="ChannelInfoStruct" optional="false"/>
-    <item name="StartTime" type="epoch_s" optional="false"/>
-    <item name="EndTime" type="epoch_s" optional="false"/>
-    <item name="Title" type="char_string" max="255" optional="false"/>
-    <item name="Subtitle" type="char_string" max="255" default="" optional="true"/>
-    <item name="Description" type="char_string" max="8192" default="" optional="true"/>
-    <item name="AudioLanguages" type="char_string" array="true" max="10" default="" optional="true"/>
-    <item name="Ratings" type="char_string" array="true" max="255" default="" optional="true"/>
-    <item name="ThumbnailUrl" type="char_string" max="8192" default="" optional="true"/>
-    <item name="PosterArtUrl" type="char_string" max="8192" default="" optional="true"/>
-    <item name="DvbiUrl" type="char_string" max="8192" default="" optional="true"/>
-    <item name="ReleaseDate" type="char_string" max="30" default="" optional="true"/>
-    <item name="ParentalGuidanceText" type="char_string" max="255" default="" optional="true"/>
-    <item name="RecordingFlag" type="RecordingFlagBitmap" optional="true"/>
-    <item name="SeriesInfo" type="SeriesInfoStruct" default="0x0" isNullable="true" optional="true"/>
-    <item name="CategoryList" type="ProgramCategoryStruct" array="true" max="255" default="" optional="true"/>
-    <item name="CastList" type="ProgramCastStruct" array="true" max="255" default="" optional="true"/>
-    <item name="ExternalIDList" type="ProgramCastStruct" array="true" max="255" default="" optional="true"/>
+    <item fieldId="0" name="Identifier" type="char_string" length="255"/>
+    <item fieldId="1" name="Channel" type="ChannelInfoStruct"/>
+    <item fieldId="2" name="StartTime" type="epoch_s"/>
+    <item fieldId="3" name="EndTime" type="epoch_s"/>
+    <item fieldId="4" name="Title" type="char_string" length="255"/>
+    <item fieldId="5" name="Subtitle" type="char_string" optional="true" length="255"/>
+    <item fieldId="6" name="Description" type="long_char_string" optional="true" length="8192"/>
+    <item fieldId="7" name="AudioLanguages" type="char_string" array="true" optional="true" length="10"/>
+    <item fieldId="8" name="Ratings" type="char_string" array="true" optional="true" length="255"/>
+    <item fieldId="9" name="ThumbnailUrl" type="long_char_string" optional="true" length="8192"/>
+    <item fieldId="10" name="PosterArtUrl" type="long_char_string" optional="true" length="8192"/>
+    <item fieldId="11" name="DvbiUrl" type="long_char_string" optional="true" length="8192"/>
+    <item fieldId="12" name="ReleaseDate" type="char_string" optional="true" length="30"/>
+    <item fieldId="13" name="ParentalGuidanceText" type="char_string" optional="true" length="255"/>
+    <item fieldId="14" name="RecordingFlag" type="RecordingFlagBitmap" optional="true" min="0x00" max="0x07"/>
+    <item fieldId="15" name="SeriesInfo" type="SeriesInfoStruct" isNullable="true" optional="true"/>
+    <item fieldId="16" name="CategoryList" type="ProgramCategoryStruct" array="true" optional="true" length="255"/>
+    <item fieldId="17" name="CastList" type="ProgramCastStruct" array="true" optional="true" length="255"/>
+    <item fieldId="18" name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true" length="255"/>
   </struct>
 
   <struct name="SeriesInfoStruct">
     <cluster code="0x0504"/>
-    <item name="Season" type="char_string" max="256" optional="false"/>
-    <item name="Episode" type="char_string" max="256" optional="false"/>
+    <item fieldId="0" name="Season" type="long_char_string" length="256"/>
+    <item fieldId="1" name="Episode" type="long_char_string" length="256"/>
   </struct>
 
   <struct name="ProgramCategoryStruct">
     <cluster code="0x0504"/>
-    <item name="Category" type="char_string" max="256" optional="false"/>
-    <item name="SubCategory" type="char_string" max="256" default="" optional="true"/>
+    <item fieldId="0" name="Category" type="long_char_string" length="256"/>
+    <item fieldId="1" name="SubCategory" type="long_char_string" optional="true" length="256"/>
   </struct>
 
   <struct name="ProgramCastStruct">
     <cluster code="0x0504"/>
-    <item name="Name" type="char_string" max="256" optional="false"/>
-    <item name="Role" type="char_string" max="256" optional="false"/>
+    <item fieldId="0" name="Name" type="long_char_string" length="256"/>
+    <item fieldId="1" name="Role" type="long_char_string" length="256"/>
   </struct>
 
   <struct name="PageTokenStruct">
     <cluster code="0x0504"/>
-    <item name="Limit" type="int16u" default="0" optional="true"/>
-    <item name="After" type="char_string" max="8192" default="" optional="true"/>
-    <item name="Before" type="char_string" max="8192" default="" optional="true"/>
+    <item fieldId="0" name="Limit" type="int16u" default="0" optional="true"/>
+    <item fieldId="1" name="After" type="long_char_string" optional="true" length="8192"/>
+    <item fieldId="2" name="Before" type="long_char_string" optional="true" length="8192"/>
   </struct>
 
   <struct name="ChannelPagingStruct">
@@ -201,10 +201,10 @@ limitations under the License.
     <item name="OTT" value="0x03"/>
   </enum>
 
-  <bitmap name="RecordingFlagBitmap" type="bitmap32">
+  <bitmap name="RecordingFlagBitmap" type="bitmap8">
     <cluster code="0x0504"/>
     <field name="Scheduled" mask="0x1"/>
-    <field name="RecordSeries"  mask="0x2"/>
+    <field name="RecordSeries" mask="0x2"/>
     <field name="Recorded" mask="0x4"/>
   </bitmap>
 

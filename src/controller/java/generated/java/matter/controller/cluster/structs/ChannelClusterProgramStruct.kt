@@ -39,11 +39,11 @@ class ChannelClusterProgramStruct(
   val dvbiUrl: Optional<String>,
   val releaseDate: Optional<String>,
   val parentalGuidanceText: Optional<String>,
-  val recordingFlag: Optional<UInt>,
+  val recordingFlag: Optional<UByte>,
   val seriesInfo: Optional<ChannelClusterSeriesInfoStruct>?,
   val categoryList: Optional<List<ChannelClusterProgramCategoryStruct>>,
   val castList: Optional<List<ChannelClusterProgramCastStruct>>,
-  val externalIDList: Optional<List<ChannelClusterProgramCastStruct>>
+  val externalIDList: Optional<List<ChannelClusterAdditionalInfoStruct>>
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterProgramStruct {\n")
@@ -262,7 +262,7 @@ class ChannelClusterProgramStruct(
         }
       val recordingFlag =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_RECORDING_FLAG))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RECORDING_FLAG)))
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_RECORDING_FLAG)))
         } else {
           Optional.empty()
         }
@@ -310,10 +310,10 @@ class ChannelClusterProgramStruct(
       val externalIDList =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))) {
           Optional.of(
-            buildList<ChannelClusterProgramCastStruct> {
+            buildList<ChannelClusterAdditionalInfoStruct> {
               tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
               while (!tlvReader.isEndOfContainer()) {
-                add(ChannelClusterProgramCastStruct.fromTlv(AnonymousTag, tlvReader))
+                add(ChannelClusterAdditionalInfoStruct.fromTlv(AnonymousTag, tlvReader))
               }
               tlvReader.exitContainer()
             }

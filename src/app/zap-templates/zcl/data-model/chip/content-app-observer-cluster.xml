@@ -23,19 +23,20 @@ limitations under the License.
     <define>CONTENT_APP_OBSERVER_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1"/>
     <description>This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse.</description>
 
     <command source="client" code="0x00" name="ContentAppMessage" response="ContentAppMessageResponse" optional="false">
       <description>Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding.</description>
-      <arg name="Data" type="char_string" optional="true"/>
-      <arg name="EncodingHint" type="char_string" optional="false"/>
+      <arg id="0" name="Data" type="long_char_string" length="500"/>
+      <arg id="1" name="EncodingHint" type="char_string" optional="true" length="100"/>
     </command>
 
-    <command source="server" code="0x01" name="ContentAppMessageResponse" optional="false" apiMaturity="provisional">
+    <command source="server" code="0x01" name="ContentAppMessageResponse" optional="false" apiMaturity="provisional" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to ContentAppMessage command.</description>
-      <arg name="Status" type="StatusEnum" optional="false"/>
-      <arg name="Data" type="char_string" optional="true"/>
-      <arg name="EncodingHint" type="char_string" optional="true"/>
+      <arg id="0" name="Status" type="StatusEnum" min="0x00" max="0x01"/>
+      <arg id="1" name="Data" type="long_char_string" optional="true" length="500"/>
+      <arg id="2" name="EncodingHint" type="char_string" optional="true" length="100"/>
     </command>
 
   </cluster>

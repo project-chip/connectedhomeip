@@ -4085,40 +4085,52 @@ static id _Nullable DecodeEventPayloadForTargetNavigatorCluster(EventId aEventId
         __auto_type * value = [MTRTargetNavigatorClusterTargetUpdatedEvent new];
 
         do {
-            NSArray * _Nonnull memberValue;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.targetList.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    MTRTargetNavigatorClusterTargetInfoStruct * newElement_0;
-                    newElement_0 = [MTRTargetNavigatorClusterTargetInfoStruct new];
-                    newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
-                    newElement_0.name = AsString(entry_0.name);
-                    if (newElement_0.name == nil) {
-                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            NSArray * _Nullable memberValue;
+            if (cppValue.targetList.HasValue()) {
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.targetList.Value().begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        MTRTargetNavigatorClusterTargetInfoStruct * newElement_1;
+                        newElement_1 = [MTRTargetNavigatorClusterTargetInfoStruct new];
+                        newElement_1.identifier = [NSNumber numberWithUnsignedChar:entry_1.identifier];
+                        newElement_1.name = AsString(entry_1.name);
+                        if (newElement_1.name == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
                         *aError = err;
                         return nil;
                     }
-                    [array_0 addObject:newElement_0];
+                    memberValue = array_1;
                 }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                memberValue = array_0;
+            } else {
+                memberValue = nil;
             }
             value.targetList = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:cppValue.currentTarget];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.currentTarget.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.currentTarget.Value()];
+            } else {
+                memberValue = nil;
+            }
             value.currentTarget = memberValue;
         } while (0);
         do {
-            NSData * _Nonnull memberValue;
-            memberValue = AsData(cppValue.data);
+            NSData * _Nullable memberValue;
+            if (cppValue.data.HasValue()) {
+                memberValue = AsData(cppValue.data.Value());
+            } else {
+                memberValue = nil;
+            }
             value.data = memberValue;
         } while (0);
 
@@ -4151,39 +4163,63 @@ static id _Nullable DecodeEventPayloadForMediaPlaybackCluster(EventId aEventId, 
             value.currentState = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.startTime];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.startTime.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.startTime.Value()];
+            } else {
+                memberValue = nil;
+            }
             value.startTime = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.duration];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.duration.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.duration.Value()];
+            } else {
+                memberValue = nil;
+            }
             value.duration = memberValue;
         } while (0);
         do {
-            MTRMediaPlaybackClusterPlaybackPositionStruct * _Nonnull memberValue;
-            memberValue = [MTRMediaPlaybackClusterPlaybackPositionStruct new];
-            memberValue.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.sampledPosition.updatedAt];
-            if (cppValue.sampledPosition.position.IsNull()) {
-                memberValue.position = nil;
+            MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable memberValue;
+            if (cppValue.sampledPosition.HasValue()) {
+                memberValue = [MTRMediaPlaybackClusterPlaybackPositionStruct new];
+                memberValue.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.sampledPosition.Value().updatedAt];
+                if (cppValue.sampledPosition.Value().position.IsNull()) {
+                    memberValue.position = nil;
+                } else {
+                    memberValue.position = [NSNumber numberWithUnsignedLongLong:cppValue.sampledPosition.Value().position.Value()];
+                }
             } else {
-                memberValue.position = [NSNumber numberWithUnsignedLongLong:cppValue.sampledPosition.position.Value()];
+                memberValue = nil;
             }
             value.sampledPosition = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithFloat:cppValue.playbackSpeed];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.playbackSpeed.HasValue()) {
+                memberValue = [NSNumber numberWithFloat:cppValue.playbackSpeed.Value()];
+            } else {
+                memberValue = nil;
+            }
             value.playbackSpeed = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.seekRangeEnd];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.seekRangeEnd.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.seekRangeEnd.Value()];
+            } else {
+                memberValue = nil;
+            }
             value.seekRangeEnd = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.seekRangeStart];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.seekRangeStart.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.seekRangeStart.Value()];
+            } else {
+                memberValue = nil;
+            }
             value.seekRangeStart = memberValue;
         } while (0);
         do {
@@ -4196,8 +4232,12 @@ static id _Nullable DecodeEventPayloadForMediaPlaybackCluster(EventId aEventId, 
             value.data = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithBool:cppValue.audioAdvanceUnmuted];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.audioAdvanceUnmuted.HasValue()) {
+                memberValue = [NSNumber numberWithBool:cppValue.audioAdvanceUnmuted.Value()];
+            } else {
+                memberValue = nil;
+            }
             value.audioAdvanceUnmuted = memberValue;
         } while (0);
 
@@ -4317,6 +4357,11 @@ static id _Nullable DecodeEventPayloadForAccountLoginCluster(EventId aEventId, T
             }
             value.node = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
 
         return value;
     }
@@ -4340,6 +4385,17 @@ static id _Nullable DecodeEventPayloadForContentControlCluster(EventId aEventId,
         }
 
         __auto_type * value = [MTRContentControlClusterRemainingScreenTimeExpiredEvent new];
+
+        return value;
+    }
+    case Events::EnteringBlockContentTimeWindow::Id: {
+        Events::EnteringBlockContentTimeWindow::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRContentControlClusterEnteringBlockContentTimeWindowEvent new];
 
         return value;
     }

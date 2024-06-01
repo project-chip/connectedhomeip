@@ -183,6 +183,7 @@ class ContentLauncherCluster(
     contentURL: String,
     displayString: String?,
     brandingInformation: ContentLauncherClusterBrandingInformationStruct?,
+    playbackPreferences: ContentLauncherClusterPlaybackPreferencesStruct?,
     timedInvokeTimeout: Duration? = null
   ): LauncherResponse {
     val commandId: UInt = 1u
@@ -199,6 +200,11 @@ class ContentLauncherCluster(
     val TAG_BRANDING_INFORMATION_REQ: Int = 2
     brandingInformation?.let {
       brandingInformation.toTlv(ContextSpecificTag(TAG_BRANDING_INFORMATION_REQ), tlvWriter)
+    }
+
+    val TAG_PLAYBACK_PREFERENCES_REQ: Int = 3
+    playbackPreferences?.let {
+      playbackPreferences.toTlv(ContextSpecificTag(TAG_PLAYBACK_PREFERENCES_REQ), tlvWriter)
     }
     tlvWriter.endStructure()
 

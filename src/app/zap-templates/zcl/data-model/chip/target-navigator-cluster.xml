@@ -34,17 +34,17 @@ limitations under the License.
       <arg name="Data"   type="char_string" optional="true"/>
     </command>
 
-    <command source="server" code="0x01" name="NavigateTargetResponse" optional="false">
+    <command source="server" code="0x01" name="NavigateTargetResponse" optional="false" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to NavigateTarget commands.</description>
       <arg name="Status" type="StatusEnum"/>
       <arg name="Data"   type="char_string" optional="true"/>
     </command>
 
-    <event side="server" code="0x00" priority="info" name="TargetUpdated" optional="false">
+    <event side="server" code="0x00" priority="info" name="TargetUpdated" optional="true">
       <description>This field SHALL indicate the updated target list as defined by the TargetList attribute if there is a change in the list of targets. Otherwise this field can be omitted from the event.</description>
-      <field id="0" name="TargetList" array="true" type="TargetInfoStruct"  />
-      <field id="1" name="CurrentTarget" type="int8u" />
-      <field id="2" name="Data" length="900" type="octet_string" />
+      <field id="0" name="TargetList" array="true" type="TargetInfoStruct" optional="true"/>
+      <field id="1" name="CurrentTarget" type="int8u" optional="true" default="0xFF"/>
+      <field id="2" name="Data" length="900" type="octet_string" optional="true"/>
     </event>
   </cluster>
 

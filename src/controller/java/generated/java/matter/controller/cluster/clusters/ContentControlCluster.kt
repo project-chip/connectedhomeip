@@ -70,6 +70,39 @@ class ContentControlCluster(
     object SubscriptionEstablished : ScheduledContentRatingsAttributeSubscriptionState()
   }
 
+  class BlockChannelListAttribute(val value: List<ContentControlClusterBlockChannelStruct>?)
+
+  sealed class BlockChannelListAttributeSubscriptionState {
+    data class Success(val value: List<ContentControlClusterBlockChannelStruct>?) :
+      BlockChannelListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : BlockChannelListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : BlockChannelListAttributeSubscriptionState()
+  }
+
+  class BlockApplicationListAttribute(val value: List<ContentControlClusterAppInfoStruct>?)
+
+  sealed class BlockApplicationListAttributeSubscriptionState {
+    data class Success(val value: List<ContentControlClusterAppInfoStruct>?) :
+      BlockApplicationListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : BlockApplicationListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : BlockApplicationListAttributeSubscriptionState()
+  }
+
+  class BlockContentTimeWindowAttribute(val value: List<ContentControlClusterTimeWindowStruct>?)
+
+  sealed class BlockContentTimeWindowAttributeSubscriptionState {
+    data class Success(val value: List<ContentControlClusterTimeWindowStruct>?) :
+      BlockContentTimeWindowAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : BlockContentTimeWindowAttributeSubscriptionState()
+
+    object SubscriptionEstablished : BlockContentTimeWindowAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -110,14 +143,14 @@ class ContentControlCluster(
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun updatePIN(oldPIN: String?, newPIN: String, timedInvokeTimeout: Duration? = null) {
+  suspend fun updatePIN(oldPIN: String, newPIN: String, timedInvokeTimeout: Duration) {
     val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_OLD_P_I_N_REQ: Int = 0
-    oldPIN?.let { tlvWriter.put(ContextSpecificTag(TAG_OLD_P_I_N_REQ), oldPIN) }
+    tlvWriter.put(ContextSpecificTag(TAG_OLD_P_I_N_REQ), oldPIN)
 
     val TAG_NEW_P_I_N_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_NEW_P_I_N_REQ), newPIN)
@@ -134,7 +167,7 @@ class ContentControlCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun resetPIN(timedInvokeTimeout: Duration? = null): ResetPINResponse {
+  suspend fun resetPIN(timedInvokeTimeout: Duration): ResetPINResponse {
     val commandId: UInt = 1u
 
     val tlvWriter = TlvWriter()
@@ -175,7 +208,7 @@ class ContentControlCluster(
     return ResetPINResponse(PINCode_decoded)
   }
 
-  suspend fun enable(timedInvokeTimeout: Duration? = null) {
+  suspend fun enable(timedInvokeTimeout: Duration) {
     val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
@@ -193,7 +226,7 @@ class ContentControlCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun disable(timedInvokeTimeout: Duration? = null) {
+  suspend fun disable(timedInvokeTimeout: Duration) {
     val commandId: UInt = 4u
 
     val tlvWriter = TlvWriter()
@@ -213,7 +246,7 @@ class ContentControlCluster(
 
   suspend fun addBonusTime(
     PINCode: String?,
-    bonusTime: UInt?,
+    bonusTime: UInt,
     timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
@@ -225,7 +258,7 @@ class ContentControlCluster(
     PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_P_I_N_CODE_REQ), PINCode) }
 
     val TAG_BONUS_TIME_REQ: Int = 1
-    bonusTime?.let { tlvWriter.put(ContextSpecificTag(TAG_BONUS_TIME_REQ), bonusTime) }
+    tlvWriter.put(ContextSpecificTag(TAG_BONUS_TIME_REQ), bonusTime)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -328,6 +361,170 @@ class ContentControlCluster(
 
     val TAG_RATING_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_RATING_REQ), rating)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun addBlockChannels(
+    channels: List<ContentControlClusterBlockChannelStruct>,
+    timedInvokeTimeout: Duration? = null
+  ) {
+    val commandId: UInt = 11u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_CHANNELS_REQ: Int = 0
+    tlvWriter.startArray(ContextSpecificTag(TAG_CHANNELS_REQ))
+    for (item in channels.iterator()) {
+      item.toTlv(AnonymousTag, tlvWriter)
+    }
+    tlvWriter.endArray()
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun removeBlockChannels(
+    channelIndexes: List<UShort>,
+    timedInvokeTimeout: Duration? = null
+  ) {
+    val commandId: UInt = 12u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_CHANNEL_INDEXES_REQ: Int = 0
+    tlvWriter.startArray(ContextSpecificTag(TAG_CHANNEL_INDEXES_REQ))
+    for (item in channelIndexes.iterator()) {
+      tlvWriter.put(AnonymousTag, item)
+    }
+    tlvWriter.endArray()
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun addBlockApplications(
+    applications: List<ContentControlClusterAppInfoStruct>,
+    timedInvokeTimeout: Duration? = null
+  ) {
+    val commandId: UInt = 13u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_APPLICATIONS_REQ: Int = 0
+    tlvWriter.startArray(ContextSpecificTag(TAG_APPLICATIONS_REQ))
+    for (item in applications.iterator()) {
+      item.toTlv(AnonymousTag, tlvWriter)
+    }
+    tlvWriter.endArray()
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun removeBlockApplications(
+    applications: List<ContentControlClusterAppInfoStruct>,
+    timedInvokeTimeout: Duration? = null
+  ) {
+    val commandId: UInt = 14u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_APPLICATIONS_REQ: Int = 0
+    tlvWriter.startArray(ContextSpecificTag(TAG_APPLICATIONS_REQ))
+    for (item in applications.iterator()) {
+      item.toTlv(AnonymousTag, tlvWriter)
+    }
+    tlvWriter.endArray()
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun setBlockContentTimeWindow(
+    timeWindow: ContentControlClusterTimeWindowStruct,
+    timedInvokeTimeout: Duration? = null
+  ) {
+    val commandId: UInt = 15u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_TIME_WINDOW_REQ: Int = 0
+    timeWindow.toTlv(ContextSpecificTag(TAG_TIME_WINDOW_REQ), tlvWriter)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun removeBlockContentTimeWindow(
+    timeWindowIndexes: List<UShort>,
+    timedInvokeTimeout: Duration? = null
+  ) {
+    val commandId: UInt = 16u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_TIME_WINDOW_INDEXES_REQ: Int = 0
+    tlvWriter.startArray(ContextSpecificTag(TAG_TIME_WINDOW_INDEXES_REQ))
+    for (item in timeWindowIndexes.iterator()) {
+      tlvWriter.put(AnonymousTag, item)
+    }
+    tlvWriter.endArray()
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -1006,7 +1203,7 @@ class ContentControlCluster(
     }
   }
 
-  suspend fun readBlockUnratedAttribute(): Boolean {
+  suspend fun readBlockUnratedAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 7u
 
     val attributePath =
@@ -1032,7 +1229,12 @@ class ContentControlCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -1076,12 +1278,332 @@ class ContentControlCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+          val decodedValue: Boolean? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getBoolean(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(BooleanSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readBlockChannelListAttribute(): BlockChannelListAttribute {
+    val ATTRIBUTE_ID: UInt = 8u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Blockchannellist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ContentControlClusterBlockChannelStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ContentControlClusterBlockChannelStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(ContentControlClusterBlockChannelStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return BlockChannelListAttribute(decodedValue)
+  }
+
+  suspend fun subscribeBlockChannelListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BlockChannelListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 8u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BlockChannelListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Blockchannellist attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ContentControlClusterBlockChannelStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ContentControlClusterBlockChannelStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ContentControlClusterBlockChannelStruct.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(BlockChannelListAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BlockChannelListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readBlockApplicationListAttribute(): BlockApplicationListAttribute {
+    val ATTRIBUTE_ID: UInt = 9u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Blockapplicationlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ContentControlClusterAppInfoStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ContentControlClusterAppInfoStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(ContentControlClusterAppInfoStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return BlockApplicationListAttribute(decodedValue)
+  }
+
+  suspend fun subscribeBlockApplicationListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BlockApplicationListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 9u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BlockApplicationListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Blockapplicationlist attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ContentControlClusterAppInfoStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ContentControlClusterAppInfoStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ContentControlClusterAppInfoStruct.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(BlockApplicationListAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BlockApplicationListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readBlockContentTimeWindowAttribute(): BlockContentTimeWindowAttribute {
+    val ATTRIBUTE_ID: UInt = 10u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Blockcontenttimewindow attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ContentControlClusterTimeWindowStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ContentControlClusterTimeWindowStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(ContentControlClusterTimeWindowStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return BlockContentTimeWindowAttribute(decodedValue)
+  }
+
+  suspend fun subscribeBlockContentTimeWindowAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BlockContentTimeWindowAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 10u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BlockContentTimeWindowAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Blockcontenttimewindow attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ContentControlClusterTimeWindowStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ContentControlClusterTimeWindowStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ContentControlClusterTimeWindowStruct.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(BlockContentTimeWindowAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BlockContentTimeWindowAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

@@ -7148,6 +7148,18 @@ namespace BlockUnrated {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace BlockUnrated
 
+namespace BlockChannelList {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace BlockChannelList
+
+namespace BlockApplicationList {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace BlockApplicationList
+
+namespace BlockContentTimeWindow {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace BlockContentTimeWindow
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

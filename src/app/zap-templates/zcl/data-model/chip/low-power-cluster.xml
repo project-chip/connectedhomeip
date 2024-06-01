@@ -23,9 +23,11 @@ limitations under the License.
     <define>LOW_POWER_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1"/>
     <description>This cluster provides an interface for managing low power mode on a device.</description>
     <command source="client" code="0x00" name="Sleep" optional="false">
       <description>This command shall put the device into low power mode.</description>
     </command>
+
   </cluster>
 </configurator>

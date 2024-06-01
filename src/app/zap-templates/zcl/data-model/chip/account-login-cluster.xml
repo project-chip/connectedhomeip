@@ -45,14 +45,15 @@ limitations under the License.
       <arg name="Node" type="node_id" optional="true"/>
     </command>
 
-    <command source="server" code="0x01" name="GetSetupPINResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x01" name="GetSetupPINResponse" optional="false" disableDefaultResponse="true" isFabricScoped="true">
       <description>This message is sent in response to the GetSetupPIN Request, and contains the Setup PIN code, or null when the accounts identified in the request does not match the active account of the running Content App.</description>
       <arg name="SetupPIN" type="char_string"/>
     </command>
 
-    <event side="server" code="0x00" priority="critical" name="LoggedOut" optional="false">
+    <event side="server" code="0x00" priority="critical" name="LoggedOut" optional="true" isFabricSensitive="true">
       <description>This event can be used by the Content App to indicate that the current user has logged out. In response to this event, the Fabric Admin SHALL remove access to this Content App by the specified Node. If no Node is provided, then the Fabric Admin SHALL remove access to all non-Admin Nodes.</description>
       <field id="0" name="Node" type="node_id" optional="true"/>
+      <access op="read" privilege="administer"/>
     </event>
 
   </cluster>

@@ -25,14 +25,15 @@ import matter.tlv.TlvWriter
 
 class MediaPlaybackClusterStateChangedEvent(
   val currentState: UByte,
-  val startTime: ULong,
-  val duration: ULong,
-  val sampledPosition: matter.controller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct,
-  val playbackSpeed: Float,
-  val seekRangeEnd: ULong,
-  val seekRangeStart: ULong,
+  val startTime: Optional<ULong>,
+  val duration: Optional<ULong>,
+  val sampledPosition:
+    Optional<matter.controller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct>,
+  val playbackSpeed: Optional<Float>,
+  val seekRangeEnd: Optional<ULong>,
+  val seekRangeStart: Optional<ULong>,
   val data: Optional<ByteArray>,
-  val audioAdvanceUnmuted: Boolean
+  val audioAdvanceUnmuted: Optional<Boolean>
 ) {
   override fun toString(): String = buildString {
     append("MediaPlaybackClusterStateChangedEvent {\n")
@@ -52,17 +53,38 @@ class MediaPlaybackClusterStateChangedEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CURRENT_STATE), currentState)
-      put(ContextSpecificTag(TAG_START_TIME), startTime)
-      put(ContextSpecificTag(TAG_DURATION), duration)
-      sampledPosition.toTlv(ContextSpecificTag(TAG_SAMPLED_POSITION), this)
-      put(ContextSpecificTag(TAG_PLAYBACK_SPEED), playbackSpeed)
-      put(ContextSpecificTag(TAG_SEEK_RANGE_END), seekRangeEnd)
-      put(ContextSpecificTag(TAG_SEEK_RANGE_START), seekRangeStart)
+      if (startTime.isPresent) {
+        val optstartTime = startTime.get()
+        put(ContextSpecificTag(TAG_START_TIME), optstartTime)
+      }
+      if (duration.isPresent) {
+        val optduration = duration.get()
+        put(ContextSpecificTag(TAG_DURATION), optduration)
+      }
+      if (sampledPosition.isPresent) {
+        val optsampledPosition = sampledPosition.get()
+        optsampledPosition.toTlv(ContextSpecificTag(TAG_SAMPLED_POSITION), this)
+      }
+      if (playbackSpeed.isPresent) {
+        val optplaybackSpeed = playbackSpeed.get()
+        put(ContextSpecificTag(TAG_PLAYBACK_SPEED), optplaybackSpeed)
+      }
+      if (seekRangeEnd.isPresent) {
+        val optseekRangeEnd = seekRangeEnd.get()
+        put(ContextSpecificTag(TAG_SEEK_RANGE_END), optseekRangeEnd)
+      }
+      if (seekRangeStart.isPresent) {
+        val optseekRangeStart = seekRangeStart.get()
+        put(ContextSpecificTag(TAG_SEEK_RANGE_START), optseekRangeStart)
+      }
       if (data.isPresent) {
         val optdata = data.get()
         put(ContextSpecificTag(TAG_DATA), optdata)
       }
-      put(ContextSpecificTag(TAG_AUDIO_ADVANCE_UNMUTED), audioAdvanceUnmuted)
+      if (audioAdvanceUnmuted.isPresent) {
+        val optaudioAdvanceUnmuted = audioAdvanceUnmuted.get()
+        put(ContextSpecificTag(TAG_AUDIO_ADVANCE_UNMUTED), optaudioAdvanceUnmuted)
+      }
       endStructure()
     }
   }
@@ -81,23 +103,59 @@ class MediaPlaybackClusterStateChangedEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val currentState = tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_STATE))
-      val startTime = tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
-      val duration = tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
+      val startTime =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_TIME))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_START_TIME)))
+        } else {
+          Optional.empty()
+        }
+      val duration =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DURATION))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_DURATION)))
+        } else {
+          Optional.empty()
+        }
       val sampledPosition =
-        matter.controller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct.fromTlv(
-          ContextSpecificTag(TAG_SAMPLED_POSITION),
-          tlvReader
-        )
-      val playbackSpeed = tlvReader.getFloat(ContextSpecificTag(TAG_PLAYBACK_SPEED))
-      val seekRangeEnd = tlvReader.getULong(ContextSpecificTag(TAG_SEEK_RANGE_END))
-      val seekRangeStart = tlvReader.getULong(ContextSpecificTag(TAG_SEEK_RANGE_START))
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SAMPLED_POSITION))) {
+          Optional.of(
+            matter.controller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct.fromTlv(
+              ContextSpecificTag(TAG_SAMPLED_POSITION),
+              tlvReader
+            )
+          )
+        } else {
+          Optional.empty()
+        }
+      val playbackSpeed =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PLAYBACK_SPEED))) {
+          Optional.of(tlvReader.getFloat(ContextSpecificTag(TAG_PLAYBACK_SPEED)))
+        } else {
+          Optional.empty()
+        }
+      val seekRangeEnd =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SEEK_RANGE_END))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SEEK_RANGE_END)))
+        } else {
+          Optional.empty()
+        }
+      val seekRangeStart =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SEEK_RANGE_START))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_SEEK_RANGE_START)))
+        } else {
+          Optional.empty()
+        }
       val data =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_DATA))) {
           Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_DATA)))
         } else {
           Optional.empty()
         }
-      val audioAdvanceUnmuted = tlvReader.getBoolean(ContextSpecificTag(TAG_AUDIO_ADVANCE_UNMUTED))
+      val audioAdvanceUnmuted =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_ADVANCE_UNMUTED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_AUDIO_ADVANCE_UNMUTED)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 

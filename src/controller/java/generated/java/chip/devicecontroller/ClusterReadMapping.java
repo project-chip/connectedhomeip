@@ -17836,6 +17836,39 @@ public class ClusterReadMapping {
           readContentControlBlockUnratedCommandParams
         );
         result.put("readBlockUnratedAttribute", readContentControlBlockUnratedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readContentControlBlockChannelListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readContentControlBlockChannelListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ContentControlCluster) cluster).readBlockChannelListAttribute(
+              (ChipClusters.ContentControlCluster.BlockChannelListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedContentControlClusterBlockChannelListAttributeCallback(),
+          readContentControlBlockChannelListCommandParams
+        );
+        result.put("readBlockChannelListAttribute", readContentControlBlockChannelListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readContentControlBlockApplicationListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readContentControlBlockApplicationListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ContentControlCluster) cluster).readBlockApplicationListAttribute(
+              (ChipClusters.ContentControlCluster.BlockApplicationListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedContentControlClusterBlockApplicationListAttributeCallback(),
+          readContentControlBlockApplicationListCommandParams
+        );
+        result.put("readBlockApplicationListAttribute", readContentControlBlockApplicationListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readContentControlBlockContentTimeWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readContentControlBlockContentTimeWindowAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ContentControlCluster) cluster).readBlockContentTimeWindowAttribute(
+              (ChipClusters.ContentControlCluster.BlockContentTimeWindowAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedContentControlClusterBlockContentTimeWindowAttributeCallback(),
+          readContentControlBlockContentTimeWindowCommandParams
+        );
+        result.put("readBlockContentTimeWindowAttribute", readContentControlBlockContentTimeWindowAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readContentControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readContentControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

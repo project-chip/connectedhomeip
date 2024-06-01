@@ -6337,25 +6337,30 @@ cluster Channel = 1284 {
     kRecordProgram = 0x8;
   }
 
-  bitmap RecordingFlagBitmap : bitmap32 {
+  bitmap RecordingFlagBitmap : bitmap8 {
     kScheduled = 0x1;
     kRecordSeries = 0x2;
     kRecorded = 0x4;
   }
 
-  struct ProgramCastStruct {
+  struct AdditionalInfoStruct {
     char_string name = 0;
-    char_string role = 1;
+    char_string value = 1;
+  }
+
+  struct ProgramCastStruct {
+    long_char_string<256> name = 0;
+    long_char_string<256> role = 1;
   }
 
   struct ProgramCategoryStruct {
-    char_string category = 0;
-    optional char_string subCategory = 1;
+    long_char_string<256> category = 0;
+    optional long_char_string<256> subCategory = 1;
   }
 
   struct SeriesInfoStruct {
-    char_string season = 0;
-    char_string episode = 1;
+    long_char_string<256> season = 0;
+    long_char_string<256> episode = 1;
   }
 
   struct ChannelInfoStruct {
@@ -6369,41 +6374,36 @@ cluster Channel = 1284 {
   }
 
   struct ProgramStruct {
-    char_string identifier = 0;
+    char_string<255> identifier = 0;
     ChannelInfoStruct channel = 1;
     epoch_s startTime = 2;
     epoch_s endTime = 3;
-    char_string title = 4;
-    optional char_string subtitle = 5;
-    optional char_string description = 6;
+    char_string<255> title = 4;
+    optional char_string<255> subtitle = 5;
+    optional long_char_string<8192> description = 6;
     optional char_string audioLanguages[] = 7;
     optional char_string ratings[] = 8;
-    optional char_string thumbnailUrl = 9;
-    optional char_string posterArtUrl = 10;
-    optional char_string dvbiUrl = 11;
-    optional char_string releaseDate = 12;
-    optional char_string parentalGuidanceText = 13;
+    optional long_char_string<8192> thumbnailUrl = 9;
+    optional long_char_string<8192> posterArtUrl = 10;
+    optional long_char_string<8192> dvbiUrl = 11;
+    optional char_string<30> releaseDate = 12;
+    optional char_string<255> parentalGuidanceText = 13;
     optional RecordingFlagBitmap recordingFlag = 14;
     optional nullable SeriesInfoStruct seriesInfo = 15;
     optional ProgramCategoryStruct categoryList[] = 16;
     optional ProgramCastStruct castList[] = 17;
-    optional ProgramCastStruct externalIDList[] = 18;
+    optional AdditionalInfoStruct externalIDList[] = 18;
   }
 
   struct PageTokenStruct {
     optional int16u limit = 0;
-    optional char_string after = 1;
-    optional char_string before = 2;
+    optional long_char_string<8192> after = 1;
+    optional long_char_string<8192> before = 2;
   }
 
   struct ChannelPagingStruct {
     optional nullable PageTokenStruct previousToken = 0;
     optional nullable PageTokenStruct nextToken = 1;
-  }
-
-  struct AdditionalInfoStruct {
-    char_string name = 0;
-    char_string value = 1;
   }
 
   struct LineupInfoStruct {
@@ -6442,13 +6442,13 @@ cluster Channel = 1284 {
   }
 
   request struct GetProgramGuideRequest {
-    optional epoch_s startTime = 0;
-    optional epoch_s endTime = 1;
+    epoch_s startTime = 0;
+    epoch_s endTime = 1;
     optional ChannelInfoStruct channelList[] = 2;
-    optional PageTokenStruct pageToken = 3;
-    optional RecordingFlagBitmap recordingFlag = 4;
+    optional nullable PageTokenStruct pageToken = 3;
+    optional nullable RecordingFlagBitmap recordingFlag = 4;
     optional AdditionalInfoStruct externalIDList[] = 5;
-    optional octet_string data = 6;
+    optional octet_string<8092> data = 6;
   }
 
   response struct ProgramGuideResponse = 5 {
@@ -6457,17 +6457,17 @@ cluster Channel = 1284 {
   }
 
   request struct RecordProgramRequest {
-    char_string programIdentifier = 0;
+    char_string<255> programIdentifier = 0;
     boolean shouldRecordSeries = 1;
-    AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    optional AdditionalInfoStruct externalIDList[] = 2;
+    optional octet_string<8092> data = 3;
   }
 
   request struct CancelRecordProgramRequest {
-    char_string programIdentifier = 0;
+    char_string<255> programIdentifier = 0;
     boolean shouldRecordSeries = 1;
-    AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    optional AdditionalInfoStruct externalIDList[] = 2;
+    optional octet_string<8092> data = 3;
   }
 
   /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
@@ -6512,25 +6512,30 @@ cluster Channel = 1284 {
     kRecordProgram = 0x8;
   }
 
-  bitmap RecordingFlagBitmap : bitmap32 {
+  bitmap RecordingFlagBitmap : bitmap8 {
     kScheduled = 0x1;
     kRecordSeries = 0x2;
     kRecorded = 0x4;
   }
 
-  struct ProgramCastStruct {
+  struct AdditionalInfoStruct {
     char_string name = 0;
-    char_string role = 1;
+    char_string value = 1;
+  }
+
+  struct ProgramCastStruct {
+    long_char_string<256> name = 0;
+    long_char_string<256> role = 1;
   }
 
   struct ProgramCategoryStruct {
-    char_string category = 0;
-    optional char_string subCategory = 1;
+    long_char_string<256> category = 0;
+    optional long_char_string<256> subCategory = 1;
   }
 
   struct SeriesInfoStruct {
-    char_string season = 0;
-    char_string episode = 1;
+    long_char_string<256> season = 0;
+    long_char_string<256> episode = 1;
   }
 
   struct ChannelInfoStruct {
@@ -6544,41 +6549,36 @@ cluster Channel = 1284 {
   }
 
   struct ProgramStruct {
-    char_string identifier = 0;
+    char_string<255> identifier = 0;
     ChannelInfoStruct channel = 1;
     epoch_s startTime = 2;
     epoch_s endTime = 3;
-    char_string title = 4;
-    optional char_string subtitle = 5;
-    optional char_string description = 6;
+    char_string<255> title = 4;
+    optional char_string<255> subtitle = 5;
+    optional long_char_string<8192> description = 6;
     optional char_string audioLanguages[] = 7;
     optional char_string ratings[] = 8;
-    optional char_string thumbnailUrl = 9;
-    optional char_string posterArtUrl = 10;
-    optional char_string dvbiUrl = 11;
-    optional char_string releaseDate = 12;
-    optional char_string parentalGuidanceText = 13;
+    optional long_char_string<8192> thumbnailUrl = 9;
+    optional long_char_string<8192> posterArtUrl = 10;
+    optional long_char_string<8192> dvbiUrl = 11;
+    optional char_string<30> releaseDate = 12;
+    optional char_string<255> parentalGuidanceText = 13;
     optional RecordingFlagBitmap recordingFlag = 14;
     optional nullable SeriesInfoStruct seriesInfo = 15;
     optional ProgramCategoryStruct categoryList[] = 16;
     optional ProgramCastStruct castList[] = 17;
-    optional ProgramCastStruct externalIDList[] = 18;
+    optional AdditionalInfoStruct externalIDList[] = 18;
   }
 
   struct PageTokenStruct {
     optional int16u limit = 0;
-    optional char_string after = 1;
-    optional char_string before = 2;
+    optional long_char_string<8192> after = 1;
+    optional long_char_string<8192> before = 2;
   }
 
   struct ChannelPagingStruct {
     optional nullable PageTokenStruct previousToken = 0;
     optional nullable PageTokenStruct nextToken = 1;
-  }
-
-  struct AdditionalInfoStruct {
-    char_string name = 0;
-    char_string value = 1;
   }
 
   struct LineupInfoStruct {
@@ -6617,13 +6617,13 @@ cluster Channel = 1284 {
   }
 
   request struct GetProgramGuideRequest {
-    optional epoch_s startTime = 0;
-    optional epoch_s endTime = 1;
+    epoch_s startTime = 0;
+    epoch_s endTime = 1;
     optional ChannelInfoStruct channelList[] = 2;
-    optional PageTokenStruct pageToken = 3;
-    optional RecordingFlagBitmap recordingFlag = 4;
+    optional nullable PageTokenStruct pageToken = 3;
+    optional nullable RecordingFlagBitmap recordingFlag = 4;
     optional AdditionalInfoStruct externalIDList[] = 5;
-    optional octet_string data = 6;
+    optional octet_string<8092> data = 6;
   }
 
   response struct ProgramGuideResponse = 5 {
@@ -6632,17 +6632,17 @@ cluster Channel = 1284 {
   }
 
   request struct RecordProgramRequest {
-    char_string programIdentifier = 0;
+    char_string<255> programIdentifier = 0;
     boolean shouldRecordSeries = 1;
-    AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    optional AdditionalInfoStruct externalIDList[] = 2;
+    optional octet_string<8092> data = 3;
   }
 
   request struct CancelRecordProgramRequest {
-    char_string programIdentifier = 0;
+    char_string<255> programIdentifier = 0;
     boolean shouldRecordSeries = 1;
-    AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    optional AdditionalInfoStruct externalIDList[] = 2;
+    optional octet_string<8092> data = 3;
   }
 
   /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
@@ -6675,9 +6675,9 @@ cluster TargetNavigator = 1285 {
   }
 
   info event TargetUpdated = 0 {
-    TargetInfoStruct targetList[] = 0;
-    int8u currentTarget = 1;
-    octet_string data = 2;
+    optional TargetInfoStruct targetList[] = 0;
+    optional int8u currentTarget = 1;
+    optional octet_string data = 2;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
@@ -6719,9 +6719,9 @@ cluster TargetNavigator = 1285 {
   }
 
   info event TargetUpdated = 0 {
-    TargetInfoStruct targetList[] = 0;
-    int8u currentTarget = 1;
-    octet_string data = 2;
+    optional TargetInfoStruct targetList[] = 0;
+    optional int8u currentTarget = 1;
+    optional octet_string data = 2;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
@@ -6798,12 +6798,13 @@ cluster MediaPlayback = 1286 {
 
   struct TrackAttributesStruct {
     char_string<32> languageCode = 0;
-    optional nullable char_string displayName = 1;
+    optional nullable CharacteristicEnum characteristics[] = 1;
+    optional nullable long_char_string<256> displayName = 2;
   }
 
   struct TrackStruct {
     char_string<32> id = 0;
-    nullable TrackAttributesStruct trackAttributes = 1;
+    TrackAttributesStruct trackAttributes = 1;
   }
 
   struct PlaybackPositionStruct {
@@ -6813,14 +6814,14 @@ cluster MediaPlayback = 1286 {
 
   info event StateChanged = 0 {
     PlaybackStateEnum currentState = 0;
-    EPOCH_US startTime = 1;
-    INT64U duration = 2;
-    PlaybackPositionStruct sampledPosition = 3;
-    single playbackSpeed = 4;
-    INT64U seekRangeEnd = 5;
-    INT64U seekRangeStart = 6;
-    optional OCTET_STRING data = 7;
-    boolean audioAdvanceUnmuted = 8;
+    optional epoch_us startTime = 1;
+    optional int64u duration = 2;
+    optional PlaybackPositionStruct sampledPosition = 3;
+    optional single playbackSpeed = 4;
+    optional int64u seekRangeEnd = 5;
+    optional int64u seekRangeStart = 6;
+    optional octet_string data = 7;
+    optional boolean audioAdvanceUnmuted = 8;
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
@@ -6867,12 +6868,12 @@ cluster MediaPlayback = 1286 {
   }
 
   request struct ActivateAudioTrackRequest {
-    CHAR_STRING trackID = 0;
-    INT8U audioOutputIndex = 1;
+    char_string<32> trackID = 0;
+    optional nullable int8u audioOutputIndex = 1;
   }
 
   request struct ActivateTextTrackRequest {
-    CHAR_STRING trackID = 0;
+    char_string<32> trackID = 0;
   }
 
   /** Upon receipt, this SHALL play media. */
@@ -6956,12 +6957,13 @@ cluster MediaPlayback = 1286 {
 
   struct TrackAttributesStruct {
     char_string<32> languageCode = 0;
-    optional nullable char_string displayName = 1;
+    optional nullable CharacteristicEnum characteristics[] = 1;
+    optional nullable long_char_string<256> displayName = 2;
   }
 
   struct TrackStruct {
     char_string<32> id = 0;
-    nullable TrackAttributesStruct trackAttributes = 1;
+    TrackAttributesStruct trackAttributes = 1;
   }
 
   struct PlaybackPositionStruct {
@@ -6971,14 +6973,14 @@ cluster MediaPlayback = 1286 {
 
   info event StateChanged = 0 {
     PlaybackStateEnum currentState = 0;
-    EPOCH_US startTime = 1;
-    INT64U duration = 2;
-    PlaybackPositionStruct sampledPosition = 3;
-    single playbackSpeed = 4;
-    INT64U seekRangeEnd = 5;
-    INT64U seekRangeStart = 6;
-    optional OCTET_STRING data = 7;
-    boolean audioAdvanceUnmuted = 8;
+    optional epoch_us startTime = 1;
+    optional int64u duration = 2;
+    optional PlaybackPositionStruct sampledPosition = 3;
+    optional single playbackSpeed = 4;
+    optional int64u seekRangeEnd = 5;
+    optional int64u seekRangeStart = 6;
+    optional octet_string data = 7;
+    optional boolean audioAdvanceUnmuted = 8;
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
@@ -7025,12 +7027,12 @@ cluster MediaPlayback = 1286 {
   }
 
   request struct ActivateAudioTrackRequest {
-    CHAR_STRING trackID = 0;
-    INT8U audioOutputIndex = 1;
+    char_string<32> trackID = 0;
+    optional nullable int8u audioOutputIndex = 1;
   }
 
   request struct ActivateTextTrackRequest {
-    CHAR_STRING trackID = 0;
+    char_string<32> trackID = 0;
   }
 
   /** Upon receipt, this SHALL play media. */
@@ -7065,7 +7067,7 @@ cluster MediaPlayback = 1286 {
 
 /** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 cluster MediaInput = 1287 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum InputTypeEnum : enum8 {
     kInternal = 0;
@@ -7123,7 +7125,7 @@ cluster MediaInput = 1287 {
 
 /** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 cluster MediaInput = 1287 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum InputTypeEnum : enum8 {
     kInternal = 0;
@@ -7181,7 +7183,7 @@ cluster MediaInput = 1287 {
 
 /** This cluster provides an interface for managing low power mode on a device. */
 cluster LowPower = 1288 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -7196,7 +7198,7 @@ cluster LowPower = 1288 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 cluster KeypadInput = 1289 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
@@ -7320,7 +7322,7 @@ cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 cluster KeypadInput = 1289 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CECKeyCodeEnum : enum8 {
     kSelect = 0;
@@ -7444,7 +7446,7 @@ cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 1;
+  revision 2;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -7503,9 +7505,9 @@ cluster ContentLauncher = 1290 {
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
-    kAdvancedSeek = 0x3;
-    kTextTracks = 0x4;
-    kAudioTracks = 0x5;
+    kAdvancedSeek = 0x4;
+    kTextTracks = 0x8;
+    kAudioTracks = 0x10;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -7521,24 +7523,24 @@ cluster ContentLauncher = 1290 {
 
   struct TrackPreferenceStruct {
     char_string<32> languageCode = 0;
-    optional CharacteristicEnum characteristics[] = 1;
-    int8u audioOutputIndex = 2;
+    optional nullable CharacteristicEnum characteristics[] = 1;
+    optional nullable int8u audioOutputIndex = 2;
   }
 
   struct PlaybackPreferencesStruct {
-    int64u playbackPosition = 0;
-    TrackPreferenceStruct textTrack = 1;
-    optional TrackPreferenceStruct audioTracks[] = 2;
+    optional nullable int64u playbackPosition = 0;
+    optional nullable TrackPreferenceStruct textTrack = 1;
+    optional nullable TrackPreferenceStruct audioTracks[] = 2;
   }
 
   struct AdditionalInfoStruct {
-    char_string<256> name = 0;
-    char_string<8192> value = 1;
+    long_char_string<256> name = 0;
+    long_char_string<8192> value = 1;
   }
 
   struct ParameterStruct {
     ParameterEnum type = 0;
-    char_string<1024> value = 1;
+    long_char_string<1024> value = 1;
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
@@ -7547,13 +7549,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformationStruct {
-    optional char_string<8192> imageURL = 0;
+    optional long_char_string<8192> imageURL = 0;
     optional char_string<9> color = 1;
     optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
-    char_string<256> providerName = 0;
+    long_char_string<256> providerName = 0;
     optional StyleInformationStruct background = 1;
     optional StyleInformationStruct logo = 2;
     optional StyleInformationStruct progressBar = 3;
@@ -7582,6 +7584,7 @@ cluster ContentLauncher = 1290 {
     char_string contentURL = 0;
     optional char_string displayString = 1;
     optional BrandingInformationStruct brandingInformation = 2;
+    optional PlaybackPreferencesStruct playbackPreferences = 3;
   }
 
   response struct LauncherResponse = 2 {
@@ -7597,7 +7600,7 @@ cluster ContentLauncher = 1290 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 1;
+  revision 2;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -7656,9 +7659,9 @@ cluster ContentLauncher = 1290 {
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
-    kAdvancedSeek = 0x3;
-    kTextTracks = 0x4;
-    kAudioTracks = 0x5;
+    kAdvancedSeek = 0x4;
+    kTextTracks = 0x8;
+    kAudioTracks = 0x10;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -7674,24 +7677,24 @@ cluster ContentLauncher = 1290 {
 
   struct TrackPreferenceStruct {
     char_string<32> languageCode = 0;
-    optional CharacteristicEnum characteristics[] = 1;
-    int8u audioOutputIndex = 2;
+    optional nullable CharacteristicEnum characteristics[] = 1;
+    optional nullable int8u audioOutputIndex = 2;
   }
 
   struct PlaybackPreferencesStruct {
-    int64u playbackPosition = 0;
-    TrackPreferenceStruct textTrack = 1;
-    optional TrackPreferenceStruct audioTracks[] = 2;
+    optional nullable int64u playbackPosition = 0;
+    optional nullable TrackPreferenceStruct textTrack = 1;
+    optional nullable TrackPreferenceStruct audioTracks[] = 2;
   }
 
   struct AdditionalInfoStruct {
-    char_string<256> name = 0;
-    char_string<8192> value = 1;
+    long_char_string<256> name = 0;
+    long_char_string<8192> value = 1;
   }
 
   struct ParameterStruct {
     ParameterEnum type = 0;
-    char_string<1024> value = 1;
+    long_char_string<1024> value = 1;
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
@@ -7700,13 +7703,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformationStruct {
-    optional char_string<8192> imageURL = 0;
+    optional long_char_string<8192> imageURL = 0;
     optional char_string<9> color = 1;
     optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
-    char_string<256> providerName = 0;
+    long_char_string<256> providerName = 0;
     optional StyleInformationStruct background = 1;
     optional StyleInformationStruct logo = 2;
     optional StyleInformationStruct progressBar = 3;
@@ -7735,6 +7738,7 @@ cluster ContentLauncher = 1290 {
     char_string contentURL = 0;
     optional char_string displayString = 1;
     optional BrandingInformationStruct brandingInformation = 2;
+    optional PlaybackPreferencesStruct playbackPreferences = 3;
   }
 
   response struct LauncherResponse = 2 {
@@ -7844,7 +7848,7 @@ cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -7903,7 +7907,7 @@ cluster ApplicationLauncher = 1292 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -7962,7 +7966,7 @@ cluster ApplicationLauncher = 1292 {
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
@@ -7994,7 +7998,7 @@ cluster ApplicationBasic = 1293 {
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
@@ -8028,8 +8032,9 @@ cluster ApplicationBasic = 1293 {
 cluster AccountLogin = 1294 {
   revision 2;
 
-  critical event LoggedOut = 0 {
+  fabric_sensitive critical event access(read: administer) LoggedOut = 0 {
     optional node_id node = 0;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -8069,8 +8074,9 @@ cluster AccountLogin = 1294 {
 cluster AccountLogin = 1294 {
   revision 2;
 
-  critical event LoggedOut = 0 {
+  fabric_sensitive critical event access(read: administer) LoggedOut = 0 {
     optional node_id node = 0;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;

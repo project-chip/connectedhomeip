@@ -105,10 +105,10 @@ limitations under the License.
 
     <command source="client" code="0x0B" name="Seek" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
-      <arg name="position" type="int64u"/>
+      <arg id="0" name="Position" type="int64u"/>
     </command>
 
-    <command source="server" code="0x0A" name="PlaybackResponse" optional="false">
+    <command source="server" code="0x0A" name="PlaybackResponse" optional="false" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to various Playback Request commands.</description>
       <arg name="Status" type="StatusEnum"/>
       <arg name="Data"   type="char_string" optional="true"/>
@@ -116,13 +116,13 @@ limitations under the License.
 
     <command source="client" code="0x0C" name="ActivateAudioTrack" optional="true">
       <description>Upon receipt, the server SHALL set the active Audio Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server will return an error status of INVALID_ARGUMENT.</description>
-      <arg name="TrackID" type="CHAR_STRING"/>
-      <arg name="AudioOutputIndex"   type="INT8U"/>
+      <arg id="0" name="TrackID" type="char_string" length="32"/>
+      <arg id="1" name="AudioOutputIndex" type="int8u" optional="true" isNullable="true"/>
     </command>
 
     <command source="client" code="0x0D" name="ActivateTextTrack" optional="true">
       <description>Upon receipt, the server SHALL set the active Text Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server SHALL return an error status of INVALID_ARGUMENT.</description>
-      <arg name="TrackID" type="CHAR_STRING"/>
+      <arg id="0" name="TrackID" type="char_string" length="32"/>
     </command>
 
     <command source="client" code="0x0E" name="DeactivateTextTrack" optional="true">
@@ -131,28 +131,29 @@ limitations under the License.
 
     <event side="server" code="0x00" priority="info" name="StateChanged" optional="true">
       <description>If supported, this event SHALL be generated when there is a change in any of the supported attributes of the Media Playback cluster.</description>
-      <field id="0" name="CurrentState" type="PlaybackStateEnum"/>
-      <field id="1" name="StartTime" type="EPOCH_US"/>
-      <field id="2" name="Duration" type="INT64U"/>
-      <field id="3" name="SampledPosition" type="PlaybackPositionStruct"/>
-      <field id="4" name="PlaybackSpeed" type="single"/>
-      <field id="5" name="SeekRangeEnd" type="INT64U"/>
-      <field id="6" name="SeekRangeStart" type="INT64U"/>
-      <field id="7" name="Data" type="OCTET_STRING" optional="true" length="900" />
-      <field id="8" name="AudioAdvanceUnmuted" type="boolean" default="true"/>
+      <field id="0" name="CurrentState" type="PlaybackStateEnum" min="0x00" max="0x03"/>
+      <field id="1" name="StartTime" type="epoch_us" optional="true"/>
+      <field id="2" name="Duration" type="int64u" optional="true"/>
+      <field id="3" name="SampledPosition" type="PlaybackPositionStruct" optional="true"/>
+      <field id="4" name="PlaybackSpeed" type="single" optional="true"/>
+      <field id="5" name="SeekRangeEnd" type="int64u" optional="true"/>
+      <field id="6" name="SeekRangeStart" type="int64u" optional="true"/>
+      <field id="7" name="Data" type="octet_string" optional="true" length="900"/>
+      <field id="8" name="AudioAdvanceUnmuted" type="boolean" default="0" optional="true"/>
     </event>
   </cluster>
 
   <struct name="TrackStruct">
     <cluster code="0x0506"/>
-    <item name="ID" type="CHAR_STRING" optional="false" length="32"/>
-    <item name="TrackAttributes" type="TrackAttributesStruct" isNullable="true" optional="false"/>
+    <item fieldId="0" name="ID" type="char_string" length="32"/>
+    <item fieldId="1" name="TrackAttributes" type="TrackAttributesStruct"/>
   </struct>
 
   <struct name="TrackAttributesStruct">
     <cluster code="0x0506"/>
-    <item name="LanguageCode" type="CHAR_STRING" optional="false" length="32"/>
-    <item name="DisplayName"  type="CHAR_STRING" isNullable="true" optional="true"/>
+    <item fieldId="0" name="LanguageCode" type="char_string" length="32"/>
+    <item fieldId="1" name="Characteristics" type="CharacteristicEnum" isNullable="true" optional="true" array="true"/>
+    <item fieldId="2" name="DisplayName" type="long_char_string" isNullable="true" optional="true" length="256"/>
     <!-- <item name="Characteristics" type="CharacteristicEnum" optional="true" array="true"/> -->
   </struct>
 
