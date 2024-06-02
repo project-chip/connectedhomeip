@@ -82,7 +82,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                                    Clusters.ProxyConfiguration.id, Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id]
         # TODO: Remove this once the latest 1.3 lands with the clusters removed from the DM XML and change the warning below about missing DM XMLs into a proper error
         # These are clusters that weren't part of the 1.3 spec that landed in the SDK before the branch cut
-        provisional_cluster_ids.extend([Clusters.WiFiNetworkManagement.id, Clusters.DemandResponseLoadControl.id])
+        provisional_cluster_ids.extend([Clusters.DemandResponseLoadControl.id])
         # These clusters are zigbee only. I don't even know why they're part of the codegen, but we should get rid of them.
         provisional_cluster_ids.extend([Clusters.BarrierControl.id, Clusters.OnOffSwitchConfiguration.id,
                                        Clusters.BinaryInputBasic.id, Clusters.ElectricalMeasurement.id])
