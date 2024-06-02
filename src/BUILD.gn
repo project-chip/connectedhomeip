@@ -84,39 +84,34 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
-    if (current_os != "zephyr" && current_os != "mbed" &&
-        chip_device_platform != "efr32") {
+    if (current_os != "zephyr" && current_os != "mbed") {
       tests += [
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]
     }
 
-    # Skip on efr32 due to flash and/or ram limitations.
-    if (chip_device_platform != "efr32") {
-      tests += [
-        "${chip_root}/src/app/tests",
-        "${chip_root}/src/credentials/tests",
-        "${chip_root}/src/lib/format/tests",
-        "${chip_root}/src/lib/support/tests",
-        "${chip_root}/src/protocols/secure_channel/tests",
-        "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
-        "${chip_root}/src/system/tests",
-        "${chip_root}/src/transport/tests",
-      ]
+    tests += [
+      "${chip_root}/src/app/tests",
+      "${chip_root}/src/credentials/tests",
+      "${chip_root}/src/lib/format/tests",
+      "${chip_root}/src/lib/support/tests",
+      "${chip_root}/src/protocols/secure_channel/tests",
+      "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
+      "${chip_root}/src/system/tests",
+      "${chip_root}/src/transport/tests",
+    ]
 
-      if (matter_enable_tracing_support &&
-          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
-        tests += [ "${chip_root}/src/tracing/tests" ]
-      }
+    if (matter_enable_tracing_support &&
+        matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
+      tests += [ "${chip_root}/src/tracing/tests" ]
     }
 
     if (chip_device_platform != "none") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
-    if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
-        chip_device_platform != "ameba") {
+    if (chip_device_platform != "esp32" && chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 
@@ -126,9 +121,7 @@ if (chip_build_tests) {
 
     # On nrfconnect, the controller tests run into
     # https://github.com/project-chip/connectedhomeip/issues/9630
-    if (chip_device_platform != "nrfconnect" &&
-        chip_device_platform != "efr32") {
-      # Doesn't compile on ef32. Multiple definitions issues with attribute storage and overflows flash memory.
+    if (chip_device_platform != "nrfconnect") {
       tests += [ "${chip_root}/src/controller/tests/data_model" ]
 
       # Skip controller test for Open IoT SDK
