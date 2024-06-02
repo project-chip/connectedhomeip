@@ -17,11 +17,12 @@ import android.util.Log;
 
 /**
  * Represents the Commissioner Declaration message sent by a User Directed Commissioning server
- * (Casting Player) to a UDC client (tv-casting-app).
+ * (CastingPlayer/Commissioner) to a UDC client (Casting Client/Commissionee).
  */
 public class CommissionerDeclaration {
   static final String TAG = CommissionerDeclaration.class.getSimpleName();
 
+  /** The allowed values for the ErrorCode field are the following */
   public enum CdError {
     kNoError(0),
     kCommissionableDiscoveryFailed(1),
@@ -52,13 +53,34 @@ public class CommissionerDeclaration {
       return value;
     }
   }
-
-  private CdError mErrorCode = CdError.kNoError;
-  private boolean mNeedsPasscode = false;
-  private boolean mNoAppsFound = false;
-  private boolean mPasscodeDialogDisplayed = false;
-  private boolean mCommissionerPasscode = false;
-  private boolean mQRCodeDisplayed = false;
+  /** Feature: All - Indicates errors incurred during commissioning. */
+  private CdError errorCode = CdError.kNoError;
+  /**
+   * Feature: Coordinate PIN Dialogs - When NoPasscode field set to true, and the Commissioner
+   * determines that a Passcode code will be needed for commissioning.
+   */
+  private boolean needsPasscode = false;
+  /**
+   * Feature: Target Content Application - No apps with AccountLogin cluster implementation were
+   * found for the last IdentificationDeclaration request. Only apps which provide access to the
+   * vendor id of the Commissionee will be considered.
+   */
+  private boolean noAppsFound = false;
+  /**
+   * Feature: Coordinate PIN Dialogs - A Passcode input dialog is now displayed for the user on the
+   * Commissioner.
+   */
+  private boolean passcodeDialogDisplayed = false;
+  /**
+   * Feature: Commissioner-Generated Passcode - A Passcode is now displayed for the user by the
+   * CastingPlayer/Commissioner.
+   */
+  private boolean commissionerPasscode = false;
+  /**
+   * Feature: Commissioner-Generated Passcode - The user experience conveying a Passcode to the user
+   * also displays a QR code.
+   */
+  private boolean qRCodeDisplayed = false;
 
   public CommissionerDeclaration(
       int errorCode,
@@ -66,70 +88,85 @@ public class CommissionerDeclaration {
       boolean noAppsFound,
       boolean passcodeDialogDisplayed,
       boolean commissionerPasscode,
-      boolean qrCodeDisplayed) {
-    mErrorCode = CdError.values()[errorCode];
-    mNeedsPasscode = needsPasscode;
-    mNoAppsFound = noAppsFound;
-    mPasscodeDialogDisplayed = passcodeDialogDisplayed;
-    mCommissionerPasscode = commissionerPasscode;
-    mQRCodeDisplayed = qrCodeDisplayed;
+      boolean qRCodeDisplayed) {
+    this.errorCode = CdError.values()[errorCode];
+    this.needsPasscode = needsPasscode;
+    this.noAppsFound = noAppsFound;
+    this.passcodeDialogDisplayed = passcodeDialogDisplayed;
+    this.commissionerPasscode = commissionerPasscode;
+    this.qRCodeDisplayed = qRCodeDisplayed;
   }
 
-  public void setErrorCode(CdError newValue) {
-    mErrorCode = newValue;
+  public void setErrorCode(CdError errorCode) {
+    this.errorCode = errorCode;
   }
 
   public CdError getErrorCode() {
-    return mErrorCode;
+    return this.errorCode;
   }
 
-  public void setNeedsPasscode(boolean newValue) {
-    mNeedsPasscode = newValue;
+  public void setNeedsPasscode(boolean needsPasscode) {
+    this.needsPasscode = needsPasscode;
   }
 
   public boolean getNeedsPasscode() {
-    return mNeedsPasscode;
+    return this.needsPasscode;
   }
 
-  public void setNoAppsFound(boolean newValue) {
-    mNoAppsFound = newValue;
+  public void setNoAppsFound(boolean noAppsFound) {
+    this.noAppsFound = noAppsFound;
   }
 
   public boolean getNoAppsFound() {
-    return mNoAppsFound;
+    return this.noAppsFound;
   }
 
-  public void setPasscodeDialogDisplayed(boolean newValue) {
-    mPasscodeDialogDisplayed = newValue;
+  public void setPasscodeDialogDisplayed(boolean passcodeDialogDisplayed) {
+    this.passcodeDialogDisplayed = passcodeDialogDisplayed;
   }
 
   public boolean getPasscodeDialogDisplayed() {
-    return mPasscodeDialogDisplayed;
+    return this.passcodeDialogDisplayed;
   }
 
-  public void setCommissionerPasscode(boolean newValue) {
-    mCommissionerPasscode = newValue;
+  public void setCommissionerPasscode(boolean commissionerPasscode) {
+    this.commissionerPasscode = commissionerPasscode;
   }
 
   public boolean getCommissionerPasscode() {
-    return mCommissionerPasscode;
+    return this.commissionerPasscode;
   }
 
-  public void setQRCodeDisplayed(boolean newValue) {
-    mQRCodeDisplayed = newValue;
+  public void setQRCodeDisplayed(boolean qRCodeDisplayed) {
+    this.qRCodeDisplayed = qRCodeDisplayed;
   }
 
   public boolean getQRCodeDisplayed() {
-    return mQRCodeDisplayed;
+    return this.qRCodeDisplayed;
+  }
+
+  @Override
+  public String toString() {
+    return "CommissionerDeclaration::errorCode:               "
+        + errorCode.name()
+        + "\n"
+        + "CommissionerDeclaration::needsPasscode:           "
+        + needsPasscode
+        + "\n"
+        + "CommissionerDeclaration::noAppsFound:             "
+        + noAppsFound
+        + "\n"
+        + "CommissionerDeclaration::passcodeDialogDisplayed: "
+        + passcodeDialogDisplayed
+        + "\n"
+        + "CommissionerDeclaration:commissionerPasscode:     "
+        + commissionerPasscode
+        + "\n"
+        + "CommissionerDeclaration::qRCodeDisplayed:         "
+        + qRCodeDisplayed;
   }
 
   public void logDetail() {
-    Log.d(TAG, "CommissionerDeclaration::logDetail() - java");
-    Log.d(TAG, "CommissionerDeclaration::mErrorCode:               " + mErrorCode.name());
-    Log.d(TAG, "CommissionerDeclaration::mNeedsPasscode:           " + mNeedsPasscode);
-    Log.d(TAG, "CommissionerDeclaration::mNoAppsFound:             " + mNoAppsFound);
-    Log.d(TAG, "CommissionerDeclaration::mPasscodeDialogDisplayed: " + mPasscodeDialogDisplayed);
-    Log.d(TAG, "CommissionerDeclaration::mCommissionerPasscode:    " + mCommissionerPasscode);
-    Log.d(TAG, "CommissionerDeclaration::mQRCodeDisplayed:         " + mQRCodeDisplayed);
+    Log.d(TAG, "CommissionerDeclaration::logDetail()\n" + this.toString());
   }
 }

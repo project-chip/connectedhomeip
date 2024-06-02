@@ -67,11 +67,8 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void handleConnectionButtonClicked(
-      CastingPlayer castingPlayer, Boolean useCommissionerGeneratedPasscode) {
-    Log.i(
-        TAG,
-        "MainActivity.handleConnectionButtonClicked() useCommissionerGeneratedPasscode: "
-            + useCommissionerGeneratedPasscode);
+      CastingPlayer castingPlayer, boolean useCommissionerGeneratedPasscode) {
+    Log.i(TAG, "MainActivity.handleConnectionButtonClicked()");
     showFragment(
         ConnectionExampleFragment.newInstance(castingPlayer, useCommissionerGeneratedPasscode));
   }
@@ -83,37 +80,34 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void handleConnectionComplete(
-      CastingPlayer castingPlayer, Boolean useCommissionerGeneratedPasscode) {
-    Log.i(
-        TAG,
-        "MainActivity.handleConnectionComplete() useCommissionerGeneratedPasscode: "
-            + useCommissionerGeneratedPasscode);
+      CastingPlayer castingPlayer, boolean useCommissionerGeneratedPasscode) {
+    Log.i(TAG, "MainActivity.handleConnectionComplete()");
     showFragment(
         ActionSelectorFragment.newInstance(castingPlayer, useCommissionerGeneratedPasscode));
   }
 
   @Override
   public void handleContentLauncherLaunchURLSelected(
-      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
     showFragment(
         ContentLauncherLaunchURLExampleFragment.newInstance(
-            selectedCastingPlayer, commissionerGeneratedPasscodeExample));
+            selectedCastingPlayer, useCommissionerGeneratedPasscode));
   }
 
   @Override
   public void handleApplicationBasicReadVendorIDSelected(
-      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
     showFragment(
         ApplicationBasicReadVendorIDExampleFragment.newInstance(
-            selectedCastingPlayer, commissionerGeneratedPasscodeExample));
+            selectedCastingPlayer, useCommissionerGeneratedPasscode));
   }
 
   @Override
   public void handleMediaPlaybackSubscribeToCurrentStateSelected(
-      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
     showFragment(
         MediaPlaybackSubscribeToCurrentStateExampleFragment.newInstance(
-            selectedCastingPlayer, commissionerGeneratedPasscodeExample));
+            selectedCastingPlayer, useCommissionerGeneratedPasscode));
   }
 
   @Override

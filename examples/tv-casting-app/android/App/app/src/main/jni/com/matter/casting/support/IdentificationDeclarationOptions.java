@@ -28,81 +28,105 @@ public class IdentificationDeclarationOptions {
 
   public IdentificationDeclarationOptions() {}
 
+  public IdentificationDeclarationOptions(
+      boolean noPasscode,
+      boolean cdUponPasscodeDialog,
+      boolean commissionerPasscode,
+      boolean commissionerPasscodeReady,
+      boolean cancelPasscode,
+      List<TargetAppInfo> targetAppInfos) {
+    this.noPasscode = noPasscode;
+    this.cdUponPasscodeDialog = cdUponPasscodeDialog;
+    this.commissionerPasscode = commissionerPasscode;
+    this.commissionerPasscodeReady = commissionerPasscodeReady;
+    this.cancelPasscode = cancelPasscode;
+    this.targetAppInfos = targetAppInfos != null ? targetAppInfos : new ArrayList<>();
+  }
+
   /**
-   * Feature: Target Content Application Flag to instruct the Commissioner not to display a Passcode
-   * input dialog, and instead send a CommissionerDeclaration message if a commissioning Passcode is
-   * needed.
+   * Feature: Target Content Application - Flag to instruct the Commissioner not to display a
+   * Passcode input dialog, and instead send a CommissionerDeclaration message if a commissioning
+   * Passcode is needed.
    */
-  public boolean mNoPasscode = false;
+  public boolean noPasscode = false;
   /**
-   * Feature: Coordinate Passcode Dialogs Flag to instruct the Commissioner to send a
+   * Feature: Coordinate Passcode Dialogs - Flag to instruct the Commissioner to send a
    * CommissionerDeclaration message when the Passcode input dialog on the Commissioner has been
    * shown to the user.
    */
-  public boolean mCdUponPasscodeDialog = false;
+  public boolean cdUponPasscodeDialog = false;
   /**
-   * Feature: Commissioner-Generated Passcode Flag to instruct the Commissioner to use the
+   * Feature: Commissioner-Generated Passcode - Flag to instruct the Commissioner to use the
    * Commissioner-generated Passcode for commissioning.
    */
-  public boolean mCommissionerPasscode = false;
+  public boolean commissionerPasscode = false;
   /**
-   * Feature: Commissioner-Generated Passcode Flag to indicate whether or not the Commissionee has
+   * Feature: Commissioner-Generated Passcode - Flag to indicate whether or not the Commissionee has
    * obtained the Commissioner Passcode from the user and is therefore ready for commissioning.
    */
-  public boolean mCommissionerPasscodeReady = false;
+  public boolean commissionerPasscodeReady = false;
   /**
-   * Feature: Coordinate Passcode Dialogs Flag to indicate when the Commissionee user has decided to
-   * exit the commissioning process.
+   * Feature: Coordinate Passcode Dialogs Flag - to indicate when the Commissionee user has decided
+   * to exit the commissioning process.
    */
-  public boolean mCancelPasscode = false;
+  public boolean cancelPasscode = false;
   /**
-   * Feature: Target Content Application The set of content app Vendor IDs (and optionally, Product
-   * IDs) that can be used for authentication. Also, if TargetAppInfo is passed in,
+   * Feature: Target Content Application - The set of content app Vendor IDs (and optionally,
+   * Product IDs) that can be used for authentication. Also, if TargetAppInfo is passed in,
    * VerifyOrEstablishConnection() will force User Directed Commissioning, in case the desired
    * TargetApp is not found in the on-device CastingStore.
    */
-  private List<TargetAppInfo> mTargetAppInfos = new ArrayList<>();
+  private List<TargetAppInfo> targetAppInfos = new ArrayList<>();
 
   public boolean addTargetAppInfo(TargetAppInfo targetAppInfo) {
     Log.d(TAG, "addTargetAppInfo()");
-    if (mTargetAppInfos.size() >= CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS) {
+    if (targetAppInfos.size() >= CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS) {
       Log.e(
           TAG,
           "addTargetAppInfo() failed to add TargetAppInfo, max list size is {0}"
               + CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS);
       return false;
     }
-    mTargetAppInfos.add(targetAppInfo);
+    targetAppInfos.add(targetAppInfo);
     return true;
   }
 
   public List<TargetAppInfo> getTargetAppInfoList() {
-    return mTargetAppInfos;
+    return targetAppInfos;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("IdentificationDeclarationOptions::noPasscode:                ")
+        .append(noPasscode)
+        .append("\n");
+    sb.append("IdentificationDeclarationOptions::cdUponPasscodeDialog:      ")
+        .append(cdUponPasscodeDialog)
+        .append("\n");
+    sb.append("IdentificationDeclarationOptions::commissionerPasscode:      ")
+        .append(commissionerPasscode)
+        .append("\n");
+    sb.append("IdentificationDeclarationOptions::commissionerPasscodeReady: ")
+        .append(commissionerPasscodeReady)
+        .append("\n");
+    sb.append("IdentificationDeclarationOptions::cancelPasscode:            ")
+        .append(cancelPasscode)
+        .append("\n");
+    sb.append("IdentificationDeclarationOptions::targetAppInfos list: \n");
+
+    for (TargetAppInfo targetAppInfo : targetAppInfos) {
+      sb.append("\t\tTargetAppInfo - Vendor ID: ")
+          .append(targetAppInfo.vendorId)
+          .append(", Product ID: ")
+          .append(targetAppInfo.productId)
+          .append("\n");
+    }
+
+    return sb.toString();
   }
 
   public void logDetail() {
-    Log.d(TAG, "IdentificationDeclarationOptions::logDetail() - java");
-    Log.d(TAG, "IdentificationDeclarationOptions::mNoPasscode:                " + mNoPasscode);
-    Log.d(
-        TAG,
-        "IdentificationDeclarationOptions::mCdUponPasscodeDialog:      " + mCdUponPasscodeDialog);
-    Log.d(
-        TAG,
-        "IdentificationDeclarationOptions::mCommissionerPasscode:      " + mCommissionerPasscode);
-    Log.d(
-        TAG,
-        "IdentificationDeclarationOptions::mCommissionerPasscodeReady: "
-            + mCommissionerPasscodeReady);
-    Log.d(TAG, "IdentificationDeclarationOptions::mCancelPasscode:            " + mCancelPasscode);
-    Log.d(TAG, "IdentificationDeclarationOptions::mTargetAppInfos list: ");
-
-    for (TargetAppInfo targetAppInfo : mTargetAppInfos) {
-      Log.d(
-          TAG,
-          "\t\tTargetAppInfo - Vendor ID: "
-              + targetAppInfo.vendorId
-              + ", Product ID: "
-              + targetAppInfo.productId);
-    }
+    Log.d(TAG, "IdentificationDeclarationOptions::logDetail()\n" + this.toString());
   }
 }

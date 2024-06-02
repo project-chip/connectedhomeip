@@ -486,7 +486,12 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             }
 
             // Continue Connecting to the target CastingPlayer with the user entered Commissioner-generated Passcode.
-            targetCastingPlayer->ContinueConnecting();
+            err = targetCastingPlayer->ContinueConnecting();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "CommandHandler() setcommissionerpasscode ContinueConnecting() err %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
         }
         else
         {
@@ -498,7 +503,11 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
     if (strcmp(argv[0], "stop-connecting") == 0)
     {
         ChipLogProgress(AppServer, "CommandHandler() stop-connecting");
-        targetCastingPlayer->StopConnecting();
+        CHIP_ERROR err = targetCastingPlayer->StopConnecting();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CommandHandler() stop-connecting, err %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
     if (strcmp(argv[0], "print-bindings") == 0)
     {

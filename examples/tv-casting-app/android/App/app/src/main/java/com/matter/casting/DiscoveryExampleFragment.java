@@ -222,7 +222,7 @@ public class DiscoveryExampleFragment extends Fragment {
   public interface Callback {
     /** Notifies listener of Connection Button click. */
     void handleConnectionButtonClicked(
-        CastingPlayer castingPlayer, Boolean useCommissionerGeneratedPasscode);
+        CastingPlayer castingPlayer, boolean useCommissionerGeneratedPasscode);
   }
 
   private boolean startDiscovery() {

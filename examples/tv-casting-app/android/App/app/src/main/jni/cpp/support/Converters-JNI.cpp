@@ -410,12 +410,12 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
         ChipLogError(AppServer,
                      "convertIdentificationDeclarationOptionsFromJavaToCpp() IdentificationDeclarationOptions class not found!"));
 
-    jfieldID noPasscodeField                = env->GetFieldID(idOptionsClass, "mNoPasscode", "Z");
-    jfieldID cdUponPasscodeDialogField      = env->GetFieldID(idOptionsClass, "mCdUponPasscodeDialog", "Z");
-    jfieldID commissionerPasscodeField      = env->GetFieldID(idOptionsClass, "mCommissionerPasscode", "Z");
-    jfieldID commissionerPasscodeReadyField = env->GetFieldID(idOptionsClass, "mCommissionerPasscodeReady", "Z");
-    jfieldID cancelPasscodeField            = env->GetFieldID(idOptionsClass, "mCancelPasscode", "Z");
-    jfieldID targetAppInfosField            = env->GetFieldID(idOptionsClass, "mTargetAppInfos", "Ljava/util/List;");
+    jfieldID noPasscodeField                = env->GetFieldID(idOptionsClass, "noPasscode", "Z");
+    jfieldID cdUponPasscodeDialogField      = env->GetFieldID(idOptionsClass, "cdUponPasscodeDialog", "Z");
+    jfieldID commissionerPasscodeField      = env->GetFieldID(idOptionsClass, "commissionerPasscode", "Z");
+    jfieldID commissionerPasscodeReadyField = env->GetFieldID(idOptionsClass, "commissionerPasscodeReady", "Z");
+    jfieldID cancelPasscodeField            = env->GetFieldID(idOptionsClass, "cancelPasscode", "Z");
+    jfieldID targetAppInfosField            = env->GetFieldID(idOptionsClass, "targetAppInfos", "Ljava/util/List;");
     VerifyOrReturnValue(
         noPasscodeField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() noPasscodeField not found!"));

@@ -93,15 +93,6 @@ public:
     MatterFailureCallbackJNI() : MatterCallbackJNI(matter::casting::support::convertMatterErrorFromCppToJava) {}
 };
 
-class MatterCommissionerDeclarationCallbackJNI
-    : public MatterCallbackJNI<chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration>
-{
-public:
-    MatterCommissionerDeclarationCallbackJNI() :
-        MatterCallbackJNI(matter::casting::support::convertCommissionerDeclarationFromCppToJava)
-    {}
-};
-
 }; // namespace support
 }; // namespace casting
 }; // namespace matter

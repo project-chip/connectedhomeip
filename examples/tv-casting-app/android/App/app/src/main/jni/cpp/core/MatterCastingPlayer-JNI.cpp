@@ -106,7 +106,6 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
     MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
 
-    //
     auto connectCallback = [](CHIP_ERROR err, CastingPlayer * playerPtr) {
         ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback()");
         if (err == CHIP_NO_ERROR)
@@ -175,7 +174,7 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 
-JNI_METHOD(jobject, continueConnecting)
+JNI_METHOD(jobject, continueConnectingNative)
 (JNIEnv * env, jobject thiz)
 {
     chip::DeviceLayer::StackLock lock;
@@ -184,9 +183,7 @@ JNI_METHOD(jobject, continueConnecting)
     CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
 
-    castingPlayer->ContinueConnecting();
-
-    return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
+    return support::convertMatterErrorFromCppToJava(castingPlayer->ContinueConnecting());
 }
 
 JNI_METHOD(jobject, stopConnecting)
@@ -198,9 +195,7 @@ JNI_METHOD(jobject, stopConnecting)
     CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
 
-    castingPlayer->StopConnecting();
-
-    return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
+    return support::convertMatterErrorFromCppToJava(castingPlayer->StopConnecting());
 }
 
 JNI_METHOD(void, disconnect)

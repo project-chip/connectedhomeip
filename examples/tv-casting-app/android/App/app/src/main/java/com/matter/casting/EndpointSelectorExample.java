@@ -19,30 +19,33 @@ public class EndpointSelectorExample {
     if (selectedCastingPlayer != null) {
       List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
       if (endpoints == null) {
-        Log.e(TAG, "No Endpoints found on CastingPlayer");
+        Log.e(TAG, "selectFirstEndpointByVID() No Endpoints found on CastingPlayer");
       } else {
         endpoint =
             endpoints
                 .stream()
                 .filter(e -> SAMPLE_ENDPOINT_VID.equals(e.getVendorId()))
                 .findFirst()
-                .get();
+                .orElse(null);
       }
     }
     return endpoint;
   }
 
   /**
-   * Returns the first Endpoint in the list of Endpoints associated with the selectedCastingPlayer.
+   * Returns the Endpoint with the desired endpoint Id in the list of Endpoints associated with the
+   * selectedCastingPlayer.
    */
-  public static Endpoint selectFirstEndpoint(CastingPlayer selectedCastingPlayer) {
+  public static Endpoint selectEndpointById(
+      CastingPlayer selectedCastingPlayer, int desiredEndpointId) {
     Endpoint endpoint = null;
     if (selectedCastingPlayer != null) {
       List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
       if (endpoints == null || endpoints.isEmpty()) {
-        Log.e(TAG, "No Endpoints found on CastingPlayer");
+        Log.e(TAG, "selectEndpointById() No Endpoints found on CastingPlayer");
       } else {
-        endpoint = endpoints.get(0);
+        endpoint =
+            endpoints.stream().filter(e -> desiredEndpointId == e.getId()).findFirst().orElse(null);
       }
     }
     return endpoint;

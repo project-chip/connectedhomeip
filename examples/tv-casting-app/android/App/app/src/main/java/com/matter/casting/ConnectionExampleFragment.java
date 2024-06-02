@@ -30,11 +30,9 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.R;
-import com.matter.casting.core.CastingApp;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.support.CommissionerDeclaration;
 import com.matter.casting.support.ConnectionCallbacks;
-import com.matter.casting.support.DataProvider;
 import com.matter.casting.support.IdentificationDeclarationOptions;
 import com.matter.casting.support.MatterCallback;
 import com.matter.casting.support.MatterError;
@@ -49,17 +47,18 @@ public class ConnectionExampleFragment extends Fragment {
   private static final short MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
   private static final Integer DESIRED_TARGET_APP_VENDOR_ID = 65521;
   // Use this Target Content Application Vendor ID, configured on the tv-app, to demonstrate the
-  // Commissioner-Generated passcode commissioning flow.
+  // CastingPlayer/Commissioner-Generated passcode commissioning flow.
   private static final Integer DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW = 1111;
-  private static final String DEFAULT_COMMISSIONER_GENERATED_PASSCODE = "12345678";
+  private static final String DEFAULT_COMMISSIONER_GENERATED_PASSCODE_STRING = "12345678";
+  private static final int DEFAULT_COMMISSIONER_GENERATED_PASSCODE_INT = 12345678;
   private static final int DEFAULT_DISCRIMINATOR_FOR_CGP_FLOW = 0;
   private final CastingPlayer targetCastingPlayer;
-  private final Boolean useCommissionerGeneratedPasscode;
+  private final boolean useCommissionerGeneratedPasscode;
   private TextView connectionFragmentStatusTextView;
   private Button connectionFragmentNextButton;
 
   public ConnectionExampleFragment(
-      CastingPlayer targetCastingPlayer, Boolean useCommissionerGeneratedPasscode) {
+      CastingPlayer targetCastingPlayer, boolean useCommissionerGeneratedPasscode) {
     Log.i(
         TAG,
         "ConnectionExampleFragment() Target CastingPlayer ID: "
@@ -106,12 +105,12 @@ public class ConnectionExampleFragment extends Fragment {
       connectionFragmentStatusTextView.setText(
           "Verifying or establishing connection with Casting Player with device name: "
               + targetCastingPlayer.getDeviceName()
-              + "\n\nAttempting Commissioner-Generated passcode commissioning.");
+              + "\n\nAttempting CastingPlayer/Commissioner-Generated passcode commissioning.");
     } else {
       connectionFragmentStatusTextView.setText(
           "Verifying or establishing connection with Casting Player with device name: "
               + targetCastingPlayer.getDeviceName()
-              + "\nCommissionee-Generated Setup Passcode: "
+              + "\nClient/Commissionee-Generated Setup Passcode: "
               + InitializationExample.commissionableDataProvider.get().getSetupPasscode()
               + "\nDiscriminator: "
               + InitializationExample.commissionableDataProvider.get().getDiscriminator());
@@ -135,7 +134,7 @@ public class ConnectionExampleFragment extends Fragment {
               targetAppInfo.vendorId = DESIRED_TARGET_APP_VENDOR_ID;
 
               if (useCommissionerGeneratedPasscode) {
-                idOptions.mCommissionerPasscode = true;
+                idOptions.commissionerPasscode = true;
                 targetAppInfo.vendorId = DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW;
                 Log.d(
                     TAG,
@@ -186,7 +185,8 @@ public class ConnectionExampleFragment extends Fragment {
                       },
                       null);
 
-              // CommissionerDeclaration is only needed for the Commissioner-Generated passcode
+              // CommissionerDeclaration is only needed for the CastingPlayer/Commissioner-Generated
+              // passcode
               // commissioning flow.
               if (useCommissionerGeneratedPasscode) {
                 connectionCallbacks.onCommissionerDeclaration =
@@ -231,21 +231,12 @@ public class ConnectionExampleFragment extends Fragment {
   private void displayPasscodeInputDialog(Context context) {
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-    String title = "Enter the Commissioner-Generated Passcode";
-    String instructions =
-        "Input the Commissioner-Generated passcode displayed on the CastingPlayer UX, or use the default provided (12345678).";
-
     LayoutInflater inflater = LayoutInflater.from(context);
     View dialogView = inflater.inflate(R.layout.custom_passcode_dialog, null);
 
-    TextView titleTextView = dialogView.findViewById(R.id.dialog_title);
-    TextView instructionsTextView = dialogView.findViewById(R.id.dialog_instructions);
-    titleTextView.setText(title);
-    instructionsTextView.setText(instructions);
-
     // Set up the input dialog with the default passcode
     final EditText input = dialogView.findViewById(R.id.passcode_input);
-    input.setText(DEFAULT_COMMISSIONER_GENERATED_PASSCODE);
+    input.setText(DEFAULT_COMMISSIONER_GENERATED_PASSCODE_STRING);
 
     // Set up the buttons
     builder.setPositiveButton(
@@ -256,50 +247,70 @@ public class ConnectionExampleFragment extends Fragment {
             String passcode = input.getText().toString();
             Log.i(
                 TAG,
-                "displayPasscodeInputDialog() User entered Commissioner-Generated passcode: "
+                "displayPasscodeInputDialog() User entered CastingPlayer/Commissioner-Generated passcode: "
                     + passcode);
 
             // Display the user entered passcode on the screen
             connectionFragmentStatusTextView.setText(
-                "Continue Connecting with user entered Commissioner-Generated passcode: "
+                "Continue Connecting with user entered CastingPlayer/Commissioner-Generated passcode: "
                     + passcode
                     + "\n\n");
 
-            long passcodeLongValue = 12345678;
+            long passcodeLongValue = DEFAULT_COMMISSIONER_GENERATED_PASSCODE_INT;
             try {
               passcodeLongValue = Long.parseLong(passcode);
+              Log.i(
+                  TAG,
+                  "displayPasscodeInputDialog() User entered CastingPlayer/Commissioner-Generated passcode: "
+                      + passcodeLongValue);
             } catch (NumberFormatException nfe) {
+              Log.e(
+                  TAG,
+                  "displayPasscodeInputDialog()User entered CastingPlayer/Commissioner-Generated passcode is not a valid integer. NumberFormatException: "
+                      + nfe);
+              connectionFragmentStatusTextView.setText(
+                  "User entered CastingPlayer/Commissioner-Generated passcode is not a valid integer: "
+                      + passcode
+                      + "\n\n");
             }
 
             // Update the CommissionableData DataProvider and AndroidChipPlatform with the user
-            // entered Commissioner-Generated setup passcode. This is mandatory for
-            // Commissioner-Generated passcode commissioning.
-            ((DataProvider) InitializationExample.commissionableDataProvider)
-                .updateCommissionableDataSetupPasscode(
-                    passcodeLongValue, DEFAULT_DISCRIMINATOR_FOR_CGP_FLOW);
-            MatterError err =
-                CastingApp.getInstance().updateAndroidChipPlatformWithCommissionableData();
+            // entered CastingPlayer/Commissioner-Generated setup passcode. This is mandatory for
+            // Commissioner-Generated passcode commissioning since the commissioning session's PAKE
+            // verifier needs to be updated with the entered passcode.
+            InitializationExample.commissionableDataProvider.updateCommissionableDataSetupPasscode(
+                passcodeLongValue, DEFAULT_DISCRIMINATOR_FOR_CGP_FLOW);
+
+            Log.i(TAG, "displayPasscodeInputDialog() calling continueConnecting()");
+            connectionFragmentStatusTextView =
+                getView().findViewById(R.id.connectionFragmentStatusText);
+            connectionFragmentStatusTextView.setText(
+                "Continuing to connect with Casting Player with device name: "
+                    + targetCastingPlayer.getDeviceName()
+                    + "\nCastingPlayer/Commissioner-Generated Setup Passcode: "
+                    + InitializationExample.commissionableDataProvider.get().getSetupPasscode()
+                    + "\nDiscriminator: "
+                    + InitializationExample.commissionableDataProvider.get().getDiscriminator());
+
+            MatterError err = targetCastingPlayer.continueConnecting();
 
             if (err.hasError()) {
-              connectionFragmentStatusTextView.setText(
-                  "displayPasscodeInputDialog() Casting Player connection failed due to: "
-                      + err
-                      + "\n\n");
-              Log.e(TAG, "displayPasscodeInputDialog() calling stopConnecting() due to: " + err);
-              targetCastingPlayer.stopConnecting();
-            } else {
-              Log.i(TAG, "displayPasscodeInputDialog() calling continueConnecting()");
-              connectionFragmentStatusTextView =
-                  getView().findViewById(R.id.connectionFragmentStatusText);
-              connectionFragmentStatusTextView.setText(
-                  "Continuing connection with Casting Player with device name: "
-                      + targetCastingPlayer.getDeviceName()
-                      + "\nCommissioner-Generated Setup Passcode: "
-                      + InitializationExample.commissionableDataProvider.get().getSetupPasscode()
-                      + "\nDiscriminator: "
-                      + InitializationExample.commissionableDataProvider.get().getDiscriminator());
-
-              targetCastingPlayer.continueConnecting();
+              MatterError finalErr = err;
+              getActivity()
+                  .runOnUiThread(
+                      () -> {
+                        connectionFragmentStatusTextView.setText(
+                            "Casting Player connection failed due to: " + finalErr + "\n\n");
+                      });
+              Log.e(
+                  TAG,
+                  "displayPasscodeInputDialog() continueConnecting() failed, calling stopConnecting() due to: "
+                      + err);
+              // Attempt to cancel the connection attempt with the CastingPlayer/Commissioner.
+              err = targetCastingPlayer.stopConnecting();
+              if (err.hasError()) {
+                Log.e(TAG, "displayPasscodeInputDialog() stopConnecting() failed due to: " + err);
+              }
             }
           }
         });
@@ -311,10 +322,13 @@ public class ConnectionExampleFragment extends Fragment {
           public void onClick(DialogInterface dialog, int which) {
             Log.i(
                 TAG,
-                "displayPasscodeInputDialog() user cancelled the Commissioner-Generated Passcode input dialog.");
+                "displayPasscodeInputDialog() user cancelled the CastingPlayer/Commissioner-Generated Passcode input dialog. Calling stopConnecting()");
             connectionFragmentStatusTextView.setText(
                 "Connection attempt with Casting Player cancelled by the user, route back to exit. \n\n");
-            targetCastingPlayer.stopConnecting();
+            MatterError err = targetCastingPlayer.stopConnecting();
+            if (err.hasError()) {
+              Log.e(TAG, "displayPasscodeInputDialog() stopConnecting() failed due to: " + err);
+            }
             dialog.cancel();
           }
         });
@@ -331,6 +345,6 @@ public class ConnectionExampleFragment extends Fragment {
   public interface Callback {
     /** Notifies listener to trigger transition on completion of connection */
     void handleConnectionComplete(
-        CastingPlayer castingPlayer, Boolean useCommissionerGeneratedPasscode);
+        CastingPlayer castingPlayer, boolean useCommissionerGeneratedPasscode);
   }
 }

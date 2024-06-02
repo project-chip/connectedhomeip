@@ -27,13 +27,21 @@ namespace matter {
 namespace casting {
 namespace core {
 
+/**
+ * This class is used to manage the JNI callbacks and C++ to Java conversions for the CastingPlayer.
+ */
 class MatterCastingPlayerJNI
 {
 public:
-    MatterCastingPlayerJNI() : mConnectionSuccessHandler([](void *) { return nullptr; }) {}
+    // Member initializer list
+    MatterCastingPlayerJNI() :
+        mConnectionSuccessHandler([](void *) { return nullptr; }),
+        mConnectionFailureHandler(matter::casting::support::convertMatterErrorFromCppToJava),
+        mCommissionerDeclarationHandler(matter::casting::support::convertCommissionerDeclarationFromCppToJava)
+    {}
     support::MatterCallbackJNI<void *> mConnectionSuccessHandler;
-    support::MatterFailureCallbackJNI mConnectionFailureHandler;
-    support::MatterCommissionerDeclarationCallbackJNI mCommissionerDeclarationHandler;
+    support::MatterCallbackJNI<CHIP_ERROR> mConnectionFailureHandler;
+    support::MatterCallbackJNI<chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration> mCommissionerDeclarationHandler;
 
 private:
     friend MatterCastingPlayerJNI & MatterCastingPlayerJNIMgr();

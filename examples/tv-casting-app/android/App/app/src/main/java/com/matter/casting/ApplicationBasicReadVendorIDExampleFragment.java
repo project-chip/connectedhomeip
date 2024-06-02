@@ -37,29 +37,32 @@ import com.matter.casting.core.Endpoint;
 public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
   private static final String TAG =
       ApplicationBasicReadVendorIDExampleFragment.class.getSimpleName();
+  private static final int DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW = 1;
 
   private final CastingPlayer selectedCastingPlayer;
-  private final Boolean commissionerGeneratedPasscodeExample;
+  private final boolean useCommissionerGeneratedPasscode;
 
   private View.OnClickListener readButtonClickListener;
 
   public ApplicationBasicReadVendorIDExampleFragment(
-      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
     this.selectedCastingPlayer = selectedCastingPlayer;
-    this.commissionerGeneratedPasscodeExample = commissionerGeneratedPasscodeExample;
+    this.useCommissionerGeneratedPasscode = useCommissionerGeneratedPasscode;
   }
 
   /**
    * Use this factory method to create a new instance of this fragment using the provided
    * parameters.
    *
-   * @param selectedCastingPlayer CastingPlayer that the casting app connected to
+   * @param selectedCastingPlayer CastingPlayer that the casting app connected to.
+   * @param useCommissionerGeneratedPasscode Boolean indicating whether this CastingPlayer was
+   *     commissioned using the Commissioner-Generated Passcode (CGP) commissioning flow.
    * @return A new instance of fragment ApplicationBasicReadVendorIDExampleFragment.
    */
   public static ApplicationBasicReadVendorIDExampleFragment newInstance(
-      CastingPlayer selectedCastingPlayer, Boolean commissionerGeneratedPasscodeExample) {
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
     return new ApplicationBasicReadVendorIDExampleFragment(
-        selectedCastingPlayer, commissionerGeneratedPasscodeExample);
+        selectedCastingPlayer, useCommissionerGeneratedPasscode);
   }
 
   @Override
@@ -73,8 +76,10 @@ public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
     this.readButtonClickListener =
         v -> {
           Endpoint endpoint;
-          if (commissionerGeneratedPasscodeExample) {
-            endpoint = EndpointSelectorExample.selectFirstEndpoint(selectedCastingPlayer);
+          if (useCommissionerGeneratedPasscode) {
+            endpoint =
+                EndpointSelectorExample.selectEndpointById(
+                    selectedCastingPlayer, DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW);
           } else {
             endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
           }
