@@ -239,7 +239,7 @@ CHIP_ERROR CastingPlayer::StopConnecting()
     SuccessOrExit(err = SendUserDirectedCommissioningRequest());
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    // SendUserDirectedCommissioningRequest() sets SetUdcStatus(true) when sending a UDC message. 
+    // SendUserDirectedCommissioningRequest() sets SetUdcStatus(true) when sending a UDC message.
     support::ChipDeviceEventHandler::SetUdcStatus(false);
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
