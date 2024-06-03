@@ -92,7 +92,7 @@ void DBusInterface::SetCurrentLevel(uint8_t value)
         light_app_level_control_set_current_level(mIfaceLevelControl, value);
 }
 
-void DBusInterface::SetColorMode(chip::app::Clusters::ColorControl::ColorMode colorMode)
+void DBusInterface::SetColorMode(chip::app::Clusters::ColorControl::ColorModeEnum colorMode)
 {
     InternalSetGuard guard(this);
     if (light_app_color_control_get_color_mode(mIfaceColorControl) != chip::to_underlying(colorMode))
@@ -217,7 +217,7 @@ void DBusInterface::InitOnOff()
 void DBusInterface::InitColor()
 {
     {
-        uint8_t value = 0;
+        chip::app::Clusters::ColorControl::ColorModeEnum value = 0;
         auto status   = Clusters::ColorControl::Attributes::ColorMode::Get(mEndpointId, &value);
         VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
                        ChipLogError(NotSpecified, "Error getting ColorMode: 0x%x", to_underlying(status)));
