@@ -63,6 +63,11 @@ def _parse_args():
         help="a firmware image which will be flashed berfore runnning the test",
     )
     parser.add_argument(
+        "-y",
+        "--flash_directory",
+        help="A directory containing image files, each of which will be flashed and then run.",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         type=argparse.FileType("wb"),
@@ -96,22 +101,41 @@ def get_hdlc_rpc_client(device: str, baudrate: int, output: Any, **kwargs):
     )
 
 
-def runner(client: rpc.HdlcRpcClient) -> int:
-    """Run the tests"""
+def run(args) -> int:
+    """Run the tests. Return the number of failed tests."""
+    with get_hdlc_rpc_client(**vars(args)) as client:
+        test_records = run_tests(client.rpcs())
+        return len(test_records.failing_tests)
 
-    test_records = run_tests(client.rpcs())
 
-    return len(test_records.failing_tests)
+def list_images(flash_directory: str, **kwargs) -> list[str]:
+    filenames: list[str] = os.listdir(flash_directory)
+    # filenames = filter(lambda x: not x.endswith('.map'), filenames)
+    return list(map(lambda x: os.path.join(flash_directory, x), filenames))
 
 
 def main() -> int:
     args = _parse_args()
-    if args.flash_image:
-        flash_device(**vars(args))
-        time.sleep(1)  # Give time for device to boot
 
-    with get_hdlc_rpc_client(**vars(args)) as client:
-        return runner(client)
+    images: list[str] = None
+    if args.flash_directory:
+        images = list_images(**vars(args))
+        if not images:
+            raise Exception(f"No images found in `{args.flash_directory}`")
+    elif args.flash_image:
+        images = [args.flash_image]
+
+    failures: int = 0
+    if images:
+        for image in images:
+            flash_device(args.device, image)
+            time.sleep(1)  # Give time for device to boot
+
+            failures += run(args)
+    else:  # No image provided. Just run.
+        failures += run(args)
+
+    return failures
 
 
 if __name__ == "__main__":
