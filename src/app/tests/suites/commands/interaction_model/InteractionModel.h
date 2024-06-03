@@ -238,7 +238,7 @@ protected:
 class InteractionModelCommands
 {
 public:
-    InteractionModelCommands(chip::app::CommandSender::Callback * callback) : mCallback(callback) { ResetOptions(); }
+    InteractionModelCommands(chip::app::CommandSender::ExtendableCallback * callback) : mCallback(callback) { ResetOptions(); }
 
 protected:
     template <class T>
@@ -255,9 +255,27 @@ protected:
                 mCallback, device->GetExchangeManager(), mTimedInteractionTimeoutMs.HasValue(), mSuppressResponse.ValueOr(false));
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
+            if (mHackedBatchCommand.ValueOr(false))
+            {
+                chip::app::CommandSender::ConfigParameters config;
+                auto remoteSessionParameters = device->GetSecureSession().Value()->GetRemoteSessionParameters();
+                config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
+                ReturnErrorOnFailure(commandSender->SetCommandSenderConfig(config));
+            }
+
             chip::app::CommandSender::AddRequestDataParameters addRequestDataParams(mTimedInteractionTimeoutMs);
+            addRequestDataParams.commandRef.SetValue(1);
             // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
             ReturnErrorOnFailure(commandSender->TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
+
+            if (mHackedBatchCommand.ValueOr(false))
+            {
+                chip::app::CommandPathParams hackedCommandPath = { static_cast<chip::EndpointId>(endpointId+1), clusterId, commandId,
+                                                                   (chip::app::CommandPathFlags::kEndpointIdValid) };
+                addRequestDataParams.commandRef.SetValue(2);
+                ReturnErrorOnFailure(commandSender->TestOnlyAddRequestDataNoTimedCheck(hackedCommandPath, value, addRequestDataParams));
+            }
+
             ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
             mCommandSender.push_back(std::move(commandSender));
 
@@ -302,7 +320,7 @@ protected:
     }
 
     std::vector<std::unique_ptr<chip::app::CommandSender>> mCommandSender;
-    chip::app::CommandSender::Callback * mCallback;
+    chip::app::CommandSender::ExtendableCallback * mCallback;
 
     InteractionModelCommands & SetTimedInteractionTimeoutMs(uint16_t timedInteractionTimeoutMs)
     {
@@ -371,10 +389,12 @@ protected:
         mRepeatCount               = chip::NullOptional;
         mRepeatDelayInMs           = chip::NullOptional;
         mBusyWaitForMs             = chip::NullOptional;
+        mHackedBatchCommand        = chip::NullOptional;
     }
 
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     chip::Optional<bool> mSuppressResponse;
+    chip::Optional<bool> mHackedBatchCommand;
     chip::Optional<uint16_t> mRepeatCount;
     chip::Optional<uint16_t> mRepeatDelayInMs;
     chip::Optional<uint16_t> mBusyWaitForMs;
@@ -587,7 +607,7 @@ class InteractionModel : public InteractionModelReports,
                          public InteractionModelWriter,
                          public chip::app::ReadClient::Callback,
                          public chip::app::WriteClient::Callback,
-                         public chip::app::CommandSender::Callback
+                         public chip::app::CommandSender::ExtendableCallback
 {
 public:
     InteractionModel() : InteractionModelReports(this), InteractionModelCommands(this), InteractionModelWriter(this){};
@@ -700,9 +720,8 @@ public:
     void OnError(const chip::app::WriteClient * client, CHIP_ERROR error) override;
     void OnDone(chip::app::WriteClient * client) override;
 
-    /////////// CommandSender Callback Interface /////////
-    void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
-                    const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override;
-    void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override;
+    /////////// CommandSender ExtendableCallback Interface /////////
+    void OnResponse(chip::app::CommandSender * client, const chip::app::CommandSender::ResponseData & responseData) override;
+    void OnError(const chip::app::CommandSender * client, const chip::app::CommandSender::ErrorData & errorData) override;
     void OnDone(chip::app::CommandSender * client) override;
 };
