@@ -465,7 +465,7 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
 
     case Clusters::ColorControl::Commands::EnhancedMoveToHue::Id:
         enhancedMoveToHueCommand.enhancedHue     = static_cast<uint16_t>(data->args[0]);
-        enhancedMoveToHueCommand.direction       = static_cast<HueDirection>(data->args[1]);
+        enhancedMoveToHueCommand.direction       = static_cast<DirectionEnum>(data->args[1]);
         enhancedMoveToHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedMoveToHueCommand.optionsMask     = static_cast<uint8_t>(data->args[3]);
         enhancedMoveToHueCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
@@ -474,7 +474,7 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveHue::Id:
-        enhancedMoveHueCommand.moveMode        = static_cast<HueMoveMode>(data->args[0]);
+        enhancedMoveHueCommand.moveMode        = static_cast<MoveModeEnum>(data->args[0]);
         enhancedMoveHueCommand.rate            = static_cast<uint16_t>(data->args[1]);
         enhancedMoveHueCommand.optionsMask     = static_cast<uint8_t>(data->args[2]);
         enhancedMoveHueCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
@@ -483,7 +483,7 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
         break;
 
     case Clusters::ColorControl::Commands::EnhancedStepHue::Id:
-        enhancedStepHueCommand.stepMode        = static_cast<HueStepMode>(data->args[0]);
+        enhancedStepHueCommand.stepMode        = static_cast<StepModeEnum>(data->args[0]);
         enhancedStepHueCommand.stepSize        = static_cast<uint16_t>(data->args[1]);
         enhancedStepHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedStepHueCommand.optionsMask     = static_cast<uint8_t>(data->args[3]);
