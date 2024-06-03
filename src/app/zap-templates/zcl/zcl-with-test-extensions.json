@@ -81,6 +81,7 @@
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "mode-select-extensions.xml",
+        "namespaces.xml",
         "network-commissioning-cluster.xml",
         "occupancy-sensing-cluster.xml",
         "onoff-cluster.xml",
