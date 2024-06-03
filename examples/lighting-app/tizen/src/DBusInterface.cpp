@@ -221,7 +221,7 @@ void DBusInterface::InitColor()
         auto status = Clusters::ColorControl::Attributes::ColorMode::Get(mEndpointId, &value);
         VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
                        ChipLogError(NotSpecified, "Error getting ColorMode: 0x%x", to_underlying(status)));
-        light_app_color_control_set_color_mode(mIfaceColorControl, value);
+        light_app_color_control_set_color_mode(mIfaceColorControl, static_cast<guchar>(value));
     }
     {
         uint16_t value = 0;
