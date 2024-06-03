@@ -154,7 +154,8 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
         if self.mode_a not in self.supported_run_modes_dut or \
                 self.mode_b not in self.supported_run_modes_dut:
-            asserts.fail("PIXIT.RVCRUNM.MODE_A and PIXIT.RVCRUNM.MODE_B must be valid supported modes.")
+            asserts.fail(
+                f"PIXIT.RVCRUNM.MODE_A and PIXIT.RVCRUNM.MODE_B must be valid supported modes. Valid modes: {self.supported_run_modes_dut}, MODE_A: {self.mode_a}, MODE_B: {self.mode_b}")
 
         for tag in self.supported_run_modes[self.mode_a].modeTags:
             if tag.value == Clusters.RvcRunMode.Enums.ModeTag.kIdle:
