@@ -45,6 +45,7 @@
    <xi:include href="chip/general-commissioning-cluster.xml" />
    <xi:include href="chip/general-diagnostics-cluster.xml" />
    <xi:include href="chip/global-attributes.xml" />
+   <xi:include href="chip/global-structs.xml" />
    <xi:include href="chip/groups-cluster.xml" />
    <xi:include href="chip/group-key-mgmt-cluster.xml" />
    <xi:include href="chip/icd-management-cluster.xml" />
@@ -61,6 +62,7 @@
    <xi:include href="chip/messages-cluster.xml" />   
    <xi:include href="chip/mode-base-cluster.xml" />
    <xi:include href="chip/mode-select-cluster.xml" />
+   <xi:include href="chip/namespaces.xml" />
    <xi:include href="chip/network-commissioning-cluster.xml" />
    <xi:include href="chip/occupancy-sensing-cluster.xml" />
    <xi:include href="chip/onoff-cluster.xml" />
