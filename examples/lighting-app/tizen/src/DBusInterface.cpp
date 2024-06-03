@@ -217,7 +217,7 @@ void DBusInterface::InitOnOff()
 void DBusInterface::InitColor()
 {
     {
-        chip::app::Clusters::ColorControl::ColorModeEnum value = 0;
+        chip::app::Clusters::ColorControl::ColorModeEnum value = chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation;
         auto status = Clusters::ColorControl::Attributes::ColorMode::Get(mEndpointId, &value);
         VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
                        ChipLogError(NotSpecified, "Error getting ColorMode: 0x%x", to_underlying(status)));
