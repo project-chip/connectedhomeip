@@ -36,6 +36,7 @@ from ctypes import CFUNCTYPE, Structure, c_bool, c_char_p, c_int64, c_uint8, c_u
 from threading import Condition, Event, Lock
 
 import chip.native
+from chip.logging import LOG_CATEGORY_AUTOMATION, LOG_CATEGORY_DETAIL, LOG_CATEGORY_ERROR, LOG_CATEGORY_PROGRESS
 from chip.native import PyChipError
 
 from .ChipUtility import ChipUtility
@@ -78,23 +79,14 @@ class DeviceStatusStruct(Structure):
 class LogCategory(object):
     """Debug logging categories used by chip."""
 
-    # NOTE: These values must correspond to those used in the chip C++ code.
-    Disabled = 0
-    Error = 1
-    Progress = 2
-    Detail = 3
-    Retain = 4
-
     @staticmethod
     def categoryToLogLevel(cat):
-        if cat == LogCategory.Error:
+        if cat == LOG_CATEGORY_ERROR:
             return logging.ERROR
-        elif cat == LogCategory.Progress:
+        elif cat == LOG_CATEGORY_PROGRESS:
             return logging.INFO
-        elif cat == LogCategory.Detail:
+        elif cat in (LOG_CATEGORY_DETAIL, LOG_CATEGORY_AUTOMATION):
             return logging.DEBUG
-        elif cat == LogCategory.Retain:
-            return logging.CRITICAL
         else:
             return logging.NOTSET
 
