@@ -433,7 +433,7 @@ class FactoryDataGenerator:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="NrfConnect Factory Data NVS generator tool")
+    parser = argparse.ArgumentParser(description="nRF Connect Factory Data generator tool")
 
     def allow_any_int(i): return int(i, 0)
     def base64_str(s): return base64.b64decode(s)
@@ -564,20 +564,20 @@ def main():
     if (exists(args.output + ".json") and not args.overwrite):
         log.error(("Output file: {} already exist, to create a new one add argument '--overwrite'. "
                   "By default overwriting is disabled").format(args.output+".json"))
-        return
+        sys.exit(1)
 
     if args.schema and no_jsonschema_module:
         log.error(("Requested verification of the JSON file using jsonschema, but the module is not installed. \n"
                   "Install only the module by invoking: pip3 install jsonschema \n"
                    "Alternatively, install it with all dependencies for Matter by invoking: pip3 install "
                    "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory."))
-        return
+        sys.exit(1)
 
     if args.generate_onboarding and no_onboarding_modules:
         log.error(("Requested generation of onboarding codes, but the some modules are not installed. \n"
                   "Install all dependencies for Matter by invoking: pip3 install "
                    "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory."))
-        return
+        sys.exit(1)
 
     generator = FactoryDataGenerator(args)
     generator.generate_json()
