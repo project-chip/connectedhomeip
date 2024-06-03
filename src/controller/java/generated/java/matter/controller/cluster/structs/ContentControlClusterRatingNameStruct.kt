@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -54,12 +53,13 @@ class ContentControlClusterRatingNameStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentControlClusterRatingNameStruct {
       tlvReader.enterStructure(tlvTag)
       val ratingName = tlvReader.getString(ContextSpecificTag(TAG_RATING_NAME))
-      val ratingNameDesc = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATING_NAME_DESC))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_RATING_NAME_DESC)))
-    } else {
-      Optional.empty()
-    }
-      
+      val ratingNameDesc =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATING_NAME_DESC))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_RATING_NAME_DESC)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return ContentControlClusterRatingNameStruct(ratingName, ratingNameDesc)

@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -55,13 +53,17 @@ class MediaPlaybackClusterTrackStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterTrackStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getString(ContextSpecificTag(TAG_ID))
-      val trackAttributes = if (!tlvReader.isNull()) {
-      MediaPlaybackClusterTrackAttributesStruct.fromTlv(ContextSpecificTag(TAG_TRACK_ATTRIBUTES), tlvReader)
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_TRACK_ATTRIBUTES))
-      null
-    }
-      
+      val trackAttributes =
+        if (!tlvReader.isNull()) {
+          MediaPlaybackClusterTrackAttributesStruct.fromTlv(
+            ContextSpecificTag(TAG_TRACK_ATTRIBUTES),
+            tlvReader
+          )
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_TRACK_ATTRIBUTES))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return MediaPlaybackClusterTrackStruct(id, trackAttributes)

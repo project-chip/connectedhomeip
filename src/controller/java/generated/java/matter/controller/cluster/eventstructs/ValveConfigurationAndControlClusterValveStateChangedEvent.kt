@@ -18,7 +18,6 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -51,15 +50,19 @@ class ValveConfigurationAndControlClusterValveStateChangedEvent(
     private const val TAG_VALVE_STATE = 0
     private const val TAG_VALVE_LEVEL = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ValveConfigurationAndControlClusterValveStateChangedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ValveConfigurationAndControlClusterValveStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val valveState = tlvReader.getUByte(ContextSpecificTag(TAG_VALVE_STATE))
-      val valveLevel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALVE_LEVEL))) {
-        Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_VALVE_LEVEL)))
-      } else {
-        Optional.empty()
-      }
-      
+      val valveLevel =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALVE_LEVEL))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_VALVE_LEVEL)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return ValveConfigurationAndControlClusterValveStateChangedEvent(valveState, valveLevel)
