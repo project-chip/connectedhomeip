@@ -17,7 +17,7 @@ limitations under the License.
 
 
 <!--
-TODO: Make these namespace enums global rather than defining then for each cluster.
+TODO: Make these namespace enums global rather than defining them for each cluster.
  This depends on the ability to define global enums via XML tags.
 -->
 
@@ -73,34 +73,34 @@ TODO: Make these namespace enums global rather than defining then for each clust
     <item value="0x29" name="Guest Room"/>
     <item value="0x2A" name="Gym"/>
     <item value="0x2B" name="Hallway"/>
-    <item value="0x2C" name="Kids Room"/>
-    <item value="0x2D" name="Kids Bedroom"/>
-    <item value="0x2E" name="Kitchen"/>
-    <item value="0x2F" name="Larder"/>
+    <item value="0x2C" name="Hearth Room"/>
+    <item value="0x2D" name="Kids Room"/>
+    <item value="0x2E" name="Kids Bedroom"/>
+    <item value="0x2F" name="Kitchen"/>
 
-    <item value="0x30" name="Laundry Room"/>
-    <item value="0x31" name="Lawn"/>
-    <item value="0x32" name="Library"/>
-    <item value="0x33" name="Living Room"/>
-    <item value="0x34" name="Lounge"/>
-    <item value="0x35" name="Man Cave"/>
-    <item value="0x36" name="Master Bathroom"/>
-    <item value="0x37" name="Master Bedroom"/>
-    <item value="0x38" name="Media/TV Room"/>
-    <item value="0x39" name="Mud Room"/>
-    <item value="0x3A" name="Music Room"/>
-    <item value="0x3B" name="Nursery"/>
-    <item value="0x3C" name="Office"/>
-    <item value="0x3D" name="Outdoor Kitchen"/>
-    <item value="0x3E" name="Outside"/>
-    <item value="0x3F" name="Pantry"/>
+    <item value="0x30" name="Larder"/>
+    <item value="0x31" name="Laundry Room"/>
+    <item value="0x32" name="Lawn"/>
+    <item value="0x33" name="Library"/>
+    <item value="0x34" name="Living Room"/>
+    <item value="0x35" name="Lounge"/>
+    <item value="0x36" name="Media/TV Room"/>
+    <item value="0x37" name="Mud Room"/>
+    <item value="0x38" name="Music Room"/>
+    <item value="0x39" name="Nursery"/>
+    <item value="0x3A" name="Office"/>
+    <item value="0x3B" name="Outdoor Kitchen"/>
+    <item value="0x3C" name="Outside"/>
+    <item value="0x3D" name="Pantry"/>
+    <item value="0x3E" name="Parking Lot"/>
+    <item value="0x3F" name="Parlor"/>
 
-    <item value="0x40" name="Parking Lot"/>
-    <item value="0x41" name="Parlor"/>
-    <item value="0x42" name="Patio"/>
-    <item value="0x43" name="Play Room"/>
-    <item value="0x44" name="Pool Room"/>
-    <item value="0x45" name="Porch"/>
+    <item value="0x40" name="Patio"/>
+    <item value="0x41" name="Play Room"/>
+    <item value="0x42" name="Pool Room"/>
+    <item value="0x43" name="Porch"/>
+    <item value="0x44" name="Primary Bathroom"/>
+    <item value="0x45" name="Primary Bedroom"/>
     <item value="0x46" name="Ramp"/>
     <item value="0x47" name="Reception Room"/>
     <item value="0x48" name="Recreation Room"/>
