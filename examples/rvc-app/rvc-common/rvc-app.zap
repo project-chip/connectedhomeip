@@ -29,7 +29,6 @@
       "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
-      "category": "matter",
       "version": "chip-v1"
     }
   ],
