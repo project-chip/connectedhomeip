@@ -1830,7 +1830,6 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
 
     if (completionStatus.err == CHIP_NO_ERROR)
     {
-        CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
         // CommissioningStageComplete uses mDeviceBeingCommissioned, which can
         // be commissionee if we are cleaning up before we've gone operational.  Normally
         // that would not happen in this non-error case, _except_ if we were told to skip sending
@@ -1843,6 +1842,8 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         // when called in the cleanup stage (which is where we are), and StopPairing does not directly release
         // mDeviceBeingCommissioned.
         CommissioningStageComplete(CHIP_NO_ERROR);
+
+        CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
         if (commissionee != nullptr)
         {
             ReleaseCommissioneeDevice(commissionee);
