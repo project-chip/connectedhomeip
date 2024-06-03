@@ -319,15 +319,16 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
     }
 
     powerAdjustmentCapability = mDelegate.GetPowerAdjustmentCapability();
-    if (powerAdjustmentCapability.IsNull())
+    if ((powerAdjustmentCapability.IsNull()) || (powerAdjustmentCapability.Value().powerAdjustCapability.IsNull()))
     {
         ChipLogError(Zcl, "DEM: powerAdjustmentCapability IsNull");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    /* PowerAdjustmentCapability is a list - so iterate through checking if the command is within one of the offers */
-    for (auto pas : powerAdjustmentCapability.Value())
+    /* PowerAdjustmentCapability is a list within a powerAdjustmentCapability structure
+       so iterate through checking if the command is within one of the offers */
+    for (auto pas : powerAdjustmentCapability.Value().powerAdjustCapability.Value())
     {
         if ((power >= pas.minPower) && (durationSec >= pas.minDuration) && (power <= pas.maxPower) &&
             (durationSec <= pas.maxDuration))
@@ -530,10 +531,10 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    /* We expect that there should be a slotIsPauseable entry (but it is optional) */
-    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable.HasValue())
+    /* We expect that there should be a slotIsPausable entry (but it is optional) */
+    if (!forecast.Value().slots[activeSlotNumber].slotIsPausable.HasValue())
     {
-        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include slotIsPauseable.", activeSlotNumber);
+        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include slotIsPausable.", activeSlotNumber);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -552,7 +553,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable.Value())
+    if (!forecast.Value().slots[activeSlotNumber].slotIsPausable.Value())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d is NOT pauseable.", activeSlotNumber);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
@@ -609,7 +610,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     Status status;
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast;
 
-    uint32_t forecastId                                                           = commandData.forecastId;
+    uint32_t forecastID                                                           = commandData.forecastID;
     DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> slotAdjustments = commandData.slotAdjustments;
     AdjustmentCauseEnum adjustmentCause                                           = commandData.cause;
 
@@ -629,7 +630,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         return;
     }
 
-    status = mDelegate.ModifyForecastRequest(forecastId, slotAdjustments, adjustmentCause);
+    status = mDelegate.ModifyForecastRequest(forecastID, slotAdjustments, adjustmentCause);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
