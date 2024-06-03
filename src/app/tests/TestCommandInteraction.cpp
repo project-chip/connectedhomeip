@@ -88,7 +88,7 @@ constexpr CommandId kTestNonExistCommandId                = 0;
 
 const app::CommandSender::TestOnlyMarker kCommandSenderTestOnlyMarker;
 
-class SimpleTLVPayload : public chip::app::DataModel::EncodableToTLV
+class SimpleTLVPayload : public app::DataModel::EncodableToTLV
 {
 public:
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
