@@ -14,12 +14,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+
+<!--
+TODO: Make these structures global rather than defining them for each cluster.
+ This depends on the ability to define global structs via XML tags.
+-->
+
 <configurator>
-  <domain name="HomeLocation"/>
+  <domain name="CHIP"/>
   <struct name="HomeLocationStruct">
-    <!-- Service Area Cluster -->
-    <cluster code="0x0150"/>
-    <!-- expected future use in Basic Information Cluster code="0x0028" -->
+    <cluster code="0x0150"/> <!-- Service Area Cluster -->
+    <!-- TODO: add Basic Information Cluster code="0x0028" -->
 
     <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false"/>
     <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"/>
