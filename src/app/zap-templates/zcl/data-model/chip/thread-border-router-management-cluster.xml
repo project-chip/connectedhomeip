@@ -62,7 +62,7 @@ limitations under the License.
     <command source="client" code="0x03" name="SetActiveDatasetRequest" optional="false">
       <description>On receipt of this command, the Thread Border Router will set or update the active Dataset of the Thread network that the Stub Router is connected to.</description>
       <arg name="ActiveDataset" type="octet_string" length="254"/>
-      <arg name="Breadcrumb" type="int64u"/>
+      <arg name="Breadcrumb" type="int64u" optional="true"/>
       <access op="invoke" privilege="manage"/>
     </command>
 

@@ -182,7 +182,7 @@ class ThreadBorderRouterManagementCluster(
 
   suspend fun setActiveDatasetRequest(
     activeDataset: ByteArray,
-    breadcrumb: ULong,
+    breadcrumb: ULong?,
     timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 3u
@@ -194,7 +194,7 @@ class ThreadBorderRouterManagementCluster(
     tlvWriter.put(ContextSpecificTag(TAG_ACTIVE_DATASET_REQ), activeDataset)
 
     val TAG_BREADCRUMB_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb)
+    breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

@@ -24352,7 +24352,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _activeDataset = [NSData data];
 
-        _breadcrumb = @(0);
+        _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -24389,7 +24389,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.activeDataset = AsByteSpan(self.activeDataset);
     }
     {
-        encodableStruct.breadcrumb = self.breadcrumb.unsignedLongLongValue;
+        if (self.breadcrumb != nil) {
+            auto & definedValue_0 = encodableStruct.breadcrumb.Emplace();
+            definedValue_0 = self.breadcrumb.unsignedLongLongValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

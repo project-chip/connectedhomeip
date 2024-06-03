@@ -35133,7 +35133,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadBorderRouterManagement::Id; }
 
     chip::ByteSpan activeDataset;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -35149,7 +35149,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadBorderRouterManagement::Id; }
 
     chip::ByteSpan activeDataset;
-    uint64_t breadcrumb = static_cast<uint64_t>(0);
+    Optional<uint64_t> breadcrumb;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetActiveDatasetRequest

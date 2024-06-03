@@ -26823,7 +26823,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo threadBorderRouterManagementsetActiveDatasetRequestactiveDatasetCommandParameterInfo = new CommandParameterInfo("activeDataset", byte[].class, byte[].class);
     threadBorderRouterManagementsetActiveDatasetRequestCommandParams.put("activeDataset",threadBorderRouterManagementsetActiveDatasetRequestactiveDatasetCommandParameterInfo);
 
-    CommandParameterInfo threadBorderRouterManagementsetActiveDatasetRequestbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", Long.class, Long.class);
+    CommandParameterInfo threadBorderRouterManagementsetActiveDatasetRequestbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", Optional.class, Long.class);
     threadBorderRouterManagementsetActiveDatasetRequestCommandParams.put("breadcrumb",threadBorderRouterManagementsetActiveDatasetRequestbreadcrumbCommandParameterInfo);
     InteractionInfo threadBorderRouterManagementsetActiveDatasetRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -26831,7 +26831,7 @@ public class ClusterInfoMapping {
         .setActiveDatasetRequest((DefaultClusterCallback) callback
         , (byte[])
         commandArguments.get("activeDataset")
-        , (Long)
+        , (Optional<Long>)
         commandArguments.get("breadcrumb")
         );
       },

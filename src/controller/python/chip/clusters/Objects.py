@@ -40491,11 +40491,11 @@ class ThreadBorderRouterManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="activeDataset", Tag=0, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=typing.Optional[uint]),
                     ])
 
             activeDataset: 'bytes' = b""
-            breadcrumb: 'uint' = 0
+            breadcrumb: 'typing.Optional[uint]' = None
 
         @dataclass
         class SetPendingDatasetRequest(ClusterCommand):

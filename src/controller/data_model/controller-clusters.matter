@@ -7700,7 +7700,7 @@ cluster ThreadBorderRouterManagement = 1106 {
 
   request struct SetActiveDatasetRequestRequest {
     octet_string<254> activeDataset = 0;
-    int64u breadcrumb = 1;
+    optional int64u breadcrumb = 1;
   }
 
   request struct SetPendingDatasetRequestRequest {

@@ -53160,11 +53160,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Long breadcrumb) {
+    public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Optional<Long> breadcrumb) {
       setActiveDatasetRequest(callback, activeDataset, breadcrumb, 0);
     }
 
-    public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Long breadcrumb, int timedInvokeTimeoutMs) {
+    public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Optional<Long> breadcrumb, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -53173,7 +53173,7 @@ public class ChipClusters {
       elements.add(new StructElement(activeDatasetFieldID, activeDatasettlvValue));
 
       final long breadcrumbFieldID = 1L;
-      BaseTLVType breadcrumbtlvValue = new UIntType(breadcrumb);
+      BaseTLVType breadcrumbtlvValue = breadcrumb.<BaseTLVType>map((nonOptionalbreadcrumb) -> new UIntType(nonOptionalbreadcrumb)).orElse(new EmptyType());
       elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
 
       StructType commandArgs = new StructType(elements);
