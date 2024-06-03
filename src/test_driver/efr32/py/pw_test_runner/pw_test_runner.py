@@ -16,6 +16,7 @@
 #
 
 import argparse
+import glob
 import logging
 import os
 import subprocess
@@ -60,12 +61,7 @@ def _parse_args():
     parser.add_argument(
         "-f",
         "--flash_image",
-        help="a firmware image which will be flashed berfore runnning the test",
-    )
-    parser.add_argument(
-        "-y",
-        "--flash_directory",
-        help="A directory containing image files, each of which will be flashed and then run.",
+        help="A firmware image which will be flashed berfore runnning the test.  Or a directory containing firmware images, each of which will be flashed and then run.",
     )
     parser.add_argument(
         "-o",
@@ -80,7 +76,7 @@ def _parse_args():
     return parser.parse_args()
 
 
-def flash_device(device: str, flash_image: str, **kwargs):
+def flash_device(device: str, flash_image: str):
     """flashes the EFR32 device using commander"""
     err = subprocess.call(
         ["commander", "flash", "--device", "EFR32", flash_image])
@@ -108,31 +104,31 @@ def run(args) -> int:
         return len(test_records.failing_tests)
 
 
-def list_images(flash_directory: str, **kwargs) -> list[str]:
-    filenames: list[str] = os.listdir(flash_directory)
-    # filenames = filter(lambda x: not x.endswith('.map'), filenames)
+def list_images(flash_directory: str) -> list[str]:
+    filenames: list[str] = glob.glob(os.path.join(flash_directory, "*.s37"))
     return list(map(lambda x: os.path.join(flash_directory, x), filenames))
 
 
 def main() -> int:
     args = _parse_args()
 
-    images: list[str] = None
-    if args.flash_directory:
-        images = list_images(**vars(args))
-        if not images:
-            raise Exception(f"No images found in `{args.flash_directory}`")
-    elif args.flash_image:
-        images = [args.flash_image]
+    failures = 0
+    if args.flash_image:
+        if os.path.isdir(args.flash_image):
+            images = list_images(args.flash_image)
+            if not images:
+                raise Exception(f"No images found in `{args.flash_image}`")
+        elif os.path.isdir(args.flash_image):
+            images = [args.flash_image]
+        else:
+            raise Exception(f"File or directory not found `{args.flash_image}`")
 
-    failures: int = 0
-    if images:
         for image in images:
             flash_device(args.device, image)
             time.sleep(1)  # Give time for device to boot
 
             failures += run(args)
-    else:  # No image provided. Just run.
+    else:  # No image provided. Just run what's on the device.
         failures += run(args)
 
     return failures

@@ -270,6 +270,11 @@ class Efr32Builder(GnBuilder):
 
         if self.app == Efr32App.UNIT_TEST:
             # Include test runner python wheels
+            for root, dirs, files in os.walk(os.path.join(self.output_dir, 'chip_pw_test_runner_wheels')):
+                for file in files:
+                    items["chip_pw_test_runner_wheels/" +
+                          file] = os.path.join(root, file)
+            # TODO [PW_MIGRATION]: remove the nl wheels once transition away from nlunit-test is completed
             for root, dirs, files in os.walk(os.path.join(self.output_dir, 'chip_nl_test_runner_wheels')):
                 for file in files:
                     items["chip_nl_test_runner_wheels/" +
