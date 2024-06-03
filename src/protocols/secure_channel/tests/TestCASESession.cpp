@@ -542,7 +542,7 @@ TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
     SessionHolder & holder = delegateCommissioner.GetSessionHolder();
     EXPECT_TRUE(bool(holder));
 
-    EXPECT_TRUE((holder->GetPeer() == chip::ScopedNodeId{ Node01_01, gCommissionerFabricIndex }));
+    EXPECT_EQ(holder->GetPeer(), (chip::ScopedNodeId{ Node01_01, gCommissionerFabricIndex }));
 
     auto * pairingCommissioner1 = chip::Platform::New<CASESession>();
     pairingCommissioner1->SetGroupDataProvider(&gCommissionerGroupDataProvider);
@@ -939,7 +939,7 @@ TEST_F(TestCASESession, SessionResumptionStorage)
 
     // Create our fabric-scoped node IDs.
     const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
-    EXPECT_NE(fabricInfo, nullptr);
+    ASSERT_NE(fabricInfo, nullptr);
     ScopedNodeId initiator = fabricInfo->GetScopedNodeIdForNode(Node01_02);
     ScopedNodeId responder = fabricInfo->GetScopedNodeIdForNode(Node01_01);
 

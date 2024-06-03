@@ -325,7 +325,7 @@ void TestPASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
     // via piggybacked acks. So we cannot check for a specific value of mSentMessageCount.
     // Let's make sure atleast number is >= than the minimum messages required to complete the
     // handshake.
-    EXPECT_TRUE(loopback.mSentMessageCount >= sTestPaseMessageCount);
+    EXPECT_GE(loopback.mSentMessageCount, sTestPaseMessageCount);
     EXPECT_EQ(delegateAccessory.mNumPairingErrors, 0u);
     EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
     EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
