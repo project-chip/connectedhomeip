@@ -54,7 +54,7 @@ TEST_F(TestStatusReport, NoData)
     testReport.WriteToBuffer(bbuf);
 
     System::PacketBufferHandle msgBuf = bbuf.Finalize();
-    EXPECT_FALSE(msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
 
     StatusReport reportToParse;
     EXPECT_EQ(reportToParse.Parse(std::move(msgBuf)), CHIP_NO_ERROR);
@@ -82,7 +82,7 @@ TEST_F(TestStatusReport, WithData)
     testReport.WriteToBuffer(bbuf);
 
     System::PacketBufferHandle msgBuf = bbuf.Finalize();
-    EXPECT_FALSE(msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
 
     StatusReport reportToParse;
     EXPECT_EQ(reportToParse.Parse(std::move(msgBuf)), CHIP_NO_ERROR);
@@ -91,7 +91,7 @@ TEST_F(TestStatusReport, WithData)
     EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);
 
     const System::PacketBufferHandle & rcvData = reportToParse.GetProtocolData();
-    EXPECT_FALSE(rcvData.IsNull());
+    ASSERT_FALSE(rcvData.IsNull());
     EXPECT_EQ(rcvData->DataLength(), dataLen);
     EXPECT_EQ(memcmp(rcvData->Start(), data, dataLen), 0);
 }
@@ -117,7 +117,7 @@ TEST_F(TestStatusReport, TestMakeBusyStatusReport)
     System::Clock::Milliseconds16 minimumWaitTime = System::Clock::Milliseconds16(5000);
 
     System::PacketBufferHandle handle = StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);
-    EXPECT_FALSE(handle.IsNull());
+    ASSERT_FALSE(handle.IsNull());
 
     StatusReport reportToParse;
     EXPECT_EQ(reportToParse.Parse(std::move(handle)), CHIP_NO_ERROR);
@@ -126,7 +126,7 @@ TEST_F(TestStatusReport, TestMakeBusyStatusReport)
     EXPECT_EQ(reportToParse.GetProtocolCode(), protocolCode);
 
     const System::PacketBufferHandle & rcvData = reportToParse.GetProtocolData();
-    EXPECT_FALSE(rcvData.IsNull());
+    ASSERT_FALSE(rcvData.IsNull());
     EXPECT_EQ(rcvData->DataLength(), sizeof(minimumWaitTime));
 
     uint16_t readMinimumWaitTime = 0;

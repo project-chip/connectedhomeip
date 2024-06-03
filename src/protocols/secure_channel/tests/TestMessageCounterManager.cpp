@@ -102,10 +102,10 @@ TEST_F(TestMessageCounterManager, CheckReceiveMessage)
 
     uint16_t payload_len              = sizeof(PAYLOAD);
     System::PacketBufferHandle msgBuf = MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
-    EXPECT_FALSE(msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
 
     Messaging::ExchangeContext * ec = NewExchangeToAlice(nullptr);
-    EXPECT_NE(ec, nullptr);
+    ASSERT_NE(ec, nullptr);
 
     EXPECT_EQ(ec->SendMessage(chip::Protocols::Echo::MsgType::EchoRequest, std::move(msgBuf),
                               Messaging::SendFlags{ Messaging::SendMessageFlags::kNoAutoRequestAck }),
