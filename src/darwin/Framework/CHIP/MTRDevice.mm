@@ -3653,7 +3653,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 #pragma mark Log Help
 
-- (NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath
+- (nullable NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath
 {
     auto * cachedData = [self _cachedAttributeValueForPath:attributePath];
 
@@ -3662,12 +3662,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         MTRDataKey : cachedData,
     }
                                                                     error:nil];
-    // REVIEWERS:  is it worth logging the `error` above?
 
     return attrReport.value;
 }
 
-- (NSNumber *)_informationalVendorID
+- (nullable NSNumber *)_informationalVendorID
 {
     auto * vendorIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
                                                               clusterID:@(MTRClusterIDTypeBasicInformationID)
@@ -3676,7 +3675,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return [self _informationalNumberAtAttributePath:vendorIDPath];
 }
 
-- (NSNumber *)_informationalProductID
+- (nullable NSNumber *)_informationalProductID
 {
     auto * productIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
                                                                clusterID:@(MTRClusterIDTypeBasicInformationID)
