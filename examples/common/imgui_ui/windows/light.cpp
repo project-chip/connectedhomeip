@@ -158,7 +158,7 @@ void Light::Render()
         (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation) ? "Hue/Saturation"
         : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentXAndCurrentY)          ? "X/Y"
         : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kColorTemperature)             ? "Temperature/Mireds"
-                                                                 : "UNKNOWN";
+                                                                                                          : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
 
