@@ -109,13 +109,6 @@ class SizeDatabase(memdf.util.sqlite.Database):
                     'size': i['size'],
                     'kind': frame
                 })
-        # Add segment sizes.
-        for i in r['frames'].get('wr', []):
-            r['sizes'].append({
-                'name': ('(read only)', '(read/write)')[int(i['wr'])],
-                'size': i['size'],
-                'kind': 'wr'
-            })
         self.add_sizes(**r)
 
     def add_sizes_from_zipfile(self, f: Union[IO, Path], origin: Dict):

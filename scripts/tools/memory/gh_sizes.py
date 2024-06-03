@@ -58,9 +58,9 @@ binary's directory. This file has the form:
           {"section": ".data", "size": 1648},
           {"section": ".text", "size": 740236}
         ],
-        "wr": [
-          {"wr": 0, "size": 262144},
-          {"wr": 1, "size": 74023}
+        "region": [
+          {"region": "FLASH", "size": 262144},
+          {"region": "RAM", "size": 74023}
         ]
     }
   }
@@ -162,7 +162,8 @@ def main(argv):
             **CONFIG,
         }
         # In case there is no platform configuration file, default to using a popular set of section names.
-        config_desc['section.select']['default'] = ['.text', '.rodata', '.data', '.bss']
+        config_desc['section.select']['default'] = [
+            '.text', '.rodata', '.data', '.bss']
 
         config = Config().init(config_desc)
         config.put('output.file', output)
@@ -197,32 +198,17 @@ def main(argv):
 
         collected: DFs = memdf.collect.collect_files(config, [binary])
 
-        # Aggregate loaded segments, by writable (RAM) or not (flash).
-        segments = collected[SegmentDF.name]
-        segments['segment'] = segments.index
-        segments['wr'] = ((segments['flags'] & 2) != 0).convert_dtypes(
-            convert_boolean=False, convert_integer=True)
-        segment_summary = segments[segments['type'] == 'PT_LOAD'][[
-            'wr', 'size'
-        ]].groupby('wr').aggregate(np.sum).reset_index().astype(
-            {'size': np.int64})
-        segment_summary.attrs['name'] = "wr"
-
         sections = collected[SectionDF.name]
-        sections = sections.join(on='segment',
-                                 how='left',
-                                 other=segments,
-                                 rsuffix='-segment')
-        section_summary = sections[['section', 'size',
-                                    'wr']].sort_values(by='section')
+        section_summary = sections[['section',
+                                    'size']].sort_values(by='section')
         section_summary.attrs['name'] = "section"
 
-        region_summary = memdf.select.groupby(config, collected['section'], 'region')
+        region_summary = memdf.select.groupby(
+            config, collected['section'], 'region')
         region_summary.attrs['name'] = "region"
 
         summaries = {
             'section': section_summary,
-            'memory': segment_summary,
             'region': region_summary,
         }
 
