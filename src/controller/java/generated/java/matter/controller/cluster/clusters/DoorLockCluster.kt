@@ -3647,7 +3647,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     }
   }
 
-  suspend fun readAutoRelockTimeAttribute(): UInt? {
+  suspend fun readAutoRelockTimeAttribute(): UInt {
     val ATTRIBUTE_ID: UInt = 35u
 
     val attributePath =
@@ -3673,12 +3673,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UInt? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUInt(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
 
     return decodedValue
   }
@@ -3764,14 +3759,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UInt? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUInt(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
 
-          decodedValue?.let { emit(UIntSubscriptionState.Success(it)) }
+          emit(UIntSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UIntSubscriptionState.SubscriptionEstablished)
