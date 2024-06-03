@@ -10882,10 +10882,10 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> valueList) {
+    public void onSuccess(@Nullable ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct>");
-      responseValues.put(commandResponseInfo, valueList);
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct");
+      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 

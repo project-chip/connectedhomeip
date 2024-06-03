@@ -47,11 +47,11 @@ class DeviceEnergyManagementCluster(
   private val endpointId: UShort
 ) {
   class PowerAdjustmentCapabilityAttribute(
-    val value: List<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct>?
+    val value: DeviceEnergyManagementClusterPowerAdjustCapabilityStruct?
   )
 
   sealed class PowerAdjustmentCapabilityAttributeSubscriptionState {
-    data class Success(val value: List<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct>?) :
+    data class Success(val value: DeviceEnergyManagementClusterPowerAdjustCapabilityStruct?) :
       PowerAdjustmentCapabilityAttributeSubscriptionState()
 
     data class Error(val exception: Exception) :
@@ -750,21 +750,10 @@ class DeviceEnergyManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct>? =
+    val decodedValue: DeviceEnergyManagementClusterPowerAdjustCapabilityStruct? =
       if (!tlvReader.isNull()) {
         if (tlvReader.isNextTag(AnonymousTag)) {
-          buildList<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> {
-            tlvReader.enterArray(AnonymousTag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(
-                DeviceEnergyManagementClusterPowerAdjustCapabilityStruct.fromTlv(
-                  AnonymousTag,
-                  tlvReader
-                )
-              )
-            }
-            tlvReader.exitContainer()
-          }
+          DeviceEnergyManagementClusterPowerAdjustCapabilityStruct.fromTlv(AnonymousTag, tlvReader)
         } else {
           null
         }
@@ -817,21 +806,13 @@ class DeviceEnergyManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct>? =
+          val decodedValue: DeviceEnergyManagementClusterPowerAdjustCapabilityStruct? =
             if (!tlvReader.isNull()) {
               if (tlvReader.isNextTag(AnonymousTag)) {
-                buildList<DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> {
-                  tlvReader.enterArray(AnonymousTag)
-                  while (!tlvReader.isEndOfContainer()) {
-                    add(
-                      DeviceEnergyManagementClusterPowerAdjustCapabilityStruct.fromTlv(
-                        AnonymousTag,
-                        tlvReader
-                      )
-                    )
-                  }
-                  tlvReader.exitContainer()
-                }
+                DeviceEnergyManagementClusterPowerAdjustCapabilityStruct.fromTlv(
+                  AnonymousTag,
+                  tlvReader
+                )
               } else {
                 null
               }

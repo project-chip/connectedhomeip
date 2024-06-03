@@ -22481,12 +22481,12 @@ struct TypeInfo
 namespace PowerAdjustmentCapability {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<
-        chip::app::DataModel::List<const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-           chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType>> &;
+    using Type =
+        chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerAdjustmentCapability::Id; }

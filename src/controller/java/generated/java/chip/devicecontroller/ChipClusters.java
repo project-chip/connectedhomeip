@@ -31267,7 +31267,7 @@ public class ChipClusters {
     }
 
     public interface PowerAdjustmentCapabilityAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> value);
+      void onSuccess(@Nullable ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct value);
     }
 
     public interface ForecastAttributeCallback extends BaseAttributeCallback {
@@ -31427,7 +31427,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, POWER_ADJUSTMENT_CAPABILITY_ATTRIBUTE_ID, true);
@@ -31440,7 +31440,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, POWER_ADJUSTMENT_CAPABILITY_ATTRIBUTE_ID, minInterval, maxInterval);

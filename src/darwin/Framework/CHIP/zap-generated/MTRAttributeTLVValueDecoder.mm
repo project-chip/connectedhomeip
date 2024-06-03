@@ -8904,51 +8904,36 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSArray * _Nullable value;
+        MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = cppValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct * newElement_1;
-                    newElement_1 = [MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct new];
-                    if (entry_1.powerAdjustCapability.IsNull()) {
-                        newElement_1.powerAdjustCapability = nil;
-                    } else {
-                        { // Scope for our temporary variables
-                            auto * array_4 = [NSMutableArray new];
-                            auto iter_4 = entry_1.powerAdjustCapability.Value().begin();
-                            while (iter_4.Next()) {
-                                auto & entry_4 = iter_4.GetValue();
-                                MTRDeviceEnergyManagementClusterPowerAdjustStruct * newElement_4;
-                                newElement_4 = [MTRDeviceEnergyManagementClusterPowerAdjustStruct new];
-                                newElement_4.minPower = [NSNumber numberWithLongLong:entry_4.minPower];
-                                newElement_4.maxPower = [NSNumber numberWithLongLong:entry_4.maxPower];
-                                newElement_4.minDuration = [NSNumber numberWithUnsignedInt:entry_4.minDuration];
-                                newElement_4.maxDuration = [NSNumber numberWithUnsignedInt:entry_4.maxDuration];
-                                [array_4 addObject:newElement_4];
-                            }
-                            CHIP_ERROR err = iter_4.GetStatus();
-                            if (err != CHIP_NO_ERROR) {
-                                *aError = err;
-                                return nil;
-                            }
-                            newElement_1.powerAdjustCapability = array_4;
-                        }
+            value = [MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct new];
+            if (cppValue.Value().powerAdjustCapability.IsNull()) {
+                value.powerAdjustCapability = nil;
+            } else {
+                { // Scope for our temporary variables
+                    auto * array_3 = [NSMutableArray new];
+                    auto iter_3 = cppValue.Value().powerAdjustCapability.Value().begin();
+                    while (iter_3.Next()) {
+                        auto & entry_3 = iter_3.GetValue();
+                        MTRDeviceEnergyManagementClusterPowerAdjustStruct * newElement_3;
+                        newElement_3 = [MTRDeviceEnergyManagementClusterPowerAdjustStruct new];
+                        newElement_3.minPower = [NSNumber numberWithLongLong:entry_3.minPower];
+                        newElement_3.maxPower = [NSNumber numberWithLongLong:entry_3.maxPower];
+                        newElement_3.minDuration = [NSNumber numberWithUnsignedInt:entry_3.minDuration];
+                        newElement_3.maxDuration = [NSNumber numberWithUnsignedInt:entry_3.maxDuration];
+                        [array_3 addObject:newElement_3];
                     }
-                    newElement_1.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.cause)];
-                    [array_1 addObject:newElement_1];
+                    CHIP_ERROR err = iter_3.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    value.powerAdjustCapability = array_3;
                 }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                value = array_1;
             }
+            value.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().cause)];
         }
         return value;
     }

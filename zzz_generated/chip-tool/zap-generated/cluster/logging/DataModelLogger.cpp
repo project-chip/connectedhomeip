@@ -12856,8 +12856,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AbsMaxPower", 1, value);
         }
         case DeviceEnergyManagement::Attributes::PowerAdjustmentCapability::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType>>
+            chip::app::DataModel::Nullable<
+                chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PowerAdjustmentCapability", 1, value);
