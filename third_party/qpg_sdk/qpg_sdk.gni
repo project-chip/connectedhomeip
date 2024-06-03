@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/openthread.gni")
 import("//build_overrides/qpg_sdk.gni")
+import("qpg_platform.gni")
 
 declare_args() {
   # Location of the QPG SDK.
@@ -24,26 +25,16 @@ declare_args() {
   # subdirectory in qpg_sdk_root where the binary library builds (.a) are to be found
   qpg_sdk_lib_dir = "Work"
 
-  # Target IC for QPG SDK
-  qpg_target_ic = "qpg6105"
-
-  # Target board for QPG SDK
-  qpg_target_board = "QPG6105DK_B01"
-
   # an option to disable referencing qorvo object archive files (*.a)
   qpg_sdk_include_platform_libs = true
 
   # Enable Sleepy end device
   enable_sleepy_device = false
 
-  # Enable mbedtls HW acceleration
-  mbedtls_alt_enabled = true
-
   # OTA parameters
   matter_device_vid = ""
   matter_device_pid = ""
-  matter_device_software_version = ""
-  matter_device_software_version_string = ""
+  matter_ota_test_image = false
 }
 
 assert(qpg_sdk_root != "", "qpg_sdk_root must be specified")
@@ -105,11 +96,8 @@ template("qpg_sdk") {
     if (matter_device_pid != "") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${matter_device_pid}" ]
     }
-    if (matter_device_software_version_string != "") {
-      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${matter_device_software_version_string}\"" ]
-    }
-    if (matter_device_software_version != "") {
-      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${matter_device_software_version}" ]
+    if (matter_ota_test_image) {
+      defines += [ "OTA_TEST_IMAGE" ]
     }
 
     if (qpg_target_ic == "qpg6200") {

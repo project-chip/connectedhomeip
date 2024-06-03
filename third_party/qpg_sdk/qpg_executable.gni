@@ -138,12 +138,8 @@ template("qpg_executable") {
       if (matter_device_pid != "") {
         ota_header_options += [ "-pid=${matter_device_pid}" ]
       }
-      if (matter_device_software_version != "") {
-        ota_header_options += [ "-vn=${matter_device_software_version}" ]
-      }
-      if (matter_device_software_version_string != "") {
-        ota_header_options +=
-            [ "-vs=\"${matter_device_software_version_string}\"" ]
+      if (matter_ota_test_image) {
+        ota_header_options += [ "-tui" ]
       }
       deps = [ ":$executable_target_name" ]
     }

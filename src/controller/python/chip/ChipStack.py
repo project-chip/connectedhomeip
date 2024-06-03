@@ -32,11 +32,11 @@ import logging
 import os
 import sys
 import time
-from ctypes import (CFUNCTYPE, POINTER, Structure, c_bool, c_char_p, c_int64, c_uint8, c_uint16, c_uint32, c_ulong, c_void_p,
-                    py_object, pythonapi)
+from ctypes import CFUNCTYPE, Structure, c_bool, c_char_p, c_int64, c_uint8, c_uint16, c_uint32, c_void_p, py_object, pythonapi
 from threading import Condition, Event, Lock
 
 import chip.native
+from chip.logging import LOG_CATEGORY_AUTOMATION, LOG_CATEGORY_DETAIL, LOG_CATEGORY_ERROR, LOG_CATEGORY_PROGRESS
 from chip.native import PyChipError
 
 from .ChipUtility import ChipUtility
@@ -79,23 +79,14 @@ class DeviceStatusStruct(Structure):
 class LogCategory(object):
     """Debug logging categories used by chip."""
 
-    # NOTE: These values must correspond to those used in the chip C++ code.
-    Disabled = 0
-    Error = 1
-    Progress = 2
-    Detail = 3
-    Retain = 4
-
     @staticmethod
     def categoryToLogLevel(cat):
-        if cat == LogCategory.Error:
+        if cat == LOG_CATEGORY_ERROR:
             return logging.ERROR
-        elif cat == LogCategory.Progress:
+        elif cat == LOG_CATEGORY_PROGRESS:
             return logging.INFO
-        elif cat == LogCategory.Detail:
+        elif cat in (LOG_CATEGORY_DETAIL, LOG_CATEGORY_AUTOMATION):
             return logging.DEBUG
-        elif cat == LogCategory.Retain:
-            return logging.CRITICAL
         else:
             return logging.NOTSET
 
@@ -194,9 +185,6 @@ class AsyncioCallableHandle:
         pythonapi.Py_DecRef(py_object(self))
 
 
-_CompleteFunct = CFUNCTYPE(None, c_void_p, c_void_p)
-_ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p,
-                        c_ulong, POINTER(DeviceStatusStruct))
 _LogMessageFunct = CFUNCTYPE(
     None, c_int64, c_int64, c_char_p, c_uint8, c_char_p)
 _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
@@ -272,21 +260,11 @@ class ChipStack(object):
             self.logger.addHandler(logHandler)
             self.logger.setLevel(logging.DEBUG)
 
-        def HandleComplete(appState, reqState):
-            self.callbackRes = True
-            self.completeEvent.set()
-
-        def HandleError(appState, reqState, err, devStatusPtr):
-            self.callbackRes = self.ErrorToException(err, devStatusPtr)
-            self.completeEvent.set()
-
         @_ChipThreadTaskRunnerFunct
         def HandleChipThreadRun(callback):
             callback()
 
         self.cbHandleChipThreadRun = HandleChipThreadRun
-        self.cbHandleComplete = _CompleteFunct(HandleComplete)
-        self.cbHandleError = _ErrorFunct(HandleError)
         # set by other modules(BLE) that require service by thread while thread blocks.
         self.blockingCB = None
 
@@ -389,15 +367,9 @@ class ChipStack(object):
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
         '''
-        # throw error if op in progress
-        self.callbackRes = None
-        self.completeEvent.clear()
         # TODO: Lock probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
         with self.networkLock:
             res = self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
-        self.completeEvent.set()
-        if res == 0 and self.callbackRes is not None:
-            return self.callbackRes
         return res
 
     async def CallAsync(self, callFunct, timeoutMs: int = None):
