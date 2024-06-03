@@ -34,7 +34,7 @@ source_set("nxp_ota") {
 }
 
 config("nxp_platform_config") {
-  defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"" ]
+  defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"", "CONFIG_BOOT_REASON_SDK_SUPPORT=1" ]
   include_dirs = [
     ".",
     "../../common",
@@ -67,6 +67,7 @@ config("nxp_platform_config") {
   if (chip_enable_wifi && chip_enable_openthread && !chip_enable_secondary_nwk_if) {
     defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
   }
+
 }
 
 static_library("nxp_platform") {
