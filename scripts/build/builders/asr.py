@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -178,13 +179,9 @@ class ASRBuilder(GnBuilder):
         return self.extra_gn_options
 
     def build_outputs(self):
-        items = {
-            '%s.out' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir, '%s.out' %
-                             self.app.AppNamePrefix()),
-            '%s.out.map' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir,
-                             '%s.out.map' % self.app.AppNamePrefix()),
-        }
-
-        return items
+        extensions = ["out"]
+        if self.options.enable_link_map_file:
+            extensions.append("out.map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
