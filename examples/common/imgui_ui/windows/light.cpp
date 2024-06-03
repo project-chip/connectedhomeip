@@ -155,14 +155,14 @@ void Light::Render()
     ImGui::Text("Color Control:");
     ImGui::Indent();
     const char * mode = // based on ColorMode attribute: spec 3.2.7.9
-        (mColorMode == kColorModeCurrentHueAndCurrentSaturation) ? "Hue/Saturation"
-        : (mColorMode == kColorModeCurrentXAndCurrentY)          ? "X/Y"
-        : (mColorMode == kColorModeColorTemperature)             ? "Temperature/Mireds"
+        (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation) ? "Hue/Saturation"
+        : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentXAndCurrentY)          ? "X/Y"
+        : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kColorTemperature)             ? "Temperature/Mireds"
                                                                  : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
 
-    if (mColorMode == kColorModeCurrentHueAndCurrentSaturation)
+    if (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation)
     {
         const float hueDegrees        = (mColorHue * 360.0f) / 254.0f;
         const float saturationPercent = 100.0f * (mColorSaturation / 254.0f);
@@ -173,12 +173,12 @@ void Light::Render()
         ImGui::ColorButton("LightColor", HueSaturationToColor(hueDegrees, saturationPercent), 0 /* ImGuiColorEditFlags_* */,
                            ImVec2(80, 80));
     }
-    else if (mColorMode == kColorModeCurrentXAndCurrentY)
+    else if (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentXAndCurrentY)
     {
         ImGui::Text("Current X: %d", mColorX);
         ImGui::Text("Current Y: %d", mColorY);
     }
-    else if (mColorMode == kColorModeColorTemperature)
+    else if (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kColorTemperature)
     {
         ImGui::Text("Color Temperature Mireds: %d", mColorTemperatureMireds);
     }
