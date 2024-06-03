@@ -52,7 +52,7 @@ namespace app {
 
 namespace {
 
-class TestTLVDataEncoder : public chip::app::DataModel::EncodableToTLV
+class TestTLVDataEncoder : public DataModel::EncodableToTLV
 {
 public:
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
