@@ -2707,24 +2707,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OccupancySensing::Occup
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadBorderRouterManagement::RoutingRoleEnum val)
-{
-    using EnumType = ThreadBorderRouterManagement::RoutingRoleEnum;
-    switch (val)
-    {
-    case EnumType::kUnspecified:
-    case EnumType::kUnassigned:
-    case EnumType::kSleepyEndDevice:
-    case EnumType::kEndDevice:
-    case EnumType::kReed:
-    case EnumType::kRouter:
-    case EnumType::kLeader:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelTypeEnum val)
 {
     using EnumType = Channel::ChannelTypeEnum;

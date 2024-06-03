@@ -7280,10 +7280,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"InterfaceEnabled";
             break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadNodeID:
-            result = @"ThreadNode";
-            break;
-
         case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeActiveDatasetTimestampID:
             result = @"ActiveDatasetTimestamp";
             break;

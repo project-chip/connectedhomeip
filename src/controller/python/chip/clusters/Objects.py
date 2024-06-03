@@ -40411,7 +40411,6 @@ class ThreadBorderRouterManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="borderAgentId", Tag=0x00000001, Type=bytes),
                 ClusterObjectFieldDescriptor(Label="threadVersion", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="interfaceEnabled", Tag=0x00000003, Type=bool),
-                ClusterObjectFieldDescriptor(Label="threadNode", Tag=0x00000004, Type=ThreadBorderRouterManagement.Structs.ThreadNodeStruct),
                 ClusterObjectFieldDescriptor(Label="activeDatasetTimestamp", Tag=0x00000005, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -40425,7 +40424,6 @@ class ThreadBorderRouterManagement(Cluster):
     borderAgentId: 'bytes' = None
     threadVersion: 'uint' = None
     interfaceEnabled: 'bool' = None
-    threadNode: 'ThreadBorderRouterManagement.Structs.ThreadNodeStruct' = None
     activeDatasetTimestamp: 'typing.Union[Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -40434,99 +40432,9 @@ class ThreadBorderRouterManagement(Cluster):
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
 
-    class Enums:
-        class RoutingRoleEnum(MatterIntEnum):
-            kUnspecified = 0x00
-            kUnassigned = 0x01
-            kSleepyEndDevice = 0x02
-            kEndDevice = 0x03
-            kReed = 0x04
-            kRouter = 0x05
-            kLeader = 0x06
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 7,
-
     class Bitmaps:
         class Feature(IntFlag):
             kPANChange = 0x1
-
-    class Structs:
-        @dataclass
-        class ChildTableStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="rloc16", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="linkQuality", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="routingRole", Tag=2, Type=ThreadBorderRouterManagement.Enums.RoutingRoleEnum),
-                    ])
-
-            rloc16: 'uint' = 0
-            linkQuality: 'uint' = 0
-            routingRole: 'ThreadBorderRouterManagement.Enums.RoutingRoleEnum' = 0
-
-        @dataclass
-        class RouteTableStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="routerId", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="pathCost", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="LQIIn", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="LQIOut", Tag=3, Type=uint),
-                    ])
-
-            routerId: 'uint' = 0
-            pathCost: 'uint' = 0
-            LQIIn: 'uint' = 0
-            LQIOut: 'uint' = 0
-
-        @dataclass
-        class ThreadNodeStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="extAddress", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="rloc16", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="IPv6s", Tag=2, Type=typing.List[bytes]),
-                        ClusterObjectFieldDescriptor(Label="routingRole", Tag=3, Type=ThreadBorderRouterManagement.Enums.RoutingRoleEnum),
-                        ClusterObjectFieldDescriptor(Label="routeTable", Tag=4, Type=typing.List[ThreadBorderRouterManagement.Structs.RouteTableStruct]),
-                        ClusterObjectFieldDescriptor(Label="childTable", Tag=5, Type=typing.List[ThreadBorderRouterManagement.Structs.ChildTableStruct]),
-                    ])
-
-            extAddress: 'uint' = 0
-            rloc16: 'uint' = 0
-            IPv6s: 'typing.List[bytes]' = field(default_factory=lambda: [])
-            routingRole: 'ThreadBorderRouterManagement.Enums.RoutingRoleEnum' = 0
-            routeTable: 'typing.List[ThreadBorderRouterManagement.Structs.RouteTableStruct]' = field(default_factory=lambda: [])
-            childTable: 'typing.List[ThreadBorderRouterManagement.Structs.ChildTableStruct]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class NeiborTableStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="extAddress", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="age", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="rloc16", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="averageRssi", Tag=3, Type=typing.Union[Nullable, int]),
-                        ClusterObjectFieldDescriptor(Label="lastRssi", Tag=4, Type=typing.Union[Nullable, int]),
-                        ClusterObjectFieldDescriptor(Label="routingRole", Tag=5, Type=ThreadBorderRouterManagement.Enums.RoutingRoleEnum),
-                    ])
-
-            extAddress: 'uint' = 0
-            age: 'uint' = 0
-            rloc16: 'uint' = 0
-            averageRssi: 'typing.Union[Nullable, int]' = NullValue
-            lastRssi: 'typing.Union[Nullable, int]' = NullValue
-            routingRole: 'ThreadBorderRouterManagement.Enums.RoutingRoleEnum' = 0
 
     class Commands:
         @dataclass
@@ -40605,46 +40513,6 @@ class ThreadBorderRouterManagement(Cluster):
 
             pendingDataset: 'bytes' = b""
 
-        @dataclass
-        class TopologyRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000452
-            command_id: typing.ClassVar[int] = 0x00000005
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'TopologyResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="count", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="startIndex", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="snapshot", Tag=2, Type=uint),
-                    ])
-
-            count: 'uint' = 0
-            startIndex: 'uint' = 0
-            snapshot: 'uint' = 0
-
-        @dataclass
-        class TopologyResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000452
-            command_id: typing.ClassVar[int] = 0x00000006
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="snapshot", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="numberOfDevices", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="threadTopology", Tag=2, Type=typing.List[ThreadBorderRouterManagement.Structs.ThreadNodeStruct]),
-                    ])
-
-            snapshot: 'uint' = 0
-            numberOfDevices: 'uint' = 0
-            threadTopology: 'typing.List[ThreadBorderRouterManagement.Structs.ThreadNodeStruct]' = field(default_factory=lambda: [])
-
     class Attributes:
         @dataclass
         class BorderRouterName(ClusterAttributeDescriptor):
@@ -40709,22 +40577,6 @@ class ThreadBorderRouterManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=bool)
 
             value: 'bool' = False
-
-        @dataclass
-        class ThreadNode(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000452
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000004
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ThreadBorderRouterManagement.Structs.ThreadNodeStruct)
-
-            value: 'ThreadBorderRouterManagement.Structs.ThreadNodeStruct' = field(default_factory=lambda: ThreadBorderRouterManagement.Structs.ThreadNodeStruct())
 
         @dataclass
         class ActiveDatasetTimestamp(ClusterAttributeDescriptor):

@@ -11083,14 +11083,12 @@ private:
 | * GetPendingDatasetRequest                                          |   0x01 |
 | * SetActiveDatasetRequest                                           |   0x03 |
 | * SetPendingDatasetRequest                                          |   0x04 |
-| * TopologyRequest                                                   |   0x05 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * BorderRouterName                                                  | 0x0000 |
 | * BorderAgentId                                                     | 0x0001 |
 | * ThreadVersion                                                     | 0x0002 |
 | * InterfaceEnabled                                                  | 0x0003 |
-| * ThreadNode                                                        | 0x0004 |
 | * ActiveDatasetTimestamp                                            | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -11259,46 +11257,6 @@ public:
 
 private:
     chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Type mRequest;
-};
-
-/*
- * Command TopologyRequest
- */
-class ThreadBorderRouterManagementTopologyRequest : public ClusterCommand
-{
-public:
-    ThreadBorderRouterManagementTopologyRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("topology-request", credsIssuerConfig)
-    {
-        AddArgument("Count", 0, UINT16_MAX, &mRequest.count);
-        AddArgument("StartIndex", 0, UINT16_MAX, &mRequest.startIndex);
-        AddArgument("Snapshot", 0, UINT8_MAX, &mRequest.snapshot);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ThreadBorderRouterManagement::Commands::TopologyRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ThreadBorderRouterManagement::Commands::TopologyRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::ThreadBorderRouterManagement::Commands::TopologyRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -24999,7 +24957,6 @@ void registerClusterThreadBorderRouterManagement(Commands & commands, Credential
         make_unique<ThreadBorderRouterManagementGetPendingDatasetRequest>(credsIssuerConfig), //
         make_unique<ThreadBorderRouterManagementSetActiveDatasetRequest>(credsIssuerConfig),  //
         make_unique<ThreadBorderRouterManagementSetPendingDatasetRequest>(credsIssuerConfig), //
-        make_unique<ThreadBorderRouterManagementTopologyRequest>(credsIssuerConfig),          //
         //
         // Attributes
         //
@@ -25008,7 +24965,6 @@ void registerClusterThreadBorderRouterManagement(Commands & commands, Credential
         make_unique<ReadAttribute>(Id, "border-agent-id", Attributes::BorderAgentId::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "thread-version", Attributes::ThreadVersion::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "interface-enabled", Attributes::InterfaceEnabled::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "thread-node", Attributes::ThreadNode::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "active-dataset-timestamp", Attributes::ActiveDatasetTimestamp::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
@@ -25025,8 +24981,6 @@ void registerClusterThreadBorderRouterManagement(Commands & commands, Credential
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "interface-enabled", 0, 1, Attributes::InterfaceEnabled::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::ThreadBorderRouterManagement::Structs::ThreadNodeStruct::Type>>(
-            Id, "thread-node", Attributes::ThreadNode::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "active-dataset-timestamp", 0, UINT64_MAX,
                                                                               Attributes::ActiveDatasetTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -25048,7 +25002,6 @@ void registerClusterThreadBorderRouterManagement(Commands & commands, Credential
         make_unique<SubscribeAttribute>(Id, "border-agent-id", Attributes::BorderAgentId::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "thread-version", Attributes::ThreadVersion::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "interface-enabled", Attributes::InterfaceEnabled::Id, credsIssuerConfig),  //
-        make_unique<SubscribeAttribute>(Id, "thread-node", Attributes::ThreadNode::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "active-dataset-timestamp", Attributes::ActiveDatasetTimestamp::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //

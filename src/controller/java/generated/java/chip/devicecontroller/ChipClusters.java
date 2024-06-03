@@ -53090,7 +53090,6 @@ public class ChipClusters {
     private static final long BORDER_AGENT_ID_ATTRIBUTE_ID = 1L;
     private static final long THREAD_VERSION_ATTRIBUTE_ID = 2L;
     private static final long INTERFACE_ENABLED_ATTRIBUTE_ID = 3L;
-    private static final long THREAD_NODE_ATTRIBUTE_ID = 4L;
     private static final long ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -53205,68 +53204,8 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void topologyRequest(TopologyResponseCallback callback, Integer count, Integer startIndex, Integer snapshot) {
-      topologyRequest(callback, count, startIndex, snapshot, 0);
-    }
-
-    public void topologyRequest(TopologyResponseCallback callback, Integer count, Integer startIndex, Integer snapshot, int timedInvokeTimeoutMs) {
-      final long commandId = 5L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long countFieldID = 0L;
-      BaseTLVType counttlvValue = new UIntType(count);
-      elements.add(new StructElement(countFieldID, counttlvValue));
-
-      final long startIndexFieldID = 1L;
-      BaseTLVType startIndextlvValue = new UIntType(startIndex);
-      elements.add(new StructElement(startIndexFieldID, startIndextlvValue));
-
-      final long snapshotFieldID = 2L;
-      BaseTLVType snapshottlvValue = new UIntType(snapshot);
-      elements.add(new StructElement(snapshotFieldID, snapshottlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          final long snapshotFieldID = 0L;
-          Integer snapshot = null;
-          final long numberOfDevicesFieldID = 1L;
-          Integer numberOfDevices = null;
-          final long threadTopologyFieldID = 2L;
-          ArrayList<ChipStructs.ThreadBorderRouterManagementClusterThreadNodeStruct> threadTopology = null;
-          for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == snapshotFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                snapshot = castingValue.value(Integer.class);
-              }
-            } else if (element.contextTagNum() == numberOfDevicesFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                numberOfDevices = castingValue.value(Integer.class);
-              }
-            } else if (element.contextTagNum() == threadTopologyFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
-                ArrayType castingValue = element.value(ArrayType.class);
-                threadTopology = castingValue.map((elementcastingValue) -> ChipStructs.ThreadBorderRouterManagementClusterThreadNodeStruct.decodeTlv(elementcastingValue));
-              }
-            }
-          }
-          callback.onSuccess(snapshot, numberOfDevices, threadTopology);
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
     public interface DatasetResponseCallback extends BaseClusterCallback {
       void onSuccess(byte[] dataset);
-    }
-
-    public interface TopologyResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer snapshot, Integer numberOfDevices, ArrayList<ChipStructs.ThreadBorderRouterManagementClusterThreadNodeStruct> threadTopology);
-    }
-
-    public interface ThreadNodeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(ChipStructs.ThreadBorderRouterManagementClusterThreadNodeStruct value);
     }
 
     public interface ActiveDatasetTimestampAttributeCallback extends BaseAttributeCallback {
@@ -53391,32 +53330,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, INTERFACE_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readThreadNodeAttribute(
-        ThreadNodeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, THREAD_NODE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            ChipStructs.ThreadBorderRouterManagementClusterThreadNodeStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, THREAD_NODE_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeThreadNodeAttribute(
-        ThreadNodeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, THREAD_NODE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            ChipStructs.ThreadBorderRouterManagementClusterThreadNodeStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, THREAD_NODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readActiveDatasetTimestampAttribute(

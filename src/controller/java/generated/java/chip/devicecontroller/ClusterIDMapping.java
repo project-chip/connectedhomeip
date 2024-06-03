@@ -14435,7 +14435,6 @@ public class ClusterIDMapping {
             BorderAgentId(1L),
             ThreadVersion(2L),
             InterfaceEnabled(3L),
-            ThreadNode(4L),
             ActiveDatasetTimestamp(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
@@ -14486,8 +14485,7 @@ public class ClusterIDMapping {
             GetActiveDatasetRequest(0L),
             GetPendingDatasetRequest(1L),
             SetActiveDatasetRequest(3L),
-            SetPendingDatasetRequest(4L),
-            TopologyRequest(5L),;
+            SetPendingDatasetRequest(4L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -14533,23 +14531,6 @@ public class ClusterIDMapping {
                     }
                     public static SetPendingDatasetRequestCommandField value(int id) throws NoSuchFieldError {
                         for (SetPendingDatasetRequestCommandField field : SetPendingDatasetRequestCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum TopologyRequestCommandField {Count(0),StartIndex(1),Snapshot(2),;
-                    private final int id;
-                    TopologyRequestCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static TopologyRequestCommandField value(int id) throws NoSuchFieldError {
-                        for (TopologyRequestCommandField field : TopologyRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

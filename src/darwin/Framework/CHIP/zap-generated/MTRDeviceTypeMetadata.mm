@@ -97,7 +97,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000510, DeviceTypeClass::Utility, "Matter Electrical Sensor" },
     { 0x00000840, DeviceTypeClass::Simple, "Matter Control Bridge" },
     { 0x00000850, DeviceTypeClass::Simple, "Matter On/Off Sensor" },
-    { 0xFFF10011, DeviceTypeClass::Simple, "Matter Thread Border Router" },
+    { 0x00000091, DeviceTypeClass::Simple, "Matter Thread Border Router" },
 };
 
 static_assert(ExtractVendorFromMEI(0xFFF10001) != 0, "Must have class defined for \"Matter Orphan Clusters\" if it's a standard device type");

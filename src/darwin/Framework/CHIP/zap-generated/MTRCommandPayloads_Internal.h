@@ -1612,18 +1612,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRThreadBorderRouterManagementClusterTopologyRequestParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRThreadBorderRouterManagementClusterTopologyResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ThreadBorderRouterManagement::Commands::TopologyResponse::DecodableType &)decodableStruct;
-
-@end
-
 @interface MTRThreadNetworkDirectoryClusterAddNetworkParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

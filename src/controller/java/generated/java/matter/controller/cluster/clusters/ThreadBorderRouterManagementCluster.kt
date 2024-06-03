@@ -48,23 +48,6 @@ class ThreadBorderRouterManagementCluster(
 ) {
   class DatasetResponse(val dataset: ByteArray)
 
-  class TopologyResponse(
-    val snapshot: UByte,
-    val numberOfDevices: UShort,
-    val threadTopology: List<ThreadBorderRouterManagementClusterThreadNodeStruct>
-  )
-
-  class ThreadNodeAttribute(val value: ThreadBorderRouterManagementClusterThreadNodeStruct)
-
-  sealed class ThreadNodeAttributeSubscriptionState {
-    data class Success(val value: ThreadBorderRouterManagementClusterThreadNodeStruct) :
-      ThreadNodeAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : ThreadNodeAttributeSubscriptionState()
-
-    object SubscriptionEstablished : ThreadNodeAttributeSubscriptionState()
-  }
-
   class ActiveDatasetTimestampAttribute(val value: ULong?)
 
   sealed class ActiveDatasetTimestampAttributeSubscriptionState {
@@ -247,92 +230,6 @@ class ThreadBorderRouterManagementCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun topologyRequest(
-    count: UShort,
-    startIndex: UShort,
-    snapshot: UByte,
-    timedInvokeTimeout: Duration? = null
-  ): TopologyResponse {
-    val commandId: UInt = 5u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_COUNT_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_COUNT_REQ), count)
-
-    val TAG_START_INDEX_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_START_INDEX_REQ), startIndex)
-
-    val TAG_SNAPSHOT_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_SNAPSHOT_REQ), snapshot)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_SNAPSHOT: Int = 0
-    var snapshot_decoded: UByte? = null
-
-    val TAG_NUMBER_OF_DEVICES: Int = 1
-    var numberOfDevices_decoded: UShort? = null
-
-    val TAG_THREAD_TOPOLOGY: Int = 2
-    var threadTopology_decoded: List<ThreadBorderRouterManagementClusterThreadNodeStruct>? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_SNAPSHOT)) {
-        snapshot_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NUMBER_OF_DEVICES)) {
-        numberOfDevices_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_THREAD_TOPOLOGY)) {
-        threadTopology_decoded =
-          buildList<ThreadBorderRouterManagementClusterThreadNodeStruct> {
-            tlvReader.enterArray(tag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(
-                ThreadBorderRouterManagementClusterThreadNodeStruct.fromTlv(AnonymousTag, tlvReader)
-              )
-            }
-            tlvReader.exitContainer()
-          }
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (snapshot_decoded == null) {
-      throw IllegalStateException("snapshot not found in TLV")
-    }
-
-    if (numberOfDevices_decoded == null) {
-      throw IllegalStateException("numberOfDevices not found in TLV")
-    }
-
-    if (threadTopology_decoded == null) {
-      throw IllegalStateException("threadTopology not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return TopologyResponse(snapshot_decoded, numberOfDevices_decoded, threadTopology_decoded)
   }
 
   suspend fun readBorderRouterNameAttribute(): String {
@@ -658,89 +555,6 @@ class ThreadBorderRouterManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readThreadNodeAttribute(): ThreadNodeAttribute {
-    val ATTRIBUTE_ID: UInt = 4u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Threadnode attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ThreadBorderRouterManagementClusterThreadNodeStruct =
-      ThreadBorderRouterManagementClusterThreadNodeStruct.fromTlv(AnonymousTag, tlvReader)
-
-    return ThreadNodeAttribute(decodedValue)
-  }
-
-  suspend fun subscribeThreadNodeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<ThreadNodeAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 4u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            ThreadNodeAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Threadnode attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ThreadBorderRouterManagementClusterThreadNodeStruct =
-            ThreadBorderRouterManagementClusterThreadNodeStruct.fromTlv(AnonymousTag, tlvReader)
-
-          emit(ThreadNodeAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(ThreadNodeAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

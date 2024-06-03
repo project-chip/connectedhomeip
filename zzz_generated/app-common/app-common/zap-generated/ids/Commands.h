@@ -1418,14 +1418,6 @@ namespace SetPendingDatasetRequest {
 static constexpr CommandId Id = 0x00000004;
 } // namespace SetPendingDatasetRequest
 
-namespace TopologyRequest {
-static constexpr CommandId Id = 0x00000005;
-} // namespace TopologyRequest
-
-namespace TopologyResponse {
-static constexpr CommandId Id = 0x00000006;
-} // namespace TopologyResponse
-
 } // namespace Commands
 } // namespace ThreadBorderRouterManagement
 

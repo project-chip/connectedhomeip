@@ -2433,13 +2433,13 @@ limitations under the License.
         <domain>HRAP</domain>
         <typeName>Matter Thread Border Router</typeName>
         <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0xFFF10011</deviceId><!-- TODO: ID-TBD -->
+        <deviceId editable="false">0x0091</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
             <include cluster="Thread Network Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Thread Border Router Mangement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
 

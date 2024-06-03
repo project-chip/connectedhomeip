@@ -11622,15 +11622,6 @@ class ChipClusters:
                     "pendingDataset": "bytes",
                 },
             },
-            0x00000005: {
-                "commandId": 0x00000005,
-                "commandName": "TopologyRequest",
-                "args": {
-                    "count": "int",
-                    "startIndex": "int",
-                    "snapshot": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
@@ -11655,12 +11646,6 @@ class ChipClusters:
                 "attributeName": "InterfaceEnabled",
                 "attributeId": 0x00000003,
                 "type": "bool",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "ThreadNode",
-                "attributeId": 0x00000004,
-                "type": "",
                 "reportable": True,
             },
             0x00000005: {

@@ -297,7 +297,6 @@
             "BorderAgentId",
             "ThreadVersion",
             "InterfaceEnabled",
-            "ThreadNode",
             "ActiveDatasetTimestamp",
             "FeatureMap"
         ],

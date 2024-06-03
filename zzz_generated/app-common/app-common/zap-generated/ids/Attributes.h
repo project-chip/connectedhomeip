@@ -6636,10 +6636,6 @@ namespace InterfaceEnabled {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InterfaceEnabled
 
-namespace ThreadNode {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace ThreadNode
-
 namespace ActiveDatasetTimestamp {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace ActiveDatasetTimestamp

@@ -7674,60 +7674,18 @@ cluster WiFiNetworkManagement = 1105 {
   command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
 }
 
-/** Thread BR management */
+/** Manage the Thread network of Thread Border Router */
 cluster ThreadBorderRouterManagement = 1106 {
   revision 1;
 
-  enum RoutingRoleEnum : enum8 {
-    kUnspecified = 0;
-    kUnassigned = 1;
-    kSleepyEndDevice = 2;
-    kEndDevice = 3;
-    kREED = 4;
-    kRouter = 5;
-    kLeader = 6;
-  }
-
   bitmap Feature : bitmap32 {
     kPANChange = 0x1;
-  }
-
-  struct ChildTableStruct {
-    int16u rloc16 = 0;
-    int8u linkQuality = 1;
-    RoutingRoleEnum routingRole = 2;
-  }
-
-  struct RouteTableStruct {
-    int8u routerId = 0;
-    int8u pathCost = 1;
-    int8u LQIIn = 2;
-    int8u LQIOut = 3;
-  }
-
-  struct ThreadNodeStruct {
-    int64u extAddress = 0;
-    int16u rloc16 = 1;
-    octet_string IPv6s[] = 2;
-    RoutingRoleEnum routingRole = 3;
-    RouteTableStruct routeTable[] = 4;
-    ChildTableStruct childTable[] = 5;
-  }
-
-  struct NeiborTableStruct {
-    int64u extAddress = 0;
-    int32u age = 1;
-    int16u rloc16 = 2;
-    nullable int8s averageRssi = 3;
-    nullable int8s lastRssi = 4;
-    RoutingRoleEnum routingRole = 5;
   }
 
   readonly attribute char_string<63> borderRouterName = 0;
   readonly attribute octet_string<16> borderAgentId = 1;
   readonly attribute int16u threadVersion = 2;
   readonly attribute boolean interfaceEnabled = 3;
-  readonly attribute ThreadNodeStruct threadNode = 4;
   readonly attribute nullable int64u activeDatasetTimestamp = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -7749,18 +7707,6 @@ cluster ThreadBorderRouterManagement = 1106 {
     octet_string<254> pendingDataset = 0;
   }
 
-  request struct TopologyRequestRequest {
-    int16u count = 0;
-    int16u startIndex = 1;
-    int8u snapshot = 2;
-  }
-
-  response struct TopologyResponse = 6 {
-    int8u snapshot = 0;
-    int16u numberOfDevices = 1;
-    ThreadNodeStruct threadTopology[] = 2;
-  }
-
   /** On receipt of this command, the Thread Border Router will read the active operational dataset of the Thread network that it is connaected to, and send the DatasetResponse as the response. This command must be sent over a valid CASE session */
   command access(invoke: manage) GetActiveDatasetRequest(): DatasetResponse = 0;
   /** On receipt of this command, the Thread Border Router will read the pending dataset and send the DatasetResponse as the response. This command must be sent over a valid CASE session */
@@ -7769,8 +7715,6 @@ cluster ThreadBorderRouterManagement = 1106 {
   command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 3;
   /** On receipt of this command, the Thread Border Router will set or update the pending Dataset */
   command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 4;
-  /** On receipt of this command, the Thread Border Router will response the current topology of the Thread network that it is connected to. */
-  command access(invoke: administer) TopologyRequest(TopologyRequestRequest): TopologyResponse = 5;
 }
 
 /** Manages the names and credentials of Thread networks visible to the user. */

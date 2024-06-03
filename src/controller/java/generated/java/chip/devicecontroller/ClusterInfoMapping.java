@@ -17448,54 +17448,6 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
-
-  public static class DelegatedThreadBorderRouterManagementClusterTopologyResponseCallback implements ChipClusters.ThreadBorderRouterManagementCluster.TopologyResponseCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(Integer snapshot, Integer numberOfDevices, ArrayList<ChipStructs.ThreadBorderRouterManagementClusterThreadNodeStruct> threadTopology) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-
-      CommandResponseInfo snapshotResponseValue = new CommandResponseInfo("snapshot", "Integer");
-      responseValues.put(snapshotResponseValue, snapshot);
-      CommandResponseInfo numberOfDevicesResponseValue = new CommandResponseInfo("numberOfDevices", "Integer");
-      responseValues.put(numberOfDevicesResponseValue, numberOfDevices);
-      // threadTopology: ThreadNodeStruct
-      // Conversion from this type to Java is not properly implemented yet
-
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-  public static class DelegatedThreadBorderRouterManagementClusterThreadNodeAttributeCallback implements ChipClusters.ThreadBorderRouterManagementCluster.ThreadNodeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(ChipStructs.ThreadBorderRouterManagementClusterThreadNodeStruct value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ThreadBorderRouterManagementClusterThreadNodeStruct");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedThreadBorderRouterManagementClusterActiveDatasetTimestampAttributeCallback implements ChipClusters.ThreadBorderRouterManagementCluster.ActiveDatasetTimestampAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -26904,36 +26856,6 @@ public class ClusterInfoMapping {
         threadBorderRouterManagementsetPendingDatasetRequestCommandParams
     );
     threadBorderRouterManagementClusterInteractionInfoMap.put("setPendingDatasetRequest", threadBorderRouterManagementsetPendingDatasetRequestInteractionInfo);
-
-    Map<String, CommandParameterInfo> threadBorderRouterManagementtopologyRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo threadBorderRouterManagementtopologyRequestcountCommandParameterInfo = new CommandParameterInfo("count", Integer.class, Integer.class);
-    threadBorderRouterManagementtopologyRequestCommandParams.put("count",threadBorderRouterManagementtopologyRequestcountCommandParameterInfo);
-
-    CommandParameterInfo threadBorderRouterManagementtopologyRequeststartIndexCommandParameterInfo = new CommandParameterInfo("startIndex", Integer.class, Integer.class);
-    threadBorderRouterManagementtopologyRequestCommandParams.put("startIndex",threadBorderRouterManagementtopologyRequeststartIndexCommandParameterInfo);
-
-    CommandParameterInfo threadBorderRouterManagementtopologyRequestsnapshotCommandParameterInfo = new CommandParameterInfo("snapshot", Integer.class, Integer.class);
-    threadBorderRouterManagementtopologyRequestCommandParams.put("snapshot",threadBorderRouterManagementtopologyRequestsnapshotCommandParameterInfo);
-    InteractionInfo threadBorderRouterManagementtopologyRequestInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThreadBorderRouterManagementCluster) cluster)
-          .topologyRequest((ChipClusters.ThreadBorderRouterManagementCluster.TopologyResponseCallback) callback
-           , (Integer)
-             commandArguments.get("count")
-
-           , (Integer)
-             commandArguments.get("startIndex")
-
-           , (Integer)
-             commandArguments.get("snapshot")
-
-            );
-        },
-        () -> new DelegatedThreadBorderRouterManagementClusterTopologyResponseCallback(),
-        threadBorderRouterManagementtopologyRequestCommandParams
-      );
-    threadBorderRouterManagementClusterInteractionInfoMap.put("topologyRequest", threadBorderRouterManagementtopologyRequestInteractionInfo);
 
     commandMap.put("threadBorderRouterManagement", threadBorderRouterManagementClusterInteractionInfoMap);
 

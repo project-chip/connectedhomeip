@@ -13068,7 +13068,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster Thread Border Router Management
  *
- * Thread BR management
+ * Manage the Thread network of Thread Border Router
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterThreadBorderRouterManagement : MTRGenericBaseCluster
@@ -13101,12 +13101,6 @@ MTR_PROVISIONALLY_AVAILABLE
  * On receipt of this command, the Thread Border Router will set or update the pending Dataset
  */
 - (void)setPendingDatasetRequestWithParams:(MTRThreadBorderRouterManagementClusterSetPendingDatasetRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-/**
- * Command TopologyRequest
- *
- * On receipt of this command, the Thread Border Router will response the current topology of the Thread network that it is connected to.
- */
-- (void)topologyRequestWithParams:(MTRThreadBorderRouterManagementClusterTopologyRequestParams *)params completion:(void (^)(MTRThreadBorderRouterManagementClusterTopologyResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeBorderRouterNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeBorderRouterNameWithParams:(MTRSubscribeParams *)params
@@ -13131,12 +13125,6 @@ MTR_PROVISIONALLY_AVAILABLE
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeInterfaceEnabledWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeThreadNodeWithCompletion:(void (^)(MTRThreadBorderRouterManagementClusterThreadNodeStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeThreadNodeWithParams:(MTRSubscribeParams *)params
-                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                 reportHandler:(void (^)(MTRThreadBorderRouterManagementClusterThreadNodeStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeThreadNodeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRThreadBorderRouterManagementClusterThreadNodeStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeActiveDatasetTimestampWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeActiveDatasetTimestampWithParams:(MTRSubscribeParams *)params
@@ -19790,16 +19778,6 @@ typedef NS_OPTIONS(uint32_t, MTRRadonConcentrationMeasurementFeature) {
     MTRRadonConcentrationMeasurementFeaturePeakMeasurement MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x10,
     MTRRadonConcentrationMeasurementFeatureAverageMeasurement MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x20,
 } MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
-
-typedef NS_ENUM(uint8_t, MTRThreadBorderRouterManagementRoutingRole) {
-    MTRThreadBorderRouterManagementRoutingRoleUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRThreadBorderRouterManagementRoutingRoleUnassigned MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRThreadBorderRouterManagementRoutingRoleSleepyEndDevice MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRThreadBorderRouterManagementRoutingRoleEndDevice MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRThreadBorderRouterManagementRoutingRoleREED MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRThreadBorderRouterManagementRoutingRoleRouter MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRThreadBorderRouterManagementRoutingRoleLeader MTR_PROVISIONALLY_AVAILABLE = 0x06,
-} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRThreadBorderRouterManagementFeature) {
     MTRThreadBorderRouterManagementFeaturePANChange MTR_PROVISIONALLY_AVAILABLE = 0x1,

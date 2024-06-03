@@ -5334,9 +5334,6 @@ static BOOL AttributeIsSpecifiedInThreadBorderRouterManagementCluster(AttributeI
     case Attributes::InterfaceEnabled::Id: {
         return YES;
     }
-    case Attributes::ThreadNode::Id: {
-        return YES;
-    }
     case Attributes::ActiveDatasetTimestamp::Id: {
         return YES;
     }
