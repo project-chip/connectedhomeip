@@ -127,7 +127,7 @@ limitations under the License.
     <attribute code="0x0007" side="server" type="amperage_ma" define="MAXIMUM_CHARGE_CURRENT" default="0" min="0">MaximumChargeCurrent</attribute>
     <!--Conformance feature V2X - for now optional-->
     <attribute code="0x0008" side="server" type="amperage_ma" define="MAXIMUM_DISCHARGE_CURRENT" default="0" min="0" optional="true">MaximumDischargeCurrent</attribute>
-    <attribute code="0x0009" side="server" type="amperage_ma" define="USER_MAXIMUM_CHARGE_CURRENT" default="0" writable="true" optional="true" min="-4611686018427387904" max="4611686018427387903">
+    <attribute code="0x0009" side="server" type="amperage_ma" define="USER_MAXIMUM_CHARGE_CURRENT" default="0" writable="true" optional="true">
       <access op="write" privilege="manage"/>
       <description>UserMaximumChargeCurrent</description>
     </attribute>
