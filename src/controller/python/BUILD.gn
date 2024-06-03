@@ -64,6 +64,8 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-StorageDelegate.h",
       "OpCredsBinding.cpp",
       "chip/bdx/bdx.cpp",
+      "chip/bdx/bdx-transfer-manager.cpp",
+      "chip/bdx/bdx-transfer-manager.h",
       "chip/bdx/bdx-transfer-pool.h",
       "chip/bdx/bdx-transfer-server.cpp",
       "chip/bdx/bdx-transfer-server.h",
