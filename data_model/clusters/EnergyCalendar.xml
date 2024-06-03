@@ -96,6 +96,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <!--
     <enum name="TimeReferenceEnum">
       <item value="0" name="UTC" summary="UTC Time">
         <mandatoryConform/>
@@ -107,6 +108,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    -->
     <bitmap name="AuxiliaryLoadBitmap">
       <bitfield name="AuxiliarySwitch1" bit="0" summary="Auxiliary Switch 1">
         <mandatoryConform/>
@@ -169,7 +171,6 @@ Davis, CA 95616, USA
     <struct name="DayStruct">
       <field id="0" name="Date" type="epoch-s">
         <optionalConform choice="a"/>
-        <constraint type="desc"/>
       </field>
       <field id="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap">
         <optionalConform choice="a"/>
@@ -180,18 +181,21 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="minCount" value="1"/>
       </field>
+      <field id="3" name="CalendarID" type="uint32">
+        <optionalConform choice="a"/>
+      </field>
     </struct>
-    <struct name="PeakPeriodStatusStruct">
-      <field id="0" name="CurrentDaySeverity" type="PeakPeriodSeverityEnum">
+    <struct name="PeakPeriodStruct">
+      <field id="0" name="Severity" type="PeakPeriodSeverityEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="NextDaySeverity" type="PeakPeriodSeverityEnum">
+      <field id="1" name="PeakPeriod" type="uint16">
         <mandatoryConform/>
       </field>
-      <field id="2" name="PeakPeriod" type="uint16">
+      <field id="2" name="StartTime" type="epoch-s">
         <mandatoryConform/>
       </field>
-      <field id="3" name="PeakPeriodPriorNotice" type="uint16">
+      <field id="3" name="EndTime" type="epoch-s">
         <mandatoryConform/>
       </field>
     </struct>
@@ -244,53 +248,41 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0005" name="TimeReference" type="TimeReferenceEnum" default="UTC">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0006" name="CalendarPeriods" type="list" default="empty">
+    <attribute id="0x0005" name="CalendarPeriods" type="list" default="empty">
       <entry type="CalendarPeriod"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0007" name="SpecialDays" type="list" default="empty">
+    <attribute id="0x0006" name="SpecialDays" type="list" default="empty">
       <entry type="DayStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000A" name="CurrentDay" type="DayStruct" default="null">
+    <attribute id="0x0007" name="CurrentDay" type="DayStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000D" name="NextDay" type="DayStruct" default="null">
+    <attribute id="0x0008" name="NextDay" type="DayStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000D" name="CurrentTransition" type="TransitionStruct" default="null">
+    <attribute id="0x0009" name="CurrentTransition" type="TransitionStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000F" name="PeakPeriodStatus" type="PeakPeriodStatusStruct" default="null">
+    <attribute id="0x000A" name="CurrentPeakPeriod" type="PeakPeriodStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="PEAKP"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0010" name="PeakPeriodStartTime" type="epoch-s" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="PEAKP"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0011" name="PeakPeriodEndTime" type="epoch-s" default="null">
+    <attribute id="0x000B" name="NextPeakPeriod" type="PeakPeriodStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
