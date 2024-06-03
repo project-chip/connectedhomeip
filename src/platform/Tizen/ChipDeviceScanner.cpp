@@ -30,6 +30,7 @@
 #include <bluetooth.h>
 #include <bluetooth_internal.h>
 
+#include <ble/BleUUID.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -39,10 +40,6 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-// CHIPoBLE UUID strings
-const char chip_service_uuid[]       = "0000FFF6-0000-1000-8000-00805F9B34FB";
-const char chip_service_uuid_short[] = "FFF6";
 
 ChipDeviceScanner::ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate) {}
 
@@ -100,8 +97,8 @@ static bool __IsChipThingDevice(bt_adapter_le_device_scan_result_info_s * info,
     {
         for (int i = 0; i < count; i++)
         {
-            if (g_strcmp0(dataList[i].service_uuid, chip_service_uuid) == 0 ||
-                g_strcmp0(dataList[i].service_uuid, chip_service_uuid_short) == 0)
+            if (g_strcmp0(dataList[i].service_uuid, chip::Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0 ||
+                g_strcmp0(dataList[i].service_uuid, chip::Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR) == 0)
             {
                 ChipLogProgress(DeviceLayer, "CHIP Thing Device Found! [Service Data UUID] = %s", dataList[i].service_uuid);
                 // Print full Service Data

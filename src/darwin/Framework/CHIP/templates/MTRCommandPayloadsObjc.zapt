@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
  @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 {{! This is using the pre-renaming names for the isAvailableBefore test, because the pre-rename things inherit
     from the post-rename ones and need to have this selector.}}
-{{else if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name))}}
+{{else if (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name))}}
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
  * schema for this command.
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error {{availability cluster command=command deprecationMessage="This command has been removed" minimalRelease="Fall 2023"}};
+                                         error:(NSError * __autoreleasing *)error {{availability cluster command=command deprecationMessage="This command has been removed" minimalRelease="3C23F160-13CE-4397-BC65-122B61E4D691"}};
 {{/if}}
 @end
 {{/if}}
