@@ -212,7 +212,6 @@ PyChipError pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::Devic
 
 const char * pychip_Stack_ErrorToString(ChipError::StorageType err);
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
-void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                               chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback);
@@ -861,17 +860,6 @@ PyChipError pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::Devic
 uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device)
 {
     return 0;
-}
-
-void pychip_Stack_SetLogFunct(LogMessageFunct logFunct)
-{
-    // TODO: determine if log redirection is supposed to be functioning in CHIP
-    //
-    // Background: original log baseline supported 'redirect logs to this
-    // function' however CHIP does not currently provide this.
-    //
-    // Ideally log redirection should work so that python code can do things
-    // like using the log module.
 }
 
 PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext)
