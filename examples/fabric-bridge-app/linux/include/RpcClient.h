@@ -37,7 +37,7 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
  *
  * @param nodeId The identifier of the node for which the commissioning window should be opened.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
- * - CHIP_NO_ERROR: The commissioning window was successfully opened.
+ * - CHIP_NO_ERROR: The RPC command was successfully sent.
  * - CHIP_ERROR_BUSY: Another commissioning window is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred.
  */

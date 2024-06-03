@@ -40,7 +40,9 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
  * If an operation is in progress, it returns `CHIP_ERROR_BUSY`.
  *
  * @param nodeId The Node ID of the device to be added.
- * @return CHIP_NO_ERROR on success, `CHIP_ERROR_BUSY` if an operation is already in progress,
- *         or `CHIP_ERROR_INTERNAL` if there is an internal error while activating the RPC call.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully sent.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
 CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId);
