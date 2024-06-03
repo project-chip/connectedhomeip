@@ -220,7 +220,8 @@ exit:
 
 CHIP_ERROR CastingPlayer::StopConnecting()
 {
-    ChipLogProgress(AppServer, "CastingPlayer::StopConnecting()");
+    ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() called, while ChipDeviceEventHandler.sUdcInProgress: %s",
+                    support::ChipDeviceEventHandler::isUdcInProgress() ? "true" : "false");
     VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
     VerifyOrReturnValue(
@@ -231,7 +232,19 @@ CHIP_ERROR CastingPlayer::StopConnecting()
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     mIdOptions.resetState();
-    mIdOptions.mCancelPasscode = true;
+    mIdOptions.mCancelPasscode     = true;
+    mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
+    mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
+    mTargetCastingPlayer           = nullptr;
+
+    // If a CastingPlayer::ContinueConnecting() error occurs, StopConnecting() can be called while sUdcInProgress == true.
+    // sUdcInProgress should be set to false before sending the CancelPasscode IdentificationDeclaration message to the
+    // CastingPlayer/Commissioner.
+    if (support::ChipDeviceEventHandler::isUdcInProgress())
+    {
+        support::ChipDeviceEventHandler::SetUdcStatus(false);
+    }
+
     ChipLogProgress(
         AppServer,
         "CastingPlayer::StopConnecting() calling SendUserDirectedCommissioningRequest() to indicate user canceled passcode entry");
@@ -239,11 +252,10 @@ CHIP_ERROR CastingPlayer::StopConnecting()
     SuccessOrExit(err = SendUserDirectedCommissioningRequest());
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    // SendUserDirectedCommissioningRequest() sets SetUdcStatus(true) when sending a UDC message.
+    // CastingPlayer::SendUserDirectedCommissioningRequest() calls SetUdcStatus(true) before sending the UDC
+    // IdentificationDeclaration message. Since StopConnecting() is attempting to cancel the commissioning proces, we need to set
+    // the UDC status to false after sending the message.
     support::ChipDeviceEventHandler::SetUdcStatus(false);
-    mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
-    mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-    mTargetCastingPlayer           = nullptr;
 
 exit:
     if (err != CHIP_NO_ERROR)

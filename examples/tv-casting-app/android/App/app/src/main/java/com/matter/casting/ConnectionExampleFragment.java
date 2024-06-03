@@ -306,7 +306,8 @@ public class ConnectionExampleFragment extends Fragment {
                   TAG,
                   "displayPasscodeInputDialog() continueConnecting() failed, calling stopConnecting() due to: "
                       + err);
-              // Attempt to cancel the connection attempt with the CastingPlayer/Commissioner.
+              // Since continueConnecting() failed, Attempt to cancel the connection attempt with
+              // the CastingPlayer/Commissioner.
               err = targetCastingPlayer.stopConnecting();
               if (err.hasError()) {
                 Log.e(TAG, "displayPasscodeInputDialog() stopConnecting() failed due to: " + err);
