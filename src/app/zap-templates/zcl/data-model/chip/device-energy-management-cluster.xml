@@ -81,7 +81,7 @@ planned operation.">
     <attribute code="0x0003" side="server" type="power_mw" define="ABS_MIN_POWER" default="0">AbsMinPower</attribute>
     <attribute code="0x0004" side="server" type="power_mw" define="ABS_MAX_POWER" default="0">AbsMaxPower</attribute>
     <!--Conformance feature PA - for now optional-->
-    <attribute code="0x0005" side="server" type="PowerAdjustCapabilityStruct" entryType="PowerAdjustStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" optional="true">PowerAdjustmentCapability</attribute>
+    <attribute code="0x0005" side="server" type="PowerAdjustCapabilityStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" optional="true">PowerAdjustmentCapability</attribute>
     <!--Conformance feature PFR \| SFR - for now optional-->
     <attribute code="0x0006" side="server" type="ForecastStruct" define="FORECAST" isNullable="true" optional="true">Forecast</attribute>
     <attribute code="0x0007" side="server" type="OptOutStateEnum" define="OPT_OUT_STATE" min="0x00" max="0x03" default="0x00" optional="true">OptOutState</attribute>
