@@ -145,14 +145,14 @@ public:
                 clientInfo.monitored_subject = mMonitoredSubject;
                 clientInfo.start_icd_counter = value.ICDCounter;
 
-                ModelCommand::AddICDEntry(clientInfo, chip::ByteSpan(mICDSymmetricKey));
+                StoreICDEntryWithKey(clientInfo, chip::ByteSpan(mICDSymmetricKey));
             }
         }
 
         if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
             (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Id))
         {
-            ModelCommand::ClearICDEntry(mScopedNodeId);
+            ClearICDEntry(mScopedNodeId);
         }
     }
 
