@@ -73,7 +73,7 @@ enum
     DriveBLEExtPerfEvt_DISCONNECT = 0,
 };
 
-static const uint8_t _svc_uuid[16]         = { 0xF6, 0xFF, 0, 0, 0x0, 0x0, 0, 0, 0, 0, 0x0, 0x0, 0, 0, 0, 0 };
+static const uint8_t _svc_uuid[16] = { 0xF6, 0xFF, 0, 0, 0x0, 0x0, 0, 0, 0, 0, 0x0, 0x0, 0, 0, 0, 0 };
 
 #define UUID_CHIPoBLECharact_RX                                                                                                    \
     {                                                                                                                              \

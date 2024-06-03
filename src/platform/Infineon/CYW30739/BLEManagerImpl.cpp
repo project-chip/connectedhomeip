@@ -49,11 +49,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-namespace {
-
-
-} // unnamed namespace
-
 BLEManagerImpl BLEManagerImpl::sInstance;
 
 wiced_bt_gatt_status_t app_gatts_callback(wiced_bt_gatt_evt_t event, wiced_bt_gatt_event_data_t * p_data);
