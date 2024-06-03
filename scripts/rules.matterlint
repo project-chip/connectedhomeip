@@ -42,9 +42,9 @@ load "../src/app/zap-templates/zcl/data-model/chip/flow-measurement-cluster.xml"
 load "../src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/global-attributes.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/global-structs.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml";
-load "../src/app/zap-templates/zcl/data-model/chip/home-location.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml";
@@ -59,6 +59,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/media-playback-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/messages-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/mode-base-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/mode-select-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/namespaces.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/network-commissioning-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml";

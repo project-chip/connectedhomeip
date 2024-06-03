@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 102,
+  "featureLevel": 100,
   "creator": "zap",
   "keyValuePairs": [
     {
