@@ -42,8 +42,9 @@ BdxTransfer * BdxTransferManager::Allocate()
 {
     VerifyOrReturnValue(mExpectedTransfers != 0, nullptr);
 
-    BdxTransfer * result = mTransferPool.CreateObject(this);
+    BdxTransfer * result = mTransferPool.CreateObject();
     VerifyOrReturn(result != nullptr);
+    result->SetDelegate(this);
 
     --mExpectedTransfers;
     return result;
@@ -52,6 +53,14 @@ BdxTransfer * BdxTransferManager::Allocate()
 void BdxTransferManager::Release(BdxTransfer * bdxTransfer)
 {
     mTransferPool.ReleaseObject(bdxTransfer);
+}
+
+void BdxTransferManager::InitMessageReceived(BdxTransfer * transfer, TransferSession::TransferInitData init_data)
+{
+}
+
+void BdxTransferManager::TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result)
+{
 }
 
 } // namespace bdx

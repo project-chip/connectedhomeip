@@ -26,9 +26,8 @@
 namespace chip {
 namespace bdx {
 
-BdxTransferServer::BdxTransferServer(BdxTransferPool * bdxTransferPool) : mBdxTransferPool(bdxTransferPool)
+BdxTransferServer::BdxTransferServer(BdxTransferPool & bdxTransferPool) : mBdxTransferPool(&bdxTransferPool)
 {
-    // TODO: Verify that bdxTransferPool is non-null?
 }
 
 CHIP_ERROR BdxTransferServer::OnUnsolicitedMessageReceived(const PayloadHeader& payloadHeader,

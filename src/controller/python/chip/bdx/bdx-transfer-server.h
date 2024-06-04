@@ -29,7 +29,7 @@ namespace bdx {
 class BdxTransferServer : public Messaging::UnsolicitedMessageHandler
 {
 public:
-    BdxTransferServer(BdxTransferPool * bdxTransferPool);
+    BdxTransferServer(BdxTransferPool & bdxTransferPool);
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader& payloadHeader, Messaging::ExchangeDelegate *& delegate) override;
     void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
