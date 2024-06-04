@@ -137,6 +137,12 @@ public:
     FabricIndex GetAccessingFabricIndex() const override;
     bool IsTimedInvoke() const override;
 
+    Messaging::ExchangeContext * GetExchangeContext() const override
+    {
+        VerifyOrDie(mpResponder);
+        return mpResponder->GetExchangeContext();
+    }
+
     /**************** Implementation-specific logic ***********************/
 
     /*
@@ -218,23 +224,6 @@ public:
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
 
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
-
-    /**
-     * Gets the inner exchange context object, without ownership.
-     *
-     * WARNING: This is dangerous, since it is directly interacting with the
-     *          exchange being managed automatically by mpResponder and
-     *          if not done carefully, may end up with use-after-free errors.
-     *
-     * @return The inner exchange context, might be nullptr if no
-     *         exchange context has been assigned or the context
-     *         has been released.
-     */
-    Messaging::ExchangeContext * GetExchangeContext() const
-    {
-        VerifyOrDie(mpResponder);
-        return mpResponder->GetExchangeContext();
-    }
 
 #if CHIP_WITH_NLFAULTINJECTION
 

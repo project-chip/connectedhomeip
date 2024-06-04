@@ -175,6 +175,19 @@ public:
 
     virtual Access::SubjectDescriptor GetSubjectDescriptor() const = 0;
 
+    /**
+     * Gets the inner exchange context object, without ownership.
+     *
+     * WARNING: This is dangerous, since it is directly interacting with the
+     *          exchange being managed automatically by mpResponder and
+     *          if not done carefully, may end up with use-after-free errors.
+     *
+     * @return The inner exchange context, might be nullptr if no
+     *         exchange context has been assigned or the context
+     *         has been released.
+     */
+    virtual Messaging::ExchangeContext * GetExchangeContext() const = 0;
+
     // actual impls
 
     /**
