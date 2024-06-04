@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import datetime
+import io
 import logging
 import os
 import os.path
@@ -38,7 +39,7 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
 
-def EnqueueLogOutput(fp, tag, q):
+def EnqueueLogOutput(fp, tag, output_stream, q):
     for line in iter(fp.readline, b''):
         timestamp = time.time()
         if len(line) > len('[1646290606.901990]') and line[0:1] == b'[':
@@ -47,24 +48,24 @@ def EnqueueLogOutput(fp, tag, q):
                 line = line[19:]
             except Exception:
                 pass
-        sys.stdout.buffer.write(
+        output_stream.write(
             (f"[{datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')}]").encode() + tag + line)
         sys.stdout.flush()
     fp.close()
 
 
-def RedirectQueueThread(fp, tag, queue) -> threading.Thread:
+def RedirectQueueThread(fp, tag, stream_output, queue) -> threading.Thread:
     log_queue_thread = threading.Thread(target=EnqueueLogOutput, args=(
-        fp, tag, queue))
+        fp, tag, stream_output, queue))
     log_queue_thread.start()
     return log_queue_thread
 
 
-def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, process: subprocess.Popen, queue: queue.Queue):
+def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, process: subprocess.Popen, stream_output, queue: queue.Queue):
     thread_list.append(RedirectQueueThread(process.stdout,
-                                           (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}]").encode(), queue))
+                                           (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}]").encode(), stream_output, queue))
     thread_list.append(RedirectQueueThread(process.stderr,
-                                           (f"[{tag}][{Fore.RED}STDERR{Style.RESET_ALL}]").encode(), queue))
+                                           (f"[{tag}][{Fore.RED}STDERR{Style.RESET_ALL}]").encode(), stream_output, queue))
 
 
 @click.command()
@@ -87,7 +88,8 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
 @click.option("--script-gdb", is_flag=True,
               help='Run script through gdb')
-def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
+@click.option("--ci", is_flag=True, help="Use this flag in CI to suppress output from passing tests")
+def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str, script: str, script_args: str, script_gdb: bool, ci: bool):
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
 
@@ -127,6 +129,10 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
     app_process = None
     app_pid = 0
 
+    stream_output = sys.stdout.buffer
+    if ci:
+        stream_output = io.BytesIO()
+
     if app:
         if not os.path.exists(app):
             if app is None:
@@ -137,7 +143,7 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         app_pid = app_process.pid
         DumpProgramOutputToQueue(
-            log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, log_queue)
+            log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, stream_output, log_queue)
 
     script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                       '--log-format', '%(message)s', "--app-pid", str(app_pid)] + shlex.split(script_args)
@@ -159,7 +165,7 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
     test_script_process = subprocess.Popen(
         final_script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     DumpProgramOutputToQueue(log_cooking_threads, Fore.GREEN + "TEST" + Style.RESET_ALL,
-                             test_script_process, log_queue)
+                             test_script_process, stream_output, log_queue)
 
     test_script_exit_code = test_script_process.wait()
 
@@ -177,12 +183,16 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
     for thread in log_cooking_threads:
         thread.join()
 
-    if test_script_exit_code != 0:
-        sys.exit(test_script_exit_code)
-    else:
-        # We expect both app and test script should exit with 0
-        sys.exit(test_app_exit_code)
+    # We expect both app and test script should exit with 0
+    exit_code = test_script_exit_code if test_script_exit_code !=0 else test_app_exit_code
 
+    if ci:
+        if exit_code:
+            sys.stdout.write(stream_output.getvalue().decode('utf-8'))
+        else:
+            logging.info("Test completed successfully")
+
+    sys.exit(exit_code)
 
 if __name__ == '__main__':
     main(auto_envvar_prefix='CHIP')
