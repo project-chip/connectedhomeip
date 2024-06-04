@@ -170,16 +170,8 @@ public class MatterCastingPlayer implements CastingPlayer {
    *     certain UDC features, where a Commissioner reply is expected, this API needs to be followed
    *     up with the continueConnecting() API defiend below. See the Matter UDC specification or
    *     parameter class definitions for details on features not included in the description below.
-   * @param connectionCallbacks contains the onSuccess, onFailure and onCommissionerDeclaration
-   *     callbacks defiend in ConnectCallbacks.java.
-   *     <p>onSuccess (Required): The callback called when the connection is established
-   *     successfully.
-   *     <p>onFailure (Required): The callback called with MatterError when the connection is fails
-   *     to establish.
-   *     <p>onCommissionerDeclaration (Optional): The callback called when the Commissionee receives
-   *     a CommissionerDeclaration message from the Commissioner. This callback is needed to support
-   *     UDC features where a reply from the Commissioner is expected. It provides information
-   *     indicating the Commissioner’s pre-commissioning state.
+   * @param connectionCallbacks contains the onSuccess (Required), onFailure (Required) and
+   *     onCommissionerDeclaration (Optional) callbacks defiend in ConnectCallbacks.java.
    *     <p>For example: During CastingPlayer/Commissioner-Generated passcode commissioning, the
    *     Commissioner replies with a CommissionerDeclaration message with PasscodeDialogDisplayed
    *     and CommissionerPasscode set to true. Given these Commissioner state details, the client is
@@ -217,7 +209,7 @@ public class MatterCastingPlayer implements CastingPlayer {
    */
   @Override
   public MatterError verifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks) {
-    Log.d(TAG, "verifyOrEstablishConnection() overload");
+    Log.d(TAG, "verifyOrEstablishConnection() (ConnectionCallbacks)");
     return verifyOrEstablishConnection(connectionCallbacks, MIN_CONNECTION_TIMEOUT_SEC, null);
   }
 

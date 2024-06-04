@@ -39,6 +39,7 @@ public final class CastingApp {
   private static final String TAG = CastingApp.class.getSimpleName();
   private static final long BROWSE_SERVICE_TIMEOUT = 2500;
   private static final long RESOLVE_SERVICE_TIMEOUT = 3000;
+  public final int CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS = getChipDeviceConfigUdcMaxTargetApps();
 
   private static CastingApp sInstance;
 
@@ -84,22 +85,15 @@ public final class CastingApp {
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
-    CommissionableData commissionableData = appParameters.getCommissionableDataProvider().get();
-    boolean updated =
-        chipPlatform.updateCommissionableDataProviderData(
-            commissionableData.getSpake2pVerifierBase64(),
-            commissionableData.getSpake2pSaltBase64(),
-            commissionableData.getSpake2pIterationCount(),
-            commissionableData.getSetupPasscode(),
-            commissionableData.getDiscriminator());
-    if (!updated) {
+    MatterError err = updateAndroidChipPlatformWithCommissionableData();
+    if (err.hasError()) {
       Log.e(
           TAG,
-          "CastingApp.initialize() failed to (updateCommissionableDataProviderData() on chipPlatform");
-      return MatterError.CHIP_ERROR_INVALID_ARGUMENT;
+          "CastingApp.initialize() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
+      return err;
     }
 
-    MatterError err = finishInitialization(appParameters);
+    err = finishInitialization(appParameters);
 
     if (err.hasNoError()) {
       chipAppServer = new ChipAppServer(); // get a reference to the Matter server now
@@ -117,7 +111,7 @@ public final class CastingApp {
    * @return MatterError.NO_ERROR if the update was successful,
    *     MatterError.CHIP_ERROR_INVALID_ARGUMENT otherwise.
    */
-  public MatterError updateAndroidChipPlatformWithCommissionableData() {
+  MatterError updateAndroidChipPlatformWithCommissionableData() {
     Log.i(TAG, "CastingApp.updateAndroidChipPlatformWithCommissionableData()");
     CommissionableData commissionableData = appParameters.getCommissionableDataProvider().get();
     boolean updated =
@@ -199,6 +193,13 @@ public final class CastingApp {
 
   /** Performs post Matter server startup registrations */
   private native MatterError finishStartup();
+
+  /**
+   * @brief Gets the maximum number of Target Content Apps that can be added to the
+   *     IdentificationDeclarationOptions.java TargetAppInfo list from
+   *     connectedhomeip/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h
+   */
+  private native int getChipDeviceConfigUdcMaxTargetApps();
 
   static {
     System.loadLibrary("TvCastingApp");

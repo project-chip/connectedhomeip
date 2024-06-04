@@ -41,7 +41,7 @@ public class EndpointSelectorExample {
     Endpoint endpoint = null;
     if (selectedCastingPlayer != null) {
       List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
-      if (endpoints == null || endpoints.isEmpty()) {
+      if (endpoints == null) {
         Log.e(TAG, "selectEndpointById() No Endpoints found on CastingPlayer");
       } else {
         endpoint =

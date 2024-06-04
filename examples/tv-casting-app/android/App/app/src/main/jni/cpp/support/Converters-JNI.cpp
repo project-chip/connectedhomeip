@@ -377,20 +377,36 @@ chip::Protocols::UserDirectedCommissioning::TargetAppInfo * convertTargetAppInfo
     VerifyOrReturnValue(targetAppInfoClass != nullptr, nullptr,
                         ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() TargetAppInfo class not found!"));
 
-    jfieldID vendorIdField  = env->GetFieldID(targetAppInfoClass, "vendorId", "I");
-    jfieldID productIdField = env->GetFieldID(targetAppInfoClass, "productId", "I");
+    jfieldID vendorIdField  = env->GetFieldID(targetAppInfoClass, "vendorId", "Ljava/lang/Integer;");
+    jfieldID productIdField = env->GetFieldID(targetAppInfoClass, "productId", "Ljava/lang/Integer;");
     VerifyOrReturnValue(vendorIdField != nullptr, nullptr,
                         ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() vendorIdField not found!"));
     VerifyOrReturnValue(productIdField != nullptr, nullptr,
                         ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() productIdField not found!"));
 
+    jobject jVendorIdObject  = env->GetObjectField(jTargetAppInfo, vendorIdField);
+    jobject jProductIdObject = env->GetObjectField(jTargetAppInfo, productIdField);
+    VerifyOrReturnValue(jVendorIdObject != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() vendorIdObject is null!"));
+    VerifyOrReturnValue(jProductIdObject != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() productIdObject is null!"));
+
+    jclass integerClass      = env->FindClass("java/lang/Integer");
+    jmethodID intValueMethod = env->GetMethodID(integerClass, "intValue", "()I");
+
+    jint vendorId  = env->CallIntMethod(jVendorIdObject, intValueMethod);
+    jint productId = env->CallIntMethod(jProductIdObject, intValueMethod);
+
     chip::Protocols::UserDirectedCommissioning::TargetAppInfo * cppTargetAppInfo =
         new chip::Protocols::UserDirectedCommissioning::TargetAppInfo();
 
-    cppTargetAppInfo->vendorId  = static_cast<uint16_t>(env->GetIntField(jTargetAppInfo, vendorIdField));
-    cppTargetAppInfo->productId = static_cast<uint16_t>(env->GetIntField(jTargetAppInfo, productIdField));
+    cppTargetAppInfo->vendorId  = static_cast<uint16_t>(vendorId);
+    cppTargetAppInfo->productId = static_cast<uint16_t>(productId);
 
     env->DeleteLocalRef(targetAppInfoClass);
+    env->DeleteLocalRef(jVendorIdObject);
+    env->DeleteLocalRef(jProductIdObject);
+    env->DeleteLocalRef(integerClass);
 
     return reinterpret_cast<chip::Protocols::UserDirectedCommissioning::TargetAppInfo *>(cppTargetAppInfo);
 }

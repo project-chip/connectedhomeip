@@ -14,6 +14,7 @@
 package com.matter.casting.support;
 
 import android.util.Log;
+import com.matter.casting.core.CastingApp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,9 @@ import java.util.List;
  * requested UDC commissioning session.
  */
 public class IdentificationDeclarationOptions {
-  static final String TAG = IdentificationDeclarationOptions.class.getSimpleName();
-  private static final int CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS = 10;
+  private final String TAG = IdentificationDeclarationOptions.class.getSimpleName();
+  private static final int CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS =
+      CastingApp.getInstance().CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
 
   public IdentificationDeclarationOptions() {}
 
@@ -83,7 +85,7 @@ public class IdentificationDeclarationOptions {
     if (targetAppInfos.size() >= CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS) {
       Log.e(
           TAG,
-          "addTargetAppInfo() failed to add TargetAppInfo, max list size is {0}"
+          "addTargetAppInfo() failed to add TargetAppInfo, max list size is: "
               + CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS);
       return false;
     }

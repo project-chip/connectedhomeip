@@ -49,8 +49,7 @@ public class ConnectionExampleFragment extends Fragment {
   // Use this Target Content Application Vendor ID, configured on the tv-app, to demonstrate the
   // CastingPlayer/Commissioner-Generated passcode commissioning flow.
   private static final Integer DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW = 1111;
-  private static final String DEFAULT_COMMISSIONER_GENERATED_PASSCODE_STRING = "12345678";
-  private static final int DEFAULT_COMMISSIONER_GENERATED_PASSCODE_INT = 12345678;
+  private static final long DEFAULT_COMMISSIONER_GENERATED_PASSCODE = 12345678;
   private static final int DEFAULT_DISCRIMINATOR_FOR_CGP_FLOW = 0;
   private final CastingPlayer targetCastingPlayer;
   private final boolean useCommissionerGeneratedPasscode;
@@ -186,8 +185,7 @@ public class ConnectionExampleFragment extends Fragment {
                       null);
 
               // CommissionerDeclaration is only needed for the CastingPlayer/Commissioner-Generated
-              // passcode
-              // commissioning flow.
+              // passcode commissioning flow.
               if (useCommissionerGeneratedPasscode) {
                 connectionCallbacks.onCommissionerDeclaration =
                     new MatterCallback<CommissionerDeclaration>() {
@@ -236,7 +234,7 @@ public class ConnectionExampleFragment extends Fragment {
 
     // Set up the input dialog with the default passcode
     final EditText input = dialogView.findViewById(R.id.passcode_input);
-    input.setText(DEFAULT_COMMISSIONER_GENERATED_PASSCODE_STRING);
+    input.setText("" + DEFAULT_COMMISSIONER_GENERATED_PASSCODE);
 
     // Set up the buttons
     builder.setPositiveButton(
@@ -256,7 +254,7 @@ public class ConnectionExampleFragment extends Fragment {
                     + passcode
                     + "\n\n");
 
-            long passcodeLongValue = DEFAULT_COMMISSIONER_GENERATED_PASSCODE_INT;
+            long passcodeLongValue = DEFAULT_COMMISSIONER_GENERATED_PASSCODE;
             try {
               passcodeLongValue = Long.parseLong(passcode);
               Log.i(
@@ -274,8 +272,8 @@ public class ConnectionExampleFragment extends Fragment {
                       + "\n\n");
             }
 
-            // Update the CommissionableData DataProvider and AndroidChipPlatform with the user
-            // entered CastingPlayer/Commissioner-Generated setup passcode. This is mandatory for
+            // Update the CommissionableData DataProvider with the user entered
+            // CastingPlayer/Commissioner-Generated setup passcode. This is mandatory for
             // Commissioner-Generated passcode commissioning since the commissioning session's PAKE
             // verifier needs to be updated with the entered passcode.
             InitializationExample.commissionableDataProvider.updateCommissionableDataSetupPasscode(
@@ -300,7 +298,9 @@ public class ConnectionExampleFragment extends Fragment {
                   .runOnUiThread(
                       () -> {
                         connectionFragmentStatusTextView.setText(
-                            "Casting Player connection failed due to: " + finalErr + "\n\n");
+                            "Casting Player CONTINUE CONNECTING failed due to: "
+                                + finalErr
+                                + "\n\n");
                       });
               Log.e(
                   TAG,
@@ -328,6 +328,13 @@ public class ConnectionExampleFragment extends Fragment {
                 "Connection attempt with Casting Player cancelled by the user, route back to exit. \n\n");
             MatterError err = targetCastingPlayer.stopConnecting();
             if (err.hasError()) {
+              MatterError finalErr = err;
+              getActivity()
+                  .runOnUiThread(
+                      () -> {
+                        connectionFragmentStatusTextView.setText(
+                            "Casting Player CANCEL failed due to: " + finalErr + "\n\n");
+                      });
               Log.e(TAG, "displayPasscodeInputDialog() stopConnecting() failed due to: " + err);
             }
             dialog.cancel();

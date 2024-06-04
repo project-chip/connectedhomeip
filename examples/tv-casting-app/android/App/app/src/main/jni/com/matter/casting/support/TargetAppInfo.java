@@ -14,10 +14,12 @@
 package com.matter.casting.support;
 
 /**
- * Feature: Target Content Application The set of content app Vendor IDs (and optionally, Product
+ * Feature: Target Content Application - The set of content app Vendor IDs (and optionally, Product
  * IDs) that can be used for authentication.
  */
 public class TargetAppInfo {
-  public int vendorId = 0;
-  public int productId = 0;
+  /** Target Target Content Application Vendor ID, 0 means unspecified */
+  public Integer vendorId = 0;
+  /** Target Target Content Application Product ID, 0 means unspecified */
+  public Integer productId = 0;
 }

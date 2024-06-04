@@ -129,18 +129,13 @@ public:
     /**
      * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new commissioning session request. If the
      * CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk, this will execute the User Directed
-     * Commissioning (UDC) process by sending an IdentificationDeclaration message to the Commissioner. For certain UDC features,
-     * where a Commissioner reply is expected, this API needs to be followed up with the ContinueConnecting() API defiend below. See
-     * the Matter UDC specification or parameter class definitions for details on features not included in the description below.
+     * Commissioning (UDC) process by sending an IdentificationDeclaration message to the CastingPlayer/Commissioner. For certain
+     * UDC features, where a Commissioner reply is expected, this API needs to be followed up with the ContinueConnecting() API
+     * defiend below. See the Matter UDC specification or parameter class definitions for details on features not included in the
+     * description below.
      *
-     * @param connectionCallbacks contains the ConnectCallback and CommissionerDeclarationCallback defiend in ConnectCallbacks.h.
-     *
-     * ConnectCallback (Required): The callback called when the connection process has ended, regardless of whether it was
-     * successful or not.
-     *
-     * CommissionerDeclarationCallback (Optional): The callback called when the Commissionee receives a CommissionerDeclaration
-     * message from the Commissioner. This callback is needed to support UDC features where a reply from the Commissioner is
-     * expected. It provides information indicating the Commissioner’s pre-commissioning state.
+     * @param connectionCallbacks contains the ConnectCallback (Required) and CommissionerDeclarationCallback (Optional) defiend in
+     * ConnectCallbacks.h.
      *
      * For example: During CastingPlayer/Commissioner-Generated passcode commissioning, the Commissioner replies with a
      * CommissionerDeclaration message with PasscodeDialogDisplayed and CommissionerPasscode set to true. Given these Commissioner
