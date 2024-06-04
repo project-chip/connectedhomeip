@@ -175,6 +175,19 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
+  sources = [
+    "CommandHandlerTestAccess.h",
+    "CommandSenderTestAccess.h",
+    "EngineTestAccess.h",
+    "InteractionModelEngineTestAccess.h",
+    "ReadClientTestAccess.h",
+    "ReadHandlerTestAccess.h",
+    "ReportSchedulerImplTestAccess.h",
+    "SynchronizedReportSchedulerImplTestAccess.h",
+    "WriteClientTestAccess.h",
+    "WriteHandlerTestAccess.h",
+  ]
+
   public_deps = [
     ":app-test-stubs",
     ":binding-test-srcs",

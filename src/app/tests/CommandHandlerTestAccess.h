@@ -22,8 +22,6 @@
 namespace chip {
 namespace Test {
 
-using namespace app;
-
 /**
  * @brief Class acts as an accessor to private methods of the CommandHandler class without needing to give friend access to
  *        each individual test.
@@ -33,9 +31,9 @@ class CommandHandlerTestAccess
 {
 
 public:
-    CommandHandlerTestAccess(CommandHandler * apCommandHandler) : mpCommandHandler(apCommandHandler) {}
-    InvokeResponseMessage::Builder & GetInvokeResponseBuilder() { return mpCommandHandler->mInvokeResponseBuilder; }
-    CommandHandlerExchangeInterface * GetmpResponder() { return mpCommandHandler->mpResponder; }
+    CommandHandlerTestAccess(app::CommandHandler * apCommandHandler) : mpCommandHandler(apCommandHandler) {}
+    app::InvokeResponseMessage::Builder & GetInvokeResponseBuilder() { return mpCommandHandler->mInvokeResponseBuilder; }
+    app::CommandHandlerExchangeInterface * GetmpResponder() { return mpCommandHandler->mpResponder; }
 
     void SetReserveSpaceForMoreChunkMessages(bool aReserveSpaceForMoreChunkMessages)
     {
@@ -50,7 +48,7 @@ public:
     }
 
 private:
-    CommandHandler * mpCommandHandler = nullptr;
+    app::CommandHandler * mpCommandHandler = nullptr;
 };
 
 } // namespace Test

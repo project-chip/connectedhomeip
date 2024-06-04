@@ -22,9 +22,6 @@
 namespace chip {
 namespace Test {
 
-using namespace app::reporting;
-using namespace app;
-
 /**
  * @brief Class acts as an accessor to private methods of the ReportSchedulerImpl class without needing to give friend access to
  *        each individual test.
@@ -32,19 +29,22 @@ using namespace app;
  */
 class ReportSchedulerImplTestAccess
 {
-public:
-    ReportSchedulerImplTestAccess(ReportSchedulerImpl * apReportSchedulerImpl) : mpReportSchedulerImpl(apReportSchedulerImpl) {}
 
-    void CancelReport(ReadHandler * aReadHandler) { mpReportSchedulerImpl->CancelReport(aReadHandler); }
+public:
+    ReportSchedulerImplTestAccess(app::reporting::ReportSchedulerImpl * apReportSchedulerImpl) :
+        mpReportSchedulerImpl(apReportSchedulerImpl)
+    {}
+
+    void CancelReport(app::ReadHandler * aReadHandler) { mpReportSchedulerImpl->CancelReport(aReadHandler); }
     void UnregisterAllHandlers() { mpReportSchedulerImpl->UnregisterAllHandlers(); }
 
-    ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler)
+    app::reporting::ReadHandlerNode * FindReadHandlerNode(const app::ReadHandler * aReadHandler)
     {
         return mpReportSchedulerImpl->FindReadHandlerNode(aReadHandler);
     }
 
 private:
-    ReportSchedulerImpl * mpReportSchedulerImpl = nullptr;
+    app::reporting::ReportSchedulerImpl * mpReportSchedulerImpl = nullptr;
 };
 
 } // namespace Test

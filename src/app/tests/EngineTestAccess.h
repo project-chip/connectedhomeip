@@ -22,8 +22,6 @@
 namespace chip {
 namespace Test {
 
-using namespace app;
-
 /**
  * @brief Class acts as an accessor to private methods of the Engine class without needing to give friend access to
  *        each individual test.
@@ -33,35 +31,36 @@ class EngineTestAccess
 {
 
 public:
-    EngineTestAccess(reporting::Engine * apEngine) : mpEngine(apEngine) {}
+    EngineTestAccess(app::reporting::Engine * apEngine) : mpEngine(apEngine) {}
 
-    reporting::Engine * GetEngine() { return mpEngine; }
+    app::reporting::Engine * GetEngine() { return mpEngine; }
     inline void BumpDirtySetGeneration() { mpEngine->BumpDirtySetGeneration(); }
     bool IsRunScheduled() const { return mpEngine->IsRunScheduled(); }
 
-    CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler)
+    CHIP_ERROR BuildAndSendSingleReportData(app::ReadHandler * apReadHandler)
     {
         return mpEngine->BuildAndSendSingleReportData(apReadHandler);
     }
 
-    bool MergeOverlappedAttributePath(const AttributePathParams & aAttributePath)
+    bool MergeOverlappedAttributePath(const app::AttributePathParams & aAttributePath)
     {
         return mpEngine->MergeOverlappedAttributePath(aAttributePath);
     }
 
-    CHIP_ERROR InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
+    CHIP_ERROR InsertPathIntoDirtySet(const app::AttributePathParams & aAttributePath)
     {
         return mpEngine->InsertPathIntoDirtySet(aAttributePath);
     }
 
-    ObjectPool<reporting::Engine::AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET, ObjectPoolMem::kInline> &
+    ObjectPool<app::reporting::Engine::AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET,
+               ObjectPoolMem::kInline> &
     GetGlobalDirtySet()
     {
         return mpEngine->mGlobalDirtySet;
     }
 
 private:
-    reporting::Engine * mpEngine = nullptr;
+    app::reporting::Engine * mpEngine = nullptr;
 };
 
 } // namespace Test

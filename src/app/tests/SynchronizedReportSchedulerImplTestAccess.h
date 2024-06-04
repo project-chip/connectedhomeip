@@ -22,8 +22,6 @@
 namespace chip {
 namespace Test {
 
-using namespace app::reporting;
-using Timestamp = System::Clock::Timestamp;
 /**
  * @brief Class acts as an accessor to private methods of the SynchronizedReportSchedulerImpl class without needing to give
  * friend access to each individual test. This is not a Global API and should only be used for (Unit) Testing.
@@ -32,23 +30,23 @@ class SynchronizedReportSchedulerImplTestAccess
 {
 
 public:
-    SynchronizedReportSchedulerImplTestAccess(SynchronizedReportSchedulerImpl * apSynchronizedReportSchedulerImpl) :
+    SynchronizedReportSchedulerImplTestAccess(app::reporting::SynchronizedReportSchedulerImpl * apSynchronizedReportSchedulerImpl) :
         mpSynchronizedReportSchedulerImpl(apSynchronizedReportSchedulerImpl)
     {}
 
-    Timestamp & GetNextMinTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextMinTimestamp; }
-    Timestamp & GetNextMaxTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextMaxTimestamp; }
-    Timestamp & GetNextReportTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextReportTimestamp; }
+    System::Clock::Timestamp & GetNextMinTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextMinTimestamp; }
+    System::Clock::Timestamp & GetNextMaxTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextMaxTimestamp; }
+    System::Clock::Timestamp & GetNextReportTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextReportTimestamp; }
 
     void UnregisterAllHandlers() { mpSynchronizedReportSchedulerImpl->UnregisterAllHandlers(); }
 
-    ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler)
+    app::reporting::ReadHandlerNode * FindReadHandlerNode(const app::ReadHandler * aReadHandler)
     {
         return mpSynchronizedReportSchedulerImpl->FindReadHandlerNode(aReadHandler);
     }
 
 private:
-    SynchronizedReportSchedulerImpl * mpSynchronizedReportSchedulerImpl = nullptr;
+    app::reporting::SynchronizedReportSchedulerImpl * mpSynchronizedReportSchedulerImpl = nullptr;
 };
 
 } // namespace Test

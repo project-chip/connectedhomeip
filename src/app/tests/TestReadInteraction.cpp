@@ -1284,8 +1284,7 @@ TEST_F(TestReadInteraction, TestSetDirtyBetweenChunks)
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 
@@ -1563,7 +1562,7 @@ TEST_F(TestReadInteraction, TestICDProcessSubscribeRequestSupMaxIntervalCeiling)
         err = privatereadHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        uint16_t idleModeDuration = readHandler.GetPublisherSelectedIntervalLimit();
+        uint16_t idleModeDuration = privatereadHandler.GetPublisherSelectedIntervalLimit();
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -1637,7 +1636,7 @@ TEST_F(TestReadInteraction, TestICDProcessSubscribeRequestInfMaxIntervalCeiling)
         err = privatereadHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        uint16_t idleModeDuration = readHandler.GetPublisherSelectedIntervalLimit();
+        uint16_t idleModeDuration = privatereadHandler.GetPublisherSelectedIntervalLimit();
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -1711,7 +1710,7 @@ TEST_F(TestReadInteraction, TestICDProcessSubscribeRequestSupMinInterval)
         err = privatereadHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        uint16_t idleModeDuration = readHandler.GetPublisherSelectedIntervalLimit();
+        uint16_t idleModeDuration = privatereadHandler.GetPublisherSelectedIntervalLimit();
 
         uint16_t minInterval;
         uint16_t maxInterval;

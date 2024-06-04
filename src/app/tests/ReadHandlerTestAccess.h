@@ -22,7 +22,6 @@
 namespace chip {
 namespace Test {
 
-using namespace app;
 /**
  * @brief Class acts as an accessor to private methods of the ReadHandler class without needing to give friend access to
  *        each individual test.
@@ -32,24 +31,28 @@ class ReadHandlerTestAccess
 {
 
 public:
-    ReadHandlerTestAccess(ReadHandler * apReadHandler) : mpReadHandler(apReadHandler) {}
+    ReadHandlerTestAccess(app::ReadHandler * apReadHandler) : mpReadHandler(apReadHandler) {}
 
     Messaging::ExchangeHolder & GetExchangeCtx() { return mpReadHandler->mExchangeCtx; }
-    ReadHandler * GetReadHandler() { return mpReadHandler; }
+    app::ReadHandler * GetReadHandler() { return mpReadHandler; }
     SessionHolder & GetSessionHandle() { return mpReadHandler->mSessionHandle; }
     Transport::SecureSession * GetSession() { return mpReadHandler->GetSession(); }
-    ReadHandler::Observer * GetObserver() { return mpReadHandler->mObserver; }
+    app::ReadHandler::Observer * GetObserver() { return mpReadHandler->mObserver; }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    uint16_t GetPublisherSelectedIntervalLimit() { return mpReadHandler->GetPublisherSelectedIntervalLimit(); }
+#endif
 
     bool IsDirty() const { return mpReadHandler->IsDirty(); }
     bool ShouldStartReporting() const { return mpReadHandler->ShouldStartReporting(); }
 
     void ForceDirtyState() { mpReadHandler->ForceDirtyState(); }
     void ClearForceDirtyFlag() { mpReadHandler->ClearForceDirtyFlag(); }
-    void MoveHandlerToIdleState() { mpReadHandler->MoveToState(ReadHandler::HandlerState::Idle); }
+    void MoveHandlerToIdleState() { mpReadHandler->MoveToState(app::ReadHandler::HandlerState::Idle); }
 
     void SetStateFlagToActiveSubscription(bool aValue)
     {
-        mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, aValue);
+        mpReadHandler->SetStateFlag(app::ReadHandler::ReadHandlerFlags::ActiveSubscription, aValue);
     }
 
     void OnInitialRequest(System::PacketBufferHandle && aPayload)
@@ -76,7 +79,7 @@ public:
     }
 
 private:
-    ReadHandler * mpReadHandler = nullptr;
+    app::ReadHandler * mpReadHandler = nullptr;
 };
 
 } // namespace Test

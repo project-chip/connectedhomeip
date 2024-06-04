@@ -28,19 +28,17 @@ namespace Test {
  *        This is not a Global API and should only be used for (Unit) Testing.
  */
 
-using namespace app;
-
 class ReadClientTestAccess
 {
 
 public:
-    ReadClientTestAccess(ReadClient * aReadClient) : mpReadClient(aReadClient) {}
+    ReadClientTestAccess(app::ReadClient * aReadClient) : mpReadClient(aReadClient) {}
 
     Messaging::ExchangeHolder & GetExchange() { return mpReadClient->mExchange; }
     Messaging::ExchangeManager * GetExchangeMgr() { return mpReadClient->mpExchangeMgr; }
     SubscriptionId GetSubscriptionId() { return mpReadClient->mSubscriptionId; }
 
-    void MoveToState(const ReadClient::ClientState aTargetState) { mpReadClient->MoveToState(aTargetState); }
+    void MoveToState(const app::ReadClient::ClientState aTargetState) { mpReadClient->MoveToState(aTargetState); }
     bool IsIdle() const { return mpReadClient->IsIdle(); }
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -49,29 +47,29 @@ public:
         return mpReadClient->OnMessageReceived(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
 
-    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, ReadClient::ReportType aReportType)
+    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, app::ReadClient::ReportType aReportType)
     {
         return mpReadClient->ProcessReportData(std::move(aPayload), aReportType);
     }
 
-    CHIP_ERROR GenerateAttributePaths(AttributePathIBs::Builder & aAttributePathIBsBuilder,
-                                      const Span<AttributePathParams> & aAttributePaths)
+    CHIP_ERROR GenerateAttributePaths(app::AttributePathIBs::Builder & aAttributePathIBsBuilder,
+                                      const Span<app::AttributePathParams> & aAttributePaths)
     {
         return mpReadClient->GenerateAttributePaths(aAttributePathIBsBuilder, aAttributePaths);
     }
 
-    CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, const Span<EventPathParams> & aEventPaths)
+    CHIP_ERROR GenerateEventPaths(app::EventPathIBs::Builder & aEventPathsBuilder, const Span<app::EventPathParams> & aEventPaths)
     {
         return mpReadClient->GenerateEventPaths(aEventPathsBuilder, aEventPaths);
     }
 
-    CHIP_ERROR SendSubscribeRequest(const ReadPrepareParams & aSubscribePrepareParams)
+    CHIP_ERROR SendSubscribeRequest(const app::ReadPrepareParams & aSubscribePrepareParams)
     {
         return mpReadClient->SendSubscribeRequest(aSubscribePrepareParams);
     }
 
 private:
-    ReadClient * mpReadClient = nullptr;
+    app::ReadClient * mpReadClient = nullptr;
 };
 
 } // namespace Test

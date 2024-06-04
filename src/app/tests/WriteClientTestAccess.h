@@ -22,8 +22,6 @@
 namespace chip {
 namespace Test {
 
-using namespace app;
-
 /**
  * @brief Class acts as an accessor to private methods of the WriteClient class without needing to give friend access to
  *        each individual test.
@@ -31,12 +29,11 @@ using namespace app;
  */
 class WriteClientTestAccess
 {
-
 public:
-    WriteClientTestAccess(WriteClient * aWriteClient) : mpWriteClient(aWriteClient) {}
+    WriteClientTestAccess(app::WriteClient * aWriteClient) : mpWriteClient(aWriteClient) {}
 
-    WriteClient::State GetState() { return mpWriteClient->mState; }
-    WriteClient::State GetEnumStateAwaitingDestruction() { return WriteClient::State::AwaitingDestruction; }
+    app::WriteClient::State GetState() { return mpWriteClient->mState; }
+    app::WriteClient::State GetEnumStateAwaitingDestruction() { return app::WriteClient::State::AwaitingDestruction; }
     Messaging::ExchangeHolder & GetExchangeCtx() { return mpWriteClient->mExchangeCtx; }
     void Close() { mpWriteClient->Close(); }
 
@@ -52,7 +49,7 @@ public:
     }
 
 private:
-    WriteClient * mpWriteClient = nullptr;
+    app::WriteClient * mpWriteClient = nullptr;
 };
 
 } // namespace Test

@@ -21,7 +21,6 @@
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
-#include <app/tests/InteractionModelEngineTestAccess.h>
 #include <app/tests/ReadHandlerTestAccess.h>
 
 #include <app/util/mock/Constants.h>
@@ -39,7 +38,9 @@
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #include <app/SimpleSubscriptionResumptionStorage.h>
+#include <app/tests/InteractionModelEngineTestAccess.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 #include <lib/core/StringBuilderAdapters.h>

@@ -22,8 +22,6 @@
 namespace chip {
 namespace Test {
 
-using namespace app;
-
 /**
  * @brief Class acts as an accessor to private methods of the CommandSender class without needing to give friend access to
  *        each individual test.
@@ -33,13 +31,13 @@ class CommandSenderTestAccess
 {
 
 public:
-    CommandSenderTestAccess(CommandSender * aCommandSender) : mpCommandSender(aCommandSender) {}
+    CommandSenderTestAccess(app::CommandSender * aCommandSender) : mpCommandSender(aCommandSender) {}
 
     Messaging::ExchangeHolder & GetExchangeCtx() { return mpCommandSender->mExchangeCtx; }
 
     void FlushNoCommandResponse() { mpCommandSender->FlushNoCommandResponse(); }
     void SetFinishedCommandCount(uint16_t aFinishedCommandCount) { mpCommandSender->mFinishedCommandCount = aFinishedCommandCount; }
-    void MoveToStateAddedCommand() { mpCommandSender->MoveToState(CommandSender::State::AddedCommand); }
+    void MoveToStateAddedCommand() { mpCommandSender->MoveToState(app::CommandSender::State::AddedCommand); }
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket) { return mpCommandSender->Finalize(commandPacket); }
     CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload, bool & moreChunkedMessages)
@@ -54,7 +52,7 @@ public:
     }
 
 private:
-    CommandSender * mpCommandSender = nullptr;
+    app::CommandSender * mpCommandSender = nullptr;
 };
 
 } // namespace Test
