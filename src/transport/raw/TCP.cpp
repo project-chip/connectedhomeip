@@ -43,7 +43,7 @@ using namespace chip::Encoding;
 constexpr size_t kPacketSizeBytes = 4;
 
 static_assert(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve <= UINT32_MAX,
-              "Max size for Large payload buffers cannot exceed UINT32_MAX");
+              "Cast below could truncate the value");
 static_assert(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve >= kPacketSizeBytes,
               "Large buffer allocation should be large enough to hold the length field");
 
