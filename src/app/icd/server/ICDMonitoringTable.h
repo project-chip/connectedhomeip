@@ -104,6 +104,7 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
     chip::FabricIndex fabricIndex                 = kUndefinedFabricIndex;
     chip::NodeId checkInNodeID                    = kUndefinedNodeId;
     uint64_t monitoredSubject                     = static_cast<uint64_t>(0);
+    uint8_t clientType                            = static_cast<uint8_t>(0);
     Crypto::Aes128KeyHandle aesKeyHandle          = Crypto::Aes128KeyHandle();
     Crypto::Hmac128KeyHandle hmacKeyHandle        = Crypto::Hmac128KeyHandle();
     bool keyHandleValid                           = false;

@@ -59,6 +59,12 @@ constexpr uint8_t kKeyBuffer3a[] = {
     0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
 };
 
+enum class ClientTypeEnum : uint8_t
+{
+    kPermanent = 0x00,
+    kEphemeral = 0x01,
+};
+
 TEST(TestICDMonitoringTable, TestEntryAssignationOverload)
 {
     TestSessionKeystoreImpl keystore;
@@ -73,6 +79,7 @@ TEST(TestICDMonitoringTable, TestEntryAssignationOverload)
 
     entry.checkInNodeID    = 34;
     entry.monitoredSubject = 32;
+    entry.clientType       = static_cast<uint8_t>(ClientTypeEnum::kEphemeral);
 
     // Entry should be valid now
     EXPECT_TRUE(entry.IsValid());
@@ -88,6 +95,7 @@ TEST(TestICDMonitoringTable, TestEntryAssignationOverload)
     EXPECT_EQ(entry.fabricIndex, entry2.fabricIndex);
     EXPECT_EQ(entry.checkInNodeID, entry2.checkInNodeID);
     EXPECT_EQ(entry.monitoredSubject, entry2.monitoredSubject);
+    EXPECT_EQ(entry.clientType, entry2.clientType);
 
     EXPECT_TRUE(entry2.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
 }
@@ -130,6 +138,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     ICDMonitoringEntry entry1(&keystore);
     entry1.checkInNodeID    = kClientNodeId11;
     entry1.monitoredSubject = kClientNodeId12;
+    entry1.clientType       = static_cast<uint8_t>(ClientTypeEnum::kPermanent);
     EXPECT_EQ(CHIP_NO_ERROR, entry1.SetKey(ByteSpan(kKeyBuffer1a)));
     EXPECT_EQ(CHIP_NO_ERROR, saving.Set(0, entry1));
 
@@ -137,6 +146,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     ICDMonitoringEntry entry2(&keystore);
     entry2.checkInNodeID    = kClientNodeId12;
     entry2.monitoredSubject = kClientNodeId11;
+    entry2.clientType       = static_cast<uint8_t>(ClientTypeEnum::kEphemeral);
     EXPECT_EQ(CHIP_NO_ERROR, entry2.SetKey(ByteSpan(kKeyBuffer2a)));
     EXPECT_EQ(CHIP_NO_ERROR, saving.Set(1, entry2));
 
@@ -152,6 +162,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(kTestFabricIndex1, entry.fabricIndex);
     EXPECT_EQ(kClientNodeId11, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId12, entry.monitoredSubject);
+    EXPECT_EQ(static_cast<uint8_t>(ClientTypeEnum::kPermanent), entry.clientType);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
     EXPECT_EQ(memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
                      entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
@@ -162,6 +173,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(kTestFabricIndex1, entry.fabricIndex);
     EXPECT_EQ(kClientNodeId12, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId11, entry.monitoredSubject);
+    EXPECT_EQ(static_cast<uint8_t>(ClientTypeEnum::kEphemeral), entry.clientType);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
     EXPECT_EQ(memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
                      entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
@@ -185,6 +197,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(kTestFabricIndex1, entry.fabricIndex);
     EXPECT_EQ(kClientNodeId12, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId11, entry.monitoredSubject);
+    EXPECT_EQ(static_cast<uint8_t>(ClientTypeEnum::kEphemeral), entry.clientType);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
     EXPECT_EQ(memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
                      entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
@@ -195,6 +208,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(kTestFabricIndex1, entry.fabricIndex);
     EXPECT_EQ(kClientNodeId13, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId11, entry.monitoredSubject);
+    EXPECT_EQ(static_cast<uint8_t>(ClientTypeEnum::kPermanent), entry.clientType);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
     EXPECT_EQ(memcmp(entry4.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
                      entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
