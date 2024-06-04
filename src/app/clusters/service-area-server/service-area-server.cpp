@@ -17,6 +17,7 @@
  */
 
 #include "service-area-server.h"
+#include "service-area-delegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -51,7 +52,6 @@ namespace Clusters {
 namespace ServiceArea {
 
 
-
 // ****************************************************************************
 // Service Area Server Instance
 
@@ -64,7 +64,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<Service
     mFeature(aFeature)
 {
     ChipLogProgress(Zcl, "Location Location: Instance constructor");
-    mDelegate->SetInstance(this);
+//    mDelegate->SetInstance(this);
 }
 
 Instance::~Instance()
@@ -184,50 +184,90 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 CHIP_ERROR Instance::ReadSupportedLocations(chip::app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (auto & entry : mSupportedLocations)
+    if (mDelegate->GetNumberOfSupportedLocations() == 0)
+    {
+        return aEncoder.EncodeNull();
+    }
+    else
+    {
+        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR 
         {
-            ReturnErrorOnFailure(encoder.Encode(entry.second));
-        }
-        return CHIP_NO_ERROR;
-    });
+            uint8_t                   locationIndex = 0;
+            LocationStructureWrapper  suppportedLocation;
+
+            while (mDelegate->GetSupportedLocationByIndex(locationIndex++, suppportedLocation))
+            {
+                ReturnErrorOnFailure(encoder.Encode(suppportedLocation));
+            }
+            return CHIP_NO_ERROR; 
+        });
+    }
 }
 
 CHIP_ERROR Instance::ReadSupportedMaps(chip::app::AttributeValueEncoder & aEncoder) 
 {
-    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (auto & entry : mSupportedMaps)
+    if (mDelegate->GetNumberOfSupportedMaps() == 0)
+    {
+        return aEncoder.EncodeNull();
+    }
+    else
+    {
+        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR 
         {
-            ReturnErrorOnFailure(encoder.Encode(entry.second));
-        }
-        return CHIP_NO_ERROR;
-    });
+            uint32_t              mapIndex = 0;
+            MapStructureWrapper   suppportedMap;
+
+            while (mDelegate->GetSupportedMapByIndex(mapIndex++, suppportedMap))
+            {
+                ReturnErrorOnFailure(encoder.Encode(suppportedMap));
+            }
+            return CHIP_NO_ERROR; 
+        });
+    }
 }
 
 CHIP_ERROR Instance::ReadSelectedLocations(chip::app::AttributeValueEncoder & aEncoder) 
 {
-    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (uint32_t & entry : mSelectedLocations)
+    if (mDelegate->GetNumberOfSelectedLocations() == 0)
+    {
+        return aEncoder.EncodeNull();
+    }
+    else
+    {
+        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR 
         {
-            ReturnErrorOnFailure(encoder.Encode(entry));
-        }
-        return CHIP_NO_ERROR;
-    });
+            uint32_t    locationIndex = 0;
+            uint32_t    selectedLocation;
+
+            while (mDelegate->GetSelectedLocationByIndex(locationIndex++, selectedLocation))
+            {
+                ReturnErrorOnFailure(encoder.Encode(selectedLocation));
+            }
+            return CHIP_NO_ERROR; 
+        });
+    }
 }
 
 CHIP_ERROR Instance::ReadProgress(chip::app::AttributeValueEncoder & aEncoder) 
 {
-    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR
+    if (mDelegate->GetNumberOfProgressElements() == 0)
     {
-        // give the device a chance to make sure values are up-to-date
-        mDelegate->HandleVolatileProgressList();
-
-        for (ProgressPairType & entry : mProgressList)
+        return aEncoder.EncodeNull();
+    }
+    else
+    {
+        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR 
         {
-            ReturnErrorOnFailure(encoder.Encode(entry.second));
-        }
-        return CHIP_NO_ERROR;
-    });
+            uint32_t                       locationIndex = 0;
+            Structs::ProgressStruct::Type  progressElement;
+
+            while (mDelegate->GetProgressElementByIndex(locationIndex++, progressElement))
+            {
+                ReturnErrorOnFailure(encoder.Encode(progressElement));
+            }
+            return CHIP_NO_ERROR; 
+        });
+    }
 }
 
 
@@ -237,73 +277,78 @@ CHIP_ERROR Instance::ReadProgress(chip::app::AttributeValueEncoder & aEncoder)
 void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::SelectLocations::DecodableType & req)
 {
     ChipLogDetail(Zcl, "HandleSelectLocationsCmd");
-    SelectLocationsStatus locationStatus = SelectLocationsStatus::kSuccess;
-    std::string           locationStatusText; 
 
-    Status cmdStatus = Status::Success;
+    SelectLocationsStatus locationStatus            = SelectLocationsStatus::kSuccess;
+    char locationStatusText[kMaxSizeStatusText + 1] = {'\0'};
+    bool useLocationStatusText                      = false;
+    Status cmdStatus                                = Status::Success;
+
+    uint32_t listIndex = 0;
+    uint32_t oldSelectedLocation;
 
     // On receipt of this command the device SHALL respond with a SelectLocationsResponse command.
     Commands::SelectLocationsResponse::Type response;
 
-    std::vector<uint32_t> newSelectLocations;  // save extracted locations from command parameter
     size_t numberOfLocations = 0;
-    bool   matchesCurrentSelectedLocations = false;
+    bool   matchesCurrentSelectedLocations;
 
     // get number of Selected Locations in command parameter
     VerifyOrExit((req.newLocations.IsNull() || (CHIP_NO_ERROR == req.newLocations.Value().ComputeSize(&numberOfLocations))), 
                                     locationStatus = SelectLocationsStatus::kInvalidSet;
-                                    locationStatusText = "Select Locations command - newLocations parameter failed decoding size";
-                                    ChipLogError(Zcl, "%s", locationStatusText.c_str())  );
+                                    strncat(locationStatusText, "Select Locations command - newLocations parameter size decoding failed", kMaxSizeStatusText);
+                                    useLocationStatusText = true;
+                                    ChipLogError(Zcl, "%s", locationStatusText)  );
 
-    // If this field is an empty list, or if the device determines that it can't operate at all locations from the list,
+    // If the device determines that it can't operate at all locations from the list,
     // the SelectLocationsResponse command's Status field SHALL indicate InvalidSet.
     // If this field is null, that indicates that the device is to operate without being constrained to any specific location(s).
     VerifyOrExit((req.newLocations.IsNull() || ((numberOfLocations != 0) && (numberOfLocations <= kMaxNumSelectedLocations))),
                                 locationStatus = SelectLocationsStatus::kInvalidSet;
-                                locationStatusText = "Select Locations command - invalid number of locations " + numberOfLocations;
-                                ChipLogError(Zcl, "%s", locationStatusText.c_str())   );
+                                strncat(locationStatusText, "Select Locations command - invalid number of locations", kMaxSizeStatusText);
+                                ChipLogError(Zcl, "%s", locationStatusText)   );
 
-    // decode the values of Selected Locations in command parameter
+
+    // if number of selected locations in parameter matchs number in attribute - the locations *might* be the same 
+    matchesCurrentSelectedLocations = (numberOfLocations == mDelegate->GetNumberOfSelectedLocations());
+
+    // do as much parameter validation as we can
+    if (!req.newLocations.IsNull())
     {
-        newSelectLocations.reserve(numberOfLocations);
-
-        if (!req.newLocations.IsNull())
+        auto locationIter = req.newLocations.Value().begin();
+        while (locationIter.Next()) 
         {
-            auto locationIter = req.newLocations.Value().begin();
-            while (locationIter.Next()) 
-            {
-                newSelectLocations.push_back(locationIter.GetValue());  // temporary save of the decoded location values
-            }
+            uint32_t aSelectedLocation = locationIter.GetValue();
 
-            VerifyOrExit(CHIP_NO_ERROR == locationIter.GetStatus(), 
-                                    locationStatus = SelectLocationsStatus::kInvalidSet;
-                                    locationStatusText = "SelectLocations command - newLocations parameter failed decoding value";
-                                    ChipLogError(Zcl, "%s", locationStatusText.c_str())  );
+            // each item in this list SHALL match the LocationID field of an entry on the SupportedLocations attribute's list
+            // If the Status field is set to UnsupportedLocation, the StatusText field SHALL be an empty string.
+            VerifyOrExit(IsSupportedLocation(aSelectedLocation), 
+                            locationStatus = SelectLocationsStatus::kInvalidSet;
+                            useLocationStatusText = true;
+                            ChipLogError(Zcl, "HandleSelectLocationsCmd - unsupported location %u", aSelectedLocation));
+
+            // check to see if parameter list and attribute still match
+            if (matchesCurrentSelectedLocations)
+            {
+                if (!mDelegate->GetSelectedLocationByIndex(listIndex, oldSelectedLocation) ||
+                    (aSelectedLocation != oldSelectedLocation)  )
+                {
+                    matchesCurrentSelectedLocations = false;
+                }
+            }
         }
+
+        // after iterating with Next through DecodableType - check for failure
+        VerifyOrExit(CHIP_NO_ERROR == locationIter.GetStatus(), 
+                                locationStatus = SelectLocationsStatus::kInvalidSet;
+                                strncat(locationStatusText, "SelectLocations command - newLocations parameter value decoding failed", kMaxSizeStatusText);
+                                ChipLogError(Zcl, "%s", locationStatusText)  );
     }
+
 
     // If the NewLocations field is the same as the value of the SelectedLocations attribute
     // the SelectLocationsResponse command SHALL have the Status field set to Success and
     // the StatusText field MAY be supplied with a human readable string or include an empty string.
-    if (numberOfLocations == mSelectedLocations.size())
-    {
-        matchesCurrentSelectedLocations = true; // might be true
-        size_t locationIndex = 0;
-        for (auto entry : mSelectedLocations)
-        {
-            if (entry != newSelectLocations[locationIndex++])
-            {
-                matchesCurrentSelectedLocations = false; // NOT true after all
-                break;
-            }
-        }
-    }
-
-    // if new selected locations match current selected locations, no action or further validation is needed, command is successful
     VerifyOrExit(!matchesCurrentSelectedLocations, cmdStatus = Status::Success);
-
-    // validate command's Selected Locations values against cluster requirements
-    VerifyOrExit(AreSetSelectLocationsParamsValid(newSelectLocations, locationStatus, locationStatusText), cmdStatus = Status::Failure);
 
     // If the current state of the device doesn't allow for the locations to be selected,
     // the SelectLocationsResponse command SHALL have the Status field set to InvalidInMode.
@@ -311,24 +356,30 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     // given the current mode of the device, which may involve other clusters. 
     // (note - locationStatusText to be filled out by delegated function for if return value is false)
     VerifyOrExit(mDelegate->IsSetSelectedLocationAllowed(locationStatusText), 
-                                                            locationStatus =SelectLocationsStatus::kInvalidInMode;  
+                                                            locationStatus = SelectLocationsStatus::kInvalidInMode;  
                                                             cmdStatus = Status::Failure);
 
 
     // ask the device to handle SelectLocations Command
     // (note - locationStatusText to be filled out by delegated function for kInvalidInMode and InvalidSet)
-    VerifyOrExit(mDelegate->HandleSetSelectLocations(newSelectLocations, locationStatus, locationStatusText), cmdStatus = Status::Failure);
+    VerifyOrExit(mDelegate->HandleSetSelectLocations(req, locationStatus, locationStatusText, useLocationStatusText), 
+                                    cmdStatus = Status::Failure);
 
     {
         // If the device successfully accepts the request, the server will attempt to operate at the location(s)
         // indicated by the entries of the NewLocation field, when requested to operate,
         // the SelectLocationsResponse command SHALL have the Status field set to Success,
         // and the SelectedLocations attribute SHALL be set to the value of the NewLocations field.
-        mSelectedLocations.clear();
+        mDelegate->ClearSelectedLocations();     
 
-        for (size_t locationIndex = 0; locationIndex < numberOfLocations; ++locationIndex)
+        if (!req.newLocations.IsNull())
         {
-            mSelectedLocations.push_back(newSelectLocations[locationIndex]);
+            auto locationIter = req.newLocations.Value().begin();
+            uint32_t dummyIter;
+            while (locationIter.Next()) 
+            {
+                mDelegate->AddSelectedLocation(locationIter.GetValue(), dummyIter); 
+            }
         }
 
         NotifySelectedLocationsChanged();
@@ -337,48 +388,35 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
 
 exit:
     response.status = locationStatus;
-    if (locationStatusText.length() > 0)
+
+    switch (locationStatus)
     {
-        response.statusText = chip::CharSpan::fromCharString( locationStatusText.c_str());
-    }
+    // If the Status field is set to UnsupportedLocation, the StatusText field SHALL be an empty string.
+    // If the Status field is set to DuplicatedLocations, the StatusText field SHALL be an empty string.
+    case SelectLocationsStatus::kUnsupportedLocation:
+    case SelectLocationsStatus::kDuplicatedLocations:
+        response.statusText = chip::CharSpan::fromCharString("");
+        break;
+
+    // If the Status field is set to Success, the StatusText field is optional.
+    case SelectLocationsStatus::kSuccess:
+        if (useLocationStatusText)
+        {
+            response.statusText = chip::CharSpan::fromCharString( locationStatusText);
+        }
+        break;
+
+    // If the Status field is not set to Success, or UnsupportedLocation, or DuplicatedLocations,
+    // the StatusText field SHALL include a vendor-defined error description
+    default:
+        response.statusText = chip::CharSpan::fromCharString( locationStatusText);
+        break;
+
+    } // end switch
+
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, cmdStatus);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-}
-
-
-bool Instance::AreSetSelectLocationsParamsValid(const std::vector<uint32_t> & selectLocations, 
-                                            SelectLocationsStatus & locationStatus, std::string & locationStatusText)
-{
-    bool ret_val = false;
-    std::map<uint32_t, uint32_t> testMap;
-
-    for (size_t entry = 0; entry < selectLocations.size(); ++entry)
-    {
-        // If at least one entry on the NewLocations field doesn't match the LocationID field of any entry of the SupportedLocations list,
-        // the SelectLocationsResponse command's Status field SHALL indicate UnsupportedLocation.
-        // If the Status field is set to UnsupportedLocation, the StatusText field SHALL be an empty string.
-        VerifyOrExit(IsSupportedLocation(selectLocations[entry]), 
-                            locationStatus = SelectLocationsStatus::kUnsupportedLocation;
-                            ChipLogError(Zcl, "AreSetSelectLocationsParamsValid - unsupported location %u", selectLocations[entry]) );
-
-        // If this field contains any duplicated entries,
-        // the SelectLocationsResponse command's Status field SHALL indicate DuplicatedLocations.
-        // If the Status field is set to DuplicatedLocations, the StatusText field SHALL be an empty string.
-        VerifyOrExit(testMap.emplace(entry, entry).second, 
-                        locationStatus = SelectLocationsStatus::kDuplicatedLocations;
-                        ChipLogError(Zcl, "AreSetSelectLocationsParamsValid - duplicated location %u", selectLocations[entry]));
-    }
-
-
-    // all checks passed,
-    ret_val = true;
-    locationStatus = SelectLocationsStatus::kSuccess;
-    // If the Status field is set to Success, the StatusText field is optional.
-
-
-exit:
-    return ret_val;
 }
 
 
@@ -386,30 +424,27 @@ void Instance::HandleSkipCurrentCmd(HandlerContext & ctx)
 {
     ChipLogDetail(Zcl, "Location Location: HandleSkipCurrent");
 
-    SkipCurrentStatus skipStatus = SkipCurrentStatus::kSuccess;
-    std::string       skipStatusText; 
-
-    Status   cmdStatus = Status::Success;
+    SkipCurrentStatus skipStatus                  = SkipCurrentStatus::kSuccess;
+    char   skipStatusText[kMaxSizeStatusText + 1] = {'\0'};
+    Status cmdStatus                              = Status::Success;
 
     // On receipt of this command the device SHALL respond with a SkipCurrentLocationResponse command. 
     Commands::SkipCurrentResponse::Type response;
 
     // InvalidLocationList | The SelectedLocations attribute is null.
     // If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string.
-    VerifyOrExit((mSelectedLocations.size() == 0), 
-                                    skipStatus  = SkipCurrentStatus::kInvalidLocationList;
-
-                                    ChipLogError(Zcl, "Skip Current Location command - Selected Locations atttribute is null");
-                                    cmdStatus = Status::Failure );
+    VerifyOrExit((mDelegate->GetNumberOfSelectedLocations() == 0), 
+                            skipStatus  = SkipCurrentStatus::kInvalidLocationList;
+                            ChipLogError(Zcl, "Skip Current Location command - Selected Locations atttribute is null");
+                            cmdStatus = Status::Failure );
 
     // InvalidInMode  | The received request cannot be handled due to the current mode of the device. For example, the CurrentLocation attribute is null.
     // If the Status field is not set to Success, or InvalidLocationList, the StatusText field SHALL include a vendor defined error description.
     VerifyOrExit(!mCurrentLocation.IsNull(), 
-                                    skipStatus  = SkipCurrentStatus::kInvalidInMode;
-                                    skipStatusText = "SkipCurrent command - Current Location attribute is null";
-                                    ChipLogError(Zcl, "%s", skipStatusText.c_str());
-                                    cmdStatus = Status::Failure );
-
+                            skipStatus  = SkipCurrentStatus::kInvalidInMode;
+                            strncat(skipStatusText, "SkipCurrent command - Current Location attribute is null", kMaxSizeStatusText);
+                            ChipLogError(Zcl, "%s", skipStatusText);
+                            cmdStatus = Status::Failure );
 
     // have the device attempt to skip     
     // If the Status field is not set to Success, or InvalidLocationList, the StatusText field SHALL include a vendor defined error description. 
@@ -420,10 +455,24 @@ void Instance::HandleSkipCurrentCmd(HandlerContext & ctx)
 
 exit:
     response.status = skipStatus;
-    if (skipStatusText.length() > 0)
+
+    switch (skipStatus)
     {
-        response.statusText = chip::CharSpan::fromCharString( skipStatusText.c_str());
-    }
+    // If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string
+    case SkipCurrentStatus::kInvalidLocationList:
+        response.statusText = chip::CharSpan::fromCharString("");
+        break;
+
+    case SkipCurrentStatus::kSuccess:
+        break;
+
+    // If the Status field is not set to Success, or InvalidLocationList,
+    // the StatusText field SHALL include a vendor defined error description
+    default:
+        response.statusText = chip::CharSpan::fromCharString(skipStatusText);
+        break;
+
+    } // end switch
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, cmdStatus);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -468,35 +517,12 @@ void Instance::NotifyProgressChanged()
 // ****************************************************************************
 //  Supported Locations manipulators
 
-void  Instance::GetSupportedLocationIds(std::vector<uint32_t> & aSupportedLocationIds)
-{
-    aSupportedLocationIds.reserve(mSupportedLocations.size());
-
-    for (SupportedLocationPairType & entry : mSupportedLocations)
-    {
-        aSupportedLocationIds.push_back(entry.second.locationId);
-    }
-}
-
-bool Instance::GetSupportedLocationById(uint32_t aLocationId, const LocationStructureWrapper*& aSupportedLocation)
-{
-    bool ret_value = false;
-
-    auto locationIter = mSupportedLocations.find(aLocationId);
-
-    if (locationIter != mSupportedLocations.end())
-    {
-        aSupportedLocation = &locationIter->second;
-        ret_value = true;
-    }
-
-    return ret_value;
-}
-
 bool Instance::IsSupportedLocation(uint32_t aLocationId)
 {
-    auto locationIter = mSupportedLocations.find(aLocationId);
-    return (locationIter != mSupportedLocations.end());
+    uint32_t dummyIndex;  
+    LocationStructureWrapper dummyLocation;
+
+    return mDelegate->GetSupportedLocationById(aLocationId, dummyIndex, dummyLocation);
 }
 
 
@@ -528,10 +554,10 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
     VerifyOrExit((!aLocation.locationInfo.landmarkTag.IsNull() || aLocation.locationInfo.positionTag.IsNull()),
                 ChipLogError(Zcl,  "IsValidSupportedLocation %u - PositionTag with no LandmarkTag", aLocation.locationId));
 
-    if (mSupportedMaps.size() == 0)
+    if (mDelegate->GetNumberOfSupportedMaps()== 0)
     {
         // If the SupportedMaps attribute is null, mapid SHALL be null.
-        VerifyOrExit((aLocation.mapId.IsNull()),
+        VerifyOrExit(aLocation.mapId.IsNull(),
                     ChipLogError(Zcl,  "IsValidSupportedLocation %u - map Id %u is not in empty supported map list ", aLocation.locationId, aLocation.mapId.Value()));
     }
     else
@@ -550,7 +576,7 @@ exit:
 }
 
 
-bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation)
+bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool & locationInSupportedList)
 {
     bool ret_value = true;
 
@@ -558,13 +584,17 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
     // If the SupportedMaps attribute is null, each entry in this list SHALL have a unique value for the LocationInfo field.
 
     // validate that the location is unique with regard to the supported locations list
-    for (auto & entry : mSupportedLocations)
+    uint8_t                   locationIndex = 0;
+    LocationStructureWrapper  entry;
+
+    while (mDelegate->GetSupportedLocationByIndex(locationIndex++, entry))
     {
         // this function may be used for uniqueness checking of a location that is a member of supported locations, (for validating modifications)
         // so do not test it against itself.
         // skip location if locationId's match
-        if (aLocation.locationId == entry.second.locationId)
+        if (aLocation.locationId == entry.locationId)
         {
+            locationInSupportedList = true; // flag that Id already exists in supported locations.
             continue;
         }
 
@@ -572,23 +602,23 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
         // if mapId is not null, skip locations with null mapId's
         // if mapId is null, skip locations with non-null mapId's
         // if both location's mapId are not null, skip locations with non matching mapId's
-        if ((aLocation.mapId.IsNull() != (entry.second.mapId.IsNull()))  ||
+        if ((aLocation.mapId.IsNull() != (entry.mapId.IsNull()))  ||
 
-            (!aLocation.mapId.IsNull() && (!entry.second.mapId.IsNull()) && (aLocation.mapId.Value() != entry.second.mapId.Value())))
+            (!aLocation.mapId.IsNull() && (!entry.mapId.IsNull()) && (aLocation.mapId.Value() != entry.mapId.Value())))
         {
             continue;
         }
 
         // check for null vs non-null HomeLocationInfo
-        if (aLocation.locationInfo.homeLocationInfo.IsNull() != (entry.second.locationInfo.homeLocationInfo.IsNull()))
+        if (aLocation.locationInfo.homeLocationInfo.IsNull() != (entry.locationInfo.homeLocationInfo.IsNull()))
         {
              continue;
         }
 
         // if both locations have non-null HomeLocationInfo, check fields
-        if (!aLocation.locationInfo.homeLocationInfo.IsNull() && (!entry.second.locationInfo.homeLocationInfo.IsNull()))
+        if (!aLocation.locationInfo.homeLocationInfo.IsNull() && (!entry.locationInfo.homeLocationInfo.IsNull()))
         {
-            if (!aLocation.DoesNameMatch(entry.second.locationInfo.homeLocationInfo.Value().locationName))
+            if (!aLocation.DoesNameMatch(entry.locationInfo.homeLocationInfo.Value().locationName))
             {
                 continue;
             }
@@ -598,10 +628,10 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
             // if FloorNumber is not null, skip locations with null FloorNumber's
             // if FloorNumber is null, skip locations with non-null FloorNumber's
             // if both location's FloorNumber are not null, skip locations with non matching FloorNumber's
-            if ((aLocation.locationInfo.homeLocationInfo.Value().floorNumber.IsNull() != entry.second.locationInfo.homeLocationInfo.Value().floorNumber.IsNull()) ||
+            if ((aLocation.locationInfo.homeLocationInfo.Value().floorNumber.IsNull() != entry.locationInfo.homeLocationInfo.Value().floorNumber.IsNull()) ||
 
-                ((!aLocation.locationInfo.homeLocationInfo.Value().floorNumber.IsNull() && !entry.second.locationInfo.homeLocationInfo.Value().floorNumber.IsNull()) 
-                    && (aLocation.locationInfo.homeLocationInfo.Value().floorNumber.Value() != entry.second.locationInfo.homeLocationInfo.Value().floorNumber.Value()))  )
+                ((!aLocation.locationInfo.homeLocationInfo.Value().floorNumber.IsNull() && !entry.locationInfo.homeLocationInfo.Value().floorNumber.IsNull()) 
+                    && (aLocation.locationInfo.homeLocationInfo.Value().floorNumber.Value() != entry.locationInfo.homeLocationInfo.Value().floorNumber.Value()))  )
             {
                 continue;
             }
@@ -611,10 +641,10 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
             // if AreaType is not null, skip locations with null AreaType's
             // if AreaType is null, skip locations with non-null AreaType's
             // if both location's AreaType are not null, skip locations with non matching AreaType's
-            if ((aLocation.locationInfo.homeLocationInfo.Value().areaType.IsNull() != entry.second.locationInfo.homeLocationInfo.Value().areaType.IsNull()) ||
+            if ((aLocation.locationInfo.homeLocationInfo.Value().areaType.IsNull() != entry.locationInfo.homeLocationInfo.Value().areaType.IsNull()) ||
 
-                ((!aLocation.locationInfo.homeLocationInfo.Value().areaType.IsNull() && !entry.second.locationInfo.homeLocationInfo.Value().areaType.IsNull()) 
-                    && (aLocation.locationInfo.homeLocationInfo.Value().areaType.Value() != entry.second.locationInfo.homeLocationInfo.Value().areaType.Value()))  )
+                ((!aLocation.locationInfo.homeLocationInfo.Value().areaType.IsNull() && !entry.locationInfo.homeLocationInfo.Value().areaType.IsNull()) 
+                    && (aLocation.locationInfo.homeLocationInfo.Value().areaType.Value() != entry.locationInfo.homeLocationInfo.Value().areaType.Value()))  )
             {
                 continue;
             }
@@ -624,10 +654,10 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
         // if landmarkTag is not null, skip locations with null landmarkTag's
         // if landmarkTag is null, skip locations with non-null landmarkTag's
         // if both location's landmarkTag are not null, skip locations with non matching landmarkTag's
-        if ((aLocation.locationInfo.landmarkTag.IsNull() != entry.second.locationInfo.landmarkTag.IsNull()) ||
+        if ((aLocation.locationInfo.landmarkTag.IsNull() != entry.locationInfo.landmarkTag.IsNull()) ||
 
-            ((!aLocation.locationInfo.landmarkTag.IsNull() && !entry.second.locationInfo.landmarkTag.IsNull()) 
-                && (aLocation.locationInfo.landmarkTag.Value() != entry.second.locationInfo.landmarkTag.Value()))  )
+            ((!aLocation.locationInfo.landmarkTag.IsNull() && !entry.locationInfo.landmarkTag.IsNull()) 
+                && (aLocation.locationInfo.landmarkTag.Value() != entry.locationInfo.landmarkTag.Value()))  )
         {
             continue;
         }
@@ -636,10 +666,10 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
         // if positionTag is not null, skip locations with null positionTag's
         // if positionTag is null, skip locations with non-null positionTag's
         // if both location's positionTag are not null, skip locations with non matching positionTag's
-        if ((aLocation.locationInfo.positionTag.IsNull() != entry.second.locationInfo.positionTag.IsNull())  ||
+        if ((aLocation.locationInfo.positionTag.IsNull() != entry.locationInfo.positionTag.IsNull())  ||
 
-            ((!aLocation.locationInfo.positionTag.IsNull() && !entry.second.locationInfo.positionTag.IsNull()  
-                && (aLocation.locationInfo.positionTag.Value() != entry.second.locationInfo.positionTag.Value())))  )
+            ((!aLocation.locationInfo.positionTag.IsNull() && !entry.locationInfo.positionTag.IsNull()  
+                && (aLocation.locationInfo.positionTag.Value() != entry.locationInfo.positionTag.Value())))  )
         {
             continue;
         }
@@ -648,10 +678,10 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
         // if surfaceTag is not null, skip locations with null surfaceTag's
         // if surfaceTag is null, skip locations with non-null surfaceTag's
         // if both location's surfaceTag are not null, skip locations with non matching surfaceTag's
-        if ((aLocation.locationInfo.surfaceTag.IsNull() != entry.second.locationInfo.surfaceTag.IsNull())  ||
+        if ((aLocation.locationInfo.surfaceTag.IsNull() != entry.locationInfo.surfaceTag.IsNull())  ||
 
-            ((!aLocation.locationInfo.surfaceTag.IsNull() && !entry.second.locationInfo.surfaceTag.IsNull()  
-                && (aLocation.locationInfo.surfaceTag.Value() != entry.second.locationInfo.surfaceTag.Value())))  )
+            ((!aLocation.locationInfo.surfaceTag.IsNull() && !entry.locationInfo.surfaceTag.IsNull()  
+                && (aLocation.locationInfo.surfaceTag.Value() != entry.locationInfo.surfaceTag.Value())))  )
         {
             continue;
         }
@@ -662,8 +692,22 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
         break;
     }
 
-
     return ret_value;
+}
+
+
+void Instance::HandleSupportedLocationsUpdated()
+{
+    // When updating the SupportedLocations attribute list 
+
+    // - the SelectedLocations attribute SHALL be set to null.
+    ClearSelectedLocations();
+
+    // - the CurrentLocation attribute SHALL be set to null.
+    SetCurrentLocation(DataModel::Nullable<uint32_t>());
+
+    // - the Progress attribute SHALL be set to null.
+    ClearProgress();
 }
 
 
@@ -677,14 +721,19 @@ bool Instance::AddSupportedLocation( uint32_t                                   
                                      const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  )
 {
     bool ret_value = false;
+    bool locationAlreadyExists = false;
+    uint32_t dummyIndex;
 
     // create location object for validation
     LocationStructureWrapper aNewLocation(  aLocationId, aMapId,
                                             aLocationName, aFloorNumber, aAreaType, 
                                             aLandmarkTag, aPositionTag, aSurfaceTag);
 
+    // does device mode allow this attribute to be updated?
+    VerifyOrExit(mDelegate->IsSupportedLocationChangeAllowed(), /* if false, should be logged as error in delegate function */);
+
     // check max# of list entries
-    VerifyOrExit((kMaxNumSupportedLocations > mSupportedLocations.size()),
+    VerifyOrExit((kMaxNumSupportedLocations > mDelegate->GetNumberOfSupportedLocations()),
                 ChipLogError(Zcl,  "AddSupportedLocation %u - to many entries", aLocationId));
 
 
@@ -693,24 +742,21 @@ bool Instance::AddSupportedLocation( uint32_t                                   
                 ChipLogError(Zcl,  "AddSupportedLocation %u - not a valid location object", aNewLocation.locationId));
 
     // must not match existing location description
-    VerifyOrExit(IsUniqueSupportedLocation(aNewLocation),
+    VerifyOrExit(IsUniqueSupportedLocation(aNewLocation, locationAlreadyExists),
                 ChipLogError(Zcl,  "AddSupportedLocation %u - not a unique location object", aNewLocation.locationId));
 
+    // Each entry in Supported Locations SHALL have a unique value for the ID field.
+    VerifyOrExit(!locationAlreadyExists,
+                ChipLogError(Zcl,  "AddSupportedLocation %u - supported location with this Id already exists", aNewLocation.locationId));
 
-    {
-        // validated - add to list
-        auto result = mSupportedLocations.emplace( SupportedLocationPairType(aLocationId, aNewLocation));
+    // add to supported locations attribute
+    VerifyOrExit( mDelegate->AddSupportedLocation(aNewLocation, dummyIndex), /* log error in delegate function*/);
 
-        // Each entry in Supported Locations SHALL have a unique value for the ID field.
-        // (successful insertion in map)
-        VerifyOrExit((result.second),
-            ChipLogError(Zcl,  "AddSupportedLocation - non-unique location Id %u", aLocationId));
-    }
 
     // success!
     ret_value = true;
+    HandleSupportedLocationsUpdated();
     NotifySupportedLocationsChanged();
-
 
 exit:
     return ret_value;
@@ -727,34 +773,55 @@ bool Instance::ModifySupportedLocation( uint32_t                                
                                         const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  )
 {
     bool ret_value = false;
+    bool mapIdChanged = false;
+    uint32_t listIndex;
 
-    // find existing supported location to modify
-    auto locationIter = mSupportedLocations.find(aLocationId);
-    
-    // create location object for validation
-    LocationStructureWrapper aNewLocation(  aLocationId, aMapId,
-                                            aLocationName, aFloorNumber, aAreaType, 
-                                            aLandmarkTag, aPositionTag, aSurfaceTag);
+    // get existing supported location to modify
+    LocationStructureWrapper supportedLocation;
+    bool locationExists = mDelegate->GetSupportedLocationById(aLocationId, listIndex, supportedLocation);
 
-    VerifyOrExit((locationIter != mSupportedLocations.end()),
-                ChipLogError(Zcl,  "ModifySupportedLocation %u - not a supported locationId", aNewLocation.locationId));
+    VerifyOrExit(locationExists,
+            ChipLogError(Zcl,  "ModifySupportedLocation %u - not a supported locationId", aLocationId)); 
 
-    // verify cluster requirements concerning valid fields and field relationships
-    VerifyOrExit(IsValidSupportedLocation(aNewLocation), 
-                ChipLogError(Zcl,  "ModifySupportedLocation %u - not a valid location object", aNewLocation.locationId));
+    {
+        // check for mapId change
+        if ((aMapId.IsNull() != supportedLocation.mapId.IsNull())  ||
 
-    // updated location description must not match another existing location description
-    VerifyOrExit(IsUniqueSupportedLocation(aNewLocation),
-                ChipLogError(Zcl,  "ModifySupportedLocation %u - not a unique location object", aNewLocation.locationId));
+            (!aMapId.IsNull() && !supportedLocation.mapId.IsNull()
+             && (aMapId.Value() != supportedLocation.mapId.Value()))  )    
+        {
+            // does device mode allow this attribute to be updated?
+            VerifyOrExit(mDelegate->IsSupportedLocationChangeAllowed(), /* if false, should be logged as error in delegate function */);
 
+            mapIdChanged = true;
+        }
 
-    // success! replace the supported location with the modified location 
-    locationIter->second = aNewLocation;
+        // create new location object for validation
+        LocationStructureWrapper aNewLocation(  aLocationId, aMapId,
+                                                aLocationName, aFloorNumber, aAreaType, 
+                                                aLandmarkTag, aPositionTag, aSurfaceTag);
+
+        // verify cluster requirements concerning valid fields and field relationships
+        VerifyOrExit(IsValidSupportedLocation(aNewLocation), 
+                    ChipLogError(Zcl,  "ModifySupportedLocation %u - not a valid location object", aNewLocation.locationId));
+
+        // updated location description must not match another existing location description
+        VerifyOrExit(IsUniqueSupportedLocation(aNewLocation, locationExists),
+                    ChipLogError(Zcl,  "ModifySupportedLocation %u - not a unique location object", aNewLocation.locationId));
+
+        // note: we already checked locationExists, we don't need to do it again here.
+
+        // replace the supported location with the modified location 
+        VerifyOrExit(mDelegate->ModifySupportedLocation(listIndex, aNewLocation), /* if false, should be logged as error in delegate function */);
+    }
+
     ret_value = true;
-    NotifySupportedLocationsChanged();
+    if (mapIdChanged)
+    {
+        HandleSupportedLocationsUpdated();
+    }
 
-    // update other attributes as required by the supported location change
-    HandleSupportedLocationModified(aLocationId); 
+    NotifySupportedLocationsChanged();
 
 
 exit:
@@ -762,297 +829,125 @@ exit:
 }
 
 
-void Instance::HandleSupportedLocationModified(uint32_t aLocationId)
-{
-    // If any entry in the SupportedLocations attribute list is updated
-    // all references to it (items matching the LocationID field's value) are removed as follows:
-    if ((!mCurrentLocation.IsNull()) &&
-        (IsSupportedLocation(mCurrentLocation.Value())))
-    {
-        // The CurrentLocation attribute SHALL be set to null if matching the updated supported location.
-        mCurrentLocation.SetNull();
-        NotifyCurrentLocationChanged();
-    }
-
-    // The SelectedLocations attribute list SHALL be updated to remove any matching entry.
-    if (IsSelectedLocation(aLocationId))
-    {
-        if (DeleteSelectedLocation(aLocationId))
-        {
-            std::string statusText;
-
-            if (!mDelegate->IsSetSelectedLocationAllowed(statusText))
-            {
-                ChipLogError(Zcl,  "HandleSupportedLocationModified - modification of SupportedLocation %u resulted in disallowed SelectedLocations change - %s",
-                                            aLocationId, statusText.c_str());
-            }
-           
-            // If the SelectedLocations attribute list becomes empty, the server SHALL stop operating.
-            // If selected locations is changed and the device is operating, the device may need to update it's operations.
-            mDelegate->HandleSelectedLocationsChanged();
-            NotifySelectedLocationsChanged();
-        }
-    }
-    
-    // The Progress attribute list SHALL be updated to remove any matching entry.
-    if (DeleteProgressElement(aLocationId))
-    {
-        NotifyProgressChanged();
-    }
-}
-
-bool Instance::PruneSupportedLocations()
-{
-    bool supportedLocationsChanged = false;
-    bool currentLocationChanged    = false;
-    bool selectedLocationsChanged  = false;
-    bool progressChanged           = false;
-
-    // carefully iterate through SupportedLocations while possibly deleting some of them
-    auto locationIter = mSupportedLocations.begin();
-
-    while (locationIter != mSupportedLocations.end())
-    {
-        // remove supported location if mapId is no longer valid
-        if ((!locationIter->second.mapId.IsNull()) &&
-            (!IsSupportedMap(locationIter->second.mapId.Value())))
-        {
-            supportedLocationsChanged = true; // deleted at least one supported location
-            uint32_t aLocationId = locationIter->second.locationId; // grab the location id before deleting it
-
-            // delete the entry, moves iterator to next in list
-            locationIter = mSupportedLocations.erase(locationIter);
-            
-            // The CurrentLocation attribute SHALL be set to null if deleted from the supported locations
-            if ((!mCurrentLocation.IsNull()) &&
-                (IsSupportedLocation(mCurrentLocation.Value())))
-            {
-                mCurrentLocation.SetNull();
-                currentLocationChanged = true;
-            }
-
-            // remove deleted location from selected locations
-            if (DeleteSelectedLocation(aLocationId))
-            {
-                selectedLocationsChanged = true;
-            }
-            
-            // remove location from  progress list
-            if (DeleteProgressElement(aLocationId))
-            {
-                progressChanged = true;
-                NotifyProgressChanged();
-            }
-        }
-        else
-        {
-            // location is still good, not deleted, move on to next one
-            ++locationIter;
-        }
-
-    } // end of while()
-
-
-    // MATTER notifications for changed attributes
-    if (supportedLocationsChanged)
-    {
-        NotifySupportedLocationsChanged();
-    }
-
-    if (currentLocationChanged)
-    {
-        NotifyCurrentLocationChanged();
-    }
-
-    if (selectedLocationsChanged)
-    {
-         std::string statusText;
-        if (!mDelegate->IsSetSelectedLocationAllowed(statusText))
-        {
-            ChipLogError(Zcl,  "PruneSupportedLocations - deletion of SupportedLocation resulted in disallowed SelectedLocations change - %s",
-                                        statusText.c_str());
-        }
-
-        // If the SelectedLocations attribute list becomes empty, the server SHALL stop operating.
-        // If selected locations is changed and the device is operating, the device may need to update it's operations.
-        mDelegate->HandleSelectedLocationsChanged();
-        NotifySelectedLocationsChanged();
-    }
-
-    if (progressChanged)
-    {
-        NotifyProgressChanged();
-    }
-
-    return supportedLocationsChanged;
-}
-
-bool Instance::DeleteSupportedLocation(uint32_t aLocationId)
-{
-    return (mSupportedLocations.erase(aLocationId) > 0);
-}
-
-bool Instance::ClearSupportedLocationsList()
-{
-    if (mSupportedLocations.size() != 0)
-    {
-        mSupportedLocations.clear();
-        NotifySupportedLocationsChanged();
-
-        // When Supported Locations change, the following attributes SHALL be set to null: SelectedLocations, CurrentLocation, and Progress.
-        if (ClearSelectedLocationsList())
-        {
-            std::string statusText;
-            if (!mDelegate->IsSetSelectedLocationAllowed(statusText))
-            {
-                ChipLogError(Zcl,  "ClearSupportedLocationsList - deletion of SupportedLocation resulted in disallowed SelectedLocations change - %s",
-                                             statusText.c_str());
-            }
-
-            // If the SelectedLocations attribute list becomes empty, the server SHALL stop operating.
-            // If selected locations is changed and the device is operating, the device may need to update it's operations.
-            mDelegate->HandleSelectedLocationsChanged();
-            NotifySelectedLocationsChanged();
-        }
-
-        if (!GetCurrentLocation().IsNull())
-        {
-            SetCurrentLocation(DataModel::Nullable<uint32_t>());
-            NotifyCurrentLocationChanged();
-        }
-
-        if (ClearProgressList())
-        {
-            NotifyProgressChanged();
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
-
-//*************************************************************************
-// Supported Maps manipulators
-
-void  Instance::GetSupportedMapIds(std::vector<uint8_t> & aSupportedMapIds)
-{
-    aSupportedMapIds.reserve(mSupportedMaps.size());
-
-    for (auto & entry : mSupportedMaps)
-    {
-        aSupportedMapIds.push_back(entry.second.mapId);
-    }
-}
-
-bool Instance::GetSupportedMapNameById(uint8_t aMapId, CharSpan & aMapName)
+bool Instance::ClearSupportedLocations()
 {
     bool ret_value = false;
 
-    auto mapIter = mSupportedMaps.find(aMapId);
+    // does device mode allow this attribute to be updated?
+    VerifyOrExit(mDelegate->IsSupportedLocationChangeAllowed(), /* if false, should be logged as error in delegate function */);
 
-    if (mapIter != mSupportedMaps.end())
+    if (mDelegate->ClearSupportedLocations())
     {
-        aMapName = mapIter->second.name;
+        HandleSupportedLocationsUpdated();
+        NotifySupportedLocationsChanged();
+
         ret_value = true;
     }
-
-    return ret_value;
-}
-
-bool Instance::IsSupportedMap(uint8_t aMapId)
-{
-    auto mapIter = mSupportedMaps.find(aMapId);
-    return (mapIter != mSupportedMaps.end());
-}
-
-bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
-{
-    bool ret_value = false;
-
-    // check max# of list entries
-    VerifyOrExit((mSupportedMaps.size() < kMaxNumSupportedMaps), 
-                ChipLogError(Zcl,  "AddSupportedMap %u - maximum number of entries", aMapId));
-
-    //  Map name SHALL include readable text that describes the mapname (cannot be empty string)
-    VerifyOrExit((aMapName.size() != 0),
-                ChipLogError(Zcl,  "AddSupportedMap %u - Name must not be empty string", aMapId));
-
-    {
-         // Each entry in this list SHALL have a unique value for the Name field.
-        for (auto & entry : mSupportedMaps)
-        {
-            // the name cannot be the same as another map
-            VerifyOrExit(((aMapId != entry.second.mapId) || (!entry.second.DoesNameMatch(aMapName))),
-                    ChipLogError(Zcl,  "AddSupportedMap %u - map already exists with mapId %u and name '%s'", 
-                                aMapId, entry.second.mapId, entry.second.name_c_str()));
-        }
-    }
-
-    {
-        //  Each entry in this list SHALL have a unique value for the MapID field.
-        auto result = mSupportedMaps.emplace(SupportedMapPairType(aMapId, SupportedMapType(aMapId, aMapName)));
-
-        VerifyOrExit(result.second, ChipLogError(Zcl,  "AddSupportedMap - non-unique Id %u", aMapId));
-    }
-
-
-    // map successfully added
-    ret_value = true;
-    NotifySupportedMapsChanged();
-    // note - no need to modifiy other lists when a map is added.
-
 
 exit:
     return ret_value;
 }
 
 
-/**
- * @brief rename an existing map in the supported maps list
- * @param aMapId id of the map
- * @param aMapName new name of the map (cannot be empty string)
- * @return true if the new name passed validation checks and was successfully modified
- * @note if the specified map is not a member of the supported maps list, returns false with no action taken.
- * @note caller is responsible for change notification
- * 
- */ 
-bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
+//*************************************************************************
+// Supported Maps manipulators
+
+bool Instance::IsSupportedMap(uint8_t aMapId)
+{
+    uint32_t dummyIndex;  
+    MapStructureWrapper dummyMap;
+
+    return mDelegate->GetSupportedMapById(aMapId, dummyIndex, dummyMap);
+}
+
+bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
 {
     bool ret_value = false;
 
-    // check that entry exists
-    auto mapIter = mSupportedMaps.find(aMapId);
+    uint8_t              mapIndex = 0;
+    MapStructureWrapper  entry;
 
-    VerifyOrExit((mapIter != mSupportedMaps.end()), 
-                ChipLogError(Zcl,  "RenameSupportedMap Id %u - map does not exist", aMapId));
+    // does device mode allow this attribute to be updated?
+    VerifyOrExit(mDelegate->IsSupportedMapChangeAllowed(), /* if false, should be logged as error in delegate function */);
+
+    // check max# of list entries
+    VerifyOrExit((mDelegate->GetNumberOfSupportedMaps() < kMaxNumSupportedMaps), 
+                ChipLogError(Zcl,  "AddSupportedMap %u - maximum number of entries", aMapId));
 
     //  Map name SHALL include readable text that describes the mapname (cannot be empty string)
     VerifyOrExit((aMapName.size() != 0),
-                ChipLogError(Zcl,  "RenameSupportedMap %u - Name must not be empty string", aMapId));
+                ChipLogError(Zcl,  "AddSupportedMap %u - Name must not be empty string", aMapId));
 
+
+    // Each entry in this list SHALL have a unique value for the Name field.
+    while (mDelegate->GetSupportedMapByIndex(mapIndex++, entry))
     {
-        // Each entry in this list SHALL have a unique value for the Name field.
-        for (auto & entry : mSupportedMaps)
-        {
-            // don't compare with it's own entry
-            if (entry.second.mapId == aMapId)
-            {
-                continue;
-            }
+        // the name cannot be the same as an existing map
+        VerifyOrExit(!entry.DoesNameMatch(aMapName),
+                ChipLogError(Zcl,  "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.name_c_str()));
 
-           
-            // (making use of MapStructureWrapper::DoesNameMatch())
-            VerifyOrExit(((aMapId != entry.second.mapId) || (!entry.second.DoesNameMatch(aMapName))),
-                    ChipLogError(Zcl,  "AddSupportedMap %u - map already exists with mapId %u and name '%s'", 
-                                aMapId, entry.second.mapId, entry.second.name_c_str()));
-        }
+        //  Each entry in this list SHALL have a unique value for the MapID field.
+        VerifyOrExit((aMapId != entry.mapId),
+                ChipLogError(Zcl,  "AddSupportedMap - non-unique Id %u", aMapId));
+    }
+ 
+    {
+        // add to supported maps attribute
+        MapStructureWrapper newMap(aMapId, aMapName);
+        uint32_t dummyIndex;
+        VerifyOrExit( mDelegate->AddSupportedMap(newMap, dummyIndex), /* log error in delegate function*/);
     }
 
+    // map successfully added
+    ret_value = true;
+    ClearSupportedLocations();
+    NotifySupportedMapsChanged();
+    
 
-    // successfully rename map
-    mapIter->second.Set(aMapId, aMapName);   // making use of MapStructureWrapper::Set()
+exit:
+    return ret_value;
+}
+
+
+bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
+{
+    bool ret_value = false;
+
+    uint32_t modifiedIndex;
+    uint32_t loopIndex = 0;
+    MapStructureWrapper modifiedMap;
+    MapStructureWrapper entry;
+
+    // get existing entry 
+    bool mapExists = mDelegate->GetSupportedMapById(aMapId, modifiedIndex, modifiedMap);
+
+    VerifyOrExit(mapExists, ChipLogError(Zcl,  "RenameSupportedMap Id %u - map does not exist", aMapId));
+
+    //  Map name SHALL include readable text that describes the mapname (cannot be empty string)
+    VerifyOrExit((newMapName.size() != 0),
+                ChipLogError(Zcl,  "RenameSupportedMap %u - Name must not be empty string", aMapId));
+
+
+    // update the local copy of the map
+    modifiedMap.Set(modifiedMap.mapId, newMapName);
+
+    // Each entry in this list SHALL have a unique value for the Name field.
+    while (mDelegate->GetSupportedMapByIndex(loopIndex, entry))
+    {
+        if (modifiedIndex == loopIndex)
+        {
+            continue; // don't check local modified map against it's own list entry
+        }
+
+        VerifyOrExit(!entry.DoesNameMatch(newMapName),
+                ChipLogError(Zcl,  "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.name_c_str()));
+
+        ++loopIndex;
+    }
+
+    VerifyOrExit( mDelegate->ModifySupportedMap(modifiedIndex, modifiedMap), /* log error in delegate function*/);
+
+    // map successfully renamed
     ret_value = true;
     NotifySupportedMapsChanged();
     // note - no need to modifiy other lists when a map is renamed
@@ -1061,42 +956,23 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
 exit:
     return ret_value;
 }
-    
 
-bool Instance::DeleteSupportedMap(uint8_t aMapId)
+
+bool Instance::ClearSupportedMaps()
 {
     bool ret_value = false;
 
-    if (mSupportedMaps.erase(aMapId) > 0)
+    // does device mode allow this attribute to be updated?
+    VerifyOrExit(mDelegate->IsSupportedMapChangeAllowed(), /* if false, should be logged as error in delegate function */);
+
+    if (mDelegate->ClearSupportedMaps())
     {
         ret_value = true;
-        mSupportedMaps.erase(aMapId);
+        ClearSupportedLocations();
         NotifySupportedMapsChanged();
-
-        // If any entry in the SupportedMaps attribute list is deleted, the entries in the SupportedLocations 
-        // attribute list with the MapID field matching the ID of the deleted map SHALL be deleted.
-        // (as necessary update SupportedLocations, SelectedLocations, CurrentLocation, Progress)
-        PruneSupportedLocations();
     }
 
-    return ret_value;
-}
-
-bool Instance::ClearSupportedMapsList()
-{
-    bool ret_value = false;
-
-    if (mSupportedMaps.size() != 0)
-    {
-        ret_value = true;
-        mSupportedMaps.clear();
-        NotifySupportedMapsChanged();
-
-        // clear lists of any locations that depended on mapId's
-        // (as necessary update SupportedLocations, SelectedLocations, CurrentLocation, Progress)
-        PruneSupportedLocations();
-    }
-
+exit:
     return ret_value;
 }
 
@@ -1104,39 +980,15 @@ bool Instance::ClearSupportedMapsList()
 //*************************************************************************
 // Selected Locations manipulators
 
-void Instance::GetSelectedLocations(std::vector<uint32_t> & aSelectedLocations)
-{
-    aSelectedLocations.clear();
-    aSelectedLocations.reserve(mSelectedLocations.size());
-
-    for (auto & entry : mSelectedLocations)
-    {
-        aSelectedLocations.push_back(entry);
-    }
-}
-
-bool Instance::IsSelectedLocation(uint32_t aLocationId)
-{
-    bool ret_value = false;
-
-    for (uint32_t & entry : mSelectedLocations)
-    {
-        if (entry == aLocationId)
-        {
-            ret_value = true;
-        }
-    }
-
-    return ret_value;
-}
-
 bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
 {
-    bool ret_value;
-    std::string locationStatusText;
+    bool     ret_value;
+    uint32_t dummyIndex;
+
+    char locationStatusText[kMaxSizeStatusText + 1] = {'\0'};
 
     // check max# of list entries
-    VerifyOrExit((mSelectedLocations.size() < kMaxNumSelectedLocations), 
+    VerifyOrExit((mDelegate->GetNumberOfSelectedLocations() < kMaxNumSelectedLocations), 
                     ChipLogError(Zcl,  "AddSelectedLocation %u - maximum number of entries", aSelectedLocation));
 
     // each item in this list SHALL match the LocationID field of an entry on the SupportedLocations attribute's list
@@ -1144,76 +996,33 @@ bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
                     ChipLogError(Zcl, "AddSelectedLocation - unsupported location %u", aSelectedLocation));
 
     // each entry in this list SHALL have a unique value
-    VerifyOrExit(!IsSelectedLocation(aSelectedLocation), 
+    VerifyOrExit(!mDelegate->IsSelectedLocation(aSelectedLocation), 
                     ChipLogError(Zcl, "AddSelectedLocation %u - duplicated location", aSelectedLocation));
 
     // Does device mode allow modification of selected locations?
     VerifyOrExit(mDelegate->IsSetSelectedLocationAllowed(locationStatusText), 
-                    ChipLogError(Zcl, "AddSelectedLocation %u - %s", aSelectedLocation, locationStatusText.c_str()));
+                    ChipLogError(Zcl, "AddSelectedLocation %u - %s", aSelectedLocation, locationStatusText));
 
 
-    // update selected location list with the new value
+    VerifyOrExit(mDelegate->AddSelectedLocation(aSelectedLocation, dummyIndex), /* if false, should be logged as error in delegate function */);
+
+
+    // success
     ret_value = true;
-    mSelectedLocations.push_back(aSelectedLocation);
-
 
 exit:
     return ret_value;
 }
 
-bool Instance::PruneSelectedLocations()
+
+bool Instance::ClearSelectedLocations()
 {
     bool ret_value = false;
 
-    // carefully iterate through SelectedLocations while possibly deleting some of them
-    auto locationIter = mSelectedLocations.begin();
-
-    while (locationIter != mSelectedLocations.end())
-    {
-        if (IsSupportedLocation(*locationIter))
-        {
-            // delete location, move to next
-            ret_value = true;
-            locationIter = mSelectedLocations.erase(locationIter);
-        }
-        else
-        {
-            ++ locationIter; //next location
-        }
-    }
-
-    return ret_value;
-}
-
-bool Instance::DeleteSelectedLocation(uint32_t aLocationId)
-{
-    bool ret_value = false;
-
-    auto locationIter = mSelectedLocations.begin();
-
-    while (locationIter != mSelectedLocations.end())
-    {
-        if (*locationIter == aLocationId)
-        {
-            // delete location
-            ret_value = true;
-            locationIter = mSelectedLocations.erase(locationIter);
-            break;
-        }
-    }
-
-    return ret_value;
-}
-
-bool Instance::ClearSelectedLocationsList()
-{
-    bool ret_value = false;
-
-    if (mSelectedLocations.size() != 0)
+    if (mDelegate->ClearSelectedLocations())
     {
         ret_value = true;
-        mSelectedLocations.clear();
-
+        NotifySelectedLocationsChanged();
     }
 
     return ret_value;
@@ -1302,191 +1111,151 @@ exit:
 //*************************************************************************
 // Progress list manipulators
 
-void Instance::GetProgressElementIds(std::vector<uint32_t> & aProgressIds)
-{
-    aProgressIds.clear();
-    aProgressIds.reserve(mProgressList.size());
-
-    for (auto & entry : mProgressList)
-    {
-        aProgressIds.push_back(entry.first);
-    }
-}
-
-bool Instance::GetProgressElementById(uint32_t aLocationId, const Structs::ProgressStruct::Type*& aProgressElement)
-{
-    bool ret_value = false;
-
-    auto progressIter = mProgressList.find(aLocationId);
-
-    if (progressIter != mProgressList.end())
-    {
-        aProgressElement = &progressIter->second;
-        ret_value = true;
-    }
-
-    return ret_value;
-}
-
-bool Instance::IsProgressElement(uint32_t aLocationId)
-{
-    bool ret_value = false;
-
-    auto progressIter = mProgressList.find(aLocationId);
-
-    if (progressIter != mProgressList.end())
-    {
-        ret_value = true;
-    }
-
-    return ret_value;
-}
-
 bool Instance::AddPendingProgressElement(uint32_t aLocationId)
 {
-    bool ret_value = false;
-    ProgressType inactiveProgress = { aLocationId, OperationalStatusEnum::kPending};
+    bool     ret_value = false;
+    uint32_t dummyIndex;
+
+    // create progress element
+    Structs::ProgressStruct::Type inactiveProgress = { aLocationId, OperationalStatusEnum::kPending};
 
     // check max# of list entries
-    VerifyOrExit((mProgressList.size() < kMaxNumSupportedProgress),  // Note: progress elements must uniquely map to supported locations, so max size is the same
+    VerifyOrExit((mDelegate->GetNumberOfProgressElements() < kMaxNumProgressElements),  // Note: progress elements must uniquely map to supported locations, so max size is the same
                 ChipLogError(Zcl,  "AddPendingProgressElement - maximum number of entries"));
 
     // For each entry in this list, the LocationID field SHALL match an entry on the SupportedLocations attribute's list.
     VerifyOrExit(IsSupportedLocation(aLocationId),
                 ChipLogError(Zcl,  "AddPendingProgressElement - not a supported location %u", aLocationId));
 
-    {
-        // add progress element to list
-        auto result = mProgressList.emplace(ProgressPairType(aLocationId, inactiveProgress));
+    // Each entry in this list SHALL have a unique value for the LocationID field.
 
-        // Each entry in this list SHALL have a unique value for the LocationID field.
-        // emplace failed, Id already exists
-        VerifyOrExit(result.second,
-                    ChipLogError(Zcl,  "AddPendingProgressElement - progress element already exists for location %u", aLocationId));
-    }
+    VerifyOrExit(!IsProgressElement(aLocationId),
+                ChipLogError(Zcl,  "AddPendingProgressElement - progress element already exists for location %u", aLocationId));         
+
+
+    VerifyOrExit(mDelegate->AddProgressElement(inactiveProgress, dummyIndex), /* if false, should be logged as error in delegate function */);
+
 
     // success
     ret_value = true;
-
+    NotifyProgressChanged();
 
 exit:
     return ret_value;
 }
 
+
 bool Instance::SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opStatus)
 {
-    bool ret_value = false;
-    OperationalStatusEnum oldOpStatus;
+    bool     ret_value = false;
+    uint32_t listIndex;
 
-    auto entry = mProgressList.find(aLocationId);
+    Structs::ProgressStruct::Type progressElement;
 
-    VerifyOrExit((entry != mProgressList.end()),
-                ChipLogError(Zcl,  "SetProgressStatus - progress element does not existsfor location %u", aLocationId));
+    VerifyOrExit(mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement),
+                ChipLogError(Zcl,  "SetProgressStatus - progress element does not exist for location %u", aLocationId));
 
 
-    VerifyOrExit((opStatus < OperationalStatusEnum::kUnknownEnumValue),
-                ChipLogError(Zcl,  "SetProgressStatus - unknown opStatus value %u", to_underlying(opStatus)));
-    
+    // if status value not changing, no need to modify the existing element
+    VerifyOrExit((progressElement.status != opStatus), ret_value = true);
 
-    // set the progress status
-    oldOpStatus = OperationalStatusEnum(entry->second.status);
-    entry->second.status = opStatus;
-    ret_value = true;
+    // set the progress status in the local copy
+    progressElement.status = opStatus;
 
     // TotalOperationalTime SHALL be null if the Status field is not set to Completed or Skipped.
     if ((opStatus != OperationalStatusEnum::kCompleted) &&
         (opStatus != OperationalStatusEnum::kSkipped))
     {
-        entry->second.totalOperationalTime.Value().SetNull();
+        progressElement.totalOperationalTime.Value().SetNull();
     }
 
-    if (oldOpStatus != OperationalStatusEnum(entry->second.status))
-    {
-        NotifyProgressChanged();
-    }
-
-
-exit:
-    return ret_value;
-}
-
-bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
-{
-    bool ret_value = false;
-    auto entry = mProgressList.find(aLocationId);
-
-    VerifyOrExit((entry != mProgressList.end()),
-            ChipLogError(Zcl,  "SetProgressTotalOperationalTime - no progress element for location %u", aLocationId));
-
-    // This attribute SHALL be null if the Status field is not set to Completed or Skipped
-    VerifyOrExit((aTotalOperationalTime.IsNull() || (entry->second.status == OperationalStatusEnum::kCompleted) || (entry->second.status == OperationalStatusEnum::kSkipped)),
-            ChipLogError(Zcl,  "SetProgressTotalOperationalTime - location %u opStatus value %u - can be non-null only if opStatus is Completed or Skipped",
-                                aLocationId, to_underlying(entry->second.status)));
+    // add the updated element to the progress attribute
+    VerifyOrExit(mDelegate->ModifyProgressElement(listIndex, progressElement), /* if false, should be logged as error in delegate function */);
 
 
     // success
-    entry->second.totalOperationalTime.SetValue(aTotalOperationalTime);
     ret_value = true;
+    NotifyProgressChanged();
 
-
-exit:
+ exit:
     return ret_value;
 }
+
+
+bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
+{
+    bool     ret_value = false;
+    uint32_t listIndex;
+
+    Structs::ProgressStruct::Type progressElement;
+
+    VerifyOrExit(mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement),
+                ChipLogError(Zcl,  "SetProgressTotalOperationalTime - progress element does not exist for location %u", aLocationId));
+
+    // if time value not changing, no need to modify the existing element
+    VerifyOrExit((progressElement.totalOperationalTime != aTotalOperationalTime), ret_value = true);
+
+    // This attribute SHALL be null if the Status field is not set to Completed or Skipped
+    VerifyOrExit((aTotalOperationalTime.IsNull() || (progressElement.status == OperationalStatusEnum::kCompleted) || (progressElement.status == OperationalStatusEnum::kSkipped)),
+            ChipLogError(Zcl,  "SetProgressTotalOperationalTime - location %u opStatus value %u - can be non-null only if opStatus is Completed or Skipped",
+                                aLocationId, to_underlying(progressElement.status)));
+
+    // set the time in the local copy
+    progressElement.totalOperationalTime.Value() = aTotalOperationalTime;
+
+    // add the updated element to the progress attribute
+    VerifyOrExit(mDelegate->ModifyProgressElement(listIndex, progressElement), /* if false, should be logged as error in delegate function */);
+
+
+    // success
+    ret_value = true;
+    NotifyProgressChanged();
+
+ exit:
+    return ret_value;
+}
+
 
 bool Instance::SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aEstimatedTime)
 {
-    bool ret_value = false;
+    bool     ret_value = false;
+    uint32_t listIndex;
 
-    auto entry = mProgressList.find(aLocationId);
+    Structs::ProgressStruct::Type progressElement;
 
-    VerifyOrExit((entry != mProgressList.end()),
-            ChipLogError(Zcl,  "SetProgressTotalOperationalTime - no progress element for location %u", aLocationId));
+    VerifyOrExit(mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement),
+                ChipLogError(Zcl,  "SetProgressEstimatedTime - progress element does not exist for location %u", aLocationId));
 
-    entry->second.estimatedTime.SetValue(aEstimatedTime);
+    // if time value not changing, no need to modify the existing element
+    VerifyOrExit((progressElement.estimatedTime != aEstimatedTime), ret_value = true);
+
+    // set the time in the local copy
+    progressElement.estimatedTime.Value() = aEstimatedTime;
+
+    // add the updated element to the progress attribute
+    VerifyOrExit(mDelegate->ModifyProgressElement(listIndex, progressElement), /* if false, should be logged as error in delegate function */);
+
+
+    // success
     ret_value = true;
+    NotifyProgressChanged();
 
-exit:
+ exit:
     return ret_value;
 }
 
-bool Instance::PruneProgressElements()
+
+bool Instance::ClearProgress()
 {
     bool ret_value = false;
 
-    // carefully iterate through ProgressList elements while possibly deleting some of them
-    auto progressIter = mProgressList.begin();
-
-    while (progressIter != mProgressList.end())
+    if (mDelegate->ClearProgress())
     {
-        if (IsSupportedLocation(progressIter->first))
-        {
-            // delete location, move to next
-            ret_value = true;
-            progressIter = mProgressList.erase(progressIter);
-        }
-        else
-        {
-            ++progressIter; //next location
-        }
+        ret_value = true;
+        NotifyProgressChanged();
     }
 
     return ret_value;
-}
-
-bool Instance::DeleteProgressElement(uint32_t aLocationId)
-{
-    return (mProgressList.erase(aLocationId) > 0);
-}
-
-bool Instance::ClearProgressList()
-{
-    if (mProgressList.size() != 0)
-    {
-        mProgressList.clear();
-        return true;
-    }
-
-    return false;
 }
 
 

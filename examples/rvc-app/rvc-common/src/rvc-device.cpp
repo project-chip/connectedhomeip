@@ -6,7 +6,7 @@ using namespace chip::app::Clusters;
 
 void RvcDevice::Init()
 {
-    mServiceAreaInstance.Init();
+//    mServiceAreaInstance.Init();
     mRunModeInstance.Init();
     mCleanModeInstance.Init();
     mOperationalStateInstance.Init();
@@ -224,7 +224,8 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
     }
 }
 
-bool RvcDevice::HandleIsSetSelectedLocationCallback(std::string & locationText)
+
+bool RvcDevice::HandleIsSetSelectedLocationCallback(char* statusText)
 {
     bool canSet;
 
@@ -236,17 +237,17 @@ bool RvcDevice::HandleIsSetSelectedLocationCallback(std::string & locationText)
 
     case RvcRunMode::ModeCleaning:
         canSet = false;
-        locationText = "SelectLocations command - cannot select locations while cleaning";
+        strncat(statusText, "SelectLocations command - cannot select locations while cleaning", ServiceArea::kMaxSizeStatusText);
         break;
 
     case RvcRunMode::ModeMapping:
         canSet = false;
-        locationText = "SelectLocations command - cannot select locations while mapping";
+        strncat(statusText, "SelectLocations command - cannot select locations while mapping", ServiceArea::kMaxSizeStatusText);
         break;
 
     default:
         canSet = false;
-        locationText = "SelectLocations command - cannot select locations - unknown mode";
+        strncat(statusText, "SelectLocations command - cannot select locations - unknown mode", ServiceArea::kMaxSizeStatusText);
         break;
     }
 
@@ -426,4 +427,419 @@ void RvcDevice::HandleResetMessage()
     mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
     mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     mCleanModeInstance.UpdateCurrentMode(RvcCleanMode::ModeQuick);
+}
+
+
+// *****************************************************************************
+//   RVC SERVICE AREA DELEGATE IMPLEMENTATION  
+
+using namespace chip::app::Clusters::ServiceArea;
+
+
+
+//*************************************************************************
+// command support
+
+bool RvcDevice::IsSetSelectedLocationAllowed(char* statusText)
+{
+    return true; // TODO IMPLEMENT
+};
+
+bool RvcDevice::HandleSetSelectLocations(const Commands::SelectLocations::DecodableType & req, 
+                        SelectLocationsStatus & locationStatus, char* statusText, bool & useStatusText) 
+{
+    bool ret_value = false;
+
+    ret_value = true; // TODO IMPLEMENT
+
+    return ret_value;
+};
+
+bool RvcDevice::HandleSkipCurrentLocation(char* skipStatusText)
+{
+    bool ret_value = false;
+
+    ret_value = true; // TODO IMPLEMENT
+
+    return ret_value;
+};
+
+
+//*************************************************************************
+// Supported Locations accessors
+
+bool RvcDevice::IsSupportedLocationChangeAllowed()
+{
+    return true; // TODO
+}
+
+uint32_t RvcDevice::GetNumberOfSupportedLocations() 
+{
+    return mSupportedLocations.size();
+}
+
+
+bool RvcDevice::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation) 
+{
+    bool ret_value = false;
+
+    if (listIndex < mSupportedLocations.size())
+    {
+        aSupportedLocation = mSupportedLocations[listIndex];
+        ret_value = true;
+    }
+
+    return ret_value;
+};
+
+
+bool RvcDevice::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex, LocationStructureWrapper & aSupportedLocation)
+{
+    // optional optimization of base delegate function
+    // still using linear search, 
+    // but don't need to copy every location (because direct access to list is available)
+    bool ret_value = false;
+
+    listIndex = 0;
+    uint32_t listSize = mSupportedLocations.size();
+
+    while (listIndex < listSize)
+    {
+        if (mSupportedLocations[listIndex].locationId == aLocationId)
+        {
+            aSupportedLocation = mSupportedLocations[listIndex];
+            ret_value = true;
+            break;
+        }
+
+        ++listIndex;
+    }
+
+    return ret_value;
+};
+
+
+bool RvcDevice::AddSupportedLocation(const LocationStructureWrapper & newLocation, uint32_t & listIndex)
+{
+    bool ret_value = false;
+
+    // server instance (caller)  is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+
+    // double check list size to ensure no memory issues
+    if (mSupportedLocations.size() < kMaxNumSupportedLocations)
+    {
+        // not sorting list, number of locations normally expected to be small, max 255
+        mSupportedLocations.push_back(newLocation);
+        listIndex = mSupportedMaps.size() - 1; // new element is last in list
+        ret_value = true;
+    }
+    else
+    {
+        ChipLogError(Zcl,  "AddSupportedLocation %u - supported locations list is already at maximum size %u",
+                            newLocation.locationId, (uint32_t)kMaxNumSupportedLocations);
+    }
+
+    return ret_value;
+}
+
+
+bool RvcDevice::ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation)
+{
+    bool ret_value = false;
+
+    // server instance (caller) is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+
+    // double check that locationId's match
+    VerifyOrExit((modifiedLocation.locationId == mSupportedLocations[listIndex].locationId), 
+        ChipLogError(Zcl,  "ModifySupportedLocation - new locationId %u does not match existing locationId %u", 
+                        modifiedLocation.locationId, mSupportedLocations[listIndex].locationId));   
+
+
+    // checks passed, update the attribute
+    mSupportedLocations[listIndex] = modifiedLocation;
+    ret_value = true;
+
+exit:
+
+    return ret_value;
+}
+
+
+bool RvcDevice::ClearSupportedLocations()
+{
+    bool ret_value = false;
+
+    if (mSupportedLocations.size() > 0)
+    {
+        mSupportedLocations.clear();
+        ret_value = true;
+    }
+
+    return ret_value;
+}
+
+
+//*************************************************************************
+// Supported Maps accessors
+
+bool RvcDevice::IsSupportedMapChangeAllowed()
+{
+    return true; // TODO
+}
+
+uint32_t RvcDevice::GetNumberOfSupportedMaps() 
+{
+    return mSupportedMaps.size();
+}
+
+bool RvcDevice::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap) 
+{
+    bool ret_value = false;
+
+    if (listIndex < mSupportedMaps.size())
+    {
+        aSupportedMap = mSupportedMaps[listIndex];
+        ret_value = true;
+    }
+
+    return ret_value;
+};
+
+
+bool RvcDevice::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
+{
+    // optional optimization of base delegate function
+    // still using linear search, 
+    // but don't need to copy every map (because direct access to list is available)
+    bool ret_value = false;
+
+    listIndex = 0;
+    uint32_t listSize = mSupportedMaps.size();
+
+    while (listIndex < listSize)
+    {
+        if (mSupportedMaps[listIndex].mapId == aMapId)
+        {
+            aSupportedMap = mSupportedMaps[listIndex];
+            ret_value = true;
+            break;
+        }
+
+        ++listIndex;
+    }
+
+    return ret_value;
+};
+
+
+bool RvcDevice::AddSupportedMap(const MapStructureWrapper & newMap, uint32_t & listIndex)
+{
+    bool ret_value = false;
+
+    // server instance class is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+
+    // double check list size to ensure no memory issues
+    if (mSupportedMaps.size() < kMaxNumSupportedMaps)
+    {
+        // not sorting list, number of locations normally expected to be small, max 255
+        mSupportedMaps.push_back(newMap);
+        listIndex = mSupportedMaps.size() - 1; // new element is last in list
+    }
+    else
+    {
+        ChipLogError(Zcl,  "AddSupportedMap %u - supported maps list is already at maximum size %u",
+                                newMap.mapId, (uint32_t)kMaxNumSupportedMaps);
+    }
+
+    return ret_value;
+}
+
+
+bool RvcDevice::ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper & modifiedMap)
+{
+    bool ret_value = false;
+
+    // server instance (caller) is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+
+    // double check that mapId's match
+    VerifyOrExit((modifiedMap.mapId == mSupportedMaps[listIndex].mapId),
+        ChipLogError(Zcl,  "ModifySupportedMap - mapId's do not match, new lmapId %u, existing mapId %u", 
+                        modifiedMap.mapId, mSupportedMaps[listIndex].mapId));   
+
+    // save modified map
+    mSupportedMaps[listIndex] = modifiedMap;
+    ret_value = true;
+
+exit:
+    return ret_value;
+}
+
+
+bool RvcDevice::ClearSupportedMaps()
+{
+    bool ret_value = false;
+
+    if (mSupportedMaps.size() > 0)
+    {
+        mSupportedMaps.clear();
+        ret_value = true;
+    }
+
+    return ret_value;
+}
+
+
+//*************************************************************************
+// Selected Locations accessors
+
+uint32_t RvcDevice::GetNumberOfSelectedLocations()
+{
+    return mSelectedLocations.size();
+}
+
+
+bool RvcDevice::GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & aSelectedLocation)
+{
+    bool ret_value = false;
+
+    if (listIndex < mSelectedLocations.size())
+    {
+        aSelectedLocation = mSelectedLocations[listIndex];
+        ret_value = true;
+    }
+
+    return ret_value;
+};
+
+
+bool RvcDevice::AddSelectedLocation(uint32_t aLocationId, uint32_t & listIndex)
+{
+    bool ret_value = false;
+
+    // server instance class is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+
+    // double check list size to ensure no memory issues
+    if (mSelectedLocations.size() < kMaxNumSelectedLocations)
+    {
+        // not sorting list, number of locations normally expected to be small, max 255
+        mSelectedLocations.push_back(aLocationId);
+        listIndex = mSelectedLocations.size() - 1; // new element is last in list
+    }
+    else
+    {
+        ChipLogError(Zcl,  "AddSelectedLocation %u - selected locations list is already at maximum size %u",
+                                aLocationId, (uint32_t)kMaxNumSelectedLocations);
+    }
+
+    return ret_value;
+}
+
+
+bool RvcDevice::ClearSelectedLocations()
+{
+    bool ret_value = false;
+
+    if (mSelectedLocations.size() > 0)
+    {
+        mSelectedLocations.clear();
+        ret_value = true;
+    }
+
+    return ret_value;
+}
+
+
+//*************************************************************************
+// Progress List accessors
+
+uint32_t RvcDevice::GetNumberOfProgressElements() 
+{
+    return mProgressList.size();
+}
+
+
+bool RvcDevice::GetProgressElementByIndex(uint32_t listIndex,  Structs::ProgressStruct::Type & aProgressElement) 
+{
+    bool ret_value = false;
+
+    if (listIndex < mProgressList.size())
+    {
+        aProgressElement = mProgressList[listIndex];
+        ret_value = true;
+    }
+
+    return ret_value;
+};
+
+
+bool RvcDevice::GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
+{
+    // optional optimization of base delegate function
+    // still using linear search, 
+    // but don't need to copy every map (because direct access to list is available)
+    bool ret_value = false;
+
+    listIndex = 0;
+    uint32_t listSize = mProgressList.size();
+
+    while (listIndex < listSize)
+    {
+        if (mProgressList[listIndex].locationId == aLocationId)
+        {
+            aProgressElement = mProgressList[listIndex];
+            ret_value = true;
+            break;
+        }
+
+        ++listIndex;
+    }
+
+    return ret_value;
+};
+
+
+bool RvcDevice::AddProgressElement(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex)
+{
+    bool ret_value = false;
+
+    // server instance class is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+
+    // double check list size to ensure no memory issues
+    if (mProgressList.size() < kMaxNumProgressElements)
+    {
+        // not sorting list, number of locations normally expected to be small, max 255
+        mProgressList.push_back(newProgressElement);
+        listIndex = mProgressList.size() - 1; // new element is last in list
+    }
+    else
+    {
+        ChipLogError(Zcl,  "AddProgressElement %u -progress list is already at maximum size %u", 
+                            newProgressElement.locationId, (uint32_t)kMaxNumProgressElements);
+    }
+
+    return ret_value;
+}
+
+
+bool RvcDevice::ModifyProgressElement(uint32_t listIndex, const Structs::ProgressStruct::Type & modifiedProgressElement) 
+{
+    bool ret_value = false;
+
+    // TODO
+
+    return ret_value; 
+}
+
+
+bool RvcDevice::ClearProgress()
+{
+    bool ret_value = false;
+
+    if (mProgressList.size() > 0)
+    {
+        mProgressList.clear();
+        ret_value = true;
+    }
+
+    return ret_value;
 }
