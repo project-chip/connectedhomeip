@@ -328,6 +328,8 @@ public:
 
     /**************** CommandHandler interface implementation ***********************/
 
+    using CommandHandler::AddResponseData;
+
     void FlushAcksRightAwayOnSlowCommand() override;
 
     CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::Status aStatus,
