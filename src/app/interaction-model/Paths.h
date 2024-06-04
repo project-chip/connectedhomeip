@@ -25,7 +25,7 @@ namespace InteractionModel {
 /// Notification listener for attribute changes.
 ///
 /// Used to notify that a specific attribute path (or several attributes
-/// via wildcards) have changed their underlying content. 
+/// via wildcards) have changed their underlying content.
 ///
 /// Methods on this class MUST be called from within the matter
 /// main loop as they will likely trigger interaction model
