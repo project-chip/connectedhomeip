@@ -18,6 +18,7 @@
 
 #include <app/CommandHandler.h>
 
+#include <app/CommandPathRegistry.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <lib/core/TLV.h>
@@ -25,12 +26,11 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/Scoped.h>
 #include <messaging/ExchangeHolder.h>
-#include <system/SystemPacketBuffer.h>
-#include <app/CommandPathRegistry.h>
-#include <system/TLVPacketBufferBackingStore.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
+#include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {
