@@ -36,7 +36,7 @@ bool IsServerMask(EmberAfClusterMask mask)
 /// Load the cluster information into the specified destination
 void LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster, InteractionModel::ClusterInfo * info)
 {
-    chip::DataVersion * versionPtr = emberAfDataVersionStorage(path);
+    DataVersion * versionPtr = emberAfDataVersionStorage(path);
     if (versionPtr != nullptr)
     {
         info->dataVersion = *versionPtr;
@@ -109,7 +109,7 @@ InteractionModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & 
 }
 
 InteractionModel::AttributeEntry AttributeEntryForGlobalListAttribute(const ConcreteClusterPath & clusterPath,
-                                                                      chip::AttributeId globalAttributeId)
+                                                                      AttributeId globalAttributeId)
 {
     InteractionModel::AttributeEntry entry;
 
@@ -135,7 +135,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR CodegenDataModel::Invoke(const InteractionModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+CHIP_ERROR CodegenDataModel::Invoke(const InteractionModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                     InteractionModel::InvokeReply & reply)
 {
     // TODO: this needs an implementation
@@ -150,6 +150,7 @@ EndpointId CodegenDataModel::FirstEndpoint()
     {
         if (emberAfEndpointIndexIsEnabled(endpoint_idx))
         {
+            mEndpointIterationHint = endpoint_idx;
             return emberAfEndpointFromIndex(endpoint_idx);
         }
     }
@@ -158,7 +159,7 @@ EndpointId CodegenDataModel::FirstEndpoint()
     return kInvalidEndpointId;
 }
 
-std::optional<unsigned> CodegenDataModel::TryFindEndpointIndex(chip::EndpointId id) const
+std::optional<unsigned> CodegenDataModel::TryFindEndpointIndex(EndpointId id) const
 {
     const uint16_t lastEndpointIndex = emberAfEndpointCount();
 
@@ -169,20 +170,13 @@ std::optional<unsigned> CodegenDataModel::TryFindEndpointIndex(chip::EndpointId 
     }
 
     // Linear search, this may be slow
-    for (uint16_t endpoint_idx = 0; endpoint_idx < lastEndpointIndex; endpoint_idx++)
+    uint16_t idx = emberAfIndexFromEndpoint(id);
+    if (idx == kEmberInvalidEndpointIndex)
     {
-        if (!emberAfEndpointIndexIsEnabled(endpoint_idx))
-        {
-            continue;
-        }
-
-        if (id == emberAfEndpointFromIndex(endpoint_idx))
-        {
-            return std::make_optional(endpoint_idx);
-        }
+        return std::nullopt;
     }
-
-    return std::nullopt;
+    
+    return std::make_optional<unsigned>(idx);
 }
 
 EndpointId CodegenDataModel::NextEndpoint(EndpointId before)
@@ -219,7 +213,7 @@ InteractionModel::ClusterEntry CodegenDataModel::FirstCluster(EndpointId endpoin
     return FirstServerClusterEntry(endpointId, endpoint, 0, mClusterIterationHint);
 }
 
-std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id) const
+std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, ClusterId id) const
 {
     const unsigned clusterCount = endpoint->clusterCount;
 
@@ -233,6 +227,8 @@ std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberA
     }
 
     // linear search, this may be slow
+    // does NOT use emberAfClusterIndex to not iteratoe over endpoints as we have 
+    // already found the correct endpoint
     for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
@@ -284,10 +280,11 @@ InteractionModel::AttributeEntry CodegenDataModel::FirstAttribute(const Concrete
     VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::Invalid());
     VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::Invalid());
 
+    mAttributeIterationHint = 0;
     return AttributeEntryFrom(path, cluster->attributes[0]);
 }
 
-std::optional<unsigned> CodegenDataModel::TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const
+std::optional<unsigned> CodegenDataModel::TryFindAttributeIndex(const EmberAfCluster * cluster, AttributeId id) const
 {
     const unsigned attributeCount = cluster->attributeCount;
 
