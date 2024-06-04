@@ -139,7 +139,7 @@ public:
             AddAttributeValuePair<uint16_t>(pairs, Attributes::ColorLoopTime::Id, loopTimeValue, attributeCount);
         }
 
-        if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorTemperatureMireds))
+        if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorTemperature))
         {
             uint16_t temperatureValue;
             if (Status::Success != Attributes::ColorTemperatureMireds::Get(endpoint, &temperatureValue))
