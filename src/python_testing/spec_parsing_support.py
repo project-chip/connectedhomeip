@@ -447,7 +447,7 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
                 endpoint_id=0, cluster_id=id, command_id=cmd.id), severity=ProblemSeverity.WARNING, problem="Command with unknown direction"))
 
 
-def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters() -> tuple[dict[int, XmlCluster], list[ProblemNotice]]:
     dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'clusters')
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
