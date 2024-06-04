@@ -84,7 +84,7 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
     return InteractionModel::ClusterEntry::Invalid();
 }
 
-/// Load the cluster information into the specified destination
+/// Load the attribute information into the specified destination
 void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttributeMetadata & attribute,
                        InteractionModel::AttributeInfo * info)
 {
