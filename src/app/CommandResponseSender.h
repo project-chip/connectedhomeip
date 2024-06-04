@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/CommandHandler.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/CommandHandlerExchangeInterface.h>
 #include <app/StatusResponse.h>
 #include <messaging/ExchangeHolder.h>

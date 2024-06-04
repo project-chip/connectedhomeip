@@ -335,9 +335,10 @@ source_set("status-response") {
 
 source_set("command-handler") {
   sources = [
-    "CommandHandler.cpp",
     "CommandHandler.h",
     "CommandHandlerExchangeInterface.h",
+    "CommandHandlerImpl.cpp",
+    "CommandHandlerImpl.h",
   ]
 
   public_deps = [

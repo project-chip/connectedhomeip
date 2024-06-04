@@ -26,6 +26,7 @@
 
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>

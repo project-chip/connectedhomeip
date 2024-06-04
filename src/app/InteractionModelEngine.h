@@ -31,7 +31,7 @@
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
-#include <app/CommandHandler.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>

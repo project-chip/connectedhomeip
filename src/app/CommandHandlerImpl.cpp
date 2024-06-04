@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/CommandHandler.h>
+#include <app/CommandHandlerImpl.h>
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/cluster-objects.h>
