@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -129,7 +130,10 @@ class NxpBuilder(GnBuilder):
 
     def build_outputs(self):
         name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
-        return {
-            '%s.elf' % name: os.path.join(self.output_dir, name),
-            '%s.map' % name: os.path.join(self.output_dir, '%s.map' % name)
-        }
+        yield BuilderOutput(
+            os.path.join(self.output_dir, name),
+            f'{name}.elf')
+        if self.options.enable_link_map_file:
+            yield BuilderOutput(
+                os.path.join(self.output_dir, f'{name}.map'),
+                f'{name}.map')

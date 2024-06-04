@@ -17,7 +17,7 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder
+from .builder import Builder, BuilderOutput
 
 
 class TelinkApp(Enum):
@@ -229,15 +229,10 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
     def build_outputs(self):
-        return {
-            '%s.elf' %
-            self.app.AppNamePrefix(): os.path.join(
-                self.output_dir,
-                'zephyr',
-                'zephyr.elf'),
-            '%s.map' %
-            self.app.AppNamePrefix(): os.path.join(
-                self.output_dir,
-                'zephyr',
-                'zephyr.map'),
-        }
+        yield BuilderOutput(
+            os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
+            '%s.elf' % self.app.AppNamePrefix())
+        if self.options.enable_link_map_file:
+            yield BuilderOutput(
+                os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
+                '%s.map' % self.app.AppNamePrefix())

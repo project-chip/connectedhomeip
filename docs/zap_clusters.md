@@ -112,6 +112,8 @@ Generally regenerate using one of:
 |       1069 |      0x42D | Pm10ConcentrationMeasurement                            |
 |       1070 |      0x42E | TotalVolatileOrganicCompoundsConcentrationMeasurement   |
 |       1071 |      0x42F | RadonConcentrationMeasurement                           |
+|       1105 |      0x451 | WiFiNetworkManagement                                   |
+|       1107 |      0x453 | ThreadNetworkDirectory                                  |
 |       1283 |      0x503 | WakeOnLan                                               |
 |       1284 |      0x504 | Channel                                                 |
 |       1285 |      0x505 | TargetNavigator                                         |

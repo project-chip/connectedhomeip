@@ -46,11 +46,11 @@ void Device::SetReachable(bool aReachable)
 
     if (aReachable)
     {
-        ChipLogProgress(DeviceLayer, "Device[%s]: ONLINE", mName);
+        ChipLogProgress(NotSpecified, "Device[%s]: ONLINE", mName);
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "Device[%s]: OFFLINE", mName);
+        ChipLogProgress(NotSpecified, "Device[%s]: OFFLINE", mName);
     }
 
     if (changed)
@@ -63,7 +63,7 @@ void Device::SetName(const char * szName)
 {
     bool changed = (strncmp(mName, szName, sizeof(mName)) != 0);
 
-    ChipLogProgress(DeviceLayer, "Device[%s]: New Name=\"%s\"", mName, szName);
+    ChipLogProgress(NotSpecified, "Device[%s]: New Name=\"%s\"", mName, szName);
 
     chip::Platform::CopyString(mName, szName);
 

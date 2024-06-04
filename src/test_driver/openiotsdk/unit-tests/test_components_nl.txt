@@ -1,2 +1,2 @@
-AppTests
+AppTestsNL
 SecureChannelTestsNL

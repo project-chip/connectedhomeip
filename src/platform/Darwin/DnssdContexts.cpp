@@ -607,7 +607,16 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     {
         auto delegate = static_cast<DiscoverNodeDelegate *>(context);
         DiscoveredNodeData nodeData;
-        service.ToDiscoveredNodeData(addresses, nodeData);
+
+        // Check whether mType (service name) exactly matches with operational service name
+        if (strcmp(service.mType, kOperationalServiceName) == 0)
+        {
+            service.ToDiscoveredOperationalNodeBrowseData(nodeData);
+        }
+        else
+        {
+            service.ToDiscoveredCommissionNodeData(addresses, nodeData);
+        }
         delegate->OnNodeDiscovered(nodeData);
     }
     else
