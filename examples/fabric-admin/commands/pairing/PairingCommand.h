@@ -18,11 +18,10 @@
 
 #pragma once
 
-#include "../common/CHIPCommand.h"
+#include <commands/common/CHIPCommand.h>
+#include <commands/common/CredentialIssuerCommands.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
-
-#include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
@@ -197,8 +196,8 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-    void OnICDRegistrationComplete(NodeId deviceId, uint32_t icdCounter) override;
-    void OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedActiveDuration) override;
+    void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
+    void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;

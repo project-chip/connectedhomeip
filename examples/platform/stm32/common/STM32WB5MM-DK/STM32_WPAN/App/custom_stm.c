@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file    custom_stm.c
+ * @file    matter_stm.c
  * @author  MCD Application Team
  * @brief   matter Service using gatt(Custom STM)
  ******************************************************************************
@@ -234,6 +234,11 @@ static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void * Event)
                 Notification.DataTransfered.Length   = attribute_modified->Attr_Data_Length;
                 Notification.DataTransfered.pPayload = attribute_modified->Attr_Data;
                 Notification.ConnectionHandle        = attribute_modified->Connection_Handle;
+                if (Notification.DataTransfered.Length == 0)
+                {
+                    /* Exit the function because of bad packet  */
+                    break;
+                }
                 APP_MATTER_Notification(&Notification);
             }
         }

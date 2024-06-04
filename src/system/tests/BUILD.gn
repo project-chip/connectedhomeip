@@ -46,6 +46,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
     "${chip_root}/src/platform",
     "${chip_root}/src/system",
   ]

@@ -38,7 +38,7 @@ CommissionerDeclarationHandler * CommissionerDeclarationHandler::GetInstance()
 }
 
 // TODO: In the following PRs. Implement setHandler() for CommissionerDeclaration messages and expose messages to higher layers for
-// Linux(DONE), Android(pending) and iOS(pending).
+// Linux, Android and iOS.
 void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
     const chip::Transport::PeerAddress & source, chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
 {

@@ -74,14 +74,6 @@ namespace Internal {
 
 namespace {
 
-/* CHIPoBLE UUID strings */
-constexpr char chip_ble_service_uuid[]    = "0000FFF6-0000-1000-8000-00805F9B34FB";
-constexpr char chip_ble_char_c1_tx_uuid[] = "18EE2EF5-263D-4559-959F-4F9C429F9D11";
-constexpr char chip_ble_char_c2_rx_uuid[] = "18EE2EF5-263D-4559-959F-4F9C429F9D12";
-
-constexpr char chip_ble_desc_uuid_short[]    = "2902";
-constexpr char chip_ble_service_uuid_short[] = "FFF6";
-
 constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
 constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
 constexpr System::Clock::Timeout kFastAdvertiseTimeout =
@@ -582,12 +574,12 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_create() failed: %s", get_error_message(ret)));
 
     // Create Service (BTP Service)
-    ret = bt_gatt_service_create(chip_ble_service_uuid, BT_GATT_SERVICE_TYPE_PRIMARY, &service);
+    ret = bt_gatt_service_create(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR, BT_GATT_SERVICE_TYPE_PRIMARY, &service);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_service_create() failed: %s", get_error_message(ret)));
 
     // Create 1st Characteristic (Client TX Buffer)
     ret = bt_gatt_characteristic_create(
-        chip_ble_char_c1_tx_uuid, BT_GATT_PERMISSION_WRITE,
+        Ble::CHIP_BLE_CHAR_1_UUID_STR, BT_GATT_PERMISSION_WRITE,
         BT_GATT_PROPERTY_WRITE, // Write Request is not coming if we use WITHOUT_RESPONSE property. Let's use WRITE property and
                                 // consider to use WITHOUT_RESPONSE property in the future according to the CHIP Spec 4.16.3.2. BTP
                                 // GATT Service
@@ -611,7 +603,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
                  ChipLogError(DeviceLayer, "bt_gatt_service_add_characteristic() failed: %s", get_error_message(ret)));
 
     // Create 2nd Characteristic (Client RX Buffer)
-    ret = bt_gatt_characteristic_create(chip_ble_char_c2_rx_uuid, BT_GATT_PERMISSION_READ,
+    ret = bt_gatt_characteristic_create(Ble::CHIP_BLE_CHAR_2_UUID_STR, BT_GATT_PERMISSION_READ,
                                         BT_GATT_PROPERTY_READ | BT_GATT_PROPERTY_INDICATE, "CHIPoBLE_C2", strlen("CHIPoBLE_C2"),
                                         &char2);
     VerifyOrExit(ret == BT_ERROR_NONE,
@@ -637,8 +629,8 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
                               get_error_message(ret)));
 
     // Create CCC Descriptor
-    ret = bt_gatt_descriptor_create(chip_ble_desc_uuid_short, BT_GATT_PERMISSION_READ | BT_GATT_PERMISSION_WRITE, desc_value,
-                                    sizeof(desc_value), &desc);
+    ret = bt_gatt_descriptor_create(Ble::CHIP_BLE_DESC_SHORT_UUID_STR, BT_GATT_PERMISSION_READ | BT_GATT_PERMISSION_WRITE,
+                                    desc_value, sizeof(desc_value), &desc);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_descriptor_create() failed: %s", get_error_message(ret)));
     ret = bt_gatt_characteristic_add_descriptor(char2, desc);
     VerifyOrExit(ret == BT_ERROR_NONE,
@@ -711,7 +703,8 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    ret = bt_adapter_le_add_advertising_service_data(mAdvertiser, BT_ADAPTER_LE_PACKET_ADVERTISING, chip_ble_service_uuid_short,
+    ret = bt_adapter_le_add_advertising_service_data(mAdvertiser, BT_ADAPTER_LE_PACKET_ADVERTISING,
+                                                     Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR,
                                                      reinterpret_cast<const char *>(&deviceIdInfo), sizeof(deviceIdInfo));
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_le_add_advertising_service_data() failed: %s", get_error_message(ret)));
@@ -779,12 +772,12 @@ static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from CHAR handle: %s", get_error_message(ret)));
 
-    if (strcasecmp(uuid.get(), chip_ble_char_c1_tx_uuid) == 0)
+    if (strcasecmp(uuid.get(), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0)
     {
         ChipLogProgress(DeviceLayer, "CHIP Char C1 TX Found [%s]", StringOrNullMarker(uuid.get()));
         conn->gattCharC1Handle = charHandle;
     }
-    else if (strcasecmp(uuid.get(), chip_ble_char_c2_rx_uuid) == 0)
+    else if (strcasecmp(uuid.get(), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0)
     {
         ChipLogProgress(DeviceLayer, "CHIP Char C2 RX Found [%s]", StringOrNullMarker(uuid.get()));
         conn->gattCharC2Handle = charHandle;
@@ -806,7 +799,7 @@ static bool __GattClientForeachServiceCb(int total, int index, bt_gatt_h svcHand
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from SVC handle: %s", get_error_message(ret)));
 
-    if (strcasecmp(uuid.get(), chip_ble_service_uuid) == 0)
+    if (strcasecmp(uuid.get(), chip::Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0)
     {
         ChipLogProgress(DeviceLayer, "CHIP Service UUID Found [%s]", StringOrNullMarker(uuid.get()));
 
@@ -1142,36 +1135,21 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         }
         break;
     case DeviceEventType::kPlatformTizenBLEWriteComplete: {
-        Ble::ChipBleUUID service_uuid;
-        Ble::ChipBleUUID char_write_uuid;
-
-        StringToUUID(chip_ble_service_uuid, service_uuid);
-        StringToUUID(chip_ble_char_c1_tx_uuid, char_write_uuid);
-
-        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &service_uuid, &char_write_uuid);
+        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID);
         break;
     }
     case DeviceEventType::kPlatformTizenBLESubscribeOpComplete: {
-        Ble::ChipBleUUID service_uuid;
-        Ble::ChipBleUUID char_notif_uuid;
-
-        StringToUUID(chip_ble_service_uuid, service_uuid);
-        StringToUUID(chip_ble_char_c2_rx_uuid, char_notif_uuid);
-
         if (apEvent->Platform.BLESubscribeOpComplete.mIsSubscribed)
-            HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &service_uuid, &char_notif_uuid);
+            HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &Ble::CHIP_BLE_SVC_ID,
+                                    &chip::Ble::CHIP_BLE_CHAR_2_UUID);
         else
-            HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &service_uuid, &char_notif_uuid);
+            HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &Ble::CHIP_BLE_SVC_ID,
+                                      &chip::Ble::CHIP_BLE_CHAR_2_UUID);
         break;
     }
     case DeviceEventType::kPlatformTizenBLEIndicationReceived: {
-        Ble::ChipBleUUID service_uuid;
-        Ble::ChipBleUUID char_notif_uuid;
-
-        StringToUUID(chip_ble_service_uuid, service_uuid);
-        StringToUUID(chip_ble_char_c2_rx_uuid, char_notif_uuid);
-
-        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &service_uuid, &char_notif_uuid,
+        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &Ble::CHIP_BLE_SVC_ID,
+                                 &chip::Ble::CHIP_BLE_CHAR_2_UUID,
                                  System::PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
     }
@@ -1182,43 +1160,29 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
-    Ble::ChipBleUUID service_uuid;
-    Ble::ChipBleUUID char_notification_uuid;
-    Ble::ChipBleUUID char_write_uuid;
-
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
         ChipLogProgress(DeviceLayer, "CHIPoBLESubscribe");
 
-        StringToUUID(chip_ble_service_uuid, service_uuid);
-        StringToUUID(chip_ble_char_c2_rx_uuid, char_notification_uuid);
-
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &service_uuid, &char_notification_uuid);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         NotifyBLEConnectionEstablished(event->CHIPoBLESubscribe.ConId, CHIP_NO_ERROR);
         break;
     case DeviceEventType::kCHIPoBLEUnsubscribe:
         ChipLogProgress(DeviceLayer, "CHIPoBLEUnsubscribe");
 
-        StringToUUID(chip_ble_service_uuid, service_uuid);
-        StringToUUID(chip_ble_char_c2_rx_uuid, char_notification_uuid);
-
-        HandleUnsubscribeReceived(event->CHIPoBLESubscribe.ConId, &service_uuid, &char_notification_uuid);
+        HandleUnsubscribeReceived(event->CHIPoBLESubscribe.ConId, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
     case DeviceEventType::kCHIPoBLEWriteReceived:
         ChipLogProgress(DeviceLayer, "CHIPoBLEWriteReceived");
 
-        StringToUUID(chip_ble_service_uuid, service_uuid);
-        StringToUUID(chip_ble_char_c1_tx_uuid, char_write_uuid);
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &service_uuid, &char_write_uuid,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             System::PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         ChipLogProgress(DeviceLayer, "CHIPoBLEIndicateConfirm");
 
-        StringToUUID(chip_ble_service_uuid, service_uuid);
-        StringToUUID(chip_ble_char_c2_rx_uuid, char_notification_uuid);
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &service_uuid, &char_notification_uuid);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
     case DeviceEventType::kCHIPoBLEConnectionError:
         ChipLogProgress(DeviceLayer, "CHIPoBLEConnectionError");
@@ -1241,19 +1205,14 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
                                              const Ble::ChipBleUUID * charId)
 {
-    Ble::ChipBleUUID service_uuid;
-    Ble::ChipBleUUID char_notif_uuid;
     int ret;
 
     ChipLogProgress(DeviceLayer, "SubscribeCharacteristic");
 
-    StringToUUID(chip_ble_service_uuid, service_uuid);
-    StringToUUID(chip_ble_char_c2_rx_uuid, char_notif_uuid);
-
     VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
-    VerifyOrExit(Ble::UUIDsMatch(svcId, &service_uuid),
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
-    VerifyOrExit(Ble::UUIDsMatch(charId, &char_notif_uuid),
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
     VerifyOrExit(conId->gattCharC2Handle != nullptr, ChipLogError(DeviceLayer, "Char C2 is null"));
 
@@ -1274,19 +1233,14 @@ exit:
 bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
                                                const Ble::ChipBleUUID * charId)
 {
-    Ble::ChipBleUUID service_uuid;
-    Ble::ChipBleUUID char_notif_uuid;
     int ret;
 
     ChipLogProgress(DeviceLayer, "UnSubscribeCharacteristic");
 
-    StringToUUID(chip_ble_service_uuid, service_uuid);
-    StringToUUID(chip_ble_char_c2_rx_uuid, char_notif_uuid);
-
     VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
-    VerifyOrExit(Ble::UUIDsMatch(svcId, &service_uuid),
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "UnSubscribeCharacteristic() called with invalid service ID"));
-    VerifyOrExit(Ble::UUIDsMatch(charId, &char_notif_uuid),
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
                  ChipLogError(DeviceLayer, "UnSubscribeCharacteristic() called with invalid characteristic ID"));
     VerifyOrExit(conId->gattCharC2Handle != nullptr, ChipLogError(DeviceLayer, "Char C2 is null"));
 
@@ -1360,19 +1314,14 @@ exit:
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                       System::PacketBufferHandle pBuf)
 {
-    Ble::ChipBleUUID service_uuid;
-    Ble::ChipBleUUID char_write_uuid;
     int ret;
 
     ChipLogProgress(DeviceLayer, "SendWriteRequest");
 
-    StringToUUID(chip_ble_service_uuid, service_uuid);
-    StringToUUID(chip_ble_char_c1_tx_uuid, char_write_uuid);
-
     VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
-    VerifyOrExit(Ble::UUIDsMatch(svcId, &service_uuid),
+    VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
-    VerifyOrExit(Ble::UUIDsMatch(charId, &char_write_uuid),
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_1_UUID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
     VerifyOrExit(conId->gattCharC1Handle != nullptr, ChipLogError(DeviceLayer, "Char C1 is null"));
 
@@ -1455,7 +1404,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     }
 
     /* Send StartChipScan Request to Scanner Class */
-    strcpy(data.service_uuid, chip_ble_service_uuid_short);
+    strcpy(data.service_uuid, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR);
     err = mDeviceScanner->StartChipScan(kNewConnectionScanTimeout, ScanFilterType::kServiceData, data);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start BLE scan"));
 

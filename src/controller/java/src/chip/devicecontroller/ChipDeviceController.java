@@ -803,6 +803,14 @@ public class ChipDeviceController {
     return getAttestationChallenge(deviceControllerPtr, devicePtr);
   }
 
+  public void startDnssd() {
+    startDnssd(deviceControllerPtr);
+  }
+
+  public void stopDnssd() {
+    stopDnssd(deviceControllerPtr);
+  }
+
   /**
    * @brief Auto-Resubscribe to the given attribute path with keepSubscriptions and isFabricFiltered
    * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
@@ -1586,6 +1594,10 @@ public class ChipDeviceController {
   private native int getFabricIndex(long deviceControllerPtr);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
+
+  private native void startDnssd(long deviceControllerPtr);
+
+  private native void stopDnssd(long deviceControllerPtr);
 
   static {
     System.loadLibrary("CHIPController");

@@ -1175,6 +1175,26 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
+/** Functionality to retrieve operational information about a managed Wi-Fi network. */
+cluster WiFiNetworkManagement = 1105 {
+  revision 1;
+
+  readonly attribute nullable octet_string<32> ssid = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct NetworkPassphraseResponse = 1 {
+    octet_string<64> passphrase = 0;
+  }
+
+  /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
+  command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
@@ -1280,7 +1300,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 0;
   }
 
   server cluster GeneralDiagnostics {
@@ -1425,7 +1445,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_network_infrastructure_manager = 4293984272, version 1;
+  device type ma_network_infrastructure_manager = 144, version 1;
 
 
   server cluster Descriptor {
@@ -1439,6 +1459,19 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster WiFiNetworkManagement {
+    callback attribute ssid;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command NetworkPassphraseRequest;
+    handle command NetworkPassphraseResponse;
   }
 }
 

@@ -76,6 +76,8 @@ shared_library("ChipDeviceCtrl") {
       "chip/crypto/p256keypair.cpp",
       "chip/crypto/p256keypair.h",
       "chip/discovery/NodeResolution.cpp",
+      "chip/icd/PyChipCheckInDelegate.cpp",
+      "chip/icd/PyChipCheckInDelegate.h",
       "chip/interaction_model/Delegate.cpp",
       "chip/interaction_model/Delegate.h",
       "chip/internal/ChipThreadWork.cpp",
@@ -121,6 +123,7 @@ shared_library("ChipDeviceCtrl") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/server",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",
@@ -414,10 +417,7 @@ chip_python_wheel_action("chip-clusters") {
 }
 
 chip_python_wheel_action("chip-repl") {
-  py_scripts = [
-    "chip-device-ctrl.py",
-    "chip-repl.py",
-  ]
+  py_scripts = [ "chip-repl.py" ]
 
   py_manifest_files = [
     {

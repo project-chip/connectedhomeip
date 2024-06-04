@@ -64,6 +64,13 @@ chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 } // namespace
 
+extern void ApplicationInit();
+
+void InitServer(intptr_t)
+{
+    ApplicationInit();
+}
+
 int main()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -167,6 +174,8 @@ int main()
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer);
 
 #if CONFIG_CHIP_LIB_SHELL
     Engine::Root().RunMainLoop();

@@ -16,9 +16,11 @@
  */
 #include "TestHelpers.h"
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
+
 #include <nlbyteorder.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ScopedBuffer.h>
 
 using namespace chip;
