@@ -408,7 +408,6 @@ private:
         }
         MockCommandResponder mMockCommandResponder;
 
-
         using app::CommandHandler::AddResponse;
     };
 
