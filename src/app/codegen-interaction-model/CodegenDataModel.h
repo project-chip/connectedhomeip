@@ -23,7 +23,7 @@
 namespace chip {
 namespace app {
 
-/// An implementation of `InterationModel::Model` that relies on code-generation
+/// An implementation of `InteractionModel::Model` that relies on code-generation
 /// via zap/ember.
 ///
 /// The Ember framework uses generated files (like endpoint-config.h and various
