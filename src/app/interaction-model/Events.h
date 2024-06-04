@@ -33,10 +33,10 @@ namespace InteractionModel {
 
 namespace internal {
 template <typename T>
-class SimpleEventLoggingDelegate : public EventLoggingDelegate
+class SimpleEventPayloadWriter : public EventLoggingDelegate
 {
 public:
-    SimpleEventLoggingDelegate(const T & aEventData) : mEventData(aEventData){};
+    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData){};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
         return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
@@ -49,7 +49,7 @@ private:
 template <typename G, typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
 {
-    internal::SimpleEventLoggingDelegate<T> eventPayloadWriter(aEventData);
+    internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
     ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     EventOptions eventOptions;
     eventOptions.mPath        = path;
@@ -86,7 +86,7 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
 template <typename G, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId endpointId)
 {
-    internal::SimpleEventLoggingDelegate<T> eventPayloadWriter(aEventData);
+    internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
     ConcreteEventPath path(endpointId, aEventData.GetClusterId(), aEventData.GetEventId());
     EventOptions eventOptions;
     eventOptions.mPath     = path;
