@@ -35,17 +35,29 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 3  
+          value: 1  
           constraints:
               type: int16u
 
-    - label: "Step 3: Read the global attribute: FeatureMap"
+    - label: "Step 3a: TH reads from the DUT the FeatureMap attribute"
+      PICS: "!MTRID.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
           constraints:
               type: bitmap32
+
+    - label:
+          "Step 3b: Given MTRID.S.F00(PowerThreshold) ensure featuremap has
+          the correct bit set"
+      PICS: MTRID.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
     - label: "Step 4a: Read the global attribute: AttributeList"
       PICS: PICS_EVENT_LIST_ENABLED
@@ -57,10 +69,7 @@ tests:
               contains: [
                          0x0000,
                          0x0001,
-                         0x0002,
-                         0x0009,
-                         0x000A,
-                         0x000B,
+                         0x0004,
                          0xFFF8, # GeneratedCommandList
                          0xFFF9, # AcceptedCommandList
                          0xFFFA, # EventList
@@ -88,6 +97,38 @@ tests:
                          0xFFFB, # AttributeList
                          0xFFFC, # FeatureMap
                          0xFFFD  # ClusterRevision                          
+                        ]
+
+    - label: "Step 4b: Read the optional attribute(CustomerName) in AttributeList"
+      PICS: MTRID.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0002]
+
+    - label: "Step 4c: Read the optional attribute(UtilityName) in AttributeList"
+      PICS: MTRID.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0003]
+
+    - label:
+          "Step 4d: Read the feature dependent(MTRID.S.F00) attribute in
+          AttributeList"
+      PICS: MTRID.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [
+                         0x0005, # PowerThreshold
+                         0x0006  # PowerThresholdSourse
                         ]
 
     - label: "Step 5: Read the global attribute: EventList"
