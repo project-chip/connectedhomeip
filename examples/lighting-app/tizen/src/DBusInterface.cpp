@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/level-control/level-control.h>
 #include <app/clusters/on-off-server/on-off-server.h>
