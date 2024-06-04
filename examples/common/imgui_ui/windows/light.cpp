@@ -157,7 +157,7 @@ void Light::Render()
     const char * mode = // based on ColorMode attribute: spec 3.2.7.9
         (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation) ? "Hue/Saturation"
         : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentXAndCurrentY)          ? "X/Y"
-        : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kColorTemperatureMireds)             ? "Temperature/Mireds"
+        : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kColorTemperatureMireds)       ? "Temperature/Mireds"
                                                                                                           : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
