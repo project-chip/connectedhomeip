@@ -3534,10 +3534,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("ExtendedPanId", indent + 1, value.extendedPanId);
+        CHIP_ERROR err = LogValue("ExtendedPanID", indent + 1, value.extendedPanID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ExtendedPanId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ExtendedPanID'");
             return err;
         }
     }
@@ -7008,10 +7008,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("ExtendedPanId", indent + 1, value.extendedPanId);
+        CHIP_ERROR err = DataModelLogger::LogValue("ExtendedPanID", indent + 1, value.extendedPanID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ExtendedPanId'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ExtendedPanID'");
             return err;
         }
     }

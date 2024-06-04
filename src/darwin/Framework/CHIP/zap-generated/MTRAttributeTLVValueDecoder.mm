@@ -15280,7 +15280,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(Attribu
                 auto & entry_0 = iter_0.GetValue();
                 MTRThreadNetworkDirectoryClusterThreadNetworkStruct * newElement_0;
                 newElement_0 = [MTRThreadNetworkDirectoryClusterThreadNetworkStruct new];
-                newElement_0.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_0.extendedPanId];
+                newElement_0.extendedPanID = [NSNumber numberWithUnsignedLongLong:entry_0.extendedPanID];
                 newElement_0.networkName = AsString(entry_0.networkName);
                 if (newElement_0.networkName == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;

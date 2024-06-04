@@ -22959,7 +22959,7 @@ namespace ThreadNetworkStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kExtendedPanId), extendedPanId);
+    encoder.Encode(to_underlying(Fields::kExtendedPanID), extendedPanID);
     encoder.Encode(to_underlying(Fields::kNetworkName), networkName);
     encoder.Encode(to_underlying(Fields::kChannel), channel);
     return encoder.Finalize();
@@ -22979,9 +22979,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kExtendedPanId))
+        if (__context_tag == to_underlying(Fields::kExtendedPanID))
         {
-            err = DataModel::Decode(reader, extendedPanId);
+            err = DataModel::Decode(reader, extendedPanID);
         }
         else if (__context_tag == to_underlying(Fields::kNetworkName))
         {
@@ -23041,7 +23041,7 @@ namespace RemoveNetwork {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kExtendedPanId), extendedPanId);
+    encoder.Encode(to_underlying(Fields::kExtendedPanID), extendedPanID);
     return encoder.Finalize();
 }
 
@@ -23059,9 +23059,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kExtendedPanId))
+        if (__context_tag == to_underlying(Fields::kExtendedPanID))
         {
-            err = DataModel::Decode(reader, extendedPanId);
+            err = DataModel::Decode(reader, extendedPanID);
         }
         else
         {
@@ -23075,7 +23075,7 @@ namespace GetOperationalDataset {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kExtendedPanId), extendedPanId);
+    encoder.Encode(to_underlying(Fields::kExtendedPanID), extendedPanID);
     return encoder.Finalize();
 }
 
@@ -23093,9 +23093,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kExtendedPanId))
+        if (__context_tag == to_underlying(Fields::kExtendedPanID))
         {
-            err = DataModel::Decode(reader, extendedPanId);
+            err = DataModel::Decode(reader, extendedPanID);
         }
         else
         {
@@ -23176,7 +23176,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kExtendedPanId), extendedPanId));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kExtendedPanID), extendedPanID));
     return aWriter.EndContainer(outer);
 }
 
@@ -23194,9 +23194,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kExtendedPanId))
+        if (__context_tag == to_underlying(Fields::kExtendedPanID))
         {
-            err = DataModel::Decode(reader, extendedPanId);
+            err = DataModel::Decode(reader, extendedPanID);
         }
         else
         {

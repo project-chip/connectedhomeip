@@ -37363,13 +37363,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_extendedPanId;
-                std::string newElement_0_extendedPanIdClassName     = "java/lang/Long";
-                std::string newElement_0_extendedPanIdCtorSignature = "(J)V";
-                jlong jninewElement_0_extendedPanId                 = static_cast<jlong>(entry_0.extendedPanId);
+                jobject newElement_0_extendedPanID;
+                std::string newElement_0_extendedPanIDClassName     = "java/lang/Long";
+                std::string newElement_0_extendedPanIDCtorSignature = "(J)V";
+                jlong jninewElement_0_extendedPanID                 = static_cast<jlong>(entry_0.extendedPanID);
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                    newElement_0_extendedPanIdClassName.c_str(), newElement_0_extendedPanIdCtorSignature.c_str(),
-                    jninewElement_0_extendedPanId, newElement_0_extendedPanId);
+                    newElement_0_extendedPanIDClassName.c_str(), newElement_0_extendedPanIDCtorSignature.c_str(),
+                    jninewElement_0_extendedPanID, newElement_0_extendedPanID);
                 jobject newElement_0_networkName;
                 LogErrorOnFailure(
                     chip::JniReferences::GetInstance().CharToStringUTF(entry_0.networkName, newElement_0_networkName));
@@ -37402,7 +37402,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 newElement_0 = env->NewObject(threadNetworkStructStructClass_1, threadNetworkStructStructCtor_1,
-                                              newElement_0_extendedPanId, newElement_0_networkName, newElement_0_channel);
+                                              newElement_0_extendedPanID, newElement_0_networkName, newElement_0_channel);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

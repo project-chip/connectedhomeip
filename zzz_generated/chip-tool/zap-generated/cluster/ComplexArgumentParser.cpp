@@ -3995,17 +3995,17 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.extendedPanId", "extendedPanId",
-                                                                  value.isMember("extendedPanId")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.extendedPanID", "extendedPanID",
+                                                                  value.isMember("extendedPanID")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.networkName", "networkName", value.isMember("networkName")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.channel", "channel", value.isMember("channel")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "extendedPanId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.extendedPanId, value["extendedPanId"]));
-    valueCopy.removeMember("extendedPanId");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "extendedPanID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.extendedPanID, value["extendedPanID"]));
+    valueCopy.removeMember("extendedPanID");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "networkName");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.networkName, value["networkName"]));
@@ -4020,7 +4020,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.extendedPanId);
+    ComplexArgumentParser::Finalize(request.extendedPanID);
     ComplexArgumentParser::Finalize(request.networkName);
     ComplexArgumentParser::Finalize(request.channel);
 }

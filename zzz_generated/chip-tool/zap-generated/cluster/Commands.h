@@ -11144,7 +11144,7 @@ public:
     ThreadNetworkDirectoryRemoveNetwork(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("remove-network", credsIssuerConfig)
     {
-        AddArgument("ExtendedPanId", 0, UINT64_MAX, &mRequest.extendedPanId);
+        AddArgument("ExtendedPanID", 0, UINT64_MAX, &mRequest.extendedPanID);
         ClusterCommand::AddArguments();
     }
 
@@ -11182,7 +11182,7 @@ public:
     ThreadNetworkDirectoryGetOperationalDataset(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("get-operational-dataset", credsIssuerConfig)
     {
-        AddArgument("ExtendedPanId", 0, UINT64_MAX, &mRequest.extendedPanId);
+        AddArgument("ExtendedPanID", 0, UINT64_MAX, &mRequest.extendedPanID);
         ClusterCommand::AddArguments();
     }
 

@@ -5585,18 +5585,18 @@ public static class PumpConfigurationAndControlClusterTurbineOperationEvent {
   }
 }
 public static class ThreadNetworkDirectoryClusterNetworkChangedEvent {
-  public Long extendedPanId;
-  private static final long EXTENDED_PAN_ID_ID = 0L;
+  public Long extendedPanID;
+  private static final long EXTENDED_PAN_I_D_ID = 0L;
 
   public ThreadNetworkDirectoryClusterNetworkChangedEvent(
-    Long extendedPanId
+    Long extendedPanID
   ) {
-    this.extendedPanId = extendedPanId;
+    this.extendedPanID = extendedPanID;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(EXTENDED_PAN_ID_ID, new UIntType(extendedPanId)));
+    values.add(new StructElement(EXTENDED_PAN_I_D_ID, new UIntType(extendedPanID)));
 
     return new StructType(values);
   }
@@ -5605,17 +5605,17 @@ public static class ThreadNetworkDirectoryClusterNetworkChangedEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long extendedPanId = null;
+    Long extendedPanID = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == EXTENDED_PAN_ID_ID) {
+      if (element.contextTagNum() == EXTENDED_PAN_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          extendedPanId = castingValue.value(Long.class);
+          extendedPanID = castingValue.value(Long.class);
         }
       }
     }
     return new ThreadNetworkDirectoryClusterNetworkChangedEvent(
-      extendedPanId
+      extendedPanID
     );
   }
 
@@ -5623,8 +5623,8 @@ public static class ThreadNetworkDirectoryClusterNetworkChangedEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ThreadNetworkDirectoryClusterNetworkChangedEvent {\n");
-    output.append("\textendedPanId: ");
-    output.append(extendedPanId);
+    output.append("\textendedPanID: ");
+    output.append(extendedPanID);
     output.append("\n");
     output.append("}\n");
     return output.toString();

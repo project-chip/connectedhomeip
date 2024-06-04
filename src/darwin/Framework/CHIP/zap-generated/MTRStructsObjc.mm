@@ -6889,7 +6889,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _extendedPanId = @(0);
+        _extendedPanID = @(0);
 
         _networkName = @"";
 
@@ -6902,7 +6902,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRThreadNetworkDirectoryClusterThreadNetworkStruct alloc] init];
 
-    other.extendedPanId = self.extendedPanId;
+    other.extendedPanID = self.extendedPanID;
     other.networkName = self.networkName;
     other.channel = self.channel;
 
@@ -6911,7 +6911,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanId:%@; networkName:%@; channel:%@; >", NSStringFromClass([self class]), _extendedPanId, _networkName, _channel];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; networkName:%@; channel:%@; >", NSStringFromClass([self class]), _extendedPanID, _networkName, _channel];
     return descriptionString;
 }
 
@@ -6922,7 +6922,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _extendedPanId = @(0);
+        _extendedPanID = @(0);
     }
     return self;
 }
@@ -6931,14 +6931,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRThreadNetworkDirectoryClusterNetworkChangedEvent alloc] init];
 
-    other.extendedPanId = self.extendedPanId;
+    other.extendedPanID = self.extendedPanID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanId:%@; >", NSStringFromClass([self class]), _extendedPanId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), _extendedPanID];
     return descriptionString;
 }
 

@@ -7679,13 +7679,13 @@ cluster ThreadNetworkDirectory = 1107 {
   revision 1;
 
   struct ThreadNetworkStruct {
-    int64u extendedPanId = 0;
+    int64u extendedPanID = 0;
     char_string<16> networkName = 1;
     int16u channel = 2;
   }
 
   info event access(read: operate) NetworkChanged = 0 {
-    int64u extendedPanId = 0;
+    int64u extendedPanID = 0;
   }
 
   attribute access(read: manage, write: manage) nullable int64u preferredExtendedPanID = 0;
@@ -7703,11 +7703,11 @@ cluster ThreadNetworkDirectory = 1107 {
   }
 
   request struct RemoveNetworkRequest {
-    int64u extendedPanId = 0;
+    int64u extendedPanID = 0;
   }
 
   request struct GetOperationalDatasetRequest {
-    int64u extendedPanId = 0;
+    int64u extendedPanID = 0;
   }
 
   response struct OperationalDatasetResponse = 3 {

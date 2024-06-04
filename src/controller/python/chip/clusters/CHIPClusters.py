@@ -11606,14 +11606,14 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "RemoveNetwork",
                 "args": {
-                    "extendedPanId": "int",
+                    "extendedPanID": "int",
                 },
             },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "GetOperationalDataset",
                 "args": {
-                    "extendedPanId": "int",
+                    "extendedPanID": "int",
                 },
             },
         },

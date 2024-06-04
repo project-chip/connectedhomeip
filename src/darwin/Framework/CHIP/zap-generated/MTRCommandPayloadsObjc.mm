@@ -24204,7 +24204,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _extendedPanId = @(0);
+        _extendedPanID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -24215,7 +24215,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRThreadNetworkDirectoryClusterRemoveNetworkParams alloc] init];
 
-    other.extendedPanId = self.extendedPanId;
+    other.extendedPanID = self.extendedPanID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -24224,7 +24224,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanId:%@; >", NSStringFromClass([self class]), _extendedPanId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), _extendedPanID];
     return descriptionString;
 }
 
@@ -24237,7 +24237,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ThreadNetworkDirectory::Commands::RemoveNetwork::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.extendedPanId = self.extendedPanId.unsignedLongLongValue;
+        encodableStruct.extendedPanID = self.extendedPanID.unsignedLongLongValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -24283,7 +24283,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _extendedPanId = @(0);
+        _extendedPanID = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -24294,7 +24294,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRThreadNetworkDirectoryClusterGetOperationalDatasetParams alloc] init];
 
-    other.extendedPanId = self.extendedPanId;
+    other.extendedPanID = self.extendedPanID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -24303,7 +24303,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanId:%@; >", NSStringFromClass([self class]), _extendedPanId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), _extendedPanID];
     return descriptionString;
 }
 
@@ -24316,7 +24316,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.extendedPanId = self.extendedPanId.unsignedLongLongValue;
+        encodableStruct.extendedPanID = self.extendedPanID.unsignedLongLongValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

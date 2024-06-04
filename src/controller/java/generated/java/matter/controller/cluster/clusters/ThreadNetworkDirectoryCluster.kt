@@ -131,14 +131,14 @@ class ThreadNetworkDirectoryCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun removeNetwork(extendedPanId: ULong, timedInvokeTimeout: Duration? = null) {
+  suspend fun removeNetwork(extendedPanID: ULong, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 1u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_EXTENDED_PAN_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_ID_REQ), extendedPanId)
+    val TAG_EXTENDED_PAN_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_I_D_REQ), extendedPanID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -153,7 +153,7 @@ class ThreadNetworkDirectoryCluster(
   }
 
   suspend fun getOperationalDataset(
-    extendedPanId: ULong,
+    extendedPanID: ULong,
     timedInvokeTimeout: Duration? = null
   ): OperationalDatasetResponse {
     val commandId: UInt = 2u
@@ -161,8 +161,8 @@ class ThreadNetworkDirectoryCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_EXTENDED_PAN_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_ID_REQ), extendedPanId)
+    val TAG_EXTENDED_PAN_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_EXTENDED_PAN_I_D_REQ), extendedPanID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

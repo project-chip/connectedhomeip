@@ -4062,8 +4062,8 @@ static id _Nullable DecodeEventPayloadForThreadNetworkDirectoryCluster(EventId a
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.extendedPanId];
-            value.extendedPanId = memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.extendedPanID];
+            value.extendedPanID = memberValue;
         } while (0);
 
         return value;

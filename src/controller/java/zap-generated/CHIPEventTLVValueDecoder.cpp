@@ -7410,13 +7410,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
-            jobject value_extendedPanId;
-            std::string value_extendedPanIdClassName     = "java/lang/Long";
-            std::string value_extendedPanIdCtorSignature = "(J)V";
-            jlong jnivalue_extendedPanId                 = static_cast<jlong>(cppValue.extendedPanId);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_extendedPanIdClassName.c_str(),
-                                                                        value_extendedPanIdCtorSignature.c_str(),
-                                                                        jnivalue_extendedPanId, value_extendedPanId);
+            jobject value_extendedPanID;
+            std::string value_extendedPanIDClassName     = "java/lang/Long";
+            std::string value_extendedPanIDCtorSignature = "(J)V";
+            jlong jnivalue_extendedPanID                 = static_cast<jlong>(cppValue.extendedPanID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_extendedPanIDClassName.c_str(),
+                                                                        value_extendedPanIDCtorSignature.c_str(),
+                                                                        jnivalue_extendedPanID, value_extendedPanID);
 
             jclass networkChangedStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -7437,7 +7437,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
 
-            jobject value = env->NewObject(networkChangedStructClass, networkChangedStructCtor, value_extendedPanId);
+            jobject value = env->NewObject(networkChangedStructClass, networkChangedStructCtor, value_extendedPanID);
 
             return value;
         }

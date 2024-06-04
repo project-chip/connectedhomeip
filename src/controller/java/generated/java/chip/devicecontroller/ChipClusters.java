@@ -53126,17 +53126,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void removeNetwork(DefaultClusterCallback callback, Long extendedPanId) {
-      removeNetwork(callback, extendedPanId, 0);
+    public void removeNetwork(DefaultClusterCallback callback, Long extendedPanID) {
+      removeNetwork(callback, extendedPanID, 0);
     }
 
-    public void removeNetwork(DefaultClusterCallback callback, Long extendedPanId, int timedInvokeTimeoutMs) {
+    public void removeNetwork(DefaultClusterCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long extendedPanIdFieldID = 0L;
-      BaseTLVType extendedPanIdtlvValue = new UIntType(extendedPanId);
-      elements.add(new StructElement(extendedPanIdFieldID, extendedPanIdtlvValue));
+      final long extendedPanIDFieldID = 0L;
+      BaseTLVType extendedPanIDtlvValue = new UIntType(extendedPanID);
+      elements.add(new StructElement(extendedPanIDFieldID, extendedPanIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -53146,17 +53146,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void getOperationalDataset(OperationalDatasetResponseCallback callback, Long extendedPanId) {
-      getOperationalDataset(callback, extendedPanId, 0);
+    public void getOperationalDataset(OperationalDatasetResponseCallback callback, Long extendedPanID) {
+      getOperationalDataset(callback, extendedPanID, 0);
     }
 
-    public void getOperationalDataset(OperationalDatasetResponseCallback callback, Long extendedPanId, int timedInvokeTimeoutMs) {
+    public void getOperationalDataset(OperationalDatasetResponseCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long extendedPanIdFieldID = 0L;
-      BaseTLVType extendedPanIdtlvValue = new UIntType(extendedPanId);
-      elements.add(new StructElement(extendedPanIdFieldID, extendedPanIdtlvValue));
+      final long extendedPanIDFieldID = 0L;
+      BaseTLVType extendedPanIDtlvValue = new UIntType(extendedPanID);
+      elements.add(new StructElement(extendedPanIDFieldID, extendedPanIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {

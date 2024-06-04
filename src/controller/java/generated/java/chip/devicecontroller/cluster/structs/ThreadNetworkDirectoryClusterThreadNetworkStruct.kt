@@ -23,13 +23,13 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThreadNetworkDirectoryClusterThreadNetworkStruct(
-  val extendedPanId: ULong,
+  val extendedPanID: ULong,
   val networkName: String,
   val channel: UInt
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDirectoryClusterThreadNetworkStruct {\n")
-    append("\textendedPanId : $extendedPanId\n")
+    append("\textendedPanID : $extendedPanID\n")
     append("\tnetworkName : $networkName\n")
     append("\tchannel : $channel\n")
     append("}\n")
@@ -38,7 +38,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_EXTENDED_PAN_ID), extendedPanId)
+      put(ContextSpecificTag(TAG_EXTENDED_PAN_I_D), extendedPanID)
       put(ContextSpecificTag(TAG_NETWORK_NAME), networkName)
       put(ContextSpecificTag(TAG_CHANNEL), channel)
       endStructure()
@@ -46,7 +46,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
   }
 
   companion object {
-    private const val TAG_EXTENDED_PAN_ID = 0
+    private const val TAG_EXTENDED_PAN_I_D = 0
     private const val TAG_NETWORK_NAME = 1
     private const val TAG_CHANNEL = 2
 
@@ -55,13 +55,13 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
       tlvReader: TlvReader
     ): ThreadNetworkDirectoryClusterThreadNetworkStruct {
       tlvReader.enterStructure(tlvTag)
-      val extendedPanId = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
+      val extendedPanID = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))
       val networkName = tlvReader.getString(ContextSpecificTag(TAG_NETWORK_NAME))
       val channel = tlvReader.getUInt(ContextSpecificTag(TAG_CHANNEL))
 
       tlvReader.exitContainer()
 
-      return ThreadNetworkDirectoryClusterThreadNetworkStruct(extendedPanId, networkName, channel)
+      return ThreadNetworkDirectoryClusterThreadNetworkStruct(extendedPanID, networkName, channel)
     }
   }
 }

@@ -14515,7 +14515,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum RemoveNetworkCommandField {ExtendedPanId(0),;
+                }public enum RemoveNetworkCommandField {ExtendedPanID(0),;
                     private final int id;
                     RemoveNetworkCommandField(int id) {
                         this.id = id;
@@ -14532,7 +14532,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum GetOperationalDatasetCommandField {ExtendedPanId(0),;
+                }public enum GetOperationalDatasetCommandField {ExtendedPanID(0),;
                     private final int id;
                     GetOperationalDatasetCommandField(int id) {
                         this.id = id;
