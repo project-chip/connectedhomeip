@@ -2304,6 +2304,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::AreaTypeTa
     case EnumType::kGuestRoom:
     case EnumType::kGym:
     case EnumType::kHallway:
+    case EnumType::kHearthRoom:
     case EnumType::kKidsRoom:
     case EnumType::kKidsBedroom:
     case EnumType::kKitchen:
@@ -2313,9 +2314,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::AreaTypeTa
     case EnumType::kLibrary:
     case EnumType::kLivingRoom:
     case EnumType::kLounge:
-    case EnumType::kManCave:
-    case EnumType::kMasterBathroom:
-    case EnumType::kMasterBedroom:
     case EnumType::kMediaTvRoom:
     case EnumType::kMudRoom:
     case EnumType::kMusicRoom:
@@ -2330,6 +2328,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::AreaTypeTa
     case EnumType::kPlayRoom:
     case EnumType::kPoolRoom:
     case EnumType::kPorch:
+    case EnumType::kPrimaryBathroom:
+    case EnumType::kPrimaryBedroom:
     case EnumType::kRamp:
     case EnumType::kReceptionRoom:
     case EnumType::kRecreationRoom:
