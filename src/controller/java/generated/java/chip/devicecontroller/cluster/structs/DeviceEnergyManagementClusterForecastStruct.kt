@@ -33,7 +33,7 @@ class DeviceEnergyManagementClusterForecastStruct(
   val latestEndTime: Optional<ULong>,
   val isPausable: Boolean,
   val slots: List<DeviceEnergyManagementClusterSlotStruct>,
-  val forecastUpdateReason: UInt,
+  val forecastUpdateReason: UInt
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterForecastStruct {\n")
@@ -145,7 +145,7 @@ class DeviceEnergyManagementClusterForecastStruct(
         latestEndTime,
         isPausable,
         slots,
-        forecastUpdateReason,
+        forecastUpdateReason
       )
     }
   }

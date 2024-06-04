@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class GroupKeyManagementClusterGroupKeyMapStruct(
   val groupId: UInt,
   val groupKeySetID: UInt,
-  val fabricIndex: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupKeyMapStruct {\n")

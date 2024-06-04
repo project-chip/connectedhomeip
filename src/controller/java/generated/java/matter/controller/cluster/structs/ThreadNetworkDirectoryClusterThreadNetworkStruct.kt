@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ThreadNetworkDirectoryClusterThreadNetworkStruct(
   val extendedPanID: ULong,
   val networkName: String,
-  val channel: UShort,
+  val channel: UShort
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDirectoryClusterThreadNetworkStruct {\n")
@@ -52,7 +52,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ThreadNetworkDirectoryClusterThreadNetworkStruct {
       tlvReader.enterStructure(tlvTag)
       val extendedPanID = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))

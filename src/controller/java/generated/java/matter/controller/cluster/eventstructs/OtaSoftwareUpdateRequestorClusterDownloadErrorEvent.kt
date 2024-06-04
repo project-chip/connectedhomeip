@@ -26,7 +26,7 @@ class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
   val softwareVersion: UInt,
   val bytesDownloaded: ULong,
   val progressPercent: UByte?,
-  val platformCode: Long?,
+  val platformCode: Long?
 ) {
   override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {\n")
@@ -64,7 +64,7 @@ class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {
       tlvReader.enterStructure(tlvTag)
       val softwareVersion = tlvReader.getUInt(ContextSpecificTag(TAG_SOFTWARE_VERSION))
@@ -90,7 +90,7 @@ class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
         softwareVersion,
         bytesDownloaded,
         progressPercent,
-        platformCode,
+        platformCode
       )
     }
   }

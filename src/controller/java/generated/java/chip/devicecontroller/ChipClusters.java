@@ -18618,11 +18618,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey) {
-      registerClient(callback, checkInNodeID, monitoredSubject, key, verificationKey, 0);
+    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, Optional<Integer> clientType, byte[] key, Optional<byte[]> verificationKey) {
+      registerClient(callback, checkInNodeID, monitoredSubject, clientType, key, verificationKey, 0);
     }
 
-    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey, int timedInvokeTimeoutMs) {
+    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, Optional<Integer> clientType, byte[] key, Optional<byte[]> verificationKey, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -18634,11 +18634,15 @@ public class ChipClusters {
       BaseTLVType monitoredSubjecttlvValue = new UIntType(monitoredSubject);
       elements.add(new StructElement(monitoredSubjectFieldID, monitoredSubjecttlvValue));
 
-      final long keyFieldID = 2L;
+      final long clientTypeFieldID = 2L;
+      BaseTLVType clientTypetlvValue = clientType.<BaseTLVType>map((nonOptionalclientType) -> new UIntType(nonOptionalclientType)).orElse(new EmptyType());
+      elements.add(new StructElement(clientTypeFieldID, clientTypetlvValue));
+
+      final long keyFieldID = 3L;
       BaseTLVType keytlvValue = new ByteArrayType(key);
       elements.add(new StructElement(keyFieldID, keytlvValue));
 
-      final long verificationKeyFieldID = 3L;
+      final long verificationKeyFieldID = 4L;
       BaseTLVType verificationKeytlvValue = verificationKey.<BaseTLVType>map((nonOptionalverificationKey) -> new ByteArrayType(nonOptionalverificationKey)).orElse(new EmptyType());
       elements.add(new StructElement(verificationKeyFieldID, verificationKeytlvValue));
 

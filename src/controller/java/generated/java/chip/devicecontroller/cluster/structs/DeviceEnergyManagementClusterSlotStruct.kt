@@ -42,7 +42,7 @@ class DeviceEnergyManagementClusterSlotStruct(
   val minPowerAdjustment: Optional<Long>,
   val maxPowerAdjustment: Optional<Long>,
   val minDurationAdjustment: Optional<ULong>,
-  val maxDurationAdjustment: Optional<ULong>,
+  val maxDurationAdjustment: Optional<ULong>
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterSlotStruct {\n")
@@ -269,7 +269,7 @@ class DeviceEnergyManagementClusterSlotStruct(
         minPowerAdjustment,
         maxPowerAdjustment,
         minDurationAdjustment,
-        maxDurationAdjustment,
+        maxDurationAdjustment
       )
     }
   }

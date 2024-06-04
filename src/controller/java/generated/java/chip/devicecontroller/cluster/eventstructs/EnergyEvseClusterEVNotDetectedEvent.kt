@@ -28,7 +28,7 @@ class EnergyEvseClusterEVNotDetectedEvent(
   val state: UInt,
   val sessionDuration: ULong,
   val sessionEnergyCharged: Long,
-  val sessionEnergyDischarged: Optional<Long>,
+  val sessionEnergyDischarged: Optional<Long>
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterEVNotDetectedEvent {\n")
@@ -82,7 +82,7 @@ class EnergyEvseClusterEVNotDetectedEvent(
         state,
         sessionDuration,
         sessionEnergyCharged,
-        sessionEnergyDischarged,
+        sessionEnergyDischarged
       )
     }
   }

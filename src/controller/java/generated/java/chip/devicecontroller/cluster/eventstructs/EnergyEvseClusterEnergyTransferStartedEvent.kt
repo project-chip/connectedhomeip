@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class EnergyEvseClusterEnergyTransferStartedEvent(
   val sessionID: ULong,
   val state: UInt,
-  val maximumCurrent: Long,
+  val maximumCurrent: Long
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterEnergyTransferStartedEvent {\n")

@@ -43,7 +43,7 @@ class ChannelClusterProgramStruct(
   val seriesInfo: Optional<ChannelClusterSeriesInfoStruct>?,
   val categoryList: Optional<List<ChannelClusterProgramCategoryStruct>>,
   val castList: Optional<List<ChannelClusterProgramCastStruct>>,
-  val externalIDList: Optional<List<ChannelClusterProgramCastStruct>>,
+  val externalIDList: Optional<List<ChannelClusterProgramCastStruct>>
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterProgramStruct {\n")
@@ -343,7 +343,7 @@ class ChannelClusterProgramStruct(
         seriesInfo,
         categoryList,
         castList,
-        externalIDList,
+        externalIDList
       )
     }
   }

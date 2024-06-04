@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ChannelClusterChannelPagingStruct(
   val previousToken: Optional<ChannelClusterPageTokenStruct>?,
-  val nextToken: Optional<ChannelClusterPageTokenStruct>?,
+  val nextToken: Optional<ChannelClusterPageTokenStruct>?
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterChannelPagingStruct {\n")
@@ -69,7 +69,7 @@ class ChannelClusterChannelPagingStruct(
             Optional.of(
               ChannelClusterPageTokenStruct.fromTlv(
                 ContextSpecificTag(TAG_PREVIOUS_TOKEN),
-                tlvReader,
+                tlvReader
               )
             )
           } else {

@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatClusterQueuedPresetStruct(
   val presetHandle: ByteArray?,
-  val transitionTimestamp: ULong?,
+  val transitionTimestamp: ULong?
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterQueuedPresetStruct {\n")

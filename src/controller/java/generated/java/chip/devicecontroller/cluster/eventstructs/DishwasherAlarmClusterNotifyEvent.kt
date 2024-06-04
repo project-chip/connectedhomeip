@@ -26,7 +26,7 @@ class DishwasherAlarmClusterNotifyEvent(
   val active: ULong,
   val inactive: ULong,
   val state: ULong,
-  val mask: ULong,
+  val mask: ULong
 ) {
   override fun toString(): String = buildString {
     append("DishwasherAlarmClusterNotifyEvent {\n")

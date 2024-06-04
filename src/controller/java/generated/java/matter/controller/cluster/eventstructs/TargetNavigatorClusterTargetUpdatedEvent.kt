@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class TargetNavigatorClusterTargetUpdatedEvent(
   val targetList: List<matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct>,
   val currentTarget: UByte,
-  val data: ByteArray,
+  val data: ByteArray
 ) {
   override fun toString(): String = buildString {
     append("TargetNavigatorClusterTargetUpdatedEvent {\n")
@@ -64,7 +64,7 @@ class TargetNavigatorClusterTargetUpdatedEvent(
             this.add(
               matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct.fromTlv(
                 AnonymousTag,
-                tlvReader,
+                tlvReader
               )
             )
           }

@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(
   val powerAdjustCapability: List<DeviceEnergyManagementClusterPowerAdjustStruct>?,
-  val cause: UInt,
+  val cause: UInt
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterPowerAdjustCapabilityStruct {\n")
@@ -57,7 +57,7 @@ class DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): DeviceEnergyManagementClusterPowerAdjustCapabilityStruct {
       tlvReader.enterStructure(tlvTag)
       val powerAdjustCapability =

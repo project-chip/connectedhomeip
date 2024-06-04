@@ -29,7 +29,7 @@ class ThermostatClusterPresetStruct(
   val name: Optional<String>?,
   val coolingSetpoint: Optional<Short>,
   val heatingSetpoint: Optional<Short>,
-  val builtIn: Boolean?,
+  val builtIn: Boolean?
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterPresetStruct {\n")
@@ -133,7 +133,7 @@ class ThermostatClusterPresetStruct(
         name,
         coolingSetpoint,
         heatingSetpoint,
-        builtIn,
+        builtIn
       )
     }
   }

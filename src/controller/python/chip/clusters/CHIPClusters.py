@@ -4062,6 +4062,7 @@ class ChipClusters:
                 "args": {
                     "checkInNodeID": "int",
                     "monitoredSubject": "int",
+                    "clientType": "int",
                     "key": "bytes",
                     "verificationKey": "bytes",
                 },

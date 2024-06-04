@@ -42,7 +42,7 @@ class DemandResponseLoadControlClusterAverageLoadControlStruct(val loadAdjustmen
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): DemandResponseLoadControlClusterAverageLoadControlStruct {
       tlvReader.enterStructure(tlvTag)
       val loadAdjustment = tlvReader.getInt(ContextSpecificTag(TAG_LOAD_ADJUSTMENT))

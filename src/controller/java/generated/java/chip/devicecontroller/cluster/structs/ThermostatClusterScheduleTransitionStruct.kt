@@ -29,7 +29,7 @@ class ThermostatClusterScheduleTransitionStruct(
   val presetHandle: Optional<ByteArray>,
   val systemMode: Optional<UInt>,
   val coolingSetpoint: Optional<Int>,
-  val heatingSetpoint: Optional<Int>,
+  val heatingSetpoint: Optional<Int>
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterScheduleTransitionStruct {\n")
@@ -112,7 +112,7 @@ class ThermostatClusterScheduleTransitionStruct(
         presetHandle,
         systemMode,
         coolingSetpoint,
-        heatingSetpoint,
+        heatingSetpoint
       )
     }
   }

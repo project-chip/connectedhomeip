@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class TimeSynchronizationClusterTimeZoneStruct(
   val offset: Long,
   val validAt: ULong,
-  val name: Optional<String>,
+  val name: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterTimeZoneStruct {\n")

@@ -45,13 +45,13 @@ class OvenCavityOperationalStateClusterOperationalErrorEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): OvenCavityOperationalStateClusterOperationalErrorEvent {
       tlvReader.enterStructure(tlvTag)
       val errorState =
         matter.controller.cluster.structs.OvenCavityOperationalStateClusterErrorStateStruct.fromTlv(
           ContextSpecificTag(TAG_ERROR_STATE),
-          tlvReader,
+          tlvReader
         )
 
       tlvReader.exitContainer()

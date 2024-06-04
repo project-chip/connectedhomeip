@@ -33,7 +33,7 @@ class MediaPlaybackClusterStateChangedEvent(
   val seekRangeEnd: ULong,
   val seekRangeStart: ULong,
   val data: Optional<ByteArray>,
-  val audioAdvanceUnmuted: Boolean,
+  val audioAdvanceUnmuted: Boolean
 ) {
   override fun toString(): String = buildString {
     append("MediaPlaybackClusterStateChangedEvent {\n")
@@ -87,7 +87,7 @@ class MediaPlaybackClusterStateChangedEvent(
       val sampledPosition =
         chip.devicecontroller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct.fromTlv(
           ContextSpecificTag(TAG_SAMPLED_POSITION),
-          tlvReader,
+          tlvReader
         )
       val playbackSpeed = tlvReader.getFloat(ContextSpecificTag(TAG_PLAYBACK_SPEED))
       val seekRangeEnd = tlvReader.getULong(ContextSpecificTag(TAG_SEEK_RANGE_END))
@@ -111,7 +111,7 @@ class MediaPlaybackClusterStateChangedEvent(
         seekRangeEnd,
         seekRangeStart,
         data,
-        audioAdvanceUnmuted,
+        audioAdvanceUnmuted
       )
     }
   }

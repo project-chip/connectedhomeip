@@ -42,7 +42,7 @@ class ThreadNetworkDirectoryClusterNetworkChangedEvent(val extendedPanID: ULong)
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader,
+      tlvReader: TlvReader
     ): ThreadNetworkDirectoryClusterNetworkChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val extendedPanID = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))

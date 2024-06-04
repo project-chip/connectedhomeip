@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class DeviceEnergyManagementModeClusterModeTagStruct(
   val mfgCode: Optional<UShort>,
-  val value: UShort,
+  val value: UShort
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementModeClusterModeTagStruct {\n")

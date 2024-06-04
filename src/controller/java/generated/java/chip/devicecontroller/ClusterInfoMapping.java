@@ -23981,6 +23981,9 @@ public class ClusterInfoMapping {
     CommandParameterInfo icdManagementregisterClientmonitoredSubjectCommandParameterInfo = new CommandParameterInfo("monitoredSubject", Long.class, Long.class);
     icdManagementregisterClientCommandParams.put("monitoredSubject",icdManagementregisterClientmonitoredSubjectCommandParameterInfo);
 
+    CommandParameterInfo icdManagementregisterClientclientTypeCommandParameterInfo = new CommandParameterInfo("clientType", Optional.class, Integer.class);
+    icdManagementregisterClientCommandParams.put("clientType",icdManagementregisterClientclientTypeCommandParameterInfo);
+
     CommandParameterInfo icdManagementregisterClientkeyCommandParameterInfo = new CommandParameterInfo("key", byte[].class, byte[].class);
     icdManagementregisterClientCommandParams.put("key",icdManagementregisterClientkeyCommandParameterInfo);
 
@@ -23995,6 +23998,9 @@ public class ClusterInfoMapping {
 
            , (Long)
              commandArguments.get("monitoredSubject")
+
+           , (Optional<Integer>)
+             commandArguments.get("clientType")
 
            , (byte[])
              commandArguments.get("key")
