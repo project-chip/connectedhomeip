@@ -1404,7 +1404,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     }
 
     /* Send StartChipScan Request to Scanner Class */
-    strcpy(data.service_uuid, Ble::CHIP_BLE_DESC_SHORT_UUID_STR);
+    strcpy(data.service_uuid, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR);
     err = mDeviceScanner->StartChipScan(kNewConnectionScanTimeout, ScanFilterType::kServiceData, data);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start BLE scan"));
 

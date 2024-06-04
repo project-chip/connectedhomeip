@@ -3987,6 +3987,45 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::W
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.extendedPanID", "extendedPanID",
+                                                                  value.isMember("extendedPanID")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.networkName", "networkName", value.isMember("networkName")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ThreadNetworkStruct.channel", "channel", value.isMember("channel")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "extendedPanID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.extendedPanID, value["extendedPanID"]));
+    valueCopy.removeMember("extendedPanID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "networkName");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.networkName, value["networkName"]));
+    valueCopy.removeMember("networkName");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "channel");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.channel, value["channel"]));
+    valueCopy.removeMember("channel");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.extendedPanID);
+    ComplexArgumentParser::Finalize(request.networkName);
+    ComplexArgumentParser::Finalize(request.channel);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Channel::Structs::ProgramCastStruct::Type & request,
                                         Json::Value & value)
 {

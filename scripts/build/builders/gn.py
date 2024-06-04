@@ -64,6 +64,9 @@ class GnBuilder(Builder):
         if self.options.pw_command_launcher:
             extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
 
+        if self.options.enable_link_map_file:
+            extra_args.append('chip_generate_link_map_file=true')
+
         if self.options.pregen_dir:
             extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
 
