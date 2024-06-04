@@ -50,7 +50,7 @@ limitations under the License.
     <field name="HueSaturation" mask="0x0001"/>
     <field name="EnhancedHue" mask="0x0002"/>
     <field name="ColorLoop" mask="0x0004"/>
-    <field name="XYAttributes" mask="0x0008"/>
+    <field name="XY" mask="0x0008"/>
     <field name="ColorTemperature" mask="0x0010"/>
   </bitmap>
 
