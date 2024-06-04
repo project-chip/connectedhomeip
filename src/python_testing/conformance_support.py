@@ -412,10 +412,7 @@ def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callabl
                 return device_feature(element.attrib['name'])
             raise
 
-    ops = []
-    for sub in element:
-        ops.append(parse_device_type_callable_from_xml(sub))
-
+    ops = [parse_device_type_callable_from_xml(sub) for sub in element]
     return parse_wrapper_callable_from_xml(element, ops)
 
 
@@ -424,6 +421,8 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
         try:
             return parse_basic_callable_from_xml(element)
         except ConformanceException:
+            # If we get an exception here, it wasn't a basic type, so move on and check if its
+            # something else.
             pass
         if element.tag == FEATURE_TAG:
             try:
@@ -446,8 +445,5 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
                 f'Unexpected xml conformance element with no children {str(element.tag)} {str(element.attrib)}')
 
     # First build the list, then create the callable for this element
-    ops = []
-    for sub in element:
-        ops.append(parse_callable_from_xml(sub, params))
-
+    ops = [parse_callable_from_xml(sub, params) for sub in element]
     return parse_wrapper_callable_from_xml(element, ops)
