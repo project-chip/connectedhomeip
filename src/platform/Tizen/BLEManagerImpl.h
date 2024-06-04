@@ -200,9 +200,9 @@ private:
     void NotifyBLEPeripheralAdvConfiguredComplete(CHIP_ERROR error);
     void NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error);
     void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
-    void NotifyBLESubscribed(bool indicationsEnabled, BLE_CONNECTION_OBJECT conId);
+    void NotifyBLESubscribed(BLE_CONNECTION_OBJECT conId, bool indicationsEnabled);
     void NotifyBLEIndicationConfirmation(BLE_CONNECTION_OBJECT conId);
-    void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
+    void NotifyBLEWriteReceived(BLE_CONNECTION_OBJECT conId, System::PacketBufferHandle & buf);
     static void HandleAdvertisingTimeout(chip::System::Layer *, void * appState);
     AdvertisingIntervals GetAdvertisingIntervals() const;
 
@@ -214,7 +214,7 @@ private:
     void NotifyHandleConnectFailed(CHIP_ERROR error);
     void NotifyHandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     void NotifySubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool isSubscribed);
-    void NotifyBLENotificationReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
+    void NotifyBLENotificationReceived(BLE_CONNECTION_OBJECT conId, System::PacketBufferHandle & buf);
 
     CHIP_ERROR RegisterGATTServer();
     CHIP_ERROR StartBLEAdvertising();
