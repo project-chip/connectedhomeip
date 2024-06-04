@@ -53,8 +53,11 @@
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace Test {
+
+// Forward declaration of  ReadClientTestAccess class to allow it to be friend with ReadClient.
+// This is not for general API use. It is only to be used for (Unit) Tests to expose private Methods/Members.
 class ReadClientTestAccess;
-}
+} // namespace Test
 namespace app {
 
 class InteractionModelEngine;

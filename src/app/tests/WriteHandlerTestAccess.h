@@ -22,6 +22,8 @@
 namespace chip {
 namespace Test {
 
+using namespace app;
+
 /**
  * @brief Class acts as an accessor to private methods of the WriteHandler class without needing to give friend access to
  *        each individual test.
@@ -31,7 +33,8 @@ class WriteHandlerTestAccess
 {
 
 public:
-    WriteHandlerTestAccess(app::WriteHandler * aWriteHandler) : mpWriteHandler(aWriteHandler) {}
+    WriteHandlerTestAccess(WriteHandler * aWriteHandler) : mpWriteHandler(aWriteHandler) {}
+    Messaging::ExchangeHolder & GetExchangeCtx() { return mpWriteHandler->mExchangeCtx; }
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload)
@@ -39,10 +42,8 @@ public:
         return mpWriteHandler->OnMessageReceived(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
 
-    Messaging::ExchangeHolder & GetExchangeCtx() { return mpWriteHandler->mExchangeCtx; }
-
 private:
-    app::WriteHandler * mpWriteHandler = nullptr;
+    WriteHandler * mpWriteHandler = nullptr;
 };
 
 } // namespace Test

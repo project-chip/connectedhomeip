@@ -22,7 +22,7 @@
 namespace chip {
 namespace Test {
 
-using namespace chip::app::reporting;
+using namespace app::reporting;
 using Timestamp = System::Clock::Timestamp;
 /**
  * @brief Class acts as an accessor to private methods of the SynchronizedReportSchedulerImpl class without needing to give
@@ -36,9 +36,9 @@ public:
         mpSynchronizedReportSchedulerImpl(apSynchronizedReportSchedulerImpl)
     {}
 
-    System::Clock::Timestamp & GetNextMinTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextMinTimestamp; }
-    System::Clock::Timestamp & GetNextMaxTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextMaxTimestamp; }
-    System::Clock::Timestamp & GetNextReportTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextReportTimestamp; }
+    Timestamp & GetNextMinTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextMinTimestamp; }
+    Timestamp & GetNextMaxTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextMaxTimestamp; }
+    Timestamp & GetNextReportTimestamp() { return mpSynchronizedReportSchedulerImpl->mNextReportTimestamp; }
 
     void UnregisterAllHandlers() { mpSynchronizedReportSchedulerImpl->UnregisterAllHandlers(); }
 

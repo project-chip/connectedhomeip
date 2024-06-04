@@ -76,8 +76,11 @@
 
 namespace chip {
 namespace Test {
+
+// Forward declaration of  InteractionModelEngineTestAccess class to allow it to be friend with InteractionModelEngine.
+// This is not for general API use. It is only to be used for (Unit) Tests to expose private Methods/Members.
 class InteractionModelEngineTestAccess;
-}
+} // namespace Test
 namespace app {
 
 /**

@@ -35,14 +35,15 @@ class ReportSchedulerImplTestAccess
 public:
     ReportSchedulerImplTestAccess(ReportSchedulerImpl * apReportSchedulerImpl) : mpReportSchedulerImpl(apReportSchedulerImpl) {}
 
+    void CancelReport(ReadHandler * aReadHandler) { mpReportSchedulerImpl->CancelReport(aReadHandler); }
+    void UnregisterAllHandlers() { mpReportSchedulerImpl->UnregisterAllHandlers(); }
+
     ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler)
     {
         return mpReportSchedulerImpl->FindReadHandlerNode(aReadHandler);
     }
 
-    void CancelReport(ReadHandler * aReadHandler) { mpReportSchedulerImpl->CancelReport(aReadHandler); }
-    void UnregisterAllHandlers() { mpReportSchedulerImpl->UnregisterAllHandlers(); }
-
+private:
     ReportSchedulerImpl * mpReportSchedulerImpl = nullptr;
 };
 

@@ -22,6 +22,8 @@
 namespace chip {
 namespace Test {
 
+using namespace app;
+
 /**
  * @brief Class acts as an accessor to private methods of the CommandHandler class without needing to give friend access to
  *        each individual test.
@@ -31,26 +33,24 @@ class CommandHandlerTestAccess
 {
 
 public:
-    CommandHandlerTestAccess(app::CommandHandler * aCommandHandler) : pCommandHandler(aCommandHandler) {}
-
-    bool TestOnlyIsInIdleState() { return pCommandHandler->TestOnlyIsInIdleState(); }
-
-    Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
-    {
-        return pCommandHandler->ProcessInvokeRequest(std::move(payload), isTimedInvoke);
-    }
+    CommandHandlerTestAccess(CommandHandler * apCommandHandler) : mpCommandHandler(apCommandHandler) {}
+    InvokeResponseMessage::Builder & GetInvokeResponseBuilder() { return mpCommandHandler->mInvokeResponseBuilder; }
+    CommandHandlerExchangeInterface * GetmpResponder() { return mpCommandHandler->mpResponder; }
 
     void SetReserveSpaceForMoreChunkMessages(bool aReserveSpaceForMoreChunkMessages)
     {
-        pCommandHandler->mReserveSpaceForMoreChunkMessages = aReserveSpaceForMoreChunkMessages;
+        mpCommandHandler->mReserveSpaceForMoreChunkMessages = aReserveSpaceForMoreChunkMessages;
     }
 
-    app::InvokeResponseMessage::Builder & GetInvokeResponseBuilder() { return pCommandHandler->mInvokeResponseBuilder; }
+    bool TestOnlyIsInIdleState() { return mpCommandHandler->TestOnlyIsInIdleState(); }
 
-    app::CommandHandlerExchangeInterface * GetmpResponder() { return pCommandHandler->mpResponder; }
+    Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
+    {
+        return mpCommandHandler->ProcessInvokeRequest(std::move(payload), isTimedInvoke);
+    }
 
 private:
-    app::CommandHandler * pCommandHandler = nullptr;
+    CommandHandler * mpCommandHandler = nullptr;
 };
 
 } // namespace Test

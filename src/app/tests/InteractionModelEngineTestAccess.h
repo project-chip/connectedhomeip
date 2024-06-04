@@ -22,7 +22,7 @@
 namespace chip {
 namespace Test {
 
-using namespace chip::app;
+using namespace app;
 /**
  * @brief Class acts as an accessor to private methods of the InteractionModelEngine class without needing to give friend access to
  *        each individual test.
@@ -35,25 +35,24 @@ public:
     InteractionModelEngineTestAccess(InteractionModelEngine * apInteractionModelEngine) :
         mpInteractionModelEngine(apInteractionModelEngine)
     {}
-
+    uint32_t GetNumOfSubscriptionsToResume() { return mpInteractionModelEngine->mNumOfSubscriptionsToResume; }
+    uint32_t GetNumSubscriptionResumptionRetries() { return mpInteractionModelEngine->mNumSubscriptionResumptionRetries; }
     InteractionModelEngine * GetInstance() { return InteractionModelEngine::GetInstance(); }
-
-    uint32_t ComputeTimeSecondsTillNextSubscriptionResumption()
-    {
-        return mpInteractionModelEngine->ComputeTimeSecondsTillNextSubscriptionResumption();
-    }
 
     void SetNumSubscriptionResumptionRetries(uint32_t aNumSubscriptionResumptionRetries)
     {
         mpInteractionModelEngine->mNumSubscriptionResumptionRetries = aNumSubscriptionResumptionRetries;
     }
-    uint32_t GetNumSubscriptionResumptionRetries() { return mpInteractionModelEngine->mNumSubscriptionResumptionRetries; }
 
     void SetNumOfSubscriptionsToResume(int8_t aNumOfSubscriptionsToResume)
     {
         mpInteractionModelEngine->mNumOfSubscriptionsToResume = aNumOfSubscriptionsToResume;
     }
-    uint32_t GetNumOfSubscriptionsToResume() { return mpInteractionModelEngine->mNumOfSubscriptionsToResume; }
+
+    uint32_t ComputeTimeSecondsTillNextSubscriptionResumption()
+    {
+        return mpInteractionModelEngine->ComputeTimeSecondsTillNextSubscriptionResumption();
+    }
 
 private:
     InteractionModelEngine * mpInteractionModelEngine = nullptr;

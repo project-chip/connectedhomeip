@@ -52,9 +52,12 @@
 
 namespace chip {
 namespace Test {
+
+// Forward declaration of  CommandSenderTestAccess class to allow it to be friend with CommandSender.
+// This is not for general API use. It is only to be used for (Unit) Tests to expose private Methods/Members.
 class CommandSenderTestAccess;
 
-}
+} // namespace Test
 namespace app {
 
 class CommandSender final : public Messaging::ExchangeDelegate

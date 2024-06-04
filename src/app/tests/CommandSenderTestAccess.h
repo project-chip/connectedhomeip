@@ -22,6 +22,8 @@
 namespace chip {
 namespace Test {
 
+using namespace app;
+
 /**
  * @brief Class acts as an accessor to private methods of the CommandSender class without needing to give friend access to
  *        each individual test.
@@ -31,18 +33,19 @@ class CommandSenderTestAccess
 {
 
 public:
-    CommandSenderTestAccess(app::CommandSender * aCommandSender) : mpCommandSender(aCommandSender) {}
+    CommandSenderTestAccess(CommandSender * aCommandSender) : mpCommandSender(aCommandSender) {}
 
+    Messaging::ExchangeHolder & GetExchangeCtx() { return mpCommandSender->mExchangeCtx; }
+
+    void FlushNoCommandResponse() { mpCommandSender->FlushNoCommandResponse(); }
+    void SetFinishedCommandCount(uint16_t aFinishedCommandCount) { mpCommandSender->mFinishedCommandCount = aFinishedCommandCount; }
+    void MoveToStateAddedCommand() { mpCommandSender->MoveToState(CommandSender::State::AddedCommand); }
+
+    CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket) { return mpCommandSender->Finalize(commandPacket); }
     CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload, bool & moreChunkedMessages)
     {
         return mpCommandSender->ProcessInvokeResponse(std::move(payload), moreChunkedMessages);
     }
-
-    void FlushNoCommandResponse() { mpCommandSender->FlushNoCommandResponse(); }
-
-    void SetFinishedCommandCount(uint16_t aFinishedCommandCount) { mpCommandSender->mFinishedCommandCount = aFinishedCommandCount; }
-
-    Messaging::ExchangeHolder & GetExchangeCtx() { return mpCommandSender->mExchangeCtx; }
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload)
@@ -50,13 +53,8 @@ public:
         return mpCommandSender->OnMessageReceived(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
 
-    CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket) { return mpCommandSender->Finalize(commandPacket); }
-
-    void MoveToState(const app::CommandSender::State aTargetState) {}
-    void MoveToStateAddedCommand() { mpCommandSender->MoveToState(app::CommandSender::State::AddedCommand); }
-
 private:
-    app::CommandSender * mpCommandSender = nullptr;
+    CommandSender * mpCommandSender = nullptr;
 };
 
 } // namespace Test

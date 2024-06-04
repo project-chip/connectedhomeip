@@ -35,14 +35,20 @@ class ReadClientTestAccess
 
 public:
     ReadClientTestAccess(ReadClient * aReadClient) : mpReadClient(aReadClient) {}
+
+    Messaging::ExchangeHolder & GetExchange() { return mpReadClient->mExchange; }
+    Messaging::ExchangeManager * GetExchangeMgr() { return mpReadClient->mpExchangeMgr; }
+    SubscriptionId GetSubscriptionId() { return mpReadClient->mSubscriptionId; }
+
+    void MoveToState(const ReadClient::ClientState aTargetState) { mpReadClient->MoveToState(aTargetState); }
+    bool IsIdle() const { return mpReadClient->IsIdle(); }
+
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload)
     {
         return mpReadClient->OnMessageReceived(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
 
-    Messaging::ExchangeHolder & GetExchange() { return mpReadClient->mExchange; }
-    Messaging::ExchangeManager * GetExchangeMgr() { return mpReadClient->mpExchangeMgr; }
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, ReadClient::ReportType aReportType)
     {
         return mpReadClient->ProcessReportData(std::move(aPayload), aReportType);
@@ -63,11 +69,6 @@ public:
     {
         return mpReadClient->SendSubscribeRequest(aSubscribePrepareParams);
     }
-
-    SubscriptionId GetSubscriptionId() { return mpReadClient->mSubscriptionId; }
-    void MoveToState(const ReadClient::ClientState aTargetState) { mpReadClient->MoveToState(aTargetState); }
-
-    bool IsIdle() const { return mpReadClient->IsIdle(); }
 
 private:
     ReadClient * mpReadClient = nullptr;

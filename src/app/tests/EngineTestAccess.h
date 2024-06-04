@@ -22,6 +22,8 @@
 namespace chip {
 namespace Test {
 
+using namespace app;
+
 /**
  * @brief Class acts as an accessor to private methods of the Engine class without needing to give friend access to
  *        each individual test.
@@ -31,38 +33,35 @@ class EngineTestAccess
 {
 
 public:
-    EngineTestAccess(chip::app::reporting::Engine * apEngine) : mpEngine(apEngine) {}
+    EngineTestAccess(reporting::Engine * apEngine) : mpEngine(apEngine) {}
 
-    CHIP_ERROR BuildAndSendSingleReportData(chip::app::ReadHandler * apReadHandler)
+    reporting::Engine * GetEngine() { return mpEngine; }
+    inline void BumpDirtySetGeneration() { mpEngine->BumpDirtySetGeneration(); }
+    bool IsRunScheduled() const { return mpEngine->IsRunScheduled(); }
+
+    CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     {
         return mpEngine->BuildAndSendSingleReportData(apReadHandler);
     }
 
-    chip::app::reporting::Engine * GetEngine() { return mpEngine; }
+    bool MergeOverlappedAttributePath(const AttributePathParams & aAttributePath)
+    {
+        return mpEngine->MergeOverlappedAttributePath(aAttributePath);
+    }
 
-    ObjectPool<chip::app::reporting::Engine::AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET,
-               ObjectPoolMem::kInline> &
+    CHIP_ERROR InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
+    {
+        return mpEngine->InsertPathIntoDirtySet(aAttributePath);
+    }
+
+    ObjectPool<reporting::Engine::AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET, ObjectPoolMem::kInline> &
     GetGlobalDirtySet()
     {
         return mpEngine->mGlobalDirtySet;
     }
 
-    bool MergeOverlappedAttributePath(const chip::app::AttributePathParams & aAttributePath)
-    {
-        return mpEngine->MergeOverlappedAttributePath(aAttributePath);
-    }
-
-    inline void BumpDirtySetGeneration() { mpEngine->BumpDirtySetGeneration(); }
-
-    CHIP_ERROR InsertPathIntoDirtySet(const chip::app::AttributePathParams & aAttributePath)
-    {
-        return mpEngine->InsertPathIntoDirtySet(aAttributePath);
-    }
-
-    bool IsRunScheduled() const { return mpEngine->IsRunScheduled(); }
-
 private:
-    chip::app::reporting::Engine * mpEngine = nullptr;
+    reporting::Engine * mpEngine = nullptr;
 };
 
 } // namespace Test

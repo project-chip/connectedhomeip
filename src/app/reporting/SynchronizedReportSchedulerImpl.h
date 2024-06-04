@@ -22,8 +22,13 @@
 
 namespace chip {
 namespace Test {
+
+// Forward declaration of SynchronizedReportSchedulerImplTestAccess class to allow it to be friend with the
+// SynchronizedReportSchedulerImpl class.
+// This is not for general API use. It is only to be used for (Unit) Tests to expose private Methods/Members.
 class SynchronizedReportSchedulerImplTestAccess;
-}
+
+} // namespace Test
 namespace app {
 namespace reporting {
 

@@ -22,6 +22,8 @@
 namespace chip {
 namespace Test {
 
+using namespace app;
+
 /**
  * @brief Class acts as an accessor to private methods of the WriteClient class without needing to give friend access to
  *        each individual test.
@@ -31,7 +33,12 @@ class WriteClientTestAccess
 {
 
 public:
-    WriteClientTestAccess(app::WriteClient * aWriteClient) : mpWriteClient(aWriteClient) {}
+    WriteClientTestAccess(WriteClient * aWriteClient) : mpWriteClient(aWriteClient) {}
+
+    WriteClient::State GetState() { return mpWriteClient->mState; }
+    WriteClient::State GetEnumStateAwaitingDestruction() { return WriteClient::State::AwaitingDestruction; }
+    Messaging::ExchangeHolder & GetExchangeCtx() { return mpWriteClient->mExchangeCtx; }
+    void Close() { mpWriteClient->Close(); }
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload)
@@ -39,20 +46,13 @@ public:
         return mpWriteClient->OnMessageReceived(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
 
-    Messaging::ExchangeHolder & GetExchangeCtx() { return mpWriteClient->mExchangeCtx; }
-
-    app::WriteClient::State GetState() { return mpWriteClient->mState; }
-    app::WriteClient::State GetEnumStateAwaitingDestruction() { return app::WriteClient::State::AwaitingDestruction; }
-
-    void Close() { mpWriteClient->Close(); }
-
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload)
     {
         return mpWriteClient->ProcessWriteResponseMessage(std::move(payload));
     }
 
 private:
-    app::WriteClient * mpWriteClient = nullptr;
+    WriteClient * mpWriteClient = nullptr;
 };
 
 } // namespace Test

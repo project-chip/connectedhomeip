@@ -22,7 +22,7 @@
 namespace chip {
 namespace Test {
 
-using namespace chip::app;
+using namespace app;
 /**
  * @brief Class acts as an accessor to private methods of the ReadHandler class without needing to give friend access to
  *        each individual test.
@@ -33,6 +33,25 @@ class ReadHandlerTestAccess
 
 public:
     ReadHandlerTestAccess(ReadHandler * apReadHandler) : mpReadHandler(apReadHandler) {}
+
+    Messaging::ExchangeHolder & GetExchangeCtx() { return mpReadHandler->mExchangeCtx; }
+    ReadHandler * GetReadHandler() { return mpReadHandler; }
+    SessionHolder & GetSessionHandle() { return mpReadHandler->mSessionHandle; }
+    Transport::SecureSession * GetSession() { return mpReadHandler->GetSession(); }
+    ReadHandler::Observer * GetObserver() { return mpReadHandler->mObserver; }
+
+    bool IsDirty() const { return mpReadHandler->IsDirty(); }
+    bool ShouldStartReporting() const { return mpReadHandler->ShouldStartReporting(); }
+
+    void ForceDirtyState() { mpReadHandler->ForceDirtyState(); }
+    void ClearForceDirtyFlag() { mpReadHandler->ClearForceDirtyFlag(); }
+    void MoveHandlerToIdleState() { mpReadHandler->MoveToState(ReadHandler::HandlerState::Idle); }
+
+    void SetStateFlagToActiveSubscription(bool aValue)
+    {
+        mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, aValue);
+    }
+
     void OnInitialRequest(System::PacketBufferHandle && aPayload)
     {
         if (mpReadHandler != nullptr)
@@ -40,37 +59,21 @@ public:
             mpReadHandler->OnInitialRequest(std::move(aPayload));
         }
     }
-    ReadHandler * GetReadHandler() { return mpReadHandler; }
-    void ForceDirtyState() { mpReadHandler->ForceDirtyState(); }
-    void ClearForceDirtyFlag() { mpReadHandler->ClearForceDirtyFlag(); }
-    ReadHandler::Observer * GetObserver() { return mpReadHandler->mObserver; }
-    void MoveHandlerToIdleState() { mpReadHandler->MoveToState(ReadHandler::HandlerState::Idle); }
-    void SetStateFlagToActiveSubscription(bool aValue)
-    {
-        mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, aValue);
-    }
-    Messaging::ExchangeHolder & GetExchangeCtx() { return mpReadHandler->mExchangeCtx; }
+
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks)
     {
         return mpReadHandler->SendReportData(std::move(aPayload), aMoreChunks);
     }
+
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload)
     {
         return mpReadHandler->ProcessSubscribeRequest(std::move(aPayload));
     }
 
-    bool IsDirty() const { return mpReadHandler->IsDirty(); }
-
-    bool ShouldStartReporting() const { return mpReadHandler->ShouldStartReporting(); }
-
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload)
     {
         return mpReadHandler->ProcessReadRequest(std::move(aPayload));
     }
-
-    SessionHolder & GetSessionHandle() { return mpReadHandler->mSessionHandle; }
-
-    Transport::SecureSession * GetSession() { return mpReadHandler->GetSession(); }
 
 private:
     ReadHandler * mpReadHandler = nullptr;

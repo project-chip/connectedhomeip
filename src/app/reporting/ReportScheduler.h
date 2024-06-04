@@ -27,7 +27,6 @@
 #include <system/SystemClock.h>
 
 namespace chip {
-
 namespace app {
 namespace reporting {
 
@@ -184,8 +183,8 @@ public:
     private:
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
-        System::Clock::Timestamp mMinTimestamp;
-        System::Clock::Timestamp mMaxTimestamp;
+        Timestamp mMinTimestamp;
+        Timestamp mMaxTimestamp;
 
         BitFlags<ReadHandlerNodeFlags> mFlags;
     };

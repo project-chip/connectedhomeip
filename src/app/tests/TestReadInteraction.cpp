@@ -271,6 +271,8 @@ namespace app {
 
 using Seconds16      = System::Clock::Seconds16;
 using Milliseconds32 = System::Clock::Milliseconds32;
+
+// TODO: Add support for a 2nd Test Context by making sSyncScheduler = true (this was not ported from NL Tests yet)
 class TestReadInteraction : public ::testing::Test
 {
 
@@ -314,8 +316,7 @@ public:
         {
             mpTestContext->SetUp();
         }
-        // TODO: change to ASSERT_EQ, once transition to pw_unit_test is complete
-        VerifyOrDie(mEventCounter.Init(0) == CHIP_NO_ERROR);
+        ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&mpTestContext->GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
@@ -345,18 +346,7 @@ protected:
 };
 
 chip::Test::AppContext * TestReadInteraction::mpTestContext = nullptr;
-
-bool TestReadInteraction::sSyncScheduler = false;
-
-// class TestSyncContext : public TestContext
-// {
-// public:
-//     static void SetUpTestSuite()
-//     {
-//         sSyncScheduler = true;
-//         TestContext::SetUpTestSuite();
-//     }
-// };
+bool TestReadInteraction::sSyncScheduler                    = false;
 
 void TestReadInteraction::GenerateReportData(System::PacketBufferHandle & aPayload, ReportType aReportType, bool aSuppressResponse,
                                              bool aHasSubscriptionId = false)
