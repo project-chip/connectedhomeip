@@ -20216,7 +20216,7 @@ typedef NS_ENUM(uint8_t, MTRColorControlColorLoopDirection) {
 typedef NS_ENUM(uint8_t, MTRColorControlColorMode) {
     MTRColorControlColorModeCurrentHueAndCurrentSaturation MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRColorControlColorModeCurrentXAndCurrentY MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRColorControlColorModeColorTemperature MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRColorControlColorModeColorTemperatureMireds MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRColorControlDirection) {
@@ -20237,7 +20237,7 @@ typedef NS_ENUM(uint8_t, MTRColorControlDriftCompensation) {
 typedef NS_ENUM(uint8_t, MTRColorControlEnhancedColorMode) {
     MTRColorControlEnhancedColorModeCurrentHueAndCurrentSaturation MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRColorControlEnhancedColorModeCurrentXAndCurrentY MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRColorControlEnhancedColorModeColorTemperature MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRColorControlEnhancedColorModeColorTemperatureMireds MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRColorControlEnhancedColorModeEnhancedCurrentHueAndCurrentSaturation MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
@@ -20253,11 +20253,11 @@ typedef NS_ENUM(uint8_t, MTRColorControlStepMode) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint16_t, MTRColorControlColorCapabilitiesBitmap) {
-    MTRColorControlColorCapabilitiesBitmapHueSaturationSupported MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRColorControlColorCapabilitiesBitmapEnhancedHueSupported MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRColorControlColorCapabilitiesBitmapColorLoopSupported MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRColorControlColorCapabilitiesBitmapXYAttributesSupported MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRColorControlColorCapabilitiesBitmapColorTemperatureSupported MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRColorControlColorCapabilitiesBitmapHueSaturation MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRColorControlColorCapabilitiesBitmapEnhancedHue MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRColorControlColorCapabilitiesBitmapColorLoop MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRColorControlColorCapabilitiesBitmapXYAttributes MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRColorControlColorCapabilitiesBitmapColorTemperature MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRColorControlFeature) {

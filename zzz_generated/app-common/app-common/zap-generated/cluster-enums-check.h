@@ -2974,7 +2974,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorMode
     {
     case EnumType::kCurrentHueAndCurrentSaturation:
     case EnumType::kCurrentXAndCurrentY:
-    case EnumType::kColorTemperature:
+    case EnumType::kColorTemperatureMireds:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -3016,7 +3016,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::EnhancedC
     {
     case EnumType::kCurrentHueAndCurrentSaturation:
     case EnumType::kCurrentXAndCurrentY:
-    case EnumType::kColorTemperature:
+    case EnumType::kColorTemperatureMireds:
     case EnumType::kEnhancedCurrentHueAndCurrentSaturation:
         return val;
     default:

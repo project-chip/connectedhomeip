@@ -4373,7 +4373,7 @@ enum class ColorModeEnum : uint8_t
 {
     kCurrentHueAndCurrentSaturation = 0x00,
     kCurrentXAndCurrentY            = 0x01,
-    kColorTemperature               = 0x02,
+    kColorTemperatureMireds         = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -4415,7 +4415,7 @@ enum class EnhancedColorModeEnum : uint8_t
 {
     kCurrentHueAndCurrentSaturation         = 0x00,
     kCurrentXAndCurrentY                    = 0x01,
-    kColorTemperature                       = 0x02,
+    kColorTemperatureMireds                 = 0x02,
     kEnhancedCurrentHueAndCurrentSaturation = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
@@ -4452,11 +4452,11 @@ enum class StepModeEnum : uint8_t
 // Bitmap for ColorCapabilitiesBitmap
 enum class ColorCapabilitiesBitmap : uint16_t
 {
-    kHueSaturationSupported    = 0x1,
-    kEnhancedHueSupported      = 0x2,
-    kColorLoopSupported        = 0x4,
-    kXYAttributesSupported     = 0x8,
-    kColorTemperatureSupported = 0x10,
+    kHueSaturation    = 0x1,
+    kEnhancedHue      = 0x2,
+    kColorLoop        = 0x4,
+    kXYAttributes     = 0x8,
+    kColorTemperature = 0x10,
 };
 
 // Bitmap for Feature

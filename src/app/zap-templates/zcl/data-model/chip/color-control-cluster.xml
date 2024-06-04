@@ -42,16 +42,16 @@ limitations under the License.
     <cluster code="0x0300"/>
     <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
     <item name="CurrentXAndCurrentY" value="0x01"/>
-    <item name="ColorTemperature" value="0x02"/>
+    <item name="ColorTemperatureMireds" value="0x02"/>
   </enum>
 
   <bitmap name="ColorCapabilitiesBitmap" type="bitmap16">
     <cluster code="0x0300"/>
-    <field name="HueSaturationSupported" mask="0x0001"/>
-    <field name="EnhancedHueSupported" mask="0x0002"/>
-    <field name="ColorLoopSupported" mask="0x0004"/>
-    <field name="XYAttributesSupported" mask="0x0008"/>
-    <field name="ColorTemperatureSupported" mask="0x0010"/>
+    <field name="HueSaturation" mask="0x0001"/>
+    <field name="EnhancedHue" mask="0x0002"/>
+    <field name="ColorLoop" mask="0x0004"/>
+    <field name="XYAttributes" mask="0x0008"/>
+    <field name="ColorTemperature" mask="0x0010"/>
   </bitmap>
 
   <bitmap name="UpdateFlagsBitmap" type="bitmap8">
@@ -78,7 +78,7 @@ limitations under the License.
     <cluster code="0x0300"/>
     <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
     <item name="CurrentXAndCurrentY" value="0x01"/>
-    <item name="ColorTemperature" value="0x02"/>
+    <item name="ColorTemperatureMireds" value="0x02"/>
     <item name="EnhancedCurrentHueAndCurrentSaturation" value="0x03"/>
   </enum>
 

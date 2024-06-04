@@ -4295,7 +4295,7 @@ cluster ColorControl = 768 {
   enum ColorModeEnum : enum8 {
     kCurrentHueAndCurrentSaturation = 0;
     kCurrentXAndCurrentY = 1;
-    kColorTemperature = 2;
+    kColorTemperatureMireds = 2;
   }
 
   enum DirectionEnum : enum8 {
@@ -4316,7 +4316,7 @@ cluster ColorControl = 768 {
   enum EnhancedColorModeEnum : enum8 {
     kCurrentHueAndCurrentSaturation = 0;
     kCurrentXAndCurrentY = 1;
-    kColorTemperature = 2;
+    kColorTemperatureMireds = 2;
     kEnhancedCurrentHueAndCurrentSaturation = 3;
   }
 
@@ -4332,11 +4332,11 @@ cluster ColorControl = 768 {
   }
 
   bitmap ColorCapabilitiesBitmap : bitmap16 {
-    kHueSaturationSupported = 0x1;
-    kEnhancedHueSupported = 0x2;
-    kColorLoopSupported = 0x4;
-    kXYAttributesSupported = 0x8;
-    kColorTemperatureSupported = 0x10;
+    kHueSaturation = 0x1;
+    kEnhancedHue = 0x2;
+    kColorLoop = 0x4;
+    kXYAttributes = 0x8;
+    kColorTemperature = 0x10;
   }
 
   bitmap Feature : bitmap32 {
