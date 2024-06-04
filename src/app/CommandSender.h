@@ -51,6 +51,10 @@
 #define COMMON_STATUS_SUCCESS 0
 
 namespace chip {
+namespace Test {
+class CommandSenderTestAccess;
+
+}
 namespace app {
 
 class CommandSender final : public Messaging::ExchangeDelegate
@@ -491,6 +495,7 @@ public:
 
 private:
     friend class TestCommandInteraction;
+    friend class chip::Test::CommandSenderTestAccess;
 
     enum class State : uint8_t
     {

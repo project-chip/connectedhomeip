@@ -21,7 +21,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <gtest/gtest.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/data-model/Nullable.h>
 #include <lib/support/Span.h>

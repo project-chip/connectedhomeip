@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
-
 #include <app/AppConfig.h>
 #include <app/MessageDef/ArrayBuilder.h>
 #include <app/MessageDef/ArrayParser.h>
@@ -28,6 +26,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <system/TLVPacketBufferBackingStore.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 namespace {
 

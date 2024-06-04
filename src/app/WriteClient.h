@@ -42,6 +42,10 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
+namespace Test {
+class WriteClientTestAccess;
+
+}
 namespace app {
 
 class InteractionModelEngine;
@@ -237,6 +241,7 @@ public:
 private:
     friend class TestWriteInteraction;
     friend class InteractionModelEngine;
+    friend class chip::Test::WriteClientTestAccess;
 
     enum class State
     {

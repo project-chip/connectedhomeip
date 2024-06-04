@@ -16,14 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a test for  CHIP Interaction Model Message Def
- *
- */
-
-#include <gtest/gtest.h>
-
 #include <app/AppConfig.h>
 #include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventStatusIB.h>
@@ -42,6 +34,9 @@
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <system/TLVPacketBufferBackingStore.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 namespace {
 

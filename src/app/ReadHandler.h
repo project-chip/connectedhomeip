@@ -56,6 +56,12 @@
 inline constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // seconds (60 minutes)
 
 namespace chip {
+
+// Forward declaration of ReadHandlerTestAccess class to allow it to be friend with the ReadHandler.
+// This is not for general API use. It is only to be used for (Unit) Tests to expose private Methods/Members.
+namespace Test {
+class ReadHandlerTestAccess;
+}
 namespace app {
 
 //
@@ -426,6 +432,7 @@ private:
     friend class TestReadInteraction;
     friend class chip::app::reporting::TestReportingEngine;
     friend class chip::app::reporting::TestReportScheduler;
+    friend class chip::Test::ReadHandlerTestAccess;
 
     //
     // The engine needs to be able to Abort/Close a ReadHandler instance upon completion of work for a given read/subscribe

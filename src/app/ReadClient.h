@@ -52,6 +52,9 @@
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
+namespace Test {
+class ReadClientTestAccess;
+}
 namespace app {
 
 class InteractionModelEngine;
@@ -298,6 +301,23 @@ public:
         kLITICD,
     };
 
+    enum class ReportType
+    {
+        // kUnsolicited reports are the first message in an exchange.
+        kUnsolicited,
+        // kContinuingTransaction reports are responses to a message we sent.
+        kContinuingTransaction
+    };
+
+    enum class ClientState : uint8_t
+    {
+        Idle,                      ///< The client has been initialized and is ready for a SendRequest
+        AwaitingInitialReport,     ///< The client is waiting for initial report
+        AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
+        SubscriptionActive,        ///< The client is maintaining subscription
+        InactiveICDSubscription,   ///< The client is waiting to resubscribe for LIT device
+    };
+
     /**
      *
      *  Constructor.
@@ -503,23 +523,7 @@ public:
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
-
-    enum class ClientState : uint8_t
-    {
-        Idle,                      ///< The client has been initialized and is ready for a SendRequest
-        AwaitingInitialReport,     ///< The client is waiting for initial report
-        AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
-        SubscriptionActive,        ///< The client is maintaining subscription
-        InactiveICDSubscription,   ///< The client is waiting to resubscribe for LIT device
-    };
-
-    enum class ReportType
-    {
-        // kUnsolicited reports are the first message in an exchange.
-        kUnsolicited,
-        // kContinuingTransaction reports are responses to a message we sent.
-        kContinuingTransaction
-    };
+    friend class chip::Test::ReadClientTestAccess;
 
     bool IsMatchingSubscriptionId(SubscriptionId aSubscriptionId)
     {
@@ -675,6 +679,6 @@ private:
         kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
 };
 
-};     // namespace app
-};     // namespace chip
+}; // namespace app
+}; // namespace chip
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT

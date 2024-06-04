@@ -75,6 +75,9 @@
 #endif                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 namespace chip {
+namespace Test {
+class InteractionModelEngineTestAccess;
+}
 namespace app {
 
 /**
@@ -416,6 +419,7 @@ private:
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
     friend class SubscriptionResumptionSessionEstablisher;
+    friend class chip::Test::InteractionModelEngineTestAccess;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandResponseSender & apResponderObj) override;

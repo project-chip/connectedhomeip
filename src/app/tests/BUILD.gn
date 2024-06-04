@@ -121,10 +121,12 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
-source_set("ember-apptest-compatibility") {
+source_set("app-test-stubs") {
   sources = [
-    "ember-test-compatibility.cpp",
-    "ember-test-compatibility.h",
+    "test-ember-api.cpp",
+    "test-ember-api.h",
+    "test-interaction-model-api.cpp",
+    "test-interaction-model-api.h",
   ]
   public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
 
@@ -139,41 +141,6 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
-    "TestBindingTable.cpp",
-    "TestBuilderParser.cpp",
-    "TestMessageDef.cpp",
-    "TestNullable.cpp",
-    "TestStatusIB.cpp",
-    "TestStatusResponseMessage.cpp",
-  ]
-
-  if (!chip_fake_platform) {
-    test_sources += [ "TestFailSafeContext.cpp" ]
-  }
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    ":binding-test-srcs",
-    ":ember-apptest-compatibility",
-    ":operational-state-test-srcs",
-    ":ota-requestor-test-srcs",
-    ":time-sync-data-provider-test-srcs",
-    "${chip_root}/src/app",
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/icd/client:manager",
-    "${chip_root}/src/app/tests:helpers",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support:test_utils",
-    "${chip_root}/src/lib/support:testing",
-  ]
-}
-
-chip_test_suite_using_nltest("tests_nltest") {
-  output_name = "libAppTestsNL"
-
-  test_sources = [
     "TestAclAttribute.cpp",
     "TestAclEvent.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
@@ -181,37 +148,73 @@ chip_test_suite_using_nltest("tests_nltest") {
     "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
-    "TestBasicCommandPathRegistry.cpp",
-    "TestClusterInfo.cpp",
+    "TestBindingTable.cpp",
+    "TestBuilderParser.cpp",
     "TestCommandInteraction.cpp",
-    "TestCommandPathParams.cpp",
-    "TestConcreteAttributePath.cpp",
-    "TestDataModelSerialization.cpp",
-    "TestDefaultOTARequestorStorage.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
-    "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
     "TestInteractionModelEngine.cpp",
+    "TestMessageDef.cpp",
+    "TestNullable.cpp",
     "TestNumericAttributeTraits.cpp",
     "TestOperationalStateClusterObjects.cpp",
     "TestPendingNotificationMap.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
+    "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
+    "TestStatusIB.cpp",
+    "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
 
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":app-test-stubs",
+    ":binding-test-srcs",
+    ":operational-state-test-srcs",
+    ":ota-requestor-test-srcs",
+    ":power-cluster-test-srcs",
+    ":time-sync-data-provider-test-srcs",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
+  ]
+
+  if (chip_config_network_layer_ble &&
+      (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+    test_sources += [ "TestCommissioningWindowManager.cpp" ]
+    public_deps += [
+      "${chip_root}/src/app/server",
+      "${chip_root}/src/messaging/tests/echo:common",
+    ]
+  }
+
+  if (!chip_fake_platform) {
+    test_sources += [ "TestFailSafeContext.cpp" ]
+  }
+
   # DefaultICDClientStorage assumes that raw AES key is used by the application
   if (chip_crypto != "psa") {
     test_sources += [ "TestDefaultICDClientStorage.cpp" ]
   }
 
-  #
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
+  }
+
   # On NRF platforms, the allocation of a large number of pbufs in this test
   # to exercise chunking causes it to run out of memory. For now, disable it there.
   #
@@ -228,22 +231,26 @@ chip_test_suite_using_nltest("tests_nltest") {
       chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
   }
+}
 
-  # The platform manager is not properly clearing queues in test teardown, which results in
-  # DrainIO calls not being able to run in expected time (5seconds) if unprocessed reported engine
-  # runs are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
-  # running all tests in one file. We need to figure out how to properly clean the event queues
-  # before enabling this test for these platforms.
-  if (chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "openiotsdk") {
-    test_sources += [ "TestReportScheduler.cpp" ]
-  }
+chip_test_suite_using_nltest("tests_nltest") {
+  output_name = "libAppTestsNL"
+
+  test_sources = [
+    "TestBasicCommandPathRegistry.cpp",
+    "TestClusterInfo.cpp",
+    "TestCommandPathParams.cpp",
+    "TestConcreteAttributePath.cpp",
+    "TestDataModelSerialization.cpp",
+    "TestDefaultOTARequestorStorage.cpp",
+    "TestEventPathParams.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":app-test-stubs",
     ":binding-test-srcs",
-    ":ember-apptest-compatibility",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":time-sync-data-provider-test-srcs",
@@ -253,6 +260,7 @@ chip_test_suite_using_nltest("tests_nltest") {
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/lib/support:testing_nlunit",
@@ -268,18 +276,5 @@ chip_test_suite_using_nltest("tests_nltest") {
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
     ]
-  }
-
-  if (chip_config_network_layer_ble &&
-      (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
-    test_sources += [ "TestCommissionManager.cpp" ]
-    public_deps += [
-      "${chip_root}/src/app/server",
-      "${chip_root}/src/messaging/tests/echo:common",
-    ]
-  }
-
-  if (chip_persist_subscriptions) {
-    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
   }
 }

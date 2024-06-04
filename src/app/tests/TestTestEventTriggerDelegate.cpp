@@ -19,9 +19,9 @@
 #include <stdint.h>
 
 #include <app/TestEventTriggerDelegate.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
+#include <pw_unit_test/framework.h>
 
 using namespace chip;
 
@@ -66,20 +66,20 @@ private:
     ByteSpan mEnableKey;
 };
 
-void TestKeyChecking(nlTestSuite * aSuite, void * aContext)
+TEST(TestTestEventTriggerDelegate, TestKeyChecking)
 {
     const uint8_t kTestKey[16]       = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
     const uint8_t kBadKey[16]        = { 255, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
     const uint8_t kDiffLenBadKey[17] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
     TestEventDelegate delegate{ ByteSpan{ kTestKey } };
 
-    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{ kTestKey }) == true);
-    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{ kBadKey }) == false);
-    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{ kDiffLenBadKey }) == false);
-    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{}) == false);
+    EXPECT_TRUE(delegate.DoesEnableKeyMatch(ByteSpan{ kTestKey }));
+    EXPECT_FALSE(delegate.DoesEnableKeyMatch(ByteSpan{ kBadKey }));
+    EXPECT_FALSE(delegate.DoesEnableKeyMatch(ByteSpan{ kDiffLenBadKey }));
+    EXPECT_FALSE(delegate.DoesEnableKeyMatch(ByteSpan{}));
 }
 
-void TestHandlerManagement(nlTestSuite * aSuite, void * aContext)
+TEST(TestTestEventTriggerDelegate, TestHandlerManagement)
 {
     const uint8_t kTestKey[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
@@ -89,31 +89,31 @@ void TestHandlerManagement(nlTestSuite * aSuite, void * aContext)
     TestEventHandler event2Handler{ 2 };
 
     // Add 2, check 2 works 1 doesn't.
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(1) != CHIP_NO_ERROR);
+    EXPECT_NE(delegate.HandleEventTriggers(1), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, delegate.AddHandler(&event2Handler) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.AddHandler(&event2Handler) != CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.AddHandler(&event2Handler), CHIP_NO_ERROR);
+    EXPECT_NE(delegate.AddHandler(&event2Handler), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(1) != CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(2) == CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.HandleEventTriggers(2), CHIP_NO_ERROR);
+    EXPECT_NE(delegate.HandleEventTriggers(1), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.HandleEventTriggers(2), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, event1Handler.GetCount() == 0);
-    NL_TEST_ASSERT(aSuite, event2Handler.GetCount() == 2);
+    EXPECT_EQ(event1Handler.GetCount(), 0);
+    EXPECT_EQ(event2Handler.GetCount(), 2);
 
     event1Handler.ClearCount();
     event2Handler.ClearCount();
 
     // Add 1, check 1 and 2 work.
-    NL_TEST_ASSERT(aSuite, delegate.AddHandler(&event1Handler) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.AddHandler(&event1Handler) != CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.AddHandler(&event1Handler), CHIP_NO_ERROR);
+    EXPECT_NE(delegate.AddHandler(&event1Handler), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(1) == CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.HandleEventTriggers(1), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.HandleEventTriggers(2), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.HandleEventTriggers(1), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, event1Handler.GetCount() == 2);
-    NL_TEST_ASSERT(aSuite, event2Handler.GetCount() == 1);
+    EXPECT_EQ(event1Handler.GetCount(), 2);
+    EXPECT_EQ(event2Handler.GetCount(), 1);
 
     event1Handler.ClearCount();
     event2Handler.ClearCount();
@@ -121,29 +121,29 @@ void TestHandlerManagement(nlTestSuite * aSuite, void * aContext)
     // Remove 2, check 1 works.
     delegate.RemoveHandler(&event2Handler);
 
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(2) != CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.HandleEventTriggers(1), CHIP_NO_ERROR);
+    EXPECT_NE(delegate.HandleEventTriggers(2), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, event1Handler.GetCount() == 1);
-    NL_TEST_ASSERT(aSuite, event2Handler.GetCount() == 0);
+    EXPECT_EQ(event1Handler.GetCount(), 1);
+    EXPECT_EQ(event2Handler.GetCount(), 0);
 
     // Remove again, should be NO-OP.
     delegate.RemoveHandler(&event2Handler);
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(2) != CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, event2Handler.GetCount() == 0);
+    EXPECT_NE(delegate.HandleEventTriggers(2), CHIP_NO_ERROR);
+    EXPECT_EQ(event2Handler.GetCount(), 0);
 
     event1Handler.ClearCount();
     event2Handler.ClearCount();
 
     // Add 2 again, check 1 and 2 work.
-    NL_TEST_ASSERT(aSuite, delegate.AddHandler(&event2Handler) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.AddHandler(&event2Handler) != CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.AddHandler(&event2Handler), CHIP_NO_ERROR);
+    EXPECT_NE(delegate.AddHandler(&event2Handler), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(2) == CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.HandleEventTriggers(1), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.HandleEventTriggers(2), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, event1Handler.GetCount() == 1);
-    NL_TEST_ASSERT(aSuite, event2Handler.GetCount() == 1);
+    EXPECT_EQ(event1Handler.GetCount(), 1);
+    EXPECT_EQ(event2Handler.GetCount(), 1);
 
     event1Handler.ClearCount();
     event2Handler.ClearCount();
@@ -151,42 +151,14 @@ void TestHandlerManagement(nlTestSuite * aSuite, void * aContext)
     // Remove all handlers, check neither works.
     delegate.ClearAllHandlers();
 
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(1) != CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(2) != CHIP_NO_ERROR);
+    EXPECT_NE(delegate.HandleEventTriggers(1), CHIP_NO_ERROR);
+    EXPECT_NE(delegate.HandleEventTriggers(2), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, event1Handler.GetCount() == 0);
-    NL_TEST_ASSERT(aSuite, event2Handler.GetCount() == 0);
+    EXPECT_EQ(event1Handler.GetCount(), 0);
+    EXPECT_EQ(event2Handler.GetCount(), 0);
 
     // Add a handler at the end: having it remaining should not cause crashes/leaks.
-    NL_TEST_ASSERT(aSuite, delegate.AddHandler(&event2Handler) == CHIP_NO_ERROR);
-}
-
-int TestSetup(void * inContext)
-{
-    return SUCCESS;
-}
-
-int TestTeardown(void * inContext)
-{
-    return SUCCESS;
+    EXPECT_EQ(delegate.AddHandler(&event2Handler), CHIP_NO_ERROR);
 }
 
 } // namespace
-
-int TestTestEventTriggerDelegate()
-{
-    static nlTest sTests[] = { NL_TEST_DEF("TestKeyChecking", TestKeyChecking),
-                               NL_TEST_DEF("TestHandlerManagement", TestHandlerManagement), NL_TEST_SENTINEL() };
-
-    nlTestSuite theSuite = {
-        "TestTestEventTriggerDelegate",
-        &sTests[0],
-        TestSetup,
-        TestTeardown,
-    };
-
-    nlTestRunner(&theSuite, nullptr);
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestTestEventTriggerDelegate)

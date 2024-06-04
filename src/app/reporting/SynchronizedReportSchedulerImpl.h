@@ -21,6 +21,9 @@
 #include <app/reporting/ReportSchedulerImpl.h>
 
 namespace chip {
+namespace Test {
+class SynchronizedReportSchedulerImplTestAccess;
+}
 namespace app {
 namespace reporting {
 
@@ -117,6 +120,7 @@ protected:
 
 private:
     friend class chip::app::reporting::TestReportScheduler;
+    friend class chip::Test::SynchronizedReportSchedulerImplTestAccess;
 
     /**
      * @brief Find the highest minimum timestamp possible that still respects the lowest max timestamp and sets it as the common

@@ -15,15 +15,15 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
-
 #include <app/AppConfig.h>
 #include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <pw_unit_test/framework.h>
 
 namespace {
 

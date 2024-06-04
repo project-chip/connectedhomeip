@@ -38,6 +38,10 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
+namespace Test {
+class EngineTestAccess;
+
+}
 namespace app {
 
 class InteractionModelEngine;
@@ -148,6 +152,7 @@ private:
 
     friend class TestReportingEngine;
     friend class ::chip::app::TestReadInteraction;
+    friend class ::chip::Test::EngineTestAccess;
 
     bool IsRunScheduled() const { return mRunScheduled; }
 
