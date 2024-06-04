@@ -17,116 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
- <!-- semantic tag namespace definitons for service area-->
-
-    <enum name="LandmarkTag" type="enum8">
-      <cluster code="0x0150"/>
-      <item value="0x00" name="Air Conditioner"/>
-      <item value="0x01" name="Air Purifier"/>
-      <item value="0x02" name="Back Door"/>
-      <item value="0x03" name="Bar Stool"/>
-      <item value="0x04" name="Bath Mat"/>
-      <item value="0x05" name="Bathtub"/>
-      <item value="0x06" name="Bed"/>
-      <item value="0x07" name="Bookshelf"/>
-      <item value="0x08" name="Chair"/>
-      <item value="0x09" name="Christmas Tree"/>
-      <item value="0x0A" name="Coat Rack"/>
-      <item value="0x0B" name="Coffee Table"/>
-      <item value="0x0C" name="Cooking Range"/>
-      <item value="0x0D" name="Couch"/>
-      <item value="0x0E" name="Countertop"/>
-      <item value="0x0F" name="Cradle"/>
-
-      <item value="0x10" name="Crib"/>
-      <item value="0x11" name="Desk"/>
-      <item value="0x12" name="Dining Table"/>
-      <item value="0x13" name="Dishwasher"/>
-      <item value="0x14" name="Door"/>
-      <item value="0x15" name="Dresser"/>
-      <item value="0x16" name="Laundry Dryer"/>
-      <item value="0x17" name="Fan"/>
-      <item value="0x18" name="Fireplace"/>
-      <item value="0x19" name="Freezer"/>
-      <item value="0x1A" name="Front Door"/>
-      <item value="0x1B" name="High Chair"/>
-      <item value="0x1C" name="Kitchen Island"/>
-      <item value="0x1D" name="Lamp"/>
-      <item value="0x1E" name="Litter Box"/>
-      <item value="0x1F" name="Mirror"/>
-
-      <item value="0x20" name="Nightstand"/>
-      <item value="0x21" name="Oven"/>
-      <item value="0x22" name="Pet Bed"/>
-      <item value="0x23" name="Pet Bowl"/>
-      <item value="0x24" name="Pet Crate"/>
-      <item value="0x25" name="Refrigerator"/>
-      <item value="0x26" name="Scratching Post"/>
-      <item value="0x27" name="Shoe Rack"/>
-      <item value="0x28" name="Shower"/>
-      <item value="0x29" name="Side Door"/>
-      <item value="0x2A" name="Sink"/>
-      <item value="0x2B" name="Sofa"/>
-      <item value="0x2C" name="Stove"/>
-      <item value="0x2D" name="Table"/>
-      <item value="0x2E" name="Toilet"/>
-      <item value="0x2F" name="Trash Can"/>
-
-      <item value="0x30" name="Laundry Washer"/>
-      <item value="0x31" name="Window"/>
-      <item value="0x32" name="Wine Cooler"/>
-    </enum>
-
-
-    <enum name="PositionTag" type="enum8">
-      <cluster code="0x0150"/>
-      <item value="0x00" name="Left"/>
-      <item value="0x01" name="Right"/>
-      <item value="0x02" name="Top"/>
-      <item value="0x03" name="Bottom"/>
-      <item value="0x04" name="Middle"/>
-      <item value="0x05" name="Row"/>
-      <item value="0x06" name="Column"/>
-      <item value="0x07" name="Under"/>
-      <item value="0x08" name="Next To"/>
-      <item value="0x09" name="Around"/>
-      <item value="0x0A" name="On"/>
-      <item value="0x0B" name="Above"/>
-      <item value="0x0C" name="Front Of"/>
-      <item value="0x0D" name="Behind"/>
-    </enum>
-
-
-    <enum name="FloorSurfaceTag" type="enum8">
-      <cluster code="0x0150"/>
-      <item value="0x00" name="Carpet"/>
-      <item value="0x01" name="Ceramic"/>
-      <item value="0x02" name="Concrete"/>
-      <item value="0x03" name="Cork"/>
-      <item value="0x04" name="Deep Carpet"/>
-      <item value="0x05" name="Dirt"/>
-      <item value="0x06" name="Engineered Wood"/>
-      <item value="0x07" name="Glass"/>
-      <item value="0x08" name="Grass"/>
-      <item value="0x09" name="Hardwood"/>
-      <item value="0x0A" name="Laminate"/>
-      <item value="0x0B" name="Linoleum"/>
-      <item value="0x0C" name="Mat"/>
-      <item value="0x0D" name="Metal"/>
-      <item value="0x0E" name="Plastic"/>
-      <item value="0x0F" name="Polished Concrete"/>
-
-      <item value="0x10" name="Rubber"/>
-      <item value="0x11" name="Rug"/>
-      <item value="0x12" name="Sand"/>
-      <item value="0x13" name="Stone"/>
-      <item value="0x14" name="Tatami"/>
-      <item value="0x15" name="Terrazzo"/>
-      <item value="0x16" name="Tile"/>
-      <item value="0x17" name="Vinyl"/>
-    </enum>
-
-
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0150" />
     <field name="ListOrder"           mask="0x01" />
@@ -171,8 +61,6 @@ limitations under the License.
     <item name="TotalOperationalTime"   type="elapsed_s"              optional="true" isNullable="true"/>
     <item name="EstimatedTime"          type="elapsed_s"              optional="true" isNullable="true"/>
   </struct>
-
-
 
   <!-- Enum definitions for select locations command response-->
   <enum name="SelectLocationsStatus" type="enum8">
