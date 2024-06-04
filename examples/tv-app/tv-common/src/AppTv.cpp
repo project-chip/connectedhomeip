@@ -640,7 +640,8 @@ std::string createSearchIndex(uint16_t vendorId, uint16_t productId)
     return formattedString;
 }
 
-void ContentAppFactoryImpl::SetAppInstallationErrorStatus(uint16_t vendorId, uint16_t productId, CommissionerDeclaration::CdError errorStatus)
+void ContentAppFactoryImpl::SetAppInstallationErrorStatus(uint16_t vendorId, uint16_t productId,
+                                                          CommissionerDeclaration::CdError errorStatus)
 {
     std::string searchIndex = createSearchIndex(vendorId, productId);
     std::map<std::string, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
@@ -722,10 +723,14 @@ CHIP_ERROR AppTvInit()
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     // test data for apps
-    const uint16_t APP1_VENDOR_ID = 1; const uint16_t APP1_PRODUCT_ID = 11;
-    const uint16_t APP2_VENDOR_ID = 65521; const uint16_t APP2_PRODUCT_ID = 32769;
-    const uint16_t APP3_VENDOR_ID = 9050; const uint16_t APP3_PRODUCT_ID = 22;
-    const uint16_t APP4_VENDOR_ID = 1111; const uint16_t APP4_PRODUCT_ID = 22;
+    const uint16_t APP1_VENDOR_ID  = 1;
+    const uint16_t APP1_PRODUCT_ID = 11;
+    const uint16_t APP2_VENDOR_ID  = 65521;
+    const uint16_t APP2_PRODUCT_ID = 32769;
+    const uint16_t APP3_VENDOR_ID  = 9050;
+    const uint16_t APP3_PRODUCT_ID = 22;
+    const uint16_t APP4_VENDOR_ID  = 1111;
+    const uint16_t APP4_PRODUCT_ID = 22;
 
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
