@@ -565,7 +565,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     if (sumOfAvailAndReserved > UINT16_MAX)
     {
         ChipLogError(chipSystemLayer,
-                     "LwIP based systems require total buffer size to be less than UINT16_MAX!."
+                     "LwIP based systems require total buffer size to be less than UINT16_MAX!"
                      "Attempted allocation size = " ChipLogFormatX64,
                      ChipLogValueX64(sumOfAvailAndReserved));
         return PacketBufferHandle();
