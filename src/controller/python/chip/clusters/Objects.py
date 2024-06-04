@@ -35115,7 +35115,7 @@ class ColorControl(Cluster):
             kHueSaturation = 0x1
             kEnhancedHue = 0x2
             kColorLoop = 0x4
-            kXYAttributes = 0x8
+            kXy = 0x8
             kColorTemperature = 0x10
 
         class Feature(IntFlag):

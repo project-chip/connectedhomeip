@@ -2364,7 +2364,7 @@ cluster ColorControl = 768 {
     kHueSaturation = 0x1;
     kEnhancedHue = 0x2;
     kColorLoop = 0x4;
-    kXYAttributes = 0x8;
+    kXY = 0x8;
     kColorTemperature = 0x10;
   }
 
