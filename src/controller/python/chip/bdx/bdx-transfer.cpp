@@ -36,12 +36,10 @@ BdxTransfer::~BdxTransfer()
     }
 }
 
-CHIP_ERROR BdxTransfer::AcceptSend(BdxTransfer::DataCallback callback)
+CHIP_ERROR BdxTransfer::AcceptSend()
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mAwaitingAccept = false;
-    mDataCallback = callback;
 
     TransferSession::TransferAcceptData accept_data;
     accept_data.ControlMode = mInitData.TransferCtlFlags;  // TODO: Is this value correct?
@@ -101,7 +99,10 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         break;
     case TransferSession::OutputEventType::kBlockReceived:
         ByteSpan data(event.blockdata.Data, event.blockdata.Length);
-        mDataCallback(data);
+        if (mDelegate)
+        {
+            mDelegate->DataReceived(this, data);
+        }
         break;
     case TransferSession::OutputEventType::kMsgToSend:
         SendMessage(event);

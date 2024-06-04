@@ -36,18 +36,19 @@ public:
     class Delegate
     {
     public:
+        virtual ~Delegate() = default;
+
         // Called when the SendInit or ReceiveInit message is received.
         virtual void InitMessageReceived(BdxTransfer * transfer, TransferSession::TransferInitData init_data) = 0;
+        // Called when a data block arrives. This is only used when the transfer is sending data to this controller.
+        virtual void DataReceived(BdxTransfer * transfer, const ByteSpan & block) = 0;
         // Called when the transfer completes. The outcome of the transfer (successful or otherwise) is indicated by result.
         virtual void TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result) = 0;
     };
 
-    // The callback used when a data block arrives. This is only used when the transfer is sending data to this controller.
-    using DataCallback = void(*)(const ByteSpan&);
-
-    // Accepts the transfer. When a block of data arrives the callback is invoked with the block. This must only be called if the
+    // Accepts the transfer. When a block of data arrives the delegate is invoked with the block. This must only be called if the
     // transfer sends data to this controller.
-    CHIP_ERROR AcceptSend(DataCallback callback);
+    CHIP_ERROR AcceptSend();
 
     // Accepts the transfer. The data provided here will be sent over the transfer. This must only be called if the transfer
     // receives data from this controller.
@@ -69,7 +70,6 @@ private:
 
     Delegate * mDelegate = nullptr;
     bool mAwaitingAccept = false;
-    DataCallback mDataCallback = nullptr;
     TransferSession::TransferInitData mInitData;
 
     // TODO: Request the data from a data source rather than copy the data here.
