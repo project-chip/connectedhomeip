@@ -43,17 +43,17 @@ class Model : public AttributeTreeIterator
 public:
     virtual ~Model() = default;
 
-    // `actions` pointers  will be guaranteed valid until Shutdown is called()
-    virtual CHIP_ERROR Startup(InteractionModelContext actions)
+    // `context` pointers  will be guaranteed valid until Shutdown is called()
+    virtual CHIP_ERROR Startup(InteractionModelContext context)
     {
-        mContext = actions;
+        mContext = context;
         return CHIP_NO_ERROR;
     }
     virtual CHIP_ERROR Shutdown() = 0;
 
     // During the transition phase, we expect a large subset of code to require access to
     // event emitting, path marking and other operations
-    virtual InteractionModelContext CurrentActions() const { return mContext; }
+    virtual InteractionModelContext CurrentContext() const { return mContext; }
 
     /// List reading has specific handling logic:
     ///   `state` contains in/out data about the current list reading. MUST start with kInvalidListIndex on first call
