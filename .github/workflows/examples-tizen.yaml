@@ -71,12 +71,12 @@ jobs:
             - name: Bloat report - chip-tool
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    linux arm chip-tool-ubsan out/tizen-arm-chip-tool-ubsan/chip-tool \
+                    tizen arm chip-tool-ubsan out/tizen-arm-chip-tool-ubsan/chip-tool \
                     /tmp/bloat_reports/
             - name: Bloat report - all-clusters-app
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    linux arm all-clusters-app out/tizen-arm-all-clusters/chip-all-clusters-app \
+                    tizen arm all-clusters-app out/tizen-arm-all-clusters/chip-all-clusters-app \
                     /tmp/bloat_reports/
 
             - name: Uploading Size Reports
