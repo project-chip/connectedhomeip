@@ -107,7 +107,7 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
 /// Exposes event access capabilities.
 ///
 /// Allows callers to "generate events" which effectively notifies of an event having
-/// ocurred. 
+/// ocurred.
 class Events
 {
 public:
