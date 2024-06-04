@@ -15,7 +15,7 @@ import("//build_overrides/chip.gni")
 
 source_set("interaction-model") {
   sources = [
-    "ActionContex.h",
+    "ActionContext.h",
     "Context.h",
     "Events.h",
     "InvokeResponder.h",
