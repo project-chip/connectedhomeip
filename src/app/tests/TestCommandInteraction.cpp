@@ -2053,13 +2053,8 @@ void TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed(nlTestS
 
     // Mimic closure of the exchange that would happen on a session release and verify that releasing the handle there-after
     // is handled gracefully.
-    //
-    // This relies on the classes that are tested beeing an Impl class.
-    CommandHandlerImpl * impl = static_cast<CommandHandlerImpl *>(asyncCommandHandle.Get());
-
-    impl->mpResponder->GetExchangeContext()->GetSessionHolder().Release();
-    impl->mpResponder->GetExchangeContext()->OnSessionReleased();
-
+    asyncCommandHandle.Get()->GetExchangeContext()->GetSessionHolder().Release();
+    asyncCommandHandle.Get()->GetExchangeContext()->OnSessionReleased();
     asyncCommandHandle = nullptr;
 }
 #endif
