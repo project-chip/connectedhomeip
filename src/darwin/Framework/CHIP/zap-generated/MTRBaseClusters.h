@@ -20256,7 +20256,7 @@ typedef NS_OPTIONS(uint16_t, MTRColorControlColorCapabilitiesBitmap) {
     MTRColorControlColorCapabilitiesBitmapHueSaturation MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRColorControlColorCapabilitiesBitmapEnhancedHue MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRColorControlColorCapabilitiesBitmapColorLoop MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRColorControlColorCapabilitiesBitmapXYAttributes MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRColorControlColorCapabilitiesBitmapXY MTR_PROVISIONALLY_AVAILABLE = 0x8,
     MTRColorControlColorCapabilitiesBitmapColorTemperature MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
