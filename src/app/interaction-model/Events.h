@@ -104,6 +104,10 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
 
 } // namespace internal
 
+/// Exposes event access capabilities.
+///
+/// Allows callers to "generate events" which effectively notifies of an event having
+/// ocurred. 
 class Events
 {
 public:
