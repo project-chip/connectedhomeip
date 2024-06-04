@@ -184,7 +184,7 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
         thread.join()
 
     # We expect both app and test script should exit with 0
-    exit_code = test_script_exit_code if test_script_exit_code !=0 else test_app_exit_code
+    exit_code = test_script_exit_code if test_script_exit_code != 0 else test_app_exit_code
 
     if ci:
         if exit_code:
@@ -193,6 +193,7 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
             logging.info("Test completed successfully")
 
     sys.exit(exit_code)
+
 
 if __name__ == '__main__':
     main(auto_envvar_prefix='CHIP')
