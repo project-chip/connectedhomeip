@@ -13076,7 +13076,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command GetActiveDatasetRequest
  *
- * On receipt of this command, the Thread Border Router will read the active operational dataset of the Thread network that it is connaected to, and send the DatasetResponse as the response. This command must be sent over a valid CASE session
+ * Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session
  */
 - (void)getActiveDatasetRequestWithParams:(MTRThreadBorderRouterManagementClusterGetActiveDatasetRequestParams * _Nullable)params completion:(void (^)(MTRThreadBorderRouterManagementClusterDatasetResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)getActiveDatasetRequestWithCompletion:(void (^)(MTRThreadBorderRouterManagementClusterDatasetResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -13084,7 +13084,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command GetPendingDatasetRequest
  *
- * On receipt of this command, the Thread Border Router will read the pending dataset and send the DatasetResponse as the response. This command must be sent over a valid CASE session
+ * Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session
  */
 - (void)getPendingDatasetRequestWithParams:(MTRThreadBorderRouterManagementClusterGetPendingDatasetRequestParams * _Nullable)params completion:(void (^)(MTRThreadBorderRouterManagementClusterDatasetResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)getPendingDatasetRequestWithCompletion:(void (^)(MTRThreadBorderRouterManagementClusterDatasetResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -13092,13 +13092,13 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command SetActiveDatasetRequest
  *
- * On receipt of this command, the Thread Border Router will set or update the active Dataset of the Thread network that the Stub Router is connected to.
+ * Command to set or update the active Dataset of the Thread network to which the Border Router is connected.
  */
 - (void)setActiveDatasetRequestWithParams:(MTRThreadBorderRouterManagementClusterSetActiveDatasetRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command SetPendingDatasetRequest
  *
- * On receipt of this command, the Thread Border Router will set or update the pending Dataset
+ * Command set or update the pending Dataset of the Thread network to which the Border Router is connected.
  */
 - (void)setPendingDatasetRequestWithParams:(MTRThreadBorderRouterManagementClusterSetPendingDatasetRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 

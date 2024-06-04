@@ -185,7 +185,7 @@ class ThreadBorderRouterManagementCluster(
     breadcrumb: ULong?,
     timedInvokeTimeout: Duration? = null
   ) {
-    val commandId: UInt = 3u
+    val commandId: UInt = 4u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -212,7 +212,7 @@ class ThreadBorderRouterManagementCluster(
     pendingDataset: ByteArray,
     timedInvokeTimeout: Duration? = null
   ) {
-    val commandId: UInt = 4u
+    val commandId: UInt = 5u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)

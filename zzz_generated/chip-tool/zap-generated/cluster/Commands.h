@@ -11081,8 +11081,8 @@ private:
 | Commands:                                                           |        |
 | * GetActiveDatasetRequest                                           |   0x00 |
 | * GetPendingDatasetRequest                                          |   0x01 |
-| * SetActiveDatasetRequest                                           |   0x03 |
-| * SetPendingDatasetRequest                                          |   0x04 |
+| * SetActiveDatasetRequest                                           |   0x04 |
+| * SetPendingDatasetRequest                                          |   0x05 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * BorderRouterName                                                  | 0x0000 |

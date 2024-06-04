@@ -290,14 +290,6 @@
             "general_error_boolean",
             "cluster_error_boolean"
         ],
-        "Thread Border Router Management": [
-            "BorderRouterName",
-            "BorderAgentId",
-            "ThreadVersion",
-            "InterfaceEnabled",
-            "ActiveDatasetTimestamp",
-            "FeatureMap"
-        ],
         "Thread Network Diagnostics": [
             "Channel",
             "RoutingRole",

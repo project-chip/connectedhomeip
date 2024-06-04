@@ -6246,6 +6246,30 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
 /**
+ * @brief Thread Border Router Management Cluster GetActiveDatasetRequest Command callback (from client)
+ */
+bool emberAfThreadBorderRouterManagementClusterGetActiveDatasetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::DecodableType & commandData);
+/**
+ * @brief Thread Border Router Management Cluster GetPendingDatasetRequest Command callback (from client)
+ */
+bool emberAfThreadBorderRouterManagementClusterGetPendingDatasetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::DecodableType & commandData);
+/**
+ * @brief Thread Border Router Management Cluster SetActiveDatasetRequest Command callback (from client)
+ */
+bool emberAfThreadBorderRouterManagementClusterSetActiveDatasetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::DecodableType & commandData);
+/**
+ * @brief Thread Border Router Management Cluster SetPendingDatasetRequest Command callback (from client)
+ */
+bool emberAfThreadBorderRouterManagementClusterSetPendingDatasetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::DecodableType & commandData);
+/**
  * @brief Thread Network Directory Cluster AddNetwork Command callback (from client)
  */
 bool emberAfThreadNetworkDirectoryClusterAddNetworkCallback(

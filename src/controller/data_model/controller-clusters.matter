@@ -7683,7 +7683,7 @@ cluster ThreadBorderRouterManagement = 1106 {
   }
 
   readonly attribute char_string<63> borderRouterName = 0;
-  readonly attribute octet_string<16> borderAgentId = 1;
+  readonly attribute octet_string<254> borderAgentId = 1;
   readonly attribute int16u threadVersion = 2;
   readonly attribute boolean interfaceEnabled = 3;
   readonly attribute nullable int64u activeDatasetTimestamp = 5;
@@ -7694,7 +7694,7 @@ cluster ThreadBorderRouterManagement = 1106 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  response struct DatasetResponse = 2 {
+  response struct DatasetResponse = 3 {
     octet_string<254> dataset = 0;
   }
 
@@ -7707,14 +7707,14 @@ cluster ThreadBorderRouterManagement = 1106 {
     octet_string<254> pendingDataset = 0;
   }
 
-  /** On receipt of this command, the Thread Border Router will read the active operational dataset of the Thread network that it is connaected to, and send the DatasetResponse as the response. This command must be sent over a valid CASE session */
+  /** Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
   command access(invoke: manage) GetActiveDatasetRequest(): DatasetResponse = 0;
-  /** On receipt of this command, the Thread Border Router will read the pending dataset and send the DatasetResponse as the response. This command must be sent over a valid CASE session */
+  /** Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
   command access(invoke: manage) GetPendingDatasetRequest(): DatasetResponse = 1;
-  /** On receipt of this command, the Thread Border Router will set or update the active Dataset of the Thread network that the Stub Router is connected to. */
-  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 3;
-  /** On receipt of this command, the Thread Border Router will set or update the pending Dataset */
-  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 4;
+  /** Command to set or update the active Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 4;
+  /** Command set or update the pending Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 5;
 }
 
 /** Manages the names and credentials of Thread networks visible to the user. */

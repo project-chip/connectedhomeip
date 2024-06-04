@@ -40466,7 +40466,7 @@ class ThreadBorderRouterManagement(Cluster):
         @dataclass
         class DatasetResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000452
-            command_id: typing.ClassVar[int] = 0x00000002
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[str] = None
 
@@ -40482,7 +40482,7 @@ class ThreadBorderRouterManagement(Cluster):
         @dataclass
         class SetActiveDatasetRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000452
-            command_id: typing.ClassVar[int] = 0x00000003
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 
@@ -40500,7 +40500,7 @@ class ThreadBorderRouterManagement(Cluster):
         @dataclass
         class SetPendingDatasetRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000452
-            command_id: typing.ClassVar[int] = 0x00000004
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 

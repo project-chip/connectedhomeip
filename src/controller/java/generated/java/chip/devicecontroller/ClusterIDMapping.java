@@ -14484,8 +14484,8 @@ public class ClusterIDMapping {
         public enum Command {
             GetActiveDatasetRequest(0L),
             GetPendingDatasetRequest(1L),
-            SetActiveDatasetRequest(3L),
-            SetPendingDatasetRequest(4L),;
+            SetActiveDatasetRequest(4L),
+            SetPendingDatasetRequest(5L),;
             private final long id;
             Command(long id) {
                 this.id = id;
