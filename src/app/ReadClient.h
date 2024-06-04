@@ -682,6 +682,6 @@ private:
         kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
 };
 
-}; // namespace app
-}; // namespace chip
+};     // namespace app
+};     // namespace chip
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
