@@ -22,7 +22,7 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 
-#include <app/interaction-model/Actions.h>
+#include <app/interaction-model/Context.h>
 #include <app/interaction-model/InvokeResponder.h>
 #include <app/interaction-model/IterationTypes.h>
 #include <app/interaction-model/OperationTypes.h>
@@ -44,16 +44,16 @@ public:
     virtual ~Model() = default;
 
     // `actions` pointers  will be guaranteed valid until Shutdown is called()
-    virtual CHIP_ERROR Startup(InteractionModelActions actions)
+    virtual CHIP_ERROR Startup(InteractionModelContext actions)
     {
-        mActions = actions;
+        mContext = actions;
         return CHIP_NO_ERROR;
     }
     virtual CHIP_ERROR Shutdown() = 0;
 
     // During the transition phase, we expect a large subset of code to require access to
     // event emitting, path marking and other operations
-    virtual InteractionModelActions CurrentActions() const { return mActions; }
+    virtual InteractionModelContext CurrentActions() const { return mContext; }
 
     /// List reading has specific handling logic:
     ///   `state` contains in/out data about the current list reading. MUST start with kInvalidListIndex on first call
@@ -115,7 +115,7 @@ public:
     virtual CHIP_ERROR Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, InvokeReply & reply) = 0;
 
 private:
-    InteractionModelActions mActions = { nullptr };
+    InteractionModelContext mContext = { nullptr };
 };
 
 } // namespace InteractionModel

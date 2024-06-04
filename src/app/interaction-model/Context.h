@@ -25,11 +25,15 @@ namespace app {
 namespace InteractionModel {
 
 /// Data provided to data models in order to interface with the interaction model environment.
-struct InteractionModelActions
+///
+/// Provides callback-style functionality to notify the interaction model of changes
+/// (e.g. using paths to notify of attribute data changes or events to generate events)
+/// as well as fetching current state (via actionContext)
+struct InteractionModelContext
 {
     Events * events;
     Paths * paths;
-    ActionContext * requestContext;
+    ActionContext * actionContext;
 };
 
 } // namespace InteractionModel
