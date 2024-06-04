@@ -249,20 +249,19 @@ CHIP_ERROR CastingPlayer::StopConnecting()
         AppServer,
         "CastingPlayer::StopConnecting() calling SendUserDirectedCommissioningRequest() to indicate user canceled passcode entry");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    SuccessOrExit(err = SendUserDirectedCommissioningRequest());
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-    // CastingPlayer::SendUserDirectedCommissioningRequest() calls SetUdcStatus(true) before sending the UDC
-    // IdentificationDeclaration message. Since StopConnecting() is attempting to cancel the commissioning proces, we need to set
-    // the UDC status to false after sending the message.
-    support::ChipDeviceEventHandler::SetUdcStatus(false);
-
-exit:
+    err = SendUserDirectedCommissioningRequest();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "CastingPlayer::StopConnecting() failed with %" CHIP_ERROR_FORMAT, err.Format());
         resetState(err);
+        return err;
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+    // CastingPlayer::SendUserDirectedCommissioningRequest() calls SetUdcStatus(true) before sending the UDC
+    // IdentificationDeclaration message. Since StopConnecting() is attempting to cancel the commissioning process, we need to set
+    // the UDC status to false after sending the message.
+    support::ChipDeviceEventHandler::SetUdcStatus(false);
 
     ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() User Directed Commissioning stopped");
     return err;

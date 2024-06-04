@@ -25,6 +25,17 @@ namespace support {
 
 using namespace chip;
 
+extern "C" {
+
+JNIEXPORT jshort JNICALL
+Java_com_matter_casting_support_IdentificationDeclarationOptions_getChipDeviceConfigUdcMaxTargetApps(JNIEnv *, jclass clazz)
+{
+    ChipLogProgress(AppServer, "Converters-JNI::getChipDeviceConfigUdcMaxTargetApps(), CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS: %d",
+                    CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS);
+    return CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
+}
+}
+
 jobject convertLongFromCppToJava(jlong value)
 {
     ChipLogProgress(AppServer, "convertLongFromCppToJava called");
@@ -386,16 +397,20 @@ chip::Protocols::UserDirectedCommissioning::TargetAppInfo * convertTargetAppInfo
 
     jobject jVendorIdObject  = env->GetObjectField(jTargetAppInfo, vendorIdField);
     jobject jProductIdObject = env->GetObjectField(jTargetAppInfo, productIdField);
-    VerifyOrReturnValue(jVendorIdObject != nullptr, nullptr,
-                        ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() vendorIdObject is null!"));
-    VerifyOrReturnValue(jProductIdObject != nullptr, nullptr,
-                        ChipLogError(AppServer, "convertTargetAppInfoFromJavaToCpp() productIdObject is null!"));
 
     jclass integerClass      = env->FindClass("java/lang/Integer");
     jmethodID intValueMethod = env->GetMethodID(integerClass, "intValue", "()I");
 
-    jint vendorId  = env->CallIntMethod(jVendorIdObject, intValueMethod);
-    jint productId = env->CallIntMethod(jProductIdObject, intValueMethod);
+    jint vendorId  = 0;
+    jint productId = 0;
+    if (jVendorIdObject != nullptr)
+    {
+        vendorId = env->CallIntMethod(jVendorIdObject, intValueMethod);
+    }
+    if (jProductIdObject != nullptr)
+    {
+        productId = env->CallIntMethod(jProductIdObject, intValueMethod);
+    }
 
     chip::Protocols::UserDirectedCommissioning::TargetAppInfo * cppTargetAppInfo =
         new chip::Protocols::UserDirectedCommissioning::TargetAppInfo();
@@ -481,9 +496,14 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
             cppTargetAppInfo != nullptr, nullptr,
             ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() Could not convert jTargetAppInfo"));
 
-        cppIdOptions->addTargetAppInfo(*cppTargetAppInfo);
+        CHIP_ERROR err = cppIdOptions->addTargetAppInfo(*cppTargetAppInfo);
 
         env->DeleteLocalRef(jTargetAppInfo);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(AppServer,
+                                         "convertIdentificationDeclarationOptionsFromJavaToCpp() failed to addTargetAppInfo, due "
+                                         "to err: %" CHIP_ERROR_FORMAT,
+                                         err.Format()));
     }
 
     env->DeleteLocalRef(targetAppInfosList);

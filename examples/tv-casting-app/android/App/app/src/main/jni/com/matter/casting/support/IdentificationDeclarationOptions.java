@@ -14,7 +14,6 @@
 package com.matter.casting.support;
 
 import android.util.Log;
-import com.matter.casting.core.CastingApp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +24,8 @@ import java.util.List;
  */
 public class IdentificationDeclarationOptions {
   private final String TAG = IdentificationDeclarationOptions.class.getSimpleName();
-  private static final int CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS =
-      CastingApp.getInstance().CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
+  private final short CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS =
+      getChipDeviceConfigUdcMaxTargetApps();
 
   public IdentificationDeclarationOptions() {}
 
@@ -44,6 +43,14 @@ public class IdentificationDeclarationOptions {
     this.cancelPasscode = cancelPasscode;
     this.targetAppInfos = targetAppInfos != null ? targetAppInfos : new ArrayList<>();
   }
+
+  /**
+   * @brief Gets the maximum number of Target Content Apps that can be added to the
+   *     IdentificationDeclarationOptions.java TargetAppInfo list from
+   *     connectedhomeip/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h.
+   *     See this file for details.
+   */
+  private native short getChipDeviceConfigUdcMaxTargetApps();
 
   /**
    * Feature: Target Content Application - Flag to instruct the Commissioner not to display a
@@ -80,6 +87,10 @@ public class IdentificationDeclarationOptions {
    */
   private List<TargetAppInfo> targetAppInfos = new ArrayList<>();
 
+  /**
+   * @brief Adds a TargetAppInfo to the IdentificationDeclarationOptions.java TargetAppInfos list,
+   *     up to a maximum of CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS.
+   */
   public boolean addTargetAppInfo(TargetAppInfo targetAppInfo) {
     Log.d(TAG, "addTargetAppInfo()");
     if (targetAppInfos.size() >= CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS) {

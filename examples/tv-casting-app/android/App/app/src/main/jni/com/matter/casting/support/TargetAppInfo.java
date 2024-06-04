@@ -18,8 +18,8 @@ package com.matter.casting.support;
  * IDs) that can be used for authentication.
  */
 public class TargetAppInfo {
-  /** Target Target Content Application Vendor ID, 0 means unspecified */
-  public Integer vendorId = 0;
-  /** Target Target Content Application Product ID, 0 means unspecified */
-  public Integer productId = 0;
+  /** Target Target Content Application Vendor ID, null means unspecified */
+  public Integer vendorId;
+  /** Target Target Content Application Product ID, null means unspecified */
+  public Integer productId;
 }

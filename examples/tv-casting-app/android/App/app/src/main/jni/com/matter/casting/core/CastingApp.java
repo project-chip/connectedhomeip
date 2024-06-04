@@ -39,7 +39,6 @@ public final class CastingApp {
   private static final String TAG = CastingApp.class.getSimpleName();
   private static final long BROWSE_SERVICE_TIMEOUT = 2500;
   private static final long RESOLVE_SERVICE_TIMEOUT = 3000;
-  public final int CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS = getChipDeviceConfigUdcMaxTargetApps();
 
   private static CastingApp sInstance;
 
@@ -193,13 +192,6 @@ public final class CastingApp {
 
   /** Performs post Matter server startup registrations */
   private native MatterError finishStartup();
-
-  /**
-   * @brief Gets the maximum number of Target Content Apps that can be added to the
-   *     IdentificationDeclarationOptions.java TargetAppInfo list from
-   *     connectedhomeip/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h
-   */
-  private native int getChipDeviceConfigUdcMaxTargetApps();
 
   static {
     System.loadLibrary("TvCastingApp");

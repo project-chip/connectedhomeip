@@ -139,13 +139,6 @@ JNI_METHOD(jobject, clearCache)(JNIEnv * env, jobject)
     return support::convertMatterErrorFromCppToJava(err);
 }
 
-JNI_METHOD(jint, getChipDeviceConfigUdcMaxTargetApps)(JNIEnv *, jclass clazz)
-{
-    ChipLogProgress(AppServer, "CastingApp-JNI::getChipDeviceConfigUdcMaxTargetApps(), CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS: %d",
-                    CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS);
-    return CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
-}
-
 jobject extractJAppParameter(jobject jAppParameters, const char * methodName, const char * methodSig)
 {
     ChipLogProgress(AppServer, "CastingApp-JNI::extractJAppParameter() called");
