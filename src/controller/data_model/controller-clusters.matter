@@ -7715,11 +7715,11 @@ cluster ThreadNetworkDirectory = 1107 {
   }
 
   /** Adds an entry to the ThreadNetworks list. */
-  command access(invoke: manage) AddNetwork(AddNetworkRequest): DefaultSuccess = 0;
+  timed command access(invoke: manage) AddNetwork(AddNetworkRequest): DefaultSuccess = 0;
   /** Removes an entry from the ThreadNetworks list. */
-  command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
+  timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
   /** Retrieves a Thread Operational Dataset from the ThreadNetworks list. */
-  command GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
+  timed command GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */

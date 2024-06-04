@@ -53106,9 +53106,6 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void addNetwork(DefaultClusterCallback callback, byte[] operationalDataset) {
-      addNetwork(callback, operationalDataset, 0);
-    }
 
     public void addNetwork(DefaultClusterCallback callback, byte[] operationalDataset, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
@@ -53126,9 +53123,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void removeNetwork(DefaultClusterCallback callback, Long extendedPanID) {
-      removeNetwork(callback, extendedPanID, 0);
-    }
 
     public void removeNetwork(DefaultClusterCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
@@ -53146,9 +53140,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void getOperationalDataset(OperationalDatasetResponseCallback callback, Long extendedPanID) {
-      getOperationalDataset(callback, extendedPanID, 0);
-    }
 
     public void getOperationalDataset(OperationalDatasetResponseCallback callback, Long extendedPanID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;

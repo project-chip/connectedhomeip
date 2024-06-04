@@ -40459,6 +40459,10 @@ class ThreadNetworkDirectory(Cluster):
                         ClusterObjectFieldDescriptor(Label="operationalDataset", Tag=0, Type=bytes),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             operationalDataset: 'bytes' = b""
 
         @dataclass
@@ -40475,6 +40479,10 @@ class ThreadNetworkDirectory(Cluster):
                         ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             extendedPanID: 'uint' = 0
 
         @dataclass
@@ -40490,6 +40498,10 @@ class ThreadNetworkDirectory(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="extendedPanID", Tag=0, Type=uint),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             extendedPanID: 'uint' = 0
 

@@ -969,6 +969,15 @@ static BOOL CommandNeedsTimedInvokeInThreadNetworkDirectoryCluster(AttributeId a
 {
     using namespace Clusters::ThreadNetworkDirectory;
     switch (aAttributeId) {
+    case Commands::AddNetwork::Id: {
+        return YES;
+    }
+    case Commands::RemoveNetwork::Id: {
+        return YES;
+    }
+    case Commands::GetOperationalDataset::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }

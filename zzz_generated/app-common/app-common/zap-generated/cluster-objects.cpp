@@ -30233,6 +30233,17 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ThreadNetworkDirectory::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ThreadNetworkDirectory::Commands::AddNetwork::Id:
+        case Clusters::ThreadNetworkDirectory::Commands::RemoveNetwork::Id:
+        case Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::AccountLogin::Id: {
         switch (aCommand)
         {

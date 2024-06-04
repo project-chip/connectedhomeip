@@ -110,7 +110,7 @@ class ThreadNetworkDirectoryCluster(
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun addNetwork(operationalDataset: ByteArray, timedInvokeTimeout: Duration? = null) {
+  suspend fun addNetwork(operationalDataset: ByteArray, timedInvokeTimeout: Duration) {
     val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
@@ -131,7 +131,7 @@ class ThreadNetworkDirectoryCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun removeNetwork(extendedPanID: ULong, timedInvokeTimeout: Duration? = null) {
+  suspend fun removeNetwork(extendedPanID: ULong, timedInvokeTimeout: Duration) {
     val commandId: UInt = 1u
 
     val tlvWriter = TlvWriter()
@@ -154,7 +154,7 @@ class ThreadNetworkDirectoryCluster(
 
   suspend fun getOperationalDataset(
     extendedPanID: ULong,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration
   ): OperationalDatasetResponse {
     val commandId: UInt = 2u
 

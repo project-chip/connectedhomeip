@@ -26671,7 +26671,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.ThreadNetworkDirectoryCluster) cluster)
         .addNetwork((DefaultClusterCallback) callback
         , (byte[])
-        commandArguments.get("operationalDataset")
+        commandArguments.get("operationalDataset"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -26688,7 +26688,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.ThreadNetworkDirectoryCluster) cluster)
         .removeNetwork((DefaultClusterCallback) callback
         , (Long)
-        commandArguments.get("extendedPanID")
+        commandArguments.get("extendedPanID"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -26707,7 +26707,7 @@ public class ClusterInfoMapping {
            , (Long)
              commandArguments.get("extendedPanID")
 
-            );
+            , 10000);
         },
         () -> new DelegatedThreadNetworkDirectoryClusterOperationalDatasetResponseCallback(),
         threadNetworkDirectorygetOperationalDatasetCommandParams
