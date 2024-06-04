@@ -24,8 +24,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <type_traits>
 #include <optional>
+#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -49,7 +49,7 @@ private:
 template <typename G, typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
 {
-    internal::SimpleEventLoggingDelegate<T> eventData(aEventData);
+    internal::SimpleEventLoggingDelegate<T> eventPayloadWriter(aEventData);
     ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     EventOptions eventOptions;
     eventOptions.mPath        = path;
@@ -73,10 +73,10 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
     // and used to match against the accessing fabric.
     //
     EventNumber eventNumber;
-    CHIP_ERROR err = generator.GenerateEvent(&eventData, eventOptions, eventNumber);
+    CHIP_ERROR err = generator.GenerateEvent(&eventPayloadWriter, eventOptions, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(EventLogging, "Failed to log event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(EventLogging, "Failed to generate event: %" CHIP_ERROR_FORMAT, err.Format());
         return std::nullopt;
     }
 
@@ -86,16 +86,16 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
 template <typename G, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
 std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId endpointId)
 {
-    internal::SimpleEventLoggingDelegate<T> eventData(aEventData);
+    internal::SimpleEventLoggingDelegate<T> eventPayloadWriter(aEventData);
     ConcreteEventPath path(endpointId, aEventData.GetClusterId(), aEventData.GetEventId());
     EventOptions eventOptions;
     eventOptions.mPath     = path;
     eventOptions.mPriority = aEventData.GetPriorityLevel();
     EventNumber eventNumber;
-    CHIP_ERROR err = generator.GenerateEvent(&eventData, eventOptions, eventNumber);
+    CHIP_ERROR err = generator.GenerateEvent(&eventPayloadWriter, eventOptions, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(EventLogging, "Failed to log event: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(EventLogging, "Failed to generate event: %" CHIP_ERROR_FORMAT, err.Format());
         return std::nullopt;
     }
 
@@ -114,11 +114,11 @@ public:
     /// Events are generally expected to be sent to subscribed clients and also
     /// be available for read later until they get overwritten by new events
     /// that are being generated.
-    virtual CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
+    virtual CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
                                      EventNumber & generatedEventNumber) = 0;
 
     // Convenience methods for event logging using cluster-object structures
-    // 
+    //
     // On error, these log and return nullopt.
     template <typename T>
     std::optional<EventNumber> GenerateEvent(const T & eventData, EndpointId endpointId)
