@@ -44,14 +44,17 @@ BdxTransfer * BdxTransferManager::Allocate()
 
     BdxTransfer * result = mTransferPool.CreateObject();
     VerifyOrReturn(result != nullptr);
+    // TODO: This needs to intercept the delegate calls so it can free the transfer after it completes.
     result->SetDelegate(mBdxTransferDelegate);
 
     --mExpectedTransfers;
     return result;
 }
 
+// This method is only called by BdxTransferServer when creating an exchange context fails.
 void BdxTransferManager::Release(BdxTransfer * bdxTransfer)
 {
+    mBdxTransferDelegate->TransferCompleted(bdxTransfer, CHIP_ERROR_CONNECTION_ABORTED);
     mTransferPool.ReleaseObject(bdxTransfer);
 }
 
