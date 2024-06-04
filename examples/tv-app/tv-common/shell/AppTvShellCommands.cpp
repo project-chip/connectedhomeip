@@ -212,10 +212,11 @@ static CHIP_ERROR PrintAllCommands()
         sout,
         "  app uninstall <vid> <pid>              Uinstall app at given vendor ID  and product ID. Usage: app uninstall "
         "65521 32768\r\n");
-    streamer_printf(
-        sout,
-        "  app setinstallerrorstatus <vid> <pid>              Set app's installation error status for a given vendor ID  and product ID. "
-        "Usage: app setinstallerrorstatus 65521 32768 13. Installation error status can be found at: UserDirectedCommissioning.h\r\n");
+    streamer_printf(sout,
+                    "  app setinstallerrorstatus <vid> <pid>              Set app's installation error status for a given vendor "
+                    "ID  and product ID. "
+                    "Usage: app setinstallerrorstatus 65521 32768 13. Installation error status can be found at: "
+                    "UserDirectedCommissioning.h\r\n");
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "  print-app-access     Print all ACLs for app platform fabric. Usage: app print-app-access\r\n");
@@ -311,13 +312,14 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         }
         char * eptr;
 
-        uint16_t vid                   = (uint16_t) strtol(argv[1], &eptr, 10);
-        uint16_t pid                   = (uint16_t) strtol(argv[2], &eptr, 10);
+        uint16_t vid                        = (uint16_t) strtol(argv[1], &eptr, 10);
+        uint16_t pid                        = (uint16_t) strtol(argv[2], &eptr, 10);
         uint16_t appInstallationErrorStatus = (uint16_t) strtol(argv[3], &eptr, 10);
 
         ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
         factory->SetAppInstallationErrorStatus(
-            vid, pid, static_cast<Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>(appInstallationErrorStatus));
+            vid, pid,
+            static_cast<Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>(appInstallationErrorStatus));
 
         ChipLogProgress(DeviceLayer, "set app installation status");
 
