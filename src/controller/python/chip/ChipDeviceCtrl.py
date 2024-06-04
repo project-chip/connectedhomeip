@@ -953,7 +953,7 @@ class ChipDeviceControllerBase():
             - StayActiveResponse on success
         '''
         await WaitForCheckIn(ScopedNodeId(nodeid, self._fabricIndex), timeoutSeconds=timeoutSeconds)
-        return await self.SendCommand(nodeid, 0, GeneratedObjects.IcdManagement.Commands.StayActiveRequest(stayActiveDuration=stayActiveDurationMs))
+        return await self.SendCommand(nodeid, 0, Clusters.IcdManagement.Commands.StayActiveRequest(stayActiveDuration=stayActiveDurationMs))
 
     async def GetConnectedDevice(self, nodeid, allowPASE: bool = True, timeoutMs: int = None):
         ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
