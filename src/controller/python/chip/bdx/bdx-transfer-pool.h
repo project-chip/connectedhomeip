@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <controller/python/chip/bdx/bdx-transfer.h>
+
 namespace chip {
 namespace bdx {
 
@@ -26,11 +28,9 @@ class BdxTransferPool
 public:
     virtual ~BdxTransferPool() = default;
 
-    // TODO: Change return type to BdxTransfer.
-    virtual void * Allocate(/* Details necessary to create a BdxTransfer */) = 0;
+    virtual BdxTransfer * Allocate() = 0;
 
-    // TODO: Change argument type to BdxTransfer.
-    virtual void Release(void * bdxTransfer) = 0;
+    virtual void Release(BdxTransfer * bdxTransfer) = 0;
 };
 
 } // namespace bdx

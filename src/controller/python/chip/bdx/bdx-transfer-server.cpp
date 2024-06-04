@@ -20,6 +20,7 @@
 #include <messaging/ExchangeDelegate.h>
 #include <transport/raw/MessageHeader.h>
 
+#include <controller/python/chip/bdx/bdx-transfer.h>
 #include <controller/python/chip/bdx/bdx-transfer-pool.h>
 
 namespace chip {
@@ -34,7 +35,7 @@ CHIP_ERROR BdxTransferServer::OnUnsolicitedMessageReceived(const PayloadHeader& 
                                                            Messaging::ExchangeDelegate *& delegate)
 {
     // TODO: Verify details from the payload header.
-    void * transfer = mBdxTransferPool->Allocate();
+    BdxTransfer * transfer = mBdxTransferPool->Allocate();
     if (!transfer)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -46,7 +47,7 @@ CHIP_ERROR BdxTransferServer::OnUnsolicitedMessageReceived(const PayloadHeader& 
 
 void BdxTransferServer::OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate)
 {
-    mBdxTransferPool->Release(delegate);
+    mBdxTransferPool->Release(static_cast<BdxTransfer *>(delegate));
 }
 
 } // namespace bdx

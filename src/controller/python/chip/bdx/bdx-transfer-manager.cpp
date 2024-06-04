@@ -20,12 +20,9 @@
 namespace chip {
 namespace bdx {
 
-BdxTransferManager::BdxTransferManager()
-{
-}
-
 BdxTransferManager::~BdxTransferManager()
 {
+    mTransferPool.ReleaseAll();
 }
 
 void BdxTransferManager::ExpectATransfer()
@@ -41,25 +38,18 @@ void BdxTransferManager::StopExpectingATransfer()
     }
 }
 
-void * BdxTransferManager::Allocate()
+BdxTransfer * BdxTransferManager::Allocate()
 {
-    if (mExpectedTransfers == 0)
-    {
-        return nullptr;
-    }
+    VerifyOrReturnValue(mExpectedTransfers != 0, nullptr);
 
-    // TODO: Change the type to BdxTransfer.
-    int * result = mTransferPool.CreateObject();
+    BdxTransfer * result = mTransferPool.CreateObject(this);
+    VerifyOrReturn(result != nullptr);
 
-    if (result)
-    {
-        --mExpectedTransfers;
-    }
-
+    --mExpectedTransfers;
     return result;
 }
 
-void BdxTransferManager::Release(void * bdxTransfer)
+void BdxTransferManager::Release(BdxTransfer * bdxTransfer)
 {
     mTransferPool.ReleaseObject(bdxTransfer);
 }

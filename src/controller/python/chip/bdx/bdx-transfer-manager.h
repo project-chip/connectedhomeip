@@ -19,6 +19,7 @@
 
 #include <lib/support/Pool.h>
 
+#include <controller/python/chip/bdx/bdx-transfer.h>
 #include <controller/python/chip/bdx/bdx-transfer-pool.h>
 
 namespace chip {
@@ -26,23 +27,20 @@ namespace bdx {
 
 // This class implements the pool interface used to allocate BdxTransfer objects. It keeps track of the number of transfers
 // that are expected to be created and only allocates a BdxTransfer object if a transfer is expected.
-template <size_t N>
 class BdxTransferManager : public BdxTransferPool
 {
 public:
-    BdxTransferManager();
     ~BdxTransferManager() override;
 
     // These keep track of the number of expected transfers.
     void ExpectATransfer();
     void StopExpectingATransfer();
 
-    void * Allocate() override;
-    void Release(void * bdxTransfer) override;
+    BdxTransfer * Allocate() override;
+    void Release(BdxTransfer * bdxTransfer) override;
 
 private:
-    // TODO: Change the type to BdxTransfer.
-    ObjectPool<int, N> mTransferPool;
+    ObjectPool<BdxTransfer, 2> mTransferPool;
     size_t mExpectedTransfers = 0;
 };
 
