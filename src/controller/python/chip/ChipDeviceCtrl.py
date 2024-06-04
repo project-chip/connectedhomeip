@@ -170,7 +170,7 @@ def _OnCheckInComplete(scopedNodeId: ScopedNodeId):
         callback(scopedNodeId)
 
 
-def RegisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: Callable[None, [OnCheckInCompleteParams]]):
+def RegisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: typing.Callable[None, [ScopedNodeId]]):
     ''' Registers a callback when the device with given (fabric index, node id) becomes active.
 
     Does nothing if the callback is already registered.
@@ -181,7 +181,7 @@ def RegisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: Callable[None
         _OnCheckInCompleteWaitList[scopedNodeId] = waitList
 
 
-def UnregisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: Callable[None, [OnCheckInCompleteParams]]):
+def UnregisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: typing.Callable[None, [ScopedNodeId]]):
     ''' Unregisters a callback when the device with given (fabric index, node id) becomes active.
 
     Does nothing if the callback has not been registered.
