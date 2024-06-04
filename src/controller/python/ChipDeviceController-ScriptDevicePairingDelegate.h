@@ -69,8 +69,8 @@ public:
     void OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
                                 Optional<Credentials::AttestationVerificationResult> additionalErrorInfo) override;
     void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) override;
-    void OnICDRegistrationComplete(NodeId deviceId, uint32_t icdCounter) override;
-    void OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedActiveDuration) override;
+    void OnICDRegistrationComplete(ScopedNodeId deviceId, uint32_t icdCounter) override;
+    void OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
     void OnFabricCheck(NodeId matchingNodeId) override;
     Callback::Callback<Controller::OnOpenCommissioningWindow> *
     GetOpenWindowCallback(Controller::CommissioningWindowOpener * context);

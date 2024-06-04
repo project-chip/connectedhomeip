@@ -185,10 +185,10 @@ ScriptDevicePairingDelegate::GetOpenWindowCallback(Controller::CommissioningWind
     return &mOpenWindowCallback;
 }
 
-void ScriptDevicePairingDelegate::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounter)
+void ScriptDevicePairingDelegate::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icdCounter)
 {
     app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = ScopedNodeId(nodeId, mFabricIndex);
+    clientInfo.peer_node         = nodeId;
     clientInfo.monitored_subject = sCommissioningParameters.GetICDMonitoredSubject().Value();
     clientInfo.start_icd_counter = icdCounter;
 
@@ -201,23 +201,23 @@ void ScriptDevicePairingDelegate::OnICDRegistrationComplete(NodeId nodeId, uint3
     if (err != CHIP_NO_ERROR)
     {
         sICDClientStorage.RemoveKey(clientInfo);
-        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
-                     err.AsString());
+        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s",
+                     ChipLogValueX64(nodeId.GetNodeId()), err.AsString());
         return;
     }
 
-    ChipLogProgress(Controller, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    ChipLogProgress(Controller, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId.GetNodeId()));
     ChipLogProgress(Controller,
                     "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
                     " / Monitored Subject: " ChipLogFormatX64 " / ICDCounter %u",
-                    ChipLogValueX64(nodeId), ChipLogValueX64(sCommissioningParameters.GetICDCheckInNodeId().Value()),
+                    ChipLogValueX64(nodeId.GetNodeId()), ChipLogValueX64(sCommissioningParameters.GetICDCheckInNodeId().Value()),
                     ChipLogValueX64(clientInfo.monitored_subject), icdCounter);
 }
 
-void ScriptDevicePairingDelegate::OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedActiveDuration)
+void ScriptDevicePairingDelegate::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t promisedActiveDuration)
 {
     ChipLogProgress(Controller, "ICD Stay Active Complete for device " ChipLogFormatX64 " / promisedActiveDuration: %u",
-                    ChipLogValueX64(deviceId), promisedActiveDuration);
+                    ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
 }
 
 } // namespace Controller
