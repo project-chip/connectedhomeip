@@ -208,7 +208,10 @@ void BLEManagerImpl::ReadValueRequestedCb(const char * remoteAddress, int reques
 
     ChipLogByteSpan(DeviceLayer, ByteSpan(Uint8::from_const_char(value.get()), len));
 
-    ret = bt_gatt_server_send_response(requestId, BT_GATT_REQUEST_TYPE_READ, offset, 0x00, value.get(), len);
+    char dummyValue[] = "";
+    // Tizen API does not like NULLs even for zero-length values.
+    char * valuePtr = value ? value.get() : dummyValue;
+    ret             = bt_gatt_server_send_response(requestId, BT_GATT_REQUEST_TYPE_READ, offset, BT_ATT_ERROR_NONE, valuePtr, len);
     VerifyOrReturn(ret == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "bt_gatt_server_send_response() failed: %s", get_error_message(ret)));
 }
@@ -233,7 +236,7 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
     ret = bt_gatt_set_value(gattHandle, value, len);
     VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
 
-    ret = bt_gatt_server_send_response(requestId, BT_GATT_REQUEST_TYPE_WRITE, offset, 0x00, nullptr, 0);
+    ret = bt_gatt_server_send_response(requestId, BT_GATT_REQUEST_TYPE_WRITE, offset, BT_ATT_ERROR_NONE, nullptr, 0);
     VerifyOrReturn(ret == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "bt_gatt_server_send_response() failed: %s", get_error_message(ret)));
 
@@ -583,7 +586,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
         BT_GATT_PROPERTY_WRITE, // Write Request is not coming if we use WITHOUT_RESPONSE property. Let's use WRITE property and
                                 // consider to use WITHOUT_RESPONSE property in the future according to the CHIP Spec 4.16.3.2. BTP
                                 // GATT Service
-        "CHIPoBLE_C1", strlen("CHIPoBLE_C1"), &char1);
+        nullptr, 0, &char1);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed: %s", get_error_message(ret)));
 
@@ -604,8 +607,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
 
     // Create 2nd Characteristic (Client RX Buffer)
     ret = bt_gatt_characteristic_create(Ble::CHIP_BLE_CHAR_2_UUID_STR, BT_GATT_PERMISSION_READ,
-                                        BT_GATT_PROPERTY_READ | BT_GATT_PROPERTY_INDICATE, "CHIPoBLE_C2", strlen("CHIPoBLE_C2"),
-                                        &char2);
+                                        BT_GATT_PROPERTY_READ | BT_GATT_PROPERTY_INDICATE, nullptr, 0, &char2);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed: %s", get_error_message(ret)));
 
@@ -618,6 +620,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
         this);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_server_set_read_value_requested_cb() failed: %s", get_error_message(ret)));
+
     ret = bt_gatt_server_set_characteristic_notification_state_change_cb(
         char2,
         +[](bool notify, bt_gatt_server_h gattServer, bt_gatt_h charHandle, void * self) {
@@ -628,13 +631,14 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
                  ChipLogError(DeviceLayer, "bt_gatt_server_set_characteristic_notification_state_change_cb() failed: %s",
                               get_error_message(ret)));
 
-    // Create CCC Descriptor
+    // Create CCC Descriptor for 2nd Characteristic
     ret = bt_gatt_descriptor_create(Ble::CHIP_BLE_DESC_SHORT_UUID_STR, BT_GATT_PERMISSION_READ | BT_GATT_PERMISSION_WRITE,
                                     desc_value, sizeof(desc_value), &desc);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_descriptor_create() failed: %s", get_error_message(ret)));
     ret = bt_gatt_characteristic_add_descriptor(char2, desc);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_characteristic_add_descriptor() failed: %s", get_error_message(ret)));
+
     ret = bt_gatt_service_add_characteristic(service, char2);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_service_add_characteristic() failed: %s", get_error_message(ret)));
