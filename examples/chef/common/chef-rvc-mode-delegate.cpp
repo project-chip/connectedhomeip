@@ -132,13 +132,12 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::Endp
         if (chip::Protocols::InteractionModel::Status::Success != ret)
         {
             ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(ret));
-            break;
         }
     }
     break;
     default:
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
-        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
+        ChipLogError(DeviceLayer, "Unsupported Writng Attribute ID: %d", static_cast<int>(attributeId));
         break;
     }
 
@@ -149,10 +148,23 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::Endpo
                                                                      const EmberAfAttributeMetadata * attributeMetadata,
                                                                      uint8_t * buffer, uint16_t maxReadLength)
 {
-    uint8_t m = gRvcRunModeInstance->GetCurrentMode();
-    memcpy(buffer, &m, sizeof(m));
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+    chip::AttributeId attributeId                 = attributeMetadata->attributeId;
 
-    return chip::Protocols::InteractionModel::Status::Success;
+    switch (attributeId)
+    {
+    case chip::app::Clusters::RvcRunMode::Attributes::CurrentMode::Id: {
+        *buffer = gRvcRunModeInstance->GetCurrentMode();
+        ChipLogDetail(DeviceLayer, "Reading RunMode CurrentMode : %d", static_cast<int>(attributeId));
+    }
+    break;
+    default:
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedRead;
+        ChipLogDetail(DeviceLayer, "Unsupported attributeId %d from reading RvcRunMode", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
 }
 
 void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
@@ -267,18 +279,16 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::En
     switch (attributeId)
     {
     case chip::app::Clusters::RvcCleanMode::Attributes::CurrentMode::Id: {
-        uint8_t m                                  = static_cast<uint8_t>(buffer[0]);
-        Protocols::InteractionModel::Status status = clusterInstance->UpdateCurrentMode(m);
-        if (Protocols::InteractionModel::Status::Success == status)
+        uint8_t m = static_cast<uint8_t>(buffer[0]);
+        ret       = clusterInstance->UpdateCurrentMode(m);
+        if (chip::Protocols::InteractionModel::Status::Success != ret)
         {
-            break;
+            ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(ret));
         }
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
-        ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(status));
     }
     break;
     default:
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
         ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
         break;
     }
@@ -293,6 +303,24 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::End
     VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
     buffer[0] = gRvcCleanModeInstance->GetCurrentMode();
     return chip::Protocols::InteractionModel::Status::Success;
+
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+    chip::AttributeId attributeId                 = attributeMetadata->attributeId;
+
+    switch (attributeId)
+    {
+    case chip::app::Clusters::RvcCleanMode::Attributes::CurrentMode::Id: {
+        *buffer = gRvcCleanModeInstance->GetCurrentMode();
+        ChipLogDetail(DeviceLayer, "Reading CleanMode CurrentMode : %d", static_cast<int>(attributeId));
+    }
+    break;
+    default:
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedRead;
+        ChipLogDetail(DeviceLayer, "Unsupported attributeId %d from reading RvcCleanMode", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
 }
 
 void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
