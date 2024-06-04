@@ -103,7 +103,7 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
     std::optional<EventNumber> n1 = events->GenerateEvent(event, 0 /* EndpointId */);
 
     ASSERT_TRUE(n1.has_value());
-    ASSERT_EQ(*n1, logOnlyEvents.CurrentEventNumber());
+    ASSERT_EQ(*n1, logOnlyEvents.CurrentEventNumber()); // NOLINT(bugprone-unchecked-optional-access)
     ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
               ConcreteEventPath(0 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 
@@ -119,7 +119,7 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
 
     std::optional<EventNumber> n2 = events->GenerateEvent(event, /* endpointId = */ 1);
     ASSERT_TRUE(n2.has_value());
-    ASSERT_EQ(*n2, logOnlyEvents.CurrentEventNumber());
+    ASSERT_EQ(*n2, logOnlyEvents.CurrentEventNumber()); // NOLINT(bugprone-unchecked-optional-access)
     ASSERT_NE(n1, logOnlyEvents.CurrentEventNumber());
 
     ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
@@ -148,7 +148,7 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     n1                = events->GenerateEvent(event, /* endpointId = */ 0);
 
     ASSERT_TRUE(n1.has_value());
-    ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
+    ASSERT_EQ(*n1, logOnlyEvents.CurrentEventNumber()); // NOLINT(bugprone-unchecked-optional-access)
     ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
               ConcreteEventPath(0 /* endpointId */, AccessControlEntryChangedType::GetClusterId(),
                                 AccessControlEntryChangedType::GetEventId()));
