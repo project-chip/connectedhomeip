@@ -105,6 +105,10 @@ rt_sdk("sdk") {
       "CHIP_DEVICE_CONFIG_ENABLE_TBR=1",
     ]
   }
+    
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
 }
 
 # Create the SDK driver instance.
@@ -270,10 +274,6 @@ rt_executable("thermostat") {
       # Consequently, some sections will need to be shifted
       ldflags += [ "-Wl,--defsym=__m_mcuboot_size__=0x20000" ]
     }
-
-    defines += [
-      "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
-    ]
   }
 
   output_dir = root_out_dir
