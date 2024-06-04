@@ -19,7 +19,7 @@ limitations under the License.
 
     <struct name="ThreadNetworkStruct">
         <cluster code="0x0453"/>
-        <item name="ExtendedPanId" type="int64u"/>
+        <item name="ExtendedPanID" type="int64u"/>
         <item name="NetworkName" type="char_string" length="16"/>
         <item name="Channel" type="int16u"/>
     </struct>
@@ -56,12 +56,12 @@ limitations under the License.
         <command source="client" code="0x01" name="RemoveNetwork" optional="false">
             <description>Removes an entry from the ThreadNetworks list.</description>
             <access op="invoke" privilege="manage"/>
-            <arg name="ExtendedPanId" type="int64u"/>
+            <arg name="ExtendedPanID" type="int64u"/>
         </command>
         <command source="client" code="0x02" name="GetOperationalDataset" optional="false" response="OperationalDatasetResponse">
             <description>Retrieves a Thread Operational Dataset from the ThreadNetworks list.</description>
             <access op="invoke" privilege="operate"/>
-            <arg name="ExtendedPanId" type="int64u"/>
+            <arg name="ExtendedPanID" type="int64u"/>
         </command>
         <command source="server" code="0x03" name="OperationalDatasetResponse" optional="false">
             <description>This is the response to a GetOperationalDataset request.</description>
@@ -70,7 +70,7 @@ limitations under the License.
 
         <event side="server" code="0x00" name="NetworkChanged" priority="info" optional="false">
             <description>This event SHALL be generated when an entry in ThreadNetworks is added, removed, or had its Operational Dataset changed.</description>
-            <field id="0" name="ExtendedPanId" type="int64u"/>
+            <field id="0" name="ExtendedPanID" type="int64u"/>
             <access op="read" privilege="operate"/>
         </event>
     </cluster>
