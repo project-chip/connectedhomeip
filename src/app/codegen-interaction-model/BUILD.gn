@@ -22,6 +22,6 @@ import("//build_overrides/chip.gni")
 #   CodegenDataModel.cpp
 #   CodegenDataModel.h
 #
-# The abolve list of files exists to satisfy the "dependency linter"
+# The above list of files exists to satisfy the "dependency linter"
 # since those files should technically be "visible to gn" even though we
 # are supposed to go through model.gni constants
