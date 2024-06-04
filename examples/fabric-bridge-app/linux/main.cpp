@@ -25,18 +25,25 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <lib/support/ZclString.h>
 
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+#include "RpcClient.h"
+#include "RpcServer.h"
+#endif
+
 #include <string>
 #include <sys/ioctl.h>
 #include <thread>
 
 using namespace chip;
 
-#define POLL_INTERVAL_MS (100)
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
 
 namespace {
+
+constexpr uint16_t kPollIntervalMs = 100;
+constexpr uint16_t kRetryIntervalS = 3;
 
 bool KeyboardHit()
 {
@@ -57,13 +64,38 @@ void BridgePollingThread()
                 ChipLogProgress(NotSpecified, "Exiting.....");
                 exit(0);
             }
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+            else if (ch == 'o')
+            {
+                CHIP_ERROR err = OpenCommissioningWindow(0x1234);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(NotSpecified, "Failed to call OpenCommissioningWindow RPC: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+            }
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             continue;
         }
 
         // Sleep to avoid tight loop reading commands
-        usleep(POLL_INTERVAL_MS * 1000);
+        usleep(kPollIntervalMs * 1000);
     }
 }
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
+{
+    if (InitRpcClient(kFabricAdminServerPort) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Connected to Fabric-Admin");
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to connect to Fabric-Admin, retry in %d seconds....", kRetryIntervalS);
+        systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
+    }
+}
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 
 DeviceManager gDeviceManager;
 
@@ -71,6 +103,11 @@ DeviceManager gDeviceManager;
 
 void ApplicationInit()
 {
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+    InitRpcServer(kFabricBridgeServerPort);
+    AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
+#endif
+
     // Start a thread for bridge polling
     std::thread pollingThread(BridgePollingThread);
     pollingThread.detach();

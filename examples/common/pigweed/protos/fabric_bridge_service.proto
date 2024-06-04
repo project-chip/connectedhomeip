@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+
+package chip.rpc;
+
+// Define the message for a synchronized end device with necessary fields
+message SynchronizedDevice {
+  uint64 node_id = 1;
+}
+
+service FabricBridge {
+  rpc AddSynchronizedDevice(SynchronizedDevice) returns (pw.protobuf.Empty){}
+}
+
