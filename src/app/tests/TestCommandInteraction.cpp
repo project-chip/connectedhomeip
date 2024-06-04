@@ -407,6 +407,9 @@ private:
             SetExchangeInterface(&mMockCommandResponder);
         }
         MockCommandResponder mMockCommandResponder;
+
+
+        using app::CommandHandler::AddResponse;
     };
 
     // Generate an invoke request.  If aCommandId is kTestCommandIdWithData, a
@@ -893,8 +896,8 @@ struct BadFields
 
 void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite * apSuite, void * apContext)
 {
-    auto path               = MakeTestCommandPath();
-    auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
+    auto path = MakeTestCommandPath();
+    ConcreteCommandPath requestCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithUnrespondedCommand commandHandler(nullptr, requestCommandPath, /* aRef = */ NullOptional);
 
     {
