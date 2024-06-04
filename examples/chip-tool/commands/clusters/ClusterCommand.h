@@ -118,6 +118,7 @@ public:
 
         if (data != nullptr)
         {
+            // log a snapshot to not advance the data reader.
             chip::TLV::TLVReader counterTlvReader;
             counterTlvReader.Init(*data);
             LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
