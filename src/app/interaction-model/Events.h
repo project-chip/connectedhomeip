@@ -56,7 +56,8 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
     eventOptions.mFabricIndex = aEventData.GetFabricIndex();
 
-    // this skips generating the event if it's fabric-scoped but no fabric association exists yet.
+    // this skips generating the event if it is fabric-scoped however the event does not seem
+    // associated with any fabric.
     if (eventOptions.mFabricIndex == kUndefinedFabricIndex)
     {
         ChipLogError(EventLogging, "Event encode failure: no fabric index for fabric scoped event");
