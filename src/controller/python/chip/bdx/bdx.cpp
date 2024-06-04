@@ -17,6 +17,9 @@
 
 #include <protocols/bdx/BdxMessages.h>
 
+#include <controller/python/chip/bdx/bdx-transfer.h>
+#include <controller/python/chip/bdx/bdx-transfer-manager.h>
+#include <controller/python/chip/bdx/bdx-transfer-server.h>
 #include <controller/python/chip/native/PyChipError.h>
 
 using PyObject = void *;
@@ -34,9 +37,67 @@ using OnTransferCompletedCallback = void (*)(PyObject context, PyChipError resul
 OnTransferObtainedCallback gOnTransferObtainedCallback   = nullptr;
 OnDataReceivedCallback gOnDataReceivedCallback           = nullptr;
 OnTransferCompletedCallback gOnTransferCompletedCallback = nullptr;
-    
+
+struct TransferData
+{
+    PyObject OnTransferObtainedContext = nullptr;
+    PyObject OnDataReceivedContext = nullptr;
+    PyObject OnTransferCompletedContext = nullptr;
+};
+
 } // namespace python
+
+namespace bdx {
+
+class BdxTransferDelegate : public BdxTransfer::Delegate
+{
+public:
+    ~BdxTransferDelegate() override = default;
+
+    virtual void InitMessageReceived(BdxTransfer * transfer, TransferSession::TransferInitData init_data)
+    {
+        if (gOnTransferObtainedCallback)
+        {
+            // TODO: Get the transfer data from transfer.
+            python::TransferData * transferData = nullptr;
+            PyChipError result;
+            gOnTransferObtainedCallback(transferData->OnTransferObtainedContext, result, transfer, init_data.TransferCtlFlags,
+                                        init_data.MaxBlockSize, init_data.StartOffset, init_data.Length, init_data.FileDesignator,
+                                        init_data.FileDesLength, init_data.Metadata, init_data.MetadataLength);
+        }
+    }
+
+    virtual void DataReceived(BdxTransfer * transfer, const ByteSpan & block)
+    {
+        if (gOnDataReceivedCallback)
+        {
+            // TODO: Get the transfer data from transfer.
+            python::TransferData * transferData = nullptr;
+            gOnDataReceivedCallback(transferData->OnDataReceivedContext, block.data(), block.size());
+        }
+    }
+
+    virtual void TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result)
+    {
+        if (gOnTransferCompletedCallback)
+        {
+            // TODO: Get the transfer data from transfer.
+            python::TransferData * transferData = nullptr;
+            gOnTransferCompletedCallback(transferData->OnTransferCompletedContext, ToPyChipError(result));
+        }
+    }
+};
+
+} // namespace bdx
 } // namespace chip
+
+namespace {
+
+chip::bdx::BdxTransferDelegate gBdxTransferDelegate;
+chip::bdx::BdxTransferManager gBdxTransferManager(&gBdxTransferDelegate);
+chip::bdx::BdxTransferServer gBdxTransferServer(gBdxTransferManager);
+
+} // namespace
 
 using namespace chip::python;
 
@@ -53,34 +114,37 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
 
 PyChipError pychip_Bdx_ExpectBdxTransfer()
 {
-    // TODO: Call BdxTransferManager::ExpectATransfer.
+    gBdxTransferManager.ExpectATransfer();
 }
 
 PyChipError pychip_Bdx_StopExpectingBdxTransfer()
 {
-    // TODO: Call BdxTransferManager::StopExpectingATransfer.
+    gBdxTransferManager.StopExpectingATransfer();
 }
 
-PyChipError pychip_Bdx_AcceptSendTransfer(void * transfer, PyObject dataReceivedContext, PyObject transferCompletedContext)
+PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyObject dataReceivedContext,
+                                          PyObject transferCompletedContext)
 {
-    // TODO: Pass transferCompletedContext to transfer so that the system will call gOnTransferCompletedCallback with
-    //       transferCompletedContext eventually.
-    // TODO: Call transfer->AcceptSend with a data callback to call gOnDataReceivedCallback with dataReceivedContext.
+    // TODO: Get the transfer data from transfer.
+    TransferData * transferData = nullptr;
+    transferData->OnDataReceivedContext = dataReceivedContext;
+    transferData->OnTransferCompletedContext = transferCompletedContext;
+    transfer->AcceptSend();
 }
 
-PyChipError pychip_Bdx_AcceptReceiveTransfer(void * transfer, const uint8_t * dataBuffer, size_t dataLength,
-                                             void * transferCompletedContext)
+PyChipError pychip_Bdx_AcceptReceiveTransfer(chip::bdx::BdxTransfer * transfer, const uint8_t * dataBuffer, size_t dataLength,
+                                             PyObject transferCompletedContext)
 {
-    // TODO: Pass transferCompletedContext to transfer so that the system will call gOnTransferCompletedCallback with
-    //       transferCompletedContext eventually.
-    // TODO: Call transfer->AcceptReceive with the data.
+    // TODO: Get the transfer data from transfer.
+    TransferData * transferData = nullptr;
+    transferData->OnTransferCompletedContext = transferCompletedContext;
+    chip::ByteSpan data(dataBuffer, dataLength);
+    transfer->AcceptReceive(data);
 }
 
-PyChipError pychip_Bdx_RejectTransfer(void * transfer)
+PyChipError pychip_Bdx_RejectTransfer(chip::bdx::BdxTransfer * transfer)
 {
-    // TODO: Pass transferCompletedContext to transfer so that the system will call gOnTransferCompletedCallback with
-    //       transferCompletedContext eventually.
-    // TODO: Call transfer->Reject.
+    transfer->Reject();
 }
 
 }
