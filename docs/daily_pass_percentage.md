@@ -1,17 +1,20 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
-| darwin-tests                            |           0 |
+| docker-chip-images                      |           0 |
 | codeql                                  |           0 |
+| darwin                                  |          57 |
+| tests                                   |          79 |
+| darwin-tests                            |          86 |
+| zap                                     |          93 |
 | build-example-bouffalolab               |         100 |
 | build-example-mbed-os                   |         100 |
 | build-example-ti-cc32xx                 |         100 |
 | build-example-nxp                       |         100 |
 | build-example-stm32                     |         100 |
+| issue-labeler                           |         100 |
 | tv-casting-example-darwin               |         100 |
-| java-tests                              |         100 |
 | test-tv-casting-example                 |         100 |
 | build-example-ameba                     |         100 |
-| darwin                                  |         100 |
 | bloat-check                             |         100 |
 | build-example-nuttx                     |         100 |
 | build-example-nrf-connect-sdk           |         100 |
@@ -19,10 +22,10 @@
 | build-example-i-mx-linux                |         100 |
 | lint-code-base                          |         100 |
 | build-example-efr32                     |         100 |
+| java-tests                              |         100 |
 | full-builds-android                     |         100 |
-| unit-integration-tests                  |         100 |
 | build-example-rw61x                     |         100 |
-| zap                                     |         100 |
+| build-example-linux-standalone          |         100 |
 | build-example-asr                       |         100 |
 | build-example-qpg                       |         100 |
 | build-example-open-iot-sdk              |         100 |
@@ -31,8 +34,8 @@
 | recent-fail-summary                     |         100 |
 | build-example-ti-cc13xx-26xx            |         100 |
 | documentation-build                     |         100 |
-| tests                                   |         100 |
 | build-chef-ci-examples-on-all-platforms |         100 |
+| build-example-tizen                     |         100 |
 | delete-old-artifacts                    |         100 |
 | build-example-linux-arm                 |         100 |
 | minimal-build-linux-configure           |         100 |
@@ -40,6 +43,5 @@
 | validate-gradle-wrapper                 |         100 |
 | cirque                                  |         100 |
 | build-example-esp32                     |         100 |
-| build-example-linux-standalone          |         100 |
-| build-example-tizen                     |         100 |
+| unit-integration-tests                  |         100 |
 | builds                                  |         100 |
