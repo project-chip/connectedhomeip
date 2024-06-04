@@ -64,7 +64,6 @@
         "Test_TC_DA_1_8"
     ],
     "DishwasherAlarm": [
-        "Test_TC_DISHALM_1_1",
         "Test_TC_DISHALM_2_1",
         "Test_TC_DISHALM_3_1",
         "Test_TC_DISHALM_3_2",
@@ -74,7 +73,6 @@
         "Test_TC_DISHALM_3_6"
     ],
     "DishwasherMode": [
-        "Test_TC_DISHM_1_1",
         "Test_TC_DISHM_1_2",
         "Test_TC_DISHM_2_1",
         "Test_TC_DISHM_3_1",
@@ -170,10 +168,8 @@
         "Test_TC_MC_11_2",
         "Test_TC_ALOGIN_12_2",
         "Test_TC_TGTNAV_8_2",
-        "Test_TC_APPOBSERVER_1_13",
         "Test_TC_APPOBSERVER_13_1",
-        "Test_TC_APPOBSERVER_13_2",
-        "Test_TC_CONCON_1_14"
+        "Test_TC_APPOBSERVER_13_2"
     ],
     "MultipleFabrics": [
         "Test_TC_CADMIN_1_1",

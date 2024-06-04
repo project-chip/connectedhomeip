@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -50,14 +49,15 @@ class ContentLauncherClusterContentSearchStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterContentSearchStruct {
       tlvReader.enterStructure(tlvTag)
-      val parameterList = buildList<ContentLauncherClusterParameterStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_PARAMETER_LIST))
-      while(!tlvReader.isEndOfContainer()) {
-        add(ContentLauncherClusterParameterStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val parameterList =
+        buildList<ContentLauncherClusterParameterStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_PARAMETER_LIST))
+          while (!tlvReader.isEndOfContainer()) {
+            add(ContentLauncherClusterParameterStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return ContentLauncherClusterContentSearchStruct(parameterList)

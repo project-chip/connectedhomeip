@@ -25,6 +25,8 @@
 
 #include <string.h>
 
+#include <app/server/Dnssd.h>
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -1063,7 +1065,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
-    ChipLogProgress(chipTool, "KVS: Getting key %s", StringOrNullMarker(key));
+    ChipLogProgress(Controller, "KVS: Getting key %s", StringOrNullMarker(key));
 
     size_t read_size = 0;
 
@@ -1076,12 +1078,25 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, voi
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    ChipLogProgress(chipTool, "KVS: Setting key %s", StringOrNullMarker(key));
+    ChipLogProgress(Controller, "KVS: Setting key %s", StringOrNullMarker(key));
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
 {
-    ChipLogProgress(chipTool, "KVS: Deleting key %s", StringOrNullMarker(key));
+    ChipLogProgress(Controller, "KVS: Deleting key %s", StringOrNullMarker(key));
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+}
+
+void AndroidDeviceControllerWrapper::StartDnssd()
+{
+    FabricTable * fabricTable = DeviceControllerFactory::GetInstance().GetSystemState()->Fabrics();
+    VerifyOrReturn(fabricTable != nullptr, ChipLogError(Controller, "Fail to get fabricTable in StartDnssd"));
+    chip::app::DnssdServer::Instance().SetFabricTable(fabricTable);
+    chip::app::DnssdServer::Instance().StartServer();
+}
+
+void AndroidDeviceControllerWrapper::StopDnssd()
+{
+    chip::app::DnssdServer::Instance().StopServer();
 }

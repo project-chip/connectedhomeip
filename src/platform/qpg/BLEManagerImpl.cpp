@@ -98,10 +98,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
-    appCbacks.stackCback    = ExternalCbHandler;
-    appCbacks.chrReadCback  = HandleTXCharRead;
-    appCbacks.chrWriteCback = HandleRXCharWrite;
-    appCbacks.cccCback      = _handleTXCharCCCDWrite;
+    appCbacks.stackCallback    = ExternalCbHandler;
+    appCbacks.chrReadCallback  = HandleTXCharRead;
+    appCbacks.chrWriteCallback = HandleRXCharWrite;
+    appCbacks.cccCallback      = _handleTXCharCCCDWrite;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     qvCHIP_BleSetUUIDs(chipUUID_CHIPoBLE_Service, chipUUID_CHIPoBLEChar_TX.bytes, chipUUID_CHIPoBLEChar_RX.bytes,
@@ -210,7 +210,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kCHIPoBLESubscribe: {
         ChipDeviceEvent connEstEvent;
 
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
         PlatformMgr().PostEventOrDie(&connEstEvent);
@@ -220,7 +220,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kCHIPoBLEUnsubscribe: {
         ChipDeviceEvent connClosedEvent;
 
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEUnsubscribe");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEUnsubscribe");
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
         connClosedEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
         PlatformMgr().PostEventOrDie(&connClosedEvent);
@@ -228,14 +228,14 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived: {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEWriteReceived");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEWriteReceived");
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
     }
     break;
 
     case DeviceEventType::kCHIPoBLEConnectionError: {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEConnectionError");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEConnectionError");
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
     }
     break;
@@ -250,7 +250,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm: {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
     }
     break;
@@ -610,7 +610,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE Client RX characteristic (con %u, len %u)", connId, len);
+    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE Client RX characteristic (con %u, len %u)", connId, len);
 
     // Copy the data to a packet buffer.
     PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(pValue, len, 0, 0);
@@ -727,11 +727,6 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
             ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_STOP_IND error: %d", (int) pDmEvt->advSetStop.status);
             return;
         }
-
-        if (mFlags.Has(Flags::kRestartAdvertising))
-        {
-            BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
-        }
         break;
     }
     case QVCHIP_DM_CONN_OPEN_IND: {
@@ -843,13 +838,13 @@ void BLEManagerImpl::ExternalCbHandler(qvCHIP_Ble_MsgHdr_t * pMsg)
         /* Process advertising/scanning and connection-related messages */
         if (pMsg->event >= QVCHIP_DM_CBACK_START && pMsg->event <= QVCHIP_DM_CBACK_END)
         {
-            ChipLogProgress(DeviceLayer, "DM event %d: status %d", pMsg->event, pMsg->status);
+            ChipLogDetail(DeviceLayer, "DM event %d: status %d", pMsg->event, pMsg->status);
             sInstance.HandleDmMsg((qvCHIP_Ble_DmEvt_t *) pMsg);
         }
         /* Process attribute-related messages */
         else if (pMsg->event >= QVCHIP_ATT_CBACK_START && pMsg->event <= QVCHIP_ATT_CBACK_END)
         {
-            ChipLogProgress(DeviceLayer, "ATT event %d: status %d", pMsg->event, pMsg->status);
+            ChipLogDetail(DeviceLayer, "ATT event %d: status %d", pMsg->event, pMsg->status);
             sInstance.HandleAttMsg((qvCHIP_Ble_AttEvt_t *) pMsg);
         }
         else
@@ -929,6 +924,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         sInstance.mFlags.Set(Flags::kRestartAdvertising);
         sInstance.StopAdvertising();
+        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     }
 }
 

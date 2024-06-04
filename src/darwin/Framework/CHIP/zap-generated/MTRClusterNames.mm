@@ -321,6 +321,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeRadonConcentrationMeasurementID:
         result = @"RadonConcentrationMeasurement";
         break;
+    case MTRClusterIDTypeWiFiNetworkManagementID:
+        result = @"WiFiNetworkManagement";
+        break;
     case MTRClusterIDTypeWakeOnLANID:
         result = @"WakeOnLAN";
         break;
@@ -7265,6 +7268,44 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeWiFiNetworkManagementID:
+
+        switch (attributeID) {
+
+            // Cluster WiFiNetworkManagement attributes
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID:
+            result = @"SSID";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 

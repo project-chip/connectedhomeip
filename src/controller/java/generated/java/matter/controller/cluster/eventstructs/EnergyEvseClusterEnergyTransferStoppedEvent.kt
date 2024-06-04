@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -56,16 +54,21 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
     private const val TAG_REASON = 2
     private const val TAG_ENERGY_TRANSFERRED = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyEvseClusterEnergyTransferStoppedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEnergyTransferStoppedEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_I_D))
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val reason = tlvReader.getUByte(ContextSpecificTag(TAG_REASON))
       val energyTransferred = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_TRANSFERRED))
-      
+
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterEnergyTransferStoppedEvent(sessionID, state, reason, energyTransferred)
+      return EnergyEvseClusterEnergyTransferStoppedEvent(
+        sessionID,
+        state,
+        reason,
+        energyTransferred
+      )
     }
   }
 }
