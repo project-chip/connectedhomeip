@@ -137,11 +137,11 @@ public:
      * and failure to register the status is checked with VerifyOrDie.
      */
     virtual void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                           const char * context = nullptr);
+                           const char * context = nullptr) = 0;
 
-    virtual CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus);
+    virtual CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) = 0;
 
-    virtual CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus);
+    virtual CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) = 0;
 
     /**
      * GetAccessingFabricIndex() may only be called during synchronous command
