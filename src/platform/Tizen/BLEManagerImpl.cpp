@@ -320,7 +320,7 @@ void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h adver
     if (advState == BT_ADAPTER_LE_ADVERTISING_STARTED)
     {
         mFlags.Set(Flags::kAdvertising);
-        NotifyBLEPeripheralAdvStartComplete(true, nullptr);
+        NotifyBLEPeripheralAdvStartComplete(CHIP_NO_ERROR);
         DeviceLayer::SystemLayer().ScheduleLambda([this] {
             // Start a timer to make sure that the fast advertising is stopped after specified timeout.
             DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimeout, this);
@@ -329,7 +329,7 @@ void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h adver
     else
     {
         mFlags.Clear(Flags::kAdvertising);
-        NotifyBLEPeripheralAdvStopComplete(true, nullptr);
+        NotifyBLEPeripheralAdvStopComplete(CHIP_NO_ERROR);
         DeviceLayer::SystemLayer().ScheduleLambda(
             [this] { DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimeout, this); });
     }
@@ -344,39 +344,36 @@ void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h adver
 }
 
 // ====== Private Functions.
-void BLEManagerImpl::NotifyBLEPeripheralGATTServerRegisterComplete(bool aIsSuccess, void * apAppstate)
+
+void BLEManagerImpl::NotifyBLEPeripheralGATTServerRegisterComplete(CHIP_ERROR error)
 {
     ChipDeviceEvent event;
     event.Type = DeviceEventType::kPlatformTizenBLEPeripheralGATTServerRegisterComplete;
-    event.Platform.BLEPeripheralGATTServerRegisterComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralGATTServerRegisterComplete.mpAppstate = apAppstate;
+    event.Platform.BLEPeripheralGATTServerRegisterComplete.mError = error;
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(CHIP_ERROR error)
 {
     ChipDeviceEvent event;
-    event.Type = DeviceEventType::kPlatformTizenBLEPeripheralAdvConfiguredComplete;
-    event.Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvConfiguredComplete.mpAppstate = apAppstate;
+    event.Type                                               = DeviceEventType::kPlatformTizenBLEPeripheralAdvConfiguredComplete;
+    event.Platform.BLEPeripheralAdvConfiguredComplete.mError = error;
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error)
 {
     ChipDeviceEvent event;
-    event.Type                                              = DeviceEventType::kPlatformTizenBLEPeripheralAdvStartComplete;
-    event.Platform.BLEPeripheralAdvStartComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvStartComplete.mpAppstate = apAppstate;
+    event.Type                                          = DeviceEventType::kPlatformTizenBLEPeripheralAdvStartComplete;
+    event.Platform.BLEPeripheralAdvStartComplete.mError = error;
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error)
 {
     ChipDeviceEvent event;
-    event.Type                                             = DeviceEventType::kPlatformTizenBLEPeripheralAdvStopComplete;
-    event.Platform.BLEPeripheralAdvStopComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvStopComplete.mpAppstate = apAppstate;
+    event.Type                                         = DeviceEventType::kPlatformTizenBLEPeripheralAdvStopComplete;
+    event.Platform.BLEPeripheralAdvStopComplete.mError = error;
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -655,8 +652,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     ret = bt_gatt_server_start();
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_start() failed: %s", get_error_message(ret)));
 
-    ChipLogDetail(DeviceLayer, "NotifyBLEPeripheralGATTServerRegisterComplete Success");
-    BLEManagerImpl::NotifyBLEPeripheralGATTServerRegisterComplete(true, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralGATTServerRegisterComplete(CHIP_NO_ERROR);
 
     // Save the Local Peripheral char1 & char2 handles
     mGattCharC1Handle = char1;
@@ -664,8 +660,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     return CHIP_NO_ERROR;
 
 exit:
-    ChipLogDetail(DeviceLayer, "NotifyBLEPeripheralGATTServerRegisterComplete Failed");
-    BLEManagerImpl::NotifyBLEPeripheralGATTServerRegisterComplete(false, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralGATTServerRegisterComplete(TizenToChipError(ret));
     return TizenToChipError(ret);
 }
 
@@ -734,7 +729,7 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_le_set_advertising_device_name() failed: %s", get_error_message(ret)));
 
-    BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(true, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(CHIP_NO_ERROR);
 
     ret = bt_adapter_le_start_advertising_new(
         mAdvertiser,
@@ -749,8 +744,9 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
     return CHIP_NO_ERROR;
 
 exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(false, nullptr);
-    return ret != BT_ERROR_NONE ? TizenToChipError(ret) : err;
+    err = ret != BT_ERROR_NONE ? TizenToChipError(ret) : err;
+    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(err);
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
@@ -765,7 +761,7 @@ CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
     return CHIP_NO_ERROR;
 
 exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(false, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(TizenToChipError(ret));
     return TizenToChipError(ret);
 }
 

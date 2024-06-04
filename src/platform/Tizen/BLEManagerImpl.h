@@ -133,7 +133,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
-    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {};
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
@@ -196,10 +196,10 @@ private:
     bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
 
     // ==== BLE Adv & GATT Server.
-    void NotifyBLEPeripheralGATTServerRegisterComplete(bool aIsSuccess, void * apAppstate);
-    void NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate);
-    void NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate);
-    void NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate);
+    void NotifyBLEPeripheralGATTServerRegisterComplete(CHIP_ERROR error);
+    void NotifyBLEPeripheralAdvConfiguredComplete(CHIP_ERROR error);
+    void NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error);
+    void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
     void NotifyBLESubscribed(bool indicationsEnabled, BLE_CONNECTION_OBJECT conId);
     void NotifyBLEIndicationConfirmation(BLE_CONNECTION_OBJECT conId);
     void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
