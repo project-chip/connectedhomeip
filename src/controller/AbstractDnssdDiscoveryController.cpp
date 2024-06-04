@@ -43,7 +43,7 @@ static bool SameExceptOrder(const chip::Span<const Inet::IPAddress> & v1, const 
         {
             if (!addressUsed[d] && v1[s] == v2[d])
             {
-                // Change the user flag so that the compared target is no longer used
+                // Change the used flag so that the compared target is no longer used
                 addressUsed.set(d, true);
                 break;
             }
