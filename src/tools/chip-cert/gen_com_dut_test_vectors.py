@@ -336,12 +336,20 @@ VIDPID_FALLBACK_ENCODING_TEST_CASES = [
         "test_folder": 'vidpid_fallback_encoding_17',
         "is_success_case": 'false',
     },
+    # Numeric only
     {
         "description": 'Fallback VID and PID encoding example from spec: valid and PID numeric only',
         "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:0001',
         "test_folder": 'vidpid_fallback_encoding_18',
         "is_success_case": 'true',
         "fallback_pid": 0x0001
+    },
+    # Not a number at all
+    {
+        "description": 'Fallback VID and PID encoding example from spec: PID is not a number',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:XYZ1',
+        "test_folder": 'vidpid_fallback_encoding_19',
+        "is_success_case": 'false',
     },
 ]
 
