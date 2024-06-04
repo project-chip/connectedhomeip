@@ -157,7 +157,7 @@ void Light::Render()
     const char * mode = // based on ColorMode attribute: spec 3.2.7.9
         (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation) ? "Hue/Saturation"
         : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kCurrentXAndCurrentY)          ? "X/Y"
-        : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kColorTemperature)             ? "Temperature/Mireds"
+        : (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kColorTemperatureMireds)             ? "Temperature/Mireds"
                                                                                                           : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
@@ -178,7 +178,7 @@ void Light::Render()
         ImGui::Text("Current X: %d", mColorX);
         ImGui::Text("Current Y: %d", mColorY);
     }
-    else if (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kColorTemperature)
+    else if (mColorMode == chip::app::Clusters::ColorControl::ColorModeEnum::kColorTemperatureMireds)
     {
         ImGui::Text("Color Temperature Mireds: %d", mColorTemperatureMireds);
     }
