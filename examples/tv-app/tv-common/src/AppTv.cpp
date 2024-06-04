@@ -726,7 +726,7 @@ CHIP_ERROR AppTvInit()
     const uint16_t APP2_VENDOR_ID = 65521; const uint16_t APP2_PRODUCT_ID = 32769;
     const uint16_t APP3_VENDOR_ID = 9050; const uint16_t APP3_PRODUCT_ID = 22;
     const uint16_t APP4_VENDOR_ID = 1111; const uint16_t APP4_PRODUCT_ID = 22;
-    
+
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
     gFactory.InstallContentApp(APP1_VENDOR_ID, APP1_PRODUCT_ID);
