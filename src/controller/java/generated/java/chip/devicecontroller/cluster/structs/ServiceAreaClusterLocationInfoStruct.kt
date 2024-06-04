@@ -17,18 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterLocationInfoStruct(
-  val homeLocationInfo: ServiceAreaClusterHomeLocationStruct?,
-  val landmarkTag: UInt?,
-  val positionTag: UInt?,
-  val surfaceTag: UInt?
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ServiceAreaClusterLocationInfoStruct (
+    val homeLocationInfo: ServiceAreaClusterHomeLocationStruct?,
+    val landmarkTag: UInt?,
+    val positionTag: UInt?,
+    val surfaceTag: UInt?) {
+  override fun toString(): String  = buildString {
     append("ServiceAreaClusterLocationInfoStruct {\n")
     append("\thomeLocationInfo : $homeLocationInfo\n")
     append("\tlandmarkTag : $landmarkTag\n")
@@ -41,25 +44,25 @@ class ServiceAreaClusterLocationInfoStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (homeLocationInfo != null) {
-        homeLocationInfo.toTlv(ContextSpecificTag(TAG_HOME_LOCATION_INFO), this)
-      } else {
-        putNull(ContextSpecificTag(TAG_HOME_LOCATION_INFO))
-      }
+      homeLocationInfo.toTlv(ContextSpecificTag(TAG_HOME_LOCATION_INFO), this)
+    } else {
+      putNull(ContextSpecificTag(TAG_HOME_LOCATION_INFO))
+    }
       if (landmarkTag != null) {
-        put(ContextSpecificTag(TAG_LANDMARK_TAG), landmarkTag)
-      } else {
-        putNull(ContextSpecificTag(TAG_LANDMARK_TAG))
-      }
+      put(ContextSpecificTag(TAG_LANDMARK_TAG), landmarkTag)
+    } else {
+      putNull(ContextSpecificTag(TAG_LANDMARK_TAG))
+    }
       if (positionTag != null) {
-        put(ContextSpecificTag(TAG_POSITION_TAG), positionTag)
-      } else {
-        putNull(ContextSpecificTag(TAG_POSITION_TAG))
-      }
+      put(ContextSpecificTag(TAG_POSITION_TAG), positionTag)
+    } else {
+      putNull(ContextSpecificTag(TAG_POSITION_TAG))
+    }
       if (surfaceTag != null) {
-        put(ContextSpecificTag(TAG_SURFACE_TAG), surfaceTag)
-      } else {
-        putNull(ContextSpecificTag(TAG_SURFACE_TAG))
-      }
+      put(ContextSpecificTag(TAG_SURFACE_TAG), surfaceTag)
+    } else {
+      putNull(ContextSpecificTag(TAG_SURFACE_TAG))
+    }
       endStructure()
     }
   }
@@ -70,48 +73,36 @@ class ServiceAreaClusterLocationInfoStruct(
     private const val TAG_POSITION_TAG = 2
     private const val TAG_SURFACE_TAG = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterLocationInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ServiceAreaClusterLocationInfoStruct {
       tlvReader.enterStructure(tlvTag)
-      val homeLocationInfo =
-        if (!tlvReader.isNull()) {
-          ServiceAreaClusterHomeLocationStruct.fromTlv(
-            ContextSpecificTag(TAG_HOME_LOCATION_INFO),
-            tlvReader
-          )
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_HOME_LOCATION_INFO))
-          null
-        }
-      val landmarkTag =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_LANDMARK_TAG))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_LANDMARK_TAG))
-          null
-        }
-      val positionTag =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_POSITION_TAG))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_POSITION_TAG))
-          null
-        }
-      val surfaceTag =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_SURFACE_TAG))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_SURFACE_TAG))
-          null
-        }
-
+      val homeLocationInfo = if (!tlvReader.isNull()) {
+      ServiceAreaClusterHomeLocationStruct.fromTlv(ContextSpecificTag(TAG_HOME_LOCATION_INFO), tlvReader)
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_HOME_LOCATION_INFO))
+      null
+    }
+      val landmarkTag = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_LANDMARK_TAG))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_LANDMARK_TAG))
+      null
+    }
+      val positionTag = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_POSITION_TAG))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_POSITION_TAG))
+      null
+    }
+      val surfaceTag = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_SURFACE_TAG))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_SURFACE_TAG))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterLocationInfoStruct(
-        homeLocationInfo,
-        landmarkTag,
-        positionTag,
-        surfaceTag
-      )
+      return ServiceAreaClusterLocationInfoStruct(homeLocationInfo, landmarkTag, positionTag, surfaceTag)
     }
   }
 }

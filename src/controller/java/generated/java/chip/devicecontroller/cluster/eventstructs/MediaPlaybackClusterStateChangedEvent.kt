@@ -17,25 +17,26 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MediaPlaybackClusterStateChangedEvent(
-  val currentState: UInt,
-  val startTime: ULong,
-  val duration: ULong,
-  val sampledPosition:
-    chip.devicecontroller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct,
-  val playbackSpeed: Float,
-  val seekRangeEnd: ULong,
-  val seekRangeStart: ULong,
-  val data: Optional<ByteArray>,
-  val audioAdvanceUnmuted: Boolean
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class MediaPlaybackClusterStateChangedEvent (
+    val currentState: UInt,
+    val startTime: ULong,
+    val duration: ULong,
+    val sampledPosition: chip.devicecontroller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct,
+    val playbackSpeed: Float,
+    val seekRangeEnd: ULong,
+    val seekRangeStart: ULong,
+    val data: Optional<ByteArray>,
+    val audioAdvanceUnmuted: Boolean) {
+  override fun toString(): String  = buildString {
     append("MediaPlaybackClusterStateChangedEvent {\n")
     append("\tcurrentState : $currentState\n")
     append("\tstartTime : $startTime\n")
@@ -60,9 +61,9 @@ class MediaPlaybackClusterStateChangedEvent(
       put(ContextSpecificTag(TAG_SEEK_RANGE_END), seekRangeEnd)
       put(ContextSpecificTag(TAG_SEEK_RANGE_START), seekRangeStart)
       if (data.isPresent) {
-        val optdata = data.get()
-        put(ContextSpecificTag(TAG_DATA), optdata)
-      }
+      val optdata = data.get()
+      put(ContextSpecificTag(TAG_DATA), optdata)
+    }
       put(ContextSpecificTag(TAG_AUDIO_ADVANCE_UNMUTED), audioAdvanceUnmuted)
       endStructure()
     }
@@ -79,40 +80,25 @@ class MediaPlaybackClusterStateChangedEvent(
     private const val TAG_DATA = 7
     private const val TAG_AUDIO_ADVANCE_UNMUTED = 8
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterStateChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MediaPlaybackClusterStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val currentState = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_STATE))
       val startTime = tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
       val duration = tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
-      val sampledPosition =
-        chip.devicecontroller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct.fromTlv(
-          ContextSpecificTag(TAG_SAMPLED_POSITION),
-          tlvReader
-        )
+      val sampledPosition = chip.devicecontroller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct.fromTlv(ContextSpecificTag(TAG_SAMPLED_POSITION), tlvReader)
       val playbackSpeed = tlvReader.getFloat(ContextSpecificTag(TAG_PLAYBACK_SPEED))
       val seekRangeEnd = tlvReader.getULong(ContextSpecificTag(TAG_SEEK_RANGE_END))
       val seekRangeStart = tlvReader.getULong(ContextSpecificTag(TAG_SEEK_RANGE_START))
-      val data =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DATA))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_DATA)))
-        } else {
-          Optional.empty()
-        }
+      val data = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DATA))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_DATA)))
+    } else {
+      Optional.empty()
+    }
       val audioAdvanceUnmuted = tlvReader.getBoolean(ContextSpecificTag(TAG_AUDIO_ADVANCE_UNMUTED))
-
+      
       tlvReader.exitContainer()
 
-      return MediaPlaybackClusterStateChangedEvent(
-        currentState,
-        startTime,
-        duration,
-        sampledPosition,
-        playbackSpeed,
-        seekRangeEnd,
-        seekRangeStart,
-        data,
-        audioAdvanceUnmuted
-      )
+      return MediaPlaybackClusterStateChangedEvent(currentState, startTime, duration, sampledPosition, playbackSpeed, seekRangeEnd, seekRangeStart, data, audioAdvanceUnmuted)
     }
   }
 }

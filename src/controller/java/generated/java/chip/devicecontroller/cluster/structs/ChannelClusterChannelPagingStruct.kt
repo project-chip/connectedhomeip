@@ -17,17 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChannelClusterChannelPagingStruct(
-  val previousToken: Optional<ChannelClusterPageTokenStruct>?,
-  val nextToken: Optional<ChannelClusterPageTokenStruct>?
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ChannelClusterChannelPagingStruct (
+    val previousToken: Optional<ChannelClusterPageTokenStruct>?,
+    val nextToken: Optional<ChannelClusterPageTokenStruct>?) {
+  override fun toString(): String  = buildString {
     append("ChannelClusterChannelPagingStruct {\n")
     append("\tpreviousToken : $previousToken\n")
     append("\tnextToken : $nextToken\n")
@@ -38,21 +40,21 @@ class ChannelClusterChannelPagingStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (previousToken != null) {
-        if (previousToken.isPresent) {
-          val optpreviousToken = previousToken.get()
-          optpreviousToken.toTlv(ContextSpecificTag(TAG_PREVIOUS_TOKEN), this)
-        }
-      } else {
-        putNull(ContextSpecificTag(TAG_PREVIOUS_TOKEN))
-      }
+      if (previousToken.isPresent) {
+      val optpreviousToken = previousToken.get()
+      optpreviousToken.toTlv(ContextSpecificTag(TAG_PREVIOUS_TOKEN), this)
+    }
+    } else {
+      putNull(ContextSpecificTag(TAG_PREVIOUS_TOKEN))
+    }
       if (nextToken != null) {
-        if (nextToken.isPresent) {
-          val optnextToken = nextToken.get()
-          optnextToken.toTlv(ContextSpecificTag(TAG_NEXT_TOKEN), this)
-        }
-      } else {
-        putNull(ContextSpecificTag(TAG_NEXT_TOKEN))
-      }
+      if (nextToken.isPresent) {
+      val optnextToken = nextToken.get()
+      optnextToken.toTlv(ContextSpecificTag(TAG_NEXT_TOKEN), this)
+    }
+    } else {
+      putNull(ContextSpecificTag(TAG_NEXT_TOKEN))
+    }
       endStructure()
     }
   }
@@ -61,38 +63,29 @@ class ChannelClusterChannelPagingStruct(
     private const val TAG_PREVIOUS_TOKEN = 0
     private const val TAG_NEXT_TOKEN = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterChannelPagingStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChannelClusterChannelPagingStruct {
       tlvReader.enterStructure(tlvTag)
-      val previousToken =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_TOKEN))) {
-            Optional.of(
-              ChannelClusterPageTokenStruct.fromTlv(
-                ContextSpecificTag(TAG_PREVIOUS_TOKEN),
-                tlvReader
-              )
-            )
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_TOKEN))
-          null
-        }
-      val nextToken =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_NEXT_TOKEN))) {
-            Optional.of(
-              ChannelClusterPageTokenStruct.fromTlv(ContextSpecificTag(TAG_NEXT_TOKEN), tlvReader)
-            )
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_NEXT_TOKEN))
-          null
-        }
-
+      val previousToken = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_TOKEN))) {
+      Optional.of(ChannelClusterPageTokenStruct.fromTlv(ContextSpecificTag(TAG_PREVIOUS_TOKEN), tlvReader))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_TOKEN))
+      null
+    }
+      val nextToken = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NEXT_TOKEN))) {
+      Optional.of(ChannelClusterPageTokenStruct.fromTlv(ContextSpecificTag(TAG_NEXT_TOKEN), tlvReader))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_NEXT_TOKEN))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return ChannelClusterChannelPagingStruct(previousToken, nextToken)

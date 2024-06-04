@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -57,19 +59,14 @@ class ServiceAreaClusterLocationStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterLocationStruct {
       tlvReader.enterStructure(tlvTag)
       val locationId = tlvReader.getUInt(ContextSpecificTag(TAG_LOCATION_ID))
-      val mapId =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_MAP_ID))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_MAP_ID))
-          null
-        }
-      val locationInfo =
-        ServiceAreaClusterLocationInfoStruct.fromTlv(
-          ContextSpecificTag(TAG_LOCATION_INFO),
-          tlvReader
-        )
-
+      val mapId = if (!tlvReader.isNull()) {
+      tlvReader.getUByte(ContextSpecificTag(TAG_MAP_ID))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_MAP_ID))
+      null
+    }
+      val locationInfo = ServiceAreaClusterLocationInfoStruct.fromTlv(ContextSpecificTag(TAG_LOCATION_INFO), tlvReader)
+      
       tlvReader.exitContainer()
 
       return ServiceAreaClusterLocationStruct(locationId, mapId, locationInfo)

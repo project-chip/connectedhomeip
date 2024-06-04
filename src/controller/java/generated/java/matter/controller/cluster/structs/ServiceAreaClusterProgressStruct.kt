@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -45,17 +46,17 @@ class ServiceAreaClusterProgressStruct(
       put(ContextSpecificTag(TAG_STATUS), status)
       if (totalOperationalTime != null) {
         if (totalOperationalTime.isPresent) {
-          val opttotalOperationalTime = totalOperationalTime.get()
-          put(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME), opttotalOperationalTime)
-        }
+        val opttotalOperationalTime = totalOperationalTime.get()
+        put(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME), opttotalOperationalTime)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
       }
       if (estimatedTime != null) {
         if (estimatedTime.isPresent) {
-          val optestimatedTime = estimatedTime.get()
-          put(ContextSpecificTag(TAG_ESTIMATED_TIME), optestimatedTime)
-        }
+        val optestimatedTime = estimatedTime.get()
+        put(ContextSpecificTag(TAG_ESTIMATED_TIME), optestimatedTime)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_ESTIMATED_TIME))
       }
@@ -73,37 +74,30 @@ class ServiceAreaClusterProgressStruct(
       tlvReader.enterStructure(tlvTag)
       val locationId = tlvReader.getUInt(ContextSpecificTag(TAG_LOCATION_ID))
       val status = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
-      val totalOperationalTime =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))) {
-            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
-          null
-        }
-      val estimatedTime =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_ESTIMATED_TIME))) {
-            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ESTIMATED_TIME)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ESTIMATED_TIME))
-          null
-        }
-
+      val totalOperationalTime = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
+      null
+    }
+      val estimatedTime = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_ESTIMATED_TIME))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ESTIMATED_TIME)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_ESTIMATED_TIME))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterProgressStruct(
-        locationId,
-        status,
-        totalOperationalTime,
-        estimatedTime
-      )
+      return ServiceAreaClusterProgressStruct(locationId, status, totalOperationalTime, estimatedTime)
     }
   }
 }

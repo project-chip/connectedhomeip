@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -62,10 +64,7 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
     private const val TAG_WI_FI_BAND = 4
     private const val TAG_RSSI = 5
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
       tlvReader.enterStructure(tlvTag)
       val security = tlvReader.getUByte(ContextSpecificTag(TAG_SECURITY))
       val ssid = tlvReader.getByteArray(ContextSpecificTag(TAG_SSID))
@@ -73,17 +72,10 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
       val channel = tlvReader.getUShort(ContextSpecificTag(TAG_CHANNEL))
       val wiFiBand = tlvReader.getUByte(ContextSpecificTag(TAG_WI_FI_BAND))
       val rssi = tlvReader.getByte(ContextSpecificTag(TAG_RSSI))
-
+      
       tlvReader.exitContainer()
 
-      return NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
-        security,
-        ssid,
-        bssid,
-        channel,
-        wiFiBand,
-        rssi
-      )
+      return NetworkCommissioningClusterWiFiInterfaceScanResultStruct(security, ssid, bssid, channel, wiFiBand, rssi)
     }
   }
 }

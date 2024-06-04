@@ -20,14 +20,16 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class EnergyEvseClusterChargingTargetScheduleStruct(
-  val dayOfWeekForSequence: UInt,
-  val chargingTargets: List<EnergyEvseClusterChargingTargetStruct>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class EnergyEvseClusterChargingTargetScheduleStruct (
+    val dayOfWeekForSequence: UInt,
+    val chargingTargets: List<EnergyEvseClusterChargingTargetStruct>) {
+  override fun toString(): String  = buildString {
     append("EnergyEvseClusterChargingTargetScheduleStruct {\n")
     append("\tdayOfWeekForSequence : $dayOfWeekForSequence\n")
     append("\tchargingTargets : $chargingTargets\n")
@@ -51,18 +53,17 @@ class EnergyEvseClusterChargingTargetScheduleStruct(
     private const val TAG_DAY_OF_WEEK_FOR_SEQUENCE = 0
     private const val TAG_CHARGING_TARGETS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterChargingTargetScheduleStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyEvseClusterChargingTargetScheduleStruct {
       tlvReader.enterStructure(tlvTag)
       val dayOfWeekForSequence = tlvReader.getUInt(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE))
-      val chargingTargets =
-        buildList<EnergyEvseClusterChargingTargetStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_CHARGING_TARGETS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(EnergyEvseClusterChargingTargetStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val chargingTargets = buildList<EnergyEvseClusterChargingTargetStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_CHARGING_TARGETS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(EnergyEvseClusterChargingTargetStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return EnergyEvseClusterChargingTargetScheduleStruct(dayOfWeekForSequence, chargingTargets)
