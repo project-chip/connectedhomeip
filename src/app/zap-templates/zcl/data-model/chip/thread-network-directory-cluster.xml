@@ -48,17 +48,17 @@ limitations under the License.
         </attribute>
         <attribute side="server" code="0x0002" define="THREAD_NETWORK_TABLE_SIZE" type="int8u" writable="false" optional="false">ThreadNetworkTableSize</attribute>
 
-        <command source="client" code="0x00" name="AddNetwork" optional="false">
+        <command source="client" code="0x00" name="AddNetwork" mustUseTimedInvoke="true" optional="false">
             <description>Adds an entry to the ThreadNetworks list.</description>
             <access op="invoke" privilege="manage"/>
             <arg name="OperationalDataset" type="octet_string" length="254"/>
         </command>
-        <command source="client" code="0x01" name="RemoveNetwork" optional="false">
+        <command source="client" code="0x01" name="RemoveNetwork" mustUseTimedInvoke="true" optional="false">
             <description>Removes an entry from the ThreadNetworks list.</description>
             <access op="invoke" privilege="manage"/>
             <arg name="ExtendedPanID" type="int64u"/>
         </command>
-        <command source="client" code="0x02" name="GetOperationalDataset" optional="false" response="OperationalDatasetResponse">
+        <command source="client" code="0x02" name="GetOperationalDataset" mustUseTimedInvoke="true" optional="false" response="OperationalDatasetResponse">
             <description>Retrieves a Thread Operational Dataset from the ThreadNetworks list.</description>
             <access op="invoke" privilege="operate"/>
             <arg name="ExtendedPanID" type="int64u"/>
