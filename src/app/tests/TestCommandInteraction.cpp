@@ -87,6 +87,19 @@ constexpr CommandId kTestCommandIdFillResponseMessage     = 7;
 constexpr CommandId kTestNonExistCommandId                = 0;
 
 const app::CommandSender::TestOnlyMarker kCommandSenderTestOnlyMarker;
+
+class SimpleTLVPayload : public app::DataModel::EncodableToTLV
+{
+public:
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+    {
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(writer.PutBoolean(chip::TLV::ContextTag(1), true));
+        return writer.EndContainer(outerType);
+    }
+};
+
 } // namespace
 
 namespace app {
@@ -199,12 +212,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
         }
         else
         {
-            const CommandHandlerImpl::InvokeResponseParameters prepareParams(aRequestCommandPath);
-            const ConcreteCommandPath responseCommandPath = aRequestCommandPath;
-            apCommandObj->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
-            chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataIBTLVWriter();
-            writer->PutBoolean(chip::TLV::ContextTag(1), true);
-            apCommandObj->FinishCommand();
+            SimpleTLVPayload payloadWriter;
+            apCommandObj->AddResponse(aRequestCommandPath, aRequestCommandPath.mCommandId, payloadWriter);
         }
     }
 
@@ -301,12 +310,11 @@ public:
     bool mResponseDropped = false;
 };
 
-class MockCommandHandlerCallback : public CommandHandlerImpl::Callback
+class MockCommandHandlerCallback : public CommandHandler::Callback
 {
 public:
-    void OnDone(CommandHandlerImpl & apCommandHandler) final { onFinalCalledTimes++; }
-    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
-                         TLV::TLVReader & apPayload) final
+    void OnDone(CommandHandler & apCommandHandler) final { onFinalCalledTimes++; }
+    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) final
     {
         DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
     }
@@ -387,18 +395,16 @@ private:
      * we want to test APIs that cluster code uses, we need to inject entries into the
      * CommandPathRegistry directly.
      */
-    class CommandHandlerWithUnrespondedCommand : public app::CommandHandlerImpl
+    class CommandHandlerWithUnrespondedCommand : public app::CommandHandler
     {
     public:
-        CommandHandlerWithUnrespondedCommand(CommandHandlerImpl::Callback * apCallback,
-                                             const ConcreteCommandPath & aRequestCommandPath, const Optional<uint16_t> & aRef) :
-            CommandHandlerImpl(apCallback)
+        CommandHandlerWithUnrespondedCommand(CommandHandler::Callback * apCallback, const ConcreteCommandPath & aRequestCommandPath,
+                                             const Optional<uint16_t> & aRef) :
+            CommandHandler(apCallback)
         {
             GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional());
             SetExchangeInterface(&mMockCommandResponder);
         }
-        virtual ~CommandHandlerWithUnrespondedCommand() = default;
-
         MockCommandResponder mMockCommandResponder;
     };
 
@@ -600,8 +606,6 @@ void TestCommandInteraction::AddInvalidInvokeRequestData(nlTestSuite * apSuite, 
 void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void * apContext, CommandHandler * apCommandHandler,
                                                    bool aNeedStatusCode, CommandId aResponseCommandId, CommandId aRequestCommandId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     constexpr EndpointId kTestEndpointId   = 1;
     constexpr ClusterId kTestClusterId     = 3;
     ConcreteCommandPath requestCommandPath = { kTestEndpointId, kTestClusterId, aRequestCommandId };
@@ -611,17 +615,8 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
     }
     else
     {
-        const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
-        ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, aResponseCommandId };
-        err = apCommandHandler->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        chip::TLV::TLVWriter * writer = apCommandHandler->GetCommandDataIBTLVWriter();
-
-        err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        err = apCommandHandler->FinishCommand();
+        SimpleTLVPayload payloadWriter;
+        CHIP_ERROR err = apCommandHandler->AddResponseData(requestCommandPath, aResponseCommandId, payloadWriter);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 }
@@ -632,8 +627,8 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSui
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
-    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
@@ -710,7 +705,7 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
         // be handle already acquired on the callers behalf.
         CommandHandler::Handle handle(&commandHandler);
 
-        const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
+        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
         err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
@@ -753,7 +748,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
         // be handle already acquired on the callers behalf.
         CommandHandler::Handle handle(&commandHandler);
 
-        const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
+        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
         err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = commandHandler.FinishCommand();
@@ -1333,7 +1328,7 @@ void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingDirectPrep
     // responder is present. This aligns with the design decision to promote AddStatus and AddResponseData
     // usage in such scenarios. See GitHub issue #32486 for discussions on phasing out external use of
     // these primitives.
-    const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
+    const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
     ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
     CHIP_ERROR err                          = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);

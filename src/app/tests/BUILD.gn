@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/app/icd/icd.gni")
@@ -37,9 +38,10 @@ static_library("helpers") {
     "${chip_root}/src/access",
     "${chip_root}/src/app",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
   ]
+
+  public_deps = [ "${chip_root}/src/messaging/tests:helpers" ]
 }
 
 source_set("binding-test-srcs") {
@@ -119,20 +121,87 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
-chip_test_suite_using_nltest("tests") {
+source_set("app-test-stubs") {
+  sources = [
+    "test-ember-api.cpp",
+    "test-ember-api.h",
+    "test-interaction-model-api.cpp",
+    "test-interaction-model-api.h",
+  ]
+  public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
+
+  public_deps = [
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
-    "TestAclAttribute.cpp",
-    "TestAclEvent.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
-    "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestMessageDef.cpp",
+    "TestNullable.cpp",
+    "TestNumericAttributeTraits.cpp",
+    "TestOperationalStateClusterObjects.cpp",
+    "TestPendingNotificationMap.cpp",
+    "TestPendingResponseTrackerImpl.cpp",
+    "TestPowerSourceCluster.cpp",
+    "TestStatusIB.cpp",
+    "TestStatusResponseMessage.cpp",
+    "TestTestEventTriggerDelegate.cpp",
+    "TestTimeSyncDataProvider.cpp",
+  ]
+
+  if (!chip_fake_platform) {
+    test_sources += [ "TestFailSafeContext.cpp" ]
+  }
+
+  # DefaultICDClientStorage assumes that raw AES key is used by the application
+  if (chip_crypto != "psa") {
+    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
+  }
+
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":app-test-stubs",
+    ":binding-test-srcs",
+    ":operational-state-test-srcs",
+    ":ota-requestor-test-srcs",
+    ":power-cluster-test-srcs",
+    ":time-sync-data-provider-test-srcs",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
+  ]
+}
+
+chip_test_suite_using_nltest("tests_nltest") {
+  output_name = "libAppTestsNL"
+
+  test_sources = [
+    "TestAclAttribute.cpp",
+    "TestAclEvent.cpp",
+    "TestBasicCommandPathRegistry.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -144,32 +213,12 @@ chip_test_suite_using_nltest("tests") {
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
     "TestInteractionModelEngine.cpp",
-    "TestMessageDef.cpp",
-    "TestNullable.cpp",
-    "TestNumericAttributeTraits.cpp",
-    "TestOperationalStateClusterObjects.cpp",
-    "TestPendingNotificationMap.cpp",
-    "TestPendingResponseTrackerImpl.cpp",
-    "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
     "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
-    "TestStatusIB.cpp",
-    "TestStatusResponseMessage.cpp",
-    "TestTestEventTriggerDelegate.cpp",
-    "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
-
-  if (!chip_fake_platform) {
-    test_sources += [ "TestFailSafeContext.cpp" ]
-  }
-
-  # DefaultICDClientStorage assumes that raw AES key is used by the application
-  if (chip_crypto != "psa") {
-    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
-  }
 
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
@@ -192,6 +241,7 @@ chip_test_suite_using_nltest("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":app-test-stubs",
     ":binding-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
@@ -226,9 +276,5 @@ chip_test_suite_using_nltest("tests") {
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
-  }
-
-  if (chip_persist_subscriptions) {
-    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
   }
 }
