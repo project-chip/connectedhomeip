@@ -237,10 +237,10 @@ public:
 
     /**
      * @brief
-     *   Called to check app's installation status.
+     *   Called to get app's installation error code.
      *
      * CdError status is designed for CommissionerDeclaration and should be set by using SetErrorCode() and
-     * sent back to the client as a CDC Message. It is expected that app installation can have following statuses:
+     * sent back to the client as a CDC Message. It is expected that app during installation can return following errors:
      * kNoError, kAppInstallConsentPending, kAppInstalling, kAppInstallFailed, kAppInstalledRetryNeeded
      *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
@@ -248,7 +248,7 @@ public:
      *
      */
     virtual chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError
-    GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) = 0;
+    GetAppInstallationErrorCode(uint16_t vendorId, uint16_t productId) = 0;
 
     virtual ~AppInstallationService() = default;
 };

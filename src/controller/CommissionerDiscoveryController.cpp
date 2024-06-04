@@ -241,7 +241,7 @@ void CommissionerDiscoveryController::InternalOk()
         ChipLogDetail(Controller, "------Via Shell Enter: app install <pid> <vid>");
 
         CommissionerDeclaration::CdError appInstallStatus =
-            mAppInstallationService->GetInstallationStatusOfApp(client->GetVendorId(), client->GetProductId());
+            mAppInstallationService->GetAppInstallationErrorCode(client->GetVendorId(), client->GetProductId());
 
         // notify client the current app's installation status
         CommissionerDeclaration cd;

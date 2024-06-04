@@ -147,9 +147,9 @@ public:
     void InstallContentApp(uint16_t vendorId, uint16_t productId);
     // Remove the app from the list of mContentApps
     bool UninstallContentApp(uint16_t vendorId, uint16_t productId);
-    // Set App's Installation Status
-    void SetAppInstallationStatus(uint16_t vendorId, uint16_t productId,
-                                  Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError status);
+    // Set App's Installation Error Status
+    void SetAppInstallationErrorStatus(uint16_t vendorId, uint16_t productId,
+                                  Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError errorStatus);
     // Get App's Installation Status
     Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError GetAppInstallationStatus(uint16_t vendorId,
                                                                                                     uint16_t productId);

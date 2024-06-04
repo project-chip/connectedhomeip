@@ -249,7 +249,7 @@ class MyAppInstallationService : public AppInstallationService
 
     // TODO: Dummy code for Android OS, needs to be updated with package manager
     // retrieving correct app's installation status
-    CommissionerDeclaration::CdError GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) override
+    CommissionerDeclaration::CdError GetAppInstallationErrorCode(uint16_t vendorId, uint16_t productId) override
     {
         return CommissionerDeclaration::CdError::kAppInstallConsentPending;
     }

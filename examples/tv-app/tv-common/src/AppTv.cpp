@@ -159,7 +159,7 @@ class MyAppInstallationService : public AppInstallationService
         return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
     }
 
-    CommissionerDeclaration::CdError GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) override
+    CommissionerDeclaration::CdError GetAppInstallationErrorCode(uint16_t vendorId, uint16_t productId) override
     {
         ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
         return factory->GetAppInstallationStatus(vendorId, productId);
@@ -640,18 +640,18 @@ std::string createSearchIndex(uint16_t vendorId, uint16_t productId)
     return formattedString;
 }
 
-void ContentAppFactoryImpl::SetAppInstallationStatus(uint16_t vendorId, uint16_t productId, CommissionerDeclaration::CdError status)
+void ContentAppFactoryImpl::SetAppInstallationErrorStatus(uint16_t vendorId, uint16_t productId, CommissionerDeclaration::CdError errorStatus)
 {
     std::string searchIndex = createSearchIndex(vendorId, productId);
     std::map<std::string, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
     it = mAppInstallationStatus.find(searchIndex);
     if (it != mAppInstallationStatus.end())
     {
-        mAppInstallationStatus[searchIndex] = status;
+        mAppInstallationStatus[searchIndex] = errorStatus;
         return;
     }
 
-    mAppInstallationStatus.insert({ searchIndex, status });
+    mAppInstallationStatus.insert({ searchIndex, errorStatus });
 }
 
 CommissionerDeclaration::CdError ContentAppFactoryImpl::GetAppInstallationStatus(uint16_t vendorId, uint16_t productId)
@@ -721,12 +721,18 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
 CHIP_ERROR AppTvInit()
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    // test data for apps
+    const uint16_t APP1_VENDOR_ID = 1; const uint16_t APP1_PRODUCT_ID = 11;
+    const uint16_t APP2_VENDOR_ID = 65521; const uint16_t APP2_PRODUCT_ID = 32769;
+    const uint16_t APP3_VENDOR_ID = 9050; const uint16_t APP3_PRODUCT_ID = 22;
+    const uint16_t APP4_VENDOR_ID = 1111; const uint16_t APP4_PRODUCT_ID = 22;
+    
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
-    gFactory.InstallContentApp((uint16_t) 1, (uint16_t) 11);
-    gFactory.InstallContentApp((uint16_t) 65521, (uint16_t) 32769);
-    gFactory.InstallContentApp((uint16_t) 9050, (uint16_t) 22);
-    gFactory.InstallContentApp((uint16_t) 1111, (uint16_t) 22);
+    gFactory.InstallContentApp(APP1_VENDOR_ID, APP1_PRODUCT_ID);
+    gFactory.InstallContentApp(APP2_VENDOR_ID, APP2_PRODUCT_ID);
+    gFactory.InstallContentApp(APP3_VENDOR_ID, APP3_PRODUCT_ID);
+    gFactory.InstallContentApp(APP4_VENDOR_ID, APP4_PRODUCT_ID);
     uint16_t value;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {

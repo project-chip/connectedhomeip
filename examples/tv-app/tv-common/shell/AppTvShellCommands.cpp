@@ -214,8 +214,8 @@ static CHIP_ERROR PrintAllCommands()
         "65521 32768\r\n");
     streamer_printf(
         sout,
-        "  app setinstallstatus <vid> <pid>              Set app's installation status for a given vendor ID  and product ID. "
-        "Usage: app setinstallstatus 65521 32768 13. Installation status can be found at: UserDirectedCommissioning.h\r\n");
+        "  app setinstallerrorstatus <vid> <pid>              Set app's installation error status for a given vendor ID  and product ID. "
+        "Usage: app setinstallerrorstatus 65521 32768 13. Installation error status can be found at: UserDirectedCommissioning.h\r\n");
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "  print-app-access     Print all ACLs for app platform fabric. Usage: app print-app-access\r\n");
@@ -303,7 +303,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(argv[0], "setinstallstatus") == 0)
+    else if (strcmp(argv[0], "setinstallerrorstatus") == 0)
     {
         if (argc < 3)
         {
@@ -313,11 +313,11 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 
         uint16_t vid                   = (uint16_t) strtol(argv[1], &eptr, 10);
         uint16_t pid                   = (uint16_t) strtol(argv[2], &eptr, 10);
-        uint16_t appInstallationStatus = (uint16_t) strtol(argv[3], &eptr, 10);
+        uint16_t appInstallationErrorStatus = (uint16_t) strtol(argv[3], &eptr, 10);
 
         ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
-        factory->SetAppInstallationStatus(
-            vid, pid, static_cast<Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>(appInstallationStatus));
+        factory->SetAppInstallationErrorStatus(
+            vid, pid, static_cast<Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>(appInstallationErrorStatus));
 
         ChipLogProgress(DeviceLayer, "set app installation status");
 
