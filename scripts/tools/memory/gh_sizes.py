@@ -183,6 +183,18 @@ def main(argv):
             if value := config[key]:
                 config.putl(['output', 'metadata', key], value)
 
+        # In case there is no platform configuration file or it does not define regions,
+        # try to find reasonable groups.
+        if not config.get('region.sections'):
+            sections = {'FLASH': [], 'RAM': []}
+            for section in config.get('section.select'):
+                print('section:', section)
+                for substring, region in [('text', 'FLASH'), ('rodata', 'FLASH'), ('data', 'RAM'), ('bss', 'RAM')]:
+                    if substring in section:
+                        sections[region].append(section)
+                        break
+            config.put('region.sections', sections)
+
         collected: DFs = memdf.collect.collect_files(config, [binary])
 
         # Aggregate loaded segments, by writable (RAM) or not (flash).
@@ -205,9 +217,13 @@ def main(argv):
                                     'wr']].sort_values(by='section')
         section_summary.attrs['name'] = "section"
 
+        region_summary = memdf.select.groupby(config, collected['section'], 'region')
+        region_summary.attrs['name'] = "region"
+
         summaries = {
             'section': section_summary,
             'memory': segment_summary,
+            'region': region_summary,
         }
 
         # Write configured (json) report to the output file.
