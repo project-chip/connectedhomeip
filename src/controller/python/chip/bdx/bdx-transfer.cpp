@@ -88,7 +88,7 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Received StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
         // TODO: Not a great error type. The issue isn't internal, it's external. We can check the status code, but I don't know
-        // if that would produce a better error type.
+        // if that would produce a better error type. Maybe CHIP_ERROR_IM_STATUS_CODE_RECEIVED?
         EndSession(CHIP_ERROR_INTERNAL);
         break;
     case TransferSession::OutputEventType::kInternalError:

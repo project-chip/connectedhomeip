@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <vector>
+
 #include <protocols/bdx/BdxMessages.h>
 
 #include <controller/python/chip/bdx/bdx-transfer.h>
@@ -40,64 +42,115 @@ OnTransferCompletedCallback gOnTransferCompletedCallback = nullptr;
 
 struct TransferData
 {
+    bdx::BdxTransfer * Transfer = nullptr;
     PyObject OnTransferObtainedContext = nullptr;
     PyObject OnDataReceivedContext = nullptr;
     PyObject OnTransferCompletedContext = nullptr;
 };
 
-} // namespace python
-
-namespace bdx {
-
-class BdxTransferDelegate : public BdxTransfer::Delegate
+class TransferMap
 {
 public:
-    ~BdxTransferDelegate() override = default;
-
-    virtual void InitMessageReceived(BdxTransfer * transfer, TransferSession::TransferInitData init_data)
+    // This returns the transfer data associated with the given transfer.
+    TransferData * TransferDataForTransfer(bdx::BdxTransfer * transfer)
     {
-        if (gOnTransferObtainedCallback)
+        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(),
+                                                               [transfer](const TransferData& data) {
+                                                                   return data.Transfer == transfer;
+                                                               });
+        VerifyOrReturnValue(result != mTransfers.end(), nullptr);
+        return &*result;
+    }
+
+    // This returns the next transfer data that has no associated BdxTransfer.
+    TransferData * NextUnassociatedTransferData()
+    {
+        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(),
+                                                               [](const TransferData& data) {
+                                                                   return data.Transfer == nullptr;
+                                                               });
+        VerifyOrReturnValue(result != mTransfers.end(), nullptr);
+        return &*result;
+    }
+
+    TransferData * CreateUnassociatedTransferData()
+    {
+        return &mTransfers.emplace_back();
+    }
+
+    void RemoveTransferData(TransferData * transferData)
+    {
+        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(),
+                                                               [transferData](const TransferData& data) {
+                                                                   return &data == transferData;
+                                                               });
+        VerifyOrReturn(result != mTransfers.end());
+        mTransfers.erase(result);
+    }
+
+private:
+    std::vector<TransferData> mTransfers;
+};
+
+class TransferDelegate : public bdx::BdxTransfer::Delegate
+{
+public:
+    TransferDelegate(TransferMap * transfers) : mTransfers(transfers) {}
+    ~TransferDelegate() override = default;
+
+    virtual void InitMessageReceived(bdx::BdxTransfer * transfer, bdx::TransferSession::TransferInitData init_data)
+    {
+        TransferData * transferData = mTransfers->CreateUnassociatedTransferData();
+        if (gOnTransferObtainedCallback && transferData)
         {
-            // TODO: Get the transfer data from transfer.
-            python::TransferData * transferData = nullptr;
-            PyChipError result;
-            gOnTransferObtainedCallback(transferData->OnTransferObtainedContext, result, transfer, init_data.TransferCtlFlags,
-                                        init_data.MaxBlockSize, init_data.StartOffset, init_data.Length, init_data.FileDesignator,
-                                        init_data.FileDesLength, init_data.Metadata, init_data.MetadataLength);
+            transferData->Transfer = transfer;
+            gOnTransferObtainedCallback(transferData->OnTransferObtainedContext, ToPyChipError(CHIP_NO_ERROR), transfer,
+                                        init_data.TransferCtlFlags, init_data.MaxBlockSize, init_data.StartOffset,
+                                        init_data.Length, init_data.FileDesignator, init_data.FileDesLength, init_data.Metadata,
+                                        init_data.MetadataLength);
         }
     }
 
-    virtual void DataReceived(BdxTransfer * transfer, const ByteSpan & block)
+    virtual void DataReceived(bdx::BdxTransfer * transfer, const ByteSpan & block)
     {
-        if (gOnDataReceivedCallback)
+        TransferData * transferData = mTransfers->TransferDataForTransfer(transfer);
+        if (gOnDataReceivedCallback && transferData)
         {
-            // TODO: Get the transfer data from transfer.
-            python::TransferData * transferData = nullptr;
             gOnDataReceivedCallback(transferData->OnDataReceivedContext, block.data(), block.size());
         }
     }
 
-    virtual void TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result)
+    virtual void TransferCompleted(bdx::BdxTransfer * transfer, CHIP_ERROR result)
     {
-        if (gOnTransferCompletedCallback)
+        TransferData * transferData = mTransfers->TransferDataForTransfer(transfer);
+        if (!transferData && result != CHIP_NO_ERROR)
         {
-            // TODO: Get the transfer data from transfer.
-            python::TransferData * transferData = nullptr;
+            // The transfer failed during initialisation.
+            transferData = mTransfers->NextUnassociatedTransferData();
+            if (gOnTransferObtainedCallback && transferData)
+            {
+                gOnTransferObtainedCallback(transferData->OnTransferObtainedContext, ToPyChipError(result), nullptr,
+                                            static_cast<bdx::TransferControlFlags>(0), 0, 0, 0, nullptr, 0, nullptr, 0);
+            }
+        }
+        else if (gOnTransferCompletedCallback && transferData)
+        {
             gOnTransferCompletedCallback(transferData->OnTransferCompletedContext, ToPyChipError(result));
+            mTransfers->RemoveTransferData(transferData);
         }
     }
+
+private:
+    TransferMap * mTransfers = nullptr;
 };
 
-} // namespace bdx
+TransferMap gTransfers;
+TransferDelegate gBdxTransferDelegate(&gTransfers);
+bdx::BdxTransferManager gBdxTransferManager(&gBdxTransferDelegate);
+bdx::BdxTransferServer gBdxTransferServer(gBdxTransferManager);
+
+} // namespace python
 } // namespace chip
-
-namespace {
-
-chip::bdx::BdxTransferDelegate gBdxTransferDelegate;
-chip::bdx::BdxTransferManager gBdxTransferManager(&gBdxTransferDelegate);
-chip::bdx::BdxTransferServer gBdxTransferServer(gBdxTransferManager);
-
-} // namespace
 
 using namespace chip::python;
 
@@ -125,8 +178,7 @@ PyChipError pychip_Bdx_StopExpectingBdxTransfer()
 PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyObject dataReceivedContext,
                                           PyObject transferCompletedContext)
 {
-    // TODO: Get the transfer data from transfer.
-    TransferData * transferData = nullptr;
+    TransferData * transferData = gTransfers.TransferDataForTransfer(transfer);
     transferData->OnDataReceivedContext = dataReceivedContext;
     transferData->OnTransferCompletedContext = transferCompletedContext;
     transfer->AcceptSend();
@@ -135,8 +187,7 @@ PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyO
 PyChipError pychip_Bdx_AcceptReceiveTransfer(chip::bdx::BdxTransfer * transfer, const uint8_t * dataBuffer, size_t dataLength,
                                              PyObject transferCompletedContext)
 {
-    // TODO: Get the transfer data from transfer.
-    TransferData * transferData = nullptr;
+    TransferData * transferData = gTransfers.TransferDataForTransfer(transfer);
     transferData->OnTransferCompletedContext = transferCompletedContext;
     chip::ByteSpan data(dataBuffer, dataLength);
     transfer->AcceptReceive(data);
