@@ -118,8 +118,9 @@ public:
 
         if (data != nullptr)
         {
+            chip::TLV::TLVReader counterTlvReader;
+            counterTlvReader.Init(*data);
             LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
-
             error = DataModelLogger::LogCommand(path, data);
             if (CHIP_NO_ERROR != error)
             {
@@ -128,10 +129,8 @@ public:
                 return;
             }
             if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
-                (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::RegisterClient::Id))
+                (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::Id))
             {
-                chip::TLV::TLVReader counterTlvReader;
-                counterTlvReader.Init(*data);
                 chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType value;
                 CHIP_ERROR err = chip::app::DataModel::Decode(counterTlvReader, value);
                 if (CHIP_NO_ERROR != err)
@@ -139,7 +138,6 @@ public:
                     ChipLogError(chipTool, "Failed to decode ICD counter: %" CHIP_ERROR_FORMAT, err.Format());
                     return;
                 }
-
                 chip::app::ICDClientInfo clientInfo;
                 clientInfo.peer_node         = mScopedNodeId;
                 clientInfo.monitored_subject = mMonitoredSubject;
