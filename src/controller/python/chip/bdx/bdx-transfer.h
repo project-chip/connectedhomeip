@@ -45,8 +45,6 @@ public:
     // The callback used when a data block arrives. This is only used when the transfer is sending data to this controller.
     using DataCallback = void(*)(const ByteSpan&);
 
-    BdxTransfer(Delegate * delegate);
-
     // Accepts the transfer. When a block of data arrives the callback is invoked with the block. This must only be called if the
     // transfer sends data to this controller.
     CHIP_ERROR AcceptSend(DataCallback callback);
@@ -58,6 +56,8 @@ public:
 
     // Rejects the transfer.
     CHIP_ERROR Reject();
+
+    void SetDelegate(Delegate * delegate);
 
     void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override;
     void OnExchangeClosing(Messaging::ExchangeContext * exchangeContext) override;

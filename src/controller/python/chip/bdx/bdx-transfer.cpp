@@ -22,9 +22,9 @@
 namespace chip {
 namespace bdx {
 
-BdxTransfer::BdxTransfer(BdxTransfer::Delegate * delegate) : mDelegate(delegate)
+void BdxTransfer::SetDelegate(BdxTransfer::Delegate * delegate)
 {
-    // TODO: Verify that delegate is non-null?
+    mDelegate = delegate;
 }
 
 BdxTransfer::~BdxTransfer()
@@ -165,9 +165,11 @@ CHIP_ERROR BdxTransfer::SendBlock()
 {
     VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    size_t dataRemaining = mDataCount - mDataTransferredCount;
     TransferSession::BlockData block;
-    block.Data = mData + mDataCount;
-    block.Length = std::min<size_t>(mTransfer.GetTransferBlockSize(), mDataCount - mDataTransferredCount);
+    block.Data = mData + mDataTransferredCount;
+    block.Length = std::min<size_t>(mTransfer.GetTransferBlockSize(), dataRemaining);
+    block.IsEof = block.Length == dataRemaining;
     ReturnOnFailure(mTransfer.PrepareBlock(block));
     mDataTransferredCount += block.Length;
     ScheduleImmediatePoll();
