@@ -1594,6 +1594,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRWiFiNetworkManagementClusterNetworkPassphraseRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWiFiNetworkManagementClusterNetworkPassphraseResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRChannelClusterChangeChannelParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

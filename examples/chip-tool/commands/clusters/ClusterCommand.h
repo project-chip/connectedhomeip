@@ -57,6 +57,15 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
                            chip::CommandId commandId,
+                           const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Type & value)
+    {
+        ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
+        mScopedNodeId = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                           chip::CommandId commandId,
                            const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type & value)
     {
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
@@ -108,6 +117,11 @@ public:
                 mError = error;
                 return;
             }
+        }
+        if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
+            (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Id))
+        {
+            ModelCommand::ClearICDEntry(mScopedNodeId);
         }
     }
 
@@ -208,7 +222,7 @@ protected:
 private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
-
+    chip::ScopedNodeId mScopedNodeId;
     CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;
 };

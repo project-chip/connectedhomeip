@@ -16,17 +16,13 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MessagesClusterMessageQueuedEvent(
-  val messageID: ByteArray
-) {
+class MessagesClusterMessageQueuedEvent(val messageID: ByteArray) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageQueuedEvent {\n")
     append("\tmessageID : $messageID\n")
@@ -44,10 +40,10 @@ class MessagesClusterMessageQueuedEvent(
   companion object {
     private const val TAG_MESSAGE_I_D = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MessagesClusterMessageQueuedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageQueuedEvent {
       tlvReader.enterStructure(tlvTag)
       val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_I_D))
-      
+
       tlvReader.exitContainer()
 
       return MessagesClusterMessageQueuedEvent(messageID)

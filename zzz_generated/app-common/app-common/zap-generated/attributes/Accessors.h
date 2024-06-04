@@ -5356,6 +5356,24 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 } // namespace Attributes
 } // namespace RadonConcentrationMeasurement
 
+namespace WiFiNetworkManagement {
+namespace Attributes {
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace WiFiNetworkManagement
+
 namespace WakeOnLan {
 namespace Attributes {
 

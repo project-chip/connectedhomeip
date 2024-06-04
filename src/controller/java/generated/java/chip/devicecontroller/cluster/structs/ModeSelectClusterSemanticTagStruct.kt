@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ModeSelectClusterSemanticTagStruct (
-    val mfgCode: UInt,
-    val value: UInt) {
-  override fun toString(): String  = buildString {
+class ModeSelectClusterSemanticTagStruct(val mfgCode: UInt, val value: UInt) {
+  override fun toString(): String = buildString {
     append("ModeSelectClusterSemanticTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
     append("\tvalue : $value\n")
@@ -49,11 +43,11 @@ class ModeSelectClusterSemanticTagStruct (
     private const val TAG_MFG_CODE = 0
     private const val TAG_VALUE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ModeSelectClusterSemanticTagStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ModeSelectClusterSemanticTagStruct {
       tlvReader.enterStructure(tlvTag)
       val mfgCode = tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE))
       val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
-      
+
       tlvReader.exitContainer()
 
       return ModeSelectClusterSemanticTagStruct(mfgCode, value)

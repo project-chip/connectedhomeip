@@ -16,17 +16,13 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BridgedDeviceBasicInformationClusterReachableChangedEvent(
-  val reachableNewValue: Boolean
-) {
+class BridgedDeviceBasicInformationClusterReachableChangedEvent(val reachableNewValue: Boolean) {
   override fun toString(): String = buildString {
     append("BridgedDeviceBasicInformationClusterReachableChangedEvent {\n")
     append("\treachableNewValue : $reachableNewValue\n")
@@ -44,10 +40,13 @@ class BridgedDeviceBasicInformationClusterReachableChangedEvent(
   companion object {
     private const val TAG_REACHABLE_NEW_VALUE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BridgedDeviceBasicInformationClusterReachableChangedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): BridgedDeviceBasicInformationClusterReachableChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val reachableNewValue = tlvReader.getBoolean(ContextSpecificTag(TAG_REACHABLE_NEW_VALUE))
-      
+
       tlvReader.exitContainer()
 
       return BridgedDeviceBasicInformationClusterReachableChangedEvent(reachableNewValue)

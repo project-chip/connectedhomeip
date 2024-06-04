@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -58,19 +56,21 @@ class ThermostatClusterQueuedPresetStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterQueuedPresetStruct {
       tlvReader.enterStructure(tlvTag)
-      val presetHandle = if (!tlvReader.isNull()) {
-      tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_PRESET_HANDLE))
-      null
-    }
-      val transitionTimestamp = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP))
-      null
-    }
-      
+      val presetHandle =
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PRESET_HANDLE))
+          null
+        }
+      val transitionTimestamp =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_TRANSITION_TIMESTAMP))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ThermostatClusterQueuedPresetStruct(presetHandle, transitionTimestamp)
