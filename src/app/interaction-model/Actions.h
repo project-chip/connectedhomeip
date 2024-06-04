@@ -18,7 +18,7 @@
 
 #include <app/interaction-model/Events.h>
 #include <app/interaction-model/Paths.h>
-#include <app/interaction-model/RequestContext.h>
+#include <app/interaction-model/ActionContext.h>
 
 namespace chip {
 namespace app {
@@ -29,7 +29,7 @@ struct InteractionModelActions
 {
     Events * events;
     Paths * paths;
-    RequestContext * requestContext;
+    ActionContext * requestContext;
 };
 
 } // namespace InteractionModel

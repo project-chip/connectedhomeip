@@ -22,23 +22,21 @@ namespace chip {
 namespace app {
 namespace InteractionModel {
 
-/// Handles path attributes for interaction models.
+/// Notification listener for attribute changes.
 ///
-/// It allows a user of the class to mark specific paths
-/// as having changed. The intended use is for some listener to
-/// perform operations as a result of something having changed,
-/// usually by forwarding updates (e.g. in case of subscriptions
-/// that cover that path).
+/// Used to notify that a specific attribute path (or several attributes
+/// via wildcards) have changed their underlying content. 
 ///
-/// Methods on this class MUCH be called from within the matter
+/// Methods on this class MUST be called from within the matter
 /// main loop as they will likely trigger interaction model
-/// internal updates and subscription event updates.
+/// internal updates and subscription data reporting.
 class Paths
 {
 public:
     virtual ~Paths() = 0;
 
-    /// Mark some specific attributes dirty.
+    /// Mark some specific attribute dirty (or several of attributes when using wildcards).
+    ///
     /// Wildcards are supported.
     virtual void MarkDirty(const AttributePathParams & path) = 0;
 };

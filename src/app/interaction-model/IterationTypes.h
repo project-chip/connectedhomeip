@@ -70,8 +70,13 @@ struct AttributeEntry
 /// Iteration rules:
 ///   - kInvalidEndpointId will be returned when iteration ends (or generally kInvalid* for paths)
 ///   - Any internal iteration errors are just logged (callers do not handle iteration CHIP_ERROR)
-///   - Iteration order is NOT guaranteed, however uniqueness and completeness is (must iterate
-///     over all possible distinct values as long as no internal structural changes occur)
+///   - Iteration order is NOT guaranteed globally. Only the following is guaranteed:
+///     - when iterating over an endpoint, ALL clusters of that endpoint will be iterated first, before
+///       switching the endpoint (order of clusters ids themselves not guaranteed)
+///     - when iterating over a cluster, ALL attributes of that cluster will be iterated first, before
+///       switching to a new cluster
+///     - uniqueness and completeness (iterate over all possible distinct values as long as no
+///       internal structural changes occur)
 class AttributeTreeIterator
 {
 public:
