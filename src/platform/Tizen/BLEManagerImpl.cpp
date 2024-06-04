@@ -74,6 +74,9 @@ namespace Internal {
 
 namespace {
 
+// Bluetooth SIG defined UUID for Client Characteristic Configuration Descriptor
+constexpr const char * kClientCharacteristicConfigurationUUID = "2902";
+
 constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
 constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
 constexpr System::Clock::Timeout kFastAdvertiseTimeout =
@@ -631,10 +634,10 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
                  ChipLogError(DeviceLayer, "bt_gatt_server_set_characteristic_notification_state_change_cb() failed: %s",
                               get_error_message(ret)));
 
-    // Create CCC Descriptor for 2nd Characteristic
-    ret = bt_gatt_descriptor_create(Ble::CHIP_BLE_DESC_SHORT_UUID_STR, BT_GATT_PERMISSION_READ | BT_GATT_PERMISSION_WRITE,
+    ret = bt_gatt_descriptor_create(kClientCharacteristicConfigurationUUID, BT_GATT_PERMISSION_READ | BT_GATT_PERMISSION_WRITE,
                                     desc_value, sizeof(desc_value), &desc);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_descriptor_create() failed: %s", get_error_message(ret)));
+
     ret = bt_gatt_characteristic_add_descriptor(char2, desc);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_characteristic_add_descriptor() failed: %s", get_error_message(ret)));
