@@ -1113,7 +1113,7 @@ class TC_OPSTATE_BASE():
             # In CI environment, the STOP coommand (step 8) already resets the variables. Only ask for
             # reboot outside CI environment.
             if not self.is_ci:
-                self.wait_for_user_input(prompt_msg="Press Enter when ready.\n")
+                self.wait_for_user_input(prompt_msg="Restart DUT. Press Enter when ready.\n")
 
             # STEP 12: TH waits for {PIXIT.WAITTIME.REBOOT}
             self.step(12)
