@@ -574,7 +574,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_create() failed: %s", get_error_message(ret)));
 
     // Create Service (BTP Service)
-    ret = bt_gatt_service_create(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR, BT_GATT_SERVICE_TYPE_PRIMARY, &service);
+    ret = bt_gatt_service_create(Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR, BT_GATT_SERVICE_TYPE_PRIMARY, &service);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_service_create() failed: %s", get_error_message(ret)));
 
     // Create 1st Characteristic (Client TX Buffer)
