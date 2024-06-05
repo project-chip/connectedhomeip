@@ -66,10 +66,6 @@ public:
         virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
     };
 
-    // Previously we kept adding arguments with default values individually as parameters. This is because there
-    // is legacy code outside of the SDK that would call PrepareCommand. With the new PrepareInvokeResponseCommand
-    // replacing PrepareCommand, we took this opportunity to create a new parameter structure to make it easier to
-    // add new parameters without there needing to be an ever increasing parameter list with defaults.
     struct InvokeResponseParameters
     {
         InvokeResponseParameters(const ConcreteCommandPath & aRequestCommandPath) : mRequestCommandPath(aRequestCommandPath) {}
@@ -136,12 +132,7 @@ public:
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
     FabricIndex GetAccessingFabricIndex() const override;
     bool IsTimedInvoke() const override;
-
-    Messaging::ExchangeContext * GetExchangeContext() const override
-    {
-        VerifyOrDie(mpResponder);
-        return mpResponder->GetExchangeContext();
-    }
+    Messaging::ExchangeContext * GetExchangeContext() const override;
 
     /**************** Implementation-specific logic ***********************/
 
@@ -192,9 +183,6 @@ public:
      */
     CHIP_ERROR PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,
                                             const InvokeResponseParameters & aPrepareParameters);
-
-    [[deprecated("PrepareCommand now needs the requested command path. Please use PrepareInvokeResponseCommand")]] CHIP_ERROR
-    PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
 
     /**
      * Finishes the CommandDataIB element within the InvokeResponses.

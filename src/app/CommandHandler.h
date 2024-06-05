@@ -35,7 +35,8 @@ namespace app {
  *  Allows adding responses to be sent in an InvokeResponse: see the various
  *  "Add*" methods.
  *
- *  Allows adding the responses asynchronously.
+ *  Allows adding the responses asynchronously when using `CommandHandler::Handle`
+ *  (see documentation for `CommandHandler::Handle` for details)
  */
 class CommandHandler
 {
@@ -146,12 +147,26 @@ public:
      * @param [in] aEncodable - an encodable that places the command data structure
      *             for `aResponseCommandId` into a TLV Writer.
      *
-     * Most applications are likely to use `AddResponseData` as a more convenient
-     * one-call that auto-sets command ID and creates the underlying encoders.
+     * If you have no great way of handling the returned CHIP_ERROR, consider
+     * using `AddResponse` which will automatically reply with `Failure` in
+     * case AddResponseData fails.
      */
     virtual CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                        DataModel::EncodableToTLV & aEncodable) = 0;
 
+    /**
+     * Attempts to encode a response to a command.
+     *
+     * `aRequestCommandPath` represents the request path (endpoint/cluster/commandid) and the reply
+     * will preserve the same path and switch the command id to aResponseCommandId.
+     *
+     * As this command does not return any error codes, it must try its best to encode the reply
+     * and if it fails, it MUST encode a `Protocols::InteractionModel::Status::Failure` as a
+     * reply (i.e. a reply is guaranteed to be sent).
+     *
+     * Above is the main difference from AddResponseData: AddResponse will auto-reply with failure while
+     * AddResponseData allows the caller to try to deal with any CHIP_ERRORs.
+     */
     virtual void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                              DataModel::EncodableToTLV & aEncodable) = 0;
 
@@ -188,17 +203,26 @@ public:
      */
     virtual Messaging::ExchangeContext * GetExchangeContext() const = 0;
 
-    // actual impls
-
     /**
      * API for adding a data response.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
      * object that can be encoded using the DataModel::Encode machinery and
      * exposes the right command id will work.
      *
+     * If you have no great way of handling the returned CHIP_ERROR, consider
+     * using `AddResponse` which will automatically reply with `Failure` in
+     * case AddResponseData fails.
+     *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
-     * @param [in] aData the data for the response.
+     *
+     *             The response path will be the same as the request, except the
+     *             reply command ID used will be `CommandData::GetCommandId()` assumed
+     *             to be a member of the templated type
+     *
+     * @param [in] aData the data for the response. It is expected to provide
+     *             `GetCommandData` as a STATIC on its type as well as encode the
+     *             correct data structure for building a reply.
      */
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
@@ -208,8 +232,11 @@ public:
     }
 
     /**
-     * API for adding a response.  This will try to encode a data response (response command), and if that fails will encode a a
-     * Protocols::InteractionModel::Status::Failure status response instead.
+     * API for adding a response.  This will try to encode a data response (response command), and if that fails 
+     * it will encode a Protocols::InteractionModel::Status::Failure status response instead.
+     *
+     * Above is the main difference from AddResponseData: AddResponse will auto-reply with failure while
+     * AddResponseData allows the caller to try to deal with any CHIP_ERRORs.
      *
      * The template parameter T is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object that
      * can be encoded using the DataModel::Encode machinery and exposes the right command id will work.
@@ -225,7 +252,7 @@ public:
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
         DataModel::EncodableType<CommandData> encodable(aData);
-        return AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
+        AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
     }
 
 protected:

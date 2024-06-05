@@ -648,25 +648,6 @@ CHIP_ERROR CommandHandlerImpl::PrepareInvokeResponseCommand(const ConcreteComman
     return PrepareInvokeResponseCommand(*commandPathRegistryEntry, aResponseCommandPath, aPrepareParameters.mStartOrEndDataStruct);
 }
 
-CHIP_ERROR CommandHandlerImpl::PrepareCommand(const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct)
-{
-    // Legacy code is calling the deprecated version of PrepareCommand. If we are in a case where
-    // there was a single command in the request, we can just assume this response is triggered by
-    // the single command.
-    size_t countOfPathRegistryEntries = GetCommandPathRegistry().Count();
-
-    // At this point application supports Batch Invoke Commands since CommandPathRegistry has more than 1 entry,
-    // but application is calling the deprecated PrepareCommand. We have no way to determine the associated CommandRef
-    // to put into the InvokeResponse.
-    VerifyOrDieWithMsg(countOfPathRegistryEntries == 1, DataManagement,
-                       "Seemingly device supports batch commands, but is calling the deprecated PrepareCommand API");
-
-    auto commandPathRegistryEntry = GetCommandPathRegistry().GetFirstEntry();
-    VerifyOrReturnValue(commandPathRegistryEntry.has_value(), CHIP_ERROR_INCORRECT_STATE);
-
-    return PrepareInvokeResponseCommand(*commandPathRegistryEntry, aResponseCommandPath, aStartDataStruct);
-}
-
 CHIP_ERROR CommandHandlerImpl::PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
                                                             const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
 {
@@ -824,37 +805,6 @@ FabricIndex CommandHandlerImpl::GetAccessingFabricIndex() const
     return mpResponder->GetAccessingFabricIndex();
 }
 
-void CommandHandler::Handle::Init(CommandHandler * handler)
-{
-    if (handler != nullptr)
-    {
-        handler->IncrementHoldOff(this);
-        mpHandler = handler;
-    }
-}
-
-CommandHandler * CommandHandler::Handle::Get()
-{
-    // Not safe to work with CommandHandlerImpl in parallel with other Matter work.
-    assertChipStackLockedByCurrentThread();
-
-    return mpHandler;
-}
-
-void CommandHandler::Handle::Release()
-{
-    if (mpHandler != nullptr)
-    {
-        mpHandler->DecrementHoldOff(this);
-        Invalidate();
-    }
-}
-
-CommandHandler::Handle::Handle(CommandHandler * handler)
-{
-    Init(handler);
-}
-
 CHIP_ERROR CommandHandlerImpl::FinalizeInvokeResponseMessageAndPrepareNext()
 {
     ReturnErrorOnFailure(FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ true));
@@ -961,10 +911,18 @@ bool CommandHandlerImpl::IsTimedInvoke() const
 void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                      DataModel::EncodableToTLV & aEncodable)
 {
-    if (AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable) != CHIP_NO_ERROR)
+    CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
+    if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(DataManagement, "Adding response failed: %" CHIP_ERROR_FORMAT ". Returning failure instead.", err.Format());
         AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
     }
+}
+
+Messaging::ExchangeContext * CommandHandlerImpl::GetExchangeContext() const
+{
+    VerifyOrDie(mpResponder);
+    return mpResponder->GetExchangeContext();
 }
 
 #if CHIP_WITH_NLFAULTINJECTION
