@@ -118,11 +118,13 @@ public:
 
         if (data != nullptr)
         {
-            // log a snapshot to not advance the data reader.
-            chip::TLV::TLVReader counterTlvReader;
-            counterTlvReader.Init(*data);
-            LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
-            error = DataModelLogger::LogCommand(path, data);
+            {
+                // log a snapshot to not advance the data reader.
+                chip::TLV::TLVReader logTlvReader;
+                logTlvReader.Init(*data);
+                LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, logTlvReader));
+                error = DataModelLogger::LogCommand(path, logTlvReader);
+            }
             if (CHIP_NO_ERROR != error)
             {
                 ChipLogError(chipTool, "Response Failure: Can not decode Data");
@@ -132,6 +134,9 @@ public:
             if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
                 (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::Id))
             {
+                // log a snapshot to not advance the data reader.
+                chip::TLV::TLVReader counterTlvReader;
+                counterTlvReader.Init(*data);
                 chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType value;
                 CHIP_ERROR err = chip::app::DataModel::Decode(counterTlvReader, value);
                 if (CHIP_NO_ERROR != err)
