@@ -22,23 +22,8 @@ from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
                                     MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
+from pics_support import attribute_pics_str, accepted_cmd_pics_str, generated_cmd_pics_str, feature_pics_str
 from spec_parsing_support import build_xml_clusters
-
-
-def attribute_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.A{id:04x}'
-
-
-def accepted_cmd_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02x}.Rsp'
-
-
-def generated_cmd_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02x}.Tx'
-
-
-def feature_pics(pics_base: str, bit: int) -> str:
-    return f'{pics_base}.S.F{bit:02x}'
 
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
@@ -64,14 +49,14 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
         try:
             if attribute_id_of_element_list == GlobalAttributeIds.ATTRIBUTE_LIST_ID:
                 all_spec_elements_to_check = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
-                pics_mapper = attribute_pics
+                pics_mapper = attribute_pics_str
             elif attribute_id_of_element_list == GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID:
                 all_spec_elements_to_check = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]
-                pics_mapper = accepted_cmd_pics
+                pics_mapper = accepted_cmd_pics_str
 
             elif attribute_id_of_element_list == GlobalAttributeIds.GENERATED_COMMAND_LIST_ID:
                 all_spec_elements_to_check = Clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id]
-                pics_mapper = generated_cmd_pics
+                pics_mapper = generated_cmd_pics_str
             else:
                 asserts.fail("add_pics_for_list function called for non-list attribute")
         except KeyError:
@@ -177,7 +162,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                     self.record_warning("PICS check", location=location,
                                         problem=f"Unable to parse feature mask {feature_mask} from cluster {cluster}")
                     continue
-                pics = feature_pics(pics_base, feature_bit)
+                pics = feature_pics_str(pics_base, feature_bit)
                 if feature_mask & feature_map:
                     required = True
                 else:
