@@ -33,3 +33,7 @@
 // All clusters app has 3 group endpoints. This needs to defined here so that
 // CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3
+
+// Claim a device type while advertising that matches the device type on our
+// endpoint 1.  0x0101 is the "Dimmable Light" device type.
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x0101
