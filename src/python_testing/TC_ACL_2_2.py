@@ -26,9 +26,11 @@ class TC_ACL_2_2(MatterBaseTest):
 
     def steps_TC_ACL_2_2(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0"),
-            TestStep(3, "TH1 reads DUT Descriptor cluster ServerList attribute from every Endpoint except 0"),
+            TestStep(1, "TH1 commissions DUT using admin node ID `N1`", "DUT is commissioned on TH1 fabric", is_commissioning=True),
+            TestStep(2, "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0",
+                     "Result list contains an element with value 31 (0x001F)"),
+            TestStep(3, "TH1 reads DUT Descriptor cluster ServerList attribute from every Endpoint except 0",
+                     "Result list does not contain an element with value 31 (0x001F)"),
         ]
         return steps
 

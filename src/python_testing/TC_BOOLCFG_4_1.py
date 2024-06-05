@@ -32,13 +32,14 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
 
     def steps_TC_BOOLCFG_4_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read FeatureMap attribute"),
-            TestStep(3, "Read AlarmsSupported attribute"),
-            TestStep("4a", "Verify AlarmsSupported attribute bit 0"),
-            TestStep("4b", "Verify AlarmsSupported attribute bit 0"),
-            TestStep("5a", "Verify AlarmsSupported attribute bit 1"),
-            TestStep("5b", "Verify AlarmsSupported attribute bit 1"),
+            TestStep(1, "{comDutTH}.", "", is_commissioning=True),
+            TestStep(2, "{THread} _Featuremap_ attribute.", "{DUTreply} the _Featuremap_ attribute."),
+            TestStep(3, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSSUPPORTED}_ attribute. {storeValueAs} supportedAlarms.",
+                     "{resDutSuccess} and that the received value is not 0."),
+            TestStep("4a", "If the _{F_VIS}_ {featIsSupported}.", "Verify that bit 0 in supportedAlarms is set to 1."),
+            TestStep("4b", "If the _{F_VIS}_ {featIsNotSupported}.", "Verify that bit 0 in supportedAlarms is set to 0."),
+            TestStep("5a", "If the _{F_AUD}_ {featIsSupported}.", "Verify that bit 1 in supportedAlarms is set to 1."),
+            TestStep("5b", "If the _{F_AUD}_ {featIsNotSupported}.", "Verify that bit 1 in supportedAlarms is set to 0."),
         ]
         return steps
 

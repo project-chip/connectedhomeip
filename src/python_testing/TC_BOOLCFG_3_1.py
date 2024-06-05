@@ -34,19 +34,21 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
     def steps_TC_BOOLCFG_3_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "Verify SENS feature is supported"),
-            TestStep("2c", "Read AttributeList attribute"),
-            TestStep(3, "Read SupportedSensitivityLevels attribute"),
-            TestStep(4, "Read DefaultSensitivityLevel attribute, if supported"),
-            TestStep(5, "Read CurrentSensitivityLevel attribute"),
-            TestStep(6, "TH loops through the number of supported sensitivity levels"),
-            TestStep(7, "Write CurrentSensitivityLevel attribute to non-default value"),
-            TestStep(8, "Write CurrentSensitivityLevel attribute to default value"),
-            TestStep(9, "Write CurrentSensitivityLevel attribute to 10"),
-            TestStep(10, "Write CurrentSensitivityLevel attribute to 255"),
-            TestStep(11, "Write CurrentSensitivityLevel attribute to the initial current value"),
+            TestStep(1, "{comDutTH}.", "", is_commissioning=True),
+            TestStep("2a", "{THread} _Featuremap_ attribute.", "{DUTreply} the _Featuremap_ attribute."),
+            TestStep("2b", "If the _{F_SENSLVL}_ {featIsNotSupported}, skip remaining steps and end test case.", ""),
+            TestStep("2c", "{THread} _AttributeList_ attribute.", "{DUTreply} the _AttributeList_ attribute."),
+            TestStep(3, "{THread} _{A_SUPPORTEDSENSITIVITYLEVELS}_ attribute. {storeValueAs} numberOfSupportedLevels.", "{resDutSuccess}."),
+            TestStep(4, "{ifAttrIsSupported}, {THread} _{A_DEFAULTSENSITIVITYLEVEL}_ attribute. {storeValueAs} defaultLevel.", "{resDutSuccess}."),
+            TestStep(5, "{THread} _{A_CURRENTSENSITIVITYLEVEL}_ attribute. {storeValueAs} currentLevel.", "{resDutSuccess}."),
+            TestStep(
+                6, "TH loops through the number of supported sensitivity levels (0 to numberOfSupportedLevels - 1) and\n                {THwrite} each value to the _{A_CURRENTSENSITIVITYLEVEL}_ attribute.", "{resDutSuccess} for all write interactions."),
+            TestStep(7, "If the _{A_DEFAULTSENSITIVITYLEVEL}_ {attrIsSupported}, {THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to a supported value that is NOT the value of defaultLevel.", "{resDutSuccess}."),
+            TestStep(
+                8, "If the _{A_DEFAULTSENSITIVITYLEVEL}_ {attrIsSupported}, {THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to the value of defaultLevel.", "{resDutSuccess}."),
+            TestStep(9, "{THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to numberOfSupportedLevels.", "{resDutConstraintError}."),
+            TestStep(10, "{THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to 255.", "{resDutConstraintError}."),
+            TestStep(11, "{THwrite} _{A_CURRENTSENSITIVITYLEVEL}_ attribute to the value of currentLevel.", "{resDutSuccess}."),
         ]
         return steps
 

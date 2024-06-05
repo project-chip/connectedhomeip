@@ -36,25 +36,36 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
 
     def steps_TC_BOOLCFG_4_4(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "Read AttributeList attribute"),
-            TestStep(3, "Verify AlarmsEnabled is supported"),
-            TestStep(4, "Create enabledAlarms and set to 0"),
-            TestStep("5a", "Enable VIS alarm in enabledAlarms"),
-            TestStep("5b", "Enable AUD alarm in enabledAlarms"),
-            TestStep("5c", "Set AlarmsEnabled attribute to value of enabledAlarms using AlarmsToEnableDisable command"),
-            TestStep(6, "Send TestEventTrigger with SensorTrigger event"),
-            TestStep(7, "Read AlarmsActive attribute"),
-            TestStep(8, "Verify VIS alarm is active"),
-            TestStep("9a", "Disable VIS alarm in enabledAlarms"),
-            TestStep("9b", "Set AlarmsEnabled attribute to value of enabledAlarms using AlarmsToEnableDisable command"),
-            TestStep(10, "Read AlarmsActive attribute"),
-            TestStep(11, "Verify AUD alarm is active"),
-            TestStep("12a", "Disable VIS alarm in enabledAlarms"),
-            TestStep("12b", "Set AlarmsEnabled attribute to value of enabledAlarms using AlarmsToEnableDisable command"),
-            TestStep(13, "Read AlarmsActive attribute"),
-            TestStep(14, "Send TestEventTrigger with SensorUntrigger event"),
+            TestStep(1, "{comDutTH}.", "", is_commissioning=True),
+            TestStep("2a", "{THread} _Featuremap_ attribute.", "{DUTreply} the _Featuremap_ attribute."),
+            TestStep("2b", "{THread} _AttributeList_ attribute.", "{DUTreply} the _AttributeList_ attribute."),
+            # Determine if test case if applicable
+            TestStep(3, "If the _{A_ALARMSENABLED}_ {attrIsNotSupported}, skip remaining steps and end test case.", ""),
+            # Given the above "guard", it is assumes in the remainder of this test case that A_ALARMSENABLED is supported,\n// hence why this is not explicitly checked in the following steps.\n\n// Verify that active alarms is disabled properly
+            TestStep(4, "Create variable named enabledAlarms and set the value to 0.", ""),
+            # Enable all supported alarms
+            TestStep("5a", "If the _{F_VIS}_ {featIsSupported}, set bit 0 in enabledAlarms to 1.", ""),
+            TestStep("5b", "If the _{F_AUD}_ {featIsSupported}, set bit 1 in enabledAlarms to 1.", ""),
+            TestStep(
+                "5c", "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
+            TestStep(6, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorTrigger event.", "{resDutSuccess}."),
+            TestStep(7, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute. {storeValueAs} activeAlarms.",
+                     "{resDutSuccess} and that the received value is not 0."),
+            # Disable visual alarm and verify it is deactivated
+            TestStep(8, "If the _{F_VIS}_ {featIsSupported}.", "Verify that bit 0 in activeAlarms is set to 1."),
+            TestStep("9a", "If the _{F_VIS}_ {featIsSupported}, set bit 0 in enabledAlarms to 0.", ""),
+            TestStep(
+                "9b", "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
+            TestStep(10, "If the _{F_VIS}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute. {storeValueAs} activeAlarms.",
+                     "{resDutSuccess} and that bit 0 is set to 0, in the received value."),
+            # Disable audible alarm and verify it is deactivated
+            TestStep(11, "If the _{F_AUD}_ {featIsSupported}.", "Verify that bit 1 in activeAlarms is set to 1."),
+            TestStep("12a", "If the _{F_AUD}_ {featIsSupported}, set bit 1 in enabledAlarms to 0.", ""),
+            TestStep(
+                "12b", "{THcommand} _{C_ENABLEDISABLEALARM}_ command with the value of enabledAlarms in the AlarmsToEnableDisable field.", "{resDutSuccess}."),
+            TestStep(13, "If the _{F_AUD}_ {featIsSupported}, {THread} _{A_ALARMSACTIVE}_ attribute.",
+                     "{resDutSuccess} and that bit 1 is set to 0, in the received value."),
+            TestStep(14, "If the _{F_VIS}_ or _{F_AUD}_ {featIsSupported}, TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0\n                with EnableKey field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.{PICS_S}.TEST_EVENT_TRIGGER for SensorUntrigger event.", "{resDutSuccess}."),
         ]
         return steps
 
