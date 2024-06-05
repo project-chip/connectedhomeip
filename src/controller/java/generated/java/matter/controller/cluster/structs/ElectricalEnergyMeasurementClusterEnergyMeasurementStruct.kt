@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -72,33 +71,46 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
     private const val TAG_START_SYSTIME = 3
     private const val TAG_END_SYSTIME = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
       tlvReader.enterStructure(tlvTag)
       val energy = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY))
-      val startTimestamp = if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_TIMESTAMP))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_START_TIMESTAMP)))
-    } else {
-      Optional.empty()
-    }
-      val endTimestamp = if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_TIMESTAMP))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_END_TIMESTAMP)))
-    } else {
-      Optional.empty()
-    }
-      val startSystime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_SYSTIME))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_START_SYSTIME)))
-    } else {
-      Optional.empty()
-    }
-      val endSystime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_SYSTIME))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_END_SYSTIME)))
-    } else {
-      Optional.empty()
-    }
-      
+      val startTimestamp =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_TIMESTAMP))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_START_TIMESTAMP)))
+        } else {
+          Optional.empty()
+        }
+      val endTimestamp =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_TIMESTAMP))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_END_TIMESTAMP)))
+        } else {
+          Optional.empty()
+        }
+      val startSystime =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_SYSTIME))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_START_SYSTIME)))
+        } else {
+          Optional.empty()
+        }
+      val endSystime =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_SYSTIME))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_END_SYSTIME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(energy, startTimestamp, endTimestamp, startSystime, endSystime)
+      return ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
+        energy,
+        startTimestamp,
+        endTimestamp,
+        startSystime,
+        endSystime
+      )
     }
   }
 }

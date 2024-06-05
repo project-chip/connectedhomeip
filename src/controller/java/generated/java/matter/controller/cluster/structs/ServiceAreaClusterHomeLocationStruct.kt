@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -63,19 +61,21 @@ class ServiceAreaClusterHomeLocationStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterHomeLocationStruct {
       tlvReader.enterStructure(tlvTag)
       val locationName = tlvReader.getString(ContextSpecificTag(TAG_LOCATION_NAME))
-      val floorNumber = if (!tlvReader.isNull()) {
-      tlvReader.getShort(ContextSpecificTag(TAG_FLOOR_NUMBER))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_FLOOR_NUMBER))
-      null
-    }
-      val areaType = if (!tlvReader.isNull()) {
-      tlvReader.getUByte(ContextSpecificTag(TAG_AREA_TYPE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_AREA_TYPE))
-      null
-    }
-      
+      val floorNumber =
+        if (!tlvReader.isNull()) {
+          tlvReader.getShort(ContextSpecificTag(TAG_FLOOR_NUMBER))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_FLOOR_NUMBER))
+          null
+        }
+      val areaType =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_AREA_TYPE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_AREA_TYPE))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ServiceAreaClusterHomeLocationStruct(locationName, floorNumber, areaType)

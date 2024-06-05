@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -48,11 +46,15 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
     private const val TAG_ASSOCIATION_FAILURE_CAUSE = 0
     private const val TAG_STATUS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       tlvReader.enterStructure(tlvTag)
-      val associationFailureCause = tlvReader.getUByte(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE))
+      val associationFailureCause =
+        tlvReader.getUByte(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE))
       val status = tlvReader.getUShort(ContextSpecificTag(TAG_STATUS))
-      
+
       tlvReader.exitContainer()
 
       return WiFiNetworkDiagnosticsClusterAssociationFailureEvent(associationFailureCause, status)
