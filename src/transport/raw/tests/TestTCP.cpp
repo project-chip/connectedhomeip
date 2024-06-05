@@ -51,7 +51,7 @@ namespace {
 
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
-constexpr uint16_t kPacketSizeBytes           = static_cast<uint16_t>(sizeof(uint16_t));
+constexpr size_t kPacketSizeBytes             = sizeof(uint32_t);
 uint16_t gChipTCPPort                         = static_cast<uint16_t>(CHIP_PORT + chip::Crypto::GetRandU16() % 100);
 chip::Transport::AppTCPConnectionCallbackCtxt gAppTCPConnCbCtxt;
 chip::Transport::ActiveTCPConnectionState * gActiveTCPConnState = nullptr;
@@ -298,7 +298,7 @@ struct TestData
     // the last buffer will be made larger.
     TestData() : mPayload(nullptr), mTotalLength(0), mMessageLength(0), mMessageOffset(0) {}
     ~TestData() { Free(); }
-    bool Init(const uint16_t sizes[]);
+    bool Init(const uint32_t sizes[]);
     void Free();
     bool IsValid() { return !mHandle.IsNull() && (mPayload != nullptr); }
 
@@ -309,7 +309,7 @@ struct TestData
     size_t mMessageOffset;
 };
 
-bool TestData::Init(const uint16_t sizes[])
+bool TestData::Init(const uint32_t sizes[])
 {
     Free();
 
@@ -325,17 +325,17 @@ bool TestData::Init(const uint16_t sizes[])
         mTotalLength += sizes[bufferCount];
     }
     --bufferCount;
-    uint16_t additionalLength = 0;
+    uint32_t additionalLength = 0;
     if (headerLength + kPacketSizeBytes > mTotalLength)
     {
-        additionalLength = static_cast<uint16_t>((headerLength + kPacketSizeBytes) - mTotalLength);
+        additionalLength = static_cast<uint32_t>((headerLength + kPacketSizeBytes) - mTotalLength);
         mTotalLength += additionalLength;
     }
-    if (mTotalLength > UINT16_MAX)
+    if (mTotalLength > UINT32_MAX)
     {
         return false;
     }
-    uint16_t messageLength = static_cast<uint16_t>(mTotalLength - kPacketSizeBytes);
+    uint32_t messageLength = static_cast<uint32_t>(mTotalLength - kPacketSizeBytes);
 
     // Build the test payload.
     uint8_t * payload = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(1, mTotalLength));
@@ -343,7 +343,7 @@ bool TestData::Init(const uint16_t sizes[])
     {
         return false;
     }
-    chip::Encoding::LittleEndian::Put16(payload, messageLength);
+    chip::Encoding::LittleEndian::Put32(payload, messageLength);
     uint16_t headerSize;
     CHIP_ERROR err = header.Encode(payload + kPacketSizeBytes, messageLength, &headerSize);
     if (err != CHIP_NO_ERROR)
@@ -363,10 +363,10 @@ bool TestData::Init(const uint16_t sizes[])
     System::PacketBufferHandle head = chip::System::PacketBufferHandle::New(sizes[0], 0 /* reserve */);
     for (int i = 1; i <= bufferCount; ++i)
     {
-        uint16_t size = sizes[i];
+        size_t size = sizes[i];
         if (i == bufferCount)
         {
-            size = static_cast<uint16_t>(size + additionalLength);
+            size = size + additionalLength;
         }
         chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::New(size, 0 /* reserve */);
         if (buffer.IsNull())
@@ -395,7 +395,7 @@ bool TestData::Init(const uint16_t sizes[])
         if (lToWriteToCurrentBuf != 0)
         {
             memcpy(iterator->Start(), writePayload, lToWriteToCurrentBuf);
-            iterator->SetDataLength(static_cast<uint16_t>(iterator->DataLength() + lToWriteToCurrentBuf), head);
+            iterator->SetDataLength(iterator->DataLength() + lToWriteToCurrentBuf, head);
             writePayload += lToWriteToCurrentBuf;
             writeLength -= lToWriteToCurrentBuf;
         }
@@ -634,22 +634,22 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 111, 0 }));
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 111, 0 }));
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 
     // Test a message in a chain of three packet buffers. The message length is split across buffers.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 1, 122, 123, 0 }));
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 1, 122, 123, 0 }));
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 
     // Test two messages in a chain.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 131, 0 }));
-    EXPECT_TRUE(testData[1].Init((const uint16_t[]){ 132, 0 }));
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 131, 0 }));
+    EXPECT_TRUE(testData[1].Init((const uint32_t[]){ 132, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -657,17 +657,25 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
 
     // Test a chain of two messages, each a chain.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
-    EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 141, 142, 0 }));
-    EXPECT_TRUE(testData[1].Init((const uint16_t[]){ 143, 144, 0 }));
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 141, 142, 0 }));
+    EXPECT_TRUE(testData[1].Init((const uint32_t[]){ 143, 144, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 2);
 
+    // Test a single packet buffer that is larger than
+    // kMaxSizeWithoutReserve but less than CHIP_CONFIG_MAX_LARGE_PAYLOAD_SIZE_BYTES.
+    gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ System::PacketBuffer::kMaxSizeWithoutReserve + 1, 0 }));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
+
     // Test a message that is too large to coalesce into a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, &testData[1]);
-    EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 51, System::PacketBuffer::kMaxSizeWithoutReserve, 0 }));
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ 51, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES, 0 }));
     // Sending only the first buffer of the long chain. This should be enough to trigger the error.
     System::PacketBufferHandle head = testData[0].mHandle.PopHead();
     err                             = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(head));

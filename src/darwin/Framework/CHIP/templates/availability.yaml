@@ -72,7 +72,7 @@
 #                  "provisional" to make sure all the things that should have
 #                  been omitted have been.
 
-- release: "Initial release"
+- release: "0E17B7EB-314F-4264-BDA8-AD6A93120B15"
   versions:
       iOS: "16.1"
       macOS: "13.0"
@@ -4774,7 +4774,7 @@
           - PulseWidthModulation
           - TimeSynchronization
 
-- release: "First dot-release"
+- release: "FD8D09B4-6CF7-4EBA-BD4F-7EDE872E3098"
   versions:
       iOS: "16.2"
       macOS: "13.1"
@@ -4830,7 +4830,7 @@
           Descriptor:
               DeviceTypeStruct: DeviceType
 
-- release: "First major API revamp"
+- release: "267F4B03-3256-4056-A62D-5237640FDCFE" # First major API revamp
   versions:
       iOS: "16.4"
       macOS: "13.3"
@@ -6787,7 +6787,7 @@
                   HeatSetpointPresent: HeatSetpointFieldPresent
                   CoolSetpointPresent: CoolSetpointFieldPresent
 
-- release: "First after major API revamp"
+- release: "27C5E231-9EB5-4932-B4C1-10D88419D9CB" # First after major API revamp
   versions:
       iOS: "16.5"
       macOS: "13.4"
@@ -7095,7 +7095,7 @@
               PumpFeature:
                   LocalOperation: Local
 
-- release: "Fall 2023"
+- release: "3C23F160-13CE-4397-BC65-122B61E4D691"
   versions:
       iOS: "17.0"
       macOS: "14.0"
@@ -7560,7 +7560,7 @@
                   - TimeFailure
                   - MissingTrustedTimeSource
 
-- release: "Fall 2023 #2"
+- release: "F7CA8603-6336-4E63-A216-30EE3F77CE8B"
   versions:
       iOS: "17.1"
       macOS: "14.1"
@@ -7625,7 +7625,7 @@
           - ProxyDiscovery
           - ProxyValid
 
-- release: "Fall 2023 #3"
+- release: "A188F985-88AC-4F0B-8968-C887132CEF9E"
   versions:
       iOS: "17.2"
       macOS: "14.2"
@@ -7771,7 +7771,7 @@
               Feature:
                   DeadFrontBehavior: DeadFront
 
-- release: "Early 2024"
+- release: "ADDB2DC1-4701-4696-87EB-87CD1123BE1A"
   versions:
       iOS: "17.4"
       macOS: "14.4"
@@ -8509,7 +8509,7 @@
               ContentLaunchStatusEnum:
                   - URLNotAvailable
 
-- release: "Middle of 2024"
+- release: "FB974A56-BCF5-46CB-91EF-B5D096E84375"
   versions:
       iOS: "17.6"
       macOS: "14.6"
@@ -9690,4 +9690,5 @@
   provisional:
       clusters:
           # Targeting Fall 2024
+          - ThreadNetworkDirectory
           - WiFiNetworkManagement
