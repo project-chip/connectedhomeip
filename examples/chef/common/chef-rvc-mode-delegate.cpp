@@ -154,10 +154,8 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(!gRvcRunModeDelegate && !gRvcRunModeInstance);
 
     gRvcRunModeDelegate = std::make_unique<RvcRunModeDelegate>();
-    gRvcRunModeInstance = std::make_unique<ModeBase::Instance>(gRvcRunModeDelegate.get()
-                                                                , endpointId
-                                                                , RvcRunMode::Id
-                                                                , chip::to_underlying(RvcRunMode::Feature::kNoFeatures));
+    gRvcRunModeInstance = std::make_unique<ModeBase::Instance>(gRvcRunModeDelegate.get(), endpointId, RvcRunMode::Id,
+                                                               chip::to_underlying(RvcRunMode::Feature::kNoFeatures));
     gRvcRunModeInstance->Init();
 }
 
@@ -292,10 +290,8 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(!gRvcCleanModeDelegate && !gRvcCleanModeInstance);
 
     gRvcCleanModeDelegate = std::make_unique<RvcCleanModeDelegate>();
-    gRvcCleanModeInstance = std::make_unique<ModeBase::Instance>(gRvcCleanModeDelegate.get()
-                                                                , endpointId
-                                                                , RvcCleanMode::Id
-                                                                , chip::to_underlying(RvcCleanMode::Feature::kNoFeatures));
+    gRvcCleanModeInstance = std::make_unique<ModeBase::Instance>(gRvcCleanModeDelegate.get(), endpointId, RvcCleanMode::Id,
+                                                                 chip::to_underlying(RvcCleanMode::Feature::kNoFeatures));
     gRvcCleanModeInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
