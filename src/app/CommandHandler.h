@@ -37,6 +37,9 @@ namespace app {
  *
  *  Allows adding the responses asynchronously when using `CommandHandler::Handle`
  *  (see documentation for `CommandHandler::Handle` for details)
+ *
+ *  Upgrading notes: this class has moved to an interface from a previous more complex
+ *  implementation. If upgrading code between versions, please see docs/upgrading.md
  */
 class CommandHandler
 {
