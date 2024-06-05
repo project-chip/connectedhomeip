@@ -122,8 +122,8 @@ public:
                 // log a snapshot to not advance the data reader.
                 chip::TLV::TLVReader logTlvReader;
                 logTlvReader.Init(*data);
-                LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, logTlvReader));
-                error = DataModelLogger::LogCommand(path, logTlvReader);
+                LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, &logTlvReader));
+                error = DataModelLogger::LogCommand(path, &logTlvReader);
             }
             if (CHIP_NO_ERROR != error)
             {
