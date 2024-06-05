@@ -35,6 +35,8 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
+#import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
@@ -1886,9 +1888,16 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         && isFromSubscription
         && !_receivingPrimingReport
         && AttributeHasChangesOmittedQuality(path)) {
-        // Do not persist new values for Changes Omitted Quality attributes unless
-        // they're part of a Priming Report or from a read response.
+        // Do not persist new values for Changes Omitted Quality (aka C Quality)
+        // attributes unless they're part of a Priming Report or from a read response.
         // (removals are OK)
+
+        // log when a device violates expectations for Changes Omitted Quality attributes.
+        using namespace chip::Tracing::DarwinFramework;
+        MATTER_LOG_METRIC_BEGIN(kMetricUnexpectedCQualityUpdate);
+        [self _addInformationalAttributesToCurrentMetricScope];
+        MATTER_LOG_METRIC_END(kMetricUnexpectedCQualityUpdate);
+
         return;
     }
 
@@ -3640,6 +3649,48 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return;
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+}
+
+#pragma mark Log Help
+
+- (nullable NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath
+{
+    auto * cachedData = [self _cachedAttributeValueForPath:attributePath];
+
+    auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
+        MTRAttributePathKey : attributePath,
+        MTRDataKey : cachedData,
+    }
+                                                                    error:nil];
+
+    return attrReport.value;
+}
+
+- (nullable NSNumber *)_informationalVendorID
+{
+    auto * vendorIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                              clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                            attributeID:@(MTRClusterBasicAttributeVendorIDID)];
+
+    return [self _informationalNumberAtAttributePath:vendorIDPath];
+}
+
+- (nullable NSNumber *)_informationalProductID
+{
+    auto * productIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                               clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                             attributeID:@(MTRClusterBasicAttributeProductIDID)];
+
+    return [self _informationalNumberAtAttributePath:productIDPath];
+}
+
+- (void)_addInformationalAttributesToCurrentMetricScope
+{
+    using namespace chip::Tracing::DarwinFramework;
+    MATTER_LOG_METRIC(kMetricDeviceVendorID, [self _informationalVendorID].unsignedShortValue);
+    MATTER_LOG_METRIC(kMetricDeviceProductID, [self _informationalProductID].unsignedShortValue);
+    BOOL usesThread = [self _deviceUsesThread];
+    MATTER_LOG_METRIC(kMetricDeviceUsesThread, usesThread);
 }
 
 @end
