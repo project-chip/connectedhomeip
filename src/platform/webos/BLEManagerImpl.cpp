@@ -56,10 +56,6 @@ namespace {
 static constexpr unsigned kNewConnectionScanTimeoutMs   = 10000;
 static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(10);
 
-#define CHIP_BLE_GATT_SERVICE "0000fff6-0000-1000-8000-00805f9b34fb"
-#define CHIP_BLE_GATT_CHAR_WRITE "18ee2ef5-263d-4559-959f-4f9c429f9d11"
-#define CHIP_BLE_GATT_CHAR_READ "18ee2ef5-263d-4559-959f-4f9c429f9d12"
-
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -430,9 +426,9 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uin
     pbnjson::JValue valueForMonitor = pbnjson::JObject();
 
     valueForMonitor.put("clientId", std::string(mClientId));
-    valueForMonitor.put("service", std::string(CHIP_BLE_GATT_SERVICE));
+    valueForMonitor.put("service", std::string(Ble::CHIP_BLE_SVC_ID));
     pbnjson::JValue bytesJArray = pbnjson::JArray();
-    bytesJArray.append(std::string(CHIP_BLE_GATT_CHAR_READ));
+    bytesJArray.append(std::string(Ble::CHIP_BLE_CHAR_2_UUID));
 
     valueForMonitor.put("characteristics", bytesJArray);
     valueForMonitor.put("subscribe", true);
@@ -452,8 +448,8 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uin
 
     pbnjson::JValue valueForDescriptor = pbnjson::JObject();
     valueForDescriptor.put("clientId", std::string(mClientId));
-    valueForDescriptor.put("service", std::string(CHIP_BLE_GATT_SERVICE));
-    valueForDescriptor.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_READ));
+    valueForDescriptor.put("service", std::string(Ble::CHIP_BLE_SVC_ID));
+    valueForDescriptor.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_2_UUID));
 
     valueForDescriptor.put("descriptor", std::string("00002902-0000-1000-8000-00805f9b34fb"));
 
@@ -564,8 +560,8 @@ bool BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * 
     pbnjson::JValue param      = pbnjson::JObject();
     pbnjson::JValue valueParam = pbnjson::JObject();
     param.put("clientId", clientId);
-    param.put("service", std::string(CHIP_BLE_GATT_SERVICE));
-    param.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
+    param.put("service", std::string(Ble::CHIP_BLE_SVC_ID));
+    param.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_1_UUID));
 
     if (valueType == "byte")
     {
