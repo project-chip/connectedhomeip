@@ -14,8 +14,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import glob
+import json
 import os
 import typing
+import xml.etree.ElementTree as ET
 
 
 def attribute_pics_str(pics_base: str, id: int) -> str:

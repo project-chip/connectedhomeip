@@ -18,7 +18,6 @@
 import argparse
 import asyncio
 import builtins
-import glob
 import inspect
 import json
 import logging
@@ -30,7 +29,6 @@ import re
 import sys
 import typing
 import uuid
-import xml.etree.ElementTree as ET
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
