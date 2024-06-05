@@ -35,11 +35,12 @@ import ctypes
 import enum
 import json
 import logging
+import secrets
 import threading
 import time
 import typing
-from ctypes import (CDLL, CFUNCTYPE, POINTER, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8, c_uint16,
-                    c_uint32, c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
+from ctypes import (CDLL, CFUNCTYPE, POINTER, Structure, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8,
+                    c_uint16, c_uint32, c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
 from dataclasses import dataclass
 
 import dacite
@@ -50,12 +51,9 @@ from . import discovery
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
-from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
-from .exceptions import UnknownAttribute, UnknownCommand
-from .interaction_model import InteractionModelError, SessionParameters, SessionParametersStruct
-from .interaction_model import delegate as im
+from .interaction_model import SessionParameters, SessionParametersStruct
 from .native import PyChipError
 
 __all__ = ["ChipDeviceController", "CommissioningParameters"]
@@ -101,6 +99,21 @@ class NOCChain:
     adminSubject: int
 
 
+@dataclass
+class ICDRegistrationParameters:
+    symmetricKey: typing.Optional[bytes]
+    checkInNodeId: typing.Optional[int]
+    monitoredSubject: typing.Optional[int]
+    stayActiveMs: typing.Optional[int]
+
+    class CStruct(Structure):
+        _fields_ = [('symmetricKey', c_char_p), ('symmetricKeyLength', c_size_t), ('checkInNodeId',
+                                                                                   c_uint64), ('monitoredSubject', c_uint64), ('stayActiveMsec', c_uint32)]
+
+    def to_c(self):
+        return ICDRegistrationParameters.CStruct(self.symmetricKey, len(self.symmetricKey), self.checkInNodeId, self.monitoredSubject, self.stayActiveMs)
+
+
 @_DeviceAvailableCallbackFunct
 def _DeviceAvailableCallback(closure, device, err):
     closure.deviceAvailable(device, err)
@@ -125,6 +138,77 @@ def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_vo
             ipkBytes = string_at(ipk, ipkLen)[:]
         nocChain = NOCChain(nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
     devCtrl.NOCChainCallback(nocChain)
+
+
+# Methods for ICD
+class ScopedNodeId(Structure):
+    _fields_ = [("nodeId", c_uint64), ("fabricIndex", c_uint8)]
+
+    def __hash__(self):
+        return self.nodeId << 8 | self.fabricIndex
+
+    def __str__(self):
+        return f"({self.fabricIndex}:{self.nodeId:16x})"
+
+    def __eq__(self, other):
+        return self.nodeId == other.nodeId and self.fabricIndex == other.fabricIndex
+
+
+_OnCheckInCompleteFunct = CFUNCTYPE(None, ScopedNodeId)
+
+_OnCheckInCompleteWaitListLock = threading.Lock()
+_OnCheckInCompleteWaitList = dict()
+
+
+@_OnCheckInCompleteFunct
+def _OnCheckInComplete(scopedNodeId: ScopedNodeId):
+    callbacks = []
+    with _OnCheckInCompleteWaitListLock:
+        callbacks = list(_OnCheckInCompleteWaitList.get(scopedNodeId, set()))
+
+    for callback in callbacks:
+        callback(scopedNodeId)
+
+
+def RegisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: typing.Callable[None, [ScopedNodeId]]):
+    ''' Registers a callback when the device with given (fabric index, node id) becomes active.
+
+    Does nothing if the callback is already registered.
+    '''
+    with _OnCheckInCompleteWaitListLock:
+        waitList = _OnCheckInCompleteWaitList.get(scopedNodeId, set())
+        waitList.add(callback)
+        _OnCheckInCompleteWaitList[scopedNodeId] = waitList
+
+
+def UnregisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: typing.Callable[None, [ScopedNodeId]]):
+    ''' Unregisters a callback when the device with given (fabric index, node id) becomes active.
+
+    Does nothing if the callback has not been registered.
+    '''
+    with _OnCheckInCompleteWaitListLock:
+        _OnCheckInCompleteWaitList.get(scopedNodeId, set()).remove(callback)
+
+
+async def WaitForCheckIn(scopedNodeId: ScopedNodeId, timeoutSeconds: float):
+    ''' Waits for a device becomes active.
+
+    Returns:
+        - A future, completes when the device becomes active.
+    '''
+    eventLoop = asyncio.get_running_loop()
+    future = eventLoop.create_future()
+
+    def OnCheckInCallback(nodeid):
+        eventLoop.call_soon_threadsafe(lambda: future.done() or future.set_result(None))
+
+    RegisterOnActiveCallback(scopedNodeId, OnCheckInCallback)
+
+    try:
+        async with asyncio.timeout(timeoutSeconds):
+            await future
+    finally:
+        UnregisterOnActiveCallback(scopedNodeId, OnCheckInCallback)
 
 # This is a fix for WEAV-429. Jay Logue recommends revisiting this at a later
 # date to allow for truly multiple instances so this is temporary.
@@ -272,6 +356,7 @@ class ChipDeviceControllerBase():
             else:
                 logging.warning("Failed to commission: {}".format(err))
 
+            self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
             self._ChipStack.commissioningEventRes = err
@@ -350,6 +435,7 @@ class ChipDeviceControllerBase():
         self._isActive = True
         # Validate FabricID/NodeID followed from NOC Chain
         self._fabricId = self.GetFabricIdInternal()
+        self._fabricIndex = self.GetFabricIndexInternal()
         self._nodeId = self.GetNodeIdInternal()
 
     def _finish_init(self):
@@ -769,6 +855,19 @@ class ChipDeviceControllerBase():
 
         return fabricid.value
 
+    def GetFabricIndexInternal(self):
+        """Get the fabric index from the object. Only used to validate cached value from property."""
+        self.CheckIsActive()
+
+        fabricindex = c_uint8(0)
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetFabricIndex(
+                self.devCtrl, pointer(fabricindex))
+        ).raise_on_error()
+
+        return fabricindex.value
+
     def GetNodeIdInternal(self) -> int:
         """Get the node ID from the object. Only used to validate cached value from property."""
         self.CheckIsActive()
@@ -843,6 +942,18 @@ class ChipDeviceControllerBase():
             returnErr.raise_on_error()
 
         return DeviceProxyWrapper(returnDevice, self._dmLib)
+
+    async def WaitForActive(self, nodeid, *, timeoutSeconds=30.0, stayActiveDurationMs=30000):
+        ''' Waits a LIT ICD device to become active. Will send a StayActive command to the device on active to allow human operations.
+
+        nodeId: Node ID of the LID ICD
+        stayActiveDurationMs: The duration in the StayActive command, in milliseconds
+
+        Returns:
+            - StayActiveResponse on success
+        '''
+        await WaitForCheckIn(ScopedNodeId(nodeid, self._fabricIndex), timeoutSeconds=timeoutSeconds)
+        return await self.SendCommand(nodeid, 0, Clusters.IcdManagement.Commands.StayActiveRequest(stayActiveDuration=stayActiveDurationMs))
 
     async def GetConnectedDevice(self, nodeid, allowPASE: bool = True, timeoutMs: int = None):
         ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
@@ -1170,33 +1281,26 @@ class ChipDeviceControllerBase():
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
     ]):
-        endpoint = None
-        cluster = None
-        attribute = None
-
         if pathTuple == ('*') or pathTuple == ():
             # Wildcard
-            pass
+            return ClusterAttribute.AttributePath()
         elif not isinstance(pathTuple, tuple):
             if isinstance(pathTuple, int):
-                endpoint = pathTuple
+                return ClusterAttribute.AttributePath(EndpointId=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.Cluster):
-                cluster = pathTuple
+                return ClusterAttribute.AttributePath.from_cluster(EndpointId=None, Cluster=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):
-                attribute = pathTuple
+                return ClusterAttribute.AttributePath.from_attribute(EndpointId=None, Attribute=pathTuple)
             else:
                 raise ValueError("Unsupported Attribute Path")
         else:
             # endpoint + (cluster) attribute / endpoint + cluster
-            endpoint = pathTuple[0]
             if issubclass(pathTuple[1], ClusterObjects.Cluster):
-                cluster = pathTuple[1]
+                return ClusterAttribute.AttributePath.from_cluster(EndpointId=pathTuple[0], Cluster=pathTuple[1])
             elif issubclass(pathTuple[1], ClusterAttribute.ClusterAttributeDescriptor):
-                attribute = pathTuple[1]
+                return ClusterAttribute.AttributePath.from_attribute(EndpointId=pathTuple[0], Attribute=pathTuple[1])
             else:
                 raise ValueError("Unsupported Attribute Path")
-        return ClusterAttribute.AttributePath(
-            EndpointId=endpoint, Cluster=cluster, Attribute=attribute)
 
     def _parseDataVersionFilterTuple(self, pathTuple: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]):
         endpoint = None
@@ -1209,7 +1313,7 @@ class ChipDeviceControllerBase():
         else:
             raise ValueError("Unsupported Cluster Path")
         dataVersion = pathTuple[2]
-        return ClusterAttribute.DataVersionFilter(
+        return ClusterAttribute.DataVersionFilter.from_cluster(
             EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)
 
     def _parseEventPathTuple(self, pathTuple: typing.Union[
@@ -1226,39 +1330,31 @@ class ChipDeviceControllerBase():
         typing.Tuple[int,
                      typing.Type[ClusterObjects.ClusterEvent], int]
     ]):
-        endpoint = None
-        cluster = None
-        event = None
-        urgent = False
         if pathTuple in [('*'), ()]:
             # Wildcard
-            pass
+            return ClusterAttribute.EventPath()
         elif not isinstance(pathTuple, tuple):
             logging.debug(type(pathTuple))
             if isinstance(pathTuple, int):
-                endpoint = pathTuple
+                return ClusterAttribute.EventPath(EndpointId=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.Cluster):
-                cluster = pathTuple
+                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.ClusterEvent):
-                event = pathTuple
+                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)
             else:
                 raise ValueError("Unsupported Event Path")
         else:
             if pathTuple[0] == '*':
-                urgent = pathTuple[-1]
-                pass
+                return ClusterAttribute.EventPath(Urgent=pathTuple[-1])
             else:
+                urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
                 # endpoint + (cluster) event / endpoint + cluster
-                endpoint = pathTuple[0]
                 if issubclass(pathTuple[1], ClusterObjects.Cluster):
-                    cluster = pathTuple[1]
+                    return ClusterAttribute.EventPath.from_cluster(EndpointId=pathTuple[0], Cluster=pathTuple[1], Urgent=urgent)
                 elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):
-                    event = pathTuple[1]
+                    return ClusterAttribute.EventPath.from_event(EndpointId=pathTuple[0], Event=pathTuple[1], Urgent=urgent)
                 else:
                     raise ValueError("Unsupported Attribute Path")
-                urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
-        return ClusterAttribute.EventPath(
-            EndpointId=endpoint, Cluster=cluster, Event=event, Urgent=urgent)
 
     async def Read(self, nodeid: int, attributes: typing.List[typing.Union[
         None,  # Empty tuple, all wildcard
@@ -1495,83 +1591,6 @@ class ChipDeviceControllerBase():
         else:
             return res.events
 
-    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
-        ''' Wrapper over SendCommand that catches the exceptions
-            Returns a tuple of (errorCode, CommandResponse)
-        '''
-        self.CheckIsActive()
-
-        req = None
-        try:
-            req = eval(
-                f"GeneratedObjects.{cluster}.Commands.{command}")(**args)
-        except BaseException:
-            raise UnknownCommand(cluster, command)
-        try:
-            res = asyncio.run(self.SendCommand(nodeid, endpoint, req))
-            logging.debug(f"CommandResponse {res}")
-            return (0, res)
-        except InteractionModelError as ex:
-            return (int(ex.status), None)
-
-    def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
-        ''' Wrapper over ReadAttribute for a single attribute
-            Returns an AttributeReadResult
-        '''
-        self.CheckIsActive()
-
-        clusterType = getattr(GeneratedObjects, cluster)
-
-        try:
-            attributeType = eval(
-                f"GeneratedObjects.{cluster}.Attributes.{attribute}")
-        except BaseException:
-            raise UnknownAttribute(cluster, attribute)
-
-        result = asyncio.run(self.ReadAttribute(
-            nodeid, [(endpoint, attributeType)]))
-        path = ClusterAttribute.AttributePath(
-            EndpointId=endpoint, Attribute=attributeType)
-        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId),
-                                      status=0, value=result[endpoint][clusterType][attributeType], dataVersion=result[endpoint][clusterType][ClusterAttribute.DataVersion])
-
-    def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, dataVersion=0, blocking=True):
-        ''' Wrapper over WriteAttribute for a single attribute
-            return PyChipError
-        '''
-        req = None
-        try:
-            req = eval(
-                f"GeneratedObjects.{cluster}.Attributes.{attribute}")(value)
-        except BaseException:
-            raise UnknownAttribute(cluster, attribute)
-
-        return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req, dataVersion)]))
-
-    def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True,
-                              keepSubscriptions=False, autoResubscribe=True):
-        ''' Wrapper over ReadAttribute for a single attribute
-            Returns a SubscriptionTransaction. See ReadAttribute for more information.
-        '''
-        self.CheckIsActive()
-
-        req = None
-        try:
-            req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
-        except BaseException:
-            raise UnknownAttribute(cluster, attribute)
-        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval),
-                                              keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe))
-
-    def ZCLCommandList(self):
-        self.CheckIsActive()
-        return self._Cluster.ListClusterCommands()
-
-    def ZCLAttributeList(self):
-        self.CheckIsActive()
-
-        return self._Cluster.ListClusterAttributes()
-
     def SetBlockingCB(self, blockingCB):
         self.CheckIsActive()
 
@@ -1630,6 +1649,11 @@ class ChipDeviceControllerBase():
 
             self._dmLib.pychip_DeviceController_SetCheckMatchingFabric.restype = PyChipError
             self._dmLib.pychip_DeviceController_SetCheckMatchingFabric.argtypes = [c_bool]
+
+            self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters.argtypes = [
+                c_bool, c_void_p
+            ]
 
             self._dmLib.pychip_DeviceController_ResetCommissioningParameters.restype = PyChipError
             self._dmLib.pychip_DeviceController_ResetCommissioningParameters.argtypes = []
@@ -1817,6 +1841,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_GetFabricId.argtypes = [c_void_p, POINTER(c_uint64)]
             self._dmLib.pychip_DeviceController_GetFabricId.restype = PyChipError
 
+            self._dmLib.pychip_DeviceController_GetFabricIndex.argtypes = [c_void_p, POINTER(c_uint8)]
+            self._dmLib.pychip_DeviceController_GetFabricIndex.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_GetLogFilter = [None]
             self._dmLib.pychip_DeviceController_GetLogFilter = c_uint8
 
@@ -1830,6 +1857,11 @@ class ChipDeviceControllerBase():
 
             self._dmLib.pychip_DeviceController_SetIpk.argtypes = [c_void_p, POINTER(c_char), c_size_t]
             self._dmLib.pychip_DeviceController_SetIpk.restype = PyChipError
+
+            self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback.restype = None
+            self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback.argtypes = [_OnCheckInCompleteFunct]
+
+            self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback(_OnCheckInComplete)
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
@@ -1977,6 +2009,38 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetCheckMatchingFabric(check)
+        ).raise_on_error()
+
+    def GenerateICDRegistrationParameters(self):
+        ''' Generates ICD registration parameters for this controller. '''
+        return ICDRegistrationParameters(
+            secrets.token_bytes(16),
+            self._nodeId,
+            self._nodeId,
+            30)
+
+    def EnableICDRegistration(self, parameters: ICDRegistrationParameters):
+        ''' Enables ICD registration for the following commissioning session.
+
+        Args:
+            parameters: A ICDRegistrationParameters for the parameters used for ICD registration, or None for default arguments.
+        '''
+        if parameters is None:
+            raise ValueError("ICD registration parameter required.")
+        if len(parameters.symmetricKey) != 16:
+            raise ValueError("symmetricKey should be 16 bytes")
+
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(
+                True, pointer(parameters.to_c()))
+        ).raise_on_error()
+
+    def DisableICDRegistration(self):
+        ''' Disables ICD registration. '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
         ).raise_on_error()
 
     def GetFabricCheckResult(self) -> int:

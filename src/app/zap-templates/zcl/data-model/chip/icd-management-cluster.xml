@@ -36,7 +36,7 @@ limitations under the License.
         <field name="SetupButtonSeconds" mask="0x2000"/>
         <field name="SetupButtonLightsBlink" mask="0x4000"/>
         <field name="SetupButtonTimes" mask="0x8000"/>
-        <field name="AppDefinedButton" mask="0x10000"/>   
+        <field name="AppDefinedButton" mask="0x10000"/>
     </bitmap>
 
     <struct name = "MonitoringRegistrationStruct" isFabricScoped="true">
@@ -103,9 +103,9 @@ limitations under the License.
             <access op="read" privilege="administer"/>
         </attribute>
         <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>
-        <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" writable="false" optional="true" isNullable="false">UserActiveModeTriggerHint</attribute>
-        <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false">UserActiveModeTriggerInstruction</attribute>
-        <attribute side="server" code="0x08" define="OPERATING_MODE" type="OperatingModeEnum" default="0" writable="false" optional="true" isNullable="false">OperatingMode</attribute>
+        <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" writable="false" optional="true" isNullable="false" apiMaturity="provisional">UserActiveModeTriggerHint</attribute>
+        <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false" apiMaturity="provisional">UserActiveModeTriggerInstruction</attribute>
+        <attribute side="server" code="0x08" define="OPERATING_MODE" type="OperatingModeEnum" default="0" writable="false" optional="true" isNullable="false" apiMaturity="provisional">OperatingMode</attribute>
 
         <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
             <description>Register a client to the end device</description>

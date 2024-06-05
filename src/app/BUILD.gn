@@ -179,9 +179,6 @@ static_library("interaction-model") {
     "ReadClient.h",  # TODO: cpp is only included conditionally. Needs logic
                      # fixing
     "ReadPrepareParams.h",
-    "RequiredPrivilege.h",
-    "StatusResponse.cpp",
-    "StatusResponse.h",
     "SubscriptionResumptionStorage.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
@@ -210,6 +207,7 @@ static_library("interaction-model") {
 
   public_deps = [
     ":app_config",
+    ":command-handler",
     ":constants",
     ":paths",
     ":subscription-info-provider",
@@ -248,8 +246,6 @@ static_library("interaction-model") {
       "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
       "dynamic_server/DynamicDispatcher.cpp",
-      "util/privilege-storage.cpp",
-      "util/privilege-storage.h",
     ]
 
     public_deps += [
@@ -301,6 +297,62 @@ static_library("attribute-access") {
   ]
 }
 
+source_set("required-privileges") {
+  sources = [ "RequiredPrivilege.h" ]
+
+  public_deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+  ]
+
+  if (chip_build_controller_dynamic_server) {
+    sources += [
+      "util/privilege-storage.cpp",
+      "util/privilege-storage.h",
+    ]
+
+    public_deps += [
+      ":global-attributes",
+      "${chip_root}/src/access",
+      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
+    ]
+
+    public_configs = [ ":config-controller-dynamic-server" ]
+  }
+}
+
+source_set("status-response") {
+  sources = [
+    "StatusResponse.cpp",
+    "StatusResponse.h",
+  ]
+  public_deps = [
+    ":constants",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/messaging",
+  ]
+}
+
+source_set("command-handler") {
+  sources = [
+    "CommandHandler.cpp",
+    "CommandHandler.h",
+    "CommandHandlerExchangeInterface.h",
+  ]
+
+  public_deps = [
+    ":paths",
+    ":required-privileges",
+    ":status-response",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/util:callbacks",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+  ]
+}
+
 # Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
 # This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
 static_library("app") {
@@ -312,8 +364,6 @@ static_library("app") {
     "AttributePersistenceProvider.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
-    "CommandHandler.cpp",
-    "CommandHandlerExchangeInterface.h",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
     "DefaultAttributePersistenceProvider.cpp",
@@ -325,6 +375,8 @@ static_library("app") {
     "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
+    "GenericEventManagementTestEventTriggerHandler.cpp",
+    "GenericEventManagementTestEventTriggerHandler.h",
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
@@ -336,7 +388,6 @@ static_library("app") {
     #       (app depending on im and im including these headers):
     #       Name with _ so that linter does not recognize it
     # "CommandResponseSender._h"
-    # "CommandHandler._h"
     # "ReadHandler._h",
     # "WriteHandler._h"
   ]
