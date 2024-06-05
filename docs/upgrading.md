@@ -26,7 +26,7 @@ ReturnOnFailure(commandHandler->PrepareInvokeResponseCommand(path, prepareParams
 TLV::TLVWriter *writer = commandHandler->GetCommandDataIBTLVWriter();
 ReturnOnFailure(writer->Put(chip::TLV::ContextTag(1), 123));
 ReturnOnFailure(writer->Put(chip::TLV::ContextTag(2), 234));
-ReturnErrorOnFailure(commandHandler->FinishCommand());
+return commandHandler->FinishCommand();
 ```
 
 After:
