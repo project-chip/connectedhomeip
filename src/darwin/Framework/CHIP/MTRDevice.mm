@@ -383,6 +383,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
 - (void)unitTestClusterDataPersisted:(MTRDevice *)device;
+- (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
 @end
 #endif
 
@@ -2026,15 +2027,24 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
 
-    // Set up a timer to mark as not reachable if it takes too long to set up a subscription
-    MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
-        MTRDevice * strongSelf = weakSelf.strongObject;
-        if (strongSelf != nil) {
-            std::lock_guard lock(strongSelf->_lock);
-            [strongSelf _markDeviceAsUnreachableIfNeverSubscribed];
-        }
-    });
+    bool markUnreachableAfterWait = true;
+#ifdef DEBUG
+    if (delegate && [delegate respondsToSelector:@selector(unitTestSuppressTimeBasedReachabilityChanges:)]) {
+        markUnreachableAfterWait = ![delegate unitTestSuppressTimeBasedReachabilityChanges:self];
+    }
+#endif
+
+    if (markUnreachableAfterWait) {
+        // Set up a timer to mark as not reachable if it takes too long to set up a subscription
+        MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
+            MTRDevice * strongSelf = weakSelf.strongObject;
+            if (strongSelf != nil) {
+                std::lock_guard lock(strongSelf->_lock);
+                [strongSelf _markDeviceAsUnreachableIfNeverSubscribed];
+            }
+        });
+    }
 
     [_deviceController
         getSessionForNode:_nodeID.unsignedLongLongValue
