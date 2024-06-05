@@ -95,16 +95,22 @@ constexpr std::pair<bool, ChipBleUUID> StringToUUID(const char (&str)[N])
     }();
 
 // UUID of CHIP BLE service.
+// NOTE: lower-case string seems to be required at least by bluez when
+//       executing g_variant_lookup_value
+//
+//       BlueZ API https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/org.bluez.Device.rst
+//       describes ServiceData as "Keys are the UUIDs in string format" however no description
+//       on actual case required
 inline constexpr char CHIP_BLE_DESC_SHORT_UUID_STR[]    = "2902";
-inline constexpr char CHIP_BLE_SERVICE_SHORT_UUID_STR[] = "FFF6";
-inline constexpr char CHIP_BLE_SERVICE_LONG_UUID_STR[]  = "0000FFF6-0000-1000-8000-00805F9B34FB";
-inline constexpr char CHIP_BLE_CHAR_1_UUID_STR[]        = "18EE2EF5-263D-4559-959F-4F9C429F9D11";
-inline constexpr char CHIP_BLE_CHAR_2_UUID_STR[]        = "18EE2EF5-263D-4559-959F-4F9C429F9D12";
-inline constexpr char CHIP_BLE_CHAR_3_UUID_STR[]        = "64630238-8772-45F2-B87D-748A83218F04";
-inline constexpr ChipBleUUID CHIP_BLE_SVC_ID            = StringToUUIDConstexpr("0000FFF6-0000-1000-8000-00805F9B34FB");
-inline constexpr ChipBleUUID CHIP_BLE_CHAR_1_UUID       = StringToUUIDConstexpr("18EE2EF5-263D-4559-959F-4F9C429F9D11");
-inline constexpr ChipBleUUID CHIP_BLE_CHAR_2_UUID       = StringToUUIDConstexpr("18EE2EF5-263D-4559-959F-4F9C429F9D12");
-inline constexpr ChipBleUUID CHIP_BLE_CHAR_3_UUID       = StringToUUIDConstexpr("64630238-8772-45F2-B87D-748A83218F04");
+inline constexpr char CHIP_BLE_SERVICE_SHORT_UUID_STR[] = "fff6";
+inline constexpr char CHIP_BLE_SERVICE_LONG_UUID_STR[]  = "0000fff6-0000-1000-8000-00805f9b34fb";
+inline constexpr char CHIP_BLE_CHAR_1_UUID_STR[]        = "18ee2ef5-263d-4559-959f-4f9c429f9d11";
+inline constexpr char CHIP_BLE_CHAR_2_UUID_STR[]        = "18ee2ef5-263d-4559-959f-4f9c429f9d12";
+inline constexpr char CHIP_BLE_CHAR_3_UUID_STR[]        = "64630238-8772-45f2-b87d-748a83218f04";
+inline constexpr ChipBleUUID CHIP_BLE_SVC_ID            = StringToUUIDConstexpr("0000fff6-0000-1000-8000-00805f9b34fb");
+inline constexpr ChipBleUUID CHIP_BLE_CHAR_1_UUID       = StringToUUIDConstexpr("18ee2ef5-263d-4559-959f-4f9c429f9d11");
+inline constexpr ChipBleUUID CHIP_BLE_CHAR_2_UUID       = StringToUUIDConstexpr("18ee2ef5-263d-4559-959f-4f9c429f9d12");
+inline constexpr ChipBleUUID CHIP_BLE_CHAR_3_UUID       = StringToUUIDConstexpr("64630238-8772-45f2-b87d-748a83218f04");
 
 } /* namespace Ble */
 } /* namespace chip */

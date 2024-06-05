@@ -25,6 +25,12 @@ namespace {
 // Max block size for the BDX transfer.
 constexpr uint32_t kMaxBdxBlockSize = 1024;
 
+// How often we poll our transfer session.  Sadly, we get allocated on
+// unsolicited message, which makes it hard for our clients to configure this.
+// But the default poll interval is 500ms, which makes log downloads extremely
+// slow.
+constexpr System::Clock::Timeout kBdxPollInterval = System::Clock::Milliseconds32(50);
+
 // Timeout for the BDX transfer session..
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 constexpr TransferRole kBdxRole              = TransferRole::kReceiver;
@@ -95,7 +101,8 @@ CHIP_ERROR BdxTransferDiagnosticLog::OnMessageReceived(Messaging::ExchangeContex
         mTransferProxy.SetFabricIndex(fabricIndex);
         mTransferProxy.SetPeerNodeId(peerNodeId);
         auto flags(TransferControlFlags::kSenderDrive);
-        ReturnLogErrorOnFailure(Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout));
+        ReturnLogErrorOnFailure(
+            Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
     }
 
     return TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
