@@ -77,7 +77,7 @@ class Efr32App(Enum):
         elif self == Efr32App.PUMP:
             return 'pump_app.flashbundle.txt'
         elif self == Efr32App.UNIT_TEST:
-            return 'efr32_device_tests.flashbundle.txt'
+            return 'efr32_device_tests.flashbundle.txt'  # ++++ target name has changed
         else:
             raise Exception('Unknown app type: %r' % self)
 

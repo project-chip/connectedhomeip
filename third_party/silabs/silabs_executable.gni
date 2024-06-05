@@ -61,14 +61,16 @@ template("silabs_executable") {
     flashing_image_name = output_base_name + ".rps"
   }
 
-  flashing_runtime_target = target_name + ".flashing_runtime"
   flashing_script_inputs = [
     "${chip_root}/scripts/flashing/silabs_firmware_utils.py",
     "${chip_root}/scripts/flashing/firmware_utils.py",
   ]
-  copy(flashing_runtime_target) {
-    sources = flashing_script_inputs
-    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+  if (defined(invoker.copy_py_files) && invoker.copy_py_files) {  #++++ added this
+    flashing_runtime_target = target_name + ".flashing_runtime"
+    copy(flashing_runtime_target) {
+      sources = flashing_script_inputs
+      outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+    }
   }
 
   flashing_script_generator =
@@ -80,7 +82,9 @@ template("silabs_executable") {
   flashbundle_name = "${target_name}.flashbundle.txt"
   flashable_executable(flash_target_name) {
     forward_variables_from(invoker, "*")
-    data_deps = [ ":${flashing_runtime_target}" ]
+    if (defined(invoker.copy_py_files) && invoker.copy_py_files) {  #++++ added this
+      data_deps = [ ":${flashing_runtime_target}" ]
+    }
   }
 
   # Add a target which generates the hex file in addition to s37.

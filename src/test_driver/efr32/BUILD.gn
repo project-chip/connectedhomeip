@@ -63,69 +63,199 @@ efr32_sdk("sdk") {
   ]
 }
 
-silabs_executable("efr32_device_tests") {
-  output_name = "matter-silabs-device_tests.out"
+# silabs_executable("efr32_device_tests") {
+#   output_name = "matter-silabs-device_tests.out"
 
-  defines = [ "PW_RPC_ENABLED" ]
-  sources = [
-    "${chip_root}/examples/common/pigweed/RpcService.cpp",
-    "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-    "${examples_common_plat_dir}/PigweedLogger.cpp",
-    "${examples_common_plat_dir}/heap_4_silabs.c",
-    "${examples_common_plat_dir}/syscalls_stubs.cpp",
-    "${examples_plat_dir}/uart.cpp",
-    "src/main.cpp",
-  ]
+#   defines = [ "PW_RPC_ENABLED" ]
+#   sources = [
+#     "${chip_root}/examples/common/pigweed/RpcService.cpp",
+#     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+#     "${examples_common_plat_dir}/PigweedLogger.cpp",
+#     "${examples_common_plat_dir}/heap_4_silabs.c",
+#     "${examples_common_plat_dir}/syscalls_stubs.cpp",
+#     "${examples_plat_dir}/uart.cpp",
+#     "src/main.cpp",
+#   ]
 
-  deps = [
-    ":nl_test_service.nanopb_rpc",
-    ":sdk",
-    "$dir_pw_unit_test:rpc_service",
-    "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
-    "${chip_root}/examples/common/pigweed:system_rpc_server",
-    "${chip_root}/src:tests",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/lib/support:pw_tests_wrapper",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
-    "${nlunit_test_root}:nlunit-test",
-  ]
+#   deps = [
+#     ":nl_test_service.nanopb_rpc",
+#     ":sdk",
+#     "$dir_pw_unit_test:rpc_service",
+#     "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+#     "${chip_root}/examples/common/pigweed:system_rpc_server",
+#     "${chip_root}/src:tests",
+#     "${chip_root}/src/lib",
+#     "${chip_root}/src/lib/support:pw_tests_wrapper",
+#     "${chip_root}/src/lib/support:testing_nlunit",
+#     "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
+#     "${nlunit_test_root}:nlunit-test",
+#   ]
 
-  # OpenThread Settings
-  if (chip_enable_openthread) {
-    deps += [
-      "${chip_root}/third_party/openthread:openthread",
-      "${chip_root}/third_party/openthread:openthread-platform",
-      "${examples_plat_dir}:efr-matter-shell",
+#   # OpenThread Settings
+#   if (chip_enable_openthread) {
+#     deps += [
+#       "${chip_root}/third_party/openthread:openthread",
+#       "${chip_root}/third_party/openthread:openthread-platform",
+#       "${examples_plat_dir}:efr-matter-shell",
+#     ]
+#   }
+
+#   # Attestation Credentials
+#   deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+
+#   # Factory Data Provider
+#   if (use_efr32_factory_data_provider) {
+#     deps += [ "${examples_plat_dir}:silabs-factory-data-provider" ]
+#   }
+
+#   deps += pw_build_LINK_DEPS
+
+#   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
+
+#   ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+
+#   inputs = [ ldscript ]
+
+#   ldflags = [
+#     "-T" + rebase_path(ldscript, root_build_dir),
+#     "-Wl,--no-warn-rwx-segment",
+#   ]
+
+#   output_dir = root_out_dir
+# }
+
+# group("efr32") {
+#   deps = [ ":efr32_device_tests" ]
+# }
+
+
+_tests = [
+  "${chip_root}/src/app/interaction-model/tests",
+  "${chip_root}/src/access/tests",
+  "${chip_root}/src/crypto/tests",
+  "${chip_root}/src/inet/tests",
+  "${chip_root}/src/lib/address_resolve/tests",
+  "${chip_root}/src/lib/asn1/tests",
+  "${chip_root}/src/lib/core/tests",
+  "${chip_root}/src/messaging/tests",
+  "${chip_root}/src/protocols/bdx/tests",
+  "${chip_root}/src/protocols/interaction_model/tests",
+  "${chip_root}/src/protocols/user_directed_commissioning/tests",
+  "${chip_root}/src/transport/retransmit/tests",
+  "${chip_root}/src/app/icd/server/tests",
+  "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+  "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
+  "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
+  "${chip_root}/src/lib/dnssd/tests",
+  "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests",
+  "${chip_root}/src/setup_payload/tests",
+  "${chip_root}/src/transport/raw/tests",
+  "${chip_root}/src/app/tests",
+  #"${chip_root}/src/credentials/tests",  # openr.c:(.text._open_r+0x10): warning: _open is not implemented and will always fail
+  "${chip_root}/src/lib/format/tests",
+  #"${chip_root}/src/lib/support/tests",  # openr.c:(.text._open_r+0x10): warning: _open is not implemented and will always fail
+  "${chip_root}/src/protocols/secure_channel/tests",
+  "${chip_root}/src/system/tests",
+  "${chip_root}/src/transport/tests",
+  "${chip_root}/src/platform/tests",
+  "${chip_root}/src/lib/shell/tests",
+]
+
+if (defined(matter_enable_tracing_support) && matter_enable_tracing_support &&
+    defined(matter_trace_config) && matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
+  _tests += [ "${chip_root}/src/tracing/tests" ]
+}
+
+if (defined(matter_enable_tracing_support) && chip_config_network_layer_ble) {
+  _tests += [ "${chip_root}/src/ble/tests" ]
+}
+
+if (chip_device_platform != "efr32") {
+  # Doesn't compile on ef32. Multiple definitions issues with attribute storage and overflows flash memory.
+  _tests += [ "${chip_root}/src/controller/tests/data_model" ]
+
+  _tests += [ "${chip_root}/src/controller/tests" ]
+}
+
+copy_py_files = true  # Copy silabs_firmware_utils.py and firmware_utils.py to the output directory only the first time silabs_executable is called.
+_deps = []
+foreach(_test, _tests) {
+  _test_suffix = string_replace(_test, "/tests", "")
+  _test_suffix = string_replace(_test_suffix, "${chip_root}/src/", "")
+  _test_suffix = string_replace(_test_suffix, "/", "-")
+
+  silabs_executable("efr32_device_tests--${_test_suffix}") {
+    output_name = "matter-silabs-device_tests--${_test_suffix}.out"
+
+    defines = [ "PW_RPC_ENABLED" ]
+    sources = [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/heap_4_silabs.c",
+      "${examples_common_plat_dir}/syscalls_stubs.cpp",
+      "${examples_plat_dir}/uart.cpp",
+      "src/main.cpp",
     ]
+
+    deps = [
+      ":nl_test_service.nanopb_rpc",
+      ":sdk",
+      "$dir_pw_unit_test:rpc_service",
+      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:system_rpc_server",
+      "${_test}:tests",
+      "${chip_root}/src/lib",
+      "${chip_root}/src/lib/support:pw_tests_wrapper",
+      "${chip_root}/src/lib/support:testing_nlunit",
+      "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
+      "${nlunit_test_root}:nlunit-test",
+    ]
+
+    # OpenThread Settings
+    if (chip_enable_openthread) {
+      deps += [
+        "${chip_root}/third_party/openthread:openthread",
+        "${chip_root}/third_party/openthread:openthread-platform",
+        "${examples_plat_dir}:efr-matter-shell",
+      ]
+    }
+
+    # Attestation Credentials
+    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+
+    # Factory Data Provider
+    if (use_efr32_factory_data_provider) {
+      deps += [ "${examples_plat_dir}:silabs-factory-data-provider" ]
+    }
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
+
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+
+    inputs = [ ldscript ]
+
+    ldflags = [
+      "-T" + rebase_path(ldscript, root_build_dir),
+      "-Wl,--no-warn-rwx-segment",
+    ]
+
+    output_dir = root_out_dir
   }
+  
+  copy_py_files = false  # Don't copy them next time.
 
-  # Attestation Credentials
-  deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+  _deps += [ ":efr32_device_tests--${_test_suffix}" ]
+}
 
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
-    deps += [ "${examples_plat_dir}:silabs-factory-data-provider" ]
-  }
-
-  deps += pw_build_LINK_DEPS
-
-  include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
-
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
-
-  inputs = [ ldscript ]
-
-  ldflags = [
-    "-T" + rebase_path(ldscript, root_build_dir),
-    "-Wl,--no-warn-rwx-segment",
-  ]
-
-  output_dir = root_out_dir
+group("efr32_device_tests") {
+  deps = _deps
 }
 
 group("efr32") {
-  deps = [ ":efr32_device_tests" ]
+  deps = [ ":efr32_device_tests" ]  #++++ Should we get rid of "efr32_device_tests" and move its contents here?
 }
 
 group("runner") {
@@ -133,8 +263,8 @@ group("runner") {
     "${efr32_project_dir}/py:pw_test_runner.install",
     "${efr32_project_dir}/py:pw_test_runner_wheel",
     # TODO [PW_MIGRATION]: remove the following when transition from nlunit-test is complete.
-    "${efr32_project_dir}/py:nl_test_runner.install",
-    "${efr32_project_dir}/py:nl_test_runner_wheel",
+    #++++"${efr32_project_dir}/py:nl_test_runner.install",
+    #++++"${efr32_project_dir}/py:nl_test_runner_wheel",
   ]
 }
 
