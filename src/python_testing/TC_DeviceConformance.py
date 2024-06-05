@@ -244,7 +244,6 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with conformance")
-        asserts.fail("CI testing")
 
     def test_TC_IDM_10_3(self):
         ignore_in_progress = self.user_params.get("ignore_in_progress", False)
