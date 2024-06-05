@@ -95,7 +95,7 @@ MTR_DIRECT_MEMBERS
     _writable = writable;
     _parentCluster = app::ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 
-    // now store the value and its serialization.  This will also check that the
+    // Now store the value and its serialization. This will also check that the
     // value is serializable to TLV.
     if ([self setValueInternal:value logIfNotAssociated:NO] == NO) {
         return nil;

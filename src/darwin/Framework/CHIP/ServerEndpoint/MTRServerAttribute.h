@@ -41,7 +41,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * Will fail if the attribute ID is not valid per the Matter specification or
  * the attribute value is not a valid data-value.
  *
- * requiredPrivilege is the privilege required to read the attribute.  This
+ * requiredPrivilege is the privilege required to read the attribute. This
  * initializer may fail if the provided attributeID is a global attribute and
  * the provided requiredPrivilege value is not correct for that attribute ID.
  */
@@ -58,7 +58,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 /**
  * Create an attribute description for a FeatureMap attribute with the provided
  * value (expected to be an unsigned integer representing the value of the
- * bitmap).  This will automatically set requiredPrivilege to the right value
+ * bitmap). This will automatically set requiredPrivilege to the right value
  * for FeatureMap.
  */
 + (MTRServerAttribute *)newFeatureMapAttributeWithInitialValue:(NSNumber *)value;
