@@ -10882,10 +10882,10 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> valueList) {
+    public void onSuccess(@Nullable ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct>");
-      responseValues.put(commandResponseInfo, valueList);
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.DeviceEnergyManagementClusterPowerAdjustCapabilityStruct");
+      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 
@@ -24765,8 +24765,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> deviceEnergyManagementmodifyForecastRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo deviceEnergyManagementmodifyForecastRequestforecastIdCommandParameterInfo = new CommandParameterInfo("forecastId", Long.class, Long.class);
-    deviceEnergyManagementmodifyForecastRequestCommandParams.put("forecastId",deviceEnergyManagementmodifyForecastRequestforecastIdCommandParameterInfo);
+    CommandParameterInfo deviceEnergyManagementmodifyForecastRequestforecastIDCommandParameterInfo = new CommandParameterInfo("forecastID", Long.class, Long.class);
+    deviceEnergyManagementmodifyForecastRequestCommandParams.put("forecastID",deviceEnergyManagementmodifyForecastRequestforecastIDCommandParameterInfo);
 
 
     CommandParameterInfo deviceEnergyManagementmodifyForecastRequestcauseCommandParameterInfo = new CommandParameterInfo("cause", Integer.class, Integer.class);
@@ -24776,7 +24776,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.DeviceEnergyManagementCluster) cluster)
         .modifyForecastRequest((DefaultClusterCallback) callback
         , (Long)
-        commandArguments.get("forecastId")
+        commandArguments.get("forecastID")
         , (ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct>)
         commandArguments.get("slotAdjustments")
         , (Integer)

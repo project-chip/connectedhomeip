@@ -21861,6 +21861,63 @@ public:
 using DecodableType = Type;
 
 } // namespace CostStruct
+namespace PowerAdjustStruct {
+enum class Fields : uint8_t
+{
+    kMinPower    = 0,
+    kMaxPower    = 1,
+    kMinDuration = 2,
+    kMaxDuration = 3,
+};
+
+struct Type
+{
+public:
+    int64_t minPower     = static_cast<int64_t>(0);
+    int64_t maxPower     = static_cast<int64_t>(0);
+    uint32_t minDuration = static_cast<uint32_t>(0);
+    uint32_t maxDuration = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PowerAdjustStruct
+namespace PowerAdjustCapabilityStruct {
+enum class Fields : uint8_t
+{
+    kPowerAdjustCapability = 0,
+    kCause                 = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<DataModel::List<const Structs::PowerAdjustStruct::Type>> powerAdjustCapability;
+    PowerAdjustReasonEnum cause = static_cast<PowerAdjustReasonEnum>(0);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::Nullable<DataModel::DecodableList<Structs::PowerAdjustStruct::DecodableType>> powerAdjustCapability;
+    PowerAdjustReasonEnum cause = static_cast<PowerAdjustReasonEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace PowerAdjustCapabilityStruct
 namespace SlotStruct {
 enum class Fields : uint8_t
 {
@@ -21869,7 +21926,7 @@ enum class Fields : uint8_t
     kDefaultDuration       = 2,
     kElapsedSlotTime       = 3,
     kRemainingSlotTime     = 4,
-    kSlotIsPauseable       = 5,
+    kSlotIsPausable        = 5,
     kMinPauseDuration      = 6,
     kMaxPauseDuration      = 7,
     kManufacturerESAState  = 8,
@@ -21892,7 +21949,7 @@ public:
     uint32_t defaultDuration   = static_cast<uint32_t>(0);
     uint32_t elapsedSlotTime   = static_cast<uint32_t>(0);
     uint32_t remainingSlotTime = static_cast<uint32_t>(0);
-    Optional<bool> slotIsPauseable;
+    Optional<bool> slotIsPausable;
     Optional<uint32_t> minPauseDuration;
     Optional<uint32_t> maxPauseDuration;
     Optional<uint16_t> manufacturerESAState;
@@ -21919,7 +21976,7 @@ public:
     uint32_t defaultDuration   = static_cast<uint32_t>(0);
     uint32_t elapsedSlotTime   = static_cast<uint32_t>(0);
     uint32_t remainingSlotTime = static_cast<uint32_t>(0);
-    Optional<bool> slotIsPauseable;
+    Optional<bool> slotIsPausable;
     Optional<uint32_t> minPauseDuration;
     Optional<uint32_t> maxPauseDuration;
     Optional<uint16_t> manufacturerESAState;
@@ -21942,13 +21999,13 @@ public:
 namespace ForecastStruct {
 enum class Fields : uint8_t
 {
-    kForecastId           = 0,
+    kForecastID           = 0,
     kActiveSlotNumber     = 1,
     kStartTime            = 2,
     kEndTime              = 3,
     kEarliestStartTime    = 4,
     kLatestEndTime        = 5,
-    kIsPauseable          = 6,
+    kIsPausable           = 6,
     kSlots                = 7,
     kForecastUpdateReason = 8,
 };
@@ -21956,13 +22013,13 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint16_t forecastId = static_cast<uint16_t>(0);
+    uint32_t forecastID = static_cast<uint32_t>(0);
     DataModel::Nullable<uint16_t> activeSlotNumber;
     uint32_t startTime = static_cast<uint32_t>(0);
     uint32_t endTime   = static_cast<uint32_t>(0);
     Optional<DataModel::Nullable<uint32_t>> earliestStartTime;
     Optional<uint32_t> latestEndTime;
-    bool isPauseable = static_cast<bool>(0);
+    bool isPausable = static_cast<bool>(0);
     DataModel::List<const Structs::SlotStruct::Type> slots;
     ForecastUpdateReasonEnum forecastUpdateReason = static_cast<ForecastUpdateReasonEnum>(0);
 
@@ -21974,13 +22031,13 @@ public:
 struct DecodableType
 {
 public:
-    uint16_t forecastId = static_cast<uint16_t>(0);
+    uint32_t forecastID = static_cast<uint32_t>(0);
     DataModel::Nullable<uint16_t> activeSlotNumber;
     uint32_t startTime = static_cast<uint32_t>(0);
     uint32_t endTime   = static_cast<uint32_t>(0);
     Optional<DataModel::Nullable<uint32_t>> earliestStartTime;
     Optional<uint32_t> latestEndTime;
-    bool isPauseable = static_cast<bool>(0);
+    bool isPausable = static_cast<bool>(0);
     DataModel::DecodableList<Structs::SlotStruct::DecodableType> slots;
     ForecastUpdateReasonEnum forecastUpdateReason = static_cast<ForecastUpdateReasonEnum>(0);
 
@@ -22019,33 +22076,6 @@ public:
 using DecodableType = Type;
 
 } // namespace ConstraintsStruct
-namespace PowerAdjustStruct {
-enum class Fields : uint8_t
-{
-    kMinPower    = 0,
-    kMaxPower    = 1,
-    kMinDuration = 2,
-    kMaxDuration = 3,
-};
-
-struct Type
-{
-public:
-    int64_t minPower     = static_cast<int64_t>(0);
-    int64_t maxPower     = static_cast<int64_t>(0);
-    uint32_t minDuration = static_cast<uint32_t>(0);
-    uint32_t maxDuration = static_cast<uint32_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace PowerAdjustStruct
 namespace SlotAdjustmentStruct {
 enum class Fields : uint8_t
 {
@@ -22057,9 +22087,9 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint8_t slotIndex    = static_cast<uint8_t>(0);
-    int64_t nominalPower = static_cast<int64_t>(0);
-    uint32_t duration    = static_cast<uint32_t>(0);
+    uint8_t slotIndex = static_cast<uint8_t>(0);
+    Optional<int64_t> nominalPower;
+    uint32_t duration = static_cast<uint32_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -22286,7 +22316,7 @@ public:
 namespace ModifyForecastRequest {
 enum class Fields : uint8_t
 {
-    kForecastId      = 0,
+    kForecastID      = 0,
     kSlotAdjustments = 1,
     kCause           = 2,
 };
@@ -22298,7 +22328,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ModifyForecastRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
 
-    uint32_t forecastId = static_cast<uint32_t>(0);
+    uint32_t forecastID = static_cast<uint32_t>(0);
     DataModel::List<const Structs::SlotAdjustmentStruct::Type> slotAdjustments;
     AdjustmentCauseEnum cause = static_cast<AdjustmentCauseEnum>(0);
 
@@ -22315,7 +22345,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ModifyForecastRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
 
-    uint32_t forecastId = static_cast<uint32_t>(0);
+    uint32_t forecastID = static_cast<uint32_t>(0);
     DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> slotAdjustments;
     AdjustmentCauseEnum cause = static_cast<AdjustmentCauseEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -22451,12 +22481,12 @@ struct TypeInfo
 namespace PowerAdjustmentCapability {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<
-        chip::app::DataModel::List<const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-           chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType>> &;
+    using Type =
+        chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerAdjustmentCapability::Id; }

@@ -364,3 +364,8 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Struc
 
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newValue)
+{
+    return CHIP_NO_ERROR;
+}

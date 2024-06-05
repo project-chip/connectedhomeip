@@ -16113,7 +16113,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _forecastId = @(0);
+        _forecastID = @(0);
 
         _slotAdjustments = [NSArray array];
 
@@ -16128,7 +16128,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRDeviceEnergyManagementClusterModifyForecastRequestParams alloc] init];
 
-    other.forecastId = self.forecastId;
+    other.forecastID = self.forecastID;
     other.slotAdjustments = self.slotAdjustments;
     other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -16139,7 +16139,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; slotAdjustments:%@; cause:%@; >", NSStringFromClass([self class]), _forecastId, _slotAdjustments, _cause];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastID:%@; slotAdjustments:%@; cause:%@; >", NSStringFromClass([self class]), _forecastID, _slotAdjustments, _cause];
     return descriptionString;
 }
 
@@ -16152,7 +16152,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::DeviceEnergyManagement::Commands::ModifyForecastRequest::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.forecastId = self.forecastId.unsignedIntValue;
+        encodableStruct.forecastID = self.forecastID.unsignedIntValue;
     }
     {
         {
@@ -16171,7 +16171,10 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     auto element_0 = (MTRDeviceEnergyManagementClusterSlotAdjustmentStruct *) self.slotAdjustments[i_0];
                     listHolder_0->mList[i_0].slotIndex = element_0.slotIndex.unsignedCharValue;
-                    listHolder_0->mList[i_0].nominalPower = element_0.nominalPower.longLongValue;
+                    if (element_0.nominalPower != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].nominalPower.Emplace();
+                        definedValue_2 = element_0.nominalPower.longLongValue;
+                    }
                     listHolder_0->mList[i_0].duration = element_0.duration.unsignedIntValue;
                 }
                 encodableStruct.slotAdjustments = ListType_0(listHolder_0->mList, self.slotAdjustments.count);

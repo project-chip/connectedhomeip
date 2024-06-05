@@ -9758,7 +9758,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ModifyForecastRequestCommandField {ForecastId(0),SlotAdjustments(1),Cause(2),;
+                }public enum ModifyForecastRequestCommandField {ForecastID(0),SlotAdjustments(1),Cause(2),;
                     private final int id;
                     ModifyForecastRequestCommandField(int id) {
                         this.id = id;
