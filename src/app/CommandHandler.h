@@ -232,7 +232,7 @@ public:
     }
 
     /**
-     * API for adding a response.  This will try to encode a data response (response command), and if that fails 
+     * API for adding a response.  This will try to encode a data response (response command), and if that fails
      * it will encode a Protocols::InteractionModel::Status::Failure status response instead.
      *
      * Above is the main difference from AddResponseData: AddResponse will auto-reply with failure while

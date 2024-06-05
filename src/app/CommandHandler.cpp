@@ -51,6 +51,5 @@ CommandHandler::Handle::Handle(CommandHandler * handler)
     Init(handler);
 }
 
-
 } // namespace app
 } // namespace chip
