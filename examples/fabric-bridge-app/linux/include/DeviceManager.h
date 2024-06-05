@@ -66,3 +66,12 @@ private:
     chip::EndpointId mFirstDynamicEndpointId;
     Device * mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 };
+
+/**
+ * Instance getter for the global DeviceManager.
+ *
+ * Callers have to externally synchronize usage of this function.
+ *
+ * @return The global DeviceManager. Assume never null.
+ */
+DeviceManager * GetDeviceManager();

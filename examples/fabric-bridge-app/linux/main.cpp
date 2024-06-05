@@ -97,8 +97,6 @@ void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
 }
 #endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 
-DeviceManager gDeviceManager;
-
 } // namespace
 
 void ApplicationInit()
@@ -135,7 +133,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     uint16_t endpointIndex  = emberAfGetDynamicIndexFromEndpoint(endpoint);
     AttributeId attributeId = attributeMetadata->attributeId;
 
-    Device * dev = gDeviceManager.GetDevice(endpointIndex);
+    Device * dev = GetDeviceManager()->GetDevice(endpointIndex);
     if (dev != nullptr && clusterId == app::Clusters::BridgedDeviceBasicInformation::Id)
     {
         using namespace app::Clusters::BridgedDeviceBasicInformation::Attributes;
@@ -179,7 +177,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     uint16_t endpointIndex                  = emberAfGetDynamicIndexFromEndpoint(endpoint);
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Failure;
 
-    Device * dev = gDeviceManager.GetDevice(endpointIndex);
+    Device * dev = GetDeviceManager()->GetDevice(endpointIndex);
     if (dev != nullptr && dev->IsReachable())
     {
         ChipLogProgress(NotSpecified, "emberAfExternalAttributeWriteCallback: ep=%d, clusterId=%d", endpoint, clusterId);

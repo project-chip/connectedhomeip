@@ -43,8 +43,13 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
+class DeviceManager;
+
 namespace {
+
 constexpr uint8_t kMaxRetries = 10;
+DeviceManager gDeviceManager;
+
 } // namespace
 
 DeviceManager::DeviceManager()
@@ -127,4 +132,9 @@ Device * DeviceManager::GetDevice(uint16_t index) const
         return mDevices[index];
     }
     return nullptr;
+}
+
+DeviceManager * GetDeviceManager()
+{
+    return &gDeviceManager;
 }
