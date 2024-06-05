@@ -142,6 +142,7 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         # On not having found a PAA dir, just return current dir to avoid blow-ups
         return pathlib.Path.cwd()
 
+
 def type_matches(received_value, desired_type):
     """ Checks if the value received matches the expected type.
 

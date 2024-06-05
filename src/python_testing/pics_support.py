@@ -17,6 +17,7 @@
 import os
 import typing
 
+
 def attribute_pics_str(pics_base: str, id: int) -> str:
     return f'{pics_base}.S.A{id:04x}'
 
@@ -32,11 +33,14 @@ def generated_cmd_pics_str(pics_base: str, id: int) -> str:
 def feature_pics_str(pics_base: str, bit: int) -> str:
     return f'{pics_base}.S.F{bit:02x}'
 
+
 def server_pics_str(pics_base: str) -> str:
     return f'{pics_base}.S'
 
+
 def client_pics_str(pics_base: str) -> str:
     return f'{pics_base}.C'
+
 
 def _parse_pics(lines: typing.List[str]) -> dict[str, bool]:
     pics = {}
@@ -55,6 +59,7 @@ def _parse_pics(lines: typing.List[str]) -> dict[str, bool]:
         pics[key.strip()] = (val == "1")
     return pics
 
+
 def _parse_pics_xml(contents: str) -> dict[str, bool]:
     pics = {}
     mytree = ET.fromstring(contents)
@@ -63,6 +68,7 @@ def _parse_pics_xml(contents: str) -> dict[str, bool]:
         support = pi.find('support').text
         pics[name] = int(json.loads(support.lower())) == 1
     return pics
+
 
 def read_pics_from_file(path: str) -> dict[str, bool]:
     """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
