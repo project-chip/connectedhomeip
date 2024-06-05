@@ -3047,7 +3047,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
     {                                                                                                                              \
         { 0x00000011, 1 }, { 0x00000016, 1 }, { 0x00000100, 1 }, { 0x00000011, 1 }, { 0x00000100, 1 }, { 0x00000011, 1 },          \
         {                                                                                                                          \
-            0xFFF10002, 1                                                                                                          \
+            0x00000019, 1                                                                                                          \
         }                                                                                                                          \
     }
 
