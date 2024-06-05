@@ -28,11 +28,18 @@
 #include <string>
 #include <vector>
 
+#if defined(PW_RPC_ENABLED)
+#include <rpc/RpcClient.h>
+#endif
+
+using namespace chip;
+
+namespace {
+
 constexpr char kInteractiveModePrompt[]          = ">>> ";
 constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
 constexpr char kInteractiveModeStopCommand[]     = "quit()";
-
-namespace {
+constexpr uint16_t kRetryIntervalS               = 5;
 
 // File pointer for the log file
 FILE * sLogFile = nullptr;
@@ -67,7 +74,7 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
         return;
     }
 
-    uint64_t timeMs       = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+    uint64_t timeMs       = System::SystemClock().GetMonotonicMilliseconds64().count();
     uint64_t seconds      = timeMs / 1000;
     uint64_t milliseconds = timeMs % 1000;
 
@@ -81,6 +88,26 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 
     funlockfile(sLogFile);
 }
+
+#if defined(PW_RPC_ENABLED)
+void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
+{
+    if (InitRpcClient(kFabricBridgeServerPort) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Connected to Fabric-Bridge");
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to connect to Fabric-Bridge, retry in %d seconds....", kRetryIntervalS);
+        systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
+    }
+}
+
+void ExecuteDeferredConnect(intptr_t ignored)
+{
+    AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
+}
+#endif
 
 } // namespace
 
@@ -134,8 +161,12 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         OpenLogFile(mLogFilePath.Value());
 
         // Redirect logs to the custom logging callback
-        chip::Logging::SetLogRedirectCallback(LoggingCallback);
+        Logging::SetLogRedirectCallback(LoggingCallback);
     }
+
+#if defined(PW_RPC_ENABLED)
+    DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredConnect, 0);
+#endif
 
     char * command = nullptr;
     int status;
@@ -167,7 +198,7 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
         // If scheduling the cleanup fails, there is not much we can do.
         // But if something went wrong while the application is leaving it could be because things have
         // not been cleaned up properly, so it is still useful to log the failure.
-        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredCleanups, 0));
+        LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredCleanups, 0));
         return false;
     }
 
