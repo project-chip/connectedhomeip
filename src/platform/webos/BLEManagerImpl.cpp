@@ -426,9 +426,9 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uin
     pbnjson::JValue valueForMonitor = pbnjson::JObject();
 
     valueForMonitor.put("clientId", std::string(mClientId));
-    valueForMonitor.put("service", std::string(Ble::CHIP_BLE_SVC_ID));
+    valueForMonitor.put("service", std::string(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR));
     pbnjson::JValue bytesJArray = pbnjson::JArray();
-    bytesJArray.append(std::string(Ble::CHIP_BLE_CHAR_2_UUID));
+    bytesJArray.append(std::string(Ble::CHIP_BLE_CHAR_2_UUID_STR));
 
     valueForMonitor.put("characteristics", bytesJArray);
     valueForMonitor.put("subscribe", true);
@@ -448,8 +448,8 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uin
 
     pbnjson::JValue valueForDescriptor = pbnjson::JObject();
     valueForDescriptor.put("clientId", std::string(mClientId));
-    valueForDescriptor.put("service", std::string(Ble::CHIP_BLE_SVC_ID));
-    valueForDescriptor.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_2_UUID));
+    valueForDescriptor.put("service", std::string(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR));
+    valueForDescriptor.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_2_UUID_STR));
 
     valueForDescriptor.put("descriptor", std::string("00002902-0000-1000-8000-00805f9b34fb"));
 
@@ -560,8 +560,8 @@ bool BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * 
     pbnjson::JValue param      = pbnjson::JObject();
     pbnjson::JValue valueParam = pbnjson::JObject();
     param.put("clientId", clientId);
-    param.put("service", std::string(Ble::CHIP_BLE_SVC_ID));
-    param.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_1_UUID));
+    param.put("service", std::string(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR));
+    param.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_1_UUID_STR));
 
     if (valueType == "byte")
     {
