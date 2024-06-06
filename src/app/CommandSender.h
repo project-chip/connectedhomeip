@@ -389,8 +389,7 @@ public:
      * This API does not validate if command provided requires timed invoke. If caller
      * wants that certainty they should call templated version of AddRequestData.
      */
-    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath,
-                              DataModel::EncodableToTLV & aEncodable,
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, DataModel::EncodableToTLV & aEncodable,
                               AddRequestDataParameters & aAddRequestDataParams)
     {
         return AddRequestDataInternal(aCommandPath, aEncodable, aAddRequestDataParams);
@@ -417,8 +416,7 @@ public:
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs)
     {
-        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(),
-                            CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         AddRequestDataParameters addRequestDataParams(aTimedInvokeTimeoutMs);
         DataModel::EncodableType<CommandDataT> encoder(aData);
         return AddRequestData(aCommandPath, encoder, addRequestDataParams);
@@ -465,8 +463,7 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
-    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath,
-                                      DataModel::EncodableToTLV & aEncodable,
+    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, DataModel::EncodableToTLV & aEncodable,
                                       AddRequestDataParameters & aAddRequestDataParams);
 
     CHIP_ERROR FinishCommandInternal(FinishCommandParameters & aFinishCommandParams);
