@@ -110,20 +110,24 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
     // This iteration relies on the hard-coding that occurs when mock_ember is used
     EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
     EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
 
     /// Some out of order requests should work as well
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
-    ASSERT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
-    ASSERT_EQ(model.FirstEndpoint(), kMockEndpoint1);
-    ASSERT_EQ(model.FirstEndpoint(), kMockEndpoint1);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint2), kMockEndpoint3);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint1), kMockEndpoint2);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
+    EXPECT_EQ(model.NextEndpoint(kMockEndpoint3), kInvalidEndpointId);
+    EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
+    EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
+
+    // invalid endpoiunts
+    EXPECT_EQ(model.NextEndpoint(kInvalidEndpointId), kInvalidEndpointId);
+    EXPECT_EQ(model.NextEndpoint(987u), kInvalidEndpointId);
 }
 
 TEST(TestCodegenModelViaMocks, IterateOverClusters)
@@ -224,6 +228,12 @@ TEST(TestCodegenModelViaMocks, IterateOverAttributes)
     ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).path.HasValidIds());
     ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).path.HasValidIds());
     ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
+
+    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kEndpointIdThatIsMissing, MockClusterId(1), 1u)).path.HasValidIds());
+    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kInvalidEndpointId, MockClusterId(1), 1u)).path.HasValidIds());
+    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kMockEndpoint1, MockClusterId(10), 1u)).path.HasValidIds());
+    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kMockEndpoint1, kInvalidClusterId, 1u)).path.HasValidIds());
+    ASSERT_FALSE(model.NextAttribute(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), 987u)).path.HasValidIds());
 
     // should be able to iterate over valid paths
     AttributeEntry entry = model.FirstAttribute(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
