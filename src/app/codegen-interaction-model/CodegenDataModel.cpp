@@ -519,7 +519,7 @@ ConcreteCommandPath CodegenDataModel::NextGeneratedCommand(const ConcreteCommand
 
     VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
 
-    std::optional<CommandId> commandId = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, before.mCommandId);
+    std::optional<CommandId> commandId = mGeneratedCommandsIterator.Next(cluster->acceptedCommandList, before.mCommandId);
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
 
     return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *commandId);
