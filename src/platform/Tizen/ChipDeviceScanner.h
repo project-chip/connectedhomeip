@@ -82,15 +82,14 @@ public:
     ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate){};
     ~ChipDeviceScanner() { StopScan(); }
 
-    /// Initiate a scan for devices, with the given timeout & scan filter data
-    CHIP_ERROR StartScan(System::Clock::Timeout timeout, ScanFilterType filterType, const ScanFilterData & filterData);
+    /// Initiate a scan for devices, with the given scan filter data
+    CHIP_ERROR StartScan(ScanFilterType filterType, const ScanFilterData & filterData);
 
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
 
 private:
     void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * scanInfo);
-    static gboolean TimerExpiredCb(void * userData);
     CHIP_ERROR StartScanImpl();
 
     int CreateLEScanFilter(ScanFilterType filterType);
@@ -101,7 +100,6 @@ private:
     ChipDeviceScannerDelegate * mDelegate;
     bool mIsScanning             = false;
     bool mIsStopping             = false;
-    unsigned int mScanTimeoutMs  = 10000;
     bt_scan_filter_h mScanFilter = nullptr;
 };
 

@@ -98,19 +98,9 @@ void ChipDeviceScanner::LeScanResultCb(int result, bt_adapter_le_device_scan_res
     mDelegate->OnDeviceScanned(*scanInfo, info);
 }
 
-gboolean ChipDeviceScanner::TimerExpiredCb(void * userData)
-{
-    auto self = reinterpret_cast<ChipDeviceScanner *>(userData);
-    ChipLogProgress(DeviceLayer, "Scan Timer expired!!");
-    self->StopScan();
-    return G_SOURCE_REMOVE;
-}
-
 CHIP_ERROR ChipDeviceScanner::StartScanImpl()
 {
-    int ret;
-
-    ret = bt_adapter_le_start_scan(
+    int ret = bt_adapter_le_start_scan(
         +[](int result, bt_adapter_le_device_scan_result_info_s * scanInfo, void * self) {
             return reinterpret_cast<ChipDeviceScanner *>(self)->LeScanResultCb(result, scanInfo);
         },
@@ -118,13 +108,6 @@ CHIP_ERROR ChipDeviceScanner::StartScanImpl()
     VerifyOrReturnValue(ret == BT_ERROR_NONE, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() failed: %s", get_error_message(ret)));
     mIsScanning = true;
-
-    // Setup timer for scan timeout
-    GAutoPtr<GSource> idleSource = GAutoPtr<GSource>(g_timeout_source_new(mScanTimeoutMs));
-    g_source_set_callback(idleSource.get(), TimerExpiredCb, this, nullptr);
-    g_source_set_priority(idleSource.get(), G_PRIORITY_HIGH_IDLE);
-    g_source_attach(idleSource.get(), g_main_context_get_thread_default());
-
     return CHIP_NO_ERROR;
 }
 
@@ -156,19 +139,15 @@ exit:
     return ret;
 }
 
-CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout, ScanFilterType filterType,
-                                        const ScanFilterData & filterData)
+CHIP_ERROR ChipDeviceScanner::StartScan(ScanFilterType filterType, const ScanFilterData & filterData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrReturnError(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     // Scan Filter Setup if supported: silently bypass error & do filterless scan in case of error
     SetupScanFilter(filterType, filterData);
 
-    mScanTimeoutMs = System::Clock::Milliseconds32(timeout).count();
-
     // All set to trigger LE Scan
-    ChipLogProgress(DeviceLayer, "Start CHIP BLE scan: timeout=%ums", mScanTimeoutMs);
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](ChipDeviceScanner * self) { return self->StartScanImpl(); }, this);
     SuccessOrExit(err);
 
@@ -184,7 +163,7 @@ exit:
 CHIP_ERROR ChipDeviceScanner::StopScan()
 {
     int ret = BT_ERROR_NONE;
-    ReturnErrorCodeIf(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     ret = bt_adapter_le_stop_scan();
     if (ret != BT_ERROR_NONE)

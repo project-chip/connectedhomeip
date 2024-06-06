@@ -175,8 +175,6 @@ private:
 
     void DriveBLEState();
 
-    void InitiateScan(BleScanState scanType);
-
     void AdapterStateChangedCb(int result, bt_adapter_state_e adapterState);
     void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState);
     void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle);
@@ -188,6 +186,10 @@ private:
     void GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress);
     static void WriteCompletedCb(int result, bt_gatt_h gattHandle, void * userData);
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
+
+    // ==== BLE Scan.
+    void InitiateScan(BleScanState scanType);
+    static void HandleScanTimeout(chip::System::Layer *, void * appState);
 
     // ==== Connection.
     void AddConnectionData(const char * remoteAddr);
