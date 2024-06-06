@@ -165,8 +165,6 @@ class ChipStack(object):
             callback()
 
         self.cbHandleChipThreadRun = HandleChipThreadRun
-        # set by other modules(BLE) that require service by thread while thread blocks.
-        self.blockingCB = None
 
         #
         # Storage has to be initialized BEFORE initializing the stack, since the latter
@@ -255,11 +253,7 @@ class ChipStack(object):
         if not res.is_success:
             self.completeEvent.set()
             raise res.to_exception()
-        while not self.completeEvent.isSet():
-            if self.blockingCB:
-                self.blockingCB()
-
-            self.completeEvent.wait(0.05)
+        self.completeEvent.wait()
         if isinstance(self.callbackRes, ChipStackException):
             raise self.callbackRes
         return self.callbackRes
