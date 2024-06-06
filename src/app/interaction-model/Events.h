@@ -24,6 +24,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <optional>
 #include <type_traits>
 
 namespace chip {
@@ -32,10 +33,10 @@ namespace InteractionModel {
 
 namespace internal {
 template <typename T>
-class SimpleEventLoggingDelegate : public EventLoggingDelegate
+class SimpleEventPayloadWriter : public EventLoggingDelegate
 {
 public:
-    SimpleEventLoggingDelegate(const T & aEventData) : mEventData(aEventData){};
+    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData){};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
         return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
@@ -45,22 +46,22 @@ private:
     const T & mEventData;
 };
 
-template <typename E, typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
-EventNumber GenerateEvent(E & emittor, const T & aEventData, EndpointId aEndpoint)
+template <typename G, typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
 {
-    internal::SimpleEventLoggingDelegate<T> eventData(aEventData);
+    internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
     ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     EventOptions eventOptions;
     eventOptions.mPath        = path;
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
     eventOptions.mFabricIndex = aEventData.GetFabricIndex();
 
-    // this skips logging the event if it's fabric-scoped but no fabric association exists yet.
-
+    // this skips generating the event if it is fabric-scoped however the event does not seem
+    // associated with any fabric.
     if (eventOptions.mFabricIndex == kUndefinedFabricIndex)
     {
         ChipLogError(EventLogging, "Event encode failure: no fabric index for fabric scoped event");
-        return kInvalidEventId;
+        return std::nullopt;
     }
 
     //
@@ -72,30 +73,30 @@ EventNumber GenerateEvent(E & emittor, const T & aEventData, EndpointId aEndpoin
     // and used to match against the accessing fabric.
     //
     EventNumber eventNumber;
-    CHIP_ERROR err = emittor.GenerateEvent(&eventData, eventOptions, eventNumber);
+    CHIP_ERROR err = generator.GenerateEvent(&eventPayloadWriter, eventOptions, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(EventLogging, "Failed to log event: %" CHIP_ERROR_FORMAT, err.Format());
-        return kInvalidEventId;
+        ChipLogError(EventLogging, "Failed to generate event: %" CHIP_ERROR_FORMAT, err.Format());
+        return std::nullopt;
     }
 
     return eventNumber;
 }
 
-template <typename E, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
-EventNumber GenerateEvent(E & emittor, const T & aEventData, EndpointId endpointId)
+template <typename G, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
+std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId endpointId)
 {
-    internal::SimpleEventLoggingDelegate<T> eventData(aEventData);
+    internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
     ConcreteEventPath path(endpointId, aEventData.GetClusterId(), aEventData.GetEventId());
     EventOptions eventOptions;
     eventOptions.mPath     = path;
     eventOptions.mPriority = aEventData.GetPriorityLevel();
     EventNumber eventNumber;
-    CHIP_ERROR err = emittor.GenerateEvent(&eventData, eventOptions, eventNumber);
+    CHIP_ERROR err = generator.GenerateEvent(&eventPayloadWriter, eventOptions, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(EventLogging, "Failed to log event: %" CHIP_ERROR_FORMAT, err.Format());
-        return kInvalidEventId;
+        ChipLogError(EventLogging, "Failed to generate event: %" CHIP_ERROR_FORMAT, err.Format());
+        return std::nullopt;
     }
 
     return eventNumber;
@@ -103,6 +104,10 @@ EventNumber GenerateEvent(E & emittor, const T & aEventData, EndpointId endpoint
 
 } // namespace internal
 
+/// Exposes event access capabilities.
+///
+/// Allows callers to "generate events" which effectively notifies of an event having
+/// ocurred.
 class Events
 {
 public:
@@ -113,13 +118,14 @@ public:
     /// Events are generally expected to be sent to subscribed clients and also
     /// be available for read later until they get overwritten by new events
     /// that are being generated.
-    virtual CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
+    virtual CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
                                      EventNumber & generatedEventNumber) = 0;
 
     // Convenience methods for event logging using cluster-object structures
-    // On error, these log and return kInvalidEventId
+    //
+    // On error, these log and return nullopt.
     template <typename T>
-    EventNumber GenerateEvent(const T & eventData, EndpointId endpointId)
+    std::optional<EventNumber> GenerateEvent(const T & eventData, EndpointId endpointId)
     {
         return internal::GenerateEvent(*this, eventData, endpointId);
     }
