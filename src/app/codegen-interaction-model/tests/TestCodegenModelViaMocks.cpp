@@ -74,7 +74,7 @@ const MockNodeConfig gTestNodeConfig({
             },    /* attributes */
             {},   /* events */
             {11}, /* acceptedCommands */
-            {4}   /* generatedCommands */
+            {4, 6}   /* generatedCommands */
         ),
     }),
     MockEndpointConfig(kMockEndpoint3, {
@@ -378,7 +378,66 @@ TEST(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 
     for (int i = 0; i < 10; i++)
     {
-        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 11));
+        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 10));
         EXPECT_FALSE(entry.path.HasValidIds());
+    }
+}
+
+TEST(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+
+    // invalid paths should return in "no more data"
+    ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).HasValidIds());
+    ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).HasValidIds());
+    ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).HasValidIds());
+    ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).HasValidIds());
+
+    // should be able to iterate over valid paths
+    ConcreteCommandPath path = model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
+    ASSERT_TRUE(path.HasValidIds());
+    EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
+    EXPECT_EQ(path.mClusterId, MockClusterId(2));
+    EXPECT_EQ(path.mCommandId, 2u);
+
+    path = model.NextGeneratedCommand(path);
+    ASSERT_TRUE(path.HasValidIds());
+    EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
+    EXPECT_EQ(path.mClusterId, MockClusterId(2));
+    EXPECT_EQ(path.mCommandId, 10u);
+
+    path = model.NextGeneratedCommand(path);
+    ASSERT_FALSE(path.HasValidIds());
+
+    // attempt some out-of-order requests as well
+    path = model.FirstGeneratedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
+    ASSERT_TRUE(path.HasValidIds());
+    EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
+    EXPECT_EQ(path.mClusterId, MockClusterId(3));
+    EXPECT_EQ(path.mCommandId, 4u);
+
+    for (int i = 0; i < 10; i++)
+    {
+        path = model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 2));
+        ASSERT_TRUE(path.HasValidIds());
+        EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
+        EXPECT_EQ(path.mClusterId, MockClusterId(2));
+        EXPECT_EQ(path.mCommandId, 10u);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        path = model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 4));
+        ASSERT_TRUE(path.HasValidIds());
+        EXPECT_EQ(path.mEndpointId, kMockEndpoint2);
+        EXPECT_EQ(path.mClusterId, MockClusterId(3));
+        EXPECT_EQ(path.mCommandId, 6u);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        path = model.NextGeneratedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 6));
+        EXPECT_FALSE(path.HasValidIds());
     }
 }
