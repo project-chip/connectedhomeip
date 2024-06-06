@@ -55,12 +55,18 @@ const MockNodeConfig gTestNodeConfig({
         MockClusterConfig(MockClusterId(1), {
             ClusterRevision::Id, FeatureMap::Id,
         }),
-        MockClusterConfig(MockClusterId(2), {
-            ClusterRevision::Id,
-            FeatureMap::Id,
-            MockAttributeId(1),
-            MockAttributeConfig(MockAttributeId(2), ZCL_ARRAY_ATTRIBUTE_TYPE),
-        }),
+        MockClusterConfig(
+            MockClusterId(2), 
+            {
+               ClusterRevision::Id,
+               FeatureMap::Id,
+               MockAttributeId(1),
+               MockAttributeConfig(MockAttributeId(2), ZCL_ARRAY_ATTRIBUTE_TYPE),
+            },          /* attributes */
+            {},         /* events */
+            {1, 2, 23}, /* acceptedCommands */
+            {2, 10}     /* generatedCommands */
+        ),
         MockClusterConfig(MockClusterId(3), {
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
         }),
@@ -304,4 +310,38 @@ TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
     info = model.GetAttributeInfo(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
     ASSERT_FALSE(info.has_value());
+}
+
+TEST(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+
+    // invalid paths should return in "no more data"
+    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
+    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kInvalidEndpointId, MockClusterId(1))).path.HasValidIds());
+    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, MockClusterId(10))).path.HasValidIds());
+    ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
+
+    // should be able to iterate over valid paths
+    CommandEntry entry = model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)));
+    ASSERT_TRUE(entry.path.HasValidIds());
+    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
+    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
+    EXPECT_EQ(entry.path.mCommandId, 1u);
+
+    entry = model.NextAcceptedCommand(entry.path);
+    ASSERT_TRUE(entry.path.HasValidIds());
+    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
+    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
+    EXPECT_EQ(entry.path.mCommandId, 2u);
+
+    entry = model.NextAcceptedCommand(entry.path);
+    ASSERT_TRUE(entry.path.HasValidIds());
+    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
+    EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
+    EXPECT_EQ(entry.path.mCommandId, 23u);
+
+    entry = model.NextAcceptedCommand(entry.path);
+    ASSERT_FALSE(entry.path.HasValidIds());
 }
