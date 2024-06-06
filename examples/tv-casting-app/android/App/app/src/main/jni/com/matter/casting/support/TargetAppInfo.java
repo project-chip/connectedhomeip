@@ -11,25 +11,15 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.matter.casting.core;
+package com.matter.casting.support;
 
-import chip.devicecontroller.ChipClusters;
-import com.matter.casting.support.DeviceTypeStruct;
-import java.util.List;
-
-/** This represents an Endpoint on a CastingPlayer e.g. a Speaker or a Matter Content App */
-public interface Endpoint {
-  int getId();
-
-  int getVendorId();
-
-  int getProductId();
-
-  List<DeviceTypeStruct> getDeviceTypeList();
-
-  /** Get an instance of a cluster based on its Class */
-  <T extends ChipClusters.BaseChipCluster> T getCluster(Class<T> clusterClass);
-
-  /** Get the CastingPlayer that this Endpoint is a part of. */
-  CastingPlayer getCastingPlayer();
+/**
+ * Feature: Target Content Application - The set of content app Vendor IDs (and optionally, Product
+ * IDs) that can be used for authentication.
+ */
+public class TargetAppInfo {
+  /** Target Target Content Application Vendor ID, null means unspecified */
+  public Integer vendorId;
+  /** Target Target Content Application Product ID, null means unspecified */
+  public Integer productId;
 }

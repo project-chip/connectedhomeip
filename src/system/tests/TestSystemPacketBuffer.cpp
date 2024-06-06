@@ -300,7 +300,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNew)
     {
         const PacketBufferHandle buffer = PacketBufferHandle::New(0, config.reserved_size);
 
-        if (config.reserved_size > PacketBuffer::kMaxSizeWithoutReserve)
+        if (config.reserved_size > PacketBuffer::kMaxAllocSize)
         {
             EXPECT_TRUE(buffer.IsNull());
             continue;
@@ -1596,7 +1596,8 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleRightSize)
 
 TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleCloneData)
 {
-    uint8_t lPayload[2 * PacketBuffer::kMaxSizeWithoutReserve];
+    uint8_t lPayload[2 * PacketBuffer::kMaxAllocSize];
+
     for (uint8_t & payload : lPayload)
     {
         payload = static_cast<uint8_t>(random());
@@ -1675,7 +1676,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleCloneData)
     // This is only testable on heap allocation configurations, where pbuf records the allocation size and we can manually
     // construct an oversize buffer.
 
-    constexpr uint16_t kOversizeDataSize = PacketBuffer::kMaxSizeWithoutReserve + 99;
+    constexpr size_t kOversizeDataSize = PacketBuffer::kMaxAllocSize + 99;
     PacketBuffer * p = reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(kStructureSize + kOversizeDataSize));
     ASSERT_NE(p, nullptr);
 
@@ -1689,15 +1690,16 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleCloneData)
     PacketBufferHandle handle = PacketBufferHandle::Adopt(p);
 
     // Fill the buffer to maximum and verify that it can be cloned.
+    size_t maxSize = PacketBuffer::kMaxAllocSize;
 
-    memset(handle->Start(), 1, PacketBuffer::kMaxSizeWithoutReserve);
-    handle->SetDataLength(PacketBuffer::kMaxSizeWithoutReserve);
-    EXPECT_EQ(handle->DataLength(), PacketBuffer::kMaxSizeWithoutReserve);
+    memset(handle->Start(), 1, maxSize);
+    handle->SetDataLength(maxSize);
+    EXPECT_EQ(handle->DataLength(), maxSize);
 
     PacketBufferHandle clone = handle.CloneData();
     ASSERT_FALSE(clone.IsNull());
-    EXPECT_EQ(clone->DataLength(), PacketBuffer::kMaxSizeWithoutReserve);
-    EXPECT_EQ(memcmp(handle->Start(), clone->Start(), PacketBuffer::kMaxSizeWithoutReserve), 0);
+    EXPECT_EQ(clone->DataLength(), maxSize);
+    EXPECT_EQ(memcmp(handle->Start(), clone->Start(), maxSize), 0);
 
     // Overfill the buffer and verify that it can not be cloned.
     memset(handle->Start(), 2, kOversizeDataSize);

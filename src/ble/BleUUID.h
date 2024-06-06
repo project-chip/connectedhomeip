@@ -101,7 +101,6 @@ constexpr std::pair<bool, ChipBleUUID> StringToUUID(const char (&str)[N])
 //       BlueZ API https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/org.bluez.Device.rst
 //       describes ServiceData as "Keys are the UUIDs in string format" however no description
 //       on actual case required
-inline constexpr char CHIP_BLE_DESC_SHORT_UUID_STR[]    = "2902";
 inline constexpr char CHIP_BLE_SERVICE_SHORT_UUID_STR[] = "fff6";
 inline constexpr char CHIP_BLE_SERVICE_LONG_UUID_STR[]  = "0000fff6-0000-1000-8000-00805f9b34fb";
 inline constexpr char CHIP_BLE_CHAR_1_UUID_STR[]        = "18ee2ef5-263d-4559-959f-4f9c429f9d11";
