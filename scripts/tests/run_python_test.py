@@ -88,8 +88,8 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
 @click.option("--script-gdb", is_flag=True,
               help='Run script through gdb')
-@click.option("--ci", is_flag=True, help="Use this flag in CI to suppress output from passing tests")
-def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str, script: str, script_args: str, script_gdb: bool, ci: bool):
+@click.option("--quiet", is_flag=True, help="Do not print output from passing tests. Use this flag in CI to keep github log sizes manageable.")
+def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str, script: str, script_args: str, script_gdb: bool, quiet: bool):
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
 
@@ -130,7 +130,7 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
     app_pid = 0
 
     stream_output = sys.stdout.buffer
-    if ci:
+    if quiet:
         stream_output = io.BytesIO()
 
     if app:
@@ -186,7 +186,7 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
     # We expect both app and test script should exit with 0
     exit_code = test_script_exit_code if test_script_exit_code != 0 else test_app_exit_code
 
-    if ci:
+    if quiet:
         if exit_code:
             sys.stdout.write(stream_output.getvalue().decode('utf-8'))
         else:
