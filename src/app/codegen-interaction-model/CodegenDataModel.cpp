@@ -404,5 +404,35 @@ std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInf
     return std::make_optional(info);
 }
 
+InteractionModel::CommandEntry CodegenDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
+{
+    // FIXME: implement
+    return InteractionModel::CommandEntry::Invalid();
+}
+
+InteractionModel::CommandEntry CodegenDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
+{
+    // FIXME: implement
+    return InteractionModel::CommandEntry::Invalid();
+}
+
+std::optional<InteractionModel::CommandInfo> CodegenDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
+{
+    // FIXME: implement
+    return std::nullopt;
+}
+
+ConcreteCommandPath CodegenDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
+{
+    // FIXME: implement
+    return ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+}
+
+ConcreteCommandPath CodegenDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
+{
+    // FIXME: implement
+    return ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+}
+
 } // namespace app
 } // namespace chip

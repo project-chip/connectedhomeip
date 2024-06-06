@@ -59,6 +59,13 @@ public:
     InteractionModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<InteractionModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
 
+    InteractionModel::CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster) override;
+    InteractionModel::CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before) override;
+    std::optional<InteractionModel::CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) override;
+
+    ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) override;
+    ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before) override;
+
 private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
