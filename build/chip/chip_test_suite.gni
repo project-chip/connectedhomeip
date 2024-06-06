@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#++++ DEBUG: These flags control whether we're creating a binary for each test suite or each individual test source.  This is a temporary solution while debugging.
-enable_efr32_build_per_suite = false  #++++ TODO: Figure out how to enable things based on `chip_device_platform == "efr32"` which is not currently in scope.
 enable_efr32_build_per_testsource = true  #++++ TODO: Figure out how to enable things based on `chip_device_platform == "efr32"` which is not currently in scope.
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-if (enable_efr32_build_per_suite || enable_efr32_build_per_testsource) {
+if (enable_efr32_build_per_testsource) {
   import("//build_overrides/efr32_sdk.gni")  # Defines efr32_sdk_build_root
   import("//build_overrides/nlunit_test.gni")  # Defines nlunit_test_root
 }
@@ -26,7 +24,7 @@ if (enable_efr32_build_per_suite || enable_efr32_build_per_testsource) {
 import("${chip_root}/build/chip/chip_test.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${dir_pw_unit_test}/test.gni")
-if (enable_efr32_build_per_suite || enable_efr32_build_per_testsource) {
+if (enable_efr32_build_per_testsource) {
   import("${efr32_sdk_build_root}/efr32_sdk.gni")
   import("${efr32_sdk_build_root}/silabs_executable.gni")
   #import("$dir_pw_protobuf_compiler/proto.gni")
@@ -96,115 +94,6 @@ template("chip_test_suite") {
     invoker.sources += invoker.test_sources
   }
 
-  if (enable_efr32_build_per_suite || enable_efr32_build_per_testsource) {
-    # Since target_name is usually "tests", we need a unique name to use in the executable target.
-    if (defined(invoker.output_name)) {
-      # Get it from the suite's output_name.
-      _unique_suite_name = invoker.output_name
-    } else {
-      # Some test suites don't have output_name defined. Use the first source file.
-      _unique_suite_name = string_replace(string_join("-", invoker.test_sources), ".cpp", "")
-    }
-  }
-
-  print("++++ SUITE ${_unique_suite_name}")
-  if (enable_efr32_build_per_suite) {
-    #++++ DEBUG: Disabled code that was used for testing an alternative implementaiton.
-    #
-    # pw_proto_library("nl_test_service--${_unique_suite_name}") {
-    #   sources = [ "${efr32_project_dir}/proto/nl_test.proto" ]
-    #   inputs = [ "${efr32_project_dir}/proto/nl_test.options" ]
-    #   deps = [ "$dir_pw_protobuf:common_protos" ]
-    #   strip_prefix = "${efr32_project_dir}/proto"
-    #   prefix = "nl_test_service"
-    # }
-    #
-    # efr32_sdk("sdk--${_unique_suite_name}") {
-    #   sources = [
-    #     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    #     "${examples_common_plat_dir}/FreeRTOSConfig.h",
-    #   ]
-    #
-    #   include_dirs = [
-    #     "${chip_root}/src/platform/silabs/efr32",
-    #     "${efr32_project_dir}/include",
-    #     "${examples_plat_dir}",
-    #     "${examples_common_plat_dir}",
-    #   ]
-    #
-    #   defines = [
-    #     "PW_RPC_ENABLED",
-    #
-    #     # Thread is built but test driver do not have the NETWORK_COMMISSIONING cluster or zap config.
-    #     "_NO_NETWORK_COMMISSIONING_DRIVER_",
-    #   ]
-    # }
-
-    silabs_executable("efr32_device_tests--${_unique_suite_name}") {
-      output_name = "matter-silabs-device_tests--${_unique_suite_name}.out"
-
-      defines = [ "PW_RPC_ENABLED" ]
-      sources = [
-        "${chip_root}/examples/common/pigweed/RpcService.cpp",
-        "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-        "${chip_root}/src/test_driver/efr32/src/main.cpp",  #++++ replace absolute path
-        "${examples_common_plat_dir}/PigweedLogger.cpp",
-        "${examples_common_plat_dir}/heap_4_silabs.c",
-        "${examples_common_plat_dir}/syscalls_stubs.cpp",
-        "${examples_plat_dir}/uart.cpp",
-      ]
-
-      deps = [
-        #++++ DEBUG: Disabled code that was used for testing an alternative implementaiton.
-        # "${chip_root}/src/test_driver/efr32:nl_test_service.nanopb_rpc",  #++++ replace absolute path
-        # "${chip_root}/src/test_driver/efr32:sdk",  #++++ replace absolute path
-        #":nl_test_service--${_unique_suite_name}.nanopb_rpc",
-        #":sdk--${_unique_suite_name}",
-
-        "$dir_pw_unit_test:rpc_service",
-        "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
-        "${chip_root}/examples/common/pigweed:system_rpc_server",
-        "${chip_root}/src/lib",
-        "${chip_root}/src/lib/support:pw_tests_wrapper",
-        "${chip_root}/src/lib/support:testing_nlunit",
-        "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
-        "${nlunit_test_root}:nlunit-test",
-      ]
-
-      # OpenThread Settings
-      if (chip_enable_openthread) {
-        deps += [
-          "${chip_root}/third_party/openthread:openthread",
-          "${chip_root}/third_party/openthread:openthread-platform",
-          "${examples_plat_dir}:efr-matter-shell",
-        ]
-      }
-
-      # Attestation Credentials
-      deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
-
-      # Factory Data Provider
-      if (use_efr32_factory_data_provider) {
-        deps += [ "${examples_plat_dir}:silabs-factory-data-provider" ]
-      }
-
-      deps += pw_build_LINK_DEPS
-
-      include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
-
-      ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
-
-      inputs = [ ldscript ]
-
-      ldflags = [
-        "-T" + rebase_path(ldscript, root_build_dir),
-        "-Wl,--no-warn-rwx-segment",
-      ]
-
-      output_dir = root_out_dir
-    }
-  }
-
   if (chip_build_test_static_libraries) {
     _target_type = "static_library"
   } else {
@@ -220,9 +109,6 @@ template("chip_test_suite") {
     }
 
     deps = [ dir_pw_unit_test ]
-    if (enable_efr32_build_per_suite) {
-      deps += [ ":efr32_device_tests--${_unique_suite_name}" ]
-    }
 
     if (current_os != "zephyr" && current_os != "mbed") {
       # Depend on stdio logging, and have it take precedence over the default platform backend
@@ -230,7 +116,6 @@ template("chip_test_suite") {
     }
   }
   if (chip_link_tests || enable_efr32_build_per_testsource) {  #++++ Temporary workaround rather than changing `chip_link_tests` and `chip_build_tests` in `tests.gni`
-    print("  ++++ LINK ${_unique_suite_name}")
     tests = []
 
     if (defined(invoker.test_sources)) {
@@ -242,8 +127,17 @@ template("chip_test_suite") {
           _test_output_dir = invoker.output_dir
         }
 
-        print("    ++++ TEST ${_unique_suite_name} -- ${_test_name}")
         if (enable_efr32_build_per_testsource) {
+
+          # Since target_name is usually "tests", we need a unique name to use in the executable target.
+          if (defined(invoker.output_name)) {
+            # Get it from the suite's output_name.
+            _unique_suite_name = invoker.output_name
+          } else {
+            # Some test suites don't have output_name defined. Use the first source file.
+            _unique_suite_name = string_replace(string_join("-", invoker.test_sources), ".cpp", "")
+          }
+
           silabs_executable("efr32_device_tests--${_unique_suite_name}--${_test_name}") {
             output_name = "matter-silabs-device_tests--${_unique_suite_name}--${_test_name}.out"
 
