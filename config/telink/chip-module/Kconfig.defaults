@@ -34,11 +34,11 @@ choice LOG_MODE
 endchoice
 
 choice MATTER_LOG_LEVEL_CHOICE
-    default MATTER_LOG_LEVEL_INF
+    default MATTER_LOG_LEVEL_DBG
 endchoice
 
 config CHIP_APP_LOG_LEVEL
-    default 3 # info
+    default 4 # debug
 
 config LOG_DEFAULT_LEVEL
     default 1 # error
