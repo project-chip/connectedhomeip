@@ -213,6 +213,7 @@ bool CodegenDataModel::EmberCommandListIterator::Exists(const CommandId * list, 
     }
 
     // move and try to find it
+    mCurrentHint = mCurrentList;
     while ((*mCurrentHint != kInvalidCommandId) && (*mCurrentHint != toCheck))
     {
         mCurrentHint++;
