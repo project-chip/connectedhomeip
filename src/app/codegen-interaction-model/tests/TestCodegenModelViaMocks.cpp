@@ -56,7 +56,7 @@ const MockNodeConfig gTestNodeConfig({
             ClusterRevision::Id, FeatureMap::Id,
         }),
         MockClusterConfig(
-            MockClusterId(2), 
+            MockClusterId(2),
             {
                ClusterRevision::Id,
                FeatureMap::Id,
@@ -68,7 +68,7 @@ const MockNodeConfig gTestNodeConfig({
             {2, 10}     /* generatedCommands */
         ),
         MockClusterConfig(
-            MockClusterId(3), 
+            MockClusterId(3),
             {
                 ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
             },    /* attributes */
