@@ -28,7 +28,7 @@ namespace bdx {
 
 // This class implements the pool interface used to allocate BdxTransfer objects. It keeps track of the number of transfers
 // that are expected to be created and only allocates a BdxTransfer object if a transfer is expected.
-class BdxTransferManager : public BdxTransferPool
+class BdxTransferManager : public BdxTransferPool, public BdxTransfer::Delegate
 {
 public:
     BdxTransferManager(BdxTransfer::Delegate * bdxTransferDelegate);
@@ -40,6 +40,10 @@ public:
 
     BdxTransfer * Allocate() override;
     void Release(BdxTransfer * bdxTransfer) override;
+
+    void InitMessageReceived(BdxTransfer * transfer, TransferSession::TransferInitData init_data) override;
+    void DataReceived(BdxTransfer * transfer, const ByteSpan & block) override;
+    void TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result) override;
 
 private:
     ObjectPool<BdxTransfer, 2> mTransferPool;

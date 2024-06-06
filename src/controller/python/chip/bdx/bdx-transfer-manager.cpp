@@ -44,8 +44,7 @@ BdxTransfer * BdxTransferManager::Allocate()
 
     BdxTransfer * result = mTransferPool.CreateObject();
     VerifyOrReturn(result != nullptr);
-    // TODO: This needs to intercept the delegate calls so it can free the transfer after it completes.
-    result->SetDelegate(mBdxTransferDelegate);
+    result->SetDelegate(this);
 
     --mExpectedTransfers;
     return result;
@@ -56,6 +55,22 @@ void BdxTransferManager::Release(BdxTransfer * bdxTransfer)
 {
     mBdxTransferDelegate->TransferCompleted(bdxTransfer, CHIP_ERROR_CONNECTION_ABORTED);
     mTransferPool.ReleaseObject(bdxTransfer);
+}
+
+void BdxTransferManager::InitMessageReceived(BdxTransfer * transfer, TransferSession::TransferInitData init_data)
+{
+    mBdxTransferDelegate->InitMessageReceived(transfer, init_data);
+}
+
+void BdxTransferManager::DataReceived(BdxTransfer * transfer, const ByteSpan & block)
+{
+    mBdxTransferDelegate->DataReceived(transfer, block);
+}
+
+void BdxTransferManager::TransferCompleted(BdxTransfer * transfer, CHIP_ERROR result)
+{
+    mBdxTransferDelegate->TransferCompleted(transfer, result);
+    mTransferPool.ReleaseObject(transfer);
 }
 
 } // namespace bdx
