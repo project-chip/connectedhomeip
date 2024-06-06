@@ -537,7 +537,8 @@ CHIP_ERROR CommandSender::FinishCommand(FinishCommandParameters & aFinishCommand
     return FinishCommandInternal(aFinishCommandParams);
 }
 
-CHIP_ERROR CommandSender::AddRequestDataInternal(const CommandPathParams & aCommandPath, DataModel::EncodableToTLV & aEncodable,
+CHIP_ERROR CommandSender::AddRequestDataInternal(const CommandPathParams & aCommandPath,
+                                                 const DataModel::EncodableToTLV & aEncodable,
                                                  AddRequestDataParameters & aAddRequestDataParams)
 {
     PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);

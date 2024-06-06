@@ -390,7 +390,7 @@ public:
      * invoke interaction. If the caller wants that certainty they should call the templated
      * version of AddRequestData.
      */
-    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, DataModel::EncodableToTLV & aEncodable,
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
                               AddRequestDataParameters & aAddRequestDataParams)
     {
         return AddRequestDataInternal(aCommandPath, aEncodable, aAddRequestDataParams);
@@ -473,7 +473,8 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
-    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, DataModel::EncodableToTLV & aEncodable,
+    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath,
+                                      const DataModel::EncodableToTLV & aEncodable,
                                       AddRequestDataParameters & aAddRequestDataParams);
 
     CHIP_ERROR FinishCommandInternal(FinishCommandParameters & aFinishCommandParams);
