@@ -297,6 +297,20 @@ uint32_t TelinkWiFiDriver::GetSupportedWiFiBandsMask() const
     return bands;
 }
 
+void TelinkWiFiDriver::StartDefaultWiFiNetwork(void)
+{
+    chip::ByteSpan ssidSpan     = ByteSpan(Uint8::from_const_char(CONFIG_DEFAULT_WIFI_SSID), strlen(CONFIG_DEFAULT_WIFI_SSID));
+    chip::ByteSpan passwordSpan = ByteSpan(Uint8::from_const_char(CONFIG_DEFAULT_WIFI_PASSWORD), strlen(CONFIG_DEFAULT_WIFI_PASSWORD));
+
+    char debugBuffer[1] = {0};
+    MutableCharSpan debugText(debugBuffer, 0);
+    uint8_t outNetworkIndex = 0;
+
+    AddOrUpdateNetwork(ssidSpan, passwordSpan, debugText, outNetworkIndex);
+    CommitConfiguration();
+    RevertConfiguration();
+}
+
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip

@@ -98,6 +98,8 @@ public:
     void OnScanWiFiNetworkResult(const WiFiScanResponse & result);
     void OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status);
 
+    void StartDefaultWiFiNetwork(void);
+
 private:
     void LoadFromStorage();
 

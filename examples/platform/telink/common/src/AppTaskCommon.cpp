@@ -26,6 +26,10 @@
 
 #include "ThreadUtil.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/telink/wifi/TelinkWiFiDriver.h>
+#endif
+
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
@@ -213,9 +217,13 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 
     AppEvent event = {};
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     StartThreadButtonEventHandler();
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    StartWiFiButtonEventHandler();
 #endif
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
 
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
@@ -360,10 +368,16 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
         FactoryResetButtonEventHandler();
         break;
 #if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case kButtonId_StartThread:
         StartThreadButtonEventHandler();
         break;
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    case kButtonId_StartWiFi:
+        StartWiFiButtonEventHandler();
+        break;
 #endif
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
     case kButtonId_StartBleAdv:
         StartBleAdvButtonEventHandler();
         break;
@@ -433,9 +447,13 @@ void AppTaskCommon::LinkButtons(ButtonManager & buttonManager)
     buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
     buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
     buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     buttonManager.addCallback(StartThreadButtonEventHandler, 3, true);
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    buttonManager.addCallback(StartWiFiButtonEventHandler, 3, true);
 #endif
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
 }
 
 void AppTaskCommon::UpdateStatusLED()
@@ -578,7 +596,8 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
     AppEvent event;
@@ -609,7 +628,38 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
         LOG_INF("Device already commissioned");
     }
 }
+
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+void AppTaskCommon::StartWiFiButtonEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = StartWiFiHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::StartWiFiHandler(AppEvent * aEvent)
+{
+    LOG_INF("StartWiFiHandler");
+
+    if (!strlen(CONFIG_DEFAULT_WIFI_SSID) || !strlen(CONFIG_DEFAULT_WIFI_PASSWORD))
+    {
+        LOG_ERR("default WiFi SSID/Password are not set");
+    }
+
+    if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
+    {
+        NetworkCommissioning::TelinkWiFiDriver().StartDefaultWiFiNetwork();
+    }
+    else
+    {
+        LOG_INF("Device already commissioned");
+    }
+}
 #endif
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
 
 void AppTaskCommon::ExampleActionButtonEventHandler(void)
 {
