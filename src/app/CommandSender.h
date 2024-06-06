@@ -377,7 +377,7 @@ public:
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
 
     /**
-     * API for adding a request data.  The `aEncodable` is generally expected to encode
+     * API for adding request data.  The `aEncodable` is generally expected to encode
      * a ClusterName::Commands::CommandName::Type struct, however any object should work.
      *
      * @param [in] aCommandPath  The path of the command being requested.
@@ -386,8 +386,9 @@ public:
      * @param [in] aAddRequestDataParams parameters associated with building the
      *             InvokeRequestMessage that are associated with this request.
      *
-     * This API does not validate if command provided requires timed invoke. If caller
-     * wants that certainty they should call templated version of AddRequestData.
+     * This API does not validate if the command provided requires interaction use a timed
+     * invoke interaction. If the caller wants that certainty they should call the templated
+     * version of AddRequestData.
      */
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, DataModel::EncodableToTLV & aEncodable,
                               AddRequestDataParameters & aAddRequestDataParams)
