@@ -67,9 +67,15 @@ const MockNodeConfig gTestNodeConfig({
             {1, 2, 23}, /* acceptedCommands */
             {2, 10}     /* generatedCommands */
         ),
-        MockClusterConfig(MockClusterId(3), {
-            ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
-        }),
+        MockClusterConfig(
+            MockClusterId(3), 
+            {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+            },    /* attributes */
+            {},   /* events */
+            {11}, /* acceptedCommands */
+            {4}   /* generatedCommands */
+        ),
     }),
     MockEndpointConfig(kMockEndpoint3, {
         MockClusterConfig(MockClusterId(1), {
@@ -344,4 +350,35 @@ TEST(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 
     entry = model.NextAcceptedCommand(entry.path);
     ASSERT_FALSE(entry.path.HasValidIds());
+
+    // attempt some out-of-order requests as well
+    entry = model.FirstAcceptedCommand(ConcreteClusterPath(kMockEndpoint2, MockClusterId(3)));
+    ASSERT_TRUE(entry.path.HasValidIds());
+    EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
+    EXPECT_EQ(entry.path.mClusterId, MockClusterId(3));
+    EXPECT_EQ(entry.path.mCommandId, 11u);
+
+    for (int i = 0; i < 10; i++)
+    {
+        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 2));
+        ASSERT_TRUE(entry.path.HasValidIds());
+        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
+        EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
+        EXPECT_EQ(entry.path.mCommandId, 23u);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1));
+        ASSERT_TRUE(entry.path.HasValidIds());
+        EXPECT_EQ(entry.path.mEndpointId, kMockEndpoint2);
+        EXPECT_EQ(entry.path.mClusterId, MockClusterId(2));
+        EXPECT_EQ(entry.path.mCommandId, 2u);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        entry = model.NextAcceptedCommand(ConcreteCommandPath(kMockEndpoint2, MockClusterId(3), 11));
+        EXPECT_FALSE(entry.path.HasValidIds());
+    }
 }
