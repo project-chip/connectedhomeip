@@ -174,7 +174,7 @@ public:
     virtual CHIP_ERROR SetESAType(ESATypeEnum)                                                                       = 0;
     virtual CHIP_ERROR SetESACanGenerate(bool)                                                                       = 0;
     virtual CHIP_ERROR SetESAState(ESAStateEnum)                                                                     = 0;
-    virtual CHIP_ERROR SetAbsMinPower(int64_t)                                                                       = 0                     ;
+    virtual CHIP_ERROR SetAbsMinPower(int64_t)                                                                       = 0;
     virtual CHIP_ERROR SetAbsMaxPower(int64_t)                                                                       = 0;
     virtual CHIP_ERROR SetPowerAdjustmentCapability(DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type>) = 0;
     virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type>)                               = 0;

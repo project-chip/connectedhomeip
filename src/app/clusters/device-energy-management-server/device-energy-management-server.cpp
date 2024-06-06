@@ -324,7 +324,8 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
         return;
     }
 
-    DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapabilityStruct = mDelegate.GetPowerAdjustmentCapability();
+    DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapabilityStruct =
+        mDelegate.GetPowerAdjustmentCapability();
     if (powerAdjustmentCapabilityStruct.IsNull())
     {
         ChipLogError(Zcl, "DEM: powerAdjustmentCapabilityStruct IsNull");
@@ -693,8 +694,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         // NominalPower is only relevant if PFR is supported
         if (HasFeature(Feature::kPowerForecastReporting))
         {
-            if (!slot.minPowerAdjustment.HasValue() ||
-                !slot.maxPowerAdjustment.HasValue() ||
+            if (!slot.minPowerAdjustment.HasValue() || !slot.maxPowerAdjustment.HasValue() ||
                 slotAdjustment.nominalPower.Value() < slot.minPowerAdjustment.Value() ||
                 slotAdjustment.nominalPower.Value() > slot.maxPowerAdjustment.Value())
             {
@@ -704,8 +704,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
             }
         }
 
-        if (!slot.minDurationAdjustment.HasValue() ||
-            !slot.maxDurationAdjustment.HasValue() ||
+        if (!slot.minDurationAdjustment.HasValue() || !slot.maxDurationAdjustment.HasValue() ||
             slotAdjustment.duration < slot.minDurationAdjustment.Value() ||
             slotAdjustment.duration > slot.maxDurationAdjustment.Value())
         {
@@ -748,7 +747,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     }
 
     uint32_t currentUtcTime = 0;
-    status = GetCurrentUtcTime(currentUtcTime);
+    status                  = GetCurrentUtcTime(currentUtcTime);
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: Forecast is Null");
@@ -848,7 +847,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
 
 void Instance::HandleCancelRequest(HandlerContext & ctx, const Commands::CancelRequest::DecodableType & commandData)
 {
-    Status status = Status::Failure;
+    Status status                                               = Status::Failure;
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
 
     if (forecast.IsNull())
