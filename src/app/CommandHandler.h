@@ -155,7 +155,7 @@ public:
      * case AddResponseData fails.
      */
     virtual CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                                       DataModel::EncodableToTLV & aEncodable) = 0;
+                                       const DataModel::EncodableToTLV & aEncodable) = 0;
 
     /**
      * Attempts to encode a response to a command.
@@ -171,7 +171,7 @@ public:
      * AddResponseData allows the caller to try to deal with any CHIP_ERRORs.
      */
     virtual void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                             DataModel::EncodableToTLV & aEncodable) = 0;
+                             const DataModel::EncodableToTLV & aEncodable) = 0;
 
     /**
      * Check whether the InvokeRequest we are handling is a timed invoke.
