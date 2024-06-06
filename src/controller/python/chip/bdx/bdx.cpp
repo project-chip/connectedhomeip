@@ -62,6 +62,16 @@ public:
         return &*result;
     }
 
+    TransferData * TransferDataForTransferObtainedContext(PyObject transferObtainedContext)
+    {
+        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(),
+                                                               [transferObtainedContext](const TransferData& data) {
+                                                                   return data.OnTransferObtainedContext == transferObtainedContext;
+                                                               });
+        VerifyOrReturnValue(result != mTransfers.end(), nullptr);
+        return &*result;
+    }
+
     // This returns the next transfer data that has no associated BdxTransfer.
     TransferData * NextUnassociatedTransferData()
     {
@@ -80,10 +90,7 @@ public:
 
     void RemoveTransferData(TransferData * transferData)
     {
-        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(),
-                                                               [transferData](const TransferData& data) {
-                                                                   return &data == transferData;
-                                                               });
+        std::vector<TransferData>::iterator result = std::find(mTransfers.begin(), mTransfers.end(), *transferData);
         VerifyOrReturn(result != mTransfers.end());
         mTransfers.erase(result);
     }
@@ -100,7 +107,7 @@ public:
 
     virtual void InitMessageReceived(bdx::BdxTransfer * transfer, bdx::TransferSession::TransferInitData init_data)
     {
-        TransferData * transferData = mTransfers->CreateUnassociatedTransferData();
+        TransferData * transferData = mTransfers->NextUnassociatedTransferData();
         if (gOnTransferObtainedCallback && transferData)
         {
             transferData->Transfer = transfer;
@@ -165,14 +172,20 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     OnTransferCompletedCallback gOnTransferCompletedCallback = onTransferCompletedCallback;
 }
 
-PyChipError pychip_Bdx_ExpectBdxTransfer()
+PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
 {
+    TransferData * transferData = gTransfers.CreateUnassociatedTransferData();
+    VerifyOrReturnValue(transferData != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    transferData->OnTransferObtainedContext = transferObtainedContext;
     gBdxTransferManager.ExpectATransfer();
 }
 
-PyChipError pychip_Bdx_StopExpectingBdxTransfer()
+PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext)
 {
+    TransferData * transferData = gTransfers.TransferDataForTransferObtainedContext(transferObtainedContext);
+    VerifyOrReturnValue(transferData != nullptr, ToPyChipError(CHIP_ERROR_NOT_FOUND));
     gBdxTransferManager.StopExpectingATransfer();
+    gTransfers.RemoveTransferData(transferData);
 }
 
 PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyObject dataReceivedContext,
