@@ -224,7 +224,7 @@ std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberA
     }
 
     // linear search, this may be slow
-    // does NOT use emberAfClusterIndex to not iteratoe over endpoints as we have
+    // does NOT use emberAfClusterIndex to not iterate over endpoints as we have
     // already found the correct endpoint
     for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
     {
