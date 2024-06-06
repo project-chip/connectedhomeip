@@ -409,8 +409,7 @@ public:
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
     {
         AddRequestDataParameters addRequestDataParams;
-        DataModel::EncodableType<CommandDataT> encoder(aData);
-        return AddRequestData(aCommandPath, encoder, addRequestDataParams);
+        return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
     template <typename CommandDataT>
