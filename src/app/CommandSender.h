@@ -473,8 +473,7 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
-    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath,
-                                      const DataModel::EncodableToTLV & aEncodable,
+    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
                                       AddRequestDataParameters & aAddRequestDataParams);
 
     CHIP_ERROR FinishCommandInternal(FinishCommandParameters & aFinishCommandParams);
