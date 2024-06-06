@@ -73,7 +73,7 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
     for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (!IsServerMask(cluster.mask & CLUSTER_MASK_SERVER))
+        if (!IsServerMask(cluster.mask))
         {
             continue;
         }
