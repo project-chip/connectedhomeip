@@ -45,7 +45,7 @@ def client_pics_str(pics_base: str) -> str:
     return f'{pics_base}.C'
 
 
-def _parse_pics(lines: typing.List[str]) -> dict[str, bool]:
+def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
     pics = {}
     for raw in lines:
         line, _, _ = raw.partition("#")
@@ -63,7 +63,7 @@ def _parse_pics(lines: typing.List[str]) -> dict[str, bool]:
     return pics
 
 
-def _parse_pics_xml(contents: str) -> dict[str, bool]:
+def parse_pics_xml(contents: str) -> dict[str, bool]:
     pics = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('picsItem'):
@@ -80,10 +80,10 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
         for filename in glob.glob(f'{path}/*.xml'):
             with open(filename, 'r') as f:
                 contents = f.read()
-                pics_dict.update(_parse_pics_xml(contents))
+                pics_dict.update(parse_pics_xml(contents))
         return pics_dict
 
     else:
         with open(path, 'r') as f:
             lines = f.readlines()
-            return _parse_pics(lines)
+            return parse_pics(lines)
