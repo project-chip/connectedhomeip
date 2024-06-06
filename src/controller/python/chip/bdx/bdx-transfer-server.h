@@ -18,6 +18,7 @@
 #pragma once
 
 #include <messaging/ExchangeDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <controller/python/chip/bdx/bdx-transfer-pool.h>
@@ -29,13 +30,17 @@ namespace bdx {
 class BdxTransferServer : public Messaging::UnsolicitedMessageHandler
 {
 public:
-    BdxTransferServer(BdxTransferPool & bdxTransferPool);
+    BdxTransferServer(BdxTransferPool & bdxTransferPool) : mBdxTransferPool(&bdxTransferPool) {}
+
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager);
+    void Shutdown();
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader& payloadHeader, Messaging::ExchangeDelegate *& delegate) override;
     void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
 private:
-    BdxTransferPool * mBdxTransferPool;
+    BdxTransferPool * mBdxTransferPool = nullptr;
+    Messaging::ExchangeManager * mExchangeManager = nullptr;
 };
 
 } // namespace bdx

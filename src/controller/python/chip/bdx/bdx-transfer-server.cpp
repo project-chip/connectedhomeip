@@ -26,8 +26,20 @@
 namespace chip {
 namespace bdx {
 
-BdxTransferServer::BdxTransferServer(BdxTransferPool & bdxTransferPool) : mBdxTransferPool(&bdxTransferPool)
+CHIP_ERROR BdxTransferServer::Init(Messaging::ExchangeManager * exchangeManager)
 {
+    VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mExchangeManager = exchangeManager;
+    ReturnOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::ReceiveAccept, this));
+    return mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::SendAccept, this);
+}
+
+void BdxTransferServer::Shutdown()
+{
+    VerifyOrReturn(mExchangeManager != nullptr);
+    LogErrorOnFailure(mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::ReceiveAccept));
+    LogErrorOnFailure(mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendAccept));
+    mExchangeManager = nullptr;
 }
 
 CHIP_ERROR BdxTransferServer::OnUnsolicitedMessageReceived(const PayloadHeader& payloadHeader,
