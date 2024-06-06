@@ -177,6 +177,7 @@ public:
     CHIP_ERROR ClearStationProvisioningData();
     CHIP_ERROR Disconnect();
     CHIP_ERROR GetWiFiInfo(WiFiInfo & info) const;
+    const WiFiNetwork & GetWantedNetwork() const { return mWantedNetwork; }
     CHIP_ERROR GetNetworkStatistics(NetworkStatistics & stats) const;
     void AbortConnectionRecovery();
     CHIP_ERROR SetLowPowerMode(bool onoff);

@@ -122,7 +122,22 @@ void TelinkWiFiDriver::OnNetworkStatusChanged(Status status)
 
     if (mpNetworkStatusChangeCallback)
     {
-        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, NullOptional, NullOptional);
+        const uint8_t * ssid{};
+        size_t ssidLen{};
+        WiFiManager::WiFiInfo wifiInfo;
+
+        if (CHIP_NO_ERROR == WiFiManager::Instance().GetWiFiInfo(wifiInfo))
+        {
+            ssid    = wifiInfo.mSsid;
+            ssidLen = wifiInfo.mSsidLen;
+        }
+        else
+        {
+            ssid    = WiFiManager::Instance().GetWantedNetwork().ssid;
+            ssidLen = WiFiManager::Instance().GetWantedNetwork().ssidLen;
+        }
+        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, MakeOptional(ByteSpan(wifiInfo.mSsid, wifiInfo.mSsidLen)),
+                                                                NullOptional);
     }
 
     if (mpConnectCallback)
