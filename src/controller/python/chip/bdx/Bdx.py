@@ -28,23 +28,46 @@ _OnTransferCompletedCallbackFunct = CFUNCTYPE(
 
 
 @_OnTransferObtainedCallbackFunct
-def _OnTransferObtainedCallback(closure, result: PyChipError, bdxTransfer, transferControlFlags: int, maxBlockSize: int,
+def _OnTransferObtainedCallback(future: Future, result: PyChipError, bdxTransfer, transferControlFlags: int, maxBlockSize: int,
                                 startOffset: int, length: int, fileDesignator, fileDesignatorLength: int, metadata,
                                 metadataLength: int):
-    # TODO: Call the closure with the rest of the parameters.
-    pass
+    if result is CHIP_NO_ERROR:
+        transfer = BdxTransfer()
+        # TODO: Set the parameters of the transfer.
+        future.set_result(transfer)
+    else:
+        future.set_exception(result.to_exception())
 
 
 @_OnDataReceivedCallbackFunct
-def _OnDataReceivedCallback(closure, dataBuffer, bufferLength: int):
-    # TODO: Call the closure with the data.
+def _OnDataReceivedCallback(context, dataBuffer, bufferLength: int):
+    # TODO: Call the context with the data.
     pass
 
 
 @_OnTransferCompletedCallbackFunct
-def _OnTransferCompletedCallback(closure, result: PyChipError):
-    # TODO: Call the closure.
-    pass
+def _OnTransferCompletedCallback(future: Future, result: PyChipError):
+    future.set_result(result)
+
+
+async def PrepareToReceiveBdxData(future: Future):
+    handle = chip.native.GetLibraryHandle()
+
+    # TODO: Do I need to increment a reference to the future? (using ctypes.pythonapi.Py_IncRef(ctypes.py_object(future)))
+    return await builtins.chipStack.CallAsync(
+        lambda: handle.pychip_Bdx_ExpectBdxTransfer(future)
+    )
+
+
+async def PrepareToSendBdxData(future: Future, data): # TODO: Type of data?
+    handle = chip.native.GetLibraryHandle()
+
+    # TODO: Store data somewhere.
+
+    # TODO: Do I need to increment a reference to the future? (using ctypes.pythonapi.Py_IncRef(ctypes.py_object(future)))
+    return await builtins.chipStack.CallAsync(
+        lambda: handle.pychip_Bdx_ExpectBdxTransfer(future)
+    )
 
 
 def Init():
