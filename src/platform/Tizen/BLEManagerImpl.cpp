@@ -479,32 +479,32 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::OnDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info)
+void BLEManagerImpl::OnDeviceScanned(const bt_adapter_le_device_scan_result_info_s & scanInfo,
+                                     const Ble::ChipBLEDeviceIdentificationInfo & info)
 {
-    auto deviceInfo = reinterpret_cast<bt_adapter_le_device_scan_result_info_s *>(device);
-    VerifyOrReturn(deviceInfo != nullptr, ChipLogError(DeviceLayer, "Invalid Device Info"));
-
-    ChipLogProgress(DeviceLayer, "New device scanned: %s", deviceInfo->remote_address);
+    ChipLogProgress(Ble, "New device scanned: %s", scanInfo.remote_address);
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
-        if (!mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator()))
-        {
-            return;
-        }
-        ChipLogProgress(DeviceLayer, "Device discriminator match. Attempting to connect.");
+        auto isMatch = mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator());
+        VerifyOrReturn(
+            isMatch,
+            ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", info.GetDeviceDiscriminator(),
+                         mBLEScanConfig.mDiscriminator.IsShortDiscriminator() ? mBLEScanConfig.mDiscriminator.GetShortValue()
+                                                                              : mBLEScanConfig.mDiscriminator.GetLongValue()));
+        ChipLogProgress(Ble, "Device discriminator match. Attempting to connect.");
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
     {
-        if (strcmp(deviceInfo->remote_address, mBLEScanConfig.mAddress.c_str()) != 0)
-        {
-            return;
-        }
-        ChipLogProgress(DeviceLayer, "Device address match. Attempting to connect.");
+        auto isMatch = strcmp(scanInfo.remote_address, mBLEScanConfig.mAddress.c_str()) == 0;
+        VerifyOrReturn(isMatch,
+                       ChipLogError(Ble, "Skip connection: Device address does not match: %s != %s", scanInfo.remote_address,
+                                    mBLEScanConfig.mAddress.c_str()));
+        ChipLogProgress(Ble, "Device address match. Attempting to connect.");
     }
     else
     {
-        ChipLogError(DeviceLayer, "Unknown discovery type. Ignoring scanned device.");
+        ChipLogError(Ble, "Unknown discovery type. Ignoring scanned device.");
         return;
     }
 
@@ -516,7 +516,7 @@ void BLEManagerImpl::OnDeviceScanned(void * device, const Ble::ChipBLEDeviceIden
     mDeviceScanner.StopScan();
 
     /* Initiate Connect */
-    auto params = std::make_pair(this, deviceInfo->remote_address);
+    auto params = std::make_pair(this, scanInfo.remote_address);
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](typeof(params) * aParams) { return aParams->first->ConnectChipThing(aParams->second); }, &params);
 }

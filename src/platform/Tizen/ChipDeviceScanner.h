@@ -63,7 +63,8 @@ public:
     virtual ~ChipDeviceScannerDelegate() {}
 
     // Called when a CHIP device was found
-    virtual void OnDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+    virtual void OnDeviceScanned(const bt_adapter_le_device_scan_result_info_s & scanInfo,
+                                 const Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
     virtual void OnScanComplete() = 0;
@@ -88,9 +89,9 @@ public:
     CHIP_ERROR StopScan();
 
 private:
-    static void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * info, void * userData);
+    void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * scanInfo);
     static gboolean TimerExpiredCb(void * userData);
-    static CHIP_ERROR TriggerScan(ChipDeviceScanner * userData);
+    CHIP_ERROR StartScanImpl();
 
     int CreateLEScanFilter(ScanFilterType filterType);
     int RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);

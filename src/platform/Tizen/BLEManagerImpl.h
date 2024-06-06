@@ -140,7 +140,8 @@ private:
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnDeviceScanned(const bt_adapter_le_device_scan_result_info_s & scanInfo,
+                         const Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnScanComplete() override;
     void OnScanError(CHIP_ERROR err) override;
 
