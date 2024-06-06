@@ -23,8 +23,7 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestCommissionableNodeController.cpp" ]
 
-  if (chip_device_platform != "mbed" && chip_device_platform != "efr32" &&
-      chip_device_platform != "esp32") {
+  if (chip_device_platform != "mbed" && chip_device_platform != "esp32") {
     test_sources += [ "TestServerCommandDispatch.cpp" ]
     test_sources += [ "TestEventChunking.cpp" ]
     test_sources += [ "TestEventCaching.cpp" ]

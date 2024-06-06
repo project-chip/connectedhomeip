@@ -63,71 +63,6 @@ efr32_sdk("sdk") {
   ]
 }
 
-# silabs_executable("efr32_device_tests") {
-#   output_name = "matter-silabs-device_tests.out"
-
-#   defines = [ "PW_RPC_ENABLED" ]
-#   sources = [
-#     "${chip_root}/examples/common/pigweed/RpcService.cpp",
-#     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-#     "${examples_common_plat_dir}/PigweedLogger.cpp",
-#     "${examples_common_plat_dir}/heap_4_silabs.c",
-#     "${examples_common_plat_dir}/syscalls_stubs.cpp",
-#     "${examples_plat_dir}/uart.cpp",
-#     "src/main.cpp",
-#   ]
-
-#   deps = [
-#     ":nl_test_service.nanopb_rpc",
-#     ":sdk",
-#     "$dir_pw_unit_test:rpc_service",
-#     "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
-#     "${chip_root}/examples/common/pigweed:system_rpc_server",
-#     "${chip_root}/src:tests",
-#     "${chip_root}/src/lib",
-#     "${chip_root}/src/lib/support:pw_tests_wrapper",
-#     "${chip_root}/src/lib/support:testing_nlunit",
-#     "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
-#     "${nlunit_test_root}:nlunit-test",
-#   ]
-
-#   # OpenThread Settings
-#   if (chip_enable_openthread) {
-#     deps += [
-#       "${chip_root}/third_party/openthread:openthread",
-#       "${chip_root}/third_party/openthread:openthread-platform",
-#       "${examples_plat_dir}:efr-matter-shell",
-#     ]
-#   }
-
-#   # Attestation Credentials
-#   deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
-
-#   # Factory Data Provider
-#   if (use_efr32_factory_data_provider) {
-#     deps += [ "${examples_plat_dir}:silabs-factory-data-provider" ]
-#   }
-
-#   deps += pw_build_LINK_DEPS
-
-#   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
-
-#   ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
-
-#   inputs = [ ldscript ]
-
-#   ldflags = [
-#     "-T" + rebase_path(ldscript, root_build_dir),
-#     "-Wl,--no-warn-rwx-segment",
-#   ]
-
-#   output_dir = root_out_dir
-# }
-
-# group("efr32") {
-#   deps = [ ":efr32_device_tests" ]
-# }
-
 
 _tests = [
   "${chip_root}/src/app/interaction-model/tests",
@@ -176,6 +111,7 @@ if (chip_device_platform != "efr32") {
 
   _tests += [ "${chip_root}/src/controller/tests" ]
 }
+
 
 copy_py_files = true  # Copy silabs_firmware_utils.py and firmware_utils.py to the output directory only the first time silabs_executable is called.
 _deps = []
@@ -250,21 +186,14 @@ foreach(_test, _tests) {
   _deps += [ ":efr32_device_tests--${_test_suffix}" ]
 }
 
-group("efr32_device_tests") {
-  deps = _deps
-}
-
 group("efr32") {
-  deps = [ ":efr32_device_tests" ]  #++++ Should we get rid of "efr32_device_tests" and move its contents here?
+  deps = _deps
 }
 
 group("runner") {
   deps = [
     "${efr32_project_dir}/py:pw_test_runner.install",
     "${efr32_project_dir}/py:pw_test_runner_wheel",
-    # TODO [PW_MIGRATION]: remove the following when transition from nlunit-test is complete.
-    #++++"${efr32_project_dir}/py:nl_test_runner.install",
-    #++++"${efr32_project_dir}/py:nl_test_runner_wheel",
   ]
 }
 
