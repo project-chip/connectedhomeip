@@ -22,13 +22,6 @@
 #include <unistd.h>
 
 #if defined(PW_RPC_ENABLED)
-#include "pw_assert/check.h"
-#include "pw_hdlc/decoder.h"
-#include "pw_hdlc/default_addresses.h"
-#include "pw_hdlc/rpc_channel.h"
-#include "pw_rpc/client.h"
-#include "pw_stream/socket_stream.h"
-
 #include <rpc/RpcClient.h>
 #endif
 

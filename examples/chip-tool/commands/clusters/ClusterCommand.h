@@ -118,9 +118,13 @@ public:
 
         if (data != nullptr)
         {
-            LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
-
-            error = DataModelLogger::LogCommand(path, data);
+            {
+                // log a snapshot to not advance the data reader.
+                chip::TLV::TLVReader logTlvReader;
+                logTlvReader.Init(*data);
+                LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, &logTlvReader));
+                error = DataModelLogger::LogCommand(path, &logTlvReader);
+            }
             if (CHIP_NO_ERROR != error)
             {
                 ChipLogError(chipTool, "Response Failure: Can not decode Data");
@@ -128,8 +132,9 @@ public:
                 return;
             }
             if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) &&
-                (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::RegisterClient::Id))
+                (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::Id))
             {
+                // log a snapshot to not advance the data reader.
                 chip::TLV::TLVReader counterTlvReader;
                 counterTlvReader.Init(*data);
                 chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType value;
@@ -139,7 +144,6 @@ public:
                     ChipLogError(chipTool, "Failed to decode ICD counter: %" CHIP_ERROR_FORMAT, err.Format());
                     return;
                 }
-
                 chip::app::ICDClientInfo clientInfo;
                 clientInfo.peer_node         = mScopedNodeId;
                 clientInfo.monitored_subject = mMonitoredSubject;
