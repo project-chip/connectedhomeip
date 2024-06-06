@@ -16,6 +16,7 @@
  */
 #include <app/codegen-interaction-model/CodegenDataModel.h>
 
+#include <app/RequiredPrivilege.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
@@ -85,24 +86,37 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
 }
 
 /// Load the attribute information into the specified destination
+///
+/// `info` is assumed to be default-constructed/clear (i.e. this sets flags, but does not reset them).
 void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttributeMetadata & attribute,
                        InteractionModel::AttributeInfo * info)
 {
+    info->readPrivilege = RequiredPrivilege::ForReadAttribute(path);
+    if (attribute.IsReadOnly())
+    {
+        info->writePrivilege = RequiredPrivilege::ForWriteAttribute(path);
+    }
+
     if (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE)
     {
         info->flags.Set(InteractionModel::AttributeQualityFlags::kListAttribute);
     }
 
+    if (attribute.MustUseTimedWrite())
+    {
+        info->flags.Set(InteractionModel::AttributeQualityFlags::kTimed);
+    }
+
+    // NOTE: we do NOT provide additional info for:
+    //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
+    //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
+    //    - Several specification flags are not available (reportable, quieter reporting,
+    //      fixed, source attribution)
+
     // TODO: Set additional flags:
-    // info->flags.Set(InteractionModel::AttributeQualityFlags::kChangesOmitted)
     // info->flags.Set(InteractionModel::AttributeQualityFlags::kFabricScoped)
     // info->flags.Set(InteractionModel::AttributeQualityFlags::kFabricSensitive)
     // info->flags.Set(InteractionModel::AttributeQualityFlags::kChangesOmitted)
-    // info->flags.Set(InteractionModel::AttributeQualityFlags::kTimed)
-
-    // TODO: load privileges (and decide if readable/writable)
-    info->readPrivilege  = Access::Privilege::kView;
-    info->writePrivilege = Access::Privilege::kOperate;
 }
 
 InteractionModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath,
