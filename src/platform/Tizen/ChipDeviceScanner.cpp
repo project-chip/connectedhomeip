@@ -42,20 +42,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-ChipDeviceScanner::ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate) {}
-
-ChipDeviceScanner::~ChipDeviceScanner()
-{
-    // In case scan is ongoing
-    StopChipScan();
-    mDelegate = nullptr;
-}
-
-std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(ChipDeviceScannerDelegate * delegate)
-{
-    return std::make_unique<ChipDeviceScanner>(delegate);
-}
-
 static void __PrintLEScanData(const bt_adapter_le_service_data_s & data)
 {
     // Print Service UUID in the Service Data
@@ -108,14 +94,14 @@ void ChipDeviceScanner::LeScanResultCb(int result, bt_adapter_le_device_scan_res
                    ChipLogDetail(Ble, "Device %s does not look like a CHIP device", info->remote_address));
 
     // Report probable CHIP device to BLEMgrImp class
-    self->mDelegate->OnChipDeviceScanned(info, deviceInfo);
+    self->mDelegate->OnDeviceScanned(info, deviceInfo);
 }
 
-gboolean ChipDeviceScanner::TimerExpiredCb(gpointer userData)
+gboolean ChipDeviceScanner::TimerExpiredCb(void * userData)
 {
     auto self = reinterpret_cast<ChipDeviceScanner *>(userData);
     ChipLogProgress(DeviceLayer, "Scan Timer expired!!");
-    self->StopChipScan();
+    self->StopScan();
     return G_SOURCE_REMOVE;
 }
 
@@ -167,8 +153,8 @@ exit:
     return ret;
 }
 
-CHIP_ERROR ChipDeviceScanner::StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType,
-                                            const ScanFilterData & filterData)
+CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout, ScanFilterType filterType,
+                                        const ScanFilterData & filterData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
@@ -187,12 +173,12 @@ CHIP_ERROR ChipDeviceScanner::StartChipScan(System::Clock::Timeout timeout, Scan
 
 exit:
     ChipLogError(DeviceLayer, "Start CHIP Scan could not succeed fully! Stop Scan...");
-    StopChipScan();
+    StopScan();
     UnRegisterScanFilter();
     return err;
 }
 
-CHIP_ERROR ChipDeviceScanner::StopChipScan()
+CHIP_ERROR ChipDeviceScanner::StopScan()
 {
     int ret = BT_ERROR_NONE;
     ReturnErrorCodeIf(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);

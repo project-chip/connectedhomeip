@@ -60,16 +60,16 @@ struct ScanFilterData
 class ChipDeviceScannerDelegate
 {
 public:
-    virtual ~ChipDeviceScannerDelegate(void) {}
+    virtual ~ChipDeviceScannerDelegate() {}
 
     // Called when a CHIP device was found
-    virtual void OnChipDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+    virtual void OnDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
-    virtual void OnScanComplete(void) = 0;
+    virtual void OnScanComplete() = 0;
 
     // Called on scan error
-    virtual void OnScanError(CHIP_ERROR err) = 0;
+    virtual void OnScanError(CHIP_ERROR) = 0;
 };
 
 /// Allows scanning for CHIP devices
@@ -78,26 +78,18 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner(void){};
-
-    /// NOTE: prefer to use the  ::Create method instead direct constructor calling.
-    ChipDeviceScanner(ChipDeviceScannerDelegate * delegate);
-
-    ~ChipDeviceScanner(void);
+    ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate){};
+    ~ChipDeviceScanner() { StopScan(); }
 
     /// Initiate a scan for devices, with the given timeout & scan filter data
-    CHIP_ERROR StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType, const ScanFilterData & filterData);
+    CHIP_ERROR StartScan(System::Clock::Timeout timeout, ScanFilterType filterType, const ScanFilterData & filterData);
 
     /// Stop any currently running scan
-    CHIP_ERROR StopChipScan(void);
-
-    /// Create a new device scanner
-    /// Convenience method to allocate any required variables.
-    static std::unique_ptr<ChipDeviceScanner> Create(ChipDeviceScannerDelegate * delegate);
+    CHIP_ERROR StopScan();
 
 private:
     static void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * info, void * userData);
-    static gboolean TimerExpiredCb(gpointer user_data);
+    static gboolean TimerExpiredCb(void * userData);
     static CHIP_ERROR TriggerScan(ChipDeviceScanner * userData);
 
     int CreateLEScanFilter(ScanFilterType filterType);
@@ -105,11 +97,11 @@ private:
     int SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
     void UnRegisterScanFilter();
 
-    ChipDeviceScannerDelegate * mDelegate = nullptr;
-    bool mIsScanning                      = false;
-    bool mIsStopping                      = false;
-    unsigned int mScanTimeoutMs           = 10000;
-    bt_scan_filter_h mScanFilter          = nullptr;
+    ChipDeviceScannerDelegate * mDelegate;
+    bool mIsScanning             = false;
+    bool mIsStopping             = false;
+    unsigned int mScanTimeoutMs  = 10000;
+    bt_scan_filter_h mScanFilter = nullptr;
 };
 
 } // namespace Internal

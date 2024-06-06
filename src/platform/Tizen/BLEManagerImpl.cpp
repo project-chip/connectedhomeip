@@ -479,7 +479,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info)
+void BLEManagerImpl::OnDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info)
 {
     auto deviceInfo = reinterpret_cast<bt_adapter_le_device_scan_result_info_s *>(device);
     VerifyOrReturn(deviceInfo != nullptr, ChipLogError(DeviceLayer, "Invalid Device Info"));
@@ -513,7 +513,7 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectionTimeout, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    mDeviceScanner->StopChipScan();
+    mDeviceScanner.StopScan();
 
     /* Initiate Connect */
     auto params = std::make_pair(this, deviceInfo->remote_address);
@@ -990,8 +990,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     ChipLogProgress(DeviceLayer, "Initialize Tizen BLE Layer");
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
     SuccessOrExit(err);
 
     // The hash table key is stored in the BLEConnection structure
@@ -1377,20 +1376,9 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         goto exit;
     }
 
-    /* Acquire Chip Device Scanner */
-    if (!mDeviceScanner)
-        mDeviceScanner = Internal::ChipDeviceScanner::Create(this);
-
-    if (!mDeviceScanner)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        ChipLogError(DeviceLayer, "Failed to create BLE device scanner");
-        goto exit;
-    }
-
-    /* Send StartChipScan Request to Scanner Class */
+    /* Send StartScan Request to Scanner Class */
     strcpy(data.service_uuid, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR);
-    err = mDeviceScanner->StartChipScan(kNewConnectionScanTimeout, ScanFilterType::kServiceData, data);
+    err = mDeviceScanner.StartScan(kNewConnectionScanTimeout, ScanFilterType::kServiceData, data);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start BLE scan"));
 
     ChipLogProgress(DeviceLayer, "BLE scan initiation successful");

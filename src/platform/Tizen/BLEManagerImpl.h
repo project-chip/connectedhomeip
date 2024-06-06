@@ -90,6 +90,9 @@ class BLEManagerImpl final : public BLEManager,
     friend BLEManager;
 
 public:
+    BLEManagerImpl() : mDeviceScanner(this) {}
+    ~BLEManagerImpl() = default;
+
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
 
 private:
@@ -133,11 +136,11 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
-    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {};
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnChipDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnScanComplete() override;
     void OnScanError(CHIP_ERROR err) override;
 
@@ -232,8 +235,9 @@ private:
     /* Connection Hash Table Map */
     GHashTable * mConnectionMap = nullptr;
 
+    ChipDeviceScanner mDeviceScanner;
     BLEScanConfig mBLEScanConfig;
-    std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
+
     bt_gatt_client_h mGattClient = nullptr;
 };
 
