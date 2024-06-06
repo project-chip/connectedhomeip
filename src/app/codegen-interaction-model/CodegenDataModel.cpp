@@ -16,8 +16,8 @@
  */
 #include <app/codegen-interaction-model/CodegenDataModel.h>
 
-#include <app/RequiredPrivilege.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/RequiredPrivilege.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/DataModelTypes.h>
@@ -126,6 +126,25 @@ InteractionModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & 
 
     entry.path = ConcreteAttributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
     LoadAttributeInfo(entry.path, attribute, &entry.info);
+
+    return entry;
+}
+
+InteractionModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath, CommandId clusterCommandId,
+                                                const EmberAfCluster * emberCluster)
+{
+    InteractionModel::CommandEntry entry;
+    entry.path                 = ConcreteCommandPath(clusterPath.mEndpointId, clusterPath.mClusterId, clusterCommandId);
+    entry.info.invokePrivilege = RequiredPrivilege::ForInvokeCommand(entry.path);
+
+    if (CommandNeedsTimedInvoke(clusterPath.mClusterId, clusterCommandId))
+    {
+        entry.info.flags.Set(InteractionModel::CommandQualityFlags::kTimed);
+    }
+
+    // TODO: Set additional flags:
+    // entry.info.flags.Set(InteractionModel::CommandQualityFlags::kFabricScoped)
+    // entry.info.flags.Set(InteractionModel::CommandQualityFlags::kFabricSensitive)
 
     return entry;
 }
@@ -379,10 +398,15 @@ std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInf
     return std::make_optional(info);
 }
 
-InteractionModel::CommandEntry CodegenDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
+InteractionModel::CommandEntry CodegenDataModel::FirstAcceptedCommand(const ConcreteClusterPath & path)
 {
-    // FIXME: implement
-    return InteractionModel::CommandEntry::Invalid();
+    const EmberAfCluster * cluster = FindServerCluster(path);
+
+    VerifyOrReturnValue(cluster != nullptr, InteractionModel::CommandEntry::Invalid());
+    VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, InteractionModel::CommandEntry::Invalid());
+    VerifyOrReturnValue(cluster->acceptedCommandList[0] != kInvalidCommandId, InteractionModel::CommandEntry::Invalid());
+
+    return CommandEntryFrom(path, cluster->acceptedCommandList[0], cluster);
 }
 
 InteractionModel::CommandEntry CodegenDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
