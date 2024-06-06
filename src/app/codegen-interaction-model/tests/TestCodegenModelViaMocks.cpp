@@ -404,6 +404,9 @@ TEST(TestCodegenModelViaMocks, AcceptedCommandInfo)
     info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1u));
     ASSERT_TRUE(info.has_value());
 
+    info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 1u));
+    ASSERT_TRUE(info.has_value());
+
     info = model.GetAcceptedCommandInfo(ConcreteCommandPath(kMockEndpoint2, MockClusterId(2), 23u));
     ASSERT_TRUE(info.has_value());
 
