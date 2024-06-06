@@ -68,7 +68,7 @@ template("silabs_executable") {
   ]
   copy(flashing_runtime_target) {
     sources = flashing_script_inputs
-    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+    outputs = [ "${root_out_dir}/${target_name}--{{source_file_part}}" ]
   }
 
   flashing_script_generator =
