@@ -84,8 +84,15 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        LogErrorOnFailure(app::DnssdServer::Instance().AdvertiseOperational());
-        ChipLogProgress(AppServer, "Operational advertising enabled");
+        CHIP_ERROR err = app::DnssdServer::Instance().AdvertiseOperational();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Operational advertising enabled");
+        }
     }
 #if CONFIG_NETWORK_LAYER_BLE
     else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
