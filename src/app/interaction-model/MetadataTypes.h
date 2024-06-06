@@ -19,8 +19,10 @@
 #include <cstdint>
 #include <optional>
 
+#include <access/Privilege.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
+#include <app/ConcreteCommandPath.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 
@@ -54,13 +56,20 @@ struct ClusterEntry
 
 enum class AttributeQualityFlags : uint32_t
 {
-    kListAttribute  = 0x0001, // This attribute is a list attribute
-    kChangesOmitted = 0x0002, // `C` quality on attributes
+    kListAttribute   = 0x0004, // This attribute is a list attribute
+    kFabricScoped    = 0x0008, // 'F' quality on attributes
+    kFabricSensitive = 0x0010, // 'S' quality on attributes
+    kChangesOmitted  = 0x0020, // `C` quality on attributes
+    kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
 };
 
 struct AttributeInfo
 {
     BitFlags<AttributeQualityFlags> flags;
+
+    // read/write access will be missing if read/write is NOT allowed
+    std::optional<Access::Privilege> readPrivilege;  // generally defaults to View if readable
+    std::optional<Access::Privilege> writePrivilege; // generally defaults to Operate if writable
 };
 
 struct AttributeEntry
@@ -76,25 +85,50 @@ struct AttributeEntry
     }
 };
 
+enum class CommandQualityFlags : uint32_t
+{
+    kFabricScoped    = 0x0001,
+    kFabricSensitive = 0x0002,
+    kTimed           = 0x0004, // `T` quality on commands
+};
+
+struct CommandInfo
+{
+    BitFlags<CommandQualityFlags> flags;
+    Access::Privilege invokePrivilege = Access::Privilege::kOperate;
+};
+
+struct CommandEntry
+{
+    ConcreteCommandPath path;
+    CommandInfo info;
+
+    static CommandEntry Invalid()
+    {
+        CommandEntry result;
+        result.path = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+        return result;
+    }
+};
+
 /// Provides metadata information for a data model
 ///
-/// The data model can be viewed as a tree of endpoint/cluster/attribute
-/// where each element can be iterated through independently
+/// The data model can be viewed as a tree of endpoint/cluster/(attribute+commands+events)
+/// where each element can be iterated through independently.
 ///
 /// Iteration rules:
 ///   - kInvalidEndpointId will be returned when iteration ends (or generally kInvalid* for paths)
+///   - Global Attributes are NOT returned since they are implied
 ///   - Any internal iteration errors are just logged (callers do not handle iteration CHIP_ERROR)
 ///   - Iteration order is NOT guaranteed globally. Only the following is guaranteed:
-///     - when iterating over an endpoint, ALL clusters of that endpoint will be iterated first, before
-///       switching the endpoint (order of clusters ids themselves not guaranteed)
-///     - when iterating over a cluster, ALL attributes of that cluster will be iterated first, before
-///       switching to a new cluster
+///     - Complete tree iteration (e.g. when iterating an endpoint, ALL clusters of that endpoint
+///       are returned, when iterating over a cluster, all attributes/commands are iterated over)
 ///     - uniqueness and completeness (iterate over all possible distinct values as long as no
 ///       internal structural changes occur)
-class AttributeTreeIterator
+class DataModelMetadataTree
 {
 public:
-    virtual ~AttributeTreeIterator() = default;
+    virtual ~DataModelMetadataTree() = default;
 
     virtual EndpointId FirstEndpoint()                 = 0;
     virtual EndpointId NextEndpoint(EndpointId before) = 0;
@@ -103,9 +137,21 @@ public:
     virtual ClusterEntry NextCluster(const ConcreteClusterPath & before)                = 0;
     virtual std::optional<ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) = 0;
 
+    // Attribute iteration and accessors provide cluster-level access over
+    // attributes
     virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
     virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
     virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
+
+    // Command iteration and accessors provide cluster-level access over commands
+    virtual CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster)              = 0;
+    virtual CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before)                = 0;
+    virtual std::optional<CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) = 0;
+
+    // "generated" commands are purely for reporting what types of command ids can be
+    // returned as responses.
+    virtual ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) = 0;
+    virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
 };
 
 } // namespace InteractionModel
