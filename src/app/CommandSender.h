@@ -414,12 +414,21 @@ public:
 
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                              AddRequestDataParameters & aAddRequestDataParams)
+    {
+        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aAddRequestDataParams.timedInvokeTimeoutMs.HasValue(),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+
+        DataModel::EncodableType<CommandDataT> encoder(aData);
+        return AddRequestDataInternal(aCommandPath, encoder, aAddRequestDataParams);
+    }
+
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs)
     {
-        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         AddRequestDataParameters addRequestDataParams(aTimedInvokeTimeoutMs);
-        DataModel::EncodableType<CommandDataT> encoder(aData);
-        return AddRequestData(aCommandPath, encoder, addRequestDataParams);
+        return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
     /**
