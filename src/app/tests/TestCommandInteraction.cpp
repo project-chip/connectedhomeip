@@ -444,7 +444,8 @@ public:
     {
     public:
         CommandHandlerWithUnrespondedCommand(CommandHandler::Callback * apCallback, const ConcreteCommandPath & aRequestCommandPath,
-                                             const Optional<uint16_t> & aRef) : CommandHandler(apCallback)
+                                             const Optional<uint16_t> & aRef) :
+            CommandHandler(apCallback)
         {
             GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional());
             SetExchangeInterface(&mMockCommandResponder);
