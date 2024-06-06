@@ -24,7 +24,7 @@
 
 #include <app/interaction-model/Context.h>
 #include <app/interaction-model/InvokeResponder.h>
-#include <app/interaction-model/IterationTypes.h>
+#include <app/interaction-model/MetadataTypes.h>
 #include <app/interaction-model/OperationTypes.h>
 
 namespace chip {
@@ -38,7 +38,7 @@ namespace InteractionModel {
 ///     thread or equivalent
 ///   - class is allowed to attempt to cache indexes/locations for faster
 ///     lookups of things (e.g during iterations)
-class Model : public AttributeTreeIterator
+class Model : public DataModelMetadataTree
 {
 public:
     virtual ~Model() = default;
