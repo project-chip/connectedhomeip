@@ -78,7 +78,7 @@ class Efr32App(Enum):
         elif self == Efr32App.PUMP:
             return 'pump_app.flashbundle.txt'
         elif self == Efr32App.UNIT_TEST:
-            return 'efr32_device_tests.flashbundle.txt'
+            return 'efr32_device_tests.flashbundle.txt'  # ++++ target name has changed
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -273,6 +273,11 @@ class Efr32Builder(GnBuilder):
 
         if self.app == Efr32App.UNIT_TEST:
             # Include test runner python wheels
+            for root, dirs, files in os.walk(os.path.join(self.output_dir, 'chip_pw_test_runner_wheels')):
+                for file in files:
+                    items["chip_pw_test_runner_wheels/" +
+                          file] = os.path.join(root, file)
+            # TODO [PW_MIGRATION]: remove the nl wheels once transition away from nlunit-test is completed
             for root, dirs, files in os.walk(os.path.join(self.output_dir, 'chip_nl_test_runner_wheels')):
                 for file in files:
                     yield BuilderOutput(

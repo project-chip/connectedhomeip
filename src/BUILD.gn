@@ -59,16 +59,22 @@ if (chip_build_tests) {
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
-      "${chip_root}/src/lib/address_resolve/tests",
-      "${chip_root}/src/lib/asn1/tests",
-      "${chip_root}/src/lib/core/tests",
-      "${chip_root}/src/messaging/tests",
-      "${chip_root}/src/protocols/bdx/tests",
-      "${chip_root}/src/protocols/interaction_model/tests",
-      "${chip_root}/src/protocols/user_directed_commissioning/tests",
-      "${chip_root}/src/transport/retransmit/tests",
-      "${chip_root}/src/app/icd/server/tests",
     ]
+
+    # Skip on efr32 due to flash limitations.
+    if (chip_device_platform != "efr32") {
+      tests += [
+        "${chip_root}/src/lib/address_resolve/tests",
+        "${chip_root}/src/lib/asn1/tests",
+        "${chip_root}/src/lib/core/tests",
+        "${chip_root}/src/messaging/tests",
+        "${chip_root}/src/protocols/bdx/tests",
+        "${chip_root}/src/protocols/interaction_model/tests",
+        "${chip_root}/src/protocols/user_directed_commissioning/tests",
+        "${chip_root}/src/transport/retransmit/tests",
+        "${chip_root}/src/app/icd/server/tests",
+      ]
+    }
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
     if (current_os != "mbed") {
