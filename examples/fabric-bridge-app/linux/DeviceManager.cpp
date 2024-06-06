@@ -43,16 +43,16 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
-class DeviceManager;
-
 namespace {
 
 constexpr uint8_t kMaxRetries = 10;
-DeviceManager gDeviceManager;
 
 } // namespace
 
-DeviceManager::DeviceManager()
+// Define the static member
+DeviceManager DeviceManager::sInstance;
+
+void DeviceManager::Init()
 {
     memset(mDevices, 0, sizeof(mDevices));
     mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
@@ -132,9 +132,4 @@ Device * DeviceManager::GetDevice(uint16_t index) const
         return mDevices[index];
     }
     return nullptr;
-}
-
-DeviceManager * GetDeviceManager()
-{
-    return &gDeviceManager;
 }

@@ -109,6 +109,8 @@ void ApplicationInit()
     // Start a thread for bridge polling
     std::thread pollingThread(BridgePollingThread);
     pollingThread.detach();
+
+    DeviceMgr().Init();
 }
 
 void ApplicationShutdown() {}
@@ -133,7 +135,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     uint16_t endpointIndex  = emberAfGetDynamicIndexFromEndpoint(endpoint);
     AttributeId attributeId = attributeMetadata->attributeId;
 
-    Device * dev = GetDeviceManager()->GetDevice(endpointIndex);
+    Device * dev = DeviceMgr().GetDevice(endpointIndex);
     if (dev != nullptr && clusterId == app::Clusters::BridgedDeviceBasicInformation::Id)
     {
         using namespace app::Clusters::BridgedDeviceBasicInformation::Attributes;
@@ -177,7 +179,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     uint16_t endpointIndex                  = emberAfGetDynamicIndexFromEndpoint(endpoint);
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Failure;
 
-    Device * dev = GetDeviceManager()->GetDevice(endpointIndex);
+    Device * dev = DeviceMgr().GetDevice(endpointIndex);
     if (dev != nullptr && dev->IsReachable())
     {
         ChipLogProgress(NotSpecified, "emberAfExternalAttributeWriteCallback: ep=%d, clusterId=%d", endpoint, clusterId);
