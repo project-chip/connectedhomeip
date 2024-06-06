@@ -142,8 +142,12 @@ InteractionModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clus
         entry.info.flags.Set(InteractionModel::CommandQualityFlags::kTimed);
     }
 
+    if (CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId))
+    {
+        entry.info.flags.Set(InteractionModel::CommandQualityFlags::kFabricScoped);
+    }
+
     // TODO: Set additional flags:
-    // entry.info.flags.Set(InteractionModel::CommandQualityFlags::kFabricScoped)
     // entry.info.flags.Set(InteractionModel::CommandQualityFlags::kFabricSensitive)
 
     return entry;
