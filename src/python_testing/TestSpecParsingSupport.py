@@ -15,14 +15,16 @@
 #    limitations under the License.
 #
 
+import os
 import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import MatterBaseTest, ProblemNotice, default_matter_test_main
 from mobly import asserts
-from spec_parsing_support import (ClusterParser, XmlCluster, add_cluster_data_from_xml, build_xml_clusters,
-                                  check_clusters_for_unknown_commands, combine_derived_clusters_with_base)
+from spec_parsing_support import (ClusterParser, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
+                                  add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
+                                  combine_derived_clusters_with_base)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
@@ -229,6 +231,24 @@ class TestSpecParsingSupport(MatterBaseTest):
         super().setup_class()
         self.spec_xml_clusters, self.spec_problems = build_xml_clusters()
         self.all_spec_clusters = set([(id, c.name, c.pics) for id, c in self.spec_xml_clusters.items()])
+
+    def test_build_xml_override(self):
+        # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
+        tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
+        asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(self.spec_xml_clusters.keys())), 0, "In progress dir does not contain any clusters not in 1.3")
+        # only the pulse width modulation cluster was removed post 1.3
+        asserts.assert_equal(set(self.spec_xml_clusters.keys()) - set(tot_xml_clusters.keys()), set([Clusters.PulseWidthModulation.id]), "There are some 1.3 clusters that are not included in the TOT spec")
+
+        str_path = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.3', 'clusters'))
+        string_override_check, problems = build_xml_clusters(str_path)
+        asserts.assert_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
+
+        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.3', 'clusters')
+        path_override_check, problems = build_xml_clusters(path)
+        asserts.assert_equal(path_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
+
+        with asserts.assert_raises(SpecParsingException):
+            build_xml_clusters("baddir")
 
     def test_spec_parsing_access(self):
         strs = [None, 'view', 'operate', 'manage', 'admin']

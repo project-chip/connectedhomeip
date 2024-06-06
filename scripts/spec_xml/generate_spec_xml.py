@@ -27,8 +27,10 @@ import click
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
-DEFAULT_OUTPUT_DIR = os.path.abspath(
-    os.path.join(DEFAULT_CHIP_ROOT, 'data_model'))
+DEFAULT_OUTPUT_DIR_1_3 = os.path.abspath(
+    os.path.join(DEFAULT_CHIP_ROOT, 'data_model', '1.3'))
+DEFAULT_OUTPUT_DIR_TOT = os.path.abspath(
+    os.path.join(DEFAULT_CHIP_ROOT, 'data_model', 'master'))
 DEFAULT_DOCUMENTATION_FILE = os.path.abspath(
     os.path.join(DEFAULT_CHIP_ROOT, 'docs', 'spec_clusters.md'))
 
@@ -65,7 +67,6 @@ def make_asciidoc(target: str, include_in_progress: bool, spec_dir: str, dry_run
     help='Path to the spec root')
 @click.option(
     '--output-dir',
-    default=DEFAULT_OUTPUT_DIR,
     help='Path to output xml files')
 @click.option(
     '--dry-run',
@@ -79,6 +80,8 @@ def make_asciidoc(target: str, include_in_progress: bool, spec_dir: str, dry_run
     help='Include in-progress items from spec')
 def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
     # Clusters need to be scraped first because the cluster directory is passed to the device type directory
+    if not output_dir:
+        output_dir = DEFAULT_OUTPUT_DIR_TOT if include_in_progress else DEFAULT_OUTPUT_DIR_1_3
     scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
     scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
     if not dry_run:

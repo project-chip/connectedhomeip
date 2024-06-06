@@ -47,6 +47,10 @@ def to_access_code(privilege: Clusters.AccessControl.Enums.AccessControlEntryPri
     return _PRIVILEGE_STR.get(privilege, "")
 
 
+class SpecParsingException(Exception):
+    pass
+
+
 @dataclass
 class XmlFeature:
     code: str
@@ -447,13 +451,28 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
                 endpoint_id=0, cluster_id=id, command_id=cmd.id), severity=ProblemSeverity.WARNING, problem="Command with unknown direction"))
 
 
-def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
-    dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'clusters')
+class PrebuiltDataModelDirectory(Enum):
+    k1_3 = auto()
+    kMaster = auto()
+
+
+def build_xml_clusters(data_model_directory: typing.Union[PrebuiltDataModelDirectory, str] = PrebuiltDataModelDirectory.k1_3) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+    if data_model_directory == PrebuiltDataModelDirectory.k1_3:
+        dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', '1.3', 'clusters')
+    elif data_model_directory == PrebuiltDataModelDirectory.kMaster:
+        dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'master', 'clusters')
+    else:
+        dir = data_model_directory
+
     clusters: dict[int, XmlCluster] = {}
     pure_base_clusters: dict[str, XmlCluster] = {}
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
-    for xml in glob.glob(f"{dir}/*.xml"):
+    files = glob.glob(f'{dir}/*.xml')
+    if not files:
+        raise SpecParsingException(f'No data model files found in specified directory {dir}')
+
+    for xml in files:
         logging.info(f'Parsing file {xml}')
         tree = ElementTree.parse(f'{xml}')
         root = tree.getroot()

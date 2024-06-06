@@ -1,0 +1,435 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2024). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Joint Fabric Datastore Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial Release"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId name="Joint Fabric Datastore Cluster"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="JFDS" scope="Node"/>
+  <dataTypes>
+    <enum name="DatastoreStateEnum">
+      <item value="0" name="Pending" summary="Target device operation is pending">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Committed" summary="Target device operation has been committed">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="DeletePending" summary="Target device delete operation is pending">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="Datastore Admin Information Entry">
+      <field id="1" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="FriendlyName" type="string">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="VendorID" type="vendor-id">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="ICAC" type="octstr">
+        <access read="true"/>
+        <mandatoryConform/>
+        <constraint type="maxLength" value="400"/>
+      </field>
+    </struct>
+    <struct name="Datastore Endpoint Entry">
+      <field id="0" name="EndpointID" type="uint64">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="FriendlyName" type="string">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="StatusEntry" type="DatastoreStatusEntry">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="GroupIDList" type="DataTypeList[Datastore Group ID Entry Type]">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="BindingList" type="DataTypeList[Datastore Binding Entry Type]">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="Datastore Epoch Key Entry">
+      <field id="0" name="GroupKeySet" type="ref_GroupKeySetStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="UpdateTimestamp" type="utc" default="null">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="FriendlyName" type="string">
+        <optionalConform/>
+      </field>
+      <field id="3" name="ID" type="uint16">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="65535"/>
+      </field>
+    </struct>
+    <struct name="Datastore Group ID Entry">
+      <field id="0" name="GroupID" type="uint64">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="GroupNameUpdateTimestamp" type="utc" default="null">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="StatusEntry" type="DatastoreStatusEntry">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="Datastore Group Information Entry">
+      <field id="0" name="GroupID" type="uint64">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="FriendlyName" type="string">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="FriendlyNameUpdateTimestamp" type="utc" default="null">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="GroupKeySetID" type="uint16">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="65535"/>
+      </field>
+      <field id="4" name="GroupKeySetUpdateTimestamp" type="utc" default="null">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="GroupCAT" type="uint16">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="65535"/>
+      </field>
+      <field id="6" name="GroupCATVersion" type="uint16">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="65535"/>
+      </field>
+      <field id="7" name="GroupPermission" type="ref_AccessControlEntryPrivilegeEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="DatastoreStatusEntry">
+      <field id="0" name="State" type="DatastoreStateEnum" default="Pending">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="UpdateTimestamp" type="utc" default="null">
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="AnchorRootCA" type="octstr">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="AnchorNodeID" type="node-id">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="AnchorVendorID" type="vendor-id">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0003" name="FriendlyName" type="string">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="GroupList" type="DataTypeList[Datastore Group Information Entry Type]">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0007" name="NodeList" type="DataTypeList[Datastore Node Information Entry Type]">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0008" name="AdminList" type="DataTypeList[Datastore Admin Information Entry Type]">
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="AddNodeToFabric Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NodeInformationEntry" type="Datastore Node Information Entry">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="RemoveNodeFromFabric Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x02" name="AddNodeToGroup Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="RemoveNodeFromGroup Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="AddGroup Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupInformationEntry" type="Datastore Group Information Entry">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x05" name="UpdateGroup Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupInformationEntry" type="Datastore Group Information Entry">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="RemoveGroup Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x07" name="AddAdmin Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="AdminInformationEntry" type="Datastore Admin Information Entry">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x08" name="UpdateAdmin Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="AdminInformationEntry" type="Datastore Admin Information Entry">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x09" name="RemoveAdmin Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0A" name="AddEndpointToNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="EndpointEntry" type="Datastore Endpoint Entry">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0B" name="RemoveEndpointFromNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0C" name="UpdateEndpointStateForNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="State" type="DatastoreStatusEntry">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0D" name="AddACLToNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ACLEntry" type="Datastore ACL Entry">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0E" name="RemoveACLFromNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="ACLID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0F" name="UpdateACLStateForNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="ACLID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="State" type="DatastoreStatusEntry">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x10" name="AddGroupIDToEndpointForNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x11" name="RemoveGroupIDFromEndpointForNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x12" name="UpdateGroupIDStateForEndpointForNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="State" type="DatastoreStatusEntry">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x13" name="AddBindingToEndpointForNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="Binding" type="Datastore Binding Entry">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x14" name="RemoveBindingFromEndpointForNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="1" name="BindingID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x15" name="UpdateBindingStateForEndpointAndNode Command" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="1" name="BindingID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="EndpointID" type="endpoint-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="State" type="DatastoreStatusEntry">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+</cluster>
