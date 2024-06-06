@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-// TODO: Includes.
 #include <lib/support/Span.h>
 #include <messaging/ExchangeContext.h>
 
@@ -52,8 +51,7 @@ public:
 
     // Accepts the transfer. The data provided here will be sent over the transfer. This must only be called if the transfer
     // receives data from this controller.
-    // TODO: Should the parameter be const&?
-    CHIP_ERROR AcceptReceive(const ByteSpan data_to_send);
+    CHIP_ERROR AcceptReceive(const ByteSpan & data_to_send);
 
     // Rejects the transfer.
     CHIP_ERROR Reject();
@@ -70,7 +68,6 @@ private:
 
     Delegate * mDelegate = nullptr;
     bool mAwaitingAccept = false;
-    TransferSession::TransferInitData mInitData;
 
     // TODO: Request the data from a data source rather than copy the data here.
     uint8_t * mData = nullptr;

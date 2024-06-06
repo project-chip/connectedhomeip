@@ -41,14 +41,15 @@ CHIP_ERROR BdxTransfer::AcceptSend()
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
 
-    TransferSession::TransferAcceptData accept_data;
-    accept_data.ControlMode = mInitData.TransferCtlFlags;  // TODO: Is this value correct?
-    accept_data.MaxBlockSize = mInitData.MaxBlockSize;
-    // TODO: Check the acceptable control modes for a Diagnostic Logs cluster transfer.
-    return mTransfer.AcceptTransfer(accept_data);
+    TransferSession::TransferAcceptData acceptData;
+    acceptData.ControlMode = TransferControlFlags::kSenderDrive;
+    acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
+    acceptData.StartOffset = mTransfer.GetStartOffset();
+    acceptData.Length = mTransfer.GetTransferLength();
+    return mTransfer.AcceptTransfer(acceptData);
 }
 
-CHIP_ERROR BdxTransfer::AcceptReceive(const ByteSpan data_to_send)
+CHIP_ERROR BdxTransfer::AcceptReceive(const ByteSpan & data_to_send)
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
@@ -60,10 +61,12 @@ CHIP_ERROR BdxTransfer::AcceptReceive(const ByteSpan data_to_send)
     memcpy(mData, data_to_send.data(), data_to_send.size());
     mDataCount = data_to_send.size();
 
-    TransferSession::TransferAcceptData accept_data;
-    accept_data.ControlMode = mInitData.TransferCtlFlags;  // TODO: Is this value correct?
-    accept_data.MaxBlockSize = mInitData.MaxBlockSize;
-    return mTransfer.AcceptTransfer(accept_data);
+    TransferSession::TransferAcceptData acceptData;
+    acceptData.ControlMode = TransferControlFlags::kReceiverDrive;
+    acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
+    acceptData.StartOffset = mTransfer.GetStartOffset();
+    acceptData.Length = mTransfer.GetTransferLength();
+    return mTransfer.AcceptTransfer(acceptData);
 }
 
 CHIP_ERROR BdxTransfer::Reject()
@@ -82,13 +85,10 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
     switch (event.EventType)
     {
     case TransferSession::OutputEventType::kInitReceived:
-        mInitData = event.transferInitData;
-        mDelegate->InitMessageReceived(this, mInitData);
+        mDelegate->InitMessageReceived(this, event.transferInitData);
         break;
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Received StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
-        // TODO: Not a great error type. The issue isn't internal, it's external. We can check the status code, but I don't know
-        // if that would produce a better error type. Maybe CHIP_ERROR_IM_STATUS_CODE_RECEIVED?
         EndSession(CHIP_ERROR_INTERNAL);
         break;
     case TransferSession::OutputEventType::kInternalError:
@@ -116,8 +116,7 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         EndSession(CHIP_NO_ERROR);
         break;
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
-        mDataTransferredCount += event.bytesToSkip.BytesToSkip;
-        mDataTransferredCount = std::min(mDataTransferredCount, mDataCount);
+        mDataTransferredCount = std::min<size_t>(mDataTransferredCount + event.bytesToSkip.BytesToSkip, mDataCount);
         // Fallthrough intentional.
     case TransferSession::OutputEventType::kQueryReceived:
         SendBlock();
