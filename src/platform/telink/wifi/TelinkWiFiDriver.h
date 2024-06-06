@@ -96,7 +96,7 @@ public:
 
     void OnNetworkStatusChanged(Status status);
     void OnScanWiFiNetworkResult(const WiFiScanResponse & result);
-    void OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status);
+    void OnScanWiFiNetworkDone(const WiFiManager::ScanDoneStatus & status);
 
     void StartDefaultWiFiNetwork(void);
 

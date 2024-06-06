@@ -125,11 +125,12 @@ const Map<wifi_iface_state, WiFiManager::StationStatus, 10>
                               { WIFI_STATE_GROUP_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
                               { WIFI_STATE_COMPLETED, WiFiManager::StationStatus::FULLY_PROVISIONED } });
 
-const Map<uint32_t, WiFiManager::NetEventHandler, 5>
-    WiFiManager::sEventHandlerMap({ { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
-                                    { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
-                                    { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
-                                    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler } });
+const Map<uint32_t, WiFiManager::NetEventHandler, 5> WiFiManager::sEventHandlerMap({
+    { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
+    { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
+    { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
+    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler },
+});
 
 void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
 {
@@ -138,7 +139,7 @@ void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mg
         Platform::UniquePtr<uint8_t> eventData(new uint8_t[cb->info_length]);
         VerifyOrReturn(eventData);
         memcpy(eventData.get(), cb->info, cb->info_length);
-        sEventHandlerMap[mgmtEvent](std::move(eventData));
+        sEventHandlerMap[mgmtEvent](std::move(eventData), cb->info_length);
     }
 }
 
@@ -270,10 +271,13 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
     return CHIP_NO_ERROR;
 }
 
-void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data)
+void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t length)
 {
+    // Validate that input data size matches the expected one.
+    VerifyOrReturn(length == sizeof(wifi_scan_result));
+
     // Contrary to other handlers, offload accumulating of the scan results from the CHIP thread to the caller's thread
-    const struct wifi_scan_result * scanResult = reinterpret_cast<const struct wifi_scan_result *>(data.get());
+    const wifi_scan_result * scanResult = reinterpret_cast<const wifi_scan_result *>(data.get());
 
     if (Instance().mInternalScan &&
         Instance().mWantedNetwork.GetSsidSpan().data_equal(ByteSpan(scanResult->ssid, scanResult->ssid_length)))
@@ -304,6 +308,7 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data)
             Instance().mWiFiParams.mParams.timeout = Instance().mHandling.mConnectionTimeout.count();
             Instance().mWiFiParams.mParams.channel = WIFI_CHANNEL_ANY;
             Instance().mWiFiParams.mRssi           = scanResult->rssi;
+            Instance().mWiFiParams.mParams.band    = WIFI_FREQ_BAND_UNKNOWN;
             Instance().mSsidFound                  = true;
         }
     }
@@ -314,26 +319,29 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data)
     }
 }
 
-void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
+void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t length)
 {
+    // Validate that input data size matches the expected one.
+    VerifyOrReturn(length == sizeof(wifi_status));
+
     CHIP_ERROR err = SystemLayer().ScheduleLambda([capturedData = data.get()] {
         Platform::UniquePtr<uint8_t> safePtr(capturedData);
-        uint8_t * rawData               = safePtr.get();
-        const wifi_status * status      = reinterpret_cast<const wifi_status *>(rawData);
-        WiFiRequestStatus requestStatus = static_cast<WiFiRequestStatus>(status->status);
+        uint8_t * rawData             = safePtr.get();
+        const wifi_status * status    = reinterpret_cast<const wifi_status *>(rawData);
+        ScanDoneStatus scanDoneStatus = status->status;
 
-        if (requestStatus == WiFiRequestStatus::FAILURE)
+        if (scanDoneStatus)
         {
-            ChipLogError(DeviceLayer, "Wi-Fi scan finalization failure (%d)", status->status);
+            ChipLogError(DeviceLayer, "Wi-Fi scan finalization failure (%d)", scanDoneStatus);
         }
         else
         {
-            ChipLogProgress(DeviceLayer, "Wi-Fi scan done (%d)", status->status);
+            ChipLogProgress(DeviceLayer, "Wi-Fi scan done");
         }
 
         if (Instance().mScanDoneCallback && !Instance().mInternalScan)
         {
-            Instance().mScanDoneCallback(requestStatus);
+            Instance().mScanDoneCallback(scanDoneStatus);
             // restore the connection state from before the scan request was issued
             Instance().mWiFiState = Instance().mCachedWiFiState;
             return;
@@ -393,8 +401,11 @@ void WiFiManager::SendRouterSolicitation(System::Layer * layer, void * param)
     }
 }
 
-void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data)
+void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t length)
 {
+    // Validate that input data size matches the expected one.
+    VerifyOrReturn(length == sizeof(wifi_status));
+
     CHIP_ERROR err = SystemLayer().ScheduleLambda([capturedData = data.get()] {
         Platform::UniquePtr<uint8_t> safePtr(capturedData);
         uint8_t * rawData               = safePtr.get();
@@ -446,13 +457,22 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data)
     }
 }
 
-void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t>)
+void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t length)
 {
-    SystemLayer().ScheduleLambda([] {
+    // Validate that input data size matches the expected one.
+    VerifyOrReturn(length == sizeof(wifi_status));
+
+    CHIP_ERROR err = SystemLayer().ScheduleLambda([] {
         ChipLogProgress(DeviceLayer, "WiFi station disconnected");
         Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
         Instance().PostConnectivityStatusChange(kConnectivity_Lost);
     });
+
+    if (CHIP_NO_ERROR == err)
+    {
+        // the ownership has been transferred to the worker thread - release the buffer
+        data.release();
+    }
 }
 
 WiFiManager::StationStatus WiFiManager::GetStationStatus() const

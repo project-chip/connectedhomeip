@@ -90,8 +90,9 @@ public:
         TERMINATED = 2
     };
 
+    using ScanDoneStatus     = decltype(wifi_status::status);
     using ScanResultCallback = void (*)(const NetworkCommissioning::WiFiScanResponse &);
-    using ScanDoneCallback   = void (*)(WiFiRequestStatus);
+    using ScanDoneCallback   = void (*)(const ScanDoneStatus &);
     using ConnectionCallback = void (*)();
 
     enum class StationStatus : uint8_t
@@ -183,7 +184,7 @@ public:
     CHIP_ERROR SetLowPowerMode(bool onoff);
 
 private:
-    using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>);
+    using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>, size_t);
 
     struct ConnectionParams
     {
@@ -196,10 +197,10 @@ private:
 
     // Event handling
     static void WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
-    static void ScanResultHandler(Platform::UniquePtr<uint8_t> data);
-    static void ScanDoneHandler(Platform::UniquePtr<uint8_t> data);
-    static void ConnectHandler(Platform::UniquePtr<uint8_t> data);
-    static void DisconnectHandler(Platform::UniquePtr<uint8_t> data);
+    static void ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t length);
+    static void ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t length);
+    static void ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t length);
+    static void DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t length);
     static void PostConnectivityStatusChange(ConnectivityChange changeType);
     static void SendRouterSolicitation(System::Layer * layer, void * param);
 
@@ -218,7 +219,7 @@ private:
 
     net_if * mNetIf{ nullptr };
     ConnectionParams mWiFiParams{};
-    ConnectionHandling mHandling;
+    ConnectionHandling mHandling{};
     wifi_iface_state mWiFiState;
     wifi_iface_state mCachedWiFiState;
     net_mgmt_event_callback mWiFiMgmtClbk{};
