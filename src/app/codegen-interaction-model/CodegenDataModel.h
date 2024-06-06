@@ -37,6 +37,33 @@ namespace app {
 /// however they would share the exact same underlying data and storage).
 class CodegenDataModel : public chip::app::InteractionModel::Model
 {
+private:
+    /// Ember commands are stored as a `CommandId *` pointer that is either null (i.e. no commands)
+    /// or is terminated with 0xFFFF_FFFF aka kInvalidCommandId
+    ///
+    /// Since iterator implementations in the data model use Next(before_path) calls, iterating
+    /// such lists from the beginning would be very inefficient as O(n^2).
+    ///
+    /// This class maintains a cached position inside such iteration, such that `Next` calls
+    /// can be faster.
+    class EmberCommandListIterator
+    {
+    private:
+        const CommandId * mCurrentList = nullptr;
+        const CommandId * mCurrentHint = nullptr; // Invariant: mCurrentHint is INSIDE mCurrentList
+    public:
+        EmberCommandListIterator() = default;
+
+        /// Returns the first command in the given list (or nullopt if list is null or starts with 0xFFFFFFF)
+        std::optional<CommandId> First(const CommandId * list);
+
+        /// Returns the command after `previousId` in the given list
+        std::optional<CommandId> Next(const CommandId * list, CommandId previousId);
+
+        /// Checks if the given command id exists in the given list
+        bool Exists(const CommandId * list, CommandId toCheck);
+    };
+
 public:
     /// Generic model implementations
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
@@ -72,6 +99,8 @@ private:
     uint16_t mEndpointIterationHint  = 0;
     unsigned mClusterIterationHint   = 0;
     unsigned mAttributeIterationHint = 0;
+    EmberCommandListIterator mAcceptedCommandsIterator;
+    EmberCommandListIterator mGeneratedCommandsIterator;
 
     // represents a remembered cluster reference that has been found as
     // looking for clusters is very common (for every attribute iteration)

@@ -130,8 +130,7 @@ InteractionModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & 
     return entry;
 }
 
-InteractionModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath, CommandId clusterCommandId,
-                                                const EmberAfCluster * emberCluster)
+InteractionModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clusterPath, CommandId clusterCommandId)
 {
     InteractionModel::CommandEntry entry;
     entry.path                 = ConcreteCommandPath(clusterPath.mEndpointId, clusterPath.mClusterId, clusterCommandId);
@@ -153,7 +152,74 @@ InteractionModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clus
     return entry;
 }
 
+const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+
 } // namespace
+
+std::optional<CommandId> CodegenDataModel::EmberCommandListIterator::First(const CommandId * list)
+{
+    VerifyOrReturnValue(list != nullptr, std::nullopt);
+    mCurrentList = mCurrentHint = list;
+
+    VerifyOrReturnValue(*mCurrentList != kInvalidCommandId, std::nullopt);
+    return *mCurrentList;
+}
+
+std::optional<CommandId> CodegenDataModel::EmberCommandListIterator::Next(const CommandId * list, CommandId previousId)
+{
+    VerifyOrReturnValue(list != nullptr, std::nullopt);
+    VerifyOrReturnValue(previousId != kInvalidCommandId, std::nullopt);
+
+    if (mCurrentList != list)
+    {
+        // invalidate the hint if switching lists...
+        mCurrentHint = nullptr;
+        mCurrentList = list;
+    }
+
+    if ((mCurrentHint == nullptr) || (*mCurrentHint != previousId))
+    {
+        // we did not find a usable hint. Search from the to set the hint
+        mCurrentHint = mCurrentList;
+        while ((*mCurrentHint != kInvalidCommandId) && (*mCurrentHint != previousId))
+        {
+            mCurrentHint++;
+        }
+    }
+
+    VerifyOrReturnValue(*mCurrentHint == previousId, std::nullopt);
+
+    // hint is valid and can be used immediately
+    mCurrentHint++; // this is the next value
+    return (*mCurrentHint == kInvalidCommandId) ? std::nullopt : std::make_optional(*mCurrentHint);
+}
+
+bool CodegenDataModel::EmberCommandListIterator::Exists(const CommandId * list, CommandId toCheck)
+{
+    VerifyOrReturnValue(list != nullptr, false);
+    VerifyOrReturnValue(toCheck != kInvalidCommandId, false);
+
+    if (mCurrentList != list)
+    {
+        // invalidate the hint if switching lists...
+        mCurrentHint = nullptr;
+        mCurrentList = list;
+    }
+
+    // maybe already positioned correctly
+    if ((mCurrentHint != nullptr) && (*mCurrentHint == toCheck))
+    {
+        return true;
+    }
+
+    // move and try to find it
+    while ((*mCurrentHint != kInvalidCommandId) && (*mCurrentHint != toCheck))
+    {
+        mCurrentHint++;
+    }
+
+    return (*mCurrentHint == toCheck);
+}
 
 CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttributeRequest & request,
                                            InteractionModel::ReadState & state, AttributeValueEncoder & encoder)
@@ -407,34 +473,56 @@ InteractionModel::CommandEntry CodegenDataModel::FirstAcceptedCommand(const Conc
     const EmberAfCluster * cluster = FindServerCluster(path);
 
     VerifyOrReturnValue(cluster != nullptr, InteractionModel::CommandEntry::Invalid());
-    VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, InteractionModel::CommandEntry::Invalid());
-    VerifyOrReturnValue(cluster->acceptedCommandList[0] != kInvalidCommandId, InteractionModel::CommandEntry::Invalid());
 
-    return CommandEntryFrom(path, cluster->acceptedCommandList[0], cluster);
+    std::optional<CommandId> commandId = mAcceptedCommandsIterator.First(cluster->acceptedCommandList);
+    VerifyOrReturnValue(commandId.has_value(), InteractionModel::CommandEntry::Invalid());
+
+    return CommandEntryFrom(path, *commandId);
 }
 
 InteractionModel::CommandEntry CodegenDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
 {
-    // FIXME: implement
-    return InteractionModel::CommandEntry::Invalid();
+    const EmberAfCluster * cluster = FindServerCluster(before);
+
+    VerifyOrReturnValue(cluster != nullptr, InteractionModel::CommandEntry::Invalid());
+
+    std::optional<CommandId> commandId = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, before.mCommandId);
+    VerifyOrReturnValue(commandId.has_value(), InteractionModel::CommandEntry::Invalid());
+
+    return CommandEntryFrom(before, *commandId);
 }
 
 std::optional<InteractionModel::CommandInfo> CodegenDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    // FIXME: implement
-    return std::nullopt;
+    const EmberAfCluster * cluster = FindServerCluster(path);
+
+    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
+    VerifyOrReturnValue(mAcceptedCommandsIterator.Exists(cluster->acceptedCommandList, path.mCommandId), std::nullopt);
+
+    return CommandEntryFrom(path, path.mCommandId).info;
 }
 
-ConcreteCommandPath CodegenDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
+ConcreteCommandPath CodegenDataModel::FirstGeneratedCommand(const ConcreteClusterPath & path)
 {
-    // FIXME: implement
-    return ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    const EmberAfCluster * cluster = FindServerCluster(path);
+
+    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
+
+    std::optional<CommandId> commandId = mGeneratedCommandsIterator.First(cluster->generatedCommandList);
+    VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
+    return ConcreteCommandPath(path.mEndpointId, path.mClusterId, *commandId);
 }
 
 ConcreteCommandPath CodegenDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
 {
-    // FIXME: implement
-    return ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    const EmberAfCluster * cluster = FindServerCluster(before);
+
+    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
+
+    std::optional<CommandId> commandId = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, before.mCommandId);
+    VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
+
+    return ConcreteCommandPath(before.mEndpointId, before.mClusterId, *commandId);
 }
 
 } // namespace app
