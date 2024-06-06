@@ -276,6 +276,12 @@ void TelinkWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * ca
     }
 }
 
+uint32_t TelinkWiFiDriver::GetSupportedWiFiBandsMask() const
+{
+    uint32_t bands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+    return bands;
+}
+
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip
