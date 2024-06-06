@@ -135,6 +135,9 @@ TEST(TestCodegenModelViaMocks, IterateOverClusters)
 
     EXPECT_FALSE(model.FirstCluster(kEndpointIdThatIsMissing).path.HasValidIds());
     EXPECT_FALSE(model.FirstCluster(kInvalidEndpointId).path.HasValidIds());
+    EXPECT_FALSE(model.NextCluster(ConcreteClusterPath(kInvalidEndpointId, 123)).path.HasValidIds());
+    EXPECT_FALSE(model.NextCluster(ConcreteClusterPath(kMockEndpoint1, kInvalidClusterId)).path.HasValidIds());
+    EXPECT_FALSE(model.NextCluster(ConcreteClusterPath(kMockEndpoint1, 981u)).path.HasValidIds());
 
     // mock endpoint 1 has 2 mock clusters: 1 and 2
     ClusterEntry entry = model.FirstCluster(kMockEndpoint1);
