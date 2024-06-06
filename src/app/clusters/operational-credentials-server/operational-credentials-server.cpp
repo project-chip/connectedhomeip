@@ -703,7 +703,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     needRevert = false;
 
     // We might have a new operational identity, so we should start advertising it right away.
-    app::DnssdServer::Instance().AdvertiseOperational();
+    LogErrorOnFailure(app::DnssdServer::Instance().AdvertiseOperational());
 
     // Notify the attributes containing fabric metadata can be read with new data
     MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
