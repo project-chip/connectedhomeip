@@ -33,6 +33,7 @@
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/PendingResponseTrackerImpl.h>
+#include <app/data-model/EncodableToTLV.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Optional.h>
@@ -376,6 +377,26 @@ public:
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
 
     /**
+     * API for adding a request data.  The `aEncodable` is generally expected to encode
+     * a ClusterName::Commands::CommandName::Type struct, however any object should work.
+     *
+     * @param [in] aCommandPath  The path of the command being requested.
+     * @param [in] aEncodable - an encodable that places the command data structure
+     *             for `aResponseCommandId` into a TLV Writer.
+     * @param [in] aAddRequestDataParams parameters associated with building the
+     *             InvokeRequestMessage that are associated with this request.
+     *
+     * This API does not validate if command provided requires timed invoke. If caller
+     * wants that certainty they should call templated version of AddRequestData.
+     */
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath,
+                              DataModel::EncodableToTLV & aEncodable,
+                              AddRequestDataParameters & aAddRequestDataParams)
+    {
+        return AddRequestDataInternal(aCommandPath, aEncodable, aAddRequestDataParams);
+    }
+
+    /**
      * API for adding a data request.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
      * object that can be encoded using the DataModel::Encode machinery and
@@ -388,24 +409,19 @@ public:
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
     {
         AddRequestDataParameters addRequestDataParams;
-        return AddRequestData(aCommandPath, aData, addRequestDataParams);
+        DataModel::EncodableType<CommandDataT> encoder(aData);
+        return AddRequestData(aCommandPath, encoder, addRequestDataParams);
     }
 
-    template <typename CommandDataT>
-    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                              AddRequestDataParameters & aAddRequestDataParams)
-    {
-        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aAddRequestDataParams.timedInvokeTimeoutMs.HasValue(),
-                            CHIP_ERROR_INVALID_ARGUMENT);
-
-        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
-    }
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs)
     {
+        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(),
+                            CHIP_ERROR_INVALID_ARGUMENT);
         AddRequestDataParameters addRequestDataParams(aTimedInvokeTimeoutMs);
-        return AddRequestData(aCommandPath, aData, addRequestDataParams);
+        DataModel::EncodableType<CommandDataT> encoder(aData);
+        return AddRequestData(aCommandPath, encoder, addRequestDataParams);
     }
 
     /**
@@ -426,7 +442,8 @@ public:
     CHIP_ERROR TestOnlyAddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                                   AddRequestDataParameters & aAddRequestDataParams)
     {
-        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
+        DataModel::EncodableType<CommandDataT> encoder(aData);
+        return AddRequestDataInternal(aCommandPath, encoder, aAddRequestDataParams);
     }
 
     CHIP_ERROR TestOnlyFinishCommand(FinishCommandParameters & aFinishCommandParams)
@@ -448,18 +465,9 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
-    template <typename CommandDataT>
-    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      AddRequestDataParameters & aAddRequestDataParams)
-    {
-        PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
-        ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
-        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
-        FinishCommandParameters finishCommandParams(aAddRequestDataParams);
-        return FinishCommand(finishCommandParams);
-    }
+    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath,
+                                      DataModel::EncodableToTLV & aEncodable,
+                                      AddRequestDataParameters & aAddRequestDataParams);
 
     CHIP_ERROR FinishCommandInternal(FinishCommandParameters & aFinishCommandParams);
 

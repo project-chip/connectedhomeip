@@ -537,6 +537,19 @@ CHIP_ERROR CommandSender::FinishCommand(FinishCommandParameters & aFinishCommand
     return FinishCommandInternal(aFinishCommandParams);
 }
 
+CHIP_ERROR CommandSender::AddRequestDataInternal(
+    const CommandPathParams & aCommandPath, DataModel::EncodableToTLV & aEncodable,
+    AddRequestDataParameters & aAddRequestDataParams)
+{
+    PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
+    ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
+    TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+    FinishCommandParameters finishCommandParams(aAddRequestDataParams);
+    return FinishCommand(finishCommandParams);
+}
+
 CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinishCommandParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
