@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#++++ DEBUG: These flags control whether we're creating a binary for each test suite or each individual test source.  This is a temporary solution while debugging.
 enable_efr32_build_per_suite = false  #++++ TODO: Figure out how to enable things based on `chip_device_platform == "efr32"` which is not currently in scope.
 enable_efr32_build_per_testsource = true  #++++ TODO: Figure out how to enable things based on `chip_device_platform == "efr32"` which is not currently in scope.
 

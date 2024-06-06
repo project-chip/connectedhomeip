@@ -59,22 +59,22 @@ if (chip_build_tests) {
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
+      "${chip_root}/src/lib/address_resolve/tests",
+      "${chip_root}/src/lib/asn1/tests",
+      "${chip_root}/src/lib/core/tests",
+      "${chip_root}/src/messaging/tests",
+      "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/protocols/interaction_model/tests",
+      "${chip_root}/src/protocols/user_directed_commissioning/tests",
+      "${chip_root}/src/transport/retransmit/tests",
+      "${chip_root}/src/app/icd/server/tests",
+      "${chip_root}/src/app/tests",
+      "${chip_root}/src/lib/format/tests",
+      "${chip_root}/src/protocols/secure_channel/tests",
+      "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
+      "${chip_root}/src/system/tests",
+      "${chip_root}/src/transport/tests",
     ]
-
-    # Skip on efr32 due to flash limitations.
-    if (chip_device_platform != "efr32") {
-      tests += [
-        "${chip_root}/src/lib/address_resolve/tests",
-        "${chip_root}/src/lib/asn1/tests",
-        "${chip_root}/src/lib/core/tests",
-        "${chip_root}/src/messaging/tests",
-        "${chip_root}/src/protocols/bdx/tests",
-        "${chip_root}/src/protocols/interaction_model/tests",
-        "${chip_root}/src/protocols/user_directed_commissioning/tests",
-        "${chip_root}/src/transport/retransmit/tests",
-        "${chip_root}/src/app/icd/server/tests",
-      ]
-    }
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
     if (current_os != "mbed") {
@@ -90,25 +90,18 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
-    if (current_os != "zephyr" && current_os != "mbed" &&
-        chip_device_platform != "efr32") {
+    if (current_os != "zephyr" && current_os != "mbed") {
       tests += [
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]
     }
 
-    # Skip on efr32 due to flash and/or ram limitations.
+    # Won't build on efr32.  openr.c:(.text._open_r+0x10): warning: _open is not implemented and will always fail due to flash and/or ram limitations.
     if (chip_device_platform != "efr32") {
       tests += [
-        "${chip_root}/src/app/tests",
         "${chip_root}/src/credentials/tests",
-        "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",
-        "${chip_root}/src/protocols/secure_channel/tests",
-        "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
-        "${chip_root}/src/system/tests",
-        "${chip_root}/src/transport/tests",
       ]
 
       if (matter_enable_tracing_support &&
@@ -121,8 +114,7 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
-    if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
-        chip_device_platform != "ameba") {
+    if (chip_device_platform != "esp32" && chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 
