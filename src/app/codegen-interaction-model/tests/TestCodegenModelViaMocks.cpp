@@ -17,7 +17,6 @@
  */
 #include <app/codegen-interaction-model/CodegenDataModel.h>
 
-#include <app/GlobalAttributes.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
@@ -240,21 +239,6 @@ TEST(TestCodegenModelViaMocks, IterateOverAttributes)
     ASSERT_EQ(entry.path.mAttributeId, MockAttributeId(2));
     ASSERT_TRUE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
 
-    // Iteration MUST include global attributes. Ember does not provide those, so we
-    // assert here that we present them in order
-    for (auto globalAttributeId : GlobalAttributesNotInMetadata)
-    {
-
-        entry = model.NextAttribute(entry.path);
-        ASSERT_TRUE(entry.path.HasValidIds());
-        ASSERT_EQ(entry.path.mEndpointId, kMockEndpoint2);
-        ASSERT_EQ(entry.path.mClusterId, MockClusterId(2));
-        ASSERT_EQ(entry.path.mAttributeId, globalAttributeId);
-
-        // all global attributes not in ember metadata are LIST typed
-        ASSERT_TRUE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
-    }
-
     entry = model.NextAttribute(entry.path);
     ASSERT_FALSE(entry.path.HasValidIds());
 
@@ -306,6 +290,7 @@ TEST(TestCodegenModelViaMocks, GetAttributeInfo)
     EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 }
 
+// global attributes are EXPLICITLY not supported
 TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
@@ -314,11 +299,9 @@ TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
     std::optional<AttributeInfo> info = model.GetAttributeInfo(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
 
-    ASSERT_TRUE(info.has_value());
-    EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_FALSE(info.has_value());
 
     info = model.GetAttributeInfo(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
-    ASSERT_TRUE(info.has_value());
-    EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_FALSE(info.has_value());
 }
