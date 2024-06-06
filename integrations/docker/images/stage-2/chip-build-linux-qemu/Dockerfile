@@ -123,11 +123,11 @@ RUN mkdir -p /tmp/workdir/linux \
 	&& make install DESTDIR=/opt/ubuntu-qemu/rootfs && mkdir -p /opt/ubuntu-qemu/rootfs/usr/bin && cp /tmp/workdir/bluez/emulator/btvirt /opt/ubuntu-qemu/rootfs/usr/bin \
 	# Download Ubuntu image for QEMU
 	&& curl https://cloud-images.ubuntu.com/minimal/releases/noble/release/ubuntu-24.04-minimal-cloudimg-amd64.img \
-	-o /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img \
+	-o /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img
 	# Prepare ubuntu image
-	&& qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
-	&& virt-resize --expand /dev/sda1 /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img $UBUNTU_QEMU_IMG
-RUN guestfish -a $UBUNTU_QEMU_IMG \
+RUN qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
+	&& virt-resize --expand /dev/sda1 /tmp/workdir/ubuntu-24.04-minimal-cloudimg-amd64.img $UBUNTU_QEMU_IMG \
+	&& guestfish -a $UBUNTU_QEMU_IMG \
 	--mount /dev/sda4:/ \
 	--network \
 	copy-in /opt/ubuntu-qemu/rootfs/lib /usr : \
@@ -154,10 +154,11 @@ RUN guestfish -a $UBUNTU_QEMU_IMG \
 	sh 'sed -i "s#^ExecStart=.*#ExecStart=-/usr/libexec/bluetooth/bluetoothd -E#" /lib/systemd/system/bluetooth.service' : \
 	sh 'rm -f /etc/resolv.conf && /bin/echo -e "nameserver 8.8.8.8" > /etc/resolv.conf' : \
 	sh '/bin/echo -e "host0 /chip 9p trans=virtio,version=9p2000.L 0 0" >> /etc/fstab' : \
-	sh '/bin/echo -e "[ -x /init.sh ] && /init.sh\n" >> /root/.profile' : \
-	sh '/bin/echo -e "export PW_ENVIRONMENT_ROOT=/root/pw_root\n[ -x /launcher.sh ] && /launcher.sh\n" >> /root/.profile'
-RUN echo -n \
+	sh '/bin/echo -e "[ -x /init.sh ] && /init.sh && rm -f /init.sh && sync && systemctl poweroff\n" >> /root/.profile' : \
+	sh '/bin/echo -e "export PW_ENVIRONMENT_ROOT=/root/pw_root\n[ -x /launcher.sh ] && /launcher.sh\n" >> /root/.profile' \
+	&& echo -n \
 	"#!/bin/bash\n" \
+	"set -e \n" \
 	"export DEBIAN_FRONTEND=noninteractive \n" \
 	"apt-get update\n" \
 	"apt-get install -y apt-utils\n" \
@@ -189,15 +190,12 @@ RUN echo -n \
 	"/usr/bin/systemctl mask dbus-fi.w1.wpa_supplicant1.service\n" \
 	"/usr/bin/systemctl mask wpa_supplicant.service\n" \
 	"git config --file /root/.gitconfig  --add safe.directory \"*\"\n" \
-	"echo Installed: cleaning and shutting down\n" \
 	"apt-get clean\n" \
 	"rm -rf /var/lib/apt/lists/*\n" \
 	"rm -rf /var/cache/apt/*\n" \
-	"rm /init.sh\n" \
 	"echo Configuration completed\n " \
-	"echo o > /proc/sysrq-trigger\n" \
-	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda4:/ upload - /init.sh : chmod 0755 /init.sh
-RUN qemu-system-x86_64 \
+	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda4:/ upload - /init.sh : chmod 0755 /init.sh \
+	&& qemu-system-x86_64 \
 	-machine ubuntu \
 	-smp 4 \
 	-m 2048 \
@@ -230,7 +228,7 @@ RUN qemu-system-x86_64 \
 	"fi\n" \
 	"echo 'Shutting down emulated system...'\n" \
 	"echo o > /proc/sysrq-trigger\n" \
-	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda3:/ upload - /launcher.sh : chmod 0755 /launcher.sh \
+	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda4:/ upload - /launcher.sh : chmod 0755 /launcher.sh \
 	&& virt-sparsify --compress ${UBUNTU_QEMU_IMG} ${UBUNTU_QEMU_IMG}.compressed \
 	&& mv ${UBUNTU_QEMU_IMG}.compressed ${UBUNTU_QEMU_IMG} \
 	&& rm -rf /var/tmp/.guestfs-0/* \
