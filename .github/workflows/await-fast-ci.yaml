@@ -36,4 +36,4 @@ jobs:
         if: ${{ failure() }}
         uses: andymckay/cancel-action@0.4
         env:
-          GH_TOKEN: ${{ secrets.JOB_CANCEL_PAT }}
+          GITHUB_TOKEN: ${{ secrets.JOB_CANCEL_PAT }}
