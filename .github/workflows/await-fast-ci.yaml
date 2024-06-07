@@ -35,3 +35,5 @@ jobs:
       - name: Stop on Fail
         if: ${{ failure() }}
         uses: andymckay/cancel-action@0.4
+        env:
+          GH_TOKEN: ${{ secrets.JOB_CANCEL_PAT }}
