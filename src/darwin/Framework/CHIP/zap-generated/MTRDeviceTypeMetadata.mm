@@ -44,6 +44,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000014, DeviceTypeClass::Utility, "Matter OTA Provider" },
     { 0x00000015, DeviceTypeClass::Simple, "Matter Contact Sensor" },
     { 0x00000016, DeviceTypeClass::Node, "Matter Root Node" },
+    { 0x00000019, DeviceTypeClass::Utility, "Matter Secondary Network Interface Device Type" },
     { 0x00000022, DeviceTypeClass::Simple, "Matter Speaker" },
     { 0x00000023, DeviceTypeClass::Simple, "Matter Casting Video Player" },
     { 0x00000024, DeviceTypeClass::Simple, "Matter Content App" },
@@ -100,7 +101,6 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
 };
 
 static_assert(ExtractVendorFromMEI(0xFFF10001) != 0, "Must have class defined for \"Matter Orphan Clusters\" if it's a standard device type");
-static_assert(ExtractVendorFromMEI(0xFFF10002) != 0, "Must have class defined for \"Matter Secondary Network Commissioning Device Type\" if it's a standard device type");
 static_assert(ExtractVendorFromMEI(0xFFF10003) != 0, "Must have class defined for \"Matter All-clusters-app Server Example\" if it's a standard device type");
 
 } // anonymous namespace

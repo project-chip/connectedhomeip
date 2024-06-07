@@ -140,16 +140,6 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress
             print(f'Removing file {xml_path} as it does not include any cluster definitions')
             os.remove(xml_path)
             continue
-        # For now, we're going to manually remove the word "Cluster" from the cluster name field
-        # to make the diff easier. The update to 1.2.4 of the scraper added this.
-        # TODO: submit a separate PR with JUST this change revered and remove this code.
-        with open(xml_path, 'rb') as input:
-            xml_str = input.read()
-
-        original_name = bytes(cluster.attrib['name'], 'utf-8')
-        replacement_name = bytes(cluster.attrib['name'].removesuffix(" Cluster"), 'utf-8')
-        with open(xml_path, 'wb') as output:
-            output.write(xml_str.replace(original_name, replacement_name))
 
 
 def scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress):
