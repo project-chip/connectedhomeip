@@ -134,7 +134,7 @@ public:
     CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) override { return CHIP_NO_ERROR; };
     CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) override { return CHIP_NO_ERROR; };
     CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) override { return CHIP_NO_ERROR; };
-    void Shutdown() override{};
+    void Shutdown() override {};
 };
 
 System::Clock::Internal::MockClock * pMockClock          = nullptr;

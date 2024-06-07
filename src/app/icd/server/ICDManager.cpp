@@ -192,7 +192,7 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            if (entry.clientType == static_cast<uint8_t>(ClientTypeEnum::kEphemeral))
+            if (entry.clientType == ClientTypeEnum::kEphemeral)
             {
                 // If the registered client is ephemeral, do not send a Check-In message
                 // continue to next entry
@@ -257,6 +257,12 @@ bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsg
             {
                 // Try to fetch the next entry upon failure (should not happen).
                 ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry, will try next entry.");
+                continue;
+            }
+
+            if (entry.clientType == ClientTypeEnum::kEphemeral)
+            {
+                // If the registered client is ephemeral, no Check-In message would be sent to this client
                 continue;
             }
 

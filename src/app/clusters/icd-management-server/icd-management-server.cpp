@@ -293,20 +293,7 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
     // Save
     entry.checkInNodeID    = nodeId;
     entry.monitoredSubject = monitoredSubject;
-
-    if (commandData.clientType.HasValue())
-    {
-        ChipLogError(NotSpecified, "-------------------------------- Received Value %d",
-                     static_cast<uint8_t>(commandData.clientType.Value()));
-
-        ChipLogError(NotSpecified, "-------------------------------- Set Value %d", static_cast<uint8_t>(clientType.Value()));
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "-------------------------- WHAT THE FUCK");
-    }
-
-    entry.clientType = static_cast<uint8_t>(clientType.ValueOr(ClientTypeEnum::kPermanent));
+    entry.clientType       = clientType.ValueOr(ClientTypeEnum::kPermanent);
 
     if (entry.keyHandleValid)
     {
