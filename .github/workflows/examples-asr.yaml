@@ -30,6 +30,7 @@ env:
     
 jobs:
     await-fast-ci:
+        name: Await Fast CI
         uses: ./.github/workflows/await-fast-ci.yaml
         
     asr:
