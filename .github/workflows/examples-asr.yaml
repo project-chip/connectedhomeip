@@ -38,6 +38,7 @@ jobs:
             - name: Stop on Fail
               if: ${{ failure() }}
               uses: andymckay/cancel-action@0.4
+              env: ${{ secrets.MATTER_PAT }}
         
     asr:
         name: ASR
