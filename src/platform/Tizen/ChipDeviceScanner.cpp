@@ -148,7 +148,8 @@ CHIP_ERROR ChipDeviceScanner::StartScan(ScanFilterType filterType, const ScanFil
     SetupScanFilter(filterType, filterData);
 
     // All set to trigger LE Scan
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](ChipDeviceScanner * self) { return self->StartScanImpl(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](ChipDeviceScanner * self) { return self->StartScanImpl(); }, this);
     SuccessOrExit(err);
 
     return CHIP_NO_ERROR;
