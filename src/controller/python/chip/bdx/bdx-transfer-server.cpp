@@ -40,16 +40,11 @@ void BdxTransferServer::Shutdown()
     mExchangeManager = nullptr;
 }
 
-CHIP_ERROR BdxTransferServer::OnUnsolicitedMessageReceived(const PayloadHeader& payloadHeader,
+CHIP_ERROR BdxTransferServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
                                                            Messaging::ExchangeDelegate *& delegate)
 {
-    // TODO: Verify details from the payload header.
     BdxTransfer * transfer = mBdxTransferPool->Allocate();
-    if (!transfer)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
+    VerifyOrReturnError(transfer != nullptr, CHIP_ERROR_NO_MEMORY);
     delegate = transfer;
     return CHIP_NO_ERROR;
 }
