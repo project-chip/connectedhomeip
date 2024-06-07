@@ -1474,9 +1474,9 @@ cluster IcdManagement = 70 {
   request struct RegisterClientRequest {
     node_id checkInNodeID = 0;
     int64u monitoredSubject = 1;
-    optional ClientTypeEnum clientType = 2;
-    octet_string<16> key = 3;
-    optional octet_string<16> verificationKey = 4;
+    octet_string<16> key = 2;
+    optional octet_string<16> verificationKey = 3;
+    ClientTypeEnum clientType = 4;
   }
 
   response struct RegisterClientResponse = 1 {

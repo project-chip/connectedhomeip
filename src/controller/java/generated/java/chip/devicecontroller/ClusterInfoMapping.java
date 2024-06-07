@@ -23981,14 +23981,14 @@ public class ClusterInfoMapping {
     CommandParameterInfo icdManagementregisterClientmonitoredSubjectCommandParameterInfo = new CommandParameterInfo("monitoredSubject", Long.class, Long.class);
     icdManagementregisterClientCommandParams.put("monitoredSubject",icdManagementregisterClientmonitoredSubjectCommandParameterInfo);
 
-    CommandParameterInfo icdManagementregisterClientclientTypeCommandParameterInfo = new CommandParameterInfo("clientType", Optional.class, Integer.class);
-    icdManagementregisterClientCommandParams.put("clientType",icdManagementregisterClientclientTypeCommandParameterInfo);
-
     CommandParameterInfo icdManagementregisterClientkeyCommandParameterInfo = new CommandParameterInfo("key", byte[].class, byte[].class);
     icdManagementregisterClientCommandParams.put("key",icdManagementregisterClientkeyCommandParameterInfo);
 
     CommandParameterInfo icdManagementregisterClientverificationKeyCommandParameterInfo = new CommandParameterInfo("verificationKey", Optional.class, byte[].class);
     icdManagementregisterClientCommandParams.put("verificationKey",icdManagementregisterClientverificationKeyCommandParameterInfo);
+
+    CommandParameterInfo icdManagementregisterClientclientTypeCommandParameterInfo = new CommandParameterInfo("clientType", Integer.class, Integer.class);
+    icdManagementregisterClientCommandParams.put("clientType",icdManagementregisterClientclientTypeCommandParameterInfo);
     InteractionInfo icdManagementregisterClientInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.IcdManagementCluster) cluster)
@@ -23999,14 +23999,14 @@ public class ClusterInfoMapping {
            , (Long)
              commandArguments.get("monitoredSubject")
 
-           , (Optional<Integer>)
-             commandArguments.get("clientType")
-
            , (byte[])
              commandArguments.get("key")
 
            , (Optional<byte[]>)
              commandArguments.get("verificationKey")
+
+           , (Integer)
+             commandArguments.get("clientType")
 
             );
         },

@@ -9682,9 +9682,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCheckInNodeID), checkInNodeID);
     encoder.Encode(to_underlying(Fields::kMonitoredSubject), monitoredSubject);
-    encoder.Encode(to_underlying(Fields::kClientType), clientType);
     encoder.Encode(to_underlying(Fields::kKey), key);
     encoder.Encode(to_underlying(Fields::kVerificationKey), verificationKey);
+    encoder.Encode(to_underlying(Fields::kClientType), clientType);
     return encoder.Finalize();
 }
 
@@ -9710,10 +9710,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, monitoredSubject);
         }
-        else if (__context_tag == to_underlying(Fields::kClientType))
-        {
-            err = DataModel::Decode(reader, clientType);
-        }
         else if (__context_tag == to_underlying(Fields::kKey))
         {
             err = DataModel::Decode(reader, key);
@@ -9721,6 +9717,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kVerificationKey))
         {
             err = DataModel::Decode(reader, verificationKey);
+        }
+        else if (__context_tag == to_underlying(Fields::kClientType))
+        {
+            err = DataModel::Decode(reader, clientType);
         }
         else
         {

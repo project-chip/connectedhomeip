@@ -4062,9 +4062,9 @@ class ChipClusters:
                 "args": {
                     "checkInNodeID": "int",
                     "monitoredSubject": "int",
-                    "clientType": "int",
                     "key": "bytes",
                     "verificationKey": "bytes",
+                    "clientType": "int",
                 },
             },
             0x00000002: {

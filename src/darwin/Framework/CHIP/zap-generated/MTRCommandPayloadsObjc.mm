@@ -9521,11 +9521,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _monitoredSubject = @(0);
 
-        _clientType = nil;
-
         _key = [NSData data];
 
         _verificationKey = nil;
+
+        _clientType = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -9538,9 +9538,9 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.checkInNodeID = self.checkInNodeID;
     other.monitoredSubject = self.monitoredSubject;
-    other.clientType = self.clientType;
     other.key = self.key;
     other.verificationKey = self.verificationKey;
+    other.clientType = self.clientType;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -9549,7 +9549,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; clientType:%@; key:%@; verificationKey:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, _clientType, [_key base64EncodedStringWithOptions:0], [_verificationKey base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; key:%@; verificationKey:%@; clientType:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, [_key base64EncodedStringWithOptions:0], [_verificationKey base64EncodedStringWithOptions:0], _clientType];
     return descriptionString;
 }
 
@@ -9568,12 +9568,6 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.monitoredSubject = self.monitoredSubject.unsignedLongLongValue;
     }
     {
-        if (self.clientType != nil) {
-            auto & definedValue_0 = encodableStruct.clientType.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.clientType.unsignedCharValue);
-        }
-    }
-    {
         encodableStruct.key = AsByteSpan(self.key);
     }
     {
@@ -9581,6 +9575,9 @@ NS_ASSUME_NONNULL_BEGIN
             auto & definedValue_0 = encodableStruct.verificationKey.Emplace();
             definedValue_0 = AsByteSpan(self.verificationKey);
         }
+    }
+    {
+        encodableStruct.clientType = static_cast<std::remove_reference_t<decltype(encodableStruct.clientType)>>(self.clientType.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

@@ -13198,9 +13198,9 @@ enum class Fields : uint8_t
 {
     kCheckInNodeID    = 0,
     kMonitoredSubject = 1,
-    kClientType       = 2,
-    kKey              = 3,
-    kVerificationKey  = 4,
+    kKey              = 2,
+    kVerificationKey  = 3,
+    kClientType       = 4,
 };
 
 struct Type
@@ -13212,9 +13212,9 @@ public:
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     uint64_t monitoredSubject  = static_cast<uint64_t>(0);
-    Optional<ClientTypeEnum> clientType;
     chip::ByteSpan key;
     Optional<chip::ByteSpan> verificationKey;
+    ClientTypeEnum clientType = static_cast<ClientTypeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -13231,9 +13231,9 @@ public:
 
     chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
     uint64_t monitoredSubject  = static_cast<uint64_t>(0);
-    Optional<ClientTypeEnum> clientType;
     chip::ByteSpan key;
     Optional<chip::ByteSpan> verificationKey;
+    ClientTypeEnum clientType = static_cast<ClientTypeEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RegisterClient

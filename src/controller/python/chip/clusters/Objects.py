@@ -14262,16 +14262,16 @@ class IcdManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="checkInNodeID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="monitoredSubject", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="clientType", Tag=2, Type=typing.Optional[IcdManagement.Enums.ClientTypeEnum]),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="verificationKey", Tag=4, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="verificationKey", Tag=3, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="clientType", Tag=4, Type=IcdManagement.Enums.ClientTypeEnum),
                     ])
 
             checkInNodeID: 'uint' = 0
             monitoredSubject: 'uint' = 0
-            clientType: 'typing.Optional[IcdManagement.Enums.ClientTypeEnum]' = None
             key: 'bytes' = b""
             verificationKey: 'typing.Optional[bytes]' = None
+            clientType: 'IcdManagement.Enums.ClientTypeEnum' = 0
 
         @dataclass
         class RegisterClientResponse(ClusterCommand):

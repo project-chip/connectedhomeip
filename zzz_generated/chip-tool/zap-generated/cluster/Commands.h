@@ -4240,9 +4240,9 @@ public:
     {
         AddArgument("CheckInNodeID", 0, UINT64_MAX, &mRequest.checkInNodeID);
         AddArgument("MonitoredSubject", 0, UINT64_MAX, &mRequest.monitoredSubject);
-        AddArgument("ClientType", 0, UINT8_MAX, &mRequest.clientType);
         AddArgument("Key", &mRequest.key);
         AddArgument("VerificationKey", &mRequest.verificationKey);
+        AddArgument("ClientType", 0, UINT8_MAX, &mRequest.clientType);
         ClusterCommand::AddArguments();
     }
 
