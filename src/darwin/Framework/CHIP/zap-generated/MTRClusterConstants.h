@@ -6499,8 +6499,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster ServiceArea commands
     MTRCommandIDTypeClusterServiceAreaCommandSelectLocationsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterServiceAreaCommandSelectLocationsResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterServiceAreaCommandSkipCurrentID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterServiceAreaCommandSkipCurrentResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterServiceAreaCommandSkipCurrentLocationID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterServiceAreaCommandSkipCurrentLocationResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
 
     // Cluster Thermostat deprecated command id names
     MTRClusterThermostatCommandSetpointRaiseLowerID

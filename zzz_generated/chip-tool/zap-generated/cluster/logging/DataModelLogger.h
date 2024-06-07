@@ -756,7 +756,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ServiceArea::Commands::SelectLocationsResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ServiceArea::Commands::SkipCurrentResponse::DecodableType & value);
+                           const chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & value);
 static CHIP_ERROR

@@ -9425,12 +9425,12 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)selectLocationsWithParams:(MTRServiceAreaClusterSelectLocationsParams *)params completion:(void (^)(MTRServiceAreaClusterSelectLocationsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command SkipCurrent
+ * Command SkipCurrentLocation
  *
  * This command is used to skip the current location where the device operates.
  */
-- (void)skipCurrentWithParams:(MTRServiceAreaClusterSkipCurrentParams * _Nullable)params completion:(void (^)(MTRServiceAreaClusterSkipCurrentResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)skipCurrentWithCompletion:(void (^)(MTRServiceAreaClusterSkipCurrentResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)skipCurrentLocationWithParams:(MTRServiceAreaClusterSkipCurrentLocationParams * _Nullable)params completion:(void (^)(MTRServiceAreaClusterSkipCurrentLocationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)skipCurrentLocationWithCompletion:(void (^)(MTRServiceAreaClusterSkipCurrentLocationResponseParams * _Nullable data, NSError * _Nullable error))completion
     MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSupportedLocationsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
@@ -19133,10 +19133,10 @@ typedef NS_ENUM(uint8_t, MTRServiceAreaSelectLocationsStatus) {
     MTRServiceAreaSelectLocationsStatusInvalidSet MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRServiceAreaSkipCurrentStatus) {
-    MTRServiceAreaSkipCurrentStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRServiceAreaSkipCurrentStatusInvalidLocationList MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRServiceAreaSkipCurrentStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x02,
+typedef NS_ENUM(uint8_t, MTRServiceAreaSkipCurrentLocationStatus) {
+    MTRServiceAreaSkipCurrentLocationStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaSkipCurrentLocationStatusInvalidLocationList MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaSkipCurrentLocationStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRServiceAreaFeature) {

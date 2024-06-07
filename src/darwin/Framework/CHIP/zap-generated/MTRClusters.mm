@@ -12518,14 +12518,14 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)skipCurrentWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRServiceAreaClusterSkipCurrentResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)skipCurrentLocationWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRServiceAreaClusterSkipCurrentLocationResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    [self skipCurrentWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+    [self skipCurrentLocationWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)skipCurrentWithParams:(MTRServiceAreaClusterSkipCurrentParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRServiceAreaClusterSkipCurrentResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)skipCurrentLocationWithParams:(MTRServiceAreaClusterSkipCurrentLocationParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRServiceAreaClusterSkipCurrentLocationResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRServiceAreaClusterSkipCurrentParams
+        params = [[MTRServiceAreaClusterSkipCurrentLocationParams
             alloc] init];
     }
 
@@ -12535,7 +12535,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = ServiceArea::Commands::SkipCurrent::Type;
+    using RequestType = ServiceArea::Commands::SkipCurrentLocation::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -12544,7 +12544,7 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRServiceAreaClusterSkipCurrentResponseParams.class
+                                     responseClass:MTRServiceAreaClusterSkipCurrentLocationResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }

@@ -22,10 +22,10 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ServiceAreaClusterMapStruct(val mapId: UByte, val name: String) {
+class ServiceAreaClusterMapStruct(val mapID: UByte, val name: String) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterMapStruct {\n")
-    append("\tmapId : $mapId\n")
+    append("\tmapID : $mapID\n")
     append("\tname : $name\n")
     append("}\n")
   }
@@ -33,24 +33,24 @@ class ServiceAreaClusterMapStruct(val mapId: UByte, val name: String) {
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_MAP_ID), mapId)
+      put(ContextSpecificTag(TAG_MAP_I_D), mapID)
       put(ContextSpecificTag(TAG_NAME), name)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_MAP_ID = 0
+    private const val TAG_MAP_I_D = 0
     private const val TAG_NAME = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterMapStruct {
       tlvReader.enterStructure(tlvTag)
-      val mapId = tlvReader.getUByte(ContextSpecificTag(TAG_MAP_ID))
+      val mapID = tlvReader.getUByte(ContextSpecificTag(TAG_MAP_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterMapStruct(mapId, name)
+      return ServiceAreaClusterMapStruct(mapID, name)
     }
   }
 }

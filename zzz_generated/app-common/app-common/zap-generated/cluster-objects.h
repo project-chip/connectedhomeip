@@ -27270,16 +27270,16 @@ using DecodableType = Type;
 namespace LocationInfoStruct {
 enum class Fields : uint8_t
 {
-    kHomeLocationInfo = 0,
-    kLandmarkTag      = 1,
-    kPositionTag      = 2,
-    kSurfaceTag       = 3,
+    kLocationInfo = 0,
+    kLandmarkTag  = 1,
+    kPositionTag  = 2,
+    kSurfaceTag   = 3,
 };
 
 struct Type
 {
 public:
-    DataModel::Nullable<Structs::HomeLocationStruct::Type> homeLocationInfo;
+    DataModel::Nullable<Structs::HomeLocationStruct::Type> locationInfo;
     DataModel::Nullable<LandmarkTag> landmarkTag;
     DataModel::Nullable<PositionTag> positionTag;
     DataModel::Nullable<FloorSurfaceTag> surfaceTag;
@@ -27297,16 +27297,16 @@ using DecodableType = Type;
 namespace LocationStruct {
 enum class Fields : uint8_t
 {
-    kLocationId   = 0,
-    kMapId        = 1,
+    kLocationID   = 0,
+    kMapID        = 1,
     kLocationInfo = 2,
 };
 
 struct Type
 {
 public:
-    uint32_t locationId = static_cast<uint32_t>(0);
-    DataModel::Nullable<uint8_t> mapId;
+    uint32_t locationID = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint8_t> mapID;
     Structs::LocationInfoStruct::Type locationInfo;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -27322,14 +27322,14 @@ using DecodableType = Type;
 namespace MapStruct {
 enum class Fields : uint8_t
 {
-    kMapId = 0,
+    kMapID = 0,
     kName  = 1,
 };
 
 struct Type
 {
 public:
-    uint8_t mapId = static_cast<uint8_t>(0);
+    uint8_t mapID = static_cast<uint8_t>(0);
     chip::CharSpan name;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -27345,7 +27345,7 @@ using DecodableType = Type;
 namespace ProgressStruct {
 enum class Fields : uint8_t
 {
-    kLocationId           = 0,
+    kLocationID           = 0,
     kStatus               = 1,
     kTotalOperationalTime = 2,
     kEstimatedTime        = 3,
@@ -27354,7 +27354,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint32_t locationId          = static_cast<uint32_t>(0);
+    uint32_t locationID          = static_cast<uint32_t>(0);
     OperationalStatusEnum status = static_cast<OperationalStatusEnum>(0);
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
     Optional<DataModel::Nullable<uint32_t>> estimatedTime;
@@ -27384,15 +27384,15 @@ struct Type;
 struct DecodableType;
 } // namespace SelectLocationsResponse
 
-namespace SkipCurrent {
+namespace SkipCurrentLocation {
 struct Type;
 struct DecodableType;
-} // namespace SkipCurrent
+} // namespace SkipCurrentLocation
 
-namespace SkipCurrentResponse {
+namespace SkipCurrentLocationResponse {
 struct Type;
 struct DecodableType;
-} // namespace SkipCurrentResponse
+} // namespace SkipCurrentLocationResponse
 
 } // namespace Commands
 
@@ -27444,7 +27444,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     SelectLocationsStatus status = static_cast<SelectLocationsStatus>(0);
-    chip::CharSpan statusText;
+    Optional<chip::CharSpan> statusText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -27460,11 +27460,11 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     SelectLocationsStatus status = static_cast<SelectLocationsStatus>(0);
-    chip::CharSpan statusText;
+    Optional<chip::CharSpan> statusText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SelectLocationsResponse
-namespace SkipCurrent {
+namespace SkipCurrentLocation {
 enum class Fields : uint8_t
 {
 };
@@ -27473,12 +27473,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SkipCurrent::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::ServiceArea::Commands::SkipCurrentResponse::DecodableType;
+    using ResponseType = Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -27486,13 +27486,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SkipCurrent::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SkipCurrent
-namespace SkipCurrentResponse {
+}; // namespace SkipCurrentLocation
+namespace SkipCurrentLocationResponse {
 enum class Fields : uint8_t
 {
     kStatus     = 0,
@@ -27503,11 +27503,11 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    SkipCurrentStatus status = static_cast<SkipCurrentStatus>(0);
-    chip::CharSpan statusText;
+    SkipCurrentLocationStatus status = static_cast<SkipCurrentLocationStatus>(0);
+    Optional<chip::CharSpan> statusText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -27519,14 +27519,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipCurrentLocationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ServiceArea::Id; }
 
-    SkipCurrentStatus status = static_cast<SkipCurrentStatus>(0);
-    chip::CharSpan statusText;
+    SkipCurrentLocationStatus status = static_cast<SkipCurrentLocationStatus>(0);
+    Optional<chip::CharSpan> statusText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SkipCurrentResponse
+}; // namespace SkipCurrentLocationResponse
 } // namespace Commands
 
 namespace Attributes {

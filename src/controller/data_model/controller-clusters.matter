@@ -6197,7 +6197,7 @@ cluster ServiceArea = 336 {
     kInvalidSet = 4;
   }
 
-  enum SkipCurrentStatus : enum8 {
+  enum SkipCurrentLocationStatus : enum8 {
     kSuccess = 0;
     kInvalidLocationList = 1;
     kInvalidInMode = 2;
@@ -6215,25 +6215,25 @@ cluster ServiceArea = 336 {
   }
 
   struct LocationInfoStruct {
-    nullable HomeLocationStruct homeLocationInfo = 0;
+    nullable HomeLocationStruct locationInfo = 0;
     nullable LandmarkTag landmarkTag = 1;
     nullable PositionTag positionTag = 2;
     nullable FloorSurfaceTag surfaceTag = 3;
   }
 
   struct LocationStruct {
-    int32u locationId = 0;
-    nullable int8u mapId = 1;
+    int32u locationID = 0;
+    nullable int8u mapID = 1;
     LocationInfoStruct locationInfo = 2;
   }
 
   struct MapStruct {
-    int8u mapId = 0;
+    int8u mapID = 0;
     char_string<64> name = 1;
   }
 
   struct ProgressStruct {
-    int32u locationId = 0;
+    int32u locationID = 0;
     OperationalStatusEnum status = 1;
     optional nullable elapsed_s totalOperationalTime = 2;
     optional nullable elapsed_s estimatedTime = 3;
@@ -6258,18 +6258,18 @@ cluster ServiceArea = 336 {
 
   response struct SelectLocationsResponse = 1 {
     SelectLocationsStatus status = 0;
-    char_string<256> statusText = 1;
+    optional char_string<256> statusText = 1;
   }
 
-  response struct SkipCurrentResponse = 3 {
-    SkipCurrentStatus status = 0;
-    char_string<256> statusText = 1;
+  response struct SkipCurrentLocationResponse = 3 {
+    SkipCurrentLocationStatus status = 0;
+    optional char_string<256> statusText = 1;
   }
 
   /** Command used to select a set of device locations, where the device is to operate */
   command SelectLocations(SelectLocationsRequest): SelectLocationsResponse = 0;
   /** This command is used to skip the current location where the device operates. */
-  command SkipCurrent(): SkipCurrentResponse = 2;
+  command SkipCurrentLocation(): SkipCurrentLocationResponse = 2;
 }
 
 /** An interface for configuring and controlling pumps. */

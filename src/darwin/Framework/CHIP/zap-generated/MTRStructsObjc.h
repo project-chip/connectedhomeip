@@ -1514,7 +1514,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterLocationInfoStruct : NSObject <NSCopying>
-@property (nonatomic, copy) MTRServiceAreaClusterHomeLocationStruct * _Nullable homeLocationInfo MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRServiceAreaClusterHomeLocationStruct * _Nullable locationInfo MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable landmarkTag MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable positionTag MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable surfaceTag MTR_PROVISIONALLY_AVAILABLE;
@@ -1522,20 +1522,20 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterLocationStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull locationId MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable mapId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull locationID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable mapID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRServiceAreaClusterLocationInfoStruct * _Nonnull locationInfo MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterMapStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull mapId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mapID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterProgressStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull locationId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull locationID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable estimatedTime MTR_PROVISIONALLY_AVAILABLE;

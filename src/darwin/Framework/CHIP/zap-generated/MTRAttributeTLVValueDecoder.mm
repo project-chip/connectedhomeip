@@ -10831,32 +10831,32 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 auto & entry_0 = iter_0.GetValue();
                 MTRServiceAreaClusterLocationStruct * newElement_0;
                 newElement_0 = [MTRServiceAreaClusterLocationStruct new];
-                newElement_0.locationId = [NSNumber numberWithUnsignedInt:entry_0.locationId];
-                if (entry_0.mapId.IsNull()) {
-                    newElement_0.mapId = nil;
+                newElement_0.locationID = [NSNumber numberWithUnsignedInt:entry_0.locationID];
+                if (entry_0.mapID.IsNull()) {
+                    newElement_0.mapID = nil;
                 } else {
-                    newElement_0.mapId = [NSNumber numberWithUnsignedChar:entry_0.mapId.Value()];
+                    newElement_0.mapID = [NSNumber numberWithUnsignedChar:entry_0.mapID.Value()];
                 }
                 newElement_0.locationInfo = [MTRServiceAreaClusterLocationInfoStruct new];
-                if (entry_0.locationInfo.homeLocationInfo.IsNull()) {
-                    newElement_0.locationInfo.homeLocationInfo = nil;
+                if (entry_0.locationInfo.locationInfo.IsNull()) {
+                    newElement_0.locationInfo.locationInfo = nil;
                 } else {
-                    newElement_0.locationInfo.homeLocationInfo = [MTRServiceAreaClusterHomeLocationStruct new];
-                    newElement_0.locationInfo.homeLocationInfo.locationName = AsString(entry_0.locationInfo.homeLocationInfo.Value().locationName);
-                    if (newElement_0.locationInfo.homeLocationInfo.locationName == nil) {
+                    newElement_0.locationInfo.locationInfo = [MTRServiceAreaClusterHomeLocationStruct new];
+                    newElement_0.locationInfo.locationInfo.locationName = AsString(entry_0.locationInfo.locationInfo.Value().locationName);
+                    if (newElement_0.locationInfo.locationInfo.locationName == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                         *aError = err;
                         return nil;
                     }
-                    if (entry_0.locationInfo.homeLocationInfo.Value().floorNumber.IsNull()) {
-                        newElement_0.locationInfo.homeLocationInfo.floorNumber = nil;
+                    if (entry_0.locationInfo.locationInfo.Value().floorNumber.IsNull()) {
+                        newElement_0.locationInfo.locationInfo.floorNumber = nil;
                     } else {
-                        newElement_0.locationInfo.homeLocationInfo.floorNumber = [NSNumber numberWithShort:entry_0.locationInfo.homeLocationInfo.Value().floorNumber.Value()];
+                        newElement_0.locationInfo.locationInfo.floorNumber = [NSNumber numberWithShort:entry_0.locationInfo.locationInfo.Value().floorNumber.Value()];
                     }
-                    if (entry_0.locationInfo.homeLocationInfo.Value().areaType.IsNull()) {
-                        newElement_0.locationInfo.homeLocationInfo.areaType = nil;
+                    if (entry_0.locationInfo.locationInfo.Value().areaType.IsNull()) {
+                        newElement_0.locationInfo.locationInfo.areaType = nil;
                     } else {
-                        newElement_0.locationInfo.homeLocationInfo.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.locationInfo.homeLocationInfo.Value().areaType.Value())];
+                        newElement_0.locationInfo.locationInfo.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.locationInfo.locationInfo.Value().areaType.Value())];
                     }
                 }
                 if (entry_0.locationInfo.landmarkTag.IsNull()) {
@@ -10903,7 +10903,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                     auto & entry_1 = iter_1.GetValue();
                     MTRServiceAreaClusterMapStruct * newElement_1;
                     newElement_1 = [MTRServiceAreaClusterMapStruct new];
-                    newElement_1.mapId = [NSNumber numberWithUnsignedChar:entry_1.mapId];
+                    newElement_1.mapID = [NSNumber numberWithUnsignedChar:entry_1.mapID];
                     newElement_1.name = AsString(entry_1.name);
                     if (newElement_1.name == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -11000,7 +11000,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                     auto & entry_1 = iter_1.GetValue();
                     MTRServiceAreaClusterProgressStruct * newElement_1;
                     newElement_1 = [MTRServiceAreaClusterProgressStruct new];
-                    newElement_1.locationId = [NSNumber numberWithUnsignedInt:entry_1.locationId];
+                    newElement_1.locationID = [NSNumber numberWithUnsignedInt:entry_1.locationID];
                     newElement_1.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.status)];
                     if (entry_1.totalOperationalTime.HasValue()) {
                         if (entry_1.totalOperationalTime.Value().IsNull()) {

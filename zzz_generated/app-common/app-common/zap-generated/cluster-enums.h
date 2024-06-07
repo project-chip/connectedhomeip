@@ -3667,8 +3667,8 @@ enum class SelectLocationsStatus : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for SkipCurrentStatus
-enum class SkipCurrentStatus : uint8_t
+// Enum for SkipCurrentLocationStatus
+enum class SkipCurrentLocationStatus : uint8_t
 {
     kSuccess             = 0x00,
     kInvalidLocationList = 0x01,

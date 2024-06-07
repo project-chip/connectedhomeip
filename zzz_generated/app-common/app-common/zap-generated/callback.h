@@ -6066,11 +6066,11 @@ bool emberAfServiceAreaClusterSelectLocationsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ServiceArea::Commands::SelectLocations::DecodableType & commandData);
 /**
- * @brief Service Area Cluster SkipCurrent Command callback (from client)
+ * @brief Service Area Cluster SkipCurrentLocation Command callback (from client)
  */
-bool emberAfServiceAreaClusterSkipCurrentCallback(
+bool emberAfServiceAreaClusterSkipCurrentLocationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ServiceArea::Commands::SkipCurrent::DecodableType & commandData);
+    const chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */

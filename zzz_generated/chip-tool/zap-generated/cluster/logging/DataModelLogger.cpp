@@ -3269,10 +3269,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("HomeLocationInfo", indent + 1, value.homeLocationInfo);
+        CHIP_ERROR err = LogValue("LocationInfo", indent + 1, value.locationInfo);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HomeLocationInfo'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationInfo'");
             return err;
         }
     }
@@ -3310,18 +3310,18 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("LocationId", indent + 1, value.locationId);
+        CHIP_ERROR err = LogValue("LocationID", indent + 1, value.locationID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationID'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("MapId", indent + 1, value.mapId);
+        CHIP_ERROR err = LogValue("MapID", indent + 1, value.mapID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MapId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MapID'");
             return err;
         }
     }
@@ -3343,10 +3343,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("MapId", indent + 1, value.mapId);
+        CHIP_ERROR err = LogValue("MapID", indent + 1, value.mapID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MapId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MapID'");
             return err;
         }
     }
@@ -3368,10 +3368,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("LocationId", indent + 1, value.locationId);
+        CHIP_ERROR err = LogValue("LocationID", indent + 1, value.locationID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationID'");
             return err;
         }
     }
@@ -7940,7 +7940,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ServiceArea::Commands::SkipCurrentResponse::DecodableType & value)
+                                     const ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -18856,10 +18856,10 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SelectLocationsResponse", 1, value);
         }
-        case ServiceArea::Commands::SkipCurrentResponse::Id: {
-            ServiceArea::Commands::SkipCurrentResponse::DecodableType value;
+        case ServiceArea::Commands::SkipCurrentLocationResponse::Id: {
+            ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SkipCurrentResponse", 1, value);
+            return DataModelLogger::LogValue("SkipCurrentLocationResponse", 1, value);
         }
         }
         break;

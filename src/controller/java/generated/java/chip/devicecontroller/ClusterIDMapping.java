@@ -11360,7 +11360,7 @@ public class ClusterIDMapping {
 
         public enum Command {
             SelectLocations(0L),
-            SkipCurrent(2L),;
+            SkipCurrentLocation(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;

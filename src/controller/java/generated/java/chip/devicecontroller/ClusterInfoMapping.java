@@ -12806,12 +12806,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, String statusText) {
+    public void onSuccess(Integer status, Optional<String> statusText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "String");
+      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "Optional<String>");
       responseValues.put(statusTextResponseValue, statusText);
       callback.onSuccess(responseValues);
     }
@@ -12822,7 +12822,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedServiceAreaClusterSkipCurrentResponseCallback implements ChipClusters.ServiceAreaCluster.SkipCurrentResponseCallback, DelegatedClusterCallback {
+  public static class DelegatedServiceAreaClusterSkipCurrentLocationResponseCallback implements ChipClusters.ServiceAreaCluster.SkipCurrentLocationResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -12830,12 +12830,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, String statusText) {
+    public void onSuccess(Integer status, Optional<String> statusText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "String");
+      CommandResponseInfo statusTextResponseValue = new CommandResponseInfo("statusText", "Optional<String>");
       responseValues.put(statusTextResponseValue, statusText);
       callback.onSuccess(responseValues);
     }
@@ -25932,17 +25932,17 @@ public class ClusterInfoMapping {
       );
     serviceAreaClusterInteractionInfoMap.put("selectLocations", serviceAreaselectLocationsInteractionInfo);
 
-    Map<String, CommandParameterInfo> serviceAreaskipCurrentCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo serviceAreaskipCurrentInteractionInfo = new InteractionInfo(
+    Map<String, CommandParameterInfo> serviceAreaskipCurrentLocationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo serviceAreaskipCurrentLocationInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ServiceAreaCluster) cluster)
-          .skipCurrent((ChipClusters.ServiceAreaCluster.SkipCurrentResponseCallback) callback
+          .skipCurrentLocation((ChipClusters.ServiceAreaCluster.SkipCurrentLocationResponseCallback) callback
             );
         },
-        () -> new DelegatedServiceAreaClusterSkipCurrentResponseCallback(),
-        serviceAreaskipCurrentCommandParams
+        () -> new DelegatedServiceAreaClusterSkipCurrentLocationResponseCallback(),
+        serviceAreaskipCurrentLocationCommandParams
       );
-    serviceAreaClusterInteractionInfoMap.put("skipCurrent", serviceAreaskipCurrentInteractionInfo);
+    serviceAreaClusterInteractionInfoMap.put("skipCurrentLocation", serviceAreaskipCurrentLocationInteractionInfo);
 
     commandMap.put("serviceArea", serviceAreaClusterInteractionInfoMap);
 

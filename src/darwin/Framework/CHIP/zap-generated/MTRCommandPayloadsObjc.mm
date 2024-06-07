@@ -20997,7 +20997,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _statusText = @"";
+        _statusText = nil;
     }
     return self;
 }
@@ -21068,10 +21068,14 @@ NS_ASSUME_NONNULL_BEGIN
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
     }
     {
-        self.statusText = AsString(decodableStruct.statusText);
-        if (self.statusText == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            return err;
+        if (decodableStruct.statusText.HasValue()) {
+            self.statusText = AsString(decodableStruct.statusText.Value());
+            if (self.statusText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.statusText = nil;
         }
     }
     return CHIP_NO_ERROR;
@@ -21079,7 +21083,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterSkipCurrentParams
+@implementation MTRServiceAreaClusterSkipCurrentLocationParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -21091,7 +21095,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRServiceAreaClusterSkipCurrentParams alloc] init];
+    auto other = [[MTRServiceAreaClusterSkipCurrentLocationParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -21107,11 +21111,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterSkipCurrentParams (InternalMethods)
+@implementation MTRServiceAreaClusterSkipCurrentLocationParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::ServiceArea::Commands::SkipCurrent::Type encodableStruct;
+    chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Type encodableStruct;
     ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -21152,21 +21156,21 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRServiceAreaClusterSkipCurrentResponseParams
+@implementation MTRServiceAreaClusterSkipCurrentLocationResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _status = @(0);
 
-        _statusText = @"";
+        _statusText = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRServiceAreaClusterSkipCurrentResponseParams alloc] init];
+    auto other = [[MTRServiceAreaClusterSkipCurrentLocationResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -21187,7 +21191,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::ServiceArea::Commands::SkipCurrentResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -21222,18 +21226,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRServiceAreaClusterSkipCurrentResponseParams (InternalMethods)
+@implementation MTRServiceAreaClusterSkipCurrentLocationResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipCurrentResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
     }
     {
-        self.statusText = AsString(decodableStruct.statusText);
-        if (self.statusText == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            return err;
+        if (decodableStruct.statusText.HasValue()) {
+            self.statusText = AsString(decodableStruct.statusText.Value());
+            if (self.statusText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.statusText = nil;
         }
     }
     return CHIP_NO_ERROR;

@@ -2508,9 +2508,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SelectLoca
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SkipCurrentStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::SkipCurrentLocationStatus val)
 {
-    using EnumType = ServiceArea::SkipCurrentStatus;
+    using EnumType = ServiceArea::SkipCurrentLocationStatus;
     switch (val)
     {
     case EnumType::kSuccess:

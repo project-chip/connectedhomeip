@@ -19456,7 +19456,7 @@ namespace LocationInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kHomeLocationInfo), homeLocationInfo);
+    encoder.Encode(to_underlying(Fields::kLocationInfo), locationInfo);
     encoder.Encode(to_underlying(Fields::kLandmarkTag), landmarkTag);
     encoder.Encode(to_underlying(Fields::kPositionTag), positionTag);
     encoder.Encode(to_underlying(Fields::kSurfaceTag), surfaceTag);
@@ -19477,9 +19477,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kHomeLocationInfo))
+        if (__context_tag == to_underlying(Fields::kLocationInfo))
         {
-            err = DataModel::Decode(reader, homeLocationInfo);
+            err = DataModel::Decode(reader, locationInfo);
         }
         else if (__context_tag == to_underlying(Fields::kLandmarkTag))
         {
@@ -19507,8 +19507,8 @@ namespace LocationStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kLocationId), locationId);
-    encoder.Encode(to_underlying(Fields::kMapId), mapId);
+    encoder.Encode(to_underlying(Fields::kLocationID), locationID);
+    encoder.Encode(to_underlying(Fields::kMapID), mapID);
     encoder.Encode(to_underlying(Fields::kLocationInfo), locationInfo);
     return encoder.Finalize();
 }
@@ -19527,13 +19527,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kLocationId))
+        if (__context_tag == to_underlying(Fields::kLocationID))
         {
-            err = DataModel::Decode(reader, locationId);
+            err = DataModel::Decode(reader, locationID);
         }
-        else if (__context_tag == to_underlying(Fields::kMapId))
+        else if (__context_tag == to_underlying(Fields::kMapID))
         {
-            err = DataModel::Decode(reader, mapId);
+            err = DataModel::Decode(reader, mapID);
         }
         else if (__context_tag == to_underlying(Fields::kLocationInfo))
         {
@@ -19553,7 +19553,7 @@ namespace MapStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kMapId), mapId);
+    encoder.Encode(to_underlying(Fields::kMapID), mapID);
     encoder.Encode(to_underlying(Fields::kName), name);
     return encoder.Finalize();
 }
@@ -19572,9 +19572,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kMapId))
+        if (__context_tag == to_underlying(Fields::kMapID))
         {
-            err = DataModel::Decode(reader, mapId);
+            err = DataModel::Decode(reader, mapID);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
@@ -19594,7 +19594,7 @@ namespace ProgressStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kLocationId), locationId);
+    encoder.Encode(to_underlying(Fields::kLocationID), locationID);
     encoder.Encode(to_underlying(Fields::kStatus), status);
     encoder.Encode(to_underlying(Fields::kTotalOperationalTime), totalOperationalTime);
     encoder.Encode(to_underlying(Fields::kEstimatedTime), estimatedTime);
@@ -19615,9 +19615,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kLocationId))
+        if (__context_tag == to_underlying(Fields::kLocationID))
         {
-            err = DataModel::Decode(reader, locationId);
+            err = DataModel::Decode(reader, locationID);
         }
         else if (__context_tag == to_underlying(Fields::kStatus))
         {
@@ -19716,7 +19716,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace SelectLocationsResponse.
-namespace SkipCurrent {
+namespace SkipCurrentLocation {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -19735,8 +19735,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
     }
 }
-} // namespace SkipCurrent.
-namespace SkipCurrentResponse {
+} // namespace SkipCurrentLocation.
+namespace SkipCurrentLocationResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -19774,7 +19774,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SkipCurrentResponse.
+} // namespace SkipCurrentLocationResponse.
 } // namespace Commands
 
 namespace Attributes {
