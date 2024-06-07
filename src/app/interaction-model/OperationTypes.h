@@ -66,7 +66,7 @@ struct ReadState
 
 enum class WriteFlags : uint32_t
 {
-    kTimed     = 0x0001, // Received as a 2nd command after a timed invoke
+    kTimed     = 0x0001, // Write is a timed write (i.e. a Timed Request Action preceeded it)
     kListBegin = 0x0002, // This is the FIRST list of data elements
     kListEnd   = 0x0004, // This is the LAST list element to write
 };
