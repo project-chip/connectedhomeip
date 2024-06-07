@@ -118,9 +118,9 @@ limitations under the License.
             <description>Register a client to the end device</description>
             <arg name="CheckInNodeID" type="node_id" optional="false"/>
             <arg name="MonitoredSubject" type="int64u" optional="false"/>
-            <arg name="ClientType" type="ClientTypeEnum" optional="true" default="0"/>
             <arg name="Key" type="octet_string" length="16" optional="false"/>
             <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
+            <arg name="ClientType" type="ClientTypeEnum" optional="false"/>
             <access op="invoke" privilege="manage"/>
         </command>
 
