@@ -136,6 +136,12 @@ const char * StageToString(CommissioningStage stage)
     case kNeedsNetworkCreds:
         return "NeedsNetworkCreds";
 
+    case kPrimaryOperationalNetworkFailed:
+        return "kPrimaryOperationalNetworkFailed";
+
+    case kDisablePrimaryNetworkInterface:
+        return "kDisablePrimaryNetworkInterface";
+
     default:
         return "???";
     }

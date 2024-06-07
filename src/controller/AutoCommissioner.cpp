@@ -298,6 +298,19 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
+    if (IsSecondaryNetworkSupported())
+    {
+        if (IsTriedSecondaryNetwork())
+        {
+            // Try secondary network interface.
+            return mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? CommissioningStage::kThreadNetworkSetup
+                                                                                     : CommissioningStage::kWiFiNetworkSetup;
+        }
+        // Try primary network interface
+        return mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? CommissioningStage::kWiFiNetworkSetup
+                                                                                 : CommissioningStage::kThreadNetworkSetup;
+    }
+
     if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
     {
         return CommissioningStage::kWiFiNetworkSetup;
@@ -455,35 +468,15 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kNeedsNetworkCreds:
         return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
     case CommissioningStage::kWiFiNetworkSetup:
-        if (mParams.GetThreadOperationalDataset().HasValue() &&
-            mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
-        {
-            return CommissioningStage::kThreadNetworkSetup;
-        }
-        else
-        {
-            return CommissioningStage::kFailsafeBeforeWiFiEnable;
-        }
+        return CommissioningStage::kFailsafeBeforeWiFiEnable;
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
-        {
-            return CommissioningStage::kFailsafeBeforeWiFiEnable;
-        }
-        else
-        {
-            return CommissioningStage::kFailsafeBeforeThreadEnable;
-        }
+        return CommissioningStage::kFailsafeBeforeThreadEnable;
     case CommissioningStage::kFailsafeBeforeWiFiEnable:
         return CommissioningStage::kWiFiNetworkEnable;
     case CommissioningStage::kFailsafeBeforeThreadEnable:
         return CommissioningStage::kThreadNetworkEnable;
     case CommissioningStage::kWiFiNetworkEnable:
-        if (mParams.GetThreadOperationalDataset().HasValue() &&
-            mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
-        {
-            return CommissioningStage::kThreadNetworkEnable;
-        }
-        else if (mParams.GetSkipCommissioningComplete().ValueOr(false))
+        if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
             SetCASEFailsafeTimerIfNeeded();
             return CommissioningStage::kCleanup;
@@ -502,6 +495,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
         return CommissioningStage::kFindOperationalForStayActive;
+    case CommissioningStage::kPrimaryOperationalNetworkFailed:
+        return CommissioningStage::kDisablePrimaryNetworkInterface;
+    case CommissioningStage::kDisablePrimaryNetworkInterface:
+        return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
     case CommissioningStage::kFindOperationalForStayActive:
         return CommissioningStage::kICDSendStayActive;
     case CommissioningStage::kICDSendStayActive:
@@ -564,6 +561,8 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage) const
     case CommissioningStage::kThreadNetworkSetup:
     case CommissioningStage::kThreadNetworkEnable:
         return mDeviceCommissioningInfo.network.thread.endpoint;
+    case CommissioningStage::kDisablePrimaryNetworkInterface:
+        return kRootEndpointId;
     default:
         return kRootEndpointId;
     }
@@ -728,6 +727,16 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 // This will allow the app to try another network.
                 report.stageCompleted = CommissioningStage::kScanNetworks;
             }
+        }
+
+        if (err != CHIP_NO_ERROR && IsSecondaryNetworkSupported() && !IsTriedSecondaryNetwork() &&
+            completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup &&
+            completionStatus.failedStage.Value() <= kICDSendStayActive)
+        {
+            // Primary network failed, disable primary network interface and try secondary network interface.
+            SetTrySecondaryNetwork();
+            err                   = CHIP_NO_ERROR;
+            report.stageCompleted = CommissioningStage::kPrimaryOperationalNetworkFailed;
         }
     }
     else

@@ -165,6 +165,14 @@ public:
     {}
 };
 
+class PairBleWiFiOrThread : public PairingCommand
+{
+public:
+    PairBleWiFiOrThread(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("ble-wifi-thread", PairingMode::Ble, PairingNetworkType::WiFiOrThread, credsIssuerConfig)
+    {}
+};
+
 class PairSoftAP : public PairingCommand
 {
 public:
@@ -233,6 +241,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairCodeThread>(credsIssuerConfig),
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
+        make_unique<PairBleWiFiOrThread>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),
         make_unique<PairAlreadyDiscovered>(credsIssuerConfig),
         make_unique<PairAlreadyDiscoveredByIndex>(credsIssuerConfig),

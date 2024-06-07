@@ -94,6 +94,8 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    CHIP_ERROR SetEnabled(bool enabled) override;
+    bool GetEnabled() override;
     void Shutdown() override;
 
     // WirelessDriver
@@ -131,6 +133,7 @@ public:
     }
 
 private:
+    static constexpr const char * kInterfaceEnabled = "g/esp/en";
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
 

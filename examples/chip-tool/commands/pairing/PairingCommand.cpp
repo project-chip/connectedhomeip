@@ -111,6 +111,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     case PairingNetworkType::Thread:
         params.SetThreadOperationalDataset(mOperationalDataset);
         break;
+    case PairingNetworkType::WiFiOrThread:
+        params.SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
+        params.SetThreadOperationalDataset(mOperationalDataset);
+        break;
     case PairingNetworkType::None:
         break;
     }
