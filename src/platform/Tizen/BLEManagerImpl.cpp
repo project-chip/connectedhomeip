@@ -401,16 +401,16 @@ void BLEManagerImpl::NotifyBLEIndicationConfirmation(BLE_CONNECTION_OBJECT conId
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error)
+void BLEManagerImpl::NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId)
 {
     ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error)
+void BLEManagerImpl::NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId)
 {
     ChipDeviceEvent event{ .Type                    = DeviceEventType::kCHIPoBLEConnectionError,
-                           .CHIPoBLEConnectionError = { .ConId = conId, .Reason = error } };
+                           .CHIPoBLEConnectionError = { .ConId = conId, .Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -873,6 +873,7 @@ void BLEManagerImpl::RemoveConnectionData(const char * remoteAddr)
     VerifyOrReturn(conn != nullptr,
                    ChipLogError(DeviceLayer, "Connection does not exist for [%s]", StringOrNullMarker(remoteAddr)));
 
+    BLEManagerImpl::NotifyBLEDisconnection(conn);
     g_hash_table_remove(mConnectionMap, remoteAddr);
 
     ChipLogProgress(DeviceLayer, "Connection Removed");
@@ -925,7 +926,7 @@ void BLEManagerImpl::HandleConnectionEvent(bool connected, const char * remoteAd
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "Device DisConnected [%s]", StringOrNullMarker(remoteAddress));
+        ChipLogProgress(DeviceLayer, "Device Disconnected [%s]", StringOrNullMarker(remoteAddress));
         RemoveConnectionData(remoteAddress);
     }
 }
@@ -1160,7 +1161,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "CHIPoBLESubscribe");
 
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &Ble::CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
-        NotifyBLEConnectionEstablished(event->CHIPoBLESubscribe.ConId, CHIP_NO_ERROR);
+        NotifyBLEConnectionEstablished(event->CHIPoBLESubscribe.ConId);
         break;
     case DeviceEventType::kCHIPoBLEUnsubscribe:
         ChipLogProgress(DeviceLayer, "CHIPoBLEUnsubscribe");

@@ -214,8 +214,8 @@ private:
 
     // ==== Connection.
     CHIP_ERROR ConnectChipThing(const char * address);
-    void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
-    void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
+    void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId);
+    void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId);
     void NotifyHandleNewConnection(BLE_CONNECTION_OBJECT conId);
     void NotifyHandleConnectFailed(CHIP_ERROR error);
     void NotifyHandleWriteComplete(BLE_CONNECTION_OBJECT conId);
