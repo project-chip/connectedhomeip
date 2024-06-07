@@ -128,6 +128,30 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
     return SendInvokeRequest();
 }
 
+void CommandSender::CreateBackupForRequestRollback(RollbackData & aRollbackData)
+{
+    VerifyOrReturn(mBufferAllocated);
+    VerifyOrReturn(mState == State::Idle || mState == State::AddedCommand);
+    VerifyOrReturn(mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
+    VerifyOrReturn(mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    mInvokeRequestBuilder.Checkpoint(aRollbackData.backupWriter);
+    aRollbackData.backupState = mState;
+    aRollbackData.rollbackIsValid = true;
+}
+
+void CommandSender::RollbackRequest(RollbackData & aRollbackData)
+{
+    VerifyOrReturn(aRollbackData.rollbackIsValid);
+    VerifyOrReturn(mState == State::AddingCommand);
+    ChipLogDetail(DataManagement, "Rolling back response");
+    // TODO(#30453): Rollback of mInvokeRequestBuilder should handle resetting
+    // InvokeResponses.
+    mInvokeRequestBuilder.GetInvokeRequests().ResetError();
+    mInvokeRequestBuilder.Rollback(aRollbackData.backupWriter);
+    MoveToState(aRollbackData.backupState);
+    aRollbackData.rollbackIsValid = false;
+}
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 CHIP_ERROR CommandSender::TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
                                                                                  Optional<System::Clock::Timeout> timeout)
@@ -540,13 +564,26 @@ CHIP_ERROR CommandSender::FinishCommand(FinishCommandParameters & aFinishCommand
 CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
                                          AddRequestDataParameters & aAddRequestDataParams)
 {
+    ReturnErrorOnFailure(AllocateBuffer());
+
+    RollbackData rollbackData;
+    CreateBackupForRequestRollback(rollbackData);
     PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
-    ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
-    TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
-    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
-    FinishCommandParameters finishCommandParams(aAddRequestDataParams);
-    return FinishCommand(finishCommandParams);
+    TLV::TLVWriter * writer = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = PrepareCommand(aCommandPath, prepareCommandParams));
+    writer = GetCommandDataIBTLVWriter();
+    VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    SuccessOrExit(err = aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+    {
+        FinishCommandParameters finishCommandParams(aAddRequestDataParams);
+        SuccessOrExit(err = FinishCommand(finishCommandParams));
+    }
+exit:
+    if (err != CHIP_NO_ERROR) {
+        RollbackRequest(rollbackData);
+    }
+    return err;
 }
 
 CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinishCommandParams)

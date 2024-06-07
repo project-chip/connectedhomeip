@@ -216,6 +216,12 @@ public:
 
         AddRequestDataParameters(const Optional<uint16_t> & aTimedInvokeTimeoutMs) : timedInvokeTimeoutMs(aTimedInvokeTimeoutMs) {}
 
+        AddRequestDataParameters & SetCommandRef(uint16_t aCommandRef)
+        {
+            commandRef.SetValue(aCommandRef);
+            return *this;
+        }
+
         // When a value is provided for timedInvokeTimeoutMs, this invoke becomes a timed
         // invoke. CommandSender will use the minimum of all provided timeouts for execution.
         const Optional<uint16_t> timedInvokeTimeoutMs;
@@ -511,6 +517,12 @@ private:
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
+    struct RollbackData {
+        TLV::TLVWriter backupWriter;
+        State backupState;
+        bool rollbackIsValid = false;
+    };
+
     union CallbackHandle
     {
         CallbackHandle(Callback * apCallback) : legacyCallback(apCallback) {}
@@ -565,6 +577,26 @@ private:
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 
     CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout);
+
+    /**
+     * Creates a backup to enable rolling back buffer containing InvokeRequestMessage
+     * in case subsequent calls to add request fail.
+     *
+     * A successful backup will only be created if the InvokeRequestMessage is
+     * in a known good state.
+     *
+     * @param [in] aRollbackData reference to rollback data that can be on the stack.
+     */
+    void CreateBackupForRequestRollback(RollbackData & aRollbackData);
+
+    /**
+     * Rolls back buffer containing InvokeRequestMessage  to a previously saved state.
+     *
+     * @param [in] aRollbackData reference to rollback data that was previously provided
+     *             to CreateBackupForRequestRollback. This rollbackData must be valid for
+     *             a successful rollback.
+     */
+    void RollbackRequest(RollbackData & aRollbackData);
 
     void OnResponseCallback(const ResponseData & aResponseData)
     {

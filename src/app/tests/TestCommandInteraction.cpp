@@ -107,30 +107,32 @@ namespace app {
 
 CommandHandler::Handle asyncCommandHandle;
 
-struct ForcedSizeBuffer
+class ForcedSizeBuffer : public app::DataModel::EncodableToTLV
 {
-    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
-
+public:
     ForcedSizeBuffer(uint32_t size)
     {
-        if (mBuffer.Alloc(size))
+        if (mBuffer_.Alloc(size))
         {
             // No significance with using 0x12, just using a value.
-            memset(mBuffer.Get(), 0x12, size);
+            memset(mBuffer_.Get(), 0x12, size);
         }
     }
 
     // No significance with using 0x12 as the CommandId, just using a value.
     static constexpr chip::CommandId GetCommandId() { return 0x12; }
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & aWriter, TLV::Tag aTag) const override
     {
-        VerifyOrReturnError(mBuffer, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(mBuffer_, CHIP_ERROR_NO_MEMORY);
 
         TLV::TLVType outerContainerType;
         ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outerContainerType));
-        ReturnErrorOnFailure(app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer.Get(), mBuffer.AllocatedSize())));
+        ReturnErrorOnFailure(app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer_.Get(), mBuffer_.AllocatedSize())));
         return aWriter.EndContainer(outerContainerType);
     }
+
+private:
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer_;
 };
 
 enum class ForcedSizeBufferLengthHint
@@ -361,6 +363,8 @@ public:
     static void TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerAcceptMultipleCommands(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked(nlTestSuite * apSuite,
+                                                                                                  void * apContext);
     static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
                                                                                                   void * apContext);
     static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(nlTestSuite * apSuite,
@@ -649,7 +653,8 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSui
     // When ForcedSizeBuffer exceeds 255, an extra byte is needed for length, affecting the overhead size required by
     // AddResponseData. In order to have this accounted for in overhead calculation we set the length to be 256.
     uint32_t sizeOfForcedSizeBuffer = aBufferSizeHint == ForcedSizeBufferLengthHint::kSizeGreaterThan255 ? 256 : 0;
-    err                             = commandHandler.AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeOfForcedSizeBuffer));
+    ForcedSizeBuffer responseData(sizeOfForcedSizeBuffer);
+    err = commandHandler.AddResponseData(aRequestCommandPath, responseData.GetCommandId(), responseData);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     uint32_t remainingSizeAfter = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     uint32_t delta              = remainingSizeBefore - remainingSizeAfter - sizeOfForcedSizeBuffer;
@@ -679,7 +684,8 @@ void TestCommandInteraction::FillCurrentInvokeResponseBuffer(nlTestSuite * apSui
     // Validating assumption. If this fails, it means overheadSizeNeededForAddingResponse is likely too large.
     NL_TEST_ASSERT(apSuite, sizeToFill >= 256);
 
-    err = apCommandHandler->AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeToFill));
+    ForcedSizeBuffer responseData(sizeToFill);
+    err = apCommandHandler->AddResponseData(aRequestCommandPath, responseData.GetCommandId(), responseData);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -1314,7 +1320,8 @@ void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingAddRespons
     CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
 
     uint32_t sizeToFill = 50; // This is an arbitrary number, we need to select a non-zero value.
-    CHIP_ERROR err      = commandHandler.AddResponseData(requestCommandPath, ForcedSizeBuffer(sizeToFill));
+    ForcedSizeBuffer responseData(sizeToFill);
+    CHIP_ERROR err = commandHandler.AddResponseData(requestCommandPath, responseData.GetCommandId(), responseData);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Since calling AddResponseData is supposed to be a no-operation when there is no responder, it is
@@ -1940,6 +1947,53 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     NL_TEST_ASSERT(apSuite, commandDispatchedCount == 2);
 }
 
+void TestCommandInteraction::TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked(
+    nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager(),
+                                     &pendingResponseTracker);
+    app::CommandSender::AddRequestDataParameters addRequestDataParams;
+
+    CommandSender::ConfigParameters config;
+    config.SetRemoteMaxPathsPerInvoke(2);
+    err = commandSender.SetCommandSenderConfig(config);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // The specific values chosen here are arbitrary.
+    uint16_t firstCommandRef  = 1;
+    uint16_t secondCommandRef = 2;
+    auto commandPathParams = MakeTestCommandPath();
+    SimpleTLVPayload simplePayloadWriter;
+    addRequestDataParams.SetCommandRef(firstCommandRef);
+
+    err = commandSender.AddRequestData(commandPathParams, simplePayloadWriter, addRequestDataParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t remainingSize = commandSender.mInvokeRequestBuilder.GetWriter()->GetRemainingFreeLength();
+    // Because request is made of both request data and request path (commandPathParams), using
+    // `remainingSize` is large enough fail.
+    ForcedSizeBuffer requestData(remainingSize);
+
+    addRequestDataParams.SetCommandRef(secondCommandRef);
+    err = commandSender.AddRequestData(commandPathParams, requestData, addRequestDataParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NO_MEMORY);
+
+    // Confirm that we can still send out a request with the first command.
+    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, commandSender.GetInvokeResponseMessageCount() == 0);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   mockCommandSenderExtendedDelegate.onResponseCalledTimes == 1 && mockCommandSenderExtendedDelegate.onFinalCalledTimes == 1 &&
+                       mockCommandSenderExtendedDelegate.onErrorCalledTimes == 0);
+}
+
 void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(
     nlTestSuite * apSuite, void * apContext)
 {
@@ -2020,7 +2074,8 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
     NL_TEST_ASSERT(apSuite, remainingSize == sizeToLeave);
 
     uint32_t sizeToFill = 50;
-    err                 = commandHandler.AddResponseData(requestCommandPath2, ForcedSizeBuffer(sizeToFill));
+    ForcedSizeBuffer responseData(sizeToFill);
+    err = commandHandler.AddResponseData(requestCommandPath2, responseData.GetCommandId(), responseData);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     remainingSize = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
@@ -2093,6 +2148,7 @@ const nlTest sTests[] =
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
     NL_TEST_DEF("TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne", chip::app::TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne),
     NL_TEST_DEF("TestCommandHandlerAcceptMultipleCommands", chip::app::TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands),
+    NL_TEST_DEF("TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked", chip::app::TestCommandInteraction::TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked),
     NL_TEST_DEF("TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse", chip::app::TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse),
     NL_TEST_DEF("TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative", chip::app::TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative),
     NL_TEST_DEF("TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse", chip::app::TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse),
