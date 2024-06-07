@@ -681,7 +681,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
             return;
         }
 
-        // Check to see if trying to modify a slot which have already been run
+        // Check to see if trying to modify a slot which has already been run
         if (!forecast.Value().activeSlotNumber.IsNull() && slotAdjustment.slotIndex < forecast.Value().activeSlotNumber.Value())
         {
             ChipLogError(Zcl, "DEM: Modifying already run slot index %d", slotAdjustment.slotIndex);
@@ -712,6 +712,12 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
         }
+    }
+
+    if (iterator.GetStatus() != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
     }
 
     status = mDelegate.ModifyForecastRequest(forecastID, slotAdjustments, adjustmentCause);
@@ -747,10 +753,10 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     }
 
     uint32_t currentUtcTime = 0;
-    status                  = GetCurrentUtcTime(currentUtcTime);
+    status                  = GetCurrentTimeEpochS(currentUtcTime);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: Forecast is Null");
+        ChipLogError(Zcl, "DEM: Failed to get UTC time");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
@@ -781,7 +787,11 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                 if (constraint.nominalPower.Value() < mDelegate.GetAbsMinPower() ||
                     constraint.nominalPower.Value() > mDelegate.GetAbsMaxPower())
                 {
-                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast nominalPower out of range [absMinPower, absMaxPower]");
+                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast nominalPower " ChipLogFormatX64 " out of range [" ChipLogFormatX64 ", " ChipLogFormatX64 "]",
+                                 ChipLogValueX64(constraint.nominalPower.Value()),
+                                 ChipLogValueX64(mDelegate.GetAbsMinPower()),
+                                 ChipLogValueX64(mDelegate.GetAbsMaxPower()));
+
                     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
                     return;
                 }
@@ -811,6 +821,12 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                 }
             }
         }
+
+        if (iterator.GetStatus() != CHIP_NO_ERROR)
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
+        }
     }
 
     // Check for overlappping elements
@@ -819,7 +835,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
         if (iterator.Next())
         {
             // Get the first constraint
-            const Structs::ConstraintsStruct::DecodableType & prevConstraint = iterator.GetValue();
+            Structs::ConstraintsStruct::DecodableType prevConstraint = iterator.GetValue();
 
             // Start comparing next vs prev constraints
             while (iterator.Next())
@@ -832,7 +848,15 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
                     return;
                 }
+
+                prevConstraint = iterator.GetValue();
             }
+        }
+
+        if (iterator.GetStatus() != CHIP_NO_ERROR)
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
         }
     }
 
@@ -868,7 +892,7 @@ void Instance::HandleCancelRequest(HandlerContext & ctx, const Commands::CancelR
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-Status Instance::GetCurrentUtcTime(uint32_t & currentUtcTime) const
+Status Instance::GetCurrentTimeEpochS(uint32_t & currentUtcTime) const
 {
     currentUtcTime = 0;
     System::Clock::Milliseconds64 cTMs;

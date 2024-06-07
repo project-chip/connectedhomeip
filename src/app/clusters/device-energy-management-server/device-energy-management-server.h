@@ -203,7 +203,7 @@ public:
     bool HasFeature(Feature aFeature) const;
 
 private:
-    Protocols::InteractionModel::Status GetCurrentUtcTime(uint32_t & currentUtcTime) const;
+    Protocols::InteractionModel::Status GetCurrentTimeEpochS(uint32_t & currentUtcTime) const;
 
 private:
     Delegate & mDelegate;
