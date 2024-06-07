@@ -77,11 +77,6 @@ public:
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - cluster `data version` has been checked for the incoming request if applicable
     ///
-    /// List operation support:
-    ///    - the first list write will have `request.writeFlags.Has(WriteFlags::kListBegin)`
-    ///    - the last list write will have `request.writeFlags.Has(WriteFlags::kListEnd)`
-    ///    - the last list write MAY have empty data (no list items)
-    ///
     /// When `request.writeFlags.Has(WriteFlags::kForceInternal)` the request is from an internal app update
     /// and SHOULD bypass some internal checks (like timed enforcement, potentially read-only restrictions)
     ///

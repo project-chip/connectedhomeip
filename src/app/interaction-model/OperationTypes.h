@@ -67,8 +67,6 @@ struct ReadState
 enum class WriteFlags : uint32_t
 {
     kTimed     = 0x0001, // Received as a 2nd command after a timed invoke
-    kListBegin = 0x0002, // Flag is for the first write in a list attribute
-    kListEnd   = 0x0004, // Flag is set for the last write in a list attribute (and that write may be empty)
 };
 
 struct WriteAttributeRequest : OperationRequest
