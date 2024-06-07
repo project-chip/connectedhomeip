@@ -39,6 +39,7 @@ class ConfigurationManagerImpl final : public Internal::GenericConfigurationMana
 public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
+    CHIP_ERROR StoreSoftwareUpdateCompleted();
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
