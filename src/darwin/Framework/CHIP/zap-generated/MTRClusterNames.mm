@@ -324,6 +324,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeWiFiNetworkManagementID:
         result = @"WiFiNetworkManagement";
         break;
+    case MTRClusterIDTypeThreadNetworkDirectoryID:
+        result = @"ThreadNetworkDirectory";
+        break;
     case MTRClusterIDTypeWakeOnLANID:
         result = @"WakeOnLAN";
         break;
@@ -7306,6 +7309,52 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeThreadNetworkDirectoryID:
+
+        switch (attributeID) {
+
+            // Cluster ThreadNetworkDirectory attributes
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributePreferredExtendedPanIDID:
+            result = @"PreferredExtendedPanID";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworksID:
+            result = @"ThreadNetworks";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworkTableSizeID:
+            result = @"ThreadNetworkTableSize";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 

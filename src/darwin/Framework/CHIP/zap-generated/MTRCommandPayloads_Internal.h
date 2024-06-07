@@ -1390,15 +1390,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRServiceAreaClusterSkipCurrentParams (InternalMethods)
+@interface MTRServiceAreaClusterSkipCurrentLocationParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRServiceAreaClusterSkipCurrentResponseParams (InternalMethods)
+@interface MTRServiceAreaClusterSkipCurrentLocationResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipCurrentResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocationResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -1603,6 +1603,30 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRWiFiNetworkManagementClusterNetworkPassphraseResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRThreadNetworkDirectoryClusterAddNetworkParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThreadNetworkDirectoryClusterRemoveNetworkParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThreadNetworkDirectoryClusterGetOperationalDatasetParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThreadNetworkDirectoryClusterOperationalDatasetResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ThreadNetworkDirectory::Commands::OperationalDatasetResponse::DecodableType &)decodableStruct;
 
 @end
 

@@ -186,6 +186,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000042E,
     MTRClusterIDTypeRadonConcentrationMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000042F,
     MTRClusterIDTypeWiFiNetworkManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000451,
+    MTRClusterIDTypeThreadNetworkDirectoryID MTR_PROVISIONALLY_AVAILABLE = 0x00000453,
     MTRClusterIDTypeWakeOnLANID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000503,
     MTRClusterIDTypeChannelID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000504,
     MTRClusterIDTypeTargetNavigatorID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000505,
@@ -4386,6 +4387,17 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster ThreadNetworkDirectory attributes
+    MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributePreferredExtendedPanIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworksID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworkTableSizeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster WakeOnLan deprecated attribute names
     MTRClusterWakeOnLanAttributeMACAddressID
         MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLANAttributeMACAddressID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -6487,8 +6499,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster ServiceArea commands
     MTRCommandIDTypeClusterServiceAreaCommandSelectLocationsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterServiceAreaCommandSelectLocationsResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterServiceAreaCommandSkipCurrentID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterServiceAreaCommandSkipCurrentResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterServiceAreaCommandSkipCurrentLocationID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterServiceAreaCommandSkipCurrentLocationResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
 
     // Cluster Thermostat deprecated command id names
     MTRClusterThermostatCommandSetpointRaiseLowerID
@@ -6609,6 +6621,12 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster WiFiNetworkManagement commands
     MTRCommandIDTypeClusterWiFiNetworkManagementCommandNetworkPassphraseRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterWiFiNetworkManagementCommandNetworkPassphraseResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
+    // Cluster ThreadNetworkDirectory commands
+    MTRCommandIDTypeClusterThreadNetworkDirectoryCommandAddNetworkID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterThreadNetworkDirectoryCommandRemoveNetworkID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterThreadNetworkDirectoryCommandGetOperationalDatasetID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterThreadNetworkDirectoryCommandOperationalDatasetResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
 
     // Cluster Channel deprecated command id names
     MTRClusterChannelCommandChangeChannelID
@@ -7357,6 +7375,9 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterPumpConfigurationAndControlEventLeakageID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000E,
     MTREventIDTypeClusterPumpConfigurationAndControlEventAirDetectionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000F,
     MTREventIDTypeClusterPumpConfigurationAndControlEventTurbineOperationID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000010,
+
+    // Cluster ThreadNetworkDirectory events
+    MTREventIDTypeClusterThreadNetworkDirectoryEventNetworkChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster TargetNavigator deprecated event names
 

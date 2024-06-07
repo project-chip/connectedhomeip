@@ -40,9 +40,9 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ServiceAreaCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class SelectLocationsResponse(val status: UByte, val statusText: String)
+  class SelectLocationsResponse(val status: UByte, val statusText: String?)
 
-  class SkipCurrentResponse(val status: UByte, val statusText: String)
+  class SkipCurrentLocationResponse(val status: UByte, val statusText: String?)
 
   class SupportedLocationsAttribute(val value: List<ServiceAreaClusterLocationStruct>)
 
@@ -192,7 +192,17 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
       }
 
       if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
-        statusText_decoded = tlvReader.getString(tag)
+        statusText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
       } else {
         tlvReader.skipElement()
       }
@@ -202,16 +212,14 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
       throw IllegalStateException("status not found in TLV")
     }
 
-    if (statusText_decoded == null) {
-      throw IllegalStateException("statusText not found in TLV")
-    }
-
     tlvReader.exitContainer()
 
     return SelectLocationsResponse(status_decoded, statusText_decoded)
   }
 
-  suspend fun skipCurrent(timedInvokeTimeout: Duration? = null): SkipCurrentResponse {
+  suspend fun skipCurrentLocation(
+    timedInvokeTimeout: Duration? = null
+  ): SkipCurrentLocationResponse {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
@@ -244,7 +252,17 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
       }
 
       if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
-        statusText_decoded = tlvReader.getString(tag)
+        statusText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
       } else {
         tlvReader.skipElement()
       }
@@ -254,13 +272,9 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
       throw IllegalStateException("status not found in TLV")
     }
 
-    if (statusText_decoded == null) {
-      throw IllegalStateException("statusText not found in TLV")
-    }
-
     tlvReader.exitContainer()
 
-    return SkipCurrentResponse(status_decoded, statusText_decoded)
+    return SkipCurrentLocationResponse(status_decoded, statusText_decoded)
   }
 
   suspend fun readSupportedLocationsAttribute(): SupportedLocationsAttribute {

@@ -97,6 +97,7 @@
    <xi:include href="chip/thermostat-user-interface-configuration-cluster.xml" />
    <xi:include href="chip/thermostat-cluster.xml" />
    <xi:include href="chip/thread-network-diagnostics-cluster.xml" />
+   <xi:include href="chip/thread-network-directory-cluster.xml" />
    <xi:include href="chip/time-format-localization-cluster.xml" />
    <xi:include href="chip/time-synchronization-cluster.xml" />
    <xi:include href="chip/timer-cluster.xml" />

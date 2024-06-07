@@ -6270,7 +6270,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _homeLocationInfo = nil;
+        _locationInfo = nil;
 
         _landmarkTag = nil;
 
@@ -6285,7 +6285,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRServiceAreaClusterLocationInfoStruct alloc] init];
 
-    other.homeLocationInfo = self.homeLocationInfo;
+    other.locationInfo = self.locationInfo;
     other.landmarkTag = self.landmarkTag;
     other.positionTag = self.positionTag;
     other.surfaceTag = self.surfaceTag;
@@ -6295,7 +6295,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: homeLocationInfo:%@; landmarkTag:%@; positionTag:%@; surfaceTag:%@; >", NSStringFromClass([self class]), _homeLocationInfo, _landmarkTag, _positionTag, _surfaceTag];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationInfo:%@; landmarkTag:%@; positionTag:%@; surfaceTag:%@; >", NSStringFromClass([self class]), _locationInfo, _landmarkTag, _positionTag, _surfaceTag];
     return descriptionString;
 }
 
@@ -6306,9 +6306,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _locationId = @(0);
+        _locationID = @(0);
 
-        _mapId = nil;
+        _mapID = nil;
 
         _locationInfo = [MTRServiceAreaClusterLocationInfoStruct new];
     }
@@ -6319,8 +6319,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRServiceAreaClusterLocationStruct alloc] init];
 
-    other.locationId = self.locationId;
-    other.mapId = self.mapId;
+    other.locationID = self.locationID;
+    other.mapID = self.mapID;
     other.locationInfo = self.locationInfo;
 
     return other;
@@ -6328,7 +6328,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationId:%@; mapId:%@; locationInfo:%@; >", NSStringFromClass([self class]), _locationId, _mapId, _locationInfo];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationID:%@; mapID:%@; locationInfo:%@; >", NSStringFromClass([self class]), _locationID, _mapID, _locationInfo];
     return descriptionString;
 }
 
@@ -6339,7 +6339,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _mapId = @(0);
+        _mapID = @(0);
 
         _name = @"";
     }
@@ -6350,7 +6350,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRServiceAreaClusterMapStruct alloc] init];
 
-    other.mapId = self.mapId;
+    other.mapID = self.mapID;
     other.name = self.name;
 
     return other;
@@ -6358,7 +6358,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mapId:%@; name:%@; >", NSStringFromClass([self class]), _mapId, _name];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mapID:%@; name:%@; >", NSStringFromClass([self class]), _mapID, _name];
     return descriptionString;
 }
 
@@ -6369,7 +6369,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _locationId = @(0);
+        _locationID = @(0);
 
         _status = @(0);
 
@@ -6384,7 +6384,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRServiceAreaClusterProgressStruct alloc] init];
 
-    other.locationId = self.locationId;
+    other.locationID = self.locationID;
     other.status = self.status;
     other.totalOperationalTime = self.totalOperationalTime;
     other.estimatedTime = self.estimatedTime;
@@ -6394,7 +6394,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationId:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _locationId, _status, _totalOperationalTime, _estimatedTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationID:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _locationID, _status, _totalOperationalTime, _estimatedTime];
     return descriptionString;
 }
 
@@ -7050,6 +7050,66 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic transitionTime;
 @dynamic heatSetpoint;
 @dynamic coolSetpoint;
+@end
+
+@implementation MTRThreadNetworkDirectoryClusterThreadNetworkStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _extendedPanID = @(0);
+
+        _networkName = @"";
+
+        _channel = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThreadNetworkDirectoryClusterThreadNetworkStruct alloc] init];
+
+    other.extendedPanID = self.extendedPanID;
+    other.networkName = self.networkName;
+    other.channel = self.channel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; networkName:%@; channel:%@; >", NSStringFromClass([self class]), _extendedPanID, _networkName, _channel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThreadNetworkDirectoryClusterNetworkChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _extendedPanID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThreadNetworkDirectoryClusterNetworkChangedEvent alloc] init];
+
+    other.extendedPanID = self.extendedPanID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; >", NSStringFromClass([self class]), _extendedPanID];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRChannelClusterProgramCastStruct

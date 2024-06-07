@@ -6197,7 +6197,7 @@ cluster ServiceArea = 336 {
     kInvalidSet = 4;
   }
 
-  enum SkipCurrentStatus : enum8 {
+  enum SkipCurrentLocationStatus : enum8 {
     kSuccess = 0;
     kInvalidLocationList = 1;
     kInvalidInMode = 2;
@@ -6215,25 +6215,25 @@ cluster ServiceArea = 336 {
   }
 
   struct LocationInfoStruct {
-    nullable HomeLocationStruct homeLocationInfo = 0;
+    nullable HomeLocationStruct locationInfo = 0;
     nullable LandmarkTag landmarkTag = 1;
     nullable PositionTag positionTag = 2;
     nullable FloorSurfaceTag surfaceTag = 3;
   }
 
   struct LocationStruct {
-    int32u locationId = 0;
-    nullable int8u mapId = 1;
+    int32u locationID = 0;
+    nullable int8u mapID = 1;
     LocationInfoStruct locationInfo = 2;
   }
 
   struct MapStruct {
-    int8u mapId = 0;
+    int8u mapID = 0;
     char_string<64> name = 1;
   }
 
   struct ProgressStruct {
-    int32u locationId = 0;
+    int32u locationID = 0;
     OperationalStatusEnum status = 1;
     optional nullable elapsed_s totalOperationalTime = 2;
     optional nullable elapsed_s estimatedTime = 3;
@@ -6258,18 +6258,18 @@ cluster ServiceArea = 336 {
 
   response struct SelectLocationsResponse = 1 {
     SelectLocationsStatus status = 0;
-    char_string<256> statusText = 1;
+    optional char_string<256> statusText = 1;
   }
 
-  response struct SkipCurrentResponse = 3 {
-    SkipCurrentStatus status = 0;
-    char_string<256> statusText = 1;
+  response struct SkipCurrentLocationResponse = 3 {
+    SkipCurrentLocationStatus status = 0;
+    optional char_string<256> statusText = 1;
   }
 
   /** Command used to select a set of device locations, where the device is to operate */
   command SelectLocations(SelectLocationsRequest): SelectLocationsResponse = 0;
   /** This command is used to skip the current location where the device operates. */
-  command SkipCurrent(): SkipCurrentResponse = 2;
+  command SkipCurrentLocation(): SkipCurrentLocationResponse = 2;
 }
 
 /** An interface for configuring and controlling pumps. */
@@ -7962,6 +7962,54 @@ cluster WiFiNetworkManagement = 1105 {
 
   /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
   command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
+}
+
+/** Manages the names and credentials of Thread networks visible to the user. */
+cluster ThreadNetworkDirectory = 1107 {
+  revision 1;
+
+  struct ThreadNetworkStruct {
+    int64u extendedPanID = 0;
+    char_string<16> networkName = 1;
+    int16u channel = 2;
+  }
+
+  info event access(read: operate) NetworkChanged = 0 {
+    int64u extendedPanID = 0;
+  }
+
+  attribute access(read: manage, write: manage) nullable int64u preferredExtendedPanID = 0;
+  readonly attribute access(read: operate) ThreadNetworkStruct threadNetworks[] = 1;
+  readonly attribute int8u threadNetworkTableSize = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddNetworkRequest {
+    octet_string<254> operationalDataset = 0;
+  }
+
+  request struct RemoveNetworkRequest {
+    int64u extendedPanID = 0;
+  }
+
+  request struct GetOperationalDatasetRequest {
+    int64u extendedPanID = 0;
+  }
+
+  response struct OperationalDatasetResponse = 3 {
+    octet_string<254> operationalDataset = 0;
+  }
+
+  /** Adds an entry to the ThreadNetworks list. */
+  timed command access(invoke: manage) AddNetwork(AddNetworkRequest): DefaultSuccess = 0;
+  /** Removes an entry from the ThreadNetworks list. */
+  timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
+  /** Retrieves a Thread Operational Dataset from the ThreadNetworks list. */
+  timed command GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */

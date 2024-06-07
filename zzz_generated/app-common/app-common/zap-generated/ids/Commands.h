@@ -1246,13 +1246,13 @@ namespace SelectLocationsResponse {
 static constexpr CommandId Id = 0x00000001;
 } // namespace SelectLocationsResponse
 
-namespace SkipCurrent {
+namespace SkipCurrentLocation {
 static constexpr CommandId Id = 0x00000002;
-} // namespace SkipCurrent
+} // namespace SkipCurrentLocation
 
-namespace SkipCurrentResponse {
+namespace SkipCurrentLocationResponse {
 static constexpr CommandId Id = 0x00000003;
-} // namespace SkipCurrentResponse
+} // namespace SkipCurrentLocationResponse
 
 } // namespace Commands
 } // namespace ServiceArea
@@ -1416,6 +1416,28 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace WiFiNetworkManagement
+
+namespace ThreadNetworkDirectory {
+namespace Commands {
+
+namespace AddNetwork {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AddNetwork
+
+namespace RemoveNetwork {
+static constexpr CommandId Id = 0x00000001;
+} // namespace RemoveNetwork
+
+namespace GetOperationalDataset {
+static constexpr CommandId Id = 0x00000002;
+} // namespace GetOperationalDataset
+
+namespace OperationalDatasetResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace OperationalDatasetResponse
+
+} // namespace Commands
+} // namespace ThreadNetworkDirectory
 
 namespace Channel {
 namespace Commands {
