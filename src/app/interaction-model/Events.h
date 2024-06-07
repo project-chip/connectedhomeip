@@ -56,7 +56,7 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
     eventOptions.mFabricIndex = aEventData.GetFabricIndex();
 
-    // this skips generating the event if it is fabric-scoped however the event does not seem
+    // this skips generating the event if it is fabric-scoped but the provided event data is not
     // associated with any fabric.
     if (eventOptions.mFabricIndex == kUndefinedFabricIndex)
     {
