@@ -40408,7 +40408,7 @@ class ThreadBorderRouterManagement(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="borderRouterName", Tag=0x00000000, Type=str),
-                ClusterObjectFieldDescriptor(Label="borderAgentId", Tag=0x00000001, Type=bytes),
+                ClusterObjectFieldDescriptor(Label="borderAgentID", Tag=0x00000001, Type=bytes),
                 ClusterObjectFieldDescriptor(Label="threadVersion", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="interfaceEnabled", Tag=0x00000003, Type=bool),
                 ClusterObjectFieldDescriptor(Label="activeDatasetTimestamp", Tag=0x00000005, Type=typing.Union[Nullable, uint]),
@@ -40421,7 +40421,7 @@ class ThreadBorderRouterManagement(Cluster):
             ])
 
     borderRouterName: 'str' = None
-    borderAgentId: 'bytes' = None
+    borderAgentID: 'bytes' = None
     threadVersion: 'uint' = None
     interfaceEnabled: 'bool' = None
     activeDatasetTimestamp: 'typing.Union[Nullable, uint]' = None
@@ -40531,7 +40531,7 @@ class ThreadBorderRouterManagement(Cluster):
             value: 'str' = ""
 
         @dataclass
-        class BorderAgentId(ClusterAttributeDescriptor):
+        class BorderAgentID(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000452

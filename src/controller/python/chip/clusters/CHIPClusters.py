@@ -11631,7 +11631,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "BorderAgentId",
+                "attributeName": "BorderAgentID",
                 "attributeId": 0x00000001,
                 "type": "bytes",
                 "reportable": True,

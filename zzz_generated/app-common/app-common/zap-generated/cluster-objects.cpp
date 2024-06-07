@@ -23111,8 +23111,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::BorderRouterName::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, borderRouterName);
-    case Attributes::BorderAgentId::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, borderAgentId);
+    case Attributes::BorderAgentID::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, borderAgentID);
     case Attributes::ThreadVersion::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, threadVersion);
     case Attributes::InterfaceEnabled::TypeInfo::GetAttributeId():

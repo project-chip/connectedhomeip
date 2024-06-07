@@ -37336,8 +37336,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
             return value;
         }
-        case Attributes::BorderAgentId::Id: {
-            using TypeInfo = Attributes::BorderAgentId::TypeInfo;
+        case Attributes::BorderAgentID::Id: {
+            using TypeInfo = Attributes::BorderAgentID::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

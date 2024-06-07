@@ -15266,8 +15266,8 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
         }
         return value;
     }
-    case Attributes::BorderAgentId::Id: {
-        using TypeInfo = Attributes::BorderAgentId::TypeInfo;
+    case Attributes::BorderAgentID::Id: {
+        using TypeInfo = Attributes::BorderAgentID::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

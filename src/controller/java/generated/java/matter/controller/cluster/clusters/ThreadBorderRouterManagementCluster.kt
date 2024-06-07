@@ -315,7 +315,7 @@ class ThreadBorderRouterManagementCluster(
     }
   }
 
-  suspend fun readBorderAgentIdAttribute(): ByteArray {
+  suspend fun readBorderAgentIDAttribute(): ByteArray {
     val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
@@ -346,7 +346,7 @@ class ThreadBorderRouterManagementCluster(
     return decodedValue
   }
 
-  suspend fun subscribeBorderAgentIdAttribute(
+  suspend fun subscribeBorderAgentIDAttribute(
     minInterval: Int,
     maxInterval: Int
   ): Flow<ByteArraySubscriptionState> {

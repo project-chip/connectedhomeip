@@ -4375,7 +4375,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster ThreadBorderRouterManagement attributes
     MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderRouterNameID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderAgentIdID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderAgentIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeInterfaceEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeActiveDatasetTimestampID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,

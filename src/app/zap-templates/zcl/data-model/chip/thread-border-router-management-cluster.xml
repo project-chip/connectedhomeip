@@ -35,7 +35,7 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="BORDER_ROUTER_NAME" type="char_string" length="63">BorderRouterName</attribute>
 
-    <attribute side="server" code="0x0001" define="BORDER_AGENT_ID" type="octet_string">BorderAgentId</attribute>
+    <attribute side="server" code="0x0001" define="BORDER_AGENT_ID" type="octet_string">BorderAgentID</attribute>
 
     <attribute side="server" code="0x0002" define="THREAD_VERSION" type="int16u">ThreadVersion</attribute>
 

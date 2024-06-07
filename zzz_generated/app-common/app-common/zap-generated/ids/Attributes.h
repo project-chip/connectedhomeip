@@ -6624,9 +6624,9 @@ namespace BorderRouterName {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace BorderRouterName
 
-namespace BorderAgentId {
+namespace BorderAgentID {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace BorderAgentId
+} // namespace BorderAgentID
 
 namespace ThreadVersion {
 static constexpr AttributeId Id = 0x00000002;

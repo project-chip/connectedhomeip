@@ -7268,8 +7268,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"BorderRouterName";
             break;
 
-        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderAgentIdID:
-            result = @"BorderAgentId";
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderAgentIDID:
+            result = @"BorderAgentID";
             break;
 
         case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadVersionID:

@@ -16212,10 +16212,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BorderRouterName", 1, value);
         }
-        case ThreadBorderRouterManagement::Attributes::BorderAgentId::Id: {
+        case ThreadBorderRouterManagement::Attributes::BorderAgentID::Id: {
             chip::ByteSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BorderAgentId", 1, value);
+            return DataModelLogger::LogValue("BorderAgentID", 1, value);
         }
         case ThreadBorderRouterManagement::Attributes::ThreadVersion::Id: {
             uint16_t value;

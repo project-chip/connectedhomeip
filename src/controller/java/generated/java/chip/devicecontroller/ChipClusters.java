@@ -53087,7 +53087,7 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 1106L;
 
     private static final long BORDER_ROUTER_NAME_ATTRIBUTE_ID = 0L;
-    private static final long BORDER_AGENT_ID_ATTRIBUTE_ID = 1L;
+    private static final long BORDER_AGENT_I_D_ATTRIBUTE_ID = 1L;
     private static final long THREAD_VERSION_ATTRIBUTE_ID = 2L;
     private static final long INTERFACE_ENABLED_ATTRIBUTE_ID = 3L;
     private static final long ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID = 5L;
@@ -53254,9 +53254,9 @@ public class ChipClusters {
         }, BORDER_ROUTER_NAME_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readBorderAgentIdAttribute(
+    public void readBorderAgentIDAttribute(
         OctetStringAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BORDER_AGENT_ID_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BORDER_AGENT_I_D_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -53264,12 +53264,12 @@ public class ChipClusters {
             byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BORDER_AGENT_ID_ATTRIBUTE_ID, true);
+        }, BORDER_AGENT_I_D_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeBorderAgentIdAttribute(
+    public void subscribeBorderAgentIDAttribute(
         OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BORDER_AGENT_ID_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BORDER_AGENT_I_D_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -53277,7 +53277,7 @@ public class ChipClusters {
             byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, BORDER_AGENT_ID_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, BORDER_AGENT_I_D_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readThreadVersionAttribute(

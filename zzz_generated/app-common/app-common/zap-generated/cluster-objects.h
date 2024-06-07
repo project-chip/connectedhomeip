@@ -35202,7 +35202,7 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 63; }
 };
 } // namespace BorderRouterName
-namespace BorderAgentId {
+namespace BorderAgentID {
 struct TypeInfo
 {
     using Type             = chip::ByteSpan;
@@ -35210,11 +35210,11 @@ struct TypeInfo
     using DecodableArgType = chip::ByteSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadBorderRouterManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BorderAgentId::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BorderAgentID::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
     static constexpr size_t MaxLength() { return 254; }
 };
-} // namespace BorderAgentId
+} // namespace BorderAgentID
 namespace ThreadVersion {
 struct TypeInfo
 {
@@ -35297,7 +35297,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::BorderRouterName::TypeInfo::DecodableType borderRouterName;
-        Attributes::BorderAgentId::TypeInfo::DecodableType borderAgentId;
+        Attributes::BorderAgentID::TypeInfo::DecodableType borderAgentID;
         Attributes::ThreadVersion::TypeInfo::DecodableType threadVersion       = static_cast<uint16_t>(0);
         Attributes::InterfaceEnabled::TypeInfo::DecodableType interfaceEnabled = static_cast<bool>(0);
         Attributes::ActiveDatasetTimestamp::TypeInfo::DecodableType activeDatasetTimestamp;

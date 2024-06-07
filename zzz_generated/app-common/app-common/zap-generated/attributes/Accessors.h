@@ -5343,11 +5343,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
 } // namespace BorderRouterName
 
-namespace BorderAgentId {
+namespace BorderAgentID {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
-} // namespace BorderAgentId
+} // namespace BorderAgentID
 
 namespace ThreadVersion {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u

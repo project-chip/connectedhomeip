@@ -7683,7 +7683,7 @@ cluster ThreadBorderRouterManagement = 1106 {
   }
 
   readonly attribute char_string<63> borderRouterName = 0;
-  readonly attribute octet_string<254> borderAgentId = 1;
+  readonly attribute octet_string<254> borderAgentID = 1;
   readonly attribute int16u threadVersion = 2;
   readonly attribute boolean interfaceEnabled = 3;
   readonly attribute nullable int64u activeDatasetTimestamp = 5;

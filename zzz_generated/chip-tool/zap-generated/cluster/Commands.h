@@ -11086,7 +11086,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * BorderRouterName                                                  | 0x0000 |
-| * BorderAgentId                                                     | 0x0001 |
+| * BorderAgentID                                                     | 0x0001 |
 | * ThreadVersion                                                     | 0x0002 |
 | * InterfaceEnabled                                                  | 0x0003 |
 | * ActiveDatasetTimestamp                                            | 0x0005 |
@@ -24962,7 +24962,7 @@ void registerClusterThreadBorderRouterManagement(Commands & commands, Credential
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "border-router-name", Attributes::BorderRouterName::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "border-agent-id", Attributes::BorderAgentId::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "border-agent-id", Attributes::BorderAgentID::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "thread-version", Attributes::ThreadVersion::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "interface-enabled", Attributes::InterfaceEnabled::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "active-dataset-timestamp", Attributes::ActiveDatasetTimestamp::Id, credsIssuerConfig), //
@@ -24975,7 +24975,7 @@ void registerClusterThreadBorderRouterManagement(Commands & commands, Credential
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "border-router-name", Attributes::BorderRouterName::Id,
                                                     WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "border-agent-id", Attributes::BorderAgentId::Id,
+        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "border-agent-id", Attributes::BorderAgentID::Id,
                                                     WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "thread-version", 0, UINT16_MAX, Attributes::ThreadVersion::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -24999,7 +24999,7 @@ void registerClusterThreadBorderRouterManagement(Commands & commands, Credential
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                         //
         make_unique<SubscribeAttribute>(Id, "border-router-name", Attributes::BorderRouterName::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "border-agent-id", Attributes::BorderAgentId::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "border-agent-id", Attributes::BorderAgentID::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "thread-version", Attributes::ThreadVersion::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "interface-enabled", Attributes::InterfaceEnabled::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "active-dataset-timestamp", Attributes::ActiveDatasetTimestamp::Id,

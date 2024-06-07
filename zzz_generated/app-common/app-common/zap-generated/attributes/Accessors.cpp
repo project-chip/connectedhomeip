@@ -34720,7 +34720,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 } // namespace BorderRouterName
 
-namespace BorderAgentId {
+namespace BorderAgentID {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 {
@@ -34766,7 +34766,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
                                  ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
-} // namespace BorderAgentId
+} // namespace BorderAgentID
 
 namespace ThreadVersion {
 

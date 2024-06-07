@@ -14432,7 +14432,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             BorderRouterName(0L),
-            BorderAgentId(1L),
+            BorderAgentID(1L),
             ThreadVersion(2L),
             InterfaceEnabled(3L),
             ActiveDatasetTimestamp(5L),

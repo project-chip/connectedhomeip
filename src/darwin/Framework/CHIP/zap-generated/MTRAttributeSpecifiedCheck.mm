@@ -5325,7 +5325,7 @@ static BOOL AttributeIsSpecifiedInThreadBorderRouterManagementCluster(AttributeI
     case Attributes::BorderRouterName::Id: {
         return YES;
     }
-    case Attributes::BorderAgentId::Id: {
+    case Attributes::BorderAgentID::Id: {
         return YES;
     }
     case Attributes::ThreadVersion::Id: {

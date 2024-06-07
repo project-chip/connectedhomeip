@@ -16622,17 +16622,17 @@ public class ClusterReadMapping {
           readThreadBorderRouterManagementBorderRouterNameCommandParams
         );
         result.put("readBorderRouterNameAttribute", readThreadBorderRouterManagementBorderRouterNameAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThreadBorderRouterManagementBorderAgentIdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThreadBorderRouterManagementBorderAgentIdAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementBorderAgentIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementBorderAgentIDAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readBorderAgentIdAttribute(
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readBorderAgentIDAttribute(
               (ChipClusters.OctetStringAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
-          readThreadBorderRouterManagementBorderAgentIdCommandParams
+          readThreadBorderRouterManagementBorderAgentIDCommandParams
         );
-        result.put("readBorderAgentIdAttribute", readThreadBorderRouterManagementBorderAgentIdAttributeInteractionInfo);
+        result.put("readBorderAgentIDAttribute", readThreadBorderRouterManagementBorderAgentIDAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThreadBorderRouterManagementThreadVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThreadBorderRouterManagementThreadVersionAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
