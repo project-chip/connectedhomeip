@@ -18,13 +18,12 @@ name: Wait For Fast CI to Pass
 on:
   workflow_call:
 
-env:
-  GITHUB_TOKEN: ${{ secrets.JOB_CANCEL_PAT }}
-
 jobs:
   wait-for-fast-ci:
     name: Wait For Fast CI to Pass
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.JOB_CANCEL_PAT }}
     steps:
       - uses: actions/checkout@v4
       - name: Review Contributor License Agreement Status
