@@ -30,6 +30,7 @@ env:
     
 jobs:
     await-fast-ci:
+        permissions: write-all
         name: Await Fast CI
         runs-on: ubuntu-latest
         steps:
@@ -38,8 +39,6 @@ jobs:
             - name: Stop on Fail
               if: ${{ failure() }}
               uses: andymckay/cancel-action@0.4
-              env:
-                  GITHUB_TOKEN: ${{ secrets.MATTER_PAT }}
         
     asr:
         name: ASR
