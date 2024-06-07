@@ -36,7 +36,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-            - uses: ./.github/workflows/await-fast-ci.yaml
+            - uses: project-chip/connectedhomeip/.github/workflows/await-fast-ci.yaml
             - name: Stop on Fail
               if: ${{ failure() }}
               uses: andymckay/cancel-action@0.4
