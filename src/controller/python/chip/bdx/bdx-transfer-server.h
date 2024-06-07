@@ -26,7 +26,8 @@
 namespace chip {
 namespace bdx {
 
-// This class handles incoming BDX init messages to start BDX transfers. It allocates BdxTransfer objects from a pool.
+// This class handles incoming BDX init messages to start BDX transfers. It requests the BdxTransfer objects from a pool
+// and uses them as exchange delegates.
 class BdxTransferServer : public Messaging::UnsolicitedMessageHandler
 {
 public:
@@ -35,7 +36,7 @@ public:
     CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager);
     void Shutdown();
 
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader& payloadHeader, Messaging::ExchangeDelegate *& delegate) override;
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, Messaging::ExchangeDelegate *& delegate) override;
     void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
 private:
