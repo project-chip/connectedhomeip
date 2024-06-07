@@ -67,7 +67,7 @@ TEST_F(TestEventPathParams, DifferentEventId)
     EXPECT_FALSE(eventPathParams1.IsSamePath(eventPathParams2));
 }
 
-/*
+/* after Init, validEventpaths array will have the following values:
 {kInvalidEndpointId, kInvalidClusterId, kInvalidEventId},
 {kInvalidEndpointId, MockClusterId(1), kInvalidEventId},
 {kInvalidEndpointId, MockClusterId(1), MockEventId(1)},

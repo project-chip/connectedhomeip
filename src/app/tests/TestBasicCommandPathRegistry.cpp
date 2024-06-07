@@ -75,22 +75,20 @@ TEST(TestBasicCommandPathRegistry, TestAddingSameCommandRef)
 
 TEST(TestBasicCommandPathRegistry, TestAddingMaxNumberOfEntries)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCommandPathRegistry<kQuickTestSize> basicCommandPathRegistry;
 
     std::optional<uint16_t> commandRef;
     uint16_t commandRefAndEndpointValue = 0;
 
     size_t idx = 0;
-    for (idx = 0; idx < kQuickTestSize && err == CHIP_NO_ERROR; idx++)
+    for (idx = 0; idx < kQuickTestSize; idx++)
     {
         ConcreteCommandPath concretePath(commandRefAndEndpointValue, 0, 0);
         commandRef.emplace(commandRefAndEndpointValue);
         commandRefAndEndpointValue++;
-        err = basicCommandPathRegistry.Add(concretePath, commandRef);
+        ASSERT_EQ(basicCommandPathRegistry.Add(concretePath, commandRef), CHIP_NO_ERROR);
     }
 
-    EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(basicCommandPathRegistry.Count(), kQuickTestSize);
 }
 

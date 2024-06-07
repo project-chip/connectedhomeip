@@ -76,7 +76,7 @@ TEST_F(TestExtensionFieldSets, TestInsertExtensionFieldSet)
 
     memset(double_size_buffer, static_cast<uint8_t>(1), sizeof(double_size_buffer));
 
-    EXPECT_EQ(true, EFS->IsEmpty());
+    EXPECT_TRUE(EFS->IsEmpty());
 
     // Test creators of single ExtensionFieldSet
     EXPECT_EQ(EFS1.mID, kOnOffClusterId);
@@ -309,7 +309,7 @@ TEST_F(TestExtensionFieldSets, TestRemoveExtensionFieldSet)
 
     // Emptying the table
     EFS->Clear();
-    EXPECT_EQ(true, EFS->IsEmpty());
+    EXPECT_TRUE(EFS->IsEmpty());
 }
 
 } // namespace TestEFS
