@@ -36,22 +36,9 @@ using namespace chip::app::Clusters;
 class TestDataModelSerialization : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        mStore = new System::TLVPacketBufferBackingStore;
-    }
-    static void TearDownTestSuite()
-    {
-        System::PacketBufferHandle buf = mStore->Release();
-
-        // This was added to avoid the error that occurs when buf is destructed just after MemoryShutdown, i.e. when it goes out of
-        // scope
-        buf = nullptr;
-
-        delete mStore;
-        chip::Platform::MemoryShutdown();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    void TearDown() override { System::PacketBufferHandle buf = mStore.Release(); }
 
     // Helper functions
     template <typename Encodable, typename Decodable>
@@ -64,30 +51,28 @@ public:
     void DumpBuf();
     void SetupReader();
 
-    static System::TLVPacketBufferBackingStore * mStore;
+    System::TLVPacketBufferBackingStore mStore;
     TLV::TLVWriter mWriter;
     TLV::TLVReader mReader;
 };
 
 using namespace TLV;
 
-System::TLVPacketBufferBackingStore * TestDataModelSerialization::mStore = nullptr;
-
 void TestDataModelSerialization::SetupBuf()
 {
     System::PacketBufferHandle buf;
 
     buf = System::PacketBufferHandle::New(1024);
-    mStore->Init(std::move(buf));
+    mStore.Init(std::move(buf));
 
-    mWriter.Init(*mStore);
-    mReader.Init(*mStore);
+    mWriter.Init(mStore);
+    mReader.Init(mStore);
 }
 
 void TestDataModelSerialization::DumpBuf()
 {
     TLV::TLVReader reader;
-    reader.Init(*mStore);
+    reader.Init(mStore);
 
     //
     // Enable this once the TLV pretty printer has been checked in.
@@ -100,7 +85,7 @@ void TestDataModelSerialization::DumpBuf()
 void TestDataModelSerialization::SetupReader()
 {
 
-    mReader.Init(*mStore);
+    mReader.Init(mStore);
     EXPECT_EQ(mReader.Next(), CHIP_NO_ERROR);
 }
 
