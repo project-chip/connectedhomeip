@@ -52,6 +52,8 @@ struct ClusterEntry
         result.path = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
         return result;
     }
+
+    bool IsValid() const { return path.HasValidIds(); }
 };
 
 enum class AttributeQualityFlags : uint32_t
@@ -83,6 +85,8 @@ struct AttributeEntry
         result.path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
         return result;
     }
+
+    bool IsValid() const { return path.HasValidIds(); }
 };
 
 enum class CommandQualityFlags : uint32_t
@@ -109,6 +113,8 @@ struct CommandEntry
         result.path = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
         return result;
     }
+
+    bool IsValid() const { return path.HasValidIds(); }
 };
 
 /// Provides metadata information for a data model
@@ -117,7 +123,9 @@ struct CommandEntry
 /// where each element can be iterated through independently.
 ///
 /// Iteration rules:
-///   - kInvalidEndpointId will be returned when iteration ends (or generally kInvalid* for paths)
+///   - Invalid paths will be returned when iteration ends (IDs will be kInvalid* and in particular
+///     mEndpointId will be kInvalidEndpointId). See `::Invalid()` methods for entries and
+///     can use ::IsValid() to determine if the entry is valid or not.
 ///   - Global Attributes are NOT returned since they are implied
 ///   - Any internal iteration errors are just logged (callers do not handle iteration CHIP_ERROR)
 ///   - Iteration order is NOT guaranteed globally. Only the following is guaranteed:
