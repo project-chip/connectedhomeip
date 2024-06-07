@@ -45,7 +45,7 @@ import matter.tlv.AnonymousTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WildcardFragment : Fragment() {
+class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCallback {
   private var _binding: WildcardFragmentBinding? = null
   private val binding
     get() = _binding!!
@@ -62,6 +62,23 @@ class WildcardFragment : Fragment() {
   private val writePath = ArrayList<AttributeWriteRequest>()
   private val invokePath = ArrayList<InvokeElement>()
   private val subscribeIdList = ArrayList<ULong>()
+
+  data class ReadICDConfig(val isFabricFiltered: Boolean, val eventMin: Long?)
+
+  data class SubscribeICDConfig(
+    val minInterval: Int,
+    val maxInterval: Int,
+    val keepSubscriptions: Boolean,
+    val isFabricFiltered: Boolean,
+    val eventMin: Long?
+  )
+
+  data class WriteInvokeICDConfig(val timedRequestTimeoutMs: Int, val imTimeoutMs: Int)
+
+  private var readICDConfig: ReadICDConfig? = null
+  private var subscribeICDConfig: SubscribeICDConfig? = null
+  private var writeICDConfig: WriteInvokeICDConfig? = null
+  private var invokeICDConfig: WriteInvokeICDConfig? = null
 
   private val reportCallback =
     object : ReportCallback {
@@ -171,6 +188,45 @@ class WildcardFragment : Fragment() {
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
     return binding.root
+  }
+
+  override fun onResume() {
+    super.onResume()
+    addressUpdateFragment.setNotifyCheckInMessageCallback(this)
+  }
+
+  override fun onPause() {
+    addressUpdateFragment.setNotifyCheckInMessageCallback(null)
+    super.onPause()
+  }
+
+  override fun notifyCheckInMessage() {
+    Log.d(TAG, "notifyCheckInMessage")
+    if (attributePath.isNotEmpty() || eventPath.isNotEmpty()) {
+      if (binding.readRadioBtn.isChecked && readICDConfig != null) {
+        scope.launch { read(readICDConfig!!.isFabricFiltered, readICDConfig!!.eventMin) }
+      } else if (binding.subscribeRadioBtn.isChecked && subscribeICDConfig != null) {
+        scope.launch {
+          subscribe(
+            subscribeICDConfig!!.minInterval,
+            subscribeICDConfig!!.maxInterval,
+            subscribeICDConfig!!.keepSubscriptions,
+            subscribeICDConfig!!.isFabricFiltered,
+            subscribeICDConfig!!.eventMin
+          )
+        }
+      }
+    } else if (
+      binding.writeRadioBtn.isChecked && writePath.isNotEmpty() && writeICDConfig != null
+    ) {
+      scope.launch { write(writeICDConfig!!.timedRequestTimeoutMs, writeICDConfig!!.imTimeoutMs) }
+    } else if (
+      binding.invokeRadioBtn.isChecked && invokePath.isNotEmpty() && invokeICDConfig != null
+    ) {
+      scope.launch {
+        invoke(invokeICDConfig!!.timedRequestTimeoutMs, invokeICDConfig!!.imTimeoutMs)
+      }
+    }
   }
 
   private fun setVisibilityEachView(radioBtnId: Int) {
@@ -520,7 +576,12 @@ class WildcardFragment : Fragment() {
         if (eventPath.isNotEmpty() && eventMinEd.text.isNotBlank()) {
           eventMin = eventMinEd.text.toString().toULong().toLong()
         }
-        read(isFabricFilteredEd.selectedItem.toString().toBoolean(), eventMin)
+        if (addressUpdateFragment.isICDDevice()) {
+          readICDConfig =
+            ReadICDConfig(isFabricFilteredEd.selectedItem.toString().toBoolean(), eventMin)
+        } else {
+          read(isFabricFilteredEd.selectedItem.toString().toBoolean(), eventMin)
+        }
         requireActivity().runOnUiThread { dialog.dismiss() }
       }
     }
@@ -537,18 +598,23 @@ class WildcardFragment : Fragment() {
         dialogView.findViewById<EditText>(R.id.timedRequestTimeoutEd).text.toString()
       val imTimeout = dialogView.findViewById<EditText>(R.id.imTimeoutEd).text.toString()
       scope.launch {
-        write(
+        val timedRequestTimeoutInt =
           if (timedRequestTimeoutMs.isEmpty()) {
             0
           } else {
             timedRequestTimeoutMs.toInt()
-          },
+          }
+        val imTimeoutInt =
           if (imTimeout.isEmpty()) {
             0
           } else {
             imTimeout.toInt()
           }
-        )
+        if (addressUpdateFragment.isICDDevice()) {
+          writeICDConfig = WriteInvokeICDConfig(timedRequestTimeoutInt, imTimeoutInt)
+        } else {
+          write(timedRequestTimeoutInt, imTimeoutInt)
+        }
         requireActivity().runOnUiThread { dialog.dismiss() }
       }
     }
@@ -588,13 +654,24 @@ class WildcardFragment : Fragment() {
           if (eventPath.isNotEmpty() && eventMinEd.text.isNotBlank()) {
             eventMin = eventMinEd.text.toString().toULong().toLong()
           }
-          subscribe(
-            minIntervalEd.text.toString().toInt(),
-            maxIntervalEd.text.toString().toInt(),
-            keepSubscriptionsSp.selectedItem.toString().toBoolean(),
-            isFabricFilteredSp.selectedItem.toString().toBoolean(),
-            eventMin,
-          )
+          if (addressUpdateFragment.isICDDevice()) {
+            subscribeICDConfig =
+              SubscribeICDConfig(
+                minIntervalEd.text.toString().toInt(),
+                maxIntervalEd.text.toString().toInt(),
+                keepSubscriptionsSp.selectedItem.toString().toBoolean(),
+                isFabricFilteredSp.selectedItem.toString().toBoolean(),
+                eventMin
+              )
+          } else {
+            subscribe(
+              minIntervalEd.text.toString().toInt(),
+              maxIntervalEd.text.toString().toInt(),
+              keepSubscriptionsSp.selectedItem.toString().toBoolean(),
+              isFabricFilteredSp.selectedItem.toString().toBoolean(),
+              eventMin
+            )
+          }
         } else {
           Log.e(TAG, "minInterval or maxInterval is empty!")
         }
@@ -614,18 +691,23 @@ class WildcardFragment : Fragment() {
         dialogView.findViewById<EditText>(R.id.timedRequestTimeoutEd).text.toString()
       val imTimeout = dialogView.findViewById<EditText>(R.id.imTimeoutEd).text.toString()
       scope.launch {
-        invoke(
+        val timedRequestTimeoutInt =
           if (timedRequestTimeoutMs.isEmpty()) {
             0
           } else {
             timedRequestTimeoutMs.toInt()
-          },
+          }
+        val imTimeoutInt =
           if (imTimeout.isEmpty()) {
             0
           } else {
             imTimeout.toInt()
           }
-        )
+        if (addressUpdateFragment.isICDDevice()) {
+          invokeICDConfig = WriteInvokeICDConfig(timedRequestTimeoutInt, imTimeoutInt)
+        } else {
+          invoke(timedRequestTimeoutInt, imTimeoutInt)
+        }
         requireActivity().runOnUiThread { dialog.dismiss() }
       }
     }

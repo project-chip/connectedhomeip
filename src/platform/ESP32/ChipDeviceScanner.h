@@ -20,9 +20,9 @@
 #include <lib/core/CHIPError.h>
 #include <system/SystemLayer.h>
 
-#if CONFIG_BT_NIMBLE_ENABLED
+#ifdef CONFIG_BT_NIMBLE_ENABLED
 #include "host/ble_hs.h"
-#elif CONFIG_BT_BLUEDROID_ENABLED
+#elif defined(CONFIG_BT_BLUEDROID_ENABLED)
 #include "esp_bt.h"
 #include "esp_bt_main.h"
 #include "esp_gap_ble_api.h"
@@ -47,7 +47,7 @@ public:
     virtual ~ChipDeviceScannerDelegate() {}
 
     // Called when a CHIP device was found
-#if CONFIG_BT_NIMBLE_ENABLED
+#ifdef CONFIG_BT_NIMBLE_ENABLED
     virtual void OnDeviceScanned(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr,
                                  const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 #else
@@ -90,7 +90,7 @@ public:
     CHIP_ERROR StopScan();
 
     bool mIsScanning = false;
-#if CONFIG_BT_NIMBLE_ENABLED
+#ifdef CONFIG_BT_NIMBLE_ENABLED
     void ReportDevice(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr);
 #else
     void ReportDevice(esp_ble_gap_cb_param_t & fields, esp_bd_addr_t & addr);

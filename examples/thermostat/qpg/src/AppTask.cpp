@@ -460,10 +460,14 @@ void AppTask::UpdateLEDs(void)
     // If the system has ble connection(s) uptill the stage above, THEN blink
     // the LEDs at an even rate of 100ms.
     //
-    // Otherwise, blink the LED ON for a very short time.
+    // Otherwise, turn the LED OFF.
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
         qvIO_LedSet(SYSTEM_STATE_LED, true);
+    }
+    else if (sIsThreadProvisioned && !sIsThreadEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
     }
     else if (sHaveBLEConnections)
     {
@@ -476,7 +480,7 @@ void AppTask::UpdateLEDs(void)
     else
     {
         // not commissioned yet
-        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
+        qvIO_LedSet(SYSTEM_STATE_LED, false);
     }
 }
 

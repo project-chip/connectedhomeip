@@ -58,5 +58,9 @@
 typedef struct {} variable_hidden_by_mtr_hide;
 // clang-format on
 
+// mtr_[un]likely(expr): Evaluates a boolean expression and hints to the compiler that it is [un]likely to be true.
+#define mtr_likely(expr) __builtin_expect(!!(expr), 1)
+#define mtr_unlikely(expr) __builtin_expect(!!(expr), 0)
+
 // Default timed interaction timeout, in ms, if another one is not provided.
 #define MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS 10000

@@ -41,6 +41,10 @@
 namespace chip {
 namespace Transport {
 
+// Forward declaration of friend class for test access.
+template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
+class TCPBaseTestAccess;
+
 /** Defines listening parameters for setting up a TCP transport */
 class TcpListenParameters
 {
@@ -200,7 +204,9 @@ public:
     void CloseActiveConnections();
 
 private:
-    friend class TCPTest;
+    // Allow tests to access private members.
+    template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
+    friend class TCPBaseTestAccess;
 
     /**
      * Allocate an unused connection from the pool
@@ -252,7 +258,7 @@ private:
      *                              is no other data).
      * @param[in]     messageSize   Size of the single message.
      */
-    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, ActiveTCPConnectionState * state, uint16_t messageSize);
+    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, ActiveTCPConnectionState * state, size_t messageSize);
 
     /**
      * Initiate a connection to the given peer. On connection completion,
@@ -300,10 +306,6 @@ private:
     // giving up.
     uint32_t mConnectTimeout = CHIP_CONFIG_TCP_CONNECT_TIMEOUT_MSECS;
 
-    // The max payload size of data over a TCP connection that is transmissible
-    // at a time.
-    uint32_t mMaxTCPPayloadSize = CHIP_CONFIG_MAX_TCP_PAYLOAD_SIZE_BYTES;
-
     // Number of active and 'pending connection' endpoints
     size_t mUsedEndPointCount = 0;
 
@@ -330,7 +332,6 @@ public:
     ~TCP() override { mPendingPackets.ReleaseAll(); }
 
 private:
-    friend class TCPTest;
     ActiveTCPConnectionState mConnectionsBuffer[kActiveConnectionsSize];
     PoolImpl<PendingPacket, kPendingPacketSize, ObjectPoolMem::kInline, PendingPacketPoolType::Interface> mPendingPackets;
 };

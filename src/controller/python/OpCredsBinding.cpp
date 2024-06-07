@@ -26,6 +26,7 @@
 #include "controller/python/chip/crypto/p256keypair.h"
 #include "controller/python/chip/interaction_model/Delegate.h"
 
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -104,6 +105,7 @@ private:
 
 extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
+extern chip::app::DefaultICDClientStorage sICDClientStorage;
 
 class TestCommissioner : public chip::Controller::AutoCommissioner
 {
@@ -331,6 +333,8 @@ private:
             return mNeedsDST && mParams.GetDSTOffsets().HasValue();
         case chip::Controller::CommissioningStage::kError:
         case chip::Controller::CommissioningStage::kSecurePairing:
+        // "not valid" because attestation verification always fails after entering revocation check step
+        case chip::Controller::CommissioningStage::kAttestationVerification:
             return false;
         default:
             return true;
@@ -566,6 +570,9 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     err =
         chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
+    pairingDelegate->SetFabricIndex(devCtrl->GetFabricIndex());
 
     *outDevCtrl         = devCtrl.release();
     *outPairingDelegate = pairingDelegate.release();

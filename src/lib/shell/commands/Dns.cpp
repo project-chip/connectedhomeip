@@ -19,13 +19,12 @@
 #include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/PeerId.h>
-#include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
+#include <lib/shell/SubShellCommand.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
@@ -36,8 +35,6 @@ namespace Shell {
 
 namespace {
 
-Shell::Engine sShellDnsBrowseSubcommands;
-Shell::Engine sShellDnsSubcommands;
 Dnssd::ResolverProxy sResolverProxy;
 
 class DnsShellResolverDelegate : public Dnssd::DiscoverNodeDelegate, public AddressResolve::NodeListener
@@ -83,15 +80,23 @@ public:
 
     AddressResolve::NodeLookupHandle & Handle() { return mSelfHandle; }
 
+    void LogOperationalNodeDiscovered(const Dnssd::OperationalNodeBrowseData & nodeData)
+    {
+        streamer_printf(streamer_get(), "DNS browse operational succeeded: \r\n");
+        streamer_printf(streamer_get(), "   Node Instance: " ChipLogFormatPeerId, ChipLogValuePeerId(nodeData.peerId));
+        streamer_printf(streamer_get(), "   hasZeroTTL: %s\r\n", nodeData.hasZeroTTL ? "true" : "false");
+    }
+
     void OnNodeDiscovered(const Dnssd::DiscoveredNodeData & discNodeData) override
     {
-        if (!discNodeData.Is<Dnssd::CommissionNodeData>())
+        if (discNodeData.Is<Dnssd::OperationalNodeBrowseData>())
         {
-            streamer_printf(streamer_get(), "DNS browse failed - not commission type node \r\n");
+            LogOperationalNodeDiscovered(discNodeData.Get<Dnssd::OperationalNodeBrowseData>());
             return;
         }
 
-        Dnssd::CommissionNodeData nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+        const auto & nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+
         if (!nodeData.IsValid())
         {
             streamer_printf(streamer_get(), "DNS browse failed - not found valid services \r\n");
@@ -224,6 +229,9 @@ CHIP_ERROR BrowseCommissionableHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissionable nodes...\r\n");
 
+    sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
+    sResolverProxy.SetDiscoveryDelegate(&sDnsShellResolverDelegate);
+
     return sResolverProxy.DiscoverCommissionableNodes(filter);
 }
 
@@ -234,62 +242,54 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissioners...\r\n");
 
+    sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
+    sResolverProxy.SetDiscoveryDelegate(&sDnsShellResolverDelegate);
+
     return sResolverProxy.DiscoverCommissioners(filter);
 }
 
-CHIP_ERROR BrowseHandler(int argc, char ** argv)
+CHIP_ERROR BrowseOperationalHandler(int argc, char ** argv)
 {
-    if (argc == 0)
-    {
-        sShellDnsBrowseSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
-        return CHIP_NO_ERROR;
-    }
+    Dnssd::DiscoveryFilter filter;
+    VerifyOrReturnError(ParseSubType(argc, argv, filter), CHIP_ERROR_INVALID_ARGUMENT);
+
+    streamer_printf(streamer_get(), "Browsing operational...\r\n");
 
     sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
     sResolverProxy.SetDiscoveryDelegate(&sDnsShellResolverDelegate);
 
-    return sShellDnsBrowseSubcommands.ExecCommand(argc, argv);
+    return sResolverProxy.DiscoverOperationalNodes(filter);
 }
 
-CHIP_ERROR DnsHandler(int argc, char ** argv)
+CHIP_ERROR BrowseStopHandler(int argc, char ** argv)
 {
-    if (argc == 0)
-    {
-        sShellDnsSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
-        return CHIP_NO_ERROR;
-    }
+    streamer_printf(streamer_get(), "Stopping browse...\r\n");
 
-    return sShellDnsSubcommands.ExecCommand(argc, argv);
+    return sResolverProxy.StopDiscovery();
 }
 
 } // namespace
 
 void RegisterDnsCommands()
 {
-    static const shell_command_t sDnsBrowseSubCommands[] = {
+    static constexpr Command browseSubCommands[] = {
         { &BrowseCommissionableHandler, "commissionable",
-          "Browse Matter commissionable nodes. Usage: dns browse commissionable [subtype]" },
-        { &BrowseCommissionerHandler, "commissioner",
-          "Browse Matter commissioner nodes. Usage: dns browse commissioner [subtype]" },
+          "Browse Matter commissionables. Usage: dns browse commissionable [subtype]" },
+        { &BrowseCommissionerHandler, "commissioner", "Browse Matter commissioners. Usage: dns browse commissioner [subtype]" },
+        { &BrowseOperationalHandler, "operational", "Browse Matter operational nodes. Usage: dns browse operational" },
+        { &BrowseStopHandler, "stop", "Stop ongoing browse. Usage: dns browse stop" },
+
     };
 
-    static const shell_command_t sDnsSubCommands[] = {
+    static constexpr Command subCommands[] = {
         { &ResolveHandler, "resolve",
-          "Resolve the DNS service. Usage: dns resolve <fabric-id> <node-id> (e.g. dns resolve 5544332211 1)" },
-        { &BrowseHandler, "browse",
-          "Browse DNS services published by Matter nodes. Usage: dns browse <commissionable|commissioner>" },
+          "Resolve Matter operational service. Usage: dns resolve fabricid nodeid (e.g. dns resolve 5544332211 1)" },
+        { &SubShellCommand<ArraySize(browseSubCommands), browseSubCommands>, "browse", "Browse Matter DNS services" },
     };
 
-    static const shell_command_t sDnsCommand = { &DnsHandler, "dns", "Dns client commands" };
+    static constexpr Command dnsCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "dns", "DNS client commands" };
 
-    // Register `dns browse` subcommands
-    sShellDnsBrowseSubcommands.RegisterCommands(sDnsBrowseSubCommands, ArraySize(sDnsBrowseSubCommands));
-
-    // Register `dns` subcommands with the local shell dispatcher.
-    sShellDnsSubcommands.RegisterCommands(sDnsSubCommands, ArraySize(sDnsSubCommands));
-
-    // Register the root `dns` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDnsCommand, 1);
+    Engine::Root().RegisterCommands(&dnsCommand, 1);
 }
 
 } // namespace Shell

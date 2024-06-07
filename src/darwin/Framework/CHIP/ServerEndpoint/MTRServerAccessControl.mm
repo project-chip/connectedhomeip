@@ -18,6 +18,7 @@
 
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRBaseDevice.h> // for MTRClusterPath
+#import <Matter/MTRClusterConstants.h> // For MTRClusterIDTypeDescriptorID
 #import <Matter/MTRDeviceControllerFactory.h>
 
 #import "MTRDeviceControllerFactory_Internal.h"
@@ -29,6 +30,8 @@
 #include <access/SubjectDescriptor.h>
 #include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Global.h>
 #include <lib/core/NodeId.h>
 
@@ -135,36 +138,52 @@ Global<ControllerAccessControl> gControllerAccessControl;
 
 } // anonymous namespace
 
-chip::Access::Privilege MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
+Privilege MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
 {
     // We don't support any event bits yet.
-    return chip::Access::Privilege::kAdminister;
+    return Privilege::kAdminister;
 }
 
-chip::Access::Privilege MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId command)
+Privilege MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId command)
 {
     // For now we only have OTA, which uses Operate.
-    return chip::Access::Privilege::kOperate;
+    return Privilege::kOperate;
 }
 
-chip::Access::Privilege MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attribute)
+Privilege MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attribute)
 {
     NSNumber * _Nullable neededPrivilege = [[MTRDeviceControllerFactory sharedInstance] neededReadPrivilegeForClusterID:@(cluster) attributeID:@(attribute)];
     if (neededPrivilege == nil) {
-        // No privileges declared for this attribute on this cluster.  Treat as
-        // "needs admin privileges", so we fail closed.
-        return chip::Access::Privilege::kAdminister;
+        // No privileges declared for this attribute on this cluster.
+
+        // In some cases, we know based on the spec what the answer is, and our
+        // API clients my not be able to provide explicit privileges for
+        // these cases because our API surface does not allow them to create
+        // custom attribute definitions for them.
+
+        // (1) Global attributes always require View privilege to read.
+        if (IsGlobalAttribute(attribute)) {
+            return Privilege::kView;
+        }
+
+        // (2) All standard descriptor attributes just require View privilege to read.
+        if (cluster == MTRClusterIDTypeDescriptorID && ExtractVendorFromMEI(attribute) == VendorId::Common) {
+            return Privilege::kView;
+        }
+
+        // Treat as "needs admin privileges", so we fail closed.
+        return Privilege::kAdminister;
     }
 
     switch (neededPrivilege.unsignedLongLongValue) {
     case MTRAccessControlEntryPrivilegeView:
-        return chip::Access::Privilege::kView;
+        return Privilege::kView;
     case MTRAccessControlEntryPrivilegeOperate:
-        return chip::Access::Privilege::kOperate;
+        return Privilege::kOperate;
     case MTRAccessControlEntryPrivilegeManage:
-        return chip::Access::Privilege::kManage;
+        return Privilege::kManage;
     case MTRAccessControlEntryPrivilegeAdminister:
-        return chip::Access::Privilege::kAdminister;
+        return Privilege::kAdminister;
     case MTRAccessControlEntryPrivilegeProxyView:
         // Just treat this as an unknown value; there is no value for this in privilege-storage.
         FALLTHROUGH;
@@ -175,13 +194,13 @@ chip::Access::Privilege MatterGetAccessPrivilegeForReadAttribute(ClusterId clust
     // To be safe, treat unknown values as "needs admin privileges".  That way the failure case
     // disallows access that maybe should be allowed, instead of allowing access that maybe
     // should be disallowed.
-    return chip::Access::Privilege::kAdminister;
+    return Privilege::kAdminister;
 }
 
-chip::Access::Privilege MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId attribute)
+Privilege MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId attribute)
 {
     // We don't have any writable attributes yet, but default to Operate.
-    return chip::Access::Privilege::kOperate;
+    return Privilege::kOperate;
 }
 
 void InitializeServerAccessControl()

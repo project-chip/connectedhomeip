@@ -16,15 +16,23 @@
 #
 
 import xml.etree.ElementTree as ElementTree
+from typing import Callable
 
-from conformance_support import ConformanceDecision, ConformanceParseParameters, parse_callable_from_xml
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from conformance_support import (ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated, disallowed,
+                                 mandatory, optional, parse_basic_callable_from_xml, parse_callable_from_xml,
+                                 parse_device_type_callable_from_xml, provisional, zigbee)
+from matter_testing_support import MatterBaseTest, default_matter_test_main
 from mobly import asserts
 
 
+def basic_test(xml: str, cls: Callable) -> None:
+    et = ElementTree.fromstring(xml)
+    xml_callable = parse_basic_callable_from_xml(et)
+    asserts.assert_true(isinstance(xml_callable, cls), "Unexpected class parsed from basic conformance")
+
+
 class TestConformanceSupport(MatterBaseTest):
-    @async_test_body
-    async def setup_class(self):
+    def setup_class(self):
         super().setup_class()
         # a small feature map
         self.feature_names_to_bits = {'AB': 0x01, 'CD': 0x02}
@@ -46,8 +54,7 @@ class TestConformanceSupport(MatterBaseTest):
         self.params = ConformanceParseParameters(
             feature_map=self.feature_names_to_bits, attribute_map=self.attribute_names_to_values, command_map=self.command_names_to_values)
 
-    @async_test_body
-    async def test_conformance_mandatory(self):
+    def test_conformance_mandatory(self):
         xml = '<mandatoryConform />'
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
@@ -55,8 +62,7 @@ class TestConformanceSupport(MatterBaseTest):
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
         asserts.assert_equal(str(xml_callable), 'M')
 
-    @async_test_body
-    async def test_conformance_optional(self):
+    def test_conformance_optional(self):
         xml = '<optionalConform />'
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
@@ -64,8 +70,7 @@ class TestConformanceSupport(MatterBaseTest):
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
         asserts.assert_equal(str(xml_callable), 'O')
 
-    @async_test_body
-    async def test_conformance_disallowed(self):
+    def test_conformance_disallowed(self):
         xml = '<disallowConform />'
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
@@ -80,8 +85,7 @@ class TestConformanceSupport(MatterBaseTest):
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.DISALLOWED)
         asserts.assert_equal(str(xml_callable), 'D')
 
-    @async_test_body
-    async def test_conformance_provisional(self):
+    def test_conformance_provisional(self):
         xml = '<provisionalConform />'
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
@@ -89,8 +93,7 @@ class TestConformanceSupport(MatterBaseTest):
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.PROVISIONAL)
         asserts.assert_equal(str(xml_callable), 'P')
 
-    @async_test_body
-    async def test_conformance_zigbee(self):
+    def test_conformance_zigbee(self):
         xml = '<condition name="Zigbee"/>'
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
@@ -98,8 +101,7 @@ class TestConformanceSupport(MatterBaseTest):
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), 'Zigbee')
 
-    @async_test_body
-    async def test_conformance_mandatory_on_condition(self):
+    def test_conformance_mandatory_on_condition(self):
         xml = ('<mandatoryConform>'
                '<feature name="AB" />'
                '</mandatoryConform>')
@@ -151,8 +153,7 @@ class TestConformanceSupport(MatterBaseTest):
 
         # test command in optional and in boolean - this is the same as attribute essentially, so testing every permutation is overkill
 
-    @async_test_body
-    async def test_conformance_optional_on_condition(self):
+    def test_conformance_optional_on_condition(self):
         # single feature optional
         xml = ('<optionalConform>'
                '<feature name="AB" />'
@@ -228,8 +229,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, [], c), ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), '[cmd2]')
 
-    @async_test_body
-    async def test_conformance_not_term_mandatory(self):
+    def test_conformance_not_term_mandatory(self):
         # single feature not mandatory
         xml = ('<mandatoryConform>'
                '<notTerm>'
@@ -288,8 +288,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), '!attr2')
 
-    @async_test_body
-    async def test_conformance_not_term_optional(self):
+    def test_conformance_not_term_optional(self):
         # single feature not optional
         xml = ('<optionalConform>'
                '<notTerm>'
@@ -319,8 +318,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), '[!CD]')
 
-    @async_test_body
-    async def test_conformance_and_term(self):
+    def test_conformance_and_term(self):
         # and term for features only
         xml = ('<mandatoryConform>'
                '<andTerm>'
@@ -370,8 +368,7 @@ class TestConformanceSupport(MatterBaseTest):
                     asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), 'AB & attr2')
 
-    @async_test_body
-    async def test_conformance_or_term(self):
+    def test_conformance_or_term(self):
         # or term feature only
         xml = ('<mandatoryConform>'
                '<orTerm>'
@@ -421,8 +418,7 @@ class TestConformanceSupport(MatterBaseTest):
                     asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), 'AB | attr2')
 
-    @async_test_body
-    async def test_conformance_and_term_with_not(self):
+    def test_conformance_and_term_with_not(self):
         # and term with not
         xml = ('<optionalConform>'
                '<andTerm>'
@@ -441,8 +437,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), '[!AB & CD]')
 
-    @async_test_body
-    async def test_conformance_or_term_with_not(self):
+    def test_conformance_or_term_with_not(self):
         # or term with not on second feature
         xml = ('<mandatoryConform>'
                '<orTerm>'
@@ -479,8 +474,7 @@ class TestConformanceSupport(MatterBaseTest):
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), '[!(AB | CD)]')
 
-    @async_test_body
-    async def test_conformance_and_term_with_three_terms(self):
+    def test_conformance_and_term_with_three_terms(self):
         # and term with three features
         xml = ('<optionalConform>'
                '<andTerm>'
@@ -519,8 +513,7 @@ class TestConformanceSupport(MatterBaseTest):
                         asserts.assert_equal(xml_callable(f, a, c), ConformanceDecision.NOT_APPLICABLE)
         asserts.assert_equal(str(xml_callable), '[AB & attr1 & cmd1]')
 
-    @async_test_body
-    async def test_conformance_or_term_with_three_terms(self):
+    def test_conformance_or_term_with_three_terms(self):
         # or term with three features
         xml = ('<optionalConform>'
                '<orTerm>'
@@ -615,6 +608,147 @@ class TestConformanceSupport(MatterBaseTest):
             else:
                 asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.PROVISIONAL)
         asserts.assert_equal(str(xml_callable), 'AB & !CD, P')
+
+    def test_conformance_greater(self):
+        # AB, [CD]
+        xml = ('<mandatoryConform>'
+               '<greaterTerm>'
+               '<attribute name="attr1" />'
+               '<literal value="1" />'
+               '</greaterTerm>'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        # TODO: switch this to check greater than once the update to the base is done (#33422)
+        asserts.assert_equal(xml_callable(0x00, [], []), ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(str(xml_callable), 'attr1 > 1')
+
+        # Ensure that we can only have greater terms with exactly 2 value
+        xml = ('<mandatoryConform>'
+               '<greaterTerm>'
+               '<attribute name="attr1" />'
+               '<attribute name="attr2" />'
+               '<literal value="1" />'
+               '</greaterTerm>'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        try:
+            xml_callable = parse_callable_from_xml(et, self.params)
+            asserts.fail("Incorrectly parsed bad greaterTerm XML with > 2 values")
+        except ConformanceException:
+            pass
+
+        xml = ('<mandatoryConform>'
+               '<greaterTerm>'
+               '<attribute name="attr1" />'
+               '</greaterTerm>'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        try:
+            xml_callable = parse_callable_from_xml(et, self.params)
+            asserts.fail("Incorrectly parsed bad greaterTerm XML with < 2 values")
+        except ConformanceException:
+            pass
+
+        # Only attributes and literals allowed because arithmetic operations require values
+        xml = ('<mandatoryConform>'
+               '<greaterTerm>'
+               '<feature name="AB" />'
+               '<literal value="1" />'
+               '</greaterTerm>'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        try:
+            xml_callable = parse_callable_from_xml(et, self.params)
+            asserts.fail("Incorrectly parsed greater term with feature value")
+        except ConformanceException:
+            pass
+
+    def test_basic_conformance(self):
+        basic_test('<mandatoryConform />', mandatory)
+        basic_test('<optionalConform />', optional)
+        basic_test('<disallowConform />', disallowed)
+        basic_test('<deprecateConform />', deprecated)
+        basic_test('<provisionalConform />', provisional)
+        basic_test('<condition name="zigbee" />', zigbee)
+
+        # feature is not basic so we should get an exception
+        xml = '<feature name="CD" />'
+        et = ElementTree.fromstring(xml)
+        try:
+            parse_basic_callable_from_xml(et)
+            asserts.fail("Unexpected success parsing non-basic conformance")
+        except ConformanceException:
+            pass
+
+        # mandatory tag is basic, but this one is a wrapper, so we should get a TypeError
+        xml = ('<mandatoryConform>'
+               '<andTerm>'
+               '<feature name="AB" />'
+               '<notTerm>'
+               '<feature name="CD" />'
+               '</notTerm>'
+               '</andTerm>'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        try:
+            parse_basic_callable_from_xml(et)
+            asserts.fail("Unexpected success parsing mandatory wrapper")
+        except ConformanceException:
+            pass
+
+    def test_device_type_conformance(self):
+        msg = "Unexpected conformance returned for device type"
+        xml = ('<mandatoryConform>'
+               '<condition name="zigbee" />'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_device_type_callable_from_xml(et)
+        asserts.assert_equal(str(xml_callable), 'Zigbee', msg)
+        asserts.assert_equal(xml_callable(0, [], []), ConformanceDecision.NOT_APPLICABLE, msg)
+
+        xml = ('<optionalConform>'
+               '<condition name="zigbee" />'
+               '</optionalConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_device_type_callable_from_xml(et)
+        # expect no exception here
+        asserts.assert_equal(str(xml_callable), '[Zigbee]', msg)
+        asserts.assert_equal(xml_callable(0, [], []), ConformanceDecision.NOT_APPLICABLE, msg)
+
+        # otherwise conforms are allowed
+        xml = ('<otherwiseConform>'
+               '<condition name="zigbee" />'
+               '<provisionalConform />'
+               '</otherwiseConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_device_type_callable_from_xml(et)
+        # expect no exception here
+        asserts.assert_equal(str(xml_callable), 'Zigbee, P', msg)
+        asserts.assert_equal(xml_callable(0, [], []), ConformanceDecision.PROVISIONAL, msg)
+
+        # Device type conditions or features don't correspond to anything in the spec, so the XML takes a best
+        # guess as to what they are. We should be able to parse features, conditions, attributes as the same
+        # thing.
+        # TODO: allow querying conformance for conditional device features
+        # TODO: adjust conformance call function to accept a list of features and evaluate based on that
+        xml = ('<mandatoryConform>'
+               '<feature name="CD" />'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_device_type_callable_from_xml(et)
+        asserts.assert_equal(str(xml_callable), 'CD', msg)
+        # Device features are always optional (at least for now), even though we didn't pass this feature in
+        asserts.assert_equal(xml_callable(0, [], []), ConformanceDecision.OPTIONAL)
+
+        xml = ('<otherwiseConform>'
+               '<feature name="CD" />'
+               '<condition name="testy" />'
+               '</otherwiseConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_device_type_callable_from_xml(et)
+        asserts.assert_equal(str(xml_callable), 'CD, testy', msg)
+        asserts.assert_equal(xml_callable(0, [], []), ConformanceDecision.OPTIONAL)
 
 
 if __name__ == "__main__":

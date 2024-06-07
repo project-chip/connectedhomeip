@@ -29,7 +29,6 @@ chip_stack_lock_tracking = "none"
 
 matter_device_vid = "0xFFF1"
 matter_device_pid = "0x8006"
-matter_device_software_version = "0x0001"
-matter_device_software_version_string = "1.0"
+matter_ota_test_image = false
 
 chip_openthread_ftd = false

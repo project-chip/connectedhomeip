@@ -67,10 +67,14 @@ public:
 
     virtual CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) { return CHIP_ERROR_BAD_REQUEST; };
 
+    void ClearICDEntry(const chip::ScopedNodeId & nodeId);
+    void StoreICDEntryWithKey(chip::app::ICDClientInfo & clientinfo, chip::ByteSpan key);
     void Shutdown() override;
 
 protected:
-    bool IsPeerLIT() { return mIsPeerLIT.ValueOr(false); }
+    bool IsPeerLIT();
+
+    chip::NodeId GetDestinationId() const { return mDestinationId; }
 
     chip::Optional<uint16_t> mTimeout;
 

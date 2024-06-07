@@ -48,7 +48,6 @@ void APP_ENTRY_ProcessMsgM0ToM4(void);
 void APP_ENTRY_Init_CFG_CLI_UART(void);
 void APP_ENTRY_TL_THREAD_INIT(void);
 void APP_ENTRY_PBSetReceiveCallback(PushButtonCallback aCallback);
-void APP_ENTRY_LedBlink(uint8_t LedStatus);
 
 #ifdef __cplusplus
 }

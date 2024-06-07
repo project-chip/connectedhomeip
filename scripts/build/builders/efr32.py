@@ -17,6 +17,7 @@ import shlex
 import subprocess
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -100,6 +101,7 @@ class Efr32Board(Enum):
     BRD4187C = 9
     BRD4186C = 10
     BRD4338A = 11
+    BRD2703A = 12
 
     def GnArgName(self):
         if self == Efr32Board.BRD4161A:
@@ -124,6 +126,8 @@ class Efr32Board(Enum):
             return 'BRD4187C'
         elif self == Efr32Board.BRD4338A:
             return 'BRD4338A'
+        elif self == Efr32Board.BRD2703A:
+            return 'BRD2703A'
         else:
             raise Exception('Unknown board #: %r' % self)
 
@@ -260,26 +264,27 @@ class Efr32Builder(GnBuilder):
         return self.extra_gn_options
 
     def build_outputs(self):
-        items = {}
-        for extension in ["out", "out.map", "hex"]:
-            name = '%s.%s' % (self.app.AppNamePrefix(), extension)
-            items[name] = os.path.join(self.output_dir, name)
+        extensions = ["out", "hex"]
+        if self.options.enable_link_map_file:
+            extensions.append("out.map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
         if self.app == Efr32App.UNIT_TEST:
             # Include test runner python wheels
             for root, dirs, files in os.walk(os.path.join(self.output_dir, 'chip_nl_test_runner_wheels')):
                 for file in files:
-                    items["chip_nl_test_runner_wheels/" +
-                          file] = os.path.join(root, file)
+                    yield BuilderOutput(
+                        os.path.join(root, file),
+                        os.path.join("chip_nl_test_runner_wheels", file))
 
         # Figure out flash bundle files and build accordingly
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
-            for line in f.readlines():
-                name = line.strip()
-                items['flashbundle/%s' %
-                      name] = os.path.join(self.output_dir, name)
-
-        return items
+            for name in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, name),
+                    os.path.join("flashbundle", name))
 
     def generate(self):
         cmd = [
@@ -294,6 +299,9 @@ class Efr32Builder(GnBuilder):
 
         if self.options.pw_command_launcher:
             extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
+
+        if self.options.enable_link_map_file:
+            extra_args.append('chip_generate_link_map_file=true')
 
         if self.options.pregen_dir:
             extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)

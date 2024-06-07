@@ -47,3 +47,7 @@
 #define CHIP_CONFIG_MAX_PATHS_PER_INVOKE 5
 
 #define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 1
+
+// Claim a device type while advertising that matches the device type on our
+// endpoint 1.  0x0101 is the "Dimmable Light" device type.
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x0101

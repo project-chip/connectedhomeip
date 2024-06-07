@@ -535,6 +535,7 @@ public:
      */
     void SetCommissionerDeclarationHandler(CommissionerDeclarationHandler * commissionerDeclarationHandler)
     {
+        ChipLogProgress(AppServer, "UserDirectedCommissioningClient::SetCommissionerDeclarationHandler()");
         mCommissionerDeclarationHandler = commissionerDeclarationHandler;
     }
 
