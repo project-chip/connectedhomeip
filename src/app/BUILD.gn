@@ -338,6 +338,8 @@ source_set("command-handler") {
     "CommandHandler.cpp",
     "CommandHandler.h",
     "CommandHandlerExchangeInterface.h",
+    "CommandHandlerImpl.cpp",
+    "CommandHandlerImpl.h",
   ]
 
   public_deps = [

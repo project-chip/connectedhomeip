@@ -37,25 +37,32 @@ import com.matter.casting.core.Endpoint;
 public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
   private static final String TAG =
       ApplicationBasicReadVendorIDExampleFragment.class.getSimpleName();
+  private static final int DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW = 1;
 
   private final CastingPlayer selectedCastingPlayer;
+  private final boolean useCommissionerGeneratedPasscode;
 
   private View.OnClickListener readButtonClickListener;
 
-  public ApplicationBasicReadVendorIDExampleFragment(CastingPlayer selectedCastingPlayer) {
+  public ApplicationBasicReadVendorIDExampleFragment(
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
     this.selectedCastingPlayer = selectedCastingPlayer;
+    this.useCommissionerGeneratedPasscode = useCommissionerGeneratedPasscode;
   }
 
   /**
    * Use this factory method to create a new instance of this fragment using the provided
    * parameters.
    *
-   * @param selectedCastingPlayer CastingPlayer that the casting app connected to
+   * @param selectedCastingPlayer CastingPlayer that the casting app connected to.
+   * @param useCommissionerGeneratedPasscode Boolean indicating whether this CastingPlayer was
+   *     commissioned using the Commissioner-Generated Passcode (CGP) commissioning flow.
    * @return A new instance of fragment ApplicationBasicReadVendorIDExampleFragment.
    */
   public static ApplicationBasicReadVendorIDExampleFragment newInstance(
-      CastingPlayer selectedCastingPlayer) {
-    return new ApplicationBasicReadVendorIDExampleFragment(selectedCastingPlayer);
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
+    return new ApplicationBasicReadVendorIDExampleFragment(
+        selectedCastingPlayer, useCommissionerGeneratedPasscode);
   }
 
   @Override
@@ -68,8 +75,20 @@ public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     this.readButtonClickListener =
         v -> {
-          Endpoint endpoint =
-              EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+          Endpoint endpoint;
+          if (useCommissionerGeneratedPasscode) {
+            // For the example Commissioner-Generated passcode commissioning flow, run demo
+            // interactions with the Endpoint with ID DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW = 1. For this
+            // flow, we commissioned with the Target Content Application with Vendor ID 1111. Since
+            // this target content application does not report its Endpoint's Vendor IDs, we find
+            // the desired endpoint based on the Endpoint ID. See
+            // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
+            endpoint =
+                EndpointSelectorExample.selectEndpointById(
+                    selectedCastingPlayer, DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW);
+          } else {
+            endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+          }
           if (endpoint == null) {
             Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
             return;

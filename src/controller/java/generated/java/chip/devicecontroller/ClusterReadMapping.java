@@ -16610,6 +16610,109 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readThreadNetworkDirectoryInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readThreadNetworkDirectoryPreferredExtendedPanIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDirectoryPreferredExtendedPanIDAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).readPreferredExtendedPanIDAttribute(
+              (ChipClusters.ThreadNetworkDirectoryCluster.PreferredExtendedPanIDAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadNetworkDirectoryClusterPreferredExtendedPanIDAttributeCallback(),
+          readThreadNetworkDirectoryPreferredExtendedPanIDCommandParams
+        );
+        result.put("readPreferredExtendedPanIDAttribute", readThreadNetworkDirectoryPreferredExtendedPanIDAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDirectoryThreadNetworksCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDirectoryThreadNetworksAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).readThreadNetworksAttribute(
+              (ChipClusters.ThreadNetworkDirectoryCluster.ThreadNetworksAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadNetworkDirectoryClusterThreadNetworksAttributeCallback(),
+          readThreadNetworkDirectoryThreadNetworksCommandParams
+        );
+        result.put("readThreadNetworksAttribute", readThreadNetworkDirectoryThreadNetworksAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDirectoryThreadNetworkTableSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDirectoryThreadNetworkTableSizeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).readThreadNetworkTableSizeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readThreadNetworkDirectoryThreadNetworkTableSizeCommandParams
+        );
+        result.put("readThreadNetworkTableSizeAttribute", readThreadNetworkDirectoryThreadNetworkTableSizeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDirectoryGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDirectoryGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ThreadNetworkDirectoryCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadNetworkDirectoryClusterGeneratedCommandListAttributeCallback(),
+          readThreadNetworkDirectoryGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readThreadNetworkDirectoryGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDirectoryAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDirectoryAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ThreadNetworkDirectoryCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadNetworkDirectoryClusterAcceptedCommandListAttributeCallback(),
+          readThreadNetworkDirectoryAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readThreadNetworkDirectoryAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDirectoryEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDirectoryEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).readEventListAttribute(
+              (ChipClusters.ThreadNetworkDirectoryCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadNetworkDirectoryClusterEventListAttributeCallback(),
+          readThreadNetworkDirectoryEventListCommandParams
+        );
+        result.put("readEventListAttribute", readThreadNetworkDirectoryEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDirectoryAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDirectoryAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ThreadNetworkDirectoryCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadNetworkDirectoryClusterAttributeListAttributeCallback(),
+          readThreadNetworkDirectoryAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readThreadNetworkDirectoryAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDirectoryFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDirectoryFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readThreadNetworkDirectoryFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readThreadNetworkDirectoryFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDirectoryClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDirectoryClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDirectoryCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readThreadNetworkDirectoryClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readThreadNetworkDirectoryClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readWakeOnLanInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWakeOnLanMACAddressCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWakeOnLanMACAddressAttributeInteractionInfo = new InteractionInfo(
@@ -20670,6 +20773,7 @@ public class ClusterReadMapping {
             put("totalVolatileOrganicCompoundsConcentrationMeasurement", readTotalVolatileOrganicCompoundsConcentrationMeasurementInteractionInfo());
             put("radonConcentrationMeasurement", readRadonConcentrationMeasurementInteractionInfo());
             put("wiFiNetworkManagement", readWiFiNetworkManagementInteractionInfo());
+            put("threadNetworkDirectory", readThreadNetworkDirectoryInteractionInfo());
             put("wakeOnLan", readWakeOnLanInteractionInfo());
             put("channel", readChannelInteractionInfo());
             put("targetNavigator", readTargetNavigatorInteractionInfo());
