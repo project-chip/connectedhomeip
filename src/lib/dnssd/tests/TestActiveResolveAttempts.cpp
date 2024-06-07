@@ -126,9 +126,6 @@ TEST(TestActiveResolveAttempts, TestSingleBrowseAddRemove)
     EXPECT_EQ(attempts.GetTimeUntilNextExpectedResponse(), std::make_optional<Timeout>(1900_ms32));
 
     // once complete, nothing to schedule
-    Dnssd::DiscoveredNodeData data;
-    data.Set<chip::Dnssd::CommissionNodeData>();
-    data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator = 1234;
     attempts.CompleteAllBrowses();
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().has_value());
     EXPECT_FALSE(attempts.NextScheduled().has_value());
@@ -377,9 +374,6 @@ TEST(TestActiveResolveAttempts, TestCombination)
     // Complete all, we should see no more scheduled.
     attempts.Complete(MakePeerId(2));
     attempts.Complete(MakePeerId(1));
-    Dnssd::DiscoveredNodeData data;
-    data.Set<chip::Dnssd::CommissionNodeData>();
-    data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator = 1234;
     attempts.CompleteAllBrowses();
 
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().has_value());
