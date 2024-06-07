@@ -107,6 +107,39 @@ public:
                                        Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload,
                                        bool readVIDPIDAttributes = false);
 
+    /**
+     * @brief
+     *   Try to look up the bridged device on the bridge with the given node id
+     *   of the bridge and endpoint id of the bridged device and ask it to re-enter
+     *   commissioning mode with a PASE verifier derived from the given information
+     *   and the given discriminator. The bridged device will exit commissioning mode
+     *   after a successful commissioning, or after the given `timeout` time.
+     *
+     * @param[in] deviceId      The device Id of the bridge.
+     * @param[in] endpoinId     The endpoint Id of the bridged node on the bridge.*
+     * @param[in] timeout       The commissioning mode should terminate after this much time.
+     * @param[in] iteration     The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+     *                          PAKE passcode verifier to be used for this commissioning.
+     * @param[in] discriminator The long discriminator for the DNS-SD advertisement.
+     * @param[in] setupPIN      The setup PIN to use, or NullOptional to use a randomly-generated one.
+     * @param[in] salt          The salt to use, or NullOptional to use a
+     *                          randomly-generated one.  If provided, must be at
+     *                          least kSpake2p_Min_PBKDF_Salt_Length bytes and
+     *                          at most kSpake2p_Max_PBKDF_Salt_Length bytes in
+     *                          length.
+     * @param[in] callback      The function to be called on success or failure of opening of commissioning window.
+     * @param[out] payload      The setup payload, not including the VID/PID bits,
+     *                          even if those were asked for, that is generated
+     *                          based on the passed-in information.  The payload
+     *                          provided to the callback function, unlike this
+     *                          out parameter, will include the VID/PID bits if
+     *                          readVIDPIDAttributes is true.
+     *
+     */
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, EndpointId endpointId, System::Clock::Seconds16 timeout, uint32_t iteration,
+                                       uint16_t discriminator, Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
+                                       Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload);
+
 private:
     enum class Step : uint8_t
     {
@@ -120,6 +153,10 @@ private:
         kOpenCommissioningWindow,
     };
 
+    CHIP_ERROR OpenCommissioningWindowImpl(NodeId deviceId, EndpointId endpointId, System::Clock::Seconds16 timeout,
+                                           uint32_t iteration, uint16_t discriminator, Optional<uint32_t> setupPIN,
+                                           Optional<ByteSpan> salt, Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                           SetupPayload & payload, bool readVIDPIDAttributes);
     CHIP_ERROR OpenCommissioningWindowInternal(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnPIDReadResponse(void * context, uint16_t value);
     static void OnVIDReadResponse(void * context, VendorId value);
@@ -137,6 +174,7 @@ private:
     Callback::Callback<OnOpenBasicCommissioningWindow> * mBasicCommissioningWindowCallback = nullptr;
     SetupPayload mSetupPayload;
     NodeId mNodeId                                       = kUndefinedNodeId;
+    EndpointId mEndpointId                               = kInvalidEndpointId;
     System::Clock::Seconds16 mCommissioningWindowTimeout = System::Clock::kZero;
     CommissioningWindowOption mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
     Crypto::Spake2pVerifier mVerifier; // Used for non-basic commissioning.

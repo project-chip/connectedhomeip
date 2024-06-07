@@ -47,6 +47,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId device
     mBasicCommissioningWindowCallback = callback;
     mCommissioningWindowCallback      = nullptr;
     mNodeId                           = deviceId;
+    mEndpointId                       = kRootEndpointId;
     mCommissioningWindowTimeout       = timeout;
 
     mNextStep = Step::kOpenCommissioningWindow;
@@ -58,6 +59,28 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
                                                               Optional<ByteSpan> salt,
                                                               Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                               SetupPayload & payload, bool readVIDPIDAttributes)
+{
+    return OpenCommissioningWindowImpl(deviceId, kRootEndpointId, timeout, iteration, discriminator, setupPIN, salt, callback,
+                                       payload, readVIDPIDAttributes);
+}
+
+CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, EndpointId endpointId, Seconds16 timeout,
+                                                              uint32_t iteration, uint16_t discriminator,
+                                                              Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
+                                                              Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                                              SetupPayload & payload)
+{
+
+    VerifyOrReturnError(endpointId != kRootEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+    return OpenCommissioningWindowImpl(deviceId, endpointId, timeout, iteration, discriminator, setupPIN, salt, callback, payload,
+                                       false);
+}
+
+CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowImpl(NodeId deviceId, EndpointId endpointId, Seconds16 timeout,
+                                                                  uint32_t iteration, uint16_t discriminator,
+                                                                  Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
+                                                                  Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                                                  SetupPayload & payload, bool readVIDPIDAttributes)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
 
@@ -103,6 +126,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
     mCommissioningWindowCallback      = callback;
     mBasicCommissioningWindowCallback = nullptr;
     mNodeId                           = deviceId;
+    mEndpointId                       = endpointId;
     mCommissioningWindowTimeout       = timeout;
     mPBKDFIterations                  = iteration;
 
@@ -129,9 +153,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
 {
     ChipLogProgress(Controller, "OpenCommissioningWindow for device ID 0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
-    constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
-
-    ClusterBase cluster(exchangeMgr, sessionHandle, kAdministratorCommissioningClusterEndpoint);
+    ClusterBase cluster(exchangeMgr, sessionHandle, mEndpointId);
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
