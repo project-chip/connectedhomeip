@@ -33,3 +33,6 @@ jobs:
         run: python scripts/helpers/poll_quick_ci.py ${{ github.event.number }} Summary
       - name: Review Restyled Status
         run: python scripts/helpers/poll_quick_ci.py ${{ github.event.number }} restyled
+      - name: Stop on Fail
+        if: ${{ failure() }}
+        uses: andymckay/cancel-action@0.4
