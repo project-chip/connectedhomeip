@@ -40,16 +40,8 @@ tests:
           constraints:
               type: MeterTypeEnum
 
-    - label: "Step 3: TH reads the MeterInstallation attribute from the DUT"
+    - label: "Step 3: TH reads the CustomerName attribute from the DUT"
       PICS: MTRID.S.A0001
-      command: "readAttribute"
-      attribute: "MeterInstallation"
-      response:
-          constraints:
-              type: MeterInstallationEnum
-
-    - label: "Step 4: TH reads the CustomerName attribute from the DUT"
-      PICS: MTRID.S.A0002
       command: "readAttribute"
       attribute: "CustomerName"
       response:
@@ -57,15 +49,15 @@ tests:
               type: char_string
               maxLength: 64
 
-    - label: "Step 4a: TH writes CustomerName attribute as CUSTOMERNAME"
-      PICS: MTRID.S.M.CustomerNameAttributeWritable && MTRID.S.A0002
+    - label: "Step 3a: TH writes CustomerName attribute as CUSTOMERNAME"
+      PICS: MTRID.S.M.CustomerNameAttributeWritable && MTRID.S.A0001
       command: "writeAttribute"
       attribute: "CustomerName"
       arguments:
           value: "CUSTOMERNAME"
 
-    - label: "Step 4a: TH writes CustomerName attribute as CUSTOMERNAME"
-      PICS: " !MTRID.S.M.CustomerNameAttributeWritable && MTRID.S.A0002 "
+    - label: "Step 3a: TH writes CustomerName attribute as CUSTOMERNAME"
+      PICS: " !MTRID.S.M.CustomerNameAttributeWritable && MTRID.S.A0001 "
       command: "writeAttribute"
       attribute: "CustomerName"
       arguments:
@@ -73,15 +65,15 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "Step 4b: TH reads CustomerName attribute from DUT"
-      PICS: MTRID.S.M.CustomerNameAttributeWritable && MTRID.S.A0002
+    - label: "Step 3b: TH reads CustomerName attribute from DUT"
+      PICS: MTRID.S.M.CustomerNameAttributeWritable && MTRID.S.A0001
       command: "readAttribute"
       attribute: "CustomerName"
       response:
           value: "CUSTOMERNAME"
 
-    - label: "Step 5: TH reads UtilityName attribute from DUT"
-      PICS: MTRID.S.A0003
+    - label: "Step 4: TH reads UtilityName attribute from DUT"
+      PICS: MTRID.S.A0002
       command: "readAttribute"
       attribute: "UtilityName"
       response:
@@ -89,8 +81,8 @@ tests:
               type: char_string
               maxLength: 16
 
-    - label: "Step 6: TH reads PointOfDelivery attribute from DUT"
-      PICS: MTRID.S.A0004
+    - label: "Step 5: TH reads PointOfDelivery attribute from DUT"
+      PICS: MTRID.S.A0003
       command: "readAttribute"
       attribute: "PointOfDelivery"
       response:
@@ -98,8 +90,8 @@ tests:
               type: char_string
               maxLength: 16
 
-    - label: "Step 7: TH reads PowerThreshold attribute from DUT"
-      PICS: MTRID.S.A0005
+    - label: "Step 6: TH reads PowerThreshold attribute from DUT"
+      PICS: MTRID.S.A0004
       command: "readAttribute"
       attribute: "PowerThreshold"
       response:
@@ -107,7 +99,7 @@ tests:
               type: power-mW
 
     - label: "Step 7: TH reads PowerThresholdSourse attribute from DUT"
-      PICS: MTRID.S.A0006
+      PICS: MTRID.S.A0005
       command: "readAttribute"
       attribute: "PowerThresholdSourse"
       response:
