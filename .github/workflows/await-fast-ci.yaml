@@ -19,7 +19,7 @@ on:
   workflow_call:
 
 env:
-  GH_TOKEN: ${{ secrets.JOB_CANCEL_PAT }}
+  GITHUB_TOKEN: ${{ secrets.JOB_CANCEL_PAT }}
 
 jobs:
   wait-for-fast-ci:
