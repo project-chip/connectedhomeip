@@ -35,28 +35,28 @@ limitations under the License.
   <!-- Data types -->
   <struct name="LocationInfoStruct">
     <cluster code="0x0150"/>
-    <item name="HomeLocationInfo"  type="HomeLocationStruct"    optional="false" isNullable="true"/>
-    <item name="LandmarkTag"       type="LandmarkTag"           optional="false" isNullable="true"/>
-    <item name="PositionTag"       type="PositionTag"           optional="false" isNullable="true"/>
-    <item name="SurfaceTag"        type="FloorSurfaceTag"       optional="false" isNullable="true"/>
+    <item name="LocationInfo"  type="HomeLocationStruct"    optional="false" isNullable="true"/>
+    <item name="LandmarkTag"   type="LandmarkTag"           optional="false" isNullable="true"/>
+    <item name="PositionTag"   type="PositionTag"           optional="false" isNullable="true"/>
+    <item name="SurfaceTag"    type="FloorSurfaceTag"       optional="false" isNullable="true"/>
   </struct>
 
   <struct name="MapStruct">
     <cluster code="0x0150"/>
-    <item name="MapId"   type="int8u"                   optional="false"/>
+    <item name="MapID"   type="int8u"                   optional="false"/>
     <item name="Name"    type="char_string" length="64" optional="false"/>
   </struct>
 
   <struct name="LocationStruct">
     <cluster code="0x0150"/>
-    <item name="LocationId"   type="int32u"                  optional="false" isNullable="false"/>
-    <item name="MapId"        type="int8u"                   optional="false" isNullable="true"/>
+    <item name="LocationID"   type="int32u"                  optional="false" isNullable="false"/>
+    <item name="MapID"        type="int8u"                   optional="false" isNullable="true"/>
     <item name="LocationInfo" type="LocationInfoStruct"      optional="false" isNullable="false"/>
   </struct>
 
   <struct name="ProgressStruct">
     <cluster code="0x0150"/>
-    <item name="LocationId"             type="int32u"                 optional="false"/>
+    <item name="LocationID"             type="int32u"                 optional="false"/>
     <item name="Status"                 type="OperationalStatusEnum"  optional="false"/>
     <item name="TotalOperationalTime"   type="elapsed_s"              optional="true" isNullable="true"/>
     <item name="EstimatedTime"          type="elapsed_s"              optional="true" isNullable="true"/>
@@ -73,7 +73,7 @@ limitations under the License.
   </enum>
 
   <!-- Enum definitions for skip location command response-->
-  <enum name="SkipCurrentStatus" type="enum8">
+  <enum name="SkipCurrentLocationStatus" type="enum8">
     <cluster code="0x0150"/>
     <item value="0x00" name="Success"/>
     <item value="0x01" name="InvalidLocationList"/>
@@ -91,7 +91,7 @@ limitations under the License.
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="SupportedLocations"  type="array"     entryType="LocationStruct"  writable="false" isNullable="false" optional="false">SupportedLocations</attribute>
     <attribute side="server" code="0x0001" define="SupportedMaps"       type="array"     entryType="MapStruct"       writable="false" isNullable="true"  optional="false">SupportedMaps</attribute>
-    <attribute side="server" code="0x0002" define="SelectedLocations"   type="array"     entryType="int32u"          writable="false" isNullable="true"  optional="false" scene="true">SelectedLocations</attribute>
+    <attribute side="server" code="0x0002" define="SelectedLocations"   type="array"     entryType="int32u"          writable="false" isNullable="true"  optional="false">SelectedLocations</attribute>
     <attribute side="server" code="0x0003" define="CurrentLocation"     type="int32u"                                writable="false" isNullable="true"  optional="true">CurrentLocation</attribute>
     <attribute side="server" code="0x0004" define="EstimatedEndTime"    type="epoch_s"                               writable="false" isNullable="true"  optional="true" >EstimatedEndTime</attribute>
     <attribute side="server" code="0x0005" define="Progress"            type="array"     entryType="ProgressStruct"  writable="false" isNullable="true"  optional="true">Progress</attribute>
@@ -109,21 +109,21 @@ limitations under the License.
         This command is sent by the device on receipt of the SelectLocations command.
       </description>
       <arg name="Status"     type="SelectLocationsStatus"     optional="false"/>
-      <arg name="StatusText" type="char_string"  length="256" optional="false"/>
+      <arg name="StatusText" type="char_string"  length="256" optional="true"/>
     </command>
 
-    <command source="client" code="0x02" name="SkipCurrent" response="SkipCurrentResponse" optional="true">
+    <command source="client" code="0x02" name="SkipCurrentLocation" response="SkipCurrentLocationResponse" optional="true">
       <description>
         This command is used to skip the current location where the device operates.
       </description>
     </command>
 
-    <command source="server" code="0x03" name="SkipCurrentResponse" disableDefaultResponse="true" optional="true">
+    <command source="server" code="0x03" name="SkipCurrentLocationResponse" disableDefaultResponse="true" optional="true">
       <description>
         This command is sent by the device on receipt of the SelectLocations command.
       </description>
       <arg name="Status"     type="SkipCurrentStatus"              optional="false"/>
-      <arg name="StatusText" type="char_string"       length="256" optional="false"/>
+      <arg name="StatusText" type="char_string"       length="256" optional="true"/>
     </command>
 
   </cluster>
