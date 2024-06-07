@@ -128,7 +128,7 @@ void ICDMonitoringEntry::Clear()
     this->checkInNodeID    = kUndefinedNodeId;
     this->monitoredSubject = kUndefinedNodeId;
     this->keyHandleValid   = false;
-    this->clientType       = 0;
+    this->clientType       = app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
 }
 
 CHIP_ERROR ICDMonitoringEntry::SetKey(ByteSpan keyData)

@@ -21,6 +21,7 @@
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <lib/core/ClusterEnums.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -51,7 +52,8 @@ static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider)
+                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider,
+                      AddressResolve::Resolver * addressResolver)
 {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     VerifyOrDie(storage != nullptr);
@@ -59,6 +61,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(symmetricKeystore != nullptr);
     VerifyOrDie(exchangeManager != nullptr);
     VerifyOrDie(subInfoProvider != nullptr);
+    VerifyOrDie(addressResolver != nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 #if CHIP_CONFIG_ENABLE_ICD_LIT
@@ -86,6 +89,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     mSymmetricKeystore = symmetricKeystore;
     mExchangeManager   = exchangeManager;
     mSubInfoProvider   = subInfoProvider;
+    mAddressResolver   = addressResolver;
 
     VerifyOrDie(ICDConfigurationData::GetInstance().GetICDCounter().Init(mStorage, DefaultStorageKeyAllocator::ICDCheckInCounter(),
                                                                          ICDConfigurationData::kICDCounterPersistenceIncrement) ==
@@ -113,6 +117,7 @@ void ICDManager::Shutdown()
     mStorage         = nullptr;
     mFabricTable     = nullptr;
     mSubInfoProvider = nullptr;
+    mAddressResolver = nullptr;
     mICDSenderPool.ReleaseAll();
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
@@ -187,6 +192,13 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
+            if (entry.clientType == static_cast<uint8_t>(ClientTypeEnum::kEphemeral))
+            {
+                // If the registered client is ephemeral, do not send a Check-In message
+                // continue to next entry
+                continue;
+            }
+
             if (!ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
@@ -205,7 +217,7 @@ void ICDManager::SendCheckInMsgs()
 
             // SenderPool will be released upon transition from active to idle state
             // This will happen when all ICD Check-In messages are sent on the network
-            ICDCheckInSender * sender = mICDSenderPool.CreateObject(mExchangeManager);
+            ICDCheckInSender * sender = mICDSenderPool.CreateObject(mExchangeManager, mAddressResolver);
             VerifyOrReturn(sender != nullptr, ChipLogError(AppServer, "Failed to allocate ICDCheckinSender"));
 
             if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable, counterValue))

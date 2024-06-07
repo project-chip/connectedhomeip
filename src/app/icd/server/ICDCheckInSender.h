@@ -31,8 +31,8 @@ namespace app {
 class ICDCheckInSender : public AddressResolve::NodeListener
 {
 public:
-    ICDCheckInSender(Messaging::ExchangeManager * exchangeManager);
-    ~ICDCheckInSender(){};
+    ICDCheckInSender(Messaging::ExchangeManager * exchangeManager, AddressResolve::Resolver * mAddressResolver);
+    ~ICDCheckInSender() = default;
 
     CHIP_ERROR RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable, uint32_t counter);
 
@@ -50,6 +50,7 @@ private:
     // This is used when a node address is required.
     AddressResolve::NodeLookupHandle mAddressLookupHandle;
 
+    AddressResolve::Resolver * mAddressResolver   = nullptr;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
     Crypto::Aes128KeyHandle mAes128KeyHandle   = Crypto::Aes128KeyHandle();
