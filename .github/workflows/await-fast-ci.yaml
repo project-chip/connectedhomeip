@@ -39,5 +39,5 @@ jobs:
           -X POST \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           -H "Accept: application/vnd.github.v3+json" \
-          -H "Authorization: Bearer ${{ secrets.JOB_CANCEL_PAT }}" \
+          -H "Authorization: Bearer ${{ github.token }}" \
           "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/${{ github.run_id }}/cancel"
