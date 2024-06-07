@@ -951,7 +951,7 @@ void DoorLockServer::clearCredentialCommandHandler(
     }
 
     commandObj->AddStatus(commandPath,
-                          clearCredential(commandPath.mEndpointId, modifier, sourceNodeId, credentialType, credentialIndex, false));
+                          clearCredential(commandPath.mEndpointId, modifier, sourceNodeId, credentialType, credentialIndex, true));
 }
 
 void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
