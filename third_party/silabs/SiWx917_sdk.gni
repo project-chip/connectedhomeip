@@ -386,7 +386,6 @@ template("siwx917_sdk") {
           "SLI_MAC_DEVICE_SI91X=1",
           "SLI_SHA_DEVICE_SI91X=1",
           "SLI_TRNG_DEVICE_SI91X=1",
-          "SLI_ECDSA_DEVICE_SI91X=1",
           "SLI_SECURE_KEY_STORAGE_DEVICE_SI91X=1",
         ]
 

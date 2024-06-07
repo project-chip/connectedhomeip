@@ -75,6 +75,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
     return 0;
 }
+#endif // !SLI_SI91X_MCU_INTERFACE
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
@@ -91,9 +92,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
+#if !(SLI_SI91X_MCU_INTERFACE)
     // 16 : Threshold value
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
-
+#endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
     VerifyOrExit(sys_mutex_new(&rngMutexHandle) == ERR_OK, err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
