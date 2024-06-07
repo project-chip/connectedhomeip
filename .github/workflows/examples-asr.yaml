@@ -30,7 +30,8 @@ env:
     
 jobs:
     await-fast-ci:
-        permissions: write-all
+        env:
+            GITHUB_TOKEN: ${{ secrets.JOB_CANCEL_PAT }}
         name: Await Fast CI
         runs-on: ubuntu-latest
         steps:
