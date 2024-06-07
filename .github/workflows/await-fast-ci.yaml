@@ -23,7 +23,7 @@ jobs:
     name: Wait For Fast CI to Pass
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.JOB_CANCEL_PAT }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - name: Review Contributor License Agreement Status
