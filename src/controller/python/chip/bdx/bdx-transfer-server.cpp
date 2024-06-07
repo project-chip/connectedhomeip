@@ -30,15 +30,13 @@ CHIP_ERROR BdxTransferServer::Init(Messaging::ExchangeManager * exchangeManager)
 {
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mExchangeManager = exchangeManager;
-    ReturnOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::ReceiveAccept, this));
-    return mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::SendAccept, this);
+    return mExchangeManager->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 }
 
 void BdxTransferServer::Shutdown()
 {
     VerifyOrReturn(mExchangeManager != nullptr);
-    LogErrorOnFailure(mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::ReceiveAccept));
-    LogErrorOnFailure(mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendAccept));
+    LogErrorOnFailure(mExchangeManager->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id));
     mExchangeManager = nullptr;
 }
 
