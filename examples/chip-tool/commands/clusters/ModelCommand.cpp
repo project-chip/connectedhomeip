@@ -76,12 +76,28 @@ void ModelCommand::Shutdown()
     CHIPCommand::Shutdown();
 }
 
-void ModelCommand::ClearICDEntry(const chip::ScopedNodeId & nodeId)
+void ModelCommand::ClearICDEntry(const ScopedNodeId & nodeId)
 {
     CHIP_ERROR deleteEntryError = CHIPCommand::sICDClientStorage.DeleteEntry(nodeId);
     if (deleteEntryError != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "Failed to delete ICD entry: %" CHIP_ERROR_FORMAT, deleteEntryError.Format());
+    }
+}
+
+void ModelCommand::StoreICDEntryWithKey(app::ICDClientInfo & clientInfo, ByteSpan key)
+{
+    CHIP_ERROR err = CHIPCommand::sICDClientStorage.SetKey(clientInfo, key);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = CHIPCommand::sICDClientStorage.StoreEntry(clientInfo);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
+        ChipLogError(chipTool, "Failed to persist symmetric key with error: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
     }
 }
 

@@ -19,6 +19,14 @@
 #include "chef-concentration-measurement.h"
 #endif
 
+#if defined(MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER) || defined(MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER)
+#include "chef-rvc-mode-delegate.h"
+#endif
+
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+#include "chef-rvc-operational-state-delegate.h"
+#endif
+
 using chip::app::DataModel::Nullable;
 
 using namespace chip;
@@ -56,6 +64,18 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::RadonConcentrationMeasurement::Id:
     case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
         return chefConcentrationMeasurementReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+    case chip::app::Clusters::RvcRunMode::Id:
+        return chefRvcRunModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+    case chip::app::Clusters::RvcCleanMode::Id:
+        return chefRvcCleanModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+    case chip::app::Clusters::RvcOperationalState::Id:
+        return chefRvcOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
     default:
         break;
@@ -104,6 +124,18 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::RadonConcentrationMeasurement::Id:
     case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
         return chefConcentrationMeasurementWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+    case chip::app::Clusters::RvcRunMode::Id:
+        return chefRvcRunModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+    case chip::app::Clusters::RvcCleanMode::Id:
+        return chefRvcCleanModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+    case chip::app::Clusters::RvcOperationalState::Id:
+        return chefRvcOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
     default:
         break;
