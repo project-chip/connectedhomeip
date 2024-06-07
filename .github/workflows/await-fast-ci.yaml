@@ -34,10 +34,9 @@ jobs:
         run: python scripts/helpers/poll_quick_ci.py ${{ github.event.number }} restyled
       - name: Stop on Fail
         if: ${{ failure() }}
-        run: |-
-          curl \
-          -X POST \
+        run: |
+          gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -H "Authorization: Bearer ${{ github.token }}" \
-          "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/${{ github.run_id }}/cancel"
+          /repos/project-chip/connectedhomeip/actions/runs/RUN_ID/cancel
