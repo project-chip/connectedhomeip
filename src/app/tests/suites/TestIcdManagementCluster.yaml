@@ -195,6 +195,8 @@ tests:
                 value: 1001
               - name: "Key"
                 value: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e"
+              - name: "ClientType"
+                value: 0
       response:
           error: CONSTRAINT_ERROR
 
@@ -208,6 +210,8 @@ tests:
                 value: 1001
               - name: "Key"
                 value: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\xff"
+              - name: "ClientType"
+                value: 0
       response:
           error: CONSTRAINT_ERROR
 
@@ -221,6 +225,8 @@ tests:
                 value: 1001
               - name: "Key"
                 value: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+              - name: "ClientType"
+                value: 0
       response:
           values:
               - name: "ICDCounter"
@@ -260,6 +266,8 @@ tests:
                 value: 3001
               - name: "Key"
                 value: "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
+              - name: "ClientType"
+                value: 0
       response:
           error: RESOURCE_EXHAUSTED
 

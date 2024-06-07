@@ -202,7 +202,7 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
 
                 Structs::MonitoringRegistrationStruct::Type s{ .checkInNodeID    = e.checkInNodeID,
                                                                .monitoredSubject = e.monitoredSubject,
-                                                               .clientType       = ClientTypeEnum(e.clientType),
+                                                               .clientType       = e.clientType,
                                                                .fabricIndex      = e.fabricIndex };
                 ReturnErrorOnFailure(subEncoder.Encode(s));
             }
@@ -250,13 +250,13 @@ CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & c
 Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                            const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)
 {
-    FabricIndex fabricIndex             = commandObj->GetAccessingFabricIndex();
-    NodeId nodeId                       = commandData.checkInNodeID;
-    uint64_t monitoredSubject           = commandData.monitoredSubject;
-    Optional<ClientTypeEnum> clientType = commandData.clientType;
-    ByteSpan key                        = commandData.key;
-    Optional<ByteSpan> verificationKey  = commandData.verificationKey;
-    bool isClientAdmin                  = false;
+    FabricIndex fabricIndex            = commandObj->GetAccessingFabricIndex();
+    NodeId nodeId                      = commandData.checkInNodeID;
+    uint64_t monitoredSubject          = commandData.monitoredSubject;
+    ClientTypeEnum clientType          = commandData.clientType;
+    ByteSpan key                       = commandData.key;
+    Optional<ByteSpan> verificationKey = commandData.verificationKey;
+    bool isClientAdmin                 = false;
 
     // Check if client is admin
     VerifyOrReturnError(CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, isClientAdmin), InteractionModel::Status::Failure);
@@ -293,7 +293,7 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
     // Save
     entry.checkInNodeID    = nodeId;
     entry.monitoredSubject = monitoredSubject;
-    entry.clientType       = clientType.ValueOr(ClientTypeEnum::kPermanent);
+    entry.clientType       = clientType;
 
     if (entry.keyHandleValid)
     {
