@@ -17,12 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0150" />
-    <field name="ListOrder"           mask="0x01" />
-    <field name="SelectWhileRunning"  mask="0x02" />
-  </bitmap>
-
   <!-- Enum definitions for structures-->
   <enum name="OperationalStatusEnum" type="enum8">
     <cluster code="0x0150"/>
@@ -84,9 +78,17 @@ limitations under the License.
   <cluster>
     <domain>General</domain>
     <name>Service Area</name>
-      <code>0x0150</code>
-    <define>SERVICE_AREA_CLUSTER</define>
     <description>The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location.</description>
+    <code>0x0150</code>
+    <define>SERVICE_AREA_CLUSTER</define>
+
+    <features>
+      <feature bit="0" code="LISTORDER" name="ListOrder" summary="The device operates at the selected locations in the list order">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected locations while running">
+        <optionalConform/>
+    </feature>
 
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="SupportedLocations"  type="array"     entryType="LocationStruct"  writable="false" isNullable="false" optional="false">SupportedLocations</attribute>
