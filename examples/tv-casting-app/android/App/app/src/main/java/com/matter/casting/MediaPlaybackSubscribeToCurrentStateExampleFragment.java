@@ -40,26 +40,33 @@ import java.util.Date;
 public class MediaPlaybackSubscribeToCurrentStateExampleFragment extends Fragment {
   private static final String TAG =
       MediaPlaybackSubscribeToCurrentStateExampleFragment.class.getSimpleName();
+  private static final int DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW = 1;
 
   private final CastingPlayer selectedCastingPlayer;
+  private final boolean useCommissionerGeneratedPasscode;
 
   private View.OnClickListener subscribeButtonClickListener;
   private View.OnClickListener shutdownSubscriptionsButtonClickListener;
 
-  public MediaPlaybackSubscribeToCurrentStateExampleFragment(CastingPlayer selectedCastingPlayer) {
+  public MediaPlaybackSubscribeToCurrentStateExampleFragment(
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
     this.selectedCastingPlayer = selectedCastingPlayer;
+    this.useCommissionerGeneratedPasscode = useCommissionerGeneratedPasscode;
   }
 
   /**
    * Use this factory method to create a new instance of this fragment using the provided
    * parameters.
    *
-   * @param selectedCastingPlayer CastingPlayer that the casting app connected to
+   * @param selectedCastingPlayer CastingPlayer that the casting app connected to.
+   * @param useCommissionerGeneratedPasscode Boolean indicating whether this CastingPlayer was
+   *     commissioned using the Commissioner-Generated Passcode (CGP) commissioning flow.
    * @return A new instance of fragment MediaPlaybackSubscribeToCurrentStateExampleFragment.
    */
   public static MediaPlaybackSubscribeToCurrentStateExampleFragment newInstance(
-      CastingPlayer selectedCastingPlayer) {
-    return new MediaPlaybackSubscribeToCurrentStateExampleFragment(selectedCastingPlayer);
+      CastingPlayer selectedCastingPlayer, boolean useCommissionerGeneratedPasscode) {
+    return new MediaPlaybackSubscribeToCurrentStateExampleFragment(
+        selectedCastingPlayer, useCommissionerGeneratedPasscode);
   }
 
   @Override
@@ -70,7 +77,14 @@ public class MediaPlaybackSubscribeToCurrentStateExampleFragment extends Fragmen
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    Endpoint endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+    Endpoint endpoint;
+    if (useCommissionerGeneratedPasscode) {
+      endpoint =
+          EndpointSelectorExample.selectEndpointById(
+              selectedCastingPlayer, DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW);
+    } else {
+      endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
+    }
     if (endpoint == null) {
       Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
       return inflater.inflate(

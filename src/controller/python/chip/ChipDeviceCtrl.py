@@ -1591,11 +1591,6 @@ class ChipDeviceControllerBase():
         else:
             return res.events
 
-    def SetBlockingCB(self, blockingCB):
-        self.CheckIsActive()
-
-        self._ChipStack.blockingCB = blockingCB
-
     def SetIpk(self, ipk: bytes):
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetIpk(self.devCtrl, ipk, len(ipk))

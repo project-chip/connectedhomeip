@@ -28,6 +28,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/AppConfig.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
@@ -115,6 +116,19 @@ constexpr CommandId kTestCommandIdFillResponseMessage     = 7;
 constexpr CommandId kTestNonExistCommandId                = 0;
 
 const app::CommandSender::TestOnlyMarker kCommandSenderTestOnlyMarker;
+
+class SimpleTLVPayload : public app::DataModel::EncodableToTLV
+{
+public:
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+    {
+        TLV::TLVType outerType;
+        EXPECT_EQ(writer.StartContainer(tag, TLV::kTLVType_Structure, outerType), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.PutBoolean(chip::TLV::ContextTag(1), true), CHIP_NO_ERROR);
+        return writer.EndContainer(outerType);
+    }
+};
+
 } // namespace
 
 namespace app {
@@ -221,10 +235,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
     }
 
     TLV::TLVType outerContainerType;
-    CHIP_ERROR err = aReader.EnterContainer(outerContainerType);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(aReader.EnterContainer(outerContainerType), CHIP_NO_ERROR);
 
-    err = aReader.Next();
+    CHIP_ERROR err = aReader.Next();
     if (aRequestCommandPath.mCommandId == kTestCommandIdNoData)
     {
         EXPECT_EQ(err, CHIP_ERROR_END_OF_TLV);
@@ -233,14 +246,13 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
     {
         EXPECT_EQ(err, CHIP_NO_ERROR);
         EXPECT_EQ(aReader.GetTag(), TLV::ContextTag(1));
+
         bool val;
-        err = aReader.Get(val);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(aReader.Get(val), CHIP_NO_ERROR);
         EXPECT_TRUE(val);
     }
 
-    err = aReader.ExitContainer(outerContainerType);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(aReader.ExitContainer(outerContainerType), CHIP_NO_ERROR);
 
     if (asyncCommand)
     {
@@ -256,12 +268,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
         }
         else
         {
-            const CommandHandler::InvokeResponseParameters prepareParams(aRequestCommandPath);
-            const ConcreteCommandPath responseCommandPath = aRequestCommandPath;
-            apCommandObj->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
-            chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataIBTLVWriter();
-            writer->PutBoolean(chip::TLV::ContextTag(1), true);
-            apCommandObj->FinishCommand();
+            SimpleTLVPayload payloadWriter;
+            apCommandObj->AddResponse(aRequestCommandPath, aRequestCommandPath.mCommandId, payloadWriter);
         }
     }
 
@@ -358,11 +366,12 @@ public:
     bool mResponseDropped = false;
 };
 
-class MockCommandHandlerCallback : public CommandHandler::Callback
+class MockCommandHandlerCallback : public CommandHandlerImpl::Callback
 {
 public:
-    void OnDone(CommandHandler & apCommandHandler) final { onFinalCalledTimes++; }
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) final
+    void OnDone(CommandHandlerImpl & apCommandHandler) final { onFinalCalledTimes++; }
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                         TLV::TLVReader & apPayload) final
     {
         DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
     }
@@ -440,17 +449,19 @@ public:
      * we want to test APIs that cluster code uses, we need to inject entries into the
      * CommandPathRegistry directly.
      */
-    class CommandHandlerWithUnrespondedCommand : public app::CommandHandler
+    class CommandHandlerWithUnrespondedCommand : public app::CommandHandlerImpl
     {
     public:
-        CommandHandlerWithUnrespondedCommand(CommandHandler::Callback * apCallback, const ConcreteCommandPath & aRequestCommandPath,
-                                             const Optional<uint16_t> & aRef) :
-            CommandHandler(apCallback)
+        CommandHandlerWithUnrespondedCommand(CommandHandlerImpl::Callback * apCallback,
+                                             const ConcreteCommandPath & aRequestCommandPath, const Optional<uint16_t> & aRef) :
+            CommandHandlerImpl(apCallback)
         {
             GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional());
             SetExchangeInterface(&mMockCommandResponder);
         }
         MockCommandResponder mMockCommandResponder;
+
+        using app::CommandHandler::AddResponse;
     };
 
     // Generate an invoke request.  If aCommandId is kTestCommandIdWithData, a
@@ -469,8 +480,8 @@ public:
                                       CommandId aRequestCommandId  = kTestCommandIdWithData);
     static uint32_t GetAddResponseDataOverheadSizeForPath(const ConcreteCommandPath & aRequestCommandPath,
                                                           ForcedSizeBufferLengthHint aBufferSizeHint);
-    static void FillCurrentInvokeResponseBuffer(CommandHandler * apCommandHandler, const ConcreteCommandPath & aRequestCommandPath,
-                                                uint32_t aSizeToLeaveInBuffer);
+    static void FillCurrentInvokeResponseBuffer(CommandHandlerImpl * apCommandHandler,
+                                                const ConcreteCommandPath & aRequestCommandPath, uint32_t aSizeToLeaveInBuffer);
     static void ValidateCommandHandlerEncodeInvokeResponseMessage(bool aNeedStatusCode);
 };
 TestContext * TestCommandInteraction::mpTestContext = nullptr;
@@ -495,13 +506,11 @@ void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & 
                                                    CommandId aCommandId, ClusterId aClusterId, EndpointId aEndpointId)
 
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     InvokeRequestMessage::Builder invokeRequestMessageBuilder;
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    err = invokeRequestMessageBuilder.Init(&writer);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(invokeRequestMessageBuilder.Init(&writer), CHIP_NO_ERROR);
 
     invokeRequestMessageBuilder.SuppressResponse(true).TimedRequest(aIsTimedRequest);
     InvokeRequests::Builder & invokeRequests = invokeRequestMessageBuilder.CreateInvokeRequests();
@@ -520,15 +529,13 @@ void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & 
     {
         chip::TLV::TLVWriter * pWriter = commandDataIBBuilder.GetWriter();
         chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
-        err = pWriter->StartContainer(chip::TLV::ContextTag(chip::to_underlying(CommandDataIB::Tag::kFields)),
-                                      chip::TLV::kTLVType_Structure, dummyType);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(pWriter->StartContainer(chip::TLV::ContextTag(chip::to_underlying(CommandDataIB::Tag::kFields)),
+                                          chip::TLV::kTLVType_Structure, dummyType),
+                  CHIP_NO_ERROR);
 
-        err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(pWriter->PutBoolean(chip::TLV::ContextTag(1), true), CHIP_NO_ERROR);
 
-        err = pWriter->EndContainer(dummyType);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(pWriter->EndContainer(dummyType), CHIP_NO_ERROR);
     }
 
     commandDataIBBuilder.EndOfCommandDataIB();
@@ -540,8 +547,7 @@ void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & 
     invokeRequestMessageBuilder.EndOfInvokeRequestMessage();
     EXPECT_EQ(invokeRequestMessageBuilder.GetError(), CHIP_NO_ERROR);
 
-    err = writer.Finalize(&aPayload);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
 }
 
 void TestCommandInteraction::GenerateInvokeResponse(System::PacketBufferHandle & aPayload, CommandId aCommandId,
@@ -549,13 +555,11 @@ void TestCommandInteraction::GenerateInvokeResponse(System::PacketBufferHandle &
                                                     std::optional<uint16_t> aCommandRef)
 
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     InvokeResponseMessage::Builder invokeResponseMessageBuilder;
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
-    err = invokeResponseMessageBuilder.Init(&writer);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(invokeResponseMessageBuilder.Init(&writer), CHIP_NO_ERROR);
 
     invokeResponseMessageBuilder.SuppressResponse(true);
     InvokeResponseIBs::Builder & invokeResponses = invokeResponseMessageBuilder.CreateInvokeResponses();
@@ -577,15 +581,14 @@ void TestCommandInteraction::GenerateInvokeResponse(System::PacketBufferHandle &
     {
         chip::TLV::TLVWriter * pWriter = commandDataIBBuilder.GetWriter();
         chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
-        err = pWriter->StartContainer(chip::TLV::ContextTag(chip::to_underlying(CommandDataIB::Tag::kFields)),
-                                      chip::TLV::kTLVType_Structure, dummyType);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(pWriter->StartContainer(chip::TLV::ContextTag(chip::to_underlying(CommandDataIB::Tag::kFields)),
+                                          chip::TLV::kTLVType_Structure, dummyType),
+                  CHIP_NO_ERROR);
 
-        err = pWriter->EndContainer(dummyType);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(pWriter->PutBoolean(chip::TLV::ContextTag(1), true), CHIP_NO_ERROR);
+
+        EXPECT_EQ(pWriter->EndContainer(dummyType), CHIP_NO_ERROR);
     }
 
     if (aCommandRef.has_value())
@@ -605,48 +608,36 @@ void TestCommandInteraction::GenerateInvokeResponse(System::PacketBufferHandle &
     invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
     EXPECT_EQ(invokeResponseMessageBuilder.GetError(), CHIP_NO_ERROR);
 
-    err = writer.Finalize(&aPayload);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
 }
 
 void TestCommandInteraction::AddInvokeRequestData(CommandSender * apCommandSender, CommandId aCommandId)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
     auto commandPathParams = MakeTestCommandPath(aCommandId);
 
-    err = apCommandSender->PrepareCommand(commandPathParams);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(apCommandSender->PrepareCommand(commandPathParams), CHIP_NO_ERROR);
 
     chip::TLV::TLVWriter * writer = apCommandSender->GetCommandDataIBTLVWriter();
 
-    err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    err = apCommandSender->FinishCommand();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(writer->PutBoolean(chip::TLV::ContextTag(1), true), CHIP_NO_ERROR);
+    EXPECT_EQ(apCommandSender->FinishCommand(), CHIP_NO_ERROR);
 }
 
 void TestCommandInteraction::AddInvalidInvokeRequestData(CommandSender * apCommandSender, CommandId aCommandId)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
     auto commandPathParams = MakeTestCommandPath(aCommandId);
 
-    err = apCommandSender->PrepareCommand(commandPathParams);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(apCommandSender->PrepareCommand(commandPathParams), CHIP_NO_ERROR);
 
     chip::TLV::TLVWriter * writer = apCommandSender->GetCommandDataIBTLVWriter();
 
-    err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
+    EXPECT_EQ(writer->PutBoolean(chip::TLV::ContextTag(1), true), CHIP_NO_ERROR);
     apCommandSender->MoveToState(CommandSender::State::AddedCommand);
 }
 
 void TestCommandInteraction::AddInvokeResponseData(CommandHandler * apCommandHandler, bool aNeedStatusCode,
                                                    CommandId aResponseCommandId, CommandId aRequestCommandId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     constexpr EndpointId kTestEndpointId   = 1;
     constexpr ClusterId kTestClusterId     = 3;
     ConcreteCommandPath requestCommandPath = { kTestEndpointId, kTestClusterId, aRequestCommandId };
@@ -656,18 +647,8 @@ void TestCommandInteraction::AddInvokeResponseData(CommandHandler * apCommandHan
     }
     else
     {
-        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
-        ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, aResponseCommandId };
-        err = apCommandHandler->PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        chip::TLV::TLVWriter * writer = apCommandHandler->GetCommandDataIBTLVWriter();
-
-        err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        err = apCommandHandler->FinishCommand();
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        SimpleTLVPayload payloadWriter;
+        EXPECT_EQ(apCommandHandler->AddResponseData(requestCommandPath, aResponseCommandId, payloadWriter), CHIP_NO_ERROR);
     }
 }
 
@@ -676,41 +657,37 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(const Con
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
-    CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
 
-    CHIP_ERROR err = basicCommandPathRegistry.Add(requestCommandPath1, std::make_optional<uint16_t>(static_cast<uint16_t>(1)));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    err = basicCommandPathRegistry.Add(requestCommandPath2, std::make_optional<uint16_t>(static_cast<uint16_t>(2)));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(basicCommandPathRegistry.Add(requestCommandPath1, std::make_optional<uint16_t>(static_cast<uint16_t>(1))),
+              CHIP_NO_ERROR);
 
-    err = commandHandler.AllocateBuffer();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(basicCommandPathRegistry.Add(requestCommandPath2, std::make_optional<uint16_t>(static_cast<uint16_t>(2))),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(commandHandler.AllocateBuffer(), CHIP_NO_ERROR);
 
     uint32_t remainingSizeBefore = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
 
     // When ForcedSizeBuffer exceeds 255, an extra byte is needed for length, affecting the overhead size required by
     // AddResponseData. In order to have this accounted for in overhead calculation we set the length to be 256.
     uint32_t sizeOfForcedSizeBuffer = aBufferSizeHint == ForcedSizeBufferLengthHint::kSizeGreaterThan255 ? 256 : 0;
-    err                             = commandHandler.AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeOfForcedSizeBuffer));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(commandHandler.AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeOfForcedSizeBuffer)), CHIP_NO_ERROR);
     uint32_t remainingSizeAfter = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     uint32_t delta              = remainingSizeBefore - remainingSizeAfter - sizeOfForcedSizeBuffer;
 
     return delta;
 }
 
-void TestCommandInteraction::FillCurrentInvokeResponseBuffer(CommandHandler * apCommandHandler,
+void TestCommandInteraction::FillCurrentInvokeResponseBuffer(CommandHandlerImpl * apCommandHandler,
                                                              const ConcreteCommandPath & aRequestCommandPath,
                                                              uint32_t aSizeToLeaveInBuffer)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = apCommandHandler->AllocateBuffer();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(apCommandHandler->AllocateBuffer(), CHIP_NO_ERROR);
     uint32_t remainingSize = apCommandHandler->mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
 
     // AddResponseData's overhead calculation depends on the size of ForcedSizeBuffer. If the buffer exceeds 255 bytes, an extra
@@ -724,8 +701,7 @@ void TestCommandInteraction::FillCurrentInvokeResponseBuffer(CommandHandler * ap
     // Validating assumption. If this fails, it means overheadSizeNeededForAddingResponse is likely too large.
     EXPECT_GE(sizeToFill, 256u);
 
-    err = apCommandHandler->AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeToFill));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(apCommandHandler->AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeToFill)), CHIP_NO_ERROR);
 }
 
 void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(bool aNeedStatusCode)
@@ -772,7 +748,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    EXPECT_FALSE(msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
@@ -845,7 +821,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    EXPECT_FALSE(msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     ReportDataMessage::Builder response;
@@ -916,7 +892,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    EXPECT_FALSE(msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     InvokeResponseMessage::Builder response;
@@ -986,7 +962,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
 
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    EXPECT_FALSE(msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
@@ -1054,7 +1030,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithWrongState)
         // be handle already acquired on the callers behalf.
         CommandHandler::Handle handle(&commandHandler);
 
-        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+        const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
         err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
     }
@@ -1096,7 +1072,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithSendEmptyCommand)
         // be handle already acquired on the callers behalf.
         CommandHandler::Handle handle(&commandHandler);
 
-        const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+        const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
         err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
         err = commandHandler.FinishCommand();
@@ -1190,8 +1166,8 @@ TEST_F(TestCommandInteraction, TestCommandHandlerEncodeSimpleCommandData)
 
 TEST_F(TestCommandInteraction, TestCommandHandlerCommandDataEncoding)
 {
-    auto path               = MakeTestCommandPath();
-    auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
+    auto path = MakeTestCommandPath();
+    ConcreteCommandPath requestCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithUnrespondedCommand commandHandler(nullptr, requestCommandPath, /* aRef = */ NullOptional);
 
     {
@@ -1272,7 +1248,7 @@ TEST_F(TestCommandInteraction, TestCommandHandlerEncodeSimpleStatusCode)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_WithoutResponderCallingAddStatus)
 {
     chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
-    CommandHandler commandHandler(&mockCommandHandlerDelegate);
+    CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
 
     commandHandler.AddStatus(requestCommandPath, Protocols::InteractionModel::Status::Failure);
 
@@ -1284,7 +1260,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_WithoutResponderC
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_WithoutResponderCallingAddResponse)
 {
     chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
-    CommandHandler commandHandler(&mockCommandHandlerDelegate);
+    CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
 
     uint32_t sizeToFill = 50; // This is an arbitrary number, we need to select a non-zero value.
     CHIP_ERROR err      = commandHandler.AddResponseData(requestCommandPath, ForcedSizeBuffer(sizeToFill));
@@ -1298,13 +1274,13 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_WithoutResponderC
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_WithoutResponderCallingDirectPrepareFinishCommandApis)
 {
     chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
-    CommandHandler commandHandler(&mockCommandHandlerDelegate);
+    CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
 
     // We intentionally prevent successful calls to PrepareInvokeResponseCommand and FinishCommand when no
     // responder is present. This aligns with the design decision to promote AddStatus and AddResponseData
     // usage in such scenarios. See GitHub issue #32486 for discussions on phasing out external use of
     // these primitives.
-    const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+    const CommandHandlerImpl::InvokeResponseParameters prepareParams(requestCommandPath);
     ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
     CHIP_ERROR err                          = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
     EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
@@ -1323,7 +1299,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithOnInvokeReceivedNotExistCo
     // Use some invalid endpoint / cluster / command.
     GenerateInvokeRequest(commandDatabuf, /* aIsTimedRequest = */ false, 0xEF /* command */, 0xADBE /* cluster */,
                           0xDE /* endpoint */);
-    CommandHandler commandHandler(&mockCommandHandlerDelegate);
+    CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
     chip::isCommandDispatched = false;
 
     mockCommandHandlerDelegate.ResetCounter();
@@ -1344,7 +1320,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithOnInvokeReceivedEmptyDataM
         for (auto transactionIsTimed : allBooleans)
         {
             mockCommandHandlerDelegate.ResetCounter();
-            CommandHandler commandHandler(&mockCommandHandlerDelegate);
+            CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
             System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
             chip::isCommandDispatched = false;
@@ -1755,8 +1731,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectsMultipleCo
 
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
-    CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
     System::PacketBufferHandle commandDatabuf;
@@ -1819,7 +1795,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectMultipleCom
     sendResponse           = true;
     commandDispatchedCount = 0;
 
-    CommandHandler commandHandler(&mockCommandHandlerDelegate);
+    CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
     MockCommandResponder mockCommandResponder;
     InteractionModel::Status status = commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
     EXPECT_EQ(status, InteractionModel::Status::InvalidAction);
@@ -1867,8 +1843,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_AcceptMultipleCom
 
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
-    CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
     System::PacketBufferHandle commandDatabuf;
@@ -1889,8 +1865,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_FillUpInvokeRespo
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
-    CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
 
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
@@ -1917,8 +1893,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction,
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
-    CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
 
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
@@ -1945,8 +1921,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_FillUpInvokeRespo
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
-    CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
@@ -1994,9 +1970,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReleaseWithExchan
 
     // Mimic closure of the exchange that would happen on a session release and verify that releasing the handle there-after
     // is handled gracefully.
-    asyncCommandHandle.Get()->mpResponder->GetExchangeContext()->GetSessionHolder().Release();
-    asyncCommandHandle.Get()->mpResponder->GetExchangeContext()->OnSessionReleased();
-
+    asyncCommandHandle.Get()->GetExchangeContext()->GetSessionHolder().Release();
+    asyncCommandHandle.Get()->GetExchangeContext()->OnSessionReleased();
     asyncCommandHandle = nullptr;
 }
 #endif

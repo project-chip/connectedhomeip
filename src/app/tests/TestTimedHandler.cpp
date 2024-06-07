@@ -118,7 +118,7 @@ public:
 void TestTimedHandler::GenerateTimedRequest(uint16_t aTimeoutValue, System::PacketBufferHandle & aPayload)
 {
     aPayload = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    EXPECT_FALSE(aPayload.IsNull());
+    ASSERT_FALSE(aPayload.IsNull());
 
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
@@ -160,7 +160,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
     // Send an empty payload, which will error out but not with the
     // UNSUPPORTED_ACCESS status we expect if we miss our timeout.
     payload = MessagePacketBuffer::New(0);
-    EXPECT_FALSE(payload.IsNull());
+    ASSERT_FALSE(payload.IsNull());
 
     delegate.mKeepExchangeOpen   = false;
     delegate.mNewMessageReceived = false;
