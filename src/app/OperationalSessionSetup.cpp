@@ -396,9 +396,81 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureRead
                                                         System::Clock::Milliseconds16 requestedBusyDelay)
 {
     //
-    // If we encountered no error, go ahead and call all success callbacks. Otherwise,
-    // call the failure callbacks.
+    // Go ahead and call our callbacks.  We want to walk through all the lists,
+    // because we need to Cancel() each callback no matter what.  Which
+    // callbacks we then call depends on whether we have encountered an error.
     //
+    while (successReady.mNext != &successReady)
+    {
+        // We expect that we only have callbacks if we are not performing just address update.
+        VerifyOrDie(!performingAddressUpdate);
+        Callback::Callback<OnDeviceConnected> * cb = Callback::Callback<OnDeviceConnected>::FromCancelable(successReady.mNext);
+
+        cb->Cancel();
+        if (error == CHIP_NO_ERROR)
+        {
+            VerifyOrDie(exchangeMgr);
+            // We know that we for sure have the SessionHandle in the successful
+            // case, and the session is active.
+            VerifyOrDie(optionalSessionHandle.Value()->AsSecureSession()->IsActiveSession());
+            cb->mCall(cb->mContext, *exchangeMgr, optionalSessionHandle.Value());
+
+            // That call might have made the session inactive.  If it did, then
+            // we should not call any more success callbacks, since we do not in
+            // fact have an active session for them, and if they try to put the
+            // session in a holder that will fail, and then trying to use the
+            // holder as if it has a session will crash.  But we should also try
+            // to make sure we don't call failure callbacks the correspond to
+            // the success callbacks we already called, since their context
+            // might be dead.
+            //
+            // What that means is that after every success callback we should
+            // remove the corresponding failure callbacks from our lists.
+            // Unfortunately, callers are allowed to pass null callbacks, so we
+            // can't just remove the first one, and in any case we have multiple
+            // kinds of error callbacks.  But what we should probably do is just
+            // remove the first callback that has the same context as the
+            // callback we just called.  And if there is more than one that
+            // matches, clearly the API consumer was not expecting to delete
+            // itself when called, so we're OK with only dropping the first one.
+            //
+            // This would all be simpler if we just had a single callback per
+            // API consumer that communicated success-or-failure in a single
+            // call...
+            for (auto * failureCancelable = failureReady.mNext; failureCancelable != &failureReady;
+                 failureCancelable        = failureCancelable->mNext)
+            {
+                auto * failureCallback = Callback::Callback<OnDeviceConnectionFailure>::FromCancelable(failureCancelable);
+                if (failureCallback->mContext == cb->mContext)
+                {
+                    failureCallback->Cancel();
+                    break;
+                }
+            }
+
+            for (auto * setupFailureCancelable = setupFailureReady.mNext; setupFailureCancelable != &setupFailureReady;
+                 setupFailureCancelable        = setupFailureCancelable->mNext)
+            {
+                auto * setupFailureCallback = Callback::Callback<OnSetupFailure>::FromCancelable(setupFailureCancelable);
+                if (setupFailureCallback->mContext == cb->mContext)
+                {
+                    setupFailureCallback->Cancel();
+                    break;
+                }
+            }
+
+            if (!optionalSessionHandle.Value()->AsSecureSession()->IsActiveSession())
+            {
+                // Set error to a non-success value so that we stop calling
+                // success callbacks.  We will call the relevant remaining error
+                // callbacks in the blocks below.
+                ChipLogError(Discovery, "Success callback for connection to " ChipLogFormatScopedNodeId " tore down session",
+                             ChipLogValueScopedNodeId(peerId));
+                error = CHIP_ERROR_CONNECTION_ABORTED;
+            }
+        }
+    }
+
     while (failureReady.mNext != &failureReady)
     {
         // We expect that we only have callbacks if we are not performing just address update.
@@ -433,21 +505,6 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureRead
             }
 #endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
             cb->mCall(cb->mContext, failureInfo);
-        }
-    }
-
-    while (successReady.mNext != &successReady)
-    {
-        // We expect that we only have callbacks if we are not performing just address update.
-        VerifyOrDie(!performingAddressUpdate);
-        Callback::Callback<OnDeviceConnected> * cb = Callback::Callback<OnDeviceConnected>::FromCancelable(successReady.mNext);
-
-        cb->Cancel();
-        if (error == CHIP_NO_ERROR)
-        {
-            VerifyOrDie(exchangeMgr);
-            // We know that we for sure have the SessionHandle in the successful case.
-            cb->mCall(cb->mContext, *exchangeMgr, optionalSessionHandle.Value());
         }
     }
 }
