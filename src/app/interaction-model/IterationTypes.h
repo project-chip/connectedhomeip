@@ -72,7 +72,7 @@ struct AttributeEntry
 ///   - Any internal iteration errors are just logged (callers do not handle iteration CHIP_ERROR)
 ///   - Iteration order is NOT guaranteed globally. Only the following is guaranteed:
 ///     - when iterating over an endpoint, ALL clusters of that endpoint will be iterated first, before
-///       switching the endpoint (order of clusters ids themselves not guaranteed)
+///       switching the endpoint (order of clusters themselves not guaranteed)
 ///     - when iterating over a cluster, ALL attributes of that cluster will be iterated first, before
 ///       switching to a new cluster
 ///     - uniqueness and completeness (iterate over all possible distinct values as long as no
