@@ -79,6 +79,11 @@ public class MediaPlaybackSubscribeToCurrentStateExampleFragment extends Fragmen
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     Endpoint endpoint;
     if (useCommissionerGeneratedPasscode) {
+      // For the example Commissioner-Generated passcode commissioning flow, run demo interactions
+      // with the Endpoint with ID DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW = 1. For this flow, we
+      // commissioned with the Target Content Application with Vendor ID 1111. Since this target
+      // content application does not report its Endpoint's Vendor IDs, we find the desired endpoint
+      // based on the Endpoint ID. See connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
       endpoint =
           EndpointSelectorExample.selectEndpointById(
               selectedCastingPlayer, DEFAULT_ENDPOINT_ID_FOR_CGP_FLOW);
