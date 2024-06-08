@@ -100,7 +100,8 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
 
     StartUpEventType event{ kFakeSoftwareVersion };
 
-    EventNumber n1 = events->GenerateEvent(event, 0 /* EndpointId */);
+    std::optional<EventNumber> n1 = events->GenerateEvent(event, 0 /* EndpointId */);
+
     ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
     ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
               ConcreteEventPath(0 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
@@ -115,9 +116,8 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
     ASSERT_EQ(err, CHIP_NO_ERROR);
     ASSERT_EQ(decoded_event.softwareVersion, kFakeSoftwareVersion);
 
-    EventNumber n2 = events->GenerateEvent(event, /* endpointId = */ 1);
+    std::optional<EventNumber> n2 = events->GenerateEvent(event, /* endpointId = */ 1);
     ASSERT_EQ(n2, logOnlyEvents.CurrentEventNumber());
-    ASSERT_NE(n1, logOnlyEvents.CurrentEventNumber());
 
     ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
               ConcreteEventPath(1 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
@@ -137,14 +137,13 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     event.adminNodeID     = chip::app::DataModel::MakeNullable(kTestNodeId);
     event.adminPasscodeID = chip::app::DataModel::MakeNullable(kTestPasscode);
 
-    EventNumber n1 = events->GenerateEvent(event, 0 /* EndpointId */);
+    std::optional<EventNumber> n1 = events->GenerateEvent(event, 0 /* EndpointId */);
     // encoding without a fabric ID MUST fail for fabric events
-    ASSERT_EQ(n1, kInvalidEventId);
+    ASSERT_FALSE(n1.has_value());
 
     event.fabricIndex = kTestFabricIndex;
     n1                = events->GenerateEvent(event, /* endpointId = */ 0);
 
-    ASSERT_NE(n1, kInvalidEventId);
     ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
     ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
               ConcreteEventPath(0 /* endpointId */, AccessControlEntryChangedType::GetClusterId(),
