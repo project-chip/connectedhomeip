@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "energy-evse-server.h"
+#include "energy-calendar-server.h"
 
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -35,187 +35,74 @@ namespace app {
 namespace Clusters {
 namespace EnergyCalendar {
 
-constexpr uint32_t kOneDay = 24 * 60 * 60;
-
 static TransitionDayOfWeekBitmap GetWeekDate(uint32_t date)
 {
-    // todo
-    return TransitionDayOfWeekBitmap::Sunday;
+    tm calendarTime{};
+    localtime_r(&date, &calendarTime);
+    return (TransitionDayOfWeekBitmap)(calendarTime.tm_wday);
 }
 
 EnergyCalendarContent::EnergyCalendarContent()
 {
     endpoint = 0;
-    currentDate = 0;
 }
 
 EnergyCalendarContent::EnergyCalendarContent(EndpointId endpoint)
 {
     this->endpoint = endpoint;
-    currentDate = 0;
 }
 
-DataModel::Nullable<Structs::DayStruct::Type> EnergyCalendarContent::GetDay(uint32_t date)
+bool EnergyCalendarServer::HasFeature(Feature aFeature) const
 {
-    auto days_iterator = SpecialDays.begin();
-    while (days_iterator.Next())
-    {
-        auto & day = days_iterator.GetValue();
-        if (day == currentDate)
-        {
-            return day;
-        }
-    }
-
-    TransitionDayOfWeekBitmap week_day = GetWeekDate(date);
-
-    auto period_iterator = CalendarPeriods.begin();
-    while (period_iterator.Next())
-    {
-        auto & period = period_iterator.GetValue();
-        if (period.StartDate < date)
-            continue;
-        auto days_iterator = period.Days.begin();
-        while (days_iterator.Next())
-        {
-            auto & day = days_iterator.GetValue();
-            if ((day.DaysOfWeek & week_day != 0) || (day.Date == date))
-            {
-                return day;
-            }
-        }
-    }
-
-    return nullptr;
+    return mFeature.Has(aFeature);
 }
 
-CHIP_ERROR EnergyCalendarContent::UpdateDateRelativeAttributes()
+DataModel::Nullable<Structs::TransitionStruct::Type> EnergyCalendarContent::GetTransition()
 {
+    if (content[0].CurrentDay.IsNull())
+    {
+        return DataModel::Nullable<Structs::TransitionStruct::Type>();
+    }
+
     uint32_t date = get_current_utc();
     uint32_t time = date % kOneDay;
-    date -= time;
 
-    if (date == currentDate)
-    {
-        return CHIP_NO_ERROR;
-    }
+    auto transition_iterator = content[0].CurrentDay.Value.Transitions.begin();
+    uint32_t next_tr_time = kOneDay;
 
-    currentDate = date;
-    CurrentDay = nullptr;
-    NextDay = nullptr;
-    CurrentTransition = nullptr;
-    CurrentPeakPeriod = nullptr;
-    NextPeakPeriod = nullptr;
+    Structs::TransitionStruct::Type current;// = content[0].CurrentDay.Value.Transitions[0];
 
-    CurrentDay = EnergyCalendarContent::GetDay(date);
-    if (CurrentDay)
-    {
-        auto transition_iterator = CurrentDay.Transitions.begin();
-        uint32_t next_tr_time = kOneDay;
-
-        while (transition_iterator.Next())
-        {
-            auto & transition = transition_iterator.GetValue();
-            auto tr_time = transition.TransitionTime;
-            if (tr_time <= time && (CurrentTransition == nullptr || CurrentTransition.TransitionTime < tr_time))
-            {
-                CurrentTransition = transition;
-            }
-            if ((time > tr_time) && (time < next_tr_time))
-            {
-                next_tr_time = time;
-            }
-        }
-
-        if (CurrentTransition)
-        {
-            CurrentPeakPeriod = nullptr; // todo
-        }
-
-    }
-
-    NextDay = EnergyCalendarContent::GetDay(date + kOneDay);
-    if (CurrentTransition)
-    {
-       NextPeakPeriod = nullptr; // todo
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-bool EnergyCalendarContent::CheckPeriods(DataModel::DecodableList<Structs::CalendarPeriod::Type> periods)
-{
-    uint32_t date = 0;
-    auto period_iterator = periods.begin();
-    while (period_iterator.Next())
-    {
-        auto & period = period_iterator.GetValue();
-        if (period.StartDate)
-        {
-            if (period.StartDate < date)
-            {
-                return false;
-            }
-            date = period.StartDate;
-        }
-
-        auto days_iterator = period.Days.begin();
-        while (days_iterator.Next())
-        {
-            auto & day = days_iterator.GetValue();
-            if (!CheckDay(day))
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-bool EnergyCalendarContent::CheckSpecialDays(DataModel::DecodableList<Structs::DayStruct::Type> days)
-{
-    uint32_t date = 0;
-    while (days_iterator.Next())
-    auto days_iterator = days.begin();
-    {
-        auto & day = days_iterator.GetValue();
-        if (day.DaysOfWeek || day.CalendarID || !CheckDay(day) || !(day.date) || day.date > date)
-        {
-            return false;
-        }
-        date = day.date;
-    }
-
-    return true;
-}
-
-bool EnergyCalendarContent::CheckDay(Structs::DayStruct::Type &day)
-{
-    if (day.DaysOfWeek && day.Date) || (!day.DaysOfWeek && !day.Date))
-    {
-        return false;
-    }
-
-    if (size(day.Transition)== 0)
-    {
-        return false;
-    }
-
-    uint32_t time = 0;
-    auto transition_iterator day.Transitions.begin();
     while (transition_iterator.Next())
     {
         auto & transition = transition_iterator.GetValue();
         auto tr_time = transition.TransitionTime;
-        if (tr_time < time)
+        if (tr_time <= time && (CurrentTransition.IsNull() || CurrentTransition.Value().TransitionTime < tr_time))
         {
-            return false;
+            CurrentTransition = transition;
         }
-        time = tr_time;
+        if ((time > tr_time) && (time < next_tr_time))
+        {
+            next_tr_time = time;
+        }
     }
+    content[0].CurrentTransition = current;
+ //CurrentPeakPeriod.Value() = DayToPeak(day);
+    }
+}
 
-    return true;
+EnergyCalendarServer::EnergyCalendarServer(EndpointId aEndpointId, Feature aFeature, CalendarProvider *provider) :
+        mFeature(aFeature), mProvider(provider)
+{
+    content[0].endpoint = aEndpointId;
+        
+    auto CalendarChangingHandler_cb = [this](){ this->CalendarChangingHandler(); };
+    auto PeakPeriodsChangingHandler_cb = [this](){ this->PeakPeriodsChangingHandler(); };
+    mProvider->SignalsHandlerSet(CalendarChangingHandler_cb, PeakPeriodsChangingHandler_cb);
+
+    uint32_t date = get_current_utc();
+    uint32_t time = date % kOneDay;
+
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(kOneDay - time), MidnightTimerCallback, nullptr);
 }
 
 // AttributeAccessInterface
@@ -241,30 +128,19 @@ CHIP_ERROR EnergyCalendarServer::Read(const ConcreteReadAttributePath & aPath, A
         return aEncoder.Encode(content[endpointIndex].SpecialDays);
     /* Date relative attributes */
     case CurrentDay::Id:
-        UpdateDateRelativeAttributes();
         return aEncoder.Encode(content[endpointIndex].CurrentDay);
     case NextDay::Id:
-        UpdateDateRelativeAttributes();
         return aEncoder.Encode(content[endpointIndex].NextDay);
     case CurrentTransition::Id:
-        UpdateDateRelativeAttributes();
         return aEncoder.Encode(content[endpointIndex].CurrentTransition);
     case CurrentPeakPeriod::Id:
-        UpdateDateRelativeAttributes();
         return aEncoder.Encode(content[endpointIndex].CurrentPeakPeriod);
     case NextPeakPeriod::Id:
-        UpdateDateRelativeAttributes();
         return aEncoder.Encode(content[endpointIndex].NextPeakPeriod);
-
-    case PeakPeriodStatus::Id:
-        UpdateDateRelativeAttributes();
-        return aEncoder.Encode(content[endpointIndex].PeakPeriodStatus);
-    case PeakPeriodStartTime::Id:
-        UpdateDateRelativeAttributes();
-        return aEncoder.Encode(content[endpointIndex].PeakPeriodStartTime);
-    case PeakPeriodEndTime::Id:
-        UpdateDateRelativeAttributes();
-        return aEncoder.Encode(content[endpointIndex].PeakPeriodSEndTime);
+    }
+    /* FeatureMap - is held locally */
+    case FeatureMap::Id:
+        return aEncoder.Encode(mFeature);
     }
 
     /* Allow all other unhandled attributes to fall through to Ember */
@@ -277,7 +153,7 @@ CHIP_ERROR EnergyCalendarServer::Write(const ConcreteDataAttributePath & aPath, 
     {
     default:
         // Unknown attribute; return error.  None of the other attributes for
-        // this cluster are writable, so should not be ending up in this code to
+        // this cluster are writable, so should not be ending up in this code to         
         // start with.
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
@@ -291,6 +167,96 @@ void EnergyCalendarServer::InvokeCommand(HandlerContext & handlerContext)
     //{
     //}
     return;
+}
+
+void LockThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
+
+void EnergyCalendarServer::UpdateCurrentAttrs(void)
+{
+    if (mProvider == nullptr)
+        return;
+
+    DataModel::Nullable<Structs::DayStruct::Type> currentDay;    
+    DataModel::Nullable<Structs::DayStruct::Type> nextDay;
+    mProvider->GetCurrentAndNextDays(content[0].endpoint, currentDay, nextDay);
+
+    // todo stop matter
+    LockThreadTask();
+
+    content[0].CurrentDay = currentDay;
+    content[0].NextDay = nextDay;
+
+    // todo start matter
+    UnlockThreadTask();
+}
+
+void EnergyCalendarServer::CalendarChangingHandler(void)
+{
+    if (mProvider == nullptr)
+        return;
+
+    if (content[endpointIndex].CalendarID.IsNull()) 
+    {
+        mProvider->GetCommonAttributes(content[0].endpoint,
+        content[0].CalendarID, content[0].Name, content[0].ProviderID, content[0].EventID);
+    }
+
+    DataModel::Nullable<uint32_t> startDate;
+    DataModel::DecodableList<Structs::CalendarPeriod::Type> calendarPeriods;
+    DataModel::DecodableList<Structs::DayStruct::Type> s`pecialDays;
+
+    mProvider->GetCalendarPeriod(content[0].endpoint, startDate, calendarPeriods);
+    mProvider->GetSpecialDays(content[0].endpoint, specialDays);
+
+    // todo stop matter
+    LockThreadTask();
+
+    content[0].StartDate = startDate;
+    content[0].CalendarPeriods = calendarPeriods;
+    content[0].SpecialDays = specialDays;
+
+    // todo start matter
+    UnlockThreadTask();
+
+    UpdateCurrentAttrs();
+}
+
+void EnergyCalendarServer::PeakPeriodsChangingHandler(void)
+{
+    if (mProvider == nullptr)
+        return;
+
+    DataModel::Nullable<Structs::PeakPeriodStruct::Type> current;
+    DataModel::Nullable<Structs::PeakPeriodStruct::Type> next;
+
+    mProvider->GetPeakPeriods(content[0].endpoint, current, next);
+
+    // todo stop matter
+    LockThreadTask();
+
+    content[0].CurrentPeakPeriod = current;
+    content[0].NextPeakPeriod = next;
+    
+    // todo start matter
+    UnlockThreadTask();
+}
+
+void EnergyCalendarServer::MidnightTimerCallback(chip::System::Layer *, void * callbackContext)
+{
+    UpdateCurrentAttrs();
+
+    uint32_t date = get_current_utc();
+    uint32_t time = date % kOneDay;
+
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(kOneDay - time), MidnightTimerCallback, nullptr);
 }
 
 } // namespace EnergyCalendar

@@ -96,19 +96,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <!--
-    <enum name="TimeReferenceEnum">
-      <item value="0" name="UTC" summary="UTC Time">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Standard" summary="UTC time adjusted to local time zone">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Local" summary="Standard time, adjusted to DST">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    -->
     <bitmap name="AuxiliaryLoadBitmap">
       <bitfield name="AuxiliarySwitch1" bit="0" summary="Auxiliary Switch 1">
         <mandatoryConform/>
@@ -158,6 +145,23 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
+    <struct name="Date">
+      <field id="0" name="Year" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Month" type="uint8">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="12"/>
+      </field>
+      <field id="2" name="Day" type="uint8">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="31"/>
+      </field>
+      <field id="3" name="DayOfWeek" type="uint8">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="7"/>
+      </field>
+    </struct>
     <struct name="CalendarPeriod">
       <field id="0" name="StartDate" type="epoch-s">
         <mandatoryConform/>
@@ -169,7 +173,7 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="DayStruct">
-      <field id="0" name="Date" type="epoch-s">
+      <field id="0" name="Date" type="Date">
         <optionalConform choice="a"/>
       </field>
       <field id="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap">

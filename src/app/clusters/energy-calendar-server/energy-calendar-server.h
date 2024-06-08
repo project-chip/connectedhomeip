@@ -29,6 +29,8 @@
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include "energy-calendar-provider.h"
+
 #include <list>
 #include <string>
 
@@ -42,19 +44,6 @@ constexpr uint32_t kMaximumNameLenght         = 12;
 constexpr uint32_t kMinimumCalendarPeriodsLength = 1;
 constexpr uint32_t kMaximumCalendarPeriodsLength = 4;
 constexpr uint32_t kMaximumSpecialDaysLength = 50;
-
-enum class SetAttributes : uint8_t
-{
-    kSetCurrentDay = 0x01,
-    kSetNextDay = 0x02,
-    kSetCurrentTransition = 0x04,
-    kSetCurrentPeakPeriod = 0x08
-    kSetNextPeakPeriod = 0x10
-
-    kSetPeakPeriodStatus = 0x20;
-    kSetPeakPeriodStartTime = 0x40;
-    kSetPeakPeriodEndTime = 0x80;
-};
 
 /** @brief
  * EnergyCalendarContent has the stateful attributes of the cluster: its endpoint
@@ -81,16 +70,9 @@ public:
 
     EnergyCalendarContent(EndpointId endpoint);
     EnergyCalendarContent();
-
-    DataModel::Nullable<Structs::DayStruct::Type> GetDay(uint32_t date);
-    CHIP_ERROR UpdateDateRelativeAttributes();
-    bool CheckPeriods(DataModel::DecodableList<Structs::CalendarPeriod::Type> periods);
-    bool CheckSpecialDays(DataModel::DecodableList<Structs::DayStruct::Type> days);
-    bool CheckDay(Structs::DayStruct::Type &day);
-
-private:
-    uint32_t currentDate;
 };
+
+typedef DataModel::Nullable<Structs::PeakPeriodStruct::Type> (*PeakPeriod_cb)(uint32_t);
 
 /** @brief
  * EnergyCalendarServer implements both Attributes and Commands
@@ -98,7 +80,10 @@ private:
 class EnergyCalendarServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    EnergyCalendarServer();
+    EnergyCalendarServer(EndpointId aEndpointId, Feature aFeature, CalendarProvider *provider);
+
+    bool HasFeature(Feature aFeature) const;
+
     //(...)
     // Attributes
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -111,6 +96,14 @@ public:
     EnergyCalendarContent content[kNumSupportedEndpoints];
     //EnergyCalendarContent* content = nullptr;
     //(...)
+private:
+    BitMask<Feature> mFeature;
+    CalendarProvider *mProvider;
+
+    void UpdateCurrentAttrs(void);
+    void CalendarChangingHandler(void);
+    void PeakPeriodsChangingHandler(void);
+    static void MidnightTimerCallback(chip::System::Layer *, void * callbackContext);
 };
 
 } // namespace EnergyCalendar
