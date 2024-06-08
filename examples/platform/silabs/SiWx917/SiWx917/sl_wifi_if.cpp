@@ -70,7 +70,11 @@ extern "C" {
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "wfx_host_events.h"
-} // extern "C" {
+#if TINYCRYPT_PRIMITIVES
+#include "sl_si91x_trng.h"
+#define TRNGKEY_SIZE 4
+#endif // TINYCRYPT_PRIMITIVES
+}
 
 WfxRsi_t wfx_rsi;
 
@@ -472,6 +476,26 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("sl_wifi_get_mac_address failed: %x", status);
         return status;
     }
+
+#ifdef TINYCRYPT_PRIMITIVES
+    const uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
+
+    // To check the Entropy of TRNG and verify TRNG functioning.
+    status = sl_si91x_trng_entropy();
+    if (status != SL_STATUS_OK)
+    {
+        SILABS_LOG("TRNG Entropy Failed");
+        return status;
+    }
+
+    // Initiate and program the key required for TRNG hardware engine
+    status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNGKEY_SIZE);
+    if (status != SL_STATUS_OK)
+    {
+        SILABS_LOG("TRNG Key Programming Failed");
+        return status;
+    }
+#endif // TINYCRYPT_PRIMITIVES
 
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;

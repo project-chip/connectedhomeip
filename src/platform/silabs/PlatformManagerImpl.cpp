@@ -63,23 +63,8 @@ int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
 
     return res;
 }
-#if SLI_SI91X_MCU_INTERFACE
-static sl_status_t init_entropy_source()
-{
-    sl_status_t status = SL_STATUS_OK;
 
-    const uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
-
-    // To check the Entropy of TRNG and verify TRNG functioning.
-    status = sl_si91x_trng_entropy();
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
-
-    // Initiate and program the key required for TRNG hardware engine
-    status = sl_si91x_trng_program_key((uint32_t *) (trngKey), TRNGKEY_SIZE);
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
-    return SL_STATUS_OK;
-}
-#else
+#if !(SLI_SI91X_MCU_INTERFACE)
 static void app_get_random(uint8_t * aOutput, size_t aLen)
 {
     VerifyOrReturn(aOutput != nullptr);
@@ -97,7 +82,6 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     return 0;
 }
 #endif // SLI_SI91X_MCU_INTERFACE
-
 #endif // TINYCRYPT_PRIMITIVES
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
@@ -116,9 +100,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
 #if defined(TINYCRYPT_PRIMITIVES)
-#if SLI_SI91X_MCU_INTERFACE
-    ReturnErrorCodeIf(init_entropy_source() != SL_STATUS_OK, CHIP_ERROR_RANDOM_DATA_UNAVAILABLE);
-#else
+#if !(SLI_SI91X_MCU_INTERFACE)
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16 /*Threshold value*/));
 #endif // SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
