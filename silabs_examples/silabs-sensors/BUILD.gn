@@ -127,7 +127,7 @@ silabs_executable("sensors_app") {
   }
   else if (is_water_leak_detector)
   {
-    sensorType = "Water-Leak-detector"
+    sensorType = "water-Leak-detector"
   }
 
   output_name = "matter-silabs-${sensorType}-example.out"
