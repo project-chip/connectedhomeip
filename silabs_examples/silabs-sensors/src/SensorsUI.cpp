@@ -41,6 +41,9 @@ static const uint8_t OffStateOccupancySensorBitMap[] = { OFF_DEMO_OCCUPANCY_SENS
 static const uint8_t OnStateContactSensorBitMap[]  = { ON_DEMO_CONTACT_SENSOR_BITMAP };
 static const uint8_t OffStateContactSensorBitMap[] = { OFF_DEMO_CONTACT_SENSOR_BITMAP };
 
+static const uint8_t OnStateWaterLeakDetectorBitMap[]  = { ON_DEMO_WATER_LEAK_DECTECTOR_BITMAP };
+static const uint8_t OffStateWaterLeakDetectorBitMap[] = { OFF_DEMO_WATER_LEAK_DECTECTOR_BITMAP };
+
 GLIB_Context_t * glibContext;
 
 
@@ -95,6 +98,21 @@ void SensorsUI::UpdateDemoState(bool state)
         {
         GLIB_drawBitmap(glibContext, (glibContext->pDisplayGeometry->xSize - APP_BITMAP_WIDTH) / 2, glibContext->pDisplayGeometry->ySize - APP_BITMAP_HEIGHT - 5, APP_BITMAP_WIDTH, APP_BITMAP_HEIGHT,
                 (OnStateContactSensorBitMap)); 
+        }
+#endif
+    }
+    else if(SensorMgr().getCurrentSensorMode() == CurrentSensorEnum::WaterLeakDetector)
+    {
+#ifdef DISPLAY_ENABLED
+        if(state)
+        {
+        GLIB_drawBitmap(glibContext, (glibContext->pDisplayGeometry->xSize - APP_BITMAP_WIDTH) / 2, glibContext->pDisplayGeometry->ySize - APP_BITMAP_HEIGHT - 5, APP_BITMAP_WIDTH, APP_BITMAP_HEIGHT,
+                (OffStateContactSensorBitMap));
+        }
+        else
+        {
+        GLIB_drawBitmap(glibContext, (glibContext->pDisplayGeometry->xSize - APP_BITMAP_WIDTH) / 2, glibContext->pDisplayGeometry->ySize - APP_BITMAP_HEIGHT - 5, APP_BITMAP_WIDTH, APP_BITMAP_HEIGHT,
+                (OffStateWaterLeakDetectorBitMap)); 
         }
 #endif
     }
@@ -153,5 +171,22 @@ void SensorsUI::DrawNextScreen(GLIB_Context_t * glibContext)
         #endif
 #endif
     }
+    if (SensorMgr().getCurrentSensorMode() == CurrentSensorEnum::WaterLeakDetector)
+    {
+#ifdef DISPLAY_ENABLED
+        GLIB_clear(glibContext);
+        demoUIDisplayHeader((char *) mName);
+        demoUIDisplayProtocols();
+        GLIB_drawBitmap(glibContext, (glibContext->pDisplayGeometry->xSize - APP_BITMAP_WIDTH) / 2, glibContext->pDisplayGeometry->ySize - APP_BITMAP_HEIGHT - 5, APP_BITMAP_WIDTH, APP_BITMAP_HEIGHT,
+                (OnStateWaterLeakDetectorBitMap));
+        #if SL_LCDCTRL_MUX
+            sl_wfx_host_pre_lcd_spi_transfer();
+        #endif // SL_LCDCTRL_MUX
+            DMD_updateDisplay();
+        #if SL_LCDCTRL_MUX
+            sl_wfx_host_post_lcd_spi_transfer();
+        #endif
+#endif
+    }    
 
 }
