@@ -41,11 +41,12 @@ enum CurrentSensorEnum
     OccupancySensor = 0,
     TemperatureSensor = 1,
     ContactSensor = 2,
-    StatusScreen = 3,
+    WaterLeakDetector = 3,
+    StatusScreen = 4,
 #ifdef QR_CODE_ENABLED
-    QrCode = 4,
+    QrCode = 5,
 #endif
-    InvalidSensor = 5
+    InvalidSensor = 6
 };
 
 
