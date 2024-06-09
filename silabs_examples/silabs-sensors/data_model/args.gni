@@ -18,4 +18,6 @@ declare_args() {
   is_temperature_sensor = false
 
   is_contact_sensor = false
+
+  is_water_leak_detector = false
 }
