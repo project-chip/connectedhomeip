@@ -33,12 +33,6 @@
 
 #if defined(TINYCRYPT_PRIMITIVES)
 #include "tinycrypt/ecc.h"
-extern "C" {
-#ifdef SLI_SI91X_MCU_INTERFACE
-#include "sl_si91x_trng.h"
-#define TRNGKEY_SIZE 4
-#endif // SLI_SI91X_MCU_INTERFACE
-}
 #endif // TINYCRYPT_PRIMITIVES
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
