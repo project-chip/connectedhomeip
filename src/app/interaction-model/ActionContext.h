@@ -22,13 +22,13 @@ namespace chip {
 namespace app {
 namespace InteractionModel {
 
-// Context for a currently executing request
-class RequestContext
+// Context for a currently executing action
+class ActionContext
 {
 public:
-    virtual ~RequestContext() = default;
+    virtual ~ActionContext() = default;
 
-    /// Valid ONLY during synchronous handling of a Read/Write/Invoke
+    /// Valid ONLY during synchronous handling of an action.
     ///
     /// Used sparingly, however some operations will require these. An example
     /// usage is "Operational Credentials aborting communications on removed fabrics"
