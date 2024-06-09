@@ -58,6 +58,7 @@ This example differs from other Silicon Labs as it showcases a device that has t
 - Occupancy Sensor
 - Temperature Sensor
 - Contact Sensor
+- Water Leak Detector
 
 The application can cycle between the 3 different sensor modes by pressing BTN0. 
 
