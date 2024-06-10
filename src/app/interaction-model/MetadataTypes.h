@@ -37,8 +37,12 @@ enum class ClusterQualityFlags : uint32_t
 
 struct ClusterInfo
 {
-    DataVersion dataVersion = 0; // current cluster data version
+    DataVersion dataVersion; // current cluster data version,
     BitFlags<ClusterQualityFlags> flags;
+
+    /// Constructor that marks data version as mandatory
+    /// for this structure.
+    ClusterInfo(DataVersion version) : dataVersion(version) {}
 };
 
 struct ClusterEntry
@@ -46,14 +50,11 @@ struct ClusterEntry
     ConcreteClusterPath path;
     ClusterInfo info;
 
-    static ClusterEntry Invalid()
-    {
-        ClusterEntry result;
-        result.path = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
-        return result;
-    }
+    ClusterEntry(ConcreteClusterPath clusterPath, ClusterInfo clusterInfo) : path(clusterPath), info(clusterInfo) {}
 
     bool IsValid() const { return path.HasValidIds(); }
+
+    static const ClusterEntry kInvalid;
 };
 
 enum class AttributeQualityFlags : uint32_t

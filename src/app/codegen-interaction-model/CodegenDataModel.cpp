@@ -21,7 +21,9 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/DataModelTypes.h>
+
 #include <optional>
+#include <variant>
 
 namespace chip {
 namespace app {
@@ -35,33 +37,41 @@ bool IsServerMask(EmberAfClusterMask mask)
 }
 
 /// Load the cluster information into the specified destination
-void LoadClusterInfo(const ConcreteClusterPath & path, const EmberAfCluster & cluster, InteractionModel::ClusterInfo * info)
+std::variant<CHIP_ERROR, InteractionModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path,
+                                                                        const EmberAfCluster & cluster)
 {
     DataVersion * versionPtr = emberAfDataVersionStorage(path);
-    if (versionPtr != nullptr)
-    {
-        info->dataVersion = *versionPtr;
-    }
-    else
+    if (versionPtr == nullptr)
     {
         ChipLogError(AppServer, "Failed to get data version for %d/" ChipLogFormatMEI, static_cast<int>(path.mEndpointId),
                      ChipLogValueMEI(cluster.clusterId));
-        info->dataVersion = 0;
+        return CHIP_ERROR_NOT_FOUND;
     }
+
+    InteractionModel::ClusterInfo info(*versionPtr);
 
     // TODO: set entry flags:
     //   info->flags.Set(ClusterQualityFlags::kDiagnosticsData)
+
+    return info;
 }
 
 /// Converts a EmberAfCluster into a ClusterEntry
-InteractionModel::ClusterEntry ClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
+std::variant<CHIP_ERROR, InteractionModel::ClusterEntry> ClusterEntryFrom(EndpointId endpointId, const EmberAfCluster & cluster)
 {
-    InteractionModel::ClusterEntry entry;
+    ConcreteClusterPath clusterPath(endpointId, cluster.clusterId);
+    auto info = LoadClusterInfo(clusterPath, cluster);
 
-    entry.path = ConcreteClusterPath(endpointId, cluster.clusterId);
-    LoadClusterInfo(entry.path, cluster, &entry.info);
+    if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
+    {
+        return *err;
+    }
 
-    return entry;
+    if (InteractionModel::ClusterInfo * infoValue = std::get_if<InteractionModel::ClusterInfo>(&info))
+    {
+        return InteractionModel::ClusterEntry(clusterPath, *infoValue);
+    }
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 /// Finds the first server cluster entry for the given endpoint data starting at [start_index]
@@ -79,10 +89,25 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
         }
 
         found_index = cluster_idx;
-        return ClusterEntryFrom(endpointId, cluster);
+        auto entry  = ClusterEntryFrom(endpointId, cluster);
+
+        if (InteractionModel::ClusterEntry * entryValue = std::get_if<InteractionModel::ClusterEntry>(&entry))
+        {
+            return *entryValue;
+        }
+
+        if (CHIP_ERROR * errValue = std::get_if<CHIP_ERROR>(&entry))
+        {
+            ChipLogError(AppServer, "Failed to load cluster entry: %" CHIP_ERROR_FORMAT, errValue->Format());
+        }
+        else
+        {
+            // Should NOT be possible: entryFrom has only 2 variants
+            ChipLogError(AppServer, "Failed to load cluster entry, UNKNOWN entry return type");
+        }
     }
 
-    return InteractionModel::ClusterEntry::Invalid();
+    return InteractionModel::ClusterEntry::kInvalid;
 }
 
 /// Load the attribute information into the specified destination
@@ -307,9 +332,9 @@ EndpointId CodegenDataModel::NextEndpoint(EndpointId before)
 InteractionModel::ClusterEntry CodegenDataModel::FirstCluster(EndpointId endpointId)
 {
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
-    VerifyOrReturnValue(endpoint != nullptr, InteractionModel::ClusterEntry::Invalid());
-    VerifyOrReturnValue(endpoint->clusterCount > 0, InteractionModel::ClusterEntry::Invalid());
-    VerifyOrReturnValue(endpoint->cluster != nullptr, InteractionModel::ClusterEntry::Invalid());
+    VerifyOrReturnValue(endpoint != nullptr, InteractionModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, InteractionModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, InteractionModel::ClusterEntry::kInvalid);
 
     return FirstServerClusterEntry(endpointId, endpoint, 0, mClusterIterationHint);
 }
@@ -348,14 +373,14 @@ InteractionModel::ClusterEntry CodegenDataModel::NextCluster(const ConcreteClust
     //       as ember API supports it
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
 
-    VerifyOrReturnValue(endpoint != nullptr, InteractionModel::ClusterEntry::Invalid());
-    VerifyOrReturnValue(endpoint->clusterCount > 0, InteractionModel::ClusterEntry::Invalid());
-    VerifyOrReturnValue(endpoint->cluster != nullptr, InteractionModel::ClusterEntry::Invalid());
+    VerifyOrReturnValue(endpoint != nullptr, InteractionModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint->clusterCount > 0, InteractionModel::ClusterEntry::kInvalid);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, InteractionModel::ClusterEntry::kInvalid);
 
     std::optional<unsigned> cluster_idx = TryFindServerClusterIndex(endpoint, before.mClusterId);
     if (!cluster_idx.has_value())
     {
-        return InteractionModel::ClusterEntry::Invalid();
+        return InteractionModel::ClusterEntry::kInvalid;
     }
 
     return FirstServerClusterEntry(before.mEndpointId, endpoint, *cluster_idx + 1, mClusterIterationHint);
@@ -367,10 +392,15 @@ std::optional<InteractionModel::ClusterInfo> CodegenDataModel::GetClusterInfo(co
 
     VerifyOrReturnValue(cluster != nullptr, std::nullopt);
 
-    InteractionModel::ClusterInfo info;
-    LoadClusterInfo(path, *cluster, &info);
+    auto info = LoadClusterInfo(path, *cluster);
 
-    return std::make_optional(info);
+    if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
+    {
+        ChipLogError(AppServer, "Failed to load cluster info: %" CHIP_ERROR_FORMAT, err->Format());
+        return std::nullopt;
+    }
+
+    return std::make_optional(std::get<InteractionModel::ClusterInfo>(info));
 }
 
 InteractionModel::AttributeEntry CodegenDataModel::FirstAttribute(const ConcreteClusterPath & path)

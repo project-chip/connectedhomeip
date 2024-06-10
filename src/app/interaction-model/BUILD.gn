@@ -19,6 +19,7 @@ source_set("interaction-model") {
     "Context.h",
     "Events.h",
     "InvokeResponder.h",
+    "MetadataTypes.cpp",
     "MetadataTypes.h",
     "Model.h",
     "OperationTypes.h",
