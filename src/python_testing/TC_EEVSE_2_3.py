@@ -249,7 +249,6 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         targets_step_9 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
             dayOfWeekForSequence=0x7F, chargingTargets=daily_targets_step_9)]
 
-        breakpoint()
         await self.send_set_targets_command(chargingTargetSchedules=targets_step_9)
 
         self.step("9a")

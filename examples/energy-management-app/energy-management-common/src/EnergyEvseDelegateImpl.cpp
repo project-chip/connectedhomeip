@@ -242,109 +242,14 @@ Status EnergyEvseDelegate::SetTargets(
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::SetTargets()");
 
-    Status status = ValidateTargets(chargingTargetSchedules);
-    if (status != Status::Success)
-    {
-        ChipLogError(AppServer, "SetTargets contained invalid data - Rejecting");
-        return status;
-    }
-
-    status = SaveTargets(chargingTargetSchedules);
+    Status status = SaveTargets(chargingTargetSchedules);
 
     /* The Application needs to be told that the Targets have been updated
      * so it can potentially re-optimize the charging start time etc
      */
     NotifyApplicationChargingPreferencesChange();
 
-    return Status::Success;
-}
-
-Status EnergyEvseDelegate::ValidateTargets(
-    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules)
-{
-    /* A) check that the targets are valid
-     *  1) each target must be within valid range (TargetTimeMinutesPastMidnight < 1440)
-     *  2) each target must be within valid range (TargetSoC percent 0 - 100)
-     *      If SOC feature not supported then this MUST be 100 or not present
-     *  3) each target must be within valid range (AddedEnergy >= 0)
-     * B) Day of Week is only allowed to be included once
-     */
-
-    uint8_t dayOfWeekBitmap = 0;
-
-    auto iter = chargingTargetSchedules.begin();
-    while (iter.Next())
-    {
-        auto & entry    = iter.GetValue();
-        uint8_t bitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
-        ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
-
-        if ((dayOfWeekBitmap & bitmask) != 0)
-        {
-            // A bit has already been set - Return ConstraintError
-            ChipLogError(AppServer, "DayOfWeekForSequence has a bit set which has already been set in another entry.");
-            return Status::ConstraintError;
-        }
-        dayOfWeekBitmap |= bitmask; // add this day Of week to the previously seen days
-
-        auto iterInner   = entry.chargingTargets.begin();
-        uint8_t innerIdx = 0;
-        while (iterInner.Next())
-        {
-            auto & targetStruct          = iterInner.GetValue();
-            uint16_t minutesPastMidnight = targetStruct.targetTimeMinutesPastMidnight;
-            ChipLogProgress(AppServer, "[%d] MinutesPastMidnight : %d", innerIdx,
-                            static_cast<short unsigned int>(minutesPastMidnight));
-
-            if (minutesPastMidnight > 1439)
-            {
-                ChipLogError(AppServer, "MinutesPastMidnight has invalid value (%d)", static_cast<int>(minutesPastMidnight));
-                return Status::ConstraintError;
-            }
-
-            uint8_t targetSoC;
-            int64_t addedEnergy;
-
-            /* Check that we have at least an AddedEnergy or TargetSoC value */
-            if (!(targetStruct.targetSoC.HasValue()) && !(targetStruct.addedEnergy.HasValue()))
-            {
-                ChipLogError(AppServer, "Must have one of AddedEnergy or TargetSoC");
-                return Status::ConstraintError;
-            }
-
-            if (targetStruct.targetSoC.HasValue())
-            {
-                targetSoC = targetStruct.targetSoC.Value();
-                ChipLogProgress(AppServer, "[%d] TargetSoC           : %d", innerIdx, static_cast<int>(targetSoC));
-
-                if (targetSoC > 100)
-                {
-                    ChipLogError(AppServer, "TargetSoC has invalid value (%d)", static_cast<int>(targetSoC));
-                    return Status::ConstraintError;
-                }
-                /* If SoC feature is not supported check that the value is 100% */
-                if (targetSoC != 100) // TODO work out how to check feature support in Delegate
-                {
-                    /* The only value we allow is 100 */
-                    ChipLogError(AppServer, "TargetSoC has can only be 100%% if SOC feature is not supported");
-                    return Status::ConstraintError;
-                }
-            }
-            if (targetStruct.addedEnergy.HasValue())
-            {
-                addedEnergy = targetStruct.addedEnergy.Value();
-                ChipLogProgress(AppServer, "[%d] AddedEnergy         : %ld", innerIdx, static_cast<signed long int>(addedEnergy));
-                if (addedEnergy < 0)
-                {
-                    ChipLogError(AppServer, "AddedEnergy has invalid value (%ld)", static_cast<signed long int>(addedEnergy));
-                    return Status::ConstraintError;
-                }
-            }
-            innerIdx++;
-        }
-    }
-
-    return Status::Success;
+    return status;
 }
 
 Status EnergyEvseDelegate::SaveTargets(

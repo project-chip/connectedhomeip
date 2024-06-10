@@ -101,7 +101,7 @@ public:
     virtual Protocols::InteractionModel::Status StartDiagnostics() = 0;
 
     /**
-     * @brief Delegate should implement a handler to SetTargets command.
+     * @brief Delegate should implement a handler for the SetTargets command.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
@@ -109,18 +109,18 @@ public:
     SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &) = 0;
 
     /**
-     * @brief Delegate should implement a handler to PrepareGetTargets
+     * @brief Delegate should implement a handler for PrepareGetTargets
      *
      * This needs to load any stored targets into memory and hold it until the GetTargetsFinished is
      * called by the cluster server.
      *
-     * @param  Reference to EvseTargetIterator class that implements the ability
-     *         for the cluster server to iterate through the target entries
+     * @param[out]  Reference to EvseTargetIterator class that implements the ability
+     *              for the cluster server to iterate through the target entries
      */
     virtual CHIP_ERROR PrepareGetTargets(EvseTargetIterator ** iterator) = 0;
 
     /**
-     * @brief Delegate should implement a handler to GetTargetsFinished
+     * @brief Delegate should implement a handler for GetTargetsFinished
      *
      * This is used by the cluster server to indicate it has finished preparing
      * the GetTargetsResponse using the iterator and that the memory in the delegate can
@@ -129,7 +129,7 @@ public:
     virtual CHIP_ERROR GetTargetsFinished() = 0;
 
     /**
-     * @brief Delegate should implement a handler to ClearTargets command.
+     * @brief Delegate should implement a handler for ClearTargets command.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
@@ -232,6 +232,10 @@ private:
     void HandleSetTargets(HandlerContext & ctx, const Commands::SetTargets::DecodableType & commandData);
     void HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData);
     void HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData);
+
+    // Check that the targets are valid
+    Protocols::InteractionModel::Status ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
+
 };
 
 } // namespace EnergyEvse

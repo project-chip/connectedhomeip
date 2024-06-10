@@ -98,6 +98,9 @@ CHIP_ERROR EvseTargetsDelegate::LoadCounter(size_t & count, size_t & targetsSize
         mpTargetStore->SyncGetKeyValue(DefaultStorageKeyAllocator::EvseTargetEntryCounter().KeyName(), backingBuffer.Get(), length);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
+        count       = 0;
+        targetsSize = MaxTargetEntrySize();
+
         return CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
@@ -365,7 +368,7 @@ CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetSchedule
         index++;
     }
 
-    // Add the new Entry - we have to convert it from DatatModel format to storage format
+    // Add the new Entry - we have to convert it from DataModel format to storage format
     EvseTargetEntry newStorageEntry;
     newStorageEntry.dayOfWeekMap = newDataModelEntry.dayOfWeekForSequence;
 

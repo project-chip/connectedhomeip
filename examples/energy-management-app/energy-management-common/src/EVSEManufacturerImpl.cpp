@@ -780,6 +780,8 @@ void SetTestEventTrigger_EVPluggedIn()
 
     dg->HwSetCableAssemblyLimit(63000);
     dg->HwSetState(StateEnum::kPluggedInNoDemand);
+    dg->SetSupplyState(SupplyStateEnum::kChargingEnabled);
+    dg->SetMaximumChargeCurrent(32000);
 }
 void SetTestEventTrigger_EVPluggedInClear()
 {
