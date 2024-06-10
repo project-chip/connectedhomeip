@@ -389,8 +389,8 @@ public:
      * invoke interaction. If the caller wants that to fail before sending the command, they should call
      * the templated version of AddRequestData.
      */
-    CHIP_ERROR AddRequest(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
-                          AddRequestDataParameters & aAddRequestDataParams);
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
+                              AddRequestDataParameters & aAddRequestDataParams);
 
     /**
      * API for adding a data request.  The template parameter T is generally
@@ -408,7 +408,7 @@ public:
         return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
-    template <typename CommandDataT>
+    template <typename CommandDataT, typename std::enable_if_t<!std::is_base_of_v<DataModel::EncodableToTLV, CommandDataT>, int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               AddRequestDataParameters & aAddRequestDataParams)
     {
@@ -416,7 +416,7 @@ public:
                             CHIP_ERROR_INVALID_ARGUMENT);
 
         DataModel::EncodableType<CommandDataT> encodable(aData);
-        return AddRequest(aCommandPath, encodable, aAddRequestDataParams);
+        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
     }
 
     template <typename CommandDataT>
@@ -446,7 +446,7 @@ public:
                                                   AddRequestDataParameters & aAddRequestDataParams)
     {
         DataModel::EncodableType<CommandDataT> encodable(aData);
-        return AddRequest(aCommandPath, encodable, aAddRequestDataParams);
+        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
     }
 
     CHIP_ERROR TestOnlyFinishCommand(FinishCommandParameters & aFinishCommandParams)
