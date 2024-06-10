@@ -4306,6 +4306,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster DemandResponseLoadControl attributes
+        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDeviceClassID:
+            result = @"DeviceClass";
+            break;
+
         case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeLoadControlProgramsID:
             result = @"LoadControlPrograms";
             break;
@@ -4326,8 +4330,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"NumberOfEventsPerProgram";
             break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransitionsID:
-            result = @"NumberOfTransitions";
+        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransistionsID:
+            result = @"NumberOfTransistions";
             break;
 
         case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID:

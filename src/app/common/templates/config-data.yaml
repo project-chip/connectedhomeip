@@ -33,6 +33,7 @@ CommandHandlerInterfaceOnlyClusters:
     - HEPA Filter Monitoring
     - RVC Operational State
     - Sample MEI
+    - Demand Response Load Control
     - Microwave Oven Control
     - Energy EVSE
     - Energy EVSE Mode

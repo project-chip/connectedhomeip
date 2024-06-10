@@ -2356,6 +2356,19 @@ enum class LoadControlEventStatusEnum : uint8_t
     kUnknownEnumValue = 13,
 };
 
+// Enum for PowerSavingsEnum
+enum class PowerSavingsEnum : uint8_t
+{
+    kLow    = 0x00,
+    kMedium = 0x01,
+    kHigh   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Bitmap for CancelControlBitmap
 enum class CancelControlBitmap : uint16_t
 {

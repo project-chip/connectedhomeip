@@ -1628,6 +1628,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::PowerSavingsEnum val)
+{
+    using EnumType = DemandResponseLoadControl::PowerSavingsEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 
 static auto __attribute__((unused)) EnsureKnownEnumValue(Messages::FutureMessagePreferenceEnum val)
 {

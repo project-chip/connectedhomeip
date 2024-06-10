@@ -2845,7 +2845,7 @@ static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventI
                     memberValue = nil;
                 } else {
                     memberValue = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
-                    memberValue.powerSavings = [NSNumber numberWithUnsignedChar:cppValue.powerSavingsControl.Value().Value().powerSavings];
+                    memberValue.powerSavings = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.powerSavingsControl.Value().Value().powerSavings)];
                 }
             } else {
                 memberValue = nil;

@@ -16,13 +16,17 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class EnergyEvseClusterRFIDEvent(val uid: ByteArray) {
+class EnergyEvseClusterRFIDEvent(
+  val uid: ByteArray
+) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterRFIDEvent {\n")
     append("\tuid : $uid\n")
@@ -40,10 +44,10 @@ class EnergyEvseClusterRFIDEvent(val uid: ByteArray) {
   companion object {
     private const val TAG_UID = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterRFIDEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyEvseClusterRFIDEvent {
       tlvReader.enterStructure(tlvTag)
       val uid = tlvReader.getByteArray(ContextSpecificTag(TAG_UID))
-
+      
       tlvReader.exitContainer()
 
       return EnergyEvseClusterRFIDEvent(uid)

@@ -185,6 +185,13 @@
             "MaxPathsPerInvoke"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
+        "Demand Response Load Control": [
+            "NumberOfLoadControlPrograms",
+            "NumberOfEventsPerProgram",
+            "NumberOfTransitions",
+            "DefaultRandomStart",
+            "DefaultRandomDuration"
+        ],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",

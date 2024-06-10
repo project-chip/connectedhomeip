@@ -9298,14 +9298,15 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            LoadControlPrograms(0L),
-            NumberOfLoadControlPrograms(1L),
-            Events(2L),
-            ActiveEvents(3L),
-            NumberOfEventsPerProgram(4L),
-            NumberOfTransitions(5L),
-            DefaultRandomStart(6L),
-            DefaultRandomDuration(7L),
+            DeviceClass(0L),
+            LoadControlPrograms(1L),
+            NumberOfLoadControlPrograms(2L),
+            Events(3L),
+            ActiveEvents(4L),
+            NumberOfEventsPerProgram(5L),
+            NumberOfTransistions(6L),
+            DefaultRandomStart(7L),
+            DefaultRandomDuration(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

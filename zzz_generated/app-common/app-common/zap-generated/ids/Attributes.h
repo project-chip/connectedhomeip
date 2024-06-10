@@ -3804,36 +3804,40 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace DemandResponseLoadControl {
 namespace Attributes {
 
-namespace LoadControlPrograms {
+namespace DeviceClass {
 static constexpr AttributeId Id = 0x00000000;
+} // namespace DeviceClass
+
+namespace LoadControlPrograms {
+static constexpr AttributeId Id = 0x00000001;
 } // namespace LoadControlPrograms
 
 namespace NumberOfLoadControlPrograms {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace NumberOfLoadControlPrograms
 
 namespace Events {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace Events
 
 namespace ActiveEvents {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace ActiveEvents
 
 namespace NumberOfEventsPerProgram {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000005;
 } // namespace NumberOfEventsPerProgram
 
-namespace NumberOfTransitions {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace NumberOfTransitions
+namespace NumberOfTransistions {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace NumberOfTransistions
 
 namespace DefaultRandomStart {
-static constexpr AttributeId Id = 0x00000006;
+static constexpr AttributeId Id = 0x00000007;
 } // namespace DefaultRandomStart
 
 namespace DefaultRandomDuration {
-static constexpr AttributeId Id = 0x00000007;
+static constexpr AttributeId Id = 0x00000008;
 } // namespace DefaultRandomDuration
 
 namespace GeneratedCommandList {

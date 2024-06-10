@@ -17,22 +17,25 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
-  val panId: UInt,
-  val extendedPanId: ULong,
-  val networkName: String,
-  val channel: UInt,
-  val version: UInt,
-  val extendedAddress: ByteArray,
-  val rssi: Int,
-  val lqi: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class NetworkCommissioningClusterThreadInterfaceScanResultStruct (
+    val panId: UInt,
+    val extendedPanId: ULong,
+    val networkName: String,
+    val channel: UInt,
+    val version: UInt,
+    val extendedAddress: ByteArray,
+    val rssi: Int,
+    val lqi: UInt) {
+  override fun toString(): String  = buildString {
     append("NetworkCommissioningClusterThreadInterfaceScanResultStruct {\n")
     append("\tpanId : $panId\n")
     append("\textendedPanId : $extendedPanId\n")
@@ -70,10 +73,7 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
     private const val TAG_RSSI = 6
     private const val TAG_LQI = 7
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): NetworkCommissioningClusterThreadInterfaceScanResultStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : NetworkCommissioningClusterThreadInterfaceScanResultStruct {
       tlvReader.enterStructure(tlvTag)
       val panId = tlvReader.getUInt(ContextSpecificTag(TAG_PAN_ID))
       val extendedPanId = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
@@ -83,19 +83,10 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
       val extendedAddress = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_ADDRESS))
       val rssi = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
       val lqi = tlvReader.getUInt(ContextSpecificTag(TAG_LQI))
-
+      
       tlvReader.exitContainer()
 
-      return NetworkCommissioningClusterThreadInterfaceScanResultStruct(
-        panId,
-        extendedPanId,
-        networkName,
-        channel,
-        version,
-        extendedAddress,
-        rssi,
-        lqi
-      )
+      return NetworkCommissioningClusterThreadInterfaceScanResultStruct(panId, extendedPanId, networkName, channel, version, extendedAddress, rssi, lqi)
     }
   }
 }

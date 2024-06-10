@@ -20,13 +20,15 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ContentLauncherClusterContentSearchStruct(
-  val parameterList: List<ContentLauncherClusterParameterStruct>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ContentLauncherClusterContentSearchStruct (
+    val parameterList: List<ContentLauncherClusterParameterStruct>) {
+  override fun toString(): String  = buildString {
     append("ContentLauncherClusterContentSearchStruct {\n")
     append("\tparameterList : $parameterList\n")
     append("}\n")
@@ -47,17 +49,16 @@ class ContentLauncherClusterContentSearchStruct(
   companion object {
     private const val TAG_PARAMETER_LIST = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterContentSearchStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentLauncherClusterContentSearchStruct {
       tlvReader.enterStructure(tlvTag)
-      val parameterList =
-        buildList<ContentLauncherClusterParameterStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_PARAMETER_LIST))
-          while (!tlvReader.isEndOfContainer()) {
-            add(ContentLauncherClusterParameterStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val parameterList = buildList<ContentLauncherClusterParameterStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_PARAMETER_LIST))
+      while(!tlvReader.isEndOfContainer()) {
+        add(ContentLauncherClusterParameterStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return ContentLauncherClusterContentSearchStruct(parameterList)

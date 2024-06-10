@@ -120,6 +120,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/drlc-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/measurement-and-sensing.xml \
                       src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml \

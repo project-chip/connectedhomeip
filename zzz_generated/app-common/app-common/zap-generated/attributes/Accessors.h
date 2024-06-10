@@ -2470,6 +2470,17 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 namespace DemandResponseLoadControl {
 namespace Attributes {
 
+namespace DeviceClass {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap> * value); // DeviceClassBitmap
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap> value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap> value,
+                                        MarkAttributeDirty markDirty);
+} // namespace DeviceClass
+
 namespace NumberOfLoadControlPrograms {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
@@ -2482,11 +2493,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace NumberOfEventsPerProgram
 
-namespace NumberOfTransitions {
+namespace NumberOfTransistions {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace NumberOfTransitions
+} // namespace NumberOfTransistions
 
 namespace DefaultRandomStart {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // int8u

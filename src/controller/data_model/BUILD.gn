@@ -44,3 +44,53 @@ chip_data_model("data_model") {
   zap_file = "controller-clusters.zap"
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
+
+if (current_os == "android" || matter_enable_java_compilation) {
+  config("java-build-config") {
+    if (matter_enable_java_compilation) {
+      include_dirs = java_matter_controller_dependent_paths
+    }
+  }
+
+  chip_codegen("java-jni-generate") {
+    input = "controller-clusters.matter"
+    generator = "java-jni"
+
+    outputs = [
+      "jni/DemandResponseLoadControlClient-InvokeSubscribeImpl.cpp",
+      "jni/DemandResponseLoadControlClient-ReadImpl.cpp",
+    ]
+    deps = [
+      ":data_model",
+      "${chip_root}/src/platform:platform_config_header",
+    ]
+
+    public_configs = [ ":java-build-config" ]
+  }
+
+  source_set("java-jni-sources") {
+    public_configs = [
+      ":java-build-config",
+      ":java-jni-generate_config",
+      "${chip_root}/src:includes",
+    ]
+
+    deps = [
+      ":data_model",
+      ":java-jni-generate",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib",
+      "${chip_root}/src/platform",
+    ]
+
+    if (matter_enable_java_compilation) {
+      if (current_os == "mac") {
+        deps += [ "${chip_root}/src/platform/Darwin" ]
+      } else {
+        deps += [ "${chip_root}/src/platform/Linux" ]
+      }
+    } else {
+      deps += [ "${chip_root}/src/platform/android" ]
+    }
+  }
+}

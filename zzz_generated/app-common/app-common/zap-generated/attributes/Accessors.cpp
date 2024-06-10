@@ -15004,6 +15004,57 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 namespace DemandResponseLoadControl {
 namespace Attributes {
 
+namespace DeviceClass {
+
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap> value,
+                                        MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE,
+                                 markDirty);
+}
+
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap> value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+} // namespace DeviceClass
+
 namespace NumberOfLoadControlPrograms {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value)
@@ -15098,7 +15149,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 } // namespace NumberOfEventsPerProgram
 
-namespace NumberOfTransitions {
+namespace NumberOfTransistions {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -15143,7 +15194,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
     return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace NumberOfTransitions
+} // namespace NumberOfTransistions
 
 namespace DefaultRandomStart {
 

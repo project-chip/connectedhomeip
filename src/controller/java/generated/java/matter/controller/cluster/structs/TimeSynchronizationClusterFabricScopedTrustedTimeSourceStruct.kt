@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -46,14 +48,11 @@ class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(
     private const val TAG_NODE_I_D = 0
     private const val TAG_ENDPOINT = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_I_D))
       val endpoint = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT))
-
+      
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(nodeID, endpoint)

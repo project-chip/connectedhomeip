@@ -15235,7 +15235,7 @@ NS_ASSUME_NONNULL_BEGIN
                     }
                     if (element_1.powerSavingsControl != nil) {
                         auto & definedValue_3 = listHolder_1->mList[i_1].powerSavingsControl.Emplace();
-                        definedValue_3.powerSavings = element_1.powerSavingsControl.powerSavings.unsignedCharValue;
+                        definedValue_3.powerSavings = static_cast<std::remove_reference_t<decltype(definedValue_3.powerSavings)>>(element_1.powerSavingsControl.powerSavings.unsignedCharValue);
                     }
                     if (element_1.heatingSourceControl != nil) {
                         auto & definedValue_3 = listHolder_1->mList[i_1].heatingSourceControl.Emplace();

@@ -6580,14 +6580,15 @@ private:
 | * ClearLoadControlEventsRequest                                     |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * LoadControlPrograms                                               | 0x0000 |
-| * NumberOfLoadControlPrograms                                       | 0x0001 |
-| * Events                                                            | 0x0002 |
-| * ActiveEvents                                                      | 0x0003 |
-| * NumberOfEventsPerProgram                                          | 0x0004 |
-| * NumberOfTransitions                                               | 0x0005 |
-| * DefaultRandomStart                                                | 0x0006 |
-| * DefaultRandomDuration                                             | 0x0007 |
+| * DeviceClass                                                       | 0x0000 |
+| * LoadControlPrograms                                               | 0x0001 |
+| * NumberOfLoadControlPrograms                                       | 0x0002 |
+| * Events                                                            | 0x0003 |
+| * ActiveEvents                                                      | 0x0004 |
+| * NumberOfEventsPerProgram                                          | 0x0005 |
+| * NumberOfTransistions                                              | 0x0006 |
+| * DefaultRandomStart                                                | 0x0007 |
+| * DefaultRandomDuration                                             | 0x0008 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -20457,6 +20458,7 @@ void registerClusterDemandResponseLoadControl(Commands & commands, CredentialIss
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                               //
+        make_unique<ReadAttribute>(Id, "device-class", Attributes::DeviceClass::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "load-control-programs", Attributes::LoadControlPrograms::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-load-control-programs", Attributes::NumberOfLoadControlPrograms::Id,
                                    credsIssuerConfig),                                                    //
@@ -20464,7 +20466,7 @@ void registerClusterDemandResponseLoadControl(Commands & commands, CredentialIss
         make_unique<ReadAttribute>(Id, "active-events", Attributes::ActiveEvents::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-events-per-program", Attributes::NumberOfEventsPerProgram::Id,
                                    credsIssuerConfig),                                                                       //
-        make_unique<ReadAttribute>(Id, "number-of-transitions", Attributes::NumberOfTransitions::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "number-of-transistions", Attributes::NumberOfTransistions::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "default-random-start", Attributes::DefaultRandomStart::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "default-random-duration", Attributes::DefaultRandomDuration::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
@@ -20474,6 +20476,8 @@ void registerClusterDemandResponseLoadControl(Commands & commands, CredentialIss
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DemandResponseLoadControl::DeviceClassBitmap>>>(
+            Id, "device-class", 0, UINT32_MAX, Attributes::DeviceClass::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlProgramStruct::Type>>>(
             Id, "load-control-programs", Attributes::LoadControlPrograms::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -20489,7 +20493,7 @@ void registerClusterDemandResponseLoadControl(Commands & commands, CredentialIss
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-events-per-program", 0, UINT8_MAX,
                                              Attributes::NumberOfEventsPerProgram::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "number-of-transitions", 0, UINT8_MAX, Attributes::NumberOfTransitions::Id,
+        make_unique<WriteAttribute<uint8_t>>(Id, "number-of-transistions", 0, UINT8_MAX, Attributes::NumberOfTransistions::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "default-random-start", 0, UINT8_MAX, Attributes::DefaultRandomStart::Id,
                                              WriteCommandType::kWrite, credsIssuerConfig), //
@@ -20509,6 +20513,7 @@ void registerClusterDemandResponseLoadControl(Commands & commands, CredentialIss
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                               //
+        make_unique<SubscribeAttribute>(Id, "device-class", Attributes::DeviceClass::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "load-control-programs", Attributes::LoadControlPrograms::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-load-control-programs", Attributes::NumberOfLoadControlPrograms::Id,
                                         credsIssuerConfig),                                                    //
@@ -20516,7 +20521,7 @@ void registerClusterDemandResponseLoadControl(Commands & commands, CredentialIss
         make_unique<SubscribeAttribute>(Id, "active-events", Attributes::ActiveEvents::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-events-per-program", Attributes::NumberOfEventsPerProgram::Id,
                                         credsIssuerConfig),                                                                       //
-        make_unique<SubscribeAttribute>(Id, "number-of-transitions", Attributes::NumberOfTransitions::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "number-of-transistions", Attributes::NumberOfTransistions::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "default-random-start", Attributes::DefaultRandomStart::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "default-random-duration", Attributes::DefaultRandomDuration::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //

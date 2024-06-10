@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -62,27 +63,22 @@ class ContentLauncherClusterStyleInformationStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterStyleInformationStruct {
       tlvReader.enterStructure(tlvTag)
-      val imageURL =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_IMAGE_U_R_L))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IMAGE_U_R_L)))
-        } else {
-          Optional.empty()
-        }
-      val color =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_COLOR))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_COLOR)))
-        } else {
-          Optional.empty()
-        }
-      val size =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SIZE))) {
-          Optional.of(
-            ContentLauncherClusterDimensionStruct.fromTlv(ContextSpecificTag(TAG_SIZE), tlvReader)
-          )
-        } else {
-          Optional.empty()
-        }
-
+      val imageURL = if (tlvReader.isNextTag(ContextSpecificTag(TAG_IMAGE_U_R_L))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IMAGE_U_R_L)))
+    } else {
+      Optional.empty()
+    }
+      val color = if (tlvReader.isNextTag(ContextSpecificTag(TAG_COLOR))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_COLOR)))
+    } else {
+      Optional.empty()
+    }
+      val size = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SIZE))) {
+      Optional.of(ContentLauncherClusterDimensionStruct.fromTlv(ContextSpecificTag(TAG_SIZE), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return ContentLauncherClusterStyleInformationStruct(imageURL, color, size)

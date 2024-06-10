@@ -1,13 +1,10 @@
 <?xml version="1.0"?>
 <!--
 Copyright (c) 2023 Project CHIP Authors
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +12,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="Energy Management"/>
+  <domain name="Energy"/>
 
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0096"/>
+    <field name="EnrollmentGroups" mask="0x1"/>
+    <field name="TemperatureOffset" mask="0x2"/>
+    <field name="TemperatureSetpoint" mask="0x4"/>
+    <field name="LoadAdjustment" mask="0x8"/>
+    <field name="DutyCycle" mask="0x10"/>
+    <field name="PowerSavings" mask="0x20"/>
+    <field name="HeatingSource" mask="0x40"/>
+  </bitmap>
 
   <bitmap name="DeviceClassBitmap" type="bitmap32">
     <cluster code="0x0096"/>
@@ -99,6 +106,13 @@ limitations under the License.
     <item name="NonElectric" value="0x2"/>
   </enum>
 
+  <enum name="PowerSavingsEnum" type="enum8">
+    <cluster code="0x0096"/>
+    <item name="Low" value="0x0"/>
+    <item name="Medium" value="0x1"/>
+    <item name="High" value="0x2"/>
+  </enum>
+
   <struct name="TemperatureControlStruct">
     <cluster code="0x0096"/>
     <!-- Note: No TemperatureDifference type available yet in ZAP XML -->
@@ -120,7 +134,7 @@ limitations under the License.
 
   <struct name="PowerSavingsControlStruct">
     <cluster code="0x0096"/>
-    <item fieldId="0" name="PowerSavings" type="percent" />
+    <item fieldId="0" name="PowerSavings" type="PowerSavingsEnum"/>
   </struct>
 
   <struct name="HeatingSourceControlStruct">
@@ -165,9 +179,9 @@ limitations under the License.
     <item fieldId="4" name="RandomDurationMinutes" type="int8u" isNullable="true" min="0x00" max="0x3C"/>
   </struct>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Demand Response Load Control</name>
-    <domain>Energy Management</domain>
+    <domain>Energy</domain>
     <description>This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control.</description>
     <code>0x0096</code>
     <define>DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER</define>
@@ -175,42 +189,19 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
-    <features>
-      <feature bit="0" code="ENRLG" name="Enrollment Groups" summary="Supports enrollment groups">
-        <optionalConform/>
-      </feature>
-      <feature bit="1" code="TEMPO" name="TemperatureOffset" summary="Supports temperature offsets">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="2" code="TEMPS" name="TemperatureSetpoint" summary="Supports temperature setpoints">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="3" code="LOADA" name="LoadAdjustment" summary="Supports average load adjustment percentage">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="4" code="DUTYC" name="DutyCycle" summary="Supports duty cycle adjustment">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="5" code="PWRSV" name="PowerSavings" summary="Supports power savings">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="6" code="HEATS" name="HeatingSource" summary="Supports selecting heating source">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-    </features>
-
-    <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="array" entryType="LoadControlProgramStruct" writable="false">LoadControlPrograms</attribute>
-    <attribute side="server" code="0x0001" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" writable="false" default="5">NumberOfLoadControlPrograms</attribute>
-    <attribute side="server" code="0x0002" define="LOAD_CONTROL_EVENTS" type="array" entryType="LoadControlEventStruct" writable="false">Events</attribute>
-    <attribute side="server" code="0x0003" define="LOAD_CONTROL_ACTIVE_EVENTS" type="array" entryType="LoadControlEventStruct" writable="false">ActiveEvents</attribute>
-    <attribute side="server" code="0x0004" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" writable="false" default="10">NumberOfEventsPerProgram</attribute>
-    <attribute side="server" code="0x0005" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" writable="false" default="3">NumberOfTransitions</attribute>
-    <attribute side="server" code="0x0006" define="DEFAULT_RANDOM_START" type="int8u" min="0" max="0x3C" default="0x1E" writable="true">
+    <attribute side="server" code="0x0000" define="DEVICE_CLASS" type="DeviceClassBitmap" default="0" writable="false">DeviceClass</attribute>
+    <attribute side="server" code="0x0001" define="LOAD_CONTROL_PROGRAMS" type="ARRAY" entryType="LoadControlProgramStruct" writable="false">LoadControlPrograms</attribute>
+    <attribute side="server" code="0x0002" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" writable="false" default="5">NumberOfLoadControlPrograms</attribute>
+    <attribute side="server" code="0x0003" define="LOAD_CONTROL_EVENTS" type="ARRAY" entryType="LoadControlEventStruct" writable="false">Events</attribute>
+    <attribute side="server" code="0x0004" define="LOAD_CONTROL_ACTIVE_EVENTS" type="ARRAY" entryType="LoadControlEventStruct" writable="false">ActiveEvents</attribute>
+    <attribute side="server" code="0x0005" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" writable="false" default="10">NumberOfEventsPerProgram</attribute>
+    <attribute side="server" code="0x0006" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" writable="false" default="3">NumberOfTransistions</attribute>
+    <attribute side="server" code="0x0007" define="DEFAULT_RANDOM_START" type="int8u" min="0" max="0x3C" default="0x1E" writable="true">
       <description>DefaultRandomStart</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0007" define="DEFAULT_RANDOM_DURATION" type="int8u" min="0" max="0x3C" default="0" writable="true">
+    <attribute side="server" code="0x0008" define="DEFAULT_RANDOM_DURATION" type="int8u" min="0" max="0x3C" default="0" writable="true">
       <description>DefaultRandomDuration</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>

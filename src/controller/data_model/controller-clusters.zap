@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 100,
+  "featureLevel": 102,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -29,6 +29,7 @@
       "pathRelativity": "relativeToZap",
       "path": "../../app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
+      "category": "matter",
       "version": "chip-v1"
     }
   ],
@@ -1928,7 +1929,6 @@
           "define": "OPERATIONAL_STATE_OVEN_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -1971,7 +1971,6 @@
           "define": "OVEN_MODE_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "ChangeToMode",
@@ -2693,7 +2692,6 @@
           "define": "MICROWAVE_OVEN_MODE_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -2736,7 +2734,6 @@
           "define": "MICROWAVE_OVEN_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "SetCookingParameters",
@@ -3116,7 +3113,6 @@
           "define": "ELECTRICAL_POWER_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -3159,7 +3155,48 @@
           "define": "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Demand Response Load Control",
+          "code": 150,
+          "mfgCode": null,
+          "define": "DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER",
+          "side": "client",
+          "enabled": 1,
           "attributes": [
             {
               "name": "FeatureMap",
@@ -3245,7 +3282,6 @@
           "define": "ENERGY_EVSE_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "Disable",
@@ -3306,7 +3342,6 @@
           "define": "POWER_TOPOLOGY_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -3349,7 +3384,6 @@
           "define": "ENERGY_EVSE_MODE_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "ChangeToMode",
