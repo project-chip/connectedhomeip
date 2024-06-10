@@ -753,7 +753,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     }
 
     uint32_t currentUtcTime = 0;
-    status                  = GetCurrentTimeEpochS(currentUtcTime);
+    status                  = GetMatterEpochTimeFromUnixTime(currentUtcTime);
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: Failed to get UTC time");
@@ -815,7 +815,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
 
                 if (constraint.loadControl.Value() < -100 || constraint.loadControl.Value() > 100)
                 {
-                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast bad loadControl %d", constraint.loadControl.HasValue());
+                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast bad loadControl %d", constraint.loadControl.Value());
                     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
                     return;
                 }
@@ -849,7 +849,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                     return;
                 }
 
-                prevConstraint = iterator.GetValue();
+                prevConstraint = constraint;
             }
         }
 
@@ -892,7 +892,7 @@ void Instance::HandleCancelRequest(HandlerContext & ctx, const Commands::CancelR
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-Status Instance::GetCurrentTimeEpochS(uint32_t & currentUtcTime) const
+Status Instance::GetMatterEpochTimeFromUnixTime(uint32_t & currentUtcTime) const
 {
     currentUtcTime = 0;
     System::Clock::Milliseconds64 cTMs;
