@@ -79,7 +79,7 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
     for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (!cluster.IsServerMask())
+        if (!cluster.IsServer())
         {
             continue;
         }
@@ -330,7 +330,7 @@ std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberA
     if (mClusterIterationHint < clusterCount)
     {
         const EmberAfCluster & cluster = endpoint->cluster[mClusterIterationHint];
-        if (cluster.IsServerMask() && (cluster.clusterId == id))
+        if (cluster.IsServer() && (cluster.clusterId == id))
         {
             return std::make_optional(mClusterIterationHint);
         }
@@ -342,7 +342,7 @@ std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberA
     for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (cluster.IsServerMask() && (cluster.clusterId == id))
+        if (cluster.IsServer() && (cluster.clusterId == id))
         {
             return std::make_optional(cluster_idx);
         }

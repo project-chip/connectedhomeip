@@ -118,7 +118,7 @@ struct EmberAfCluster
      */
     uint16_t eventCount;
 
-    bool IsServerMask() const { return (mask & CLUSTER_MASK_SERVER) != 0; }
+    bool IsServer() const { return (mask & CLUSTER_MASK_SERVER) != 0; }
 };
 
 /**
