@@ -94,6 +94,15 @@ void ContentApp::SendAppObserverCommand(chip::Controller::DeviceCommissioner * c
     ChipLogProgress(Controller, "Completed send of AppObserver command");
 }
 
+bool ContentApp::HasSupportedCluster(chip::ClusterId clusterId) const {
+    for (const auto& supportedCluster : mSupportedClusters) {
+        if (clusterId == supportedCluster.clusterIdentifier) {
+            return true;
+        }
+    }
+    return false;
+}
+
 CHIP_ERROR ContentAppClientCommandSender::SendContentAppMessage(chip::Controller::DeviceCommissioner * commissioner,
                                                                 chip::NodeId destinationId, chip::EndpointId endPointId,
                                                                 char * data, char * encodingHint)

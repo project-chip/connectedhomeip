@@ -35,8 +35,10 @@
 #include <app/util/attribute-storage.h>
 #include <controller/CHIPDeviceController.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <string>
+#include <vector>
 
 namespace chip {
 namespace AppPlatform {
@@ -94,10 +96,29 @@ private:
 class DLL_EXPORT ContentApp
 {
 public:
+
+    struct SupportedCluster {
+        chip::ClusterId clusterIdentifier { chip::kInvalidClusterId };
+        uint32_t features { 0 };
+        std::vector<chip::CommandId> optionalCommandIdentifiers;
+        std::vector<chip::AttributeId> optionalAttributesIdentifiers;
+
+        SupportedCluster(chip::ClusterId clusterId, uint32_t feats, const std::vector<chip::CommandId>& commandIds, const std::vector<chip::AttributeId>& attributeIds) :
+            clusterIdentifier{ clusterId },
+            features{ feats },
+            optionalCommandIdentifiers{ commandIds },
+            optionalAttributesIdentifiers{ attributeIds } {}
+    };
+
+    ContentApp(std::vector<SupportedCluster> supportedClusters) : mSupportedClusters{ supportedClusters } {}
+
     virtual ~ContentApp() = default;
 
     inline void SetEndpointId(EndpointId id) { mEndpointId = id; };
     inline EndpointId GetEndpointId() { return mEndpointId; };
+
+    const std::vector<SupportedCluster>& GetSupportedClusters() const { return mSupportedClusters; };
+    bool HasSupportedCluster(chip::ClusterId clusterId) const; 
 
     virtual AccountLoginDelegate * GetAccountLoginDelegate()               = 0;
     virtual ApplicationBasicDelegate * GetApplicationBasicDelegate()       = 0;
@@ -122,6 +143,7 @@ public:
 
 protected:
     EndpointId mEndpointId = 0;
+    std::vector<SupportedCluster> mSupportedClusters;
 
     uint8_t mClientNodeCount     = 0;
     uint8_t mNextClientNodeIndex = 0;
