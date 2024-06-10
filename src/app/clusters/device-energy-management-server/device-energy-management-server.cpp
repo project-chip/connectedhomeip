@@ -787,9 +787,10 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                 if (constraint.nominalPower.Value() < mDelegate.GetAbsMinPower() ||
                     constraint.nominalPower.Value() > mDelegate.GetAbsMaxPower())
                 {
-                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast nominalPower " ChipLogFormatX64 " out of range [" ChipLogFormatX64 ", " ChipLogFormatX64 "]",
-                                 ChipLogValueX64(constraint.nominalPower.Value()),
-                                 ChipLogValueX64(mDelegate.GetAbsMinPower()),
+                    ChipLogError(Zcl,
+                                 "DEM: RequestConstraintBasedForecast nominalPower " ChipLogFormatX64
+                                 " out of range [" ChipLogFormatX64 ", " ChipLogFormatX64 "]",
+                                 ChipLogValueX64(constraint.nominalPower.Value()), ChipLogValueX64(mDelegate.GetAbsMinPower()),
                                  ChipLogValueX64(mDelegate.GetAbsMaxPower()));
 
                     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
