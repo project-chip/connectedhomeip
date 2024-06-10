@@ -20,15 +20,10 @@ namespace chip {
 namespace app {
 namespace InteractionModel {
 
-const AttributeEntry AttributeEntry::kInvalid
-{
-    .path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
-};
+const AttributeEntry AttributeEntry::kInvalid{ .path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId,
+                                                                             kInvalidAttributeId) };
 
-const CommandEntry CommandEntry::kInvalid
-{
-    .path = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId)
-};
+const CommandEntry CommandEntry::kInvalid{ .path = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId) };
 
 const ClusterEntry ClusterEntry::kInvalid{
     .path = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId),

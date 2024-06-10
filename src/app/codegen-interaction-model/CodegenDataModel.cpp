@@ -29,13 +29,6 @@ namespace chip {
 namespace app {
 namespace {
 
-/// Checks if the specified ember cluster mask corresponds to a valid
-/// server cluster.
-bool IsServerMask(EmberAfClusterMask mask)
-{
-    return (mask == 0) || ((mask & CLUSTER_MASK_SERVER) != 0);
-}
-
 /// Load the cluster information into the specified destination
 std::variant<CHIP_ERROR, InteractionModel::ClusterInfo> LoadClusterInfo(const ConcreteClusterPath & path,
                                                                         const EmberAfCluster & cluster)
@@ -86,7 +79,7 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
     for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (!IsServerMask(cluster.mask))
+        if (!cluster.IsServerMask())
         {
             continue;
         }
@@ -338,7 +331,7 @@ std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberA
     if (mClusterIterationHint < clusterCount)
     {
         const EmberAfCluster & cluster = endpoint->cluster[mClusterIterationHint];
-        if (IsServerMask(cluster.mask) && (cluster.clusterId == id))
+        if (cluster.IsServerMask() && (cluster.clusterId == id))
         {
             return std::make_optional(mClusterIterationHint);
         }
@@ -350,7 +343,7 @@ std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberA
     for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
     {
         const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (IsServerMask(cluster.mask) && (cluster.clusterId == id))
+        if (cluster.IsServerMask() && (cluster.clusterId == id))
         {
             return std::make_optional(cluster_idx);
         }
