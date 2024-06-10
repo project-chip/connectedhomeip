@@ -17,9 +17,9 @@
  */
 
 #include <app/CommandPathRegistry.h>
-#include <lib/support/UnitTestRegistration.h>
 
-#include <nlunit-test.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 namespace chip {
 namespace app {
@@ -30,7 +30,7 @@ size_t constexpr kQuickTestSize = 10;
 
 } // namespace
 
-void TestAddingSameConcretePath(nlTestSuite * apSuite, void * apContext)
+TEST(TestBasicCommandPathRegistry, TestAddingSameConcretePath)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCommandPathRegistry<kQuickTestSize> basicCommandPathRegistry;
@@ -47,11 +47,11 @@ void TestAddingSameConcretePath(nlTestSuite * apSuite, void * apContext)
         err = basicCommandPathRegistry.Add(concretePath, commandRef);
     }
 
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_DUPLICATE_KEY_ID);
-    NL_TEST_ASSERT(apSuite, basicCommandPathRegistry.Count() == 1);
+    EXPECT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
+    EXPECT_EQ(basicCommandPathRegistry.Count(), 1u);
 }
 
-void TestAddingSameCommandRef(nlTestSuite * apSuite, void * apContext)
+TEST(TestBasicCommandPathRegistry, TestAddingSameCommandRef)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCommandPathRegistry<kQuickTestSize> basicCommandPathRegistry;
@@ -69,32 +69,30 @@ void TestAddingSameCommandRef(nlTestSuite * apSuite, void * apContext)
         err = basicCommandPathRegistry.Add(concretePath, commandRef);
     }
 
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_DUPLICATE_KEY_ID);
-    NL_TEST_ASSERT(apSuite, basicCommandPathRegistry.Count() == 1);
+    EXPECT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
+    EXPECT_EQ(basicCommandPathRegistry.Count(), 1u);
 }
 
-void TestAddingMaxNumberOfEntries(nlTestSuite * apSuite, void * apContext)
+TEST(TestBasicCommandPathRegistry, TestAddingMaxNumberOfEntries)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCommandPathRegistry<kQuickTestSize> basicCommandPathRegistry;
 
     std::optional<uint16_t> commandRef;
     uint16_t commandRefAndEndpointValue = 0;
 
     size_t idx = 0;
-    for (idx = 0; idx < kQuickTestSize && err == CHIP_NO_ERROR; idx++)
+    for (idx = 0; idx < kQuickTestSize; idx++)
     {
         ConcreteCommandPath concretePath(commandRefAndEndpointValue, 0, 0);
         commandRef.emplace(commandRefAndEndpointValue);
         commandRefAndEndpointValue++;
-        err = basicCommandPathRegistry.Add(concretePath, commandRef);
+        ASSERT_EQ(basicCommandPathRegistry.Add(concretePath, commandRef), CHIP_NO_ERROR);
     }
 
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, basicCommandPathRegistry.Count() == kQuickTestSize);
+    EXPECT_EQ(basicCommandPathRegistry.Count(), kQuickTestSize);
 }
 
-void TestAddingTooManyEntries(nlTestSuite * apSuite, void * apContext)
+TEST(TestBasicCommandPathRegistry, TestAddingTooManyEntries)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCommandPathRegistry<kQuickTestSize> basicCommandPathRegistry;
@@ -112,36 +110,10 @@ void TestAddingTooManyEntries(nlTestSuite * apSuite, void * apContext)
         err = basicCommandPathRegistry.Add(concretePath, commandRef);
     }
 
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NO_MEMORY);
-    NL_TEST_ASSERT(apSuite, basicCommandPathRegistry.Count() == kQuickTestSize);
+    EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(basicCommandPathRegistry.Count(), kQuickTestSize);
 }
 
 } // namespace TestBasicCommandPathRegistry
 } // namespace app
 } // namespace chip
-
-namespace {
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestAddingSameConcretePath", chip::app::TestBasicCommandPathRegistry::TestAddingSameConcretePath),
-    NL_TEST_DEF("TestAddingSameCommandRef", chip::app::TestBasicCommandPathRegistry::TestAddingSameCommandRef),
-    NL_TEST_DEF("TestAddingMaxNumberOfEntries", chip::app::TestBasicCommandPathRegistry::TestAddingMaxNumberOfEntries),
-    NL_TEST_DEF("TestAddingTooManyEntries", chip::app::TestBasicCommandPathRegistry::TestAddingTooManyEntries),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-} // namespace
-
-int TestBasicCommandPathRegistry()
-{
-    nlTestSuite theSuite = { "CommandPathRegistry", &sTests[0], nullptr, nullptr };
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestBasicCommandPathRegistry)

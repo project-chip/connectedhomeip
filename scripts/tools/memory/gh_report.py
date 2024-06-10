@@ -276,6 +276,10 @@ class SizeContext:
                 continue
 
             df = pd.DataFrame(changes.rows, columns=changes.columns)
+
+            # Filter down to region reports only.
+            df = df[df['kind'] == 'region'].drop('kind', axis=1)
+
             df.attrs = {
                 'name': f'{pr},{parent},{commit}',
                 'title': (f'PR #{pr}: ' if pr else '') +
