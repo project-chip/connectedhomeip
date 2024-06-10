@@ -408,7 +408,8 @@ public:
         return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
-    template <typename CommandDataT, typename std::enable_if_t<!std::is_base_of_v<DataModel::EncodableToTLV, CommandDataT>, int> = 0>
+    template <typename CommandDataT,
+              typename std::enable_if_t<!std::is_base_of_v<DataModel::EncodableToTLV, CommandDataT>, int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               AddRequestDataParameters & aAddRequestDataParams)
     {
