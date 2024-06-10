@@ -69,7 +69,7 @@ public:
                            const chip::app::Clusters::IcdManagement::Commands::RegisterClient::Type & value)
     {
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
-        mScopedNodeId     = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
+        mScopedNodeId     = chip::ScopedNodeId(device->GetDeviceId(), device->GetSecureSession().Value()->GetFabricIndex());
         mMonitoredSubject = value.monitoredSubject;
         mClientType       = value.clientType;
         memcpy(mICDSymmetricKey, value.key.data(), value.key.size());
