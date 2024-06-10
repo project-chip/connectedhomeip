@@ -1012,7 +1012,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster MicrowaveOvenMode = 94 {
+cluster MicrowaveOvenMode = 94 {
   revision 1;
 
   enum ModeTag : enum16 {
@@ -1046,7 +1046,7 @@ provisional cluster MicrowaveOvenMode = 94 {
 }
 
 /** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
-provisional cluster MicrowaveOvenControl = 95 {
+cluster MicrowaveOvenControl = 95 {
   revision 1; // NOTE: Default/not specifically set
 
   bitmap Feature : bitmap32 {

@@ -54,61 +54,42 @@ class EventPriority(Enum):
     CRITICAL = 2
 
 
-@dataclass
+@dataclass(frozen=True)
 class AttributePath:
     EndpointId: int = None
     ClusterId: int = None
     AttributeId: int = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, Attribute=None, ClusterId=None, AttributeId=None):
-        self.EndpointId = EndpointId
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (Attribute is not None) or (ClusterId is not None) or (AttributeId is not None):
-                raise Warning(
-                    "Attribute, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-            return
-        if Attribute is not None:
-            if (ClusterId is not None) or (AttributeId is not None):
-                raise Warning(
-                    "ClusterId and AttributeId is ignored when Attribute is specified")
-            self.ClusterId = Attribute.cluster_id
-            self.AttributeId = Attribute.attribute_id
-            return
-        self.ClusterId = ClusterId
-        self.AttributeId = AttributeId
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster) -> AttributePath:
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return AttributePath(EndpointId=EndpointId, ClusterId=Cluster.id)
+
+    @staticmethod
+    def from_attribute(EndpointId: int, Attribute: ClusterAttributeDescriptor) -> AttributePath:
+        if Attribute is None:
+            raise ValueError("Attribute cannot be None")
+        return AttributePath(EndpointId=EndpointId, ClusterId=Attribute.cluster_id, AttributeId=Attribute.attribute_id)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.AttributeId}"
 
-    def __hash__(self):
-        return str(self).__hash__()
 
-
-@dataclass
+@dataclass(frozen=True)
 class DataVersionFilter:
     EndpointId: int = None
     ClusterId: int = None
     DataVersion: int = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, ClusterId=None, DataVersion=None):
-        self.EndpointId = EndpointId
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (ClusterId is not None):
-                raise Warning(
-                    "Attribute, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-        else:
-            self.ClusterId = ClusterId
-        self.DataVersion = DataVersion
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster, DataVersion: int = None) -> AttributePath:
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return DataVersionFilter(EndpointId=EndpointId, ClusterId=Cluster.id, DataVersion=DataVersion)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.DataVersion}"
-
-    def __hash__(self):
-        return str(self).__hash__()
 
 
 @dataclass
@@ -165,43 +146,27 @@ class TypedAttributePath:
         self.AttributeId = self.AttributeType.attribute_id
 
 
-@dataclass
+@dataclass(frozen=True)
 class EventPath:
     EndpointId: int = None
     ClusterId: int = None
     EventId: int = None
     Urgent: int = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None, Urgent=None):
-        self.EndpointId = EndpointId
-        self.Urgent = Urgent
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (Event is not None) or (ClusterId is not None) or (EventId is not None):
-                raise Warning(
-                    "Event, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-            return
-        if Event is not None:
-            if (ClusterId is not None) or (EventId is not None):
-                raise Warning(
-                    "ClusterId and EventId is ignored when Event is specified")
-            self.ClusterId = Event.cluster_id
-            self.EventId = Event.event_id
-            return
-        self.ClusterId = ClusterId
-        self.EventId = EventId
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster, EventId: int = None, Urgent: int = None) -> "EventPath":
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return EventPath(EndpointId=EndpointId, ClusterId=Cluster.id, EventId=EventId, Urgent=Urgent)
+
+    @staticmethod
+    def from_event(EndpointId: int, Event: ClusterEvent, Urgent: int = None) -> "EventPath":
+        if Event is None:
+            raise ValueError("Event cannot be None")
+        return EventPath(EndpointId=EndpointId, ClusterId=Event.cluster_id, EventId=Event.event_id, Urgent=Urgent)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/{self.Urgent}"
-
-    def __hash__(self):
-        return str(self).__hash__()
-
-
-@dataclass
-class AttributePathWithListIndex(AttributePath):
-    ListIndex: int = None
 
 
 @dataclass
@@ -698,7 +663,7 @@ class AsyncReadTransaction:
     def GetAllEventValues(self):
         return self._events
 
-    def handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
+    def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
         try:
             imStatus = chip.interaction_model.Status(status)
 
