@@ -38,8 +38,8 @@ namespace core {
 
 const int kPortMaxLength = 5; // port is uint16_t
 // +1 for the : between the hostname and the port.
-const int kIdMaxLength                                      = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
-const unsigned long long int kCommissioningWindowTimeoutSec = 3 * 60; // 3 minutes
+const int kIdMaxLength                        = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
+const uint16_t kCommissioningWindowTimeoutSec = 3 * 60; // 3 minutes
 
 /**
  * @brief Describes an Endpoint that the client wants to connect to
@@ -89,7 +89,7 @@ class ConnectionContext;
 class CastingPlayer;
 
 /**
- * @brief CastingPlayer represents a Matter commissioner that is able to play media to a physical
+ * @brief CastingPlayer represents a Matter Commissioner that is able to play media to a physical
  * output or to a display screen which is part of the device.
  */
 class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>
@@ -112,45 +112,88 @@ public:
     }
 
     /**
+     * @brief Define the copy constructor
+     */
+    CastingPlayer(const CastingPlayer & other);
+
+    /**
+     * @brief Define the assignment operator
+     */
+    CastingPlayer & operator=(const CastingPlayer & other);
+
+    /**
      * @return true if this CastingPlayer is connected to the CastingApp
      */
     bool IsConnected() const { return mConnectionState == CASTING_PLAYER_CONNECTED; }
 
     /**
-     * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new session
-     * request. If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk,
-     * this will execute the User Directed Commissioning (UDC) process.
+     * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new commissioning session request. If the
+     * CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk, this will execute the User Directed
+     * Commissioning (UDC) process by sending an IdentificationDeclaration message to the CastingPlayer/Commissioner. For certain
+     * UDC features, where a Commissioner reply is expected, this API needs to be followed up with the ContinueConnecting() API
+     * defiend below. See the Matter UDC specification or parameter class definitions for details on features not included in the
+     * description below.
      *
-     * @param connectionCallbacks contains the ConnectCallback and CommissionerDeclarationCallback (Optional).
+     * @param connectionCallbacks contains the ConnectCallback (Required) and CommissionerDeclarationCallback (Optional) defiend in
+     * ConnectCallbacks.h.
+     *
+     * For example: During CastingPlayer/Commissioner-Generated passcode commissioning, the Commissioner replies with a
+     * CommissionerDeclaration message with PasscodeDialogDisplayed and CommissionerPasscode set to true. Given these Commissioner
+     * state details, the client is expected to perform some actions, detailed in the ContinueConnecting() API below, and then call
+     * the ContinueConnecting() API to complete the process.
+     *
      * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
      * required. Needs to be >= kCommissioningWindowTimeoutSec.
+     *
      * @param idOptions (Optional) Parameters in the IdentificationDeclaration message sent by the Commissionee to the Commissioner.
      * These parameters specify the information relating to the requested commissioning session.
+     *
+     * For example: To invoke the CastingPlayer/Commissioner-Generated passcode commissioning flow, the client would call this API
+     * with IdentificationDeclarationOptions containing CommissionerPasscode set to true. See IdentificationDeclarationOptions.h for
+     * a complete list of optional parameters.
+     *
      * Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants to interact with after commissioning.
      * If this value is passed in, VerifyOrEstablishConnection() will force UDC, in case the desired
      * TargetApp is not found in the on-device CastingStore.
      */
     void VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks,
-                                     unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec,
-                                     IdentificationDeclarationOptions idOptions           = IdentificationDeclarationOptions());
+                                     uint16_t commissioningWindowTimeoutSec     = kCommissioningWindowTimeoutSec,
+                                     IdentificationDeclarationOptions idOptions = IdentificationDeclarationOptions());
 
     /**
-     * @brief Continues the UDC process during the Commissioner-Generated passcode commissioning flow by sending a second
-     * IdentificationDeclaration to Commissioner containing CommissionerPasscode and CommissionerPasscodeReady set to true. At this
-     * point it is assumed that the following have occurred:
-     * 1. Client has handled the Commissioner's CommissionerDecelration message with PasscodeDialogDisplayed and
-     * CommissionerPasscode set to true.
-     * 2. Client prompted user to input Passcode from Commissioner.
-     * 3. Client has updated the commissioning session's PAKE verifier using the user input Passcode by updating the CastingApps
+     * @brief This is a continuation of the CastingPlayer/Commissioner-Generated passcode commissioning flow started via the
+     * VerifyOrEstablishConnection() API above. It continues the UDC process by sending a second IdentificationDeclaration message
+     * to Commissioner containing CommissionerPasscode and CommissionerPasscodeReady set to true. At this point it is assumed that
+     * the following have occurred:
+     *
+     * 1. Client (Commissionee) has sent the first IdentificationDeclaration message, via VerifyOrEstablishConnection(), to the
+     * Commissioner containing CommissionerPasscode set to true.
+     * 2. Commissioner generated and displayed a passcode.
+     * 3. The Commissioner replied with a CommissionerDecelration message with PasscodeDialogDisplayed and CommissionerPasscode set
+     * to true.
+     * 4. Client has handled the Commissioner's CommissionerDecelration message.
+     * 5. Client prompted user to input Passcode from Commissioner.
+     * 6. Client has updated the commissioning session's PAKE verifier using the user input Passcode by updating the CastingApp's
      * CommissionableDataProvider
      * (matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(CommissionableDataProvider)).
      *
-     * @param connectionCallbacks contains the ConnectCallback and CommissionerDeclarationCallback (Optional).
-     * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
-     * required. Needs to be >= kCommissioningWindowTimeoutSec.
+     * The same connectionCallbacks and commissioningWindowTimeoutSec parameters passed into VerifyOrEstablishConnection() will be
+     * used.
+     * @return CHIP_NO_ERROR if this function was called with the CastingPlayer in the correct state and an error otherwise.
      */
-    void ContinueConnecting(ConnectionCallbacks connectionCallbacks,
-                            unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec);
+    CHIP_ERROR ContinueConnecting();
+
+    /**
+     * @brief This cancels the CastingPlayer/Commissioner-Generated passcode commissioning flow started via the
+     * VerifyOrEstablishConnection() API above. It constructs and sends an IdentificationDeclaration message to the
+     * CastingPlayer/Commissioner containing CancelPasscode set to true. It is used to indicate that the user, and thus the
+     * Client/Commissionee, have cancelled the commissioning process. This indicates that the CastingPlayer/Commissioner can dismiss
+     * any dialogs corresponding to commissioning, such as a Passcode input dialog or a Passcode display dialog.
+     * Note: stopConnecting() does not call the ConnectCallback() callback passed to the VerifyOrEstablishConnection() API above
+     * since no connection is established.
+     * @return CHIP_NO_ERROR if this function was called with the CastingPlayer in the correct state and an error otherwise.
+     */
+    CHIP_ERROR StopConnecting();
 
     /**
      * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
@@ -220,8 +263,8 @@ private:
     CastingPlayerAttributes mAttributes;
     IdentificationDeclarationOptions mIdOptions;
     static CastingPlayer * mTargetCastingPlayer;
-    unsigned long long int mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-    ConnectCallback mOnCompleted                          = {};
+    uint16_t mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
+    ConnectCallback mOnCompleted            = {};
 
     /**
      * @brief resets this CastingPlayer's state and calls mOnCompleted with the CHIP_ERROR. Also, after calling mOnCompleted, it

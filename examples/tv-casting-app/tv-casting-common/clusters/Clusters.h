@@ -67,6 +67,28 @@ public:
 };
 }; // namespace application_basic
 
+namespace account_login {
+class AccountLoginCluster : public core::BaseCluster
+{
+public:
+    AccountLoginCluster(memory::Weak<core::Endpoint> endpoint) : core::BaseCluster(endpoint) {}
+
+    void SetUp()
+    {
+        ChipLogProgress(AppServer, "Setting up AccountLoginCluster on EndpointId: %d", GetEndpoint().lock()->GetId());
+
+        RegisterCommand(chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Id,
+                        new core::Command<chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type>(GetEndpoint()));
+        RegisterCommand(chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Id,
+                        new core::Command<chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type>(GetEndpoint()));
+        RegisterCommand(chip::app::Clusters::AccountLogin::Commands::Login::Id,
+                        new core::Command<chip::app::Clusters::AccountLogin::Commands::Login::Type>(GetEndpoint()));
+        RegisterCommand(chip::app::Clusters::AccountLogin::Commands::Logout::Id,
+                        new core::Command<chip::app::Clusters::AccountLogin::Commands::Logout::Type>(GetEndpoint()));
+    }
+};
+}; // namespace account_login
+
 namespace application_launcher {
 class ApplicationLauncherCluster : public core::BaseCluster
 {

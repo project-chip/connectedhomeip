@@ -17,11 +17,20 @@
 
 #include "FactoryDataProvider.h"
 
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
+#include <credentials/examples/ExampleDACs.h>
+#endif
+
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
+
+#ifdef USE_STM32WBXX_DAC_CRYPTO
+#include <dac_crypto_hal.h>
+#include <openthread/error.h>
+#endif
 
 namespace chip {
 namespace {} // namespace
@@ -32,6 +41,24 @@ CHIP_ERROR FactoryDataProvider::Init()
 {
     return CHIP_NO_ERROR;
 }
+
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 1)
+CHIP_ERROR FactoryDataProvider::MapSTM32WBError(FACTORYDATA_StatusTypeDef err)
+{
+    switch (err)
+    {
+    case DATAFACTORY_OK:
+        return CHIP_NO_ERROR;
+    case DATAFACTORY_BUFFER_TOO_SMALL:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    case DATAFACTORY_PARAM_ERROR:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    default:
+        break;
+    }
+    return CHIP_ERROR_INTERNAL;
+}
+#endif
 
 FactoryDataProvider & FactoryDataProvider::GetDefaultInstance()
 {
@@ -61,96 +88,159 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto:
 
 CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    const uint8_t kDevelopmentDAC_PublicKey_FFF1_8004[65] = {
-        0x04, 0x50, 0x41, 0x38, 0xef, 0x31, 0xc9, 0xdd, 0x16, 0x0e, 0xb4, 0x6c, 0x6c, 0x17, 0x11, 0x4f, 0x9d,
-        0x72, 0x88, 0x40, 0x80, 0x1f, 0x73, 0xbb, 0x9b, 0x5a, 0x2c, 0x51, 0x91, 0xc9, 0xb2, 0x06, 0x63, 0x01,
-        0x9d, 0x94, 0x76, 0xd1, 0x93, 0x1b, 0x93, 0xff, 0x47, 0xf4, 0x32, 0x56, 0x37, 0x90, 0x35, 0xd2, 0x29,
-        0x62, 0x0b, 0x7e, 0x21, 0x0e, 0x59, 0x2f, 0x26, 0x43, 0x7d, 0x2d, 0x57, 0x62, 0x05,
-    };
-    const uint8_t kDevelopmentDAC_PrivateKey_FFF1_8004[32] = {
-        0x82, 0x0a, 0x24, 0x2a, 0x03, 0x0e, 0xbc, 0xe1, 0x1f, 0x38, 0x73, 0x5a, 0xcf, 0x1a, 0x6f, 0x37,
-        0xc3, 0xad, 0xa6, 0xe4, 0x32, 0xd2, 0x47, 0x0a, 0x8a, 0x41, 0x37, 0x43, 0xf8, 0x95, 0x63, 0xf3,
-    };
-    ByteSpan kDacPrivateKey = ByteSpan(kDevelopmentDAC_PrivateKey_FFF1_8004);
-    ByteSpan kDacPublicKey  = ByteSpan(kDevelopmentDAC_PublicKey_FFF1_8004);
+#ifdef USE_STM32WBXX_DAC_CRYPTO
+    otError otCksDAC_error;
+    uint8_t signature_bytes[Crypto::kP256_ECDSA_Signature_Length_Raw];
+#endif
 
     VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
+#ifdef USE_STM32WBXX_DAC_CRYPTO
+
+    otCksDAC_error =
+        otCksDacSignature(messageToSign.data(), messageToSign.size(), DevelopmentCerts::kDacPublicKey.data(), &signature_bytes[0]);
+    memcpy(signature.Bytes(), &signature_bytes[0], Crypto::kP256_ECDSA_Signature_Length_Raw);
+    signature.SetLength(Crypto::kP256_ECDSA_Signature_Length_Raw);
+
+    if (otCksDAC_error != OT_ERROR_NONE)
+    {
+        ChipLogProgress(Crypto, "DAC signature unexpected failure");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+#else
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    ReturnErrorOnFailure(LoadKeypairFromRaw(kDacPrivateKey, kDacPublicKey, keypair));
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
+    ReturnErrorOnFailure(LoadKeypairFromRaw(DevelopmentCerts::kDacPrivateKey, DevelopmentCerts::kDacPublicKey, keypair));
+
+#else
+    uint8_t Privatekeybuffer[PRIVATE_KEY_LEN];
+    uint8_t Publickeybuffer[PUBLIC_KEY_LEN];
+    uint32_t tlvDataLength; // Dummy value keys values are fix
+    FACTORYDATA_StatusTypeDef err;
+
+    err = FACTORYDATA_GetValue(TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY, Privatekeybuffer, PRIVATE_KEY_LEN, &tlvDataLength);
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    err = FACTORYDATA_GetValue(TAG_ID_DEVICE_ATTESTATION_PUBLIC_KEY, Publickeybuffer, PUBLIC_KEY_LEN, &tlvDataLength);
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(Privatekeybuffer), ByteSpan(Publickeybuffer), keypair));
+#endif
+
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
+#endif
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     setupDiscriminator = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
     return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_SETUP_DISCRIMINATOR, (uint8_t *) &setupDiscriminator, sizeof(setupDiscriminator),
+                               &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    return CHIP_NO_ERROR;
 #endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     constexpr uint32_t kDefaultTestVerifierIterationCount = 1000;
     iterationCount                                        = kDefaultTestVerifierIterationCount;
     return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_SPAKE2_ITERATION_COUNT, (uint8_t *) &iterationCount, sizeof(iterationCount), &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    return CHIP_NO_ERROR;
 #endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     setupPasscode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
     return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_SPAKE2_SETUP_PASSCODE, (uint8_t *) &setupPasscode, sizeof(setupPasscode), &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    return CHIP_NO_ERROR;
 #endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     vendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
     return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_VENDOR_ID, (uint8_t *) &vendorId, sizeof(vendorId), &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    return CHIP_NO_ERROR;
 #endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     productId = CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
     return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_PRODUCT_ID, (uint8_t *) &productId, sizeof(productId), &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    return CHIP_NO_ERROR;
 #endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     hardwareVersion = CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION;
     return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_HARDWARE_VERSION, (uint8_t *) &hardwareVersion, sizeof(hardwareVersion), &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    return CHIP_NO_ERROR;
 #endif
 }
 
@@ -176,32 +266,68 @@ CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 
 CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME, sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME));
+#else
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_VENDOR_NAME, (uint8_t *) buf, bufSize, &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+#endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME, sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME));
+#else
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_PRODUCT_NAME, (uint8_t *) buf, bufSize, &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+#endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, bufSize);
     return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_SERIAL_NUMBER, (uint8_t *) buf, bufSize, &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    return CHIP_NO_ERROR;
 #endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING,
+           sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierSpan, size_t & verifierLen)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     static const uint8_t kDefaultTestVerifier[97] = {
         0xb9, 0x61, 0x70, 0xaa, 0xe8, 0x03, 0x34, 0x68, 0x84, 0x72, 0x4f, 0xe9, 0xa3, 0xb2, 0x87, 0xc3, 0x03, 0x30, 0xc2, 0xa6,
         0x60, 0x37, 0x5d, 0x17, 0xbb, 0x20, 0x5a, 0x8c, 0xf1, 0xae, 0xcb, 0x35, 0x04, 0x57, 0xf8, 0xab, 0x79, 0xee, 0x25, 0x3a,
@@ -217,16 +343,24 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierSpa
     }
     memcpy(verifierSpan.data(), &kDefaultTestVerifier[0], verifierLen);
     verifierSpan.reduce_size(verifierLen);
-    return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_SPAKE2_VERIFIER, verifierSpan.data(), verifierSpan.size(), &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    verifierSpan.reduce_size(tlvDataLength);
+    verifierLen = tlvDataLength;
 #endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBufferSpan)
 {
 
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     //-> format_version = 1
     //-> vendor_id = 0xFFF1
     //-> product_id_array = [ 0x8000, 0x8001, 0x8002, 0x8003, 0x8004, 0x8005, 0x8006, 0x8007, 0x8008, 0x8009, 0x800A, 0x800B,
@@ -276,7 +410,15 @@ CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & ou
 
     return CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBufferSpan);
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_CERTIFICATION_DECLARATION, outBufferSpan.data(), outBufferSpan.size(), &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    outBufferSpan.reduce_size(tlvDataLength);
+    return CHIP_NO_ERROR;
 #endif
 }
 
@@ -287,7 +429,7 @@ CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & firmwar
 
 CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & attestationCertSpan)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     static const uint8_t kDevelopmentDAC_Cert_FFF1_8004[493] = {
         0x30, 0x82, 0x01, 0xe9, 0x30, 0x82, 0x01, 0x8e, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x1e, 0x06, 0x7f, 0x3b, 0xfe,
         0xcd, 0xd8, 0x13, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x3d, 0x31, 0x25, 0x30,
@@ -318,13 +460,23 @@ CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & attes
 
     return CopySpanToMutableSpan(ByteSpan(kDevelopmentDAC_Cert_FFF1_8004), attestationCertSpan);
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_DEVICE_ATTESTATION_CERTIFICATE, attestationCertSpan.data(), attestationCertSpan.size(),
+                               &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    attestationCertSpan.reduce_size(tlvDataLength);
+
+    return CHIP_NO_ERROR;
 #endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByteSpan & intermediateCertSpan)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     static const uint8_t kDevelopmentPAI_Cert_FFF1[463] = {
         0x30, 0x82, 0x01, 0xcb, 0x30, 0x82, 0x01, 0x71, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x56, 0xad, 0x82, 0x22, 0xad,
         0x94, 0x5b, 0x64, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x30, 0x31, 0x18, 0x30,
@@ -354,13 +506,23 @@ CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByt
 
     return CopySpanToMutableSpan(ByteSpan(kDevelopmentPAI_Cert_FFF1), intermediateCertSpan);
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_PRODUCT_ATTESTATION_INTERMEDIATE_CERTIFICATE, intermediateCertSpan.data(),
+                               intermediateCertSpan.size(), &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    intermediateCertSpan.reduce_size(tlvDataLength);
+
+    return CHIP_NO_ERROR;
 #endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltSpan)
 {
-#if !CONFIG_STM32_FACTORY_DATA_ENABLE
+#if (CONFIG_STM32_FACTORY_DATA_ENABLE == 0)
     static const uint8_t kDefaultTestVerifierSalt[16] = {
         0x53, 0x50, 0x41, 0x4b, 0x45, 0x32, 0x50, 0x20, 0x4b, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6c, 0x74,
     };
@@ -374,7 +536,16 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltSpan)
     saltSpan.reduce_size(saltLen);
     return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    FACTORYDATA_StatusTypeDef err;
+    uint32_t tlvDataLength;
+
+    err = FACTORYDATA_GetValue(TAG_ID_SPAKE2_SALT, saltSpan.data(), saltSpan.size(), &tlvDataLength);
+
+    VerifyOrReturnError(DATAFACTORY_OK == err, MapSTM32WBError(err));
+
+    saltSpan.reduce_size(tlvDataLength);
+
+    return CHIP_NO_ERROR;
 #endif
 }
 

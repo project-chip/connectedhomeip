@@ -807,7 +807,6 @@ class BluezManager(ChipBleBase):
         self.rx = None
         self.setInputHook(self.readlineCB)
         self.devMgr = devMgr
-        self.devMgr.SetBlockingCB(self.devMgrCB)
 
     def __del__(self):
         self.disconnect()
