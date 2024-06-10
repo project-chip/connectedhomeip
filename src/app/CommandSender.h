@@ -446,8 +446,7 @@ public:
                                                   AddRequestDataParameters & aAddRequestDataParams)
     {
         DataModel::EncodableType<CommandDataT> encoder(aData);
-        DataModel::EncodableToTLV & encodable = encoder;
-        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
+        return AddRequest(aCommandPath, encodable, aAddRequestDataParams);
     }
 
     CHIP_ERROR TestOnlyFinishCommand(FinishCommandParameters & aFinishCommandParams)
