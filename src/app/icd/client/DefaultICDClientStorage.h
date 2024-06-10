@@ -130,6 +130,7 @@ protected:
         kMonitoredSubject = 5,
         kAesKeyHandle     = 6,
         kHmacKeyHandle    = 7,
+        kClientType       = 8,
     };
 
     enum class CounterTag : uint8_t
