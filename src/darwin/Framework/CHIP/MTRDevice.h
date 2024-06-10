@@ -107,7 +107,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * nil if no such estimate is available.  Otherwise, the NSNumber stores an NSTimeInterval.
  */
-@property (nonatomic, readonly, nullable, copy) NSNumber * estimatedSubscriptionLatency MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable, copy) NSNumber * estimatedSubscriptionLatency MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.

@@ -17,6 +17,7 @@
 
 #import "MTRDeviceConnectionBridge.h"
 #import "MTRBaseDevice_Internal.h"
+#import "MTRConversion.h"
 #import "MTRError_Internal.h"
 
 void MTRDeviceConnectionBridge::OnConnected(
@@ -31,7 +32,7 @@ void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, const chip::
 {
     NSNumber * retryDelay;
     if (failureInfo.requestedBusyDelay.HasValue()) {
-        retryDelay = @(static_cast<double>(failureInfo.requestedBusyDelay.Value().count()) / MSEC_PER_SEC);
+        retryDelay = @(DurationToTimeInterval(failureInfo.requestedBusyDelay.Value()));
     }
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
     object->mCompletionHandler(nil, chip::NullOptional, [MTRError errorForCHIPErrorCode:failureInfo.error], retryDelay);

@@ -145,14 +145,21 @@ chip_test_suite("tests") {
     "TestAclEvent.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
+    "TestAttributePathParams.cpp",
     "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
+    "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestCommandInteraction.cpp",
+    "TestCommandPathParams.cpp",
+    "TestConcreteAttributePath.cpp",
+    "TestDataModelSerialization.cpp",
+    "TestDefaultOTARequestorStorage.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
+    "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
@@ -194,6 +201,17 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support/tests:pw-test-macros",
   ]
 
+  if (chip_device_platform != "android") {
+    test_sources += [
+      "TestExtensionFieldSets.cpp",
+      "TestSceneTable.cpp",
+    ]
+    public_deps += [
+      ":power-cluster-test-srcs",
+      ":scenes-table-test-srcs",
+    ]
+  }
+
   if (chip_config_network_layer_ble &&
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissioningWindowManager.cpp" ]
@@ -231,51 +249,5 @@ chip_test_suite("tests") {
   if (chip_device_platform != "nrfconnect" &&
       chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
-  }
-}
-
-chip_test_suite_using_nltest("tests_nltest") {
-  output_name = "libAppTestsNL"
-
-  test_sources = [
-    "TestBasicCommandPathRegistry.cpp",
-    "TestClusterInfo.cpp",
-    "TestCommandPathParams.cpp",
-    "TestConcreteAttributePath.cpp",
-    "TestDataModelSerialization.cpp",
-    "TestDefaultOTARequestorStorage.cpp",
-    "TestEventPathParams.cpp",
-  ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    ":app-test-stubs",
-    ":binding-test-srcs",
-    ":operational-state-test-srcs",
-    ":ota-requestor-test-srcs",
-    ":time-sync-data-provider-test-srcs",
-    "${chip_root}/src/app",
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/icd/client:manager",
-    "${chip_root}/src/app/tests:helpers",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/core:string-builder-adapters",
-    "${chip_root}/src/lib/support:test_utils",
-    "${chip_root}/src/lib/support:testing",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${nlunit_test_root}:nlunit-test",
-  ]
-
-  if (chip_device_platform != "android") {
-    test_sources += [
-      "TestExtensionFieldSets.cpp",
-      "TestSceneTable.cpp",
-    ]
-    public_deps += [
-      ":power-cluster-test-srcs",
-      ":scenes-table-test-srcs",
-    ]
   }
 }

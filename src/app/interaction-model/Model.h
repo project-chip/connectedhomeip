@@ -22,7 +22,7 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 
-#include <app/interaction-model/Actions.h>
+#include <app/interaction-model/Context.h>
 #include <app/interaction-model/InvokeResponder.h>
 #include <app/interaction-model/IterationTypes.h>
 #include <app/interaction-model/OperationTypes.h>
@@ -43,17 +43,17 @@ class Model : public AttributeTreeIterator
 public:
     virtual ~Model() = default;
 
-    // `actions` pointers  will be guaranteed valid until Shutdown is called()
-    virtual CHIP_ERROR Startup(InteractionModelActions actions)
+    // `context` pointers  will be guaranteed valid until Shutdown is called()
+    virtual CHIP_ERROR Startup(InteractionModelContext context)
     {
-        mActions = actions;
+        mContext = context;
         return CHIP_NO_ERROR;
     }
     virtual CHIP_ERROR Shutdown() = 0;
 
     // During the transition phase, we expect a large subset of code to require access to
     // event emitting, path marking and other operations
-    virtual InteractionModelActions CurrentActions() { return mActions; }
+    virtual InteractionModelContext CurrentContext() const { return mContext; }
 
     /// List reading has specific handling logic:
     ///   `state` contains in/out data about the current list reading. MUST start with kInvalidListIndex on first call
@@ -94,14 +94,14 @@ public:
     ///         - `NeedsTimedInteraction` for writes that are not timed however are required to be so
     virtual CHIP_ERROR WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
-    /// `responder` is used to send back the reply.
+    /// `reply` is used to send back the reply.
     ///    - calling Reply() or ReplyAsync() will let the application control the reply
     ///    - returning a CHIP_NO_ERROR without reply/reply_async implies a Status::Success reply without data
-    ///    - returning a CHIP_*_ERROR implies an error reply (error and data are mutually exclusive)
+    ///    - returning a value other than CHIP_NO_ERROR implies an error reply (error and data are mutually exclusive)
     ///
     /// See InvokeReply/AutoCompleteInvokeResponder for details on how to send back replies and expected
-    /// error handling. If you require knowledge if a response was successfully sent, use the underlying
-    /// `reply` object instead of returning an error codes from Invoke.
+    /// error handling. If you need to know weather a response was successfully sent, use the underlying
+    /// `reply` object instead of returning an error code from Invoke.
     ///
     /// Return codes
     ///   CHIP_IM_GLOBAL_STATUS(code):
@@ -115,7 +115,7 @@ public:
     virtual CHIP_ERROR Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, InvokeReply & reply) = 0;
 
 private:
-    InteractionModelActions mActions = { nullptr };
+    InteractionModelContext mContext = { nullptr };
 };
 
 } // namespace InteractionModel

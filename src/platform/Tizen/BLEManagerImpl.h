@@ -90,6 +90,9 @@ class BLEManagerImpl final : public BLEManager,
     friend BLEManager;
 
 public:
+    BLEManagerImpl() : mDeviceScanner(this) {}
+    ~BLEManagerImpl() = default;
+
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
 
 private:
@@ -137,7 +140,8 @@ private:
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnChipDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnDeviceScanned(const bt_adapter_le_device_scan_result_info_s & scanInfo,
+                         const Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnScanComplete() override;
     void OnScanError(CHIP_ERROR err) override;
 
@@ -171,8 +175,6 @@ private:
 
     void DriveBLEState();
 
-    void InitiateScan(BleScanState scanType);
-
     void AdapterStateChangedCb(int result, bt_adapter_state_e adapterState);
     void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState);
     void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle);
@@ -184,6 +186,10 @@ private:
     void GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress);
     static void WriteCompletedCb(int result, bt_gatt_h gattHandle, void * userData);
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
+
+    // ==== BLE Scan.
+    void InitiateScan(BleScanState scanType);
+    static void HandleScanTimeout(chip::System::Layer *, void * appState);
 
     // ==== Connection.
     void AddConnectionData(const char * remoteAddr);
@@ -208,8 +214,8 @@ private:
 
     // ==== Connection.
     CHIP_ERROR ConnectChipThing(const char * address);
-    void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
-    void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
+    void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId);
+    void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId);
     void NotifyHandleNewConnection(BLE_CONNECTION_OBJECT conId);
     void NotifyHandleConnectFailed(CHIP_ERROR error);
     void NotifyHandleWriteComplete(BLE_CONNECTION_OBJECT conId);
@@ -232,8 +238,9 @@ private:
     /* Connection Hash Table Map */
     GHashTable * mConnectionMap = nullptr;
 
+    ChipDeviceScanner mDeviceScanner;
     BLEScanConfig mBLEScanConfig;
-    std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
+
     bt_gatt_client_h mGattClient = nullptr;
 };
 
