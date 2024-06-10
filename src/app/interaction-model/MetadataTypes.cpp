@@ -20,8 +20,17 @@ namespace chip {
 namespace app {
 namespace InteractionModel {
 
-const ClusterEntry ClusterEntry::kInvalid 
+const AttributeEntry AttributeEntry::kInvalid
 {
+    .path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId)
+};
+
+const CommandEntry CommandEntry::kInvalid
+{
+    .path = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId)
+};
+
+const ClusterEntry ClusterEntry::kInvalid{
     .path = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId),
     .info = ClusterInfo(0 /* version */), // version of invalid cluster entry does not matter
 };

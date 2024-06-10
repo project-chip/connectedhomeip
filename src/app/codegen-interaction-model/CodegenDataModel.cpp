@@ -69,7 +69,10 @@ std::variant<CHIP_ERROR, InteractionModel::ClusterEntry> ClusterEntryFrom(Endpoi
 
     if (InteractionModel::ClusterInfo * infoValue = std::get_if<InteractionModel::ClusterInfo>(&info))
     {
-        return InteractionModel::ClusterEntry(clusterPath, *infoValue);
+        return InteractionModel::ClusterEntry{
+            .path = clusterPath,
+            .info = *infoValue,
+        };
     }
     return CHIP_ERROR_INCORRECT_STATE;
 }
@@ -407,9 +410,9 @@ InteractionModel::AttributeEntry CodegenDataModel::FirstAttribute(const Concrete
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
-    VerifyOrReturnValue(cluster != nullptr, InteractionModel::AttributeEntry::Invalid());
-    VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::Invalid());
-    VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::Invalid());
+    VerifyOrReturnValue(cluster != nullptr, InteractionModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::kInvalid);
 
     mAttributeIterationHint = 0;
     return AttributeEntryFrom(path, cluster->attributes[0]);
@@ -457,15 +460,15 @@ const EmberAfCluster * CodegenDataModel::FindServerCluster(const ConcreteCluster
 InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteAttributePath & before)
 {
     const EmberAfCluster * cluster = FindServerCluster(before);
-    VerifyOrReturnValue(cluster != nullptr, InteractionModel::AttributeEntry::Invalid());
-    VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::Invalid());
-    VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::Invalid());
+    VerifyOrReturnValue(cluster != nullptr, InteractionModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::kInvalid);
+    VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::kInvalid);
 
     // find the given attribute in the list and then return the next one
     std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, before.mAttributeId);
     if (!attribute_idx.has_value())
     {
-        return InteractionModel::AttributeEntry::Invalid();
+        return InteractionModel::AttributeEntry::kInvalid;
     }
 
     unsigned next_idx = *attribute_idx + 1;
@@ -476,7 +479,7 @@ InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteA
     }
 
     // iteration complete
-    return InteractionModel::AttributeEntry::Invalid();
+    return InteractionModel::AttributeEntry::kInvalid;
 }
 
 std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
@@ -503,10 +506,10 @@ InteractionModel::CommandEntry CodegenDataModel::FirstAcceptedCommand(const Conc
 {
     const EmberAfCluster * cluster = FindServerCluster(path);
 
-    VerifyOrReturnValue(cluster != nullptr, InteractionModel::CommandEntry::Invalid());
+    VerifyOrReturnValue(cluster != nullptr, InteractionModel::CommandEntry::kInvalid);
 
     std::optional<CommandId> commandId = mAcceptedCommandsIterator.First(cluster->acceptedCommandList);
-    VerifyOrReturnValue(commandId.has_value(), InteractionModel::CommandEntry::Invalid());
+    VerifyOrReturnValue(commandId.has_value(), InteractionModel::CommandEntry::kInvalid);
 
     return CommandEntryFrom(path, *commandId);
 }
@@ -515,10 +518,10 @@ InteractionModel::CommandEntry CodegenDataModel::NextAcceptedCommand(const Concr
 {
     const EmberAfCluster * cluster = FindServerCluster(before);
 
-    VerifyOrReturnValue(cluster != nullptr, InteractionModel::CommandEntry::Invalid());
+    VerifyOrReturnValue(cluster != nullptr, InteractionModel::CommandEntry::kInvalid);
 
     std::optional<CommandId> commandId = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, before.mCommandId);
-    VerifyOrReturnValue(commandId.has_value(), InteractionModel::CommandEntry::Invalid());
+    VerifyOrReturnValue(commandId.has_value(), InteractionModel::CommandEntry::kInvalid);
 
     return CommandEntryFrom(before, *commandId);
 }

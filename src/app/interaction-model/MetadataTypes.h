@@ -50,8 +50,6 @@ struct ClusterEntry
     ConcreteClusterPath path;
     ClusterInfo info;
 
-    ClusterEntry(ConcreteClusterPath clusterPath, ClusterInfo clusterInfo) : path(clusterPath), info(clusterInfo) {}
-
     bool IsValid() const { return path.HasValidIds(); }
 
     static const ClusterEntry kInvalid;
@@ -80,14 +78,9 @@ struct AttributeEntry
     ConcreteAttributePath path;
     AttributeInfo info;
 
-    static AttributeEntry Invalid()
-    {
-        AttributeEntry result;
-        result.path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
-        return result;
-    }
-
     bool IsValid() const { return path.HasValidIds(); }
+
+    static const AttributeEntry kInvalid;
 };
 
 enum class CommandQualityFlags : uint32_t
@@ -108,14 +101,9 @@ struct CommandEntry
     ConcreteCommandPath path;
     CommandInfo info;
 
-    static CommandEntry Invalid()
-    {
-        CommandEntry result;
-        result.path = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
-        return result;
-    }
-
     bool IsValid() const { return path.HasValidIds(); }
+
+    static const CommandEntry kInvalid;
 };
 
 /// Provides metadata information for a data model
@@ -125,7 +113,7 @@ struct CommandEntry
 ///
 /// Iteration rules:
 ///   - Invalid paths will be returned when iteration ends (IDs will be kInvalid* and in particular
-///     mEndpointId will be kInvalidEndpointId). See `::Invalid()` methods for entries and
+///     mEndpointId will be kInvalidEndpointId). See `::kInvalid` constants for entries and
 ///     can use ::IsValid() to determine if the entry is valid or not.
 ///   - Global Attributes are NOT returned since they are implied
 ///   - Any internal iteration errors are just logged (callers do not handle iteration CHIP_ERROR)
