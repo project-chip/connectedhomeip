@@ -68,8 +68,7 @@ public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
                    CredentialIssuerCommands * credIssuerCmds,
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
-        CHIPCommand(commandName, credIssuerCmds),
-        mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
+        CHIPCommand(commandName, credIssuerCmds), mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
         mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
         mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {
@@ -84,6 +83,8 @@ public:
                     "The check-in node id for the ICD, default: node id of the commissioner.");
         AddArgument("icd-monitored-subject", 0, UINT64_MAX, &mICDMonitoredSubject,
                     "The monitored subject of the ICD, default: The node id used for icd-check-in-nodeid.");
+        AddArgument("icd-client-type", 0, 1, &mICDClientType,
+                    "The ClientType of the client regsitering, default: Permanent client - 0");
         AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
         AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
@@ -258,6 +259,7 @@ private:
     chip::Optional<char *> mCountryCode;
     chip::Optional<bool> mICDRegistration;
     chip::Optional<NodeId> mICDCheckInNodeId;
+    chip::Optional<chip::app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
     chip::Optional<chip::ByteSpan> mICDSymmetricKey;
     chip::Optional<uint64_t> mICDMonitoredSubject;
     chip::Optional<uint32_t> mICDStayActiveDurationMsec;

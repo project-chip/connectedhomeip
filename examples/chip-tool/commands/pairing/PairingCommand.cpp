@@ -157,6 +157,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         {
             mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
         }
+        if (!mICDClientType.HasValue())
+        {
+            mICDClientType.SetValue(app::Clusters::IcdManagement::ClientTypeEnum::kPermanent);
+        }
         // These Optionals must have values now.
         // The commissioner will verify these values.
         params.SetICDSymmetricKey(mICDSymmetricKey.Value());
@@ -166,6 +170,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         }
         params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
         params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
+        params.SetICDClientType(mICDClientType.Value());
     }
 
     return params;
