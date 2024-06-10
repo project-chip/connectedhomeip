@@ -25,7 +25,9 @@
 class DeviceManager
 {
 public:
-    DeviceManager();
+    DeviceManager() = default;
+
+    void Init();
 
     /**
      * @brief Adds a device to a dynamic endpoint.
@@ -62,7 +64,22 @@ public:
     Device * GetDevice(uint16_t index) const;
 
 private:
+    friend DeviceManager & DeviceMgr();
+
+    static DeviceManager sInstance;
+
     chip::EndpointId mCurrentEndpointId;
     chip::EndpointId mFirstDynamicEndpointId;
     Device * mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 };
+
+/**
+ * Returns the public interface of the DeviceManager singleton object.
+ *
+ * Applications should use this to access features of the DeviceManager
+ * object.
+ */
+inline DeviceManager & DeviceMgr()
+{
+    return DeviceManager::sInstance;
+}
