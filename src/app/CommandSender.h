@@ -415,8 +415,8 @@ public:
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aAddRequestDataParams.timedInvokeTimeoutMs.HasValue(),
                             CHIP_ERROR_INVALID_ARGUMENT);
 
-        DataModel::EncodableType<CommandDataT> encoder(aData);
-        return AddRequest(aCommandPath, encoder, aAddRequestDataParams);
+        DataModel::EncodableType<CommandDataT> encodable(aData);
+        return AddRequest(aCommandPath, encodable, aAddRequestDataParams);
     }
 
     template <typename CommandDataT>
@@ -445,7 +445,7 @@ public:
     CHIP_ERROR TestOnlyAddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                                   AddRequestDataParameters & aAddRequestDataParams)
     {
-        DataModel::EncodableType<CommandDataT> encoder(aData);
+        DataModel::EncodableType<CommandDataT> encodable(aData);
         return AddRequest(aCommandPath, encodable, aAddRequestDataParams);
     }
 
