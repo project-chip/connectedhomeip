@@ -16,6 +16,7 @@
 #
 
 import copy
+from datetime import datetime
 import logging
 import queue
 import threading
@@ -144,7 +145,7 @@ class TC_IDM_4_3(MatterBaseTest):
     previous_report_data_time: time = 0
     attr_update_report_data_time: time = 0
 
-    min_interval_floor_sec: int = 2
+    min_interval_floor_sec: int = 1
     max_interval_ceiling_sec: int = 3
 
     @async_test_body
@@ -169,7 +170,7 @@ class TC_IDM_4_3(MatterBaseTest):
 
         sub_th_step1ab.SetNotifySubscriptionStillActiveCallback(self.on_notify_subscription_still_active)
 
-        secs = 45
+        secs = 15
         print(f"\n\n\n\n\nTime to sleep {secs} second(s)")
         time.sleep(secs)
         print(f"Rise and shine after {secs} second(s)\n\n\n\n\n")
@@ -207,6 +208,17 @@ class TC_IDM_4_3(MatterBaseTest):
         # Number of seconds elapsed between the last report data event
         # and the arrival of the attribute update report data
         elapsed_time_since_report = self.attr_update_report_data_time - self.previous_report_data_time
+
+
+        # Convert the current time to a datetime object
+        update_time = datetime.fromtimestamp(self.attr_update_report_data_time)
+        previous_time = datetime.fromtimestamp(self.previous_report_data_time)
+
+        # Format the datetime object into the desired string format
+        update_time_f = update_time.strftime("%H:%M:%S.%f")
+        previous_time_f = previous_time.strftime("%H:%M:%S.%f")
+
+        self.fprint(f"\n\n\t\elapsed_time_since_report: {elapsed_time_since_report}s\n\t\tattr_update_report_data_time: {update_time_f}s\n\t\tprevious_report_data_time: {previous_time_f}s\n\n", "green")
 
         # Verify that the attribute update report data is sent
         # after MinInterval time and before MaxInterval time
