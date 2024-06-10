@@ -42,8 +42,7 @@ include(linker)
 add_subdirectory(${OPEN_IOT_SDK_EXAMPLE_COMMON}/app ./app_build)
 
 file(STRINGS test_components.txt TEST_NAMES_FROM_FILE)
-# TODO [PW_MIGRATION] Remove the following variable once the migration to pw_unit_test is complete. 
-file(STRINGS test_components_nl.txt TEST_NAMES_FROM_FILE_NL)
+
 
 target_compile_definitions(openiotsdk-startup
     PRIVATE
