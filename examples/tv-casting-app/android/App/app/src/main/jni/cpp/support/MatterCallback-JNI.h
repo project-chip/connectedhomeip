@@ -62,6 +62,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    bool IsSetUp() const { return mCallbackObject.HasValidObjectRef() && mMethod != nullptr; }
+
     void Handle(T responseData)
     {
         ChipLogProgress(AppServer, "MatterCallbackJNI::Handle called");
