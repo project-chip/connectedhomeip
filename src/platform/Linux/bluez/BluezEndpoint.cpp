@@ -438,10 +438,10 @@ void BluezEndpoint::SetupGattService()
     static const char * const c3_flags[] = { "read", nullptr };
 #endif
 
-    mService.reset(CreateGattService(CHIP_BLE_UUID_SERVICE_SHORT_STRING));
+    mService.reset(CreateGattService(Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR));
 
     // C1 characteristic
-    mC1.reset(CreateGattCharacteristic(mService.get(), "c1", CHIP_PLAT_BLE_UUID_C1_STRING, c1_flags));
+    mC1.reset(CreateGattCharacteristic(mService.get(), "c1", Ble::CHIP_BLE_CHAR_1_UUID_STR, c1_flags));
     g_signal_connect(mC1.get(), "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
@@ -455,7 +455,7 @@ void BluezEndpoint::SetupGattService()
     g_signal_connect(mC1.get(), "handle-confirm", G_CALLBACK(BluezCharacteristicConfirmError), nullptr);
 
     // C2 characteristic
-    mC2.reset(CreateGattCharacteristic(mService.get(), "c2", CHIP_PLAT_BLE_UUID_C2_STRING, c2_flags));
+    mC2.reset(CreateGattCharacteristic(mService.get(), "c2", Ble::CHIP_BLE_CHAR_2_UUID_STR, c2_flags));
     g_signal_connect(mC2.get(), "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
@@ -478,7 +478,7 @@ void BluezEndpoint::SetupGattService()
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is TRUE");
     // Additional data characteristics
-    mC3.reset(CreateGattCharacteristic(mService.get(), "c3", CHIP_PLAT_BLE_UUID_C3_STRING, c3_flags));
+    mC3.reset(CreateGattCharacteristic(mService.get(), "c3", Ble::CHIP_BLE_CHAR_3_UUID_STR, c3_flags));
     g_signal_connect(mC3.get(), "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),

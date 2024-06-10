@@ -119,7 +119,7 @@ private:
 
 public:
     /**
-     * The maximum size buffer an application can allocate with no protocol header reserve.
+     * The maximum size of a regular buffer an application can allocate with no protocol header reserve.
      */
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static constexpr size_t kMaxSizeWithoutReserve = LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE);
@@ -134,9 +134,29 @@ public:
     static constexpr uint16_t kDefaultHeaderReserve = CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE;
 
     /**
-     * The maximum size buffer an application can allocate with the default protocol header reserve.
+     * The maximum size of a regular buffer an application can allocate with the default protocol header reserve.
      */
     static constexpr size_t kMaxSize = kMaxSizeWithoutReserve - kDefaultHeaderReserve;
+
+    /**
+     * The maximum size of a large buffer(> IPv6 MTU) that an application can allocate with no protocol header reserve.
+     */
+    static constexpr size_t kLargeBufMaxSizeWithoutReserve = CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES;
+
+    /**
+     * The maximum size of a large buffer(> IPv6 MTU) that an application can allocate with the default protocol header reserve.
+     */
+    static constexpr size_t kLargeBufMaxSize = kLargeBufMaxSizeWithoutReserve - kDefaultHeaderReserve;
+
+    /**
+     * Unified constant(both regular and large buffers) for the maximum size that an application can allocate with no
+     * protocol header reserve.
+     */
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    static constexpr size_t kMaxAllocSize = kLargeBufMaxSizeWithoutReserve;
+#else
+    static constexpr size_t kMaxAllocSize          = kMaxSizeWithoutReserve;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**
      * Return the size of the allocation including the reserved and payload data spaces but not including space

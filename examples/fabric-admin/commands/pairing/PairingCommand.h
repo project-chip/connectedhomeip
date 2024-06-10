@@ -196,8 +196,8 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-    void OnICDRegistrationComplete(NodeId deviceId, uint32_t icdCounter) override;
-    void OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedActiveDuration) override;
+    void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
+    void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;

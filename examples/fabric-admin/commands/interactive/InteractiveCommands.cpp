@@ -26,16 +26,44 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
+#include <thread>
 #include <vector>
+
+#if defined(PW_RPC_ENABLED)
+#include <rpc/RpcClient.h>
+#endif
+
+using namespace chip;
+
+namespace {
 
 constexpr char kInteractiveModePrompt[]          = ">>> ";
 constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
 constexpr char kInteractiveModeStopCommand[]     = "quit()";
-
-namespace {
+constexpr uint16_t kRetryIntervalS               = 5;
 
 // File pointer for the log file
 FILE * sLogFile = nullptr;
+
+std::queue<std::string> sCommandQueue;
+std::mutex sQueueMutex;
+std::condition_variable sQueueCondition;
+
+void ReadCommandThread()
+{
+    char * command;
+    while (true)
+    {
+        command = readline(kInteractiveModePrompt);
+        if (command != nullptr && *command)
+        {
+            std::unique_lock<std::mutex> lock(sQueueMutex);
+            sCommandQueue.push(command);
+            free(command);
+            sQueueCondition.notify_one();
+        }
+    }
+}
 
 void OpenLogFile(const char * filePath)
 {
@@ -67,7 +95,7 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
         return;
     }
 
-    uint64_t timeMs       = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+    uint64_t timeMs       = System::SystemClock().GetMonotonicMilliseconds64().count();
     uint64_t seconds      = timeMs / 1000;
     uint64_t milliseconds = timeMs % 1000;
 
@@ -82,17 +110,46 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
     funlockfile(sLogFile);
 }
 
+#if defined(PW_RPC_ENABLED)
+void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
+{
+    if (InitRpcClient(kFabricBridgeServerPort) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Connected to Fabric-Bridge");
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to connect to Fabric-Bridge, retry in %d seconds....", kRetryIntervalS);
+        systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
+    }
+}
+
+void ExecuteDeferredConnect(intptr_t ignored)
+{
+    AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
+}
+#endif
+
 } // namespace
 
 char * InteractiveStartCommand::GetCommand(char * command)
 {
+    std::unique_lock<std::mutex> lock(sQueueMutex);
+    sQueueCondition.wait(lock, [&] { return !sCommandQueue.empty(); });
+
+    std::string cmd = sCommandQueue.front();
+    sCommandQueue.pop();
+
     if (command != nullptr)
     {
         free(command);
         command = nullptr;
     }
 
-    command = readline(kInteractiveModePrompt);
+    command = new char[cmd.length() + 1];
+    strcpy(command, cmd.c_str());
+
+    ChipLogProgress(NotSpecified, "GetCommand: %s", command);
 
     // Do not save empty lines
     if (command != nullptr && *command)
@@ -134,8 +191,15 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         OpenLogFile(mLogFilePath.Value());
 
         // Redirect logs to the custom logging callback
-        chip::Logging::SetLogRedirectCallback(LoggingCallback);
+        Logging::SetLogRedirectCallback(LoggingCallback);
     }
+
+#if defined(PW_RPC_ENABLED)
+    DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredConnect, 0);
+#endif
+
+    std::thread readCommands(ReadCommandThread);
+    readCommands.detach();
 
     char * command = nullptr;
     int status;
@@ -167,7 +231,7 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
         // If scheduling the cleanup fails, there is not much we can do.
         // But if something went wrong while the application is leaving it could be because things have
         // not been cleaned up properly, so it is still useful to log the failure.
-        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredCleanups, 0));
+        LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredCleanups, 0));
         return false;
     }
 
@@ -181,4 +245,13 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 bool InteractiveCommand::NeedsOperationalAdvertising()
 {
     return mAdvertiseOperational.ValueOr(true);
+}
+
+void PushCommand(const std::string & command)
+{
+    std::unique_lock<std::mutex> lock(sQueueMutex);
+
+    ChipLogProgress(NotSpecified, "PushCommand: %s", command.c_str());
+    sCommandQueue.push(command);
+    sQueueCondition.notify_one();
 }

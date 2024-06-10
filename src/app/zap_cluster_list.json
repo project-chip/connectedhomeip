@@ -289,6 +289,7 @@
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [
             "thread-network-diagnostics-server"
         ],
+        "THREAD_NETWORK_DIRECTORY_CLUSTER": [],
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
