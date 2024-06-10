@@ -114,7 +114,7 @@ Status CommandHandlerImpl::OnInvokeCommandRequest(CommandHandlerExchangeInterfac
 }
 
 CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                                                  DataModel::EncodableToTLV & aEncodable)
+                                                  const DataModel::EncodableToTLV & aEncodable)
 {
     ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
                                                 aResponseCommandId };
@@ -134,7 +134,7 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
 }
 
 CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                                               DataModel::EncodableToTLV & aEncodable)
+                                               const DataModel::EncodableToTLV & aEncodable)
 {
     // Return early when response should not be sent out.
     VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
@@ -909,7 +909,7 @@ bool CommandHandlerImpl::IsTimedInvoke() const
 }
 
 void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                                     DataModel::EncodableToTLV & aEncodable)
+                                     const DataModel::EncodableToTLV & aEncodable)
 {
     CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
     if (err != CHIP_NO_ERROR)

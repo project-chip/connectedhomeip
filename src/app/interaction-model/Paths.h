@@ -35,7 +35,7 @@ class Paths
 public:
     virtual ~Paths() = 0;
 
-    /// Mark some specific attribute dirty (or several of attributes when using wildcards).
+    /// Mark all attributes matching the given path (which may be a wildcard) dirty.
     ///
     /// Wildcards are supported.
     virtual void MarkDirty(const AttributePathParams & path) = 0;

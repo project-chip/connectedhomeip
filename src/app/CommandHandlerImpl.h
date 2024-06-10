@@ -125,9 +125,9 @@ public:
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override;
 
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                               DataModel::EncodableToTLV & aEncodable) override;
+                               const DataModel::EncodableToTLV & aEncodable) override;
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     DataModel::EncodableToTLV & aEncodable) override;
+                     const DataModel::EncodableToTLV & aEncodable) override;
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
     FabricIndex GetAccessingFabricIndex() const override;
@@ -409,7 +409,7 @@ private:
      * @param [in] aEncodable the data to encode for the given aResponseCommandId
      */
     CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                                  DataModel::EncodableToTLV & aEncodable);
+                                  const DataModel::EncodableToTLV & aEncodable);
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 

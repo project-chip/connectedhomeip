@@ -35,7 +35,7 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
-static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
+static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;

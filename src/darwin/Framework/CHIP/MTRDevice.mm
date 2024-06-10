@@ -788,9 +788,18 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // attempt, since we now have no delegate.
     _reattemptingSubscription = NO;
 
-    // We do not change _internalDeviceState here, because we might still have a
-    // subscription.  In that case, _internalDeviceState will update when the
-    // subscription is actually terminated.
+    [_deviceController asyncDispatchToMatterQueue:^{
+        // Destroy the read client and callback (has to happen on the Matter
+        // queue, to avoid deleting objects that are being referenced), to
+        // tear down the subscription.  We will get no more callbacks from
+        // the subscrption after this point.
+        std::lock_guard lock(self->_lock);
+        self->_currentReadClient = nullptr;
+        self->_currentSubscriptionCallback = nullptr;
+
+        [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
+    }
+                                     errorHandler:nil];
 
     [self _stopConnectivityMonitoring];
 
