@@ -16,16 +16,16 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
-
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/StatusResponse.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/support/UnitTestUtils.h>
 #include <protocols/interaction_model/Constants.h>
+#include <pw_unit_test/framework.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
 
@@ -193,7 +193,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(MsgType aMsgType)
 
     TestExchangeDelegate delegate;
     ExchangeContext * exchange = pTestContext->NewExchangeToAlice(&delegate);
-    EXPECT_NE(exchange, nullptr);
+    ASSERT_NE(exchange, nullptr);
 
     EXPECT_FALSE(delegate.mNewMessageReceived);
 

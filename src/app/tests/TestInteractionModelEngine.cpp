@@ -296,7 +296,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
 
     // Create ExchangeContext
     Messaging::ExchangeContext * exchangeCtx1 = mpTestContext->NewExchangeToBob(nullptr, false);
-    EXPECT_TRUE(exchangeCtx1);
+    ASSERT_TRUE(exchangeCtx1);
 
     // InteractionModelEngine init
     EXPECT_EQ(CHIP_NO_ERROR,
@@ -341,10 +341,10 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
 
     // Create ExchangeContexts
     Messaging::ExchangeContext * exchangeCtx1 = mpTestContext->NewExchangeToBob(nullptr, false);
-    EXPECT_TRUE(exchangeCtx1);
+    ASSERT_TRUE(exchangeCtx1);
 
     Messaging::ExchangeContext * exchangeCtx2 = mpTestContext->NewExchangeToBob(nullptr, false);
-    EXPECT_TRUE(exchangeCtx1);
+    ASSERT_TRUE(exchangeCtx1);
 
     // InteractionModelEngine init
     EXPECT_EQ(CHIP_NO_ERROR,
@@ -400,10 +400,10 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
 
     // Create ExchangeContexts
     Messaging::ExchangeContext * exchangeCtx1 = mpTestContext->NewExchangeToBob(nullptr, false);
-    EXPECT_TRUE(exchangeCtx1);
+    ASSERT_TRUE(exchangeCtx1);
 
     Messaging::ExchangeContext * exchangeCtx2 = mpTestContext->NewExchangeToAlice(nullptr, false);
-    EXPECT_TRUE(exchangeCtx2);
+    ASSERT_TRUE(exchangeCtx2);
 
     // InteractionModelEngine init
     EXPECT_EQ(CHIP_NO_ERROR,
@@ -476,16 +476,16 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
 
     // Create ExchangeContexts
     Messaging::ExchangeContext * exchangeCtx11 = mpTestContext->NewExchangeToBob(nullptr, false);
-    EXPECT_TRUE(exchangeCtx11);
+    ASSERT_TRUE(exchangeCtx11);
 
     Messaging::ExchangeContext * exchangeCtx12 = mpTestContext->NewExchangeToBob(nullptr, false);
-    EXPECT_TRUE(exchangeCtx12);
+    ASSERT_TRUE(exchangeCtx12);
 
     Messaging::ExchangeContext * exchangeCtx21 = mpTestContext->NewExchangeToAlice(nullptr, false);
-    EXPECT_TRUE(exchangeCtx21);
+    ASSERT_TRUE(exchangeCtx21);
 
     Messaging::ExchangeContext * exchangeCtx22 = mpTestContext->NewExchangeToAlice(nullptr, false);
-    EXPECT_TRUE(exchangeCtx22);
+    ASSERT_TRUE(exchangeCtx22);
 
     // InteractionModelEngine init
     EXPECT_EQ(CHIP_NO_ERROR,
@@ -579,7 +579,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscription
 
     // Create ExchangeContexts
     Messaging::ExchangeContext * exchangeCtx = mpTestContext->NewExchangeToBob(nullptr, false);
-    EXPECT_TRUE(exchangeCtx);
+    ASSERT_TRUE(exchangeCtx);
 
     // Create readHandler
     ReadHandler * readHandler = engine->GetReadHandlerPool().CreateObject(
