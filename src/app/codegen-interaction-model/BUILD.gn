@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
-import("${chip_root}/build/chip/chip_test_suite.gni")
-
-chip_test_suite("tests") {
-  output_name = "libIMInterfaceTests"
-
-  test_sources = [ "TestEventEmitting.cpp" ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [ "${chip_root}/src/app/interaction-model" ]
-}
+# This source set is TIGHLY coupled with code-generated data models
+# as generally implemented by `src/app/util`
+#
+# Corresponding functions defined in attribute-storace.cpp/attribute-table.cpp must
+# be available at link time for this model to use
+#
+# Use `model.gni` to get access to:
+#   CodegenDataModel.cpp
+#   CodegenDataModel.h
+#
+# The above list of files exists to satisfy the "dependency linter"
+# since those files should technically be "visible to gn" even though we
+# are supposed to go through model.gni constants
