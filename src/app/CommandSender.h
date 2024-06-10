@@ -379,9 +379,9 @@ public:
     /**
      * API for adding request data using DataModel::EncodableToTLV.
      *
-     * @param [in] aCommandPath  The path of the command being requested.
-     * @param [in] aEncodable - an encodable that places the command data structure
-     *             for `aAddRequestDataParams` into a TLV Writer.
+     * @param [in] aCommandPath The path of the command being requested.
+     * @param [in] aEncodable The request data to encode into the
+     *             `CommandFields` member of `CommandDataIB`.
      * @param [in] aAddRequestDataParams parameters associated with building the
      *             InvokeRequestMessage that are associated with this request.
      *
