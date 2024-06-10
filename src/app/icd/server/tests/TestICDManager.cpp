@@ -124,19 +124,6 @@ private:
     bool mHasPersistedSubscription = false;
 };
 
-class TestAddressResolver : public AddressResolve::Resolver
-{
-public:
-    TestAddressResolver()          = default;
-    virtual ~TestAddressResolver() = default;
-
-    CHIP_ERROR Init(System::Layer * systemLayer) override { return CHIP_NO_ERROR; };
-    CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) override { return CHIP_NO_ERROR; };
-    CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) override { return CHIP_NO_ERROR; };
-    CHIP_ERROR CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method) override { return CHIP_NO_ERROR; };
-    void Shutdown() override{};
-};
-
 System::Clock::Internal::MockClock * pMockClock          = nullptr;
 System::Clock::ClockBase * pRealClock                    = nullptr;
 chip::Test::LoopbackMessagingContext * pMessagingContext = nullptr;
@@ -218,7 +205,7 @@ public:
         mICDStateObserver.ResetAll();
         mICDManager.RegisterObserver(&mICDStateObserver);
         mICDManager.Init(&testStorage, &(pMessagingContext->GetFabricTable()), &mKeystore,
-                         &(pMessagingContext->GetExchangeManager()), &mSubInfoProvider, &mAddressResolver);
+                         &(pMessagingContext->GetExchangeManager()), &mSubInfoProvider);
     }
 
     // Performs teardown for each individual test in the test suite
@@ -228,7 +215,6 @@ public:
         pMessagingContext->TearDown();
     }
 
-    TestAddressResolver mAddressResolver;
     TestSessionKeystoreImpl mKeystore;
     ICDManager mICDManager;
     TestSubscriptionsInfoProvider mSubInfoProvider;
@@ -591,7 +577,7 @@ TEST_F(TestICDManager, TestICDCounter)
     // Shut down and reinit ICDManager to increment counter
     mICDManager.Shutdown();
     mICDManager.Init(&(testStorage), &(pMessagingContext->GetFabricTable()), &(mKeystore),
-                     &(pMessagingContext->GetExchangeManager()), &(mSubInfoProvider), &mAddressResolver);
+                     &(pMessagingContext->GetExchangeManager()), &(mSubInfoProvider));
     mICDManager.RegisterObserver(&(mICDStateObserver));
 
     EXPECT_EQ(counter + ICDConfigurationData::kICDCounterPersistenceIncrement,
@@ -997,7 +983,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnICDModeChangeOnInit)
     mICDManager.Shutdown();
     mICDManager.RegisterObserver(&(mICDStateObserver));
     mICDManager.Init(&testStorage, &(pMessagingContext->GetFabricTable()), &mKeystore, &(pMessagingContext->GetExchangeManager()),
-                     &mSubInfoProvider, &mAddressResolver);
+                     &mSubInfoProvider);
 
     // We have a registration, transition to LIT mode
     EXPECT_TRUE(mICDStateObserver.mOnICDModeChangeCalled);

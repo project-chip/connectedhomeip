@@ -27,14 +27,10 @@ namespace app {
 
 using namespace Protocols::SecureChannel;
 
-ICDCheckInSender::ICDCheckInSender(Messaging::ExchangeManager * exchangeManager, AddressResolve::Resolver * addressResolver)
+ICDCheckInSender::ICDCheckInSender(Messaging::ExchangeManager * exchangeManager)
 {
     VerifyOrDie(exchangeManager != nullptr);
-    VerifyOrDie(addressResolver != nullptr);
-
     mExchangeManager = exchangeManager;
-    mAddressResolver = addressResolver;
-
     mAddressLookupHandle.SetListener(this);
 }
 
@@ -111,7 +107,7 @@ CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTa
     memcpy(mHmac128KeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
            entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
-    CHIP_ERROR err = mAddressResolver->LookupNode(request, mAddressLookupHandle);
+    CHIP_ERROR err = AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 
     if (err == CHIP_NO_ERROR)
     {

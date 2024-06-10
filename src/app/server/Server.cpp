@@ -356,7 +356,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
     mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
-                     chip::app::InteractionModelEngine::GetInstance(), &AddressResolve::Resolver::Instance());
+                     chip::app::InteractionModelEngine::GetInstance());
 
     // Register Test Event Trigger Handler
     mTestEventTriggerDelegate->AddHandler(&mICDManager);

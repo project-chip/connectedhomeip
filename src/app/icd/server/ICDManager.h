@@ -26,7 +26,6 @@
 #include <app/icd/server/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <crypto/SessionKeystore.h>
-#include <lib/address_resolve/AddressResolve.h>
 #include <lib/support/BitFlags.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -116,8 +115,7 @@ public:
     ~ICDManager() = default;
 
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider,
-              AddressResolve::Resolver * adressResolver);
+              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider);
     void Shutdown();
 
     /**
@@ -325,7 +323,6 @@ private:
     Messaging::ExchangeManager * mExchangeManager  = nullptr;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
     SubscriptionsInfoProvider * mSubInfoProvider   = nullptr;
-    AddressResolve::Resolver * mAddressResolver    = nullptr;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
