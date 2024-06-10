@@ -377,24 +377,20 @@ public:
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
 
     /**
-     * API for adding request data.  The `aEncodable` is generally expected to encode
-     * a ClusterName::Commands::CommandName::Type struct, however any object should work.
+     * API for adding request data using DataModel::EncodableToTLV.
      *
      * @param [in] aCommandPath  The path of the command being requested.
      * @param [in] aEncodable - an encodable that places the command data structure
-     *             for `aResponseCommandId` into a TLV Writer.
+     *             for `aAddRequestDataParams` into a TLV Writer.
      * @param [in] aAddRequestDataParams parameters associated with building the
      *             InvokeRequestMessage that are associated with this request.
      *
-     * This API does not validate if the command provided requires interaction use a timed
-     * invoke interaction. If the caller wants that certainty they should call the templated
-     * version of AddRequestData.
+     * This API will not fail if this is an untimed invoke but the command provided requires a timed
+     * invoke interaction. If the caller wants that to fail before sending the command, they should call
+     * the templated version of AddRequestData.
      */
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
-                              AddRequestDataParameters & aAddRequestDataParams)
-    {
-        return AddRequestDataInternal(aCommandPath, aEncodable, aAddRequestDataParams);
-    }
+                              AddRequestDataParameters & aAddRequestDataParams);
 
     /**
      * API for adding a data request.  The template parameter T is generally
@@ -420,7 +416,8 @@ public:
                             CHIP_ERROR_INVALID_ARGUMENT);
 
         DataModel::EncodableType<CommandDataT> encoder(aData);
-        return AddRequestDataInternal(aCommandPath, encoder, aAddRequestDataParams);
+        DataModel::EncodableToTLV & encodable = encoder;
+        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
     }
 
     template <typename CommandDataT>
@@ -450,7 +447,8 @@ public:
                                                   AddRequestDataParameters & aAddRequestDataParams)
     {
         DataModel::EncodableType<CommandDataT> encoder(aData);
-        return AddRequestDataInternal(aCommandPath, encoder, aAddRequestDataParams);
+        DataModel::EncodableToTLV & encodable = encoder;
+        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
     }
 
     CHIP_ERROR TestOnlyFinishCommand(FinishCommandParameters & aFinishCommandParams)
@@ -472,9 +470,6 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
-    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
-                                      AddRequestDataParameters & aAddRequestDataParams);
-
     CHIP_ERROR FinishCommandInternal(FinishCommandParameters & aFinishCommandParams);
 
 public:
