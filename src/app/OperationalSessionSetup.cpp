@@ -420,7 +420,7 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureRead
             // fact have an active session for them, and if they try to put the
             // session in a holder that will fail, and then trying to use the
             // holder as if it has a session will crash.  But we should also try
-            // to make sure we don't call failure callbacks the correspond to
+            // to make sure we don't call failure callbacks that correspond to
             // the success callbacks we already called, since their context
             // might be dead.
             //
