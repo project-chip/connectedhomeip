@@ -389,8 +389,8 @@ public:
      * invoke interaction. If the caller wants that to fail before sending the command, they should call
      * the templated version of AddRequestData.
      */
-    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
-                              AddRequestDataParameters & aAddRequestDataParams);
+    CHIP_ERROR AddRequest(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
+                          AddRequestDataParameters & aAddRequestDataParams);
 
     /**
      * API for adding a data request.  The template parameter T is generally
@@ -416,8 +416,7 @@ public:
                             CHIP_ERROR_INVALID_ARGUMENT);
 
         DataModel::EncodableType<CommandDataT> encoder(aData);
-        DataModel::EncodableToTLV & encodable = encoder;
-        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
+        return AddRequest(aCommandPath, encoder, aAddRequestDataParams);
     }
 
     template <typename CommandDataT>
