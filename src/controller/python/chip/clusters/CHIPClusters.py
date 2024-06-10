@@ -6657,7 +6657,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000006: {
-                "attributeName": "NumberOfTransistions",
+                "attributeName": "NumberOfTransitions",
                 "attributeId": 0x00000006,
                 "type": "int",
                 "reportable": True,

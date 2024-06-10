@@ -8690,8 +8690,8 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::NumberOfTransistions::Id: {
-        using TypeInfo = Attributes::NumberOfTransistions::TypeInfo;
+    case Attributes::NumberOfTransitions::Id: {
+        using TypeInfo = Attributes::NumberOfTransitions::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

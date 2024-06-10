@@ -812,7 +812,7 @@ suspend fun readNumberOfEventsPerProgramAttribute(): UByte {val ATTRIBUTE_ID: UI
       }
     }    
   }
-suspend fun readNumberOfTransistionsAttribute(): UByte {val ATTRIBUTE_ID: UInt = 6u
+suspend fun readNumberOfTransitionsAttribute(): UByte {val ATTRIBUTE_ID: UInt = 6u
 
     val attributePath = AttributePath(
       endpointId = endpointId, 
@@ -840,7 +840,7 @@ suspend fun readNumberOfTransistionsAttribute(): UByte {val ATTRIBUTE_ID: UInt =
       }        
        
     requireNotNull(attributeData) { 
-      "Numberoftransistions attribute not found in response" 
+      "Numberoftransitions attribute not found in response" 
     }
 
     // Decode the TLV data into the appropriate type
@@ -851,7 +851,7 @@ suspend fun readNumberOfTransistionsAttribute(): UByte {val ATTRIBUTE_ID: UInt =
     return decodedValue
   }
 
-  suspend fun subscribeNumberOfTransistionsAttribute(
+  suspend fun subscribeNumberOfTransitionsAttribute(
     minInterval: Int,
     maxInterval: Int
   ): Flow<UByteSubscriptionState> {
@@ -883,7 +883,7 @@ suspend fun readNumberOfTransistionsAttribute(): UByte {val ATTRIBUTE_ID: UInt =
             }        
              
           requireNotNull(attributeData) { 
-            "Numberoftransistions attribute not found in Node State update" 
+            "Numberoftransitions attribute not found in Node State update" 
           }
 
           // Decode the TLV data into the appropriate type

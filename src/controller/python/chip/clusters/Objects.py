@@ -23190,7 +23190,7 @@ class DemandResponseLoadControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="events", Tag=0x00000003, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]),
                 ClusterObjectFieldDescriptor(Label="activeEvents", Tag=0x00000004, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]),
                 ClusterObjectFieldDescriptor(Label="numberOfEventsPerProgram", Tag=0x00000005, Type=uint),
-                ClusterObjectFieldDescriptor(Label="numberOfTransistions", Tag=0x00000006, Type=uint),
+                ClusterObjectFieldDescriptor(Label="numberOfTransitions", Tag=0x00000006, Type=uint),
                 ClusterObjectFieldDescriptor(Label="defaultRandomStart", Tag=0x00000007, Type=uint),
                 ClusterObjectFieldDescriptor(Label="defaultRandomDuration", Tag=0x00000008, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -23207,7 +23207,7 @@ class DemandResponseLoadControl(Cluster):
     events: 'typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]' = None
     activeEvents: 'typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]' = None
     numberOfEventsPerProgram: 'uint' = None
-    numberOfTransistions: 'uint' = None
+    numberOfTransitions: 'uint' = None
     defaultRandomStart: 'uint' = None
     defaultRandomDuration: 'uint' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -23630,7 +23630,7 @@ class DemandResponseLoadControl(Cluster):
             value: 'uint' = 0
 
         @dataclass
-        class NumberOfTransistions(ClusterAttributeDescriptor):
+        class NumberOfTransitions(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000096

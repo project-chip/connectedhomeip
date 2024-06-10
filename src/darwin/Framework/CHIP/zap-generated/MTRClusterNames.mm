@@ -4330,8 +4330,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"NumberOfEventsPerProgram";
             break;
 
-        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransistionsID:
-            result = @"NumberOfTransistions";
+        case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransitionsID:
+            result = @"NumberOfTransitions";
             break;
 
         case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID:

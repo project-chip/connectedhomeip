@@ -30213,7 +30213,7 @@ public class ChipClusters {
     private static final long EVENTS_ATTRIBUTE_ID = 3L;
     private static final long ACTIVE_EVENTS_ATTRIBUTE_ID = 4L;
     private static final long NUMBER_OF_EVENTS_PER_PROGRAM_ATTRIBUTE_ID = 5L;
-    private static final long NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID = 6L;
+    private static final long NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID = 6L;
     private static final long DEFAULT_RANDOM_START_ATTRIBUTE_ID = 7L;
     private static final long DEFAULT_RANDOM_DURATION_ATTRIBUTE_ID = 8L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
@@ -30517,9 +30517,9 @@ public class ChipClusters {
         }, NUMBER_OF_EVENTS_PER_PROGRAM_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readNumberOfTransistionsAttribute(
+    public void readNumberOfTransitionsAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -30527,12 +30527,12 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID, true);
+        }, NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeNumberOfTransistionsAttribute(
+    public void subscribeNumberOfTransitionsAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -30540,7 +30540,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, NUMBER_OF_TRANSISTIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, NUMBER_OF_TRANSITIONS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readDefaultRandomStartAttribute(

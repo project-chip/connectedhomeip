@@ -3075,7 +3075,7 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
     case Attributes::NumberOfEventsPerProgram::Id: {
         return YES;
     }
-    case Attributes::NumberOfTransistions::Id: {
+    case Attributes::NumberOfTransitions::Id: {
         return YES;
     }
     case Attributes::DefaultRandomStart::Id: {

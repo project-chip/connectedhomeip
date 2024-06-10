@@ -5750,37 +5750,6 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
 /**
- * @brief Demand Response Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
- */
-bool emberAfDemandResponseLoadControlClusterRegisterLoadControlProgramRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::DecodableType & commandData);
-/**
- * @brief Demand Response Load Control Cluster UnregisterLoadControlProgramRequest Command callback (from client)
- */
-bool emberAfDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::DecodableType &
-        commandData);
-/**
- * @brief Demand Response Load Control Cluster AddLoadControlEventRequest Command callback (from client)
- */
-bool emberAfDemandResponseLoadControlClusterAddLoadControlEventRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DemandResponseLoadControl::Commands::AddLoadControlEventRequest::DecodableType & commandData);
-/**
- * @brief Demand Response Load Control Cluster RemoveLoadControlEventRequest Command callback (from client)
- */
-bool emberAfDemandResponseLoadControlClusterRemoveLoadControlEventRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::DecodableType & commandData);
-/**
- * @brief Demand Response Load Control Cluster ClearLoadControlEventsRequest Command callback (from client)
- */
-bool emberAfDemandResponseLoadControlClusterClearLoadControlEventsRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::DecodableType & commandData);
-/**
  * @brief Messages Cluster PresentMessagesRequest Command callback (from client)
  */
 bool emberAfMessagesClusterPresentMessagesRequestCallback(

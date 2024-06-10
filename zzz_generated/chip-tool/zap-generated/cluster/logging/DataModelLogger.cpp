@@ -12696,10 +12696,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NumberOfEventsPerProgram", 1, value);
         }
-        case DemandResponseLoadControl::Attributes::NumberOfTransistions::Id: {
+        case DemandResponseLoadControl::Attributes::NumberOfTransitions::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NumberOfTransistions", 1, value);
+            return DataModelLogger::LogValue("NumberOfTransitions", 1, value);
         }
         case DemandResponseLoadControl::Attributes::DefaultRandomStart::Id: {
             uint8_t value;

@@ -22838,8 +22838,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                        value);
             return value;
         }
-        case Attributes::NumberOfTransistions::Id: {
-            using TypeInfo = Attributes::NumberOfTransistions::TypeInfo;
+        case Attributes::NumberOfTransitions::Id: {
+            using TypeInfo = Attributes::NumberOfTransitions::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

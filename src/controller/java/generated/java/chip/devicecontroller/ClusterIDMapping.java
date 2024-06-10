@@ -9304,7 +9304,7 @@ public class ClusterIDMapping {
             Events(3L),
             ActiveEvents(4L),
             NumberOfEventsPerProgram(5L),
-            NumberOfTransistions(6L),
+            NumberOfTransitions(6L),
             DefaultRandomStart(7L),
             DefaultRandomDuration(8L),
             GeneratedCommandList(65528L),

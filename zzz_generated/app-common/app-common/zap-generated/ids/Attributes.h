@@ -3828,9 +3828,9 @@ namespace NumberOfEventsPerProgram {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace NumberOfEventsPerProgram
 
-namespace NumberOfTransistions {
+namespace NumberOfTransitions {
 static constexpr AttributeId Id = 0x00000006;
-} // namespace NumberOfTransistions
+} // namespace NumberOfTransitions
 
 namespace DefaultRandomStart {
 static constexpr AttributeId Id = 0x00000007;
