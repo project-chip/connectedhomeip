@@ -131,6 +131,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/channel-server/channel-delegate.h': {'list'},
     'src/app/clusters/content-launch-server/content-launch-delegate.h': {'list'},
     'src/app/clusters/content-launch-server/content-launch-server.cpp': {'list'},
+    'src/app/clusters/energy-evse-server/energy-evse-server.h': {'vector'},
     'src/app/clusters/media-input-server/media-input-delegate.h': {'list'},
     'src/app/clusters/media-playback-server/media-playback-delegate.h': {'list'},
     'src/app/clusters/target-navigator-server/target-navigator-delegate.h': {'list'},
