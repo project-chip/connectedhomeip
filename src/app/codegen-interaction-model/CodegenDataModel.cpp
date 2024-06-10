@@ -386,7 +386,7 @@ std::optional<InteractionModel::ClusterInfo> CodegenDataModel::GetClusterInfo(co
 #if CHIP_ERROR_LOGGING
         ChipLogError(AppServer, "Failed to load cluster info: %" CHIP_ERROR_FORMAT, err->Format());
 #else
-        (void)err->Format();
+        (void) err->Format();
 #endif
         return std::nullopt;
     }
