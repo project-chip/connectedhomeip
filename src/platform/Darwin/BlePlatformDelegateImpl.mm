@@ -154,12 +154,6 @@ namespace DeviceLayer {
             return found;
         }
 
-        bool BlePlatformDelegateImpl::SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext,
-            const ChipBleUUID * svcId, const ChipBleUUID * charId)
-        {
-            return false;
-        }
-
     } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

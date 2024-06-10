@@ -1333,12 +1333,6 @@ exit:
     return false;
 }
 
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId)
-{
-    return false;
-}
-
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)

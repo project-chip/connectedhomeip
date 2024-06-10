@@ -620,13 +620,6 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     return result;
 }
 
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId)
-{
-    ChipLogError(Ble, "SendReadRBluezonse: Not implemented");
-    return true;
-}
-
 void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
 {
     BLEConnection * conn;

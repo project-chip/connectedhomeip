@@ -802,13 +802,6 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
     return false;
 }
 
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogDetail(DeviceLayer, "BLE central not implemented");
-    return false;
-}
-
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     CloseConnection(conId);
