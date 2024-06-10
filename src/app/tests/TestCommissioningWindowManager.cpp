@@ -84,11 +84,14 @@ void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::Clu
 
 namespace {
 
-static constexpr int kTestTaskWaitSeconds = 2;
-
 void TearDownTask(intptr_t context)
 {
     chip::Server::GetInstance().Shutdown();
+}
+
+static void StopEventLoop(intptr_t context)
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 class TestCommissioningWindowManager : public ::testing::Test
@@ -117,16 +120,15 @@ public:
         ASSERT_EQ(chip::Server::GetInstance().Init(initParams), CHIP_NO_ERROR);
 
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-        chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
     }
     static void TearDownTestSuite()
     {
 
         // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
         chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0);
-        sleep(kTestTaskWaitSeconds);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+        chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
         chip::DeviceLayer::PlatformMgr().Shutdown();
 
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
@@ -175,8 +177,10 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
 
 TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerBasicWindowOpenClose)
 {
+
     chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerBasicWindowOpenCloseTask);
-    sleep(kTestTaskWaitSeconds);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
 void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t context)
@@ -222,7 +226,8 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t
 TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerBasicWindowOpenCloseFromCluster)
 {
     chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask);
-    sleep(kTestTaskWaitSeconds);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
 void CheckCommissioningWindowManagerWindowClosedTask(chip::System::Layer *, void *)
@@ -265,7 +270,8 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
 TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerWindowTimeout)
 {
     chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerWindowTimeoutTask);
-    sleep(kTestTaskWaitSeconds);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
 void SimulateFailedSessionEstablishmentTask(chip::System::Layer *, void *)
@@ -319,7 +325,8 @@ void CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsT
 TEST_F(TestCommissioningWindowManager, CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrors)
 {
     chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsTask);
-    sleep(kTestTaskWaitSeconds);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
 void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
@@ -376,7 +383,8 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
 TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhancedWindow)
 {
     chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerEnhancedWindowTask);
-    sleep(kTestTaskWaitSeconds);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
 } // namespace
