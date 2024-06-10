@@ -415,10 +415,12 @@ class CustomCommissioningParameters:
     commissioningParameters: CommissioningParameters
     randomDiscriminator: int
 
+
 @dataclass
 class ProblemLocation:
     def __str__(self):
         return "UNKNOWN"
+
 
 @dataclass
 class AttributePathLocation(ProblemLocation):

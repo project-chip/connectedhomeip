@@ -31,6 +31,8 @@ from MockTestRunner import MockTestRunner
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file
 # Vendor ID is included on ON in the PICS file
+
+
 def create_read(include_reachable: bool = False, include_max_paths: bool = False, include_vendor_id: bool = True) -> Attribute.AsyncReadTransaction.ReadResponse:
     # Attribute read here is set to match the example_pics_xml_basic_info.xml in this directory
     bi = Clusters.BasicInformation.Attributes
@@ -70,6 +72,7 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
     resp.tlvAttributes = {0: {Clusters.BasicInformation.id: tlv_attrs}}
 
     return resp
+
 
 def main():
     # TODO: add the same test for commands and features

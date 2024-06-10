@@ -178,7 +178,8 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
 
         self.step(7)
         if self.check_pics('PICS_SDK_CI_ONLY'):
-            self.record_error("PICS check", location=ProblemLocation(), problem=f"PICS PICS_SDK_CI_ONLY found in PICS list. This PICS is disallowed for certification.")
+            self.record_error("PICS check", location=ProblemLocation(),
+                              problem=f"PICS PICS_SDK_CI_ONLY found in PICS list. This PICS is disallowed for certification.")
             self.success = False
 
         if not self.success:
