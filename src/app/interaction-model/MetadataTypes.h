@@ -85,8 +85,8 @@ struct AttributeEntry
 
 enum class CommandQualityFlags : uint32_t
 {
-    kFabricScoped    = 0x0001,
-    kTimed           = 0x0002, // `T` quality on commands
+    kFabricScoped = 0x0001,
+    kTimed        = 0x0002, // `T` quality on commands
 };
 
 struct CommandInfo
