@@ -35,7 +35,7 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
-static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
+static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -1721,15 +1721,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         ],
     };
 
-#if 0
-    __auto_type * listOfStructsValue2 = @{
-        MTRTypeKey : MTRArrayValueType,
-        MTRValueKey : @[
-                        @{ MTRDataKey: structValue2, },
-                        ],
-    };
-#endif
-
     __auto_type responsePathFromRequestPath = ^(MTRAttributeRequestPath * path) {
         return [MTRAttributePath attributePathWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute];
     };
@@ -2007,32 +1998,60 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     // Now do a wildcard read on the endpoint and check that this does the right
     // thing (gets the right things from descriptor, gets both clusters, etc).
-#if 0
-    // Unused bits ifdefed out until we doing more testing on the actual values
-    // we get back.
     __auto_type globalAttributePath = ^(NSNumber * clusterID, MTRAttributeIDType attributeID) {
         return [MTRAttributePath attributePathWithEndpointID:endpointId1 clusterID:clusterID attributeID:@(attributeID)];
     };
+    __auto_type descriptorAttributePath = ^(MTRAttributeIDType attributeID) {
+        return [MTRAttributePath attributePathWithEndpointID:endpointId1 clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(attributeID)];
+    };
     __auto_type unsignedIntValue = ^(NSUInteger value) {
         return @{
-        MTRTypeKey: MTRUnsignedIntegerValueType,
-        MTRValueKey: @(value),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(value),
         };
     };
     __auto_type arrayOfUnsignedIntegersValue = ^(NSArray<NSNumber *> * values) {
         __auto_type * mutableArray = [[NSMutableArray alloc] init];
         for (NSNumber * value in values) {
-            [mutableArray addObject:@{ MTRDataKey: @{
-                    MTRTypeKey: MTRUnsignedIntegerValueType,
-                            MTRValueKey: value,
-                            }, }];
+            [mutableArray addObject:@{
+                MTRDataKey : @ {
+                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                    MTRValueKey : value,
+                },
+            }];
         }
         return @{
-        MTRTypeKey: MTRArrayValueType,
-                MTRValueKey: [mutableArray copy],
-                };
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : [mutableArray copy],
+        };
     };
-#endif
+    __auto_type endpoint1DeviceTypeValue = @{
+        MTRTypeKey : MTRArrayValueType,
+        MTRValueKey : @[
+            @{
+                MTRDataKey : @ {
+                    MTRTypeKey : MTRStructureValueType,
+                    MTRValueKey : @[
+                        @{
+                            MTRContextTagKey : @(0),
+                            MTRDataKey : @ {
+                                MTRTypeKey : MTRUnsignedIntegerValueType,
+                                MTRValueKey : deviceType1.deviceTypeID,
+                            },
+                        },
+                        @{
+                            MTRContextTagKey : @(1),
+                            MTRDataKey : @ {
+                                MTRTypeKey : MTRUnsignedIntegerValueType,
+                                MTRValueKey : deviceType1.deviceTypeRevision,
+                            },
+                        },
+                    ],
+                }
+            },
+        ],
+    };
+
     XCTestExpectation * wildcardReadExpectation = [self expectationWithDescription:@"Wildcard read of our endpoint"];
     [baseDevice readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:endpointId1 clusterID:nil attributeID:nil] ]
                         eventPaths:nil
@@ -2042,32 +2061,118 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                             XCTAssertNil(error);
                             XCTAssertNotNil(values);
 
-                            // TODO: Figure out how to test that values is correct that's not
-                            // too fragile if things get returned in different valid order.
-                            // For now just check that every path we got has a value, not an
-                            // error.
                             for (NSDictionary<NSString *, id> * value in values) {
                                 XCTAssertNotNil(value[MTRAttributePathKey]);
                                 XCTAssertNil(value[MTRErrorKey]);
                                 XCTAssertNotNil(value[MTRDataKey]);
                             }
-#if 0
-            XCTAssertEqualObjects(values, @[
-                                            // cluster1
-                                            @{ MTRAttributePathKey: attribute1ResponsePath,
-                                                    MTRDataKey: unsignedIntValue2, },
-                                               @{ MTRAttributePathKey: globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeFeatureMapID),
-                                                    MTRDataKey: unsignedIntValue(0), },
-                                               @{ MTRAttributePathKey: globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeClusterRevisionID),
-                                                    MTRDataKey: clusterRevision1, },
-                                               @{ MTRAttributePathKey: globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID),
-                                                    MTRDataKey: arrayOfUnsignedIntegersValue(@[]), },
-                                               @{ MTRAttributePathKey: globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID),
-                                                    MTRDataKey: arrayOfUnsignedIntegersValue(@[]), },
-                                             // etc
 
-                                            ]);
-#endif
+                            NSSet<NSDictionary<NSString *, id> *> * receivedValues = [NSSet setWithArray:values];
+                            NSSet<NSDictionary<NSString *, id> *> * expectedValues = [NSSet setWithArray:@[
+                                // cluster1
+                                @ {
+                                    MTRAttributePathKey : attribute1ResponsePath,
+                                    MTRDataKey : unsignedIntValue2,
+                                },
+                                // attribute3 requires Operate privileges to read, which we do not have
+                                // for this cluster, so it will not be present here.
+                                @ {
+                                    MTRAttributePathKey : globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeFeatureMapID),
+                                    MTRDataKey : unsignedIntValue(0),
+                                },
+                                @ {
+                                    MTRAttributePathKey : globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeClusterRevisionID),
+                                    MTRDataKey : unsignedIntValue(clusterRevision1.unsignedIntegerValue),
+                                },
+                                @{
+                                    MTRAttributePathKey : globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[]),
+                                },
+                                @{
+                                    MTRAttributePathKey : globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[]),
+                                },
+                                @{
+                                    MTRAttributePathKey : globalAttributePath(clusterId1, MTRAttributeIDTypeGlobalAttributeAttributeListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[
+                                        attributeId1, @(0xFFF8), @(0xFFF9), @(0xFFFB), attributeId2, @(0xFFFC), @(0xFFFD)
+                                    ]),
+                                },
+
+                                // cluster2
+                                @ {
+                                    MTRAttributePathKey : attribute2ResponsePath,
+                                    MTRDataKey : listOfStructsValue1,
+                                },
+                                @ {
+                                    MTRAttributePathKey : globalAttributePath(clusterId2, MTRAttributeIDTypeGlobalAttributeFeatureMapID),
+                                    MTRDataKey : unsignedIntValue(0),
+                                },
+                                @ {
+                                    MTRAttributePathKey : globalAttributePath(clusterId2, MTRAttributeIDTypeGlobalAttributeClusterRevisionID),
+                                    MTRDataKey : unsignedIntValue(clusterRevision2.unsignedIntegerValue),
+                                },
+                                @{MTRAttributePathKey : globalAttributePath(clusterId2, MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[]),
+                                },
+                                @{
+                                    MTRAttributePathKey : globalAttributePath(clusterId2, MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[]),
+                                },
+                                @{
+                                    MTRAttributePathKey : globalAttributePath(clusterId2, MTRAttributeIDTypeGlobalAttributeAttributeListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[
+                                        @0xFFF8, @(0xFFF9), @(0xFFFB), attributeId2, @(0xFFFC), @(0xFFFD)
+                                    ]),
+                                },
+
+                                // descriptor
+                                @ {
+                                    MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID),
+                                    MTRDataKey : endpoint1DeviceTypeValue,
+                                },
+                                @{
+                                    MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeClusterDescriptorAttributeServerListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[ clusterId1, clusterId2, @(MTRClusterIDTypeDescriptorID) ]),
+                                },
+                                @{
+                                    MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeClusterDescriptorAttributeClientListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[]),
+                                },
+                                @{
+                                    MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeClusterDescriptorAttributePartsListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[]),
+                                },
+                                // No TagList attribute on this descriptor.
+                                @ {
+                                    MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeGlobalAttributeFeatureMapID),
+                                    MTRDataKey : unsignedIntValue(0),
+                                },
+                                @ {
+                                    MTRAttributePathKey : descriptorAttributePath(MTRAttributeIDTypeGlobalAttributeClusterRevisionID),
+                                    // Would be nice if we could get the Descriptor cluster revision
+                                    // from somewhere intead of hardcoding it...
+                                    MTRDataKey : unsignedIntValue(2),
+                                },
+                                @{
+                                    MTRAttributePathKey : globalAttributePath(@(MTRClusterIDTypeDescriptorID), MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[]),
+                                },
+                                @{
+                                    MTRAttributePathKey : globalAttributePath(@(MTRClusterIDTypeDescriptorID), MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[]),
+                                },
+                                @{
+                                    MTRAttributePathKey : globalAttributePath(@(MTRClusterIDTypeDescriptorID), MTRAttributeIDTypeGlobalAttributeAttributeListID),
+                                    MTRDataKey : arrayOfUnsignedIntegersValue(@[
+                                        @(0), @(1), @(2), @(3), @(0xFFF8), @(0xFFF9), @(0xFFFB), @(0xFFFC), @(0xFFFD)
+                                    ]),
+                                },
+
+                            ]];
+
+                            XCTAssertEqualObjects(receivedValues, expectedValues);
+
                             [wildcardReadExpectation fulfill];
                         }];
     [self waitForExpectations:@[ wildcardReadExpectation ] timeout:kTimeoutInSeconds];

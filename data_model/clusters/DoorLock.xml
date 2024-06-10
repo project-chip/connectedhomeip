@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock" revision="7">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock Cluster" revision="7">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1811 1812 1821"/>
     <revision revision="2" summary="CCB 2430"/>

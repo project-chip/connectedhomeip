@@ -1560,7 +1560,7 @@ endpoint 1 {
   }
 }
 endpoint 65534 {
-  device type ma_secondary_network_commissioning = 4293984258, version 1;
+  device type ma_secondary_network_interface = 25, version 1;
 
 
   server cluster Descriptor {

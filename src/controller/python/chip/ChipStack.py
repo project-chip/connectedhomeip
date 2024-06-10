@@ -144,8 +144,6 @@ class ChipStack(object):
     def __init__(self, persistentStoragePath: str, enableServerInteractions=True):
         builtins.enableDebugMode = False
 
-        # TODO: Probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
-        self.networkLock = Lock()
         self.completeEvent = Event()
         self.commissioningCompleteEvent = Event()
         self._ChipStackLib = None
@@ -167,8 +165,6 @@ class ChipStack(object):
             callback()
 
         self.cbHandleChipThreadRun = HandleChipThreadRun
-        # set by other modules(BLE) that require service by thread while thread blocks.
-        self.blockingCB = None
 
         #
         # Storage has to be initialized BEFORE initializing the stack, since the latter
@@ -212,7 +208,6 @@ class ChipStack(object):
         # #20437 tracks consolidating these.
         #
         self._ChipStackLib.pychip_CommonStackShutdown()
-        self.networkLock = None
         self.completeEvent = None
         self._ChipStackLib = None
         self._chipDLLPath = None
@@ -226,10 +221,7 @@ class ChipStack(object):
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
         '''
-        # TODO: Lock probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
-        with self.networkLock:
-            res = self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
-        return res
+        return self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
 
     async def CallAsync(self, callFunct, timeoutMs: int = None):
         '''Run a Python function on CHIP stack, and wait for the response.
@@ -256,18 +248,12 @@ class ChipStack(object):
         # throw error if op in progress
         self.callbackRes = None
         self.completeEvent.clear()
-        # TODO: Lock probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
-        with self.networkLock:
-            res = self.PostTaskOnChipThread(callFunct).Wait()
+        res = self.PostTaskOnChipThread(callFunct).Wait()
 
         if not res.is_success:
             self.completeEvent.set()
             raise res.to_exception()
-        while not self.completeEvent.isSet():
-            if self.blockingCB:
-                self.blockingCB()
-
-            self.completeEvent.wait(0.05)
+        self.completeEvent.wait()
         if isinstance(self.callbackRes, ChipStackException):
             raise self.callbackRes
         return self.callbackRes

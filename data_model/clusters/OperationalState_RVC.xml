@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
     <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Deprecate the Start and Stop commands. Add the GoHome command."/>

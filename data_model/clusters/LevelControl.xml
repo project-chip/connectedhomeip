@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
     <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change)

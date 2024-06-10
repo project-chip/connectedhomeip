@@ -44,10 +44,15 @@ using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
 namespace {
+
 constexpr uint8_t kMaxRetries = 10;
+
 } // namespace
 
-DeviceManager::DeviceManager()
+// Define the static member
+DeviceManager DeviceManager::sInstance;
+
+void DeviceManager::Init()
 {
     memset(mDevices, 0, sizeof(mDevices));
     mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
