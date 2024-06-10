@@ -92,6 +92,7 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
             return *entryValue;
         }
 
+#if CHIP_ERROR_LOGGING
         if (CHIP_ERROR * errValue = std::get_if<CHIP_ERROR>(&entry))
         {
             ChipLogError(AppServer, "Failed to load cluster entry: %" CHIP_ERROR_FORMAT, errValue->Format());
@@ -101,6 +102,7 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
             // Should NOT be possible: entryFrom has only 2 variants
             ChipLogError(AppServer, "Failed to load cluster entry, UNKNOWN entry return type");
         }
+#endif
     }
 
     return InteractionModel::ClusterEntry::kInvalid;
@@ -381,7 +383,11 @@ std::optional<InteractionModel::ClusterInfo> CodegenDataModel::GetClusterInfo(co
 
     if (CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&info))
     {
+#if CHIP_ERROR_LOGGING
         ChipLogError(AppServer, "Failed to load cluster info: %" CHIP_ERROR_FORMAT, err->Format());
+#else
+        (void)err->Format();
+#endif
         return std::nullopt;
     }
 
