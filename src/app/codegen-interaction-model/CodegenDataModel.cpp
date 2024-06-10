@@ -125,15 +125,8 @@ void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttribut
         info->writePrivilege = RequiredPrivilege::ForWriteAttribute(path);
     }
 
-    if (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE)
-    {
-        info->flags.Set(InteractionModel::AttributeQualityFlags::kListAttribute);
-    }
-
-    if (attribute.MustUseTimedWrite())
-    {
-        info->flags.Set(InteractionModel::AttributeQualityFlags::kTimed);
-    }
+    info->flags.Set(InteractionModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
+    info->flags.Set(InteractionModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
 
     // NOTE: we do NOT provide additional info for:
     //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
@@ -164,15 +157,11 @@ InteractionModel::CommandEntry CommandEntryFrom(const ConcreteClusterPath & clus
     entry.path                 = ConcreteCommandPath(clusterPath.mEndpointId, clusterPath.mClusterId, clusterCommandId);
     entry.info.invokePrivilege = RequiredPrivilege::ForInvokeCommand(entry.path);
 
-    if (CommandNeedsTimedInvoke(clusterPath.mClusterId, clusterCommandId))
-    {
-        entry.info.flags.Set(InteractionModel::CommandQualityFlags::kTimed);
-    }
+    entry.info.flags.Set(InteractionModel::CommandQualityFlags::kTimed,
+                         CommandNeedsTimedInvoke(clusterPath.mClusterId, clusterCommandId));
 
-    if (CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId))
-    {
-        entry.info.flags.Set(InteractionModel::CommandQualityFlags::kFabricScoped);
-    }
+    entry.info.flags.Set(InteractionModel::CommandQualityFlags::kFabricScoped,
+                         CommandIsFabricScoped(clusterPath.mClusterId, clusterCommandId));
 
     // TODO: Set additional flags:
     // entry.info.flags.Set(InteractionModel::CommandQualityFlags::kFabricSensitive)
