@@ -1927,11 +1927,12 @@ void DeviceCommissioner::CleanupDoneAfterError()
     VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
 
     NodeId nodeId = mDeviceBeingCommissioned->GetDeviceId();
-    // At this point, we also want to close off the pase session so we need to re-establish
-    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
 
     // Signal completion - this will reset mDeviceBeingCommissioned.
     CommissioningStageComplete(CHIP_NO_ERROR);
+
+    // At this point, we also want to close off the pase session so we need to re-establish
+    CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
 
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)
