@@ -64,7 +64,7 @@ typedef void (*EmberAfGenericClusterFunction)(void);
 /**
  * @brief Struct describing cluster
  */
-typedef struct
+struct EmberAfCluster
 {
     /**
      *  ID of cluster according to ZCL spec
@@ -119,7 +119,7 @@ typedef struct
     uint16_t eventCount;
 
     bool IsServerMask() const { return (mask & CLUSTER_MASK_SERVER) != 0; }
-} EmberAfCluster;
+};
 
 /**
  * @brief Struct that represents a logical device type consisting
