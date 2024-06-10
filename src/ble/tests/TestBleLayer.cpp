@@ -145,11 +145,6 @@ public:
     {
         return true;
     }
-    bool SendReadRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                         PacketBufferHandle pBuf) override
-    {
-        return true;
-    }
     bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
                           const ChipBleUUID * charId) override
     {

@@ -78,8 +78,6 @@ class BLEManagerImpl final : public BLEManager,
                         System::PacketBufferHandle data) override;
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                           System::PacketBufferHandle data) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBufferHandle data) override;
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
                           const Ble::ChipBleUUID * charId) override;
 

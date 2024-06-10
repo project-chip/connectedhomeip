@@ -592,13 +592,6 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
     return false;
 }
 
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBufferHandle pBuf)
-{
-    ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
-    return false;
-}
-
 bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
                                       const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {

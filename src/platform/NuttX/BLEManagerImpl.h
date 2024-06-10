@@ -126,8 +126,6 @@ private:
                         System::PacketBufferHandle pBuf) override;
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                           System::PacketBufferHandle pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBufferHandle pBuf) override;
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
                           const Ble::ChipBleUUID * charId) override;
 
@@ -139,7 +137,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
-    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate

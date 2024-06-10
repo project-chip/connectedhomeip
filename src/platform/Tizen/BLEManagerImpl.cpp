@@ -998,8 +998,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     ChipLogProgress(DeviceLayer, "Initialize Tizen BLE Layer");
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
     SuccessOrExit(err);
 
     // The hash table key is stored in the BLEConnection structure
@@ -1331,12 +1330,6 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
                  ChipLogError(DeviceLayer, "bt_gatt_client_write_value() failed: %s", get_error_message(ret)));
     return true;
 exit:
-    return false;
-}
-
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                     System::PacketBufferHandle pBuf)
-{
     return false;
 }
 

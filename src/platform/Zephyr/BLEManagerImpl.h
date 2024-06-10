@@ -71,8 +71,6 @@ private:
                         PacketBufferHandle pBuf);
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                           PacketBufferHandle pBuf);
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                         PacketBufferHandle pBuf);
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
                           const ChipBleUUID * charId);
 

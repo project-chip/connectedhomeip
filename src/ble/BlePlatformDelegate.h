@@ -73,10 +73,6 @@ public:
     virtual bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                   PacketBufferHandle pBuf) = 0;
 
-    // Send GATT characteristic read request
-    virtual bool SendReadRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                 PacketBufferHandle pBuf) = 0;
-
     // Send response to remote host's GATT chacteristic read response
     virtual bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
                                   const ChipBleUUID * charId) = 0;
