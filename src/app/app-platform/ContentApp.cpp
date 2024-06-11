@@ -94,9 +94,12 @@ void ContentApp::SendAppObserverCommand(chip::Controller::DeviceCommissioner * c
     ChipLogProgress(Controller, "Completed send of AppObserver command");
 }
 
-bool ContentApp::HasSupportedCluster(chip::ClusterId clusterId) const {
-    for (const auto& supportedCluster : mSupportedClusters) {
-        if (clusterId == supportedCluster.clusterIdentifier) {
+bool ContentApp::HasSupportedCluster(chip::ClusterId clusterId) const
+{
+    for (const auto & supportedCluster : mSupportedClusters)
+    {
+        if (clusterId == supportedCluster.clusterIdentifier)
+        {
             return true;
         }
     }

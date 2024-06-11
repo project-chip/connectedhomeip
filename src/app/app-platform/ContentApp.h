@@ -34,8 +34,8 @@
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 #include <app/util/attribute-storage.h>
 #include <controller/CHIPDeviceController.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <string>
 #include <vector>
@@ -96,18 +96,18 @@ private:
 class DLL_EXPORT ContentApp
 {
 public:
-
-    struct SupportedCluster {
-        chip::ClusterId clusterIdentifier { chip::kInvalidClusterId };
-        uint32_t features { 0 };
+    struct SupportedCluster
+    {
+        chip::ClusterId clusterIdentifier{ chip::kInvalidClusterId };
+        uint32_t features{ 0 };
         std::vector<chip::CommandId> optionalCommandIdentifiers;
         std::vector<chip::AttributeId> optionalAttributesIdentifiers;
 
-        SupportedCluster(chip::ClusterId clusterId, uint32_t feats, const std::vector<chip::CommandId>& commandIds, const std::vector<chip::AttributeId>& attributeIds) :
+        SupportedCluster(chip::ClusterId clusterId, uint32_t feats, const std::vector<chip::CommandId> & commandIds,
+                         const std::vector<chip::AttributeId> & attributeIds) :
             clusterIdentifier{ clusterId },
-            features{ feats },
-            optionalCommandIdentifiers{ commandIds },
-            optionalAttributesIdentifiers{ attributeIds } {}
+            features{ feats }, optionalCommandIdentifiers{ commandIds }, optionalAttributesIdentifiers{ attributeIds }
+        {}
     };
 
     ContentApp(std::vector<SupportedCluster> supportedClusters) : mSupportedClusters{ supportedClusters } {}
@@ -117,7 +117,7 @@ public:
     inline void SetEndpointId(EndpointId id) { mEndpointId = id; };
     inline EndpointId GetEndpointId() { return mEndpointId; };
 
-    const std::vector<SupportedCluster>& GetSupportedClusters() const { return mSupportedClusters; };
+    const std::vector<SupportedCluster> & GetSupportedClusters() const { return mSupportedClusters; };
     bool HasSupportedCluster(chip::ClusterId clusterId) const;
 
     virtual AccountLoginDelegate * GetAccountLoginDelegate()               = 0;

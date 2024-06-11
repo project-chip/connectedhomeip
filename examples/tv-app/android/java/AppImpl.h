@@ -57,11 +57,12 @@
 
 CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager);
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, std::vector<chip::AppPlatform::ContentApp::SupportedCluster> supportedClusters,
-                         jobject manager);
+                         const char * szApplicationVersion,
+                         std::vector<chip::AppPlatform::ContentApp::SupportedCluster> supportedClusters, jobject manager);
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, std::vector<chip::AppPlatform::ContentApp::SupportedCluster> supportedClusters,
-                         EndpointId endpointId, jobject manager);
+                         const char * szApplicationVersion,
+                         std::vector<chip::AppPlatform::ContentApp::SupportedCluster> supportedClusters, EndpointId endpointId,
+                         jobject manager);
 EndpointId RemoveContentApp(EndpointId epId);
 void ReportAttributeChange(EndpointId epId, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
@@ -165,8 +166,7 @@ public:
     ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
 
     EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                             const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters,
-                             jobject manager);
+                             const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters, jobject manager);
 
     EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                              const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters,

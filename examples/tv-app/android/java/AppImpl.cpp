@@ -339,12 +339,12 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 }
 
 EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
-                                                uint16_t productId, const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters,
-                                                jobject manager)
+                                                uint16_t productId, const char * szApplicationVersion,
+                                                std::vector<SupportedCluster> supportedClusters, jobject manager)
 {
     DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
-    ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "", std::move(supportedClusters),
-                                              mAttributeDelegate, mCommandDelegate);
+    ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
+                                              std::move(supportedClusters), mAttributeDelegate, mCommandDelegate);
     EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
         app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType));
@@ -356,12 +356,13 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
 }
 
 EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
-                                                uint16_t productId, const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters,
-                                                EndpointId desiredEndpointId, jobject manager)
+                                                uint16_t productId, const char * szApplicationVersion,
+                                                std::vector<SupportedCluster> supportedClusters, EndpointId desiredEndpointId,
+                                                jobject manager)
 {
     DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
-    ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "", std::move(supportedClusters),
-                                              mAttributeDelegate, mCommandDelegate);
+    ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
+                                              std::move(supportedClusters), mAttributeDelegate, mCommandDelegate);
     EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
         app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
@@ -485,17 +486,20 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, std::move(supportedClusters), manager);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion,
+                                  std::move(supportedClusters), manager);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return kInvalidEndpointId;
 }
 
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters, EndpointId endpointId, jobject manager)
+                         const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters, EndpointId endpointId,
+                         jobject manager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, std::move(supportedClusters), endpointId, manager);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion,
+                                  std::move(supportedClusters), endpointId, manager);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return kInvalidEndpointId;
 }
