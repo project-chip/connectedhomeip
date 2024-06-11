@@ -127,11 +127,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Adds a delegate to receive asynchronous callbacks about the device, and limit attribute reports to a specific set of paths.
  *
  * interestedAttributePaths may contain either MTRClusterPath or MTRAttributePath.
+ *
+ * MTRDevice does not hold a strong reference to the delegate object.
  */
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedAttributePaths:(NSArray *)interestedAttributePaths MTR_NEWLY_AVAILABLE;
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray *)interestedPathsForAttributes MTR_NEWLY_AVAILABLE;
 
 /**
- * Removes the delegate from
+ * Removes the delegate from receiving callbacks abou the device.
  */
 - (void)removeDelegate:(id<MTRDeviceDelegate>)delegate MTR_NEWLY_AVAILABLE;
 

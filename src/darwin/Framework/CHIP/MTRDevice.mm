@@ -63,22 +63,22 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 
-// Holder of weak reference of MTRDevice delegate along with its queue
+// container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
 @interface MTRDeviceDelegateInfo : NSObject {
 @private
     void * _delegatePointerValue;
     __weak id _delegate;
     __weak dispatch_queue_t _queue;
-    NSArray * _interestedAttributePaths;
+    NSArray * _interestedPathsForAttributes;
 }
 
 // Array of interested cluster paths or attribute paths, for attribute report filtering.
-@property (readonly) NSArray * interestedAttributePaths;
+@property (readonly) NSArray * interestedPathsForAttributes;
 
 // Pointer value for logging purpose only
 @property (readonly) void * delegatePointerValue;
 
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedAttributePaths:(NSArray * _Nullable)interestedAttributePaths;
+- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes;
 
 // Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
 - (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
@@ -96,20 +96,20 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 @end
 
 @implementation MTRDeviceDelegateInfo
-- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedAttributePaths:(NSArray * _Nullable)interestedAttributePaths
+- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes
 {
     if (self = [super init]) {
         _delegate = delegate;
         _delegatePointerValue = (__bridge void *) delegate;
         _queue = queue;
-        _interestedAttributePaths = [interestedAttributePaths copy];
+        _interestedPathsForAttributes = [interestedPathsForAttributes copy];
     }
     return self;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested paths count %lu>", self, _delegatePointerValue, static_cast<unsigned long>(_interestedAttributePaths.count)];
+    return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested paths count %lu>", self, _delegatePointerValue, static_cast<unsigned long>(_interestedPathsForAttributes.count)];
 }
 
 - (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
@@ -501,8 +501,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     id _systemTimeChangeObserverToken;
 
     NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
-    // Keep a separate entry to ensure deprecated API still works
-    MTRDeviceDelegateInfo * _legacyDelegate;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -798,22 +796,22 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     MTR_LOG("%@ setDelegate %@", self, delegate);
-    [self _addDelegate:delegate queue:queue interestedAttributePaths:nil isLegacyDelegate:YES];
+    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil];
 }
 
 - (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     MTR_LOG("%@ addDelegate %@", self, delegate);
-    [self _addDelegate:delegate queue:queue interestedAttributePaths:nil isLegacyDelegate:NO];
+    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil];
 }
 
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedAttributePaths:(NSArray *)interestedPaths
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray *)interestedPaths
 {
     MTR_LOG("%@ addDelegate %@ with interested paths %@", self, delegate, interestedPaths);
-    [self _addDelegate:delegate queue:queue interestedAttributePaths:interestedPaths isLegacyDelegate:NO];
+    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:interestedPaths];
 }
 
-- (void)_addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedAttributePaths:(NSArray * _Nullable)interestedPaths isLegacyDelegate:(BOOL)isLegacyDelegate
+- (void)_addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPaths
 {
     std::lock_guard lock(_lock);
 
@@ -835,11 +833,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         MTR_LOG("%@ addDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
 
-    MTRDeviceDelegateInfo * newDelegateInfo = [[MTRDeviceDelegateInfo alloc] initWithDelegate:delegate queue:queue interestedAttributePaths:interestedPaths];
+    MTRDeviceDelegateInfo * newDelegateInfo = [[MTRDeviceDelegateInfo alloc] initWithDelegate:delegate queue:queue interestedPathsForAttributes:interestedPaths];
     [_delegates addObject:newDelegateInfo];
-    if (isLegacyDelegate) {
-        _legacyDelegate = newDelegateInfo;
-    }
     MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
 
     __block BOOL shouldSetUpSubscription = [self _subscriptionsAllowed];
@@ -888,10 +883,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         [_delegates minusSet:delegatesToRemove];
         MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
-
-    if ([_legacyDelegate containsDelegate:delegate]) {
-        _legacyDelegate = nil;
-    }
 }
 
 - (void)invalidate
@@ -909,7 +900,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _state = MTRDeviceStateUnknown;
 
     [_delegates removeAllObjects];
-    _legacyDelegate = nil;
 
     // Make sure we don't try to resubscribe if we have a pending resubscribe
     // attempt, since we now have no delegate.
@@ -1073,7 +1063,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         MTR_LOG("%@ no delegates to iterate", self);
     }
 
-    // Opportunistically remove defunct delegate references
+    // Opportunistically remove defunct delegate references on every iteration
     NSMutableSet * delegatesToRemove = [NSMutableSet set];
     for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
         if ([delegateInfo delegateIsNull]) {
@@ -1880,7 +1870,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
             // make an autorelease pool so that temporary filtered attributes reports don't bloat memory
             @autoreleasepool {
-                NSArray<NSDictionary<NSString *, id> *> * filteredAttributes = [self _filteredAttributes:attributes forInterestedPaths:delegateInfo.interestedAttributePaths];
+                NSArray<NSDictionary<NSString *, id> *> * filteredAttributes = [self _filteredAttributes:attributes forInterestedPaths:delegateInfo.interestedPathsForAttributes];
                 if (filteredAttributes.count) {
                     [delegateInfo callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
                         [delegate device:self receivedAttributeReport:filteredAttributes];

@@ -3929,6 +3929,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device addDelegate:delegate1 queue:queue];
 
+    // Use autoreleasepool to dealloc a second delegate upon exiting the scope
     @autoreleasepool {
         // Test that a second delegate can also receive attribute reports
         XCTestExpectation * gotAReport2 = [self expectationWithDescription:@"Report end  for delegate 2"];
@@ -3951,7 +3952,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [self waitForExpectations:@[ gotReportEnd1 ] timeout:60];
 
-    // Verify that once the entire report comes in from all-clusters, that delegate2 has been dealloced, and MTRDevice no longer sees it
+    // Verify that once the entire report comes in from all-clusters, that delegate2 had been dealloced, and MTRDevice no longer sees it
     XCTAssertEqual([device unitTestNonnullDelegateCount], 1);
 }
 
@@ -4008,7 +4009,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(21) attributeID:@(212)],
         [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(21)],
     ];
-    [device addDelegate:delegate1 queue:queue interestedAttributePaths:interestedPaths1];
+    [device addDelegate:delegate1 queue:queue interestedPathsForAttributes:interestedPaths1];
 
     // Test that a second delegate can also receive attribute reports
     XCTestExpectation * gotReportEnd2 = [self expectationWithDescription:@"Report end for delegate 2"];
@@ -4031,7 +4032,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [MTRClusterPath clusterPathWithEndpointID:@(3) clusterID:@(32)],
         [MTRClusterPath clusterPathWithEndpointID:@(3) clusterID:@(33)],
     ];
-    [device addDelegate:delegate2 queue:queue interestedAttributePaths:interestedPaths2];
+    [device addDelegate:delegate2 queue:queue interestedPathsForAttributes:interestedPaths2];
 
     // Test that a second delegate can also receive attribute reports
     XCTestExpectation * gotReportEnd3 = [self expectationWithDescription:@"Report end for delegate 3"];
