@@ -502,6 +502,12 @@ bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t product
         return true;
     }
 
+    if (!app->HasSupportedCluster(chip::app::Clusters::AccountLogin::Id))
+    {
+        ChipLogProgress(DeviceLayer, "AccountLogin cluster not supported for app with vendor id=%d \r\n", vendorId);
+        return true;
+    }
+
     static const size_t kSetupPasscodeSize = 12;
     char mSetupPasscode[kSetupPasscodeSize];
 
