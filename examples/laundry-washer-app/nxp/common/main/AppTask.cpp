@@ -50,7 +50,8 @@ const static std::map<std::string, uint8_t> map_cmd_errstate{
 const static std::map<std::string, uint8_t> map_cmd_opstate{ { "stop", (uint8_t) OperationalState::OperationalStateEnum::kStopped },
                                                              { "run", (uint8_t) OperationalState::OperationalStateEnum::kRunning },
                                                              { "pause", (uint8_t) OperationalState::OperationalStateEnum::kPaused },
-                                                             { "error", (uint8_t) OperationalState::OperationalStateEnum::kError } };
+                                                             { "error",
+                                                               (uint8_t) OperationalState::OperationalStateEnum::kError } };
 
 static void InvalidStateHandler(void)
 {
