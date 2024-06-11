@@ -336,6 +336,7 @@ class BitmapHandler(BaseHandler):
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
 
+
 class FeaturesHandler(BaseHandler):
     """Handles .../features 
 
