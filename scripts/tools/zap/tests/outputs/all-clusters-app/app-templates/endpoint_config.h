@@ -637,7 +637,7 @@
             { ZAP_SIMPLE_DEFAULT(0x000F), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                 \
             { ZAP_SIMPLE_DEFAULT(2), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },        /* ClusterRevision */                            \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                          \
+            /* Endpoint: 0, Cluster: Wi-Fi Network Diagnostics (server) */                                                         \
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 7, ZAP_TYPE(OCTET_STRING),                                                          \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* BSSID */                                   \
             { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(ENUM8),                                                                 \
@@ -1502,7 +1502,7 @@
   /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
   /* EventList (index=12) */ \
   0x00000000, /* SoftwareFault */ \
-  /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
+  /* Endpoint: 0, Cluster: Wi-Fi Network Diagnostics (server) */ \
   /* EventList (index=13) */ \
   0x00000000, /* Disconnection */ \
   0x00000001, /* AssociationFailure */ \
@@ -1662,7 +1662,7 @@
   /*   AcceptedCommandList (index=44) */ \
   0x00000000 /* ResetCounts */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */\
+  /* Endpoint: 0, Cluster: Wi-Fi Network Diagnostics (server) */\
   /*   AcceptedCommandList (index=46) */ \
   0x00000000 /* ResetCounts */, \
   chip::kInvalidCommandId /* end of list */, \
@@ -2197,7 +2197,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
+      /* Endpoint: 0, Cluster: Wi-Fi Network Diagnostics (server) */ \
       .clusterId = 0x00000036, \
       .attributes = ZAP_ATTRIBUTE_INDEX(173), \
       .attributeCount = 15, \
