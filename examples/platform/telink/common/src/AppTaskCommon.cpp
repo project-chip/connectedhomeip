@@ -652,7 +652,13 @@ void AppTaskCommon::StartWiFiHandler(AppEvent * aEvent)
 
     if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
     {
+        // Switch context from BLE to WiFi
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        Internal::BLEManagerImpl sInstance;
+        sInstance.SwitchToWiFi();
+#else
         net_if_up(InetUtils::GetWiFiInterface());
+#endif
         NetworkCommissioning::TelinkWiFiDriver().StartDefaultWiFiNetwork();
     }
     else

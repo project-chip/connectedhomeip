@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -164,8 +164,9 @@ public:
     static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
 #endif
 
-    /* Switch to IEEE802154 interface. @todo: remove to other module? */
+    // Switch context from BLE to Thread/WiFi
     void SwitchToIeee802154(void);
+    void SwitchToWiFi(void);
 
     CHIP_ERROR StartAdvertisingProcess(void);
 };

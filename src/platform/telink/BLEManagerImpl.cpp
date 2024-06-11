@@ -46,6 +46,7 @@
 #include <zephyr/sys/util.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/Zephyr/InetUtils.h>
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
 #endif
 
@@ -969,6 +970,19 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     // Init Thread
     ThreadStackMgrImpl().SetRadioBlocked(false);
     ThreadStackMgrImpl().SetThreadEnabled(true);
+}
+
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+void BLEManagerImpl::SwitchToWiFi(void)
+{
+    ChipLogProgress(DeviceLayer, "Switch context from BLE to WiFi");
+
+    // Deinit BLE
+    bt_disable();
+    mBLERadioInitialized = false;
+
+    // Init WiFi
+    net_if_up(InetUtils::GetWiFiInterface());
 }
 #endif
 
