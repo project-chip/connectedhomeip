@@ -14,5 +14,10 @@
 
 declare_args() {
   # Root directory for NXP SDKs.
-  nxp_sdk_build_root = "//third_party/connectedhomeip/third_party/nxp"
+  nxp_sdk_matter_support_root =
+      "//third_party/connectedhomeip/third_party/nxp/nxp_matter_support"
+}
+
+declare_args() {
+  nxp_sdk_build_root = "${nxp_sdk_matter_support_root}/gn_build"
 }

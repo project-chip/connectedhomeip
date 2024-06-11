@@ -1,6 +1,0 @@
-r
-h
-loadfile chip-k32w1-light-example.srec
-r
-g
-q
