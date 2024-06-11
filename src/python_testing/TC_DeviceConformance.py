@@ -33,6 +33,7 @@ import chip.clusters as Clusters
 from basic_composition_support import BasicCompositionTests
 from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
+from choice_conformance_support import evaluate_attribute_choice_conformance, evaluate_command_choice_conformance, evaluate_feature_choice_conformance
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, ProblemNotice,
                                     ProblemSeverity, async_test_body, default_matter_test_main)
@@ -188,7 +189,14 @@ class DeviceConformanceTests(BasicCompositionTests):
                 check_spec_conformance_for_commands(CommandType.ACCEPTED)
                 check_spec_conformance_for_commands(CommandType.GENERATED)
 
-        # TODO: Add choice checkers
+                feature_choice_problems = evaluate_feature_choice_conformance(endpoint_id, cluster_id, self.xml_clusters, feature_map, attribute_list, all_command_list)
+                attribute_choice_problems = evaluate_attribute_choice_conformance(endpoint_id, cluster_id, self.xml_clusters, feature_map, attribute_list, all_command_list)
+                command_choice_problem = evaluate_command_choice_conformance(endpoint_id, cluster_id, self.xml_clusters, feature_map, attribute_list, all_command_list)
+
+                if feature_choice_problems or attribute_choice_problems or command_choice_problem:
+                    success = False
+                problems.extend(feature_choice_problems+attribute_choice_problems+command_choice_problem)
+
         print(f'success = {success}')
         return success, problems
 
