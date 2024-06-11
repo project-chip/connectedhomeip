@@ -178,6 +178,7 @@ PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
     VerifyOrReturnValue(transferData != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
     transferData->OnTransferObtainedContext = transferObtainedContext;
     gBdxTransferManager.ExpectATransfer();
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
 PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext)
@@ -186,6 +187,7 @@ PyChipError pychip_Bdx_StopExpectingBdxTransfer(PyObject transferObtainedContext
     VerifyOrReturnValue(transferData != nullptr, ToPyChipError(CHIP_ERROR_NOT_FOUND));
     gBdxTransferManager.StopExpectingATransfer();
     gTransfers.RemoveTransferData(transferData);
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
 PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyObject dataReceivedContext,
@@ -194,7 +196,7 @@ PyChipError pychip_Bdx_AcceptSendTransfer(chip::bdx::BdxTransfer * transfer, PyO
     TransferData * transferData = gTransfers.TransferDataForTransfer(transfer);
     transferData->OnDataReceivedContext = dataReceivedContext;
     transferData->OnTransferCompletedContext = transferCompletedContext;
-    transfer->AcceptSend();
+    return ToPyChipError(transfer->AcceptSend());
 }
 
 PyChipError pychip_Bdx_AcceptReceiveTransfer(chip::bdx::BdxTransfer * transfer, const uint8_t * dataBuffer, size_t dataLength,
@@ -203,12 +205,12 @@ PyChipError pychip_Bdx_AcceptReceiveTransfer(chip::bdx::BdxTransfer * transfer, 
     TransferData * transferData = gTransfers.TransferDataForTransfer(transfer);
     transferData->OnTransferCompletedContext = transferCompletedContext;
     chip::ByteSpan data(dataBuffer, dataLength);
-    transfer->AcceptReceive(data);
+    return ToPyChipError(transfer->AcceptReceive(data));
 }
 
 PyChipError pychip_Bdx_RejectTransfer(chip::bdx::BdxTransfer * transfer)
 {
-    transfer->Reject();
+    return ToPyChipError(transfer->Reject());
 }
 
 }

@@ -32,41 +32,89 @@ def _OnTransferObtainedCallback(future: Future, result: PyChipError, bdxTransfer
                                 startOffset: int, length: int, fileDesignator, fileDesignatorLength: int, metadata,
                                 metadataLength: int):
     if result is CHIP_NO_ERROR:
-        transfer = BdxTransfer()
-        # TODO: Set the parameters of the transfer.
-        future.set_result(transfer)
+        fileDesignatorData = ctypes.string_at(fileDesignator, fileDesignatorLength)
+        metadataData = ctypes.string_at(metadata, metadataLength)
+
+        initMessage = InitMessage()
+        initMessage.TransferControlFlags = transferControlFlags
+        initMessage.MaxBlockSize = maxBlockSize
+        initMessage.StartOffset = startOffset
+        initMessage.Length = length
+        initMessage.FileDesignator = fileDesignatorData[:]
+        initMessage.Metadata = metadataData[:]
+
+        future.handleTransfer(bdxTransfer, initMessage)
     else:
-        future.set_exception(result.to_exception())
+        future.handleError(result)
 
 
 @_OnDataReceivedCallbackFunct
 def _OnDataReceivedCallback(context, dataBuffer, bufferLength: int):
-    # TODO: Call the context with the data.
-    pass
+    data = ctypes.string_at(dataBuffer, bufferLength)
+    context(data[:])
 
 
 @_OnTransferCompletedCallbackFunct
 def _OnTransferCompletedCallback(future: Future, result: PyChipError):
-    future.set_result(result)
+    if result is CHIP_NO_ERROR:
+        future.set_result(result)
+    else:
+        future.set_exception(result.to_exception())
+
+
+class AsyncTransferObtainedTransaction:
+    def __init__(self, future, data=None):
+        self._future = future
+        self._data = data
+
+    def handleTransfer(self, bdxTransfer, initMessage: InitMessage):
+        transfer = BdxTransfer(bdx_transfer=bdxTransfer, init_message=initMessage, data=self._data)
+        self._future.set_result(transfer)
+
+    def handleError(self, result: PyChipError):
+        self._future.set_exception(result.to_exception())
 
 
 async def PrepareToReceiveBdxData(future: Future):
     handle = chip.native.GetLibraryHandle()
+    transaction = AsyncTransferObtainedTransaction(future=future)
 
-    # TODO: Do I need to increment a reference to the future? (using ctypes.pythonapi.Py_IncRef(ctypes.py_object(future)))
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     return await builtins.chipStack.CallAsync(
-        lambda: handle.pychip_Bdx_ExpectBdxTransfer(future)
+        lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
     )
 
 
-async def PrepareToSendBdxData(future: Future, data): # TODO: Type of data?
+async def PrepareToSendBdxData(future: Future, data: bytes):
     handle = chip.native.GetLibraryHandle()
+    transaction = AsyncTransferObtainedTransaction(future=future, data=data)
 
-    # TODO: Store data somewhere.
-
-    # TODO: Do I need to increment a reference to the future? (using ctypes.pythonapi.Py_IncRef(ctypes.py_object(future)))
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     return await builtins.chipStack.CallAsync(
-        lambda: handle.pychip_Bdx_ExpectBdxTransfer(future)
+        lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
+    )
+
+
+async def AcceptSendTransfer(transfer: c_void_p, dataReceivedClosure, transferComplete: Future):
+    handle = chip.native.GetLibraryHandle()
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(dataReceivedClosure))
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transferComplete))
+    return await builtins.chipStack.CallAsync(
+        lambda: handle.pychip_Bdx_AcceptSendTransfer(transfer, dataReceivedClosure, transferComplete)
+    )
+
+
+async def AcceptReceiveTransfer(transfer: c_void_p, data: bytes, transferComplete: Future):
+    handle = chip.native.GetLibraryHandle()
+    return await builtins.chipStack.CallAsync(
+        lambda: handle.pychip_Bdx_AcceptReceiveTransfer(transfer, ctypes.c_char_p(data), len(data), transferComplete)
+    )
+
+
+async def RejectTransfer(transfer: c_void_p):
+    handle = chip.native.GetLibraryHandle()
+    return await builtins.chipStack.CallAsync(
+        lambda: handle.pychip_Bdx_RejectTransfer(transfer)
     )
 
 
@@ -77,9 +125,9 @@ def Init():
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_Bdx_ExpectBdxTransfer',
-                   PyChipError, [])
+                   PyChipError, [py_object])
         setter.Set('pychip_Bdx_StopExpectingBdxTransfer',
-                   PyChipError, [])
+                   PyChipError, [py_object])
         setter.Set('pychip_Bdx_AcceptSendTransfer',
                    PyChipError, [c_void_p, py_object, py_object])
         setter.Set('pychip_Bdx_AcceptReceiveTransfer',
