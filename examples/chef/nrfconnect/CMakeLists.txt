@@ -87,7 +87,6 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-laundry-washer-controls-delegate-impl.cpp
     ${CHEF}/common/chef-laundry-washer-mode.cpp
     ${CHEF}/common/chef-operational-state-delegate-impl.cpp
-    ${CHEF}/common/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
     ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
@@ -99,6 +98,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
     ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp
+    ${CHEF}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
     ${CHEF}/common/stubs.cpp

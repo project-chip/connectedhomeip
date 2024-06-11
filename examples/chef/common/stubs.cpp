@@ -18,6 +18,11 @@
     defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
 #include "chef-concentration-measurement.h"
 #endif
+#if defined(MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER) ||                                                  \
+    defined(MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER)
+#include "resource-monitoring/chef-resource-monitoring-delegates.h"
+#endif
+
 
 using chip::app::DataModel::Nullable;
 
@@ -56,6 +61,12 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::RadonConcentrationMeasurement::Id:
     case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
         return chefConcentrationMeasurementReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#if defined(MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER) ||                                                  \
+    defined(MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER)
+    case chip::app::Clusters::HepaFilterMonitoring::Id:
+    case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
+        return chefResourceMonitoringExternalReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
     default:
         break;
@@ -104,6 +115,12 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::RadonConcentrationMeasurement::Id:
     case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
         return chefConcentrationMeasurementWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#if defined(MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER) ||                                                  \
+    defined(MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER)
+    case chip::app::Clusters::HepaFilterMonitoring::Id:
+    case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
+        return chefResourceMonitoringExternalWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
     default:
         break;
