@@ -45,8 +45,6 @@ static_library("telink") {
     "ConnectivityManagerImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
-    "NFCManagerImpl.cpp",
-    "NFCManagerImpl.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
   ]
@@ -101,6 +99,13 @@ static_library("telink") {
       "wifi/TelinkWiFiDriver.h",
       "wifi/WiFiManager.cpp",
       "wifi/WiFiManager.h",
+    ]
+  }
+
+  if (chip_enable_nfc) {
+    sources += [
+      "NFCManagerImpl.cpp",
+      "NFCManagerImpl.h",
     ]
   }
 
