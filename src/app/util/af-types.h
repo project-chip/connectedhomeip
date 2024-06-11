@@ -23,6 +23,7 @@
  * @{
  */
 
+#include "att-storage.h"
 #include <stdbool.h> // For bool
 #include <stdint.h>  // For various uint*_t types
 
@@ -63,7 +64,7 @@ typedef void (*EmberAfGenericClusterFunction)(void);
 /**
  * @brief Struct describing cluster
  */
-typedef struct
+struct EmberAfCluster
 {
     /**
      *  ID of cluster according to ZCL spec
@@ -116,7 +117,9 @@ typedef struct
      * Total number of events supported by the cluster instance (in eventList array).
      */
     uint16_t eventCount;
-} EmberAfCluster;
+
+    bool IsServer() const { return (mask & CLUSTER_MASK_SERVER) != 0; }
+};
 
 /**
  * @brief Struct that represents a logical device type consisting

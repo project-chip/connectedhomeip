@@ -26,7 +26,7 @@ namespace InteractionModel {
 
 /// Handles encoding of an invoke response for a specific invoke request.
 ///
-/// This class handles a single response (i.e. a CommandDataIB within the
+/// This class handles a single request (i.e. a CommandDataIB within the
 /// matter protocol) and is responsible for constructing its corresponding
 /// response (i.e. a InvokeResponseIB within the matter protocol)
 ///

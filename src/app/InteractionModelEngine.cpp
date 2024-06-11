@@ -389,8 +389,8 @@ void InteractionModelEngine::OnDone(CommandResponseSender & apResponderObj)
     mCommandResponderObjs.ReleaseObject(&apResponderObj);
 }
 
-// TODO(#30453): Follow up refactor. Remove need for InteractionModelEngine::OnDone(CommandHandler).
-void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
+// TODO(#30453): Follow up refactor. Remove need for InteractionModelEngine::OnDone(CommandHandlerImpl).
+void InteractionModelEngine::OnDone(CommandHandlerImpl & apCommandObj)
 {
     // We are no longer expecting to receive this callback. With the introduction of CommandResponseSender, it is now
     // responsible for receiving this callback.
@@ -437,20 +437,20 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
         return Status::Busy;
     }
-    CHIP_FAULT_INJECT(
-        FaultInjection::kFault_IMInvoke_SeparateResponses,
-        commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(
-            apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandler::NlFaultInjectionType::SeparateResponseMessages);
-        return Status::Success;);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponses,
+                      commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(
+                          apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                          CommandHandlerImpl::NlFaultInjectionType::SeparateResponseMessages);
+                      return Status::Success;);
     CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponsesInvertResponseOrder,
                       commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(
                           apExchangeContext, std::move(aPayload), aIsTimedInvoke,
-                          CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
+                          CommandHandlerImpl::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
                       return Status::Success;);
     CHIP_FAULT_INJECT(
         FaultInjection::kFault_IMInvoke_SkipSecondResponse,
-        commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
-                                                                         CommandHandler::NlFaultInjectionType::SkipSecondResponse);
+        commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(
+            apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandlerImpl::NlFaultInjectionType::SkipSecondResponse);
         return Status::Success;);
     commandResponder->OnInvokeCommandRequest(apExchangeContext, std::move(aPayload), aIsTimedInvoke);
     return Status::Success;
@@ -1674,7 +1674,7 @@ CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectL
     return CHIP_NO_ERROR;
 }
 
-void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                              TLV::TLVReader & apPayload)
 {
     CommandHandlerInterface * handler = FindCommandHandler(aCommandPath.mEndpointId, aCommandPath.mClusterId);
@@ -1901,7 +1901,7 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
         }
     }
 
-    // Applications may hold references to CommandHandler instances for async command processing.
+    // Applications may hold references to CommandHandlerImpl instances for async command processing.
     // Therefore we can't forcible destroy CommandHandlers here.  Their exchanges will get closed by
     // the fabric removal, though, so they will fail when they try to actually send their command response
     // and will close at that point.

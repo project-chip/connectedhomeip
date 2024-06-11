@@ -114,12 +114,16 @@ android_library("java") {
     "App/app/src/main/jni/com/matter/casting/core/MatterCastingPlayerDiscovery.java",
     "App/app/src/main/jni/com/matter/casting/support/AppParameters.java",
     "App/app/src/main/jni/com/matter/casting/support/CommissionableData.java",
+    "App/app/src/main/jni/com/matter/casting/support/CommissionerDeclaration.java",
+    "App/app/src/main/jni/com/matter/casting/support/ConnectionCallbacks.java",
     "App/app/src/main/jni/com/matter/casting/support/DACProvider.java",
     "App/app/src/main/jni/com/matter/casting/support/DataProvider.java",
     "App/app/src/main/jni/com/matter/casting/support/DeviceTypeStruct.java",
     "App/app/src/main/jni/com/matter/casting/support/EndpointFilter.java",
+    "App/app/src/main/jni/com/matter/casting/support/IdentificationDeclarationOptions.java",
     "App/app/src/main/jni/com/matter/casting/support/MatterCallback.java",
     "App/app/src/main/jni/com/matter/casting/support/MatterError.java",
+    "App/app/src/main/jni/com/matter/casting/support/TargetAppInfo.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

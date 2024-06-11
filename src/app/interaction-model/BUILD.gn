@@ -15,14 +15,15 @@ import("//build_overrides/chip.gni")
 
 source_set("interaction-model") {
   sources = [
-    "Actions.h",
+    "ActionContext.h",
+    "Context.h",
     "Events.h",
     "InvokeResponder.h",
-    "IterationTypes.h",
+    "MetadataTypes.cpp",
+    "MetadataTypes.h",
     "Model.h",
     "OperationTypes.h",
     "Paths.h",
-    "RequestContext.h",
   ]
 
   public_deps = [
