@@ -173,7 +173,7 @@ public class AppPlatformService {
               app.getProductId(),
               app.getVersion(),
               app.getSupportedClusters(),
-              mapSupportedCluster(app.getSupportedClusters()),
+              mapSupportedClusters(app.getSupportedClusters()),
               desiredEndpointId,
               new ContentAppEndpointManagerImpl(context));
     } else {
@@ -184,7 +184,7 @@ public class AppPlatformService {
               app.getAppName(),
               app.getProductId(),
               app.getVersion(),
-              mapSupportedCluster(app.getSupportedClusters()),
+              mapSupportedClusters(app.getSupportedClusters()),
               new ContentAppEndpointManagerImpl(context));
     }
     if (retEndpointId > 0) {
