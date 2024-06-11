@@ -67,7 +67,8 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_equal(len(device_type[device_type_id].server_clusters), len(clusters), "Unexpected number of clusters")
         for id, name in clusters.items():
             asserts.assert_equal(device_type[device_type_id].server_clusters[id].name, name, "Incorrect cluster name")
-            asserts.assert_equal(str(device_type[device_type_id].server_clusters[id].conformance), 'M', 'Incorrect cluster conformance')
+            asserts.assert_equal(str(device_type[device_type_id].server_clusters[id].conformance),
+                                 'M', 'Incorrect cluster conformance')
 
         clusters = {}
         xml = template.render(device_type_id=device_type_id, revision=revision, classification_class=classification_class,
