@@ -22,10 +22,10 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 
-#include <app/interaction-model/Context.h>
-#include <app/interaction-model/InvokeResponder.h>
-#include <app/interaction-model/MetadataTypes.h>
-#include <app/interaction-model/OperationTypes.h>
+#include <app/data-model-interface/Context.h>
+#include <app/data-model-interface/InvokeResponder.h>
+#include <app/data-model-interface/MetadataTypes.h>
+#include <app/data-model-interface/OperationTypes.h>
 
 namespace chip {
 namespace app {
@@ -38,10 +38,10 @@ namespace InteractionModel {
 ///     thread or equivalent
 ///   - class is allowed to attempt to cache indexes/locations for faster
 ///     lookups of things (e.g during iterations)
-class Model : public DataModelMetadataTree
+class DataModel : public DataModelMetadataTree
 {
 public:
-    virtual ~Model() = default;
+    virtual ~DataModel() = default;
 
     // `context` pointers  will be guaranteed valid until Shutdown is called()
     virtual CHIP_ERROR Startup(InteractionModelContext context)

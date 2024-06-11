@@ -17,8 +17,8 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model-interface/EventsGenerator.h>
 #include <app/data-model/Decode.h>
-#include <app/interaction-model/Events.h>
 #include <lib/support/CodeUtils.h>
 
 #include <gtest/gtest.h>
@@ -36,7 +36,7 @@ constexpr uint32_t kFakeSoftwareVersion = 0x1234abcd;
 
 /// Keeps the "last event" in-memory to allow tests to validate
 /// that event writing and encoding worked.
-class LogOnlyEvents : public Events
+class LogOnlyEvents : public EventsGenerator
 {
 public:
     CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
@@ -96,7 +96,7 @@ private:
 TEST(TestInteractionModelEventEmitting, TestBasicType)
 {
     LogOnlyEvents logOnlyEvents;
-    Events * events = &logOnlyEvents;
+    EventsGenerator * events = &logOnlyEvents;
 
     StartUpEventType event{ kFakeSoftwareVersion };
 
@@ -131,7 +131,7 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     static_assert(kTestFabricIndex != kUndefinedFabricIndex);
 
     LogOnlyEvents logOnlyEvents;
-    Events * events = &logOnlyEvents;
+    EventsGenerator * events = &logOnlyEvents;
 
     AccessControlEntryChangedType event;
     event.adminNodeID     = chip::app::DataModel::MakeNullable(kTestNodeId);

@@ -16,24 +16,30 @@
  */
 #pragma once
 
-#include <app/interaction-model/ActionContext.h>
-#include <app/interaction-model/Events.h>
-#include <app/interaction-model/Paths.h>
+#include <app/AttributePathParams.h>
 
 namespace chip {
 namespace app {
 namespace InteractionModel {
 
-/// Data provided to data models in order to interface with the interaction model environment.
+/// Notification listener for changes of the underlying data in a
+/// data model.
 ///
-/// Provides callback-style functionality to notify the interaction model of changes
-/// (e.g. using paths to notify of attribute data changes or events to generate events)
-/// as well as fetching current state (via actionContext)
-struct InteractionModelContext
+/// Used to notify that a specific attribute path (or several attributes
+/// via wildcards) have changed their underlying content.
+///
+/// Methods on this class MUST be called from within the matter
+/// main loop as they will likely trigger interaction model
+/// internal updates and subscription data reporting.
+class DataModelChangeListener
 {
-    Events * events;
-    Paths * paths;
-    ActionContext * actionContext;
+public:
+    virtual ~DataModelChangeListener() = 0;
+
+    /// Mark all attributes matching the given path (which may be a wildcard) dirty.
+    ///
+    /// Wildcards are supported.
+    virtual void MarkDirty(const AttributePathParams & path) = 0;
 };
 
 } // namespace InteractionModel
