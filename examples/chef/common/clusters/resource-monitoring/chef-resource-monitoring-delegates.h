@@ -31,17 +31,18 @@ class ChefResourceMonitorInstance : public ResourceMonitoring::Instance
 {
 public:
     ChefResourceMonitorInstance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatureMap,
-             ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-             bool aResetConditionCommandSupported) : ResourceMonitoring::Instance(aDelegate, aEndpointId, aClusterId, aFeatureMap,
-                 aDegradationDirection, aResetConditionCommandSupported) { };
+                                ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
+                                bool aResetConditionCommandSupported) :
+        ResourceMonitoring::Instance(aDelegate, aEndpointId, aClusterId, aFeatureMap, aDegradationDirection,
+                                     aResetConditionCommandSupported){};
 
-    chip::Protocols::InteractionModel::Status ExternalAttributeWrite(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
-    chip::Protocols::InteractionModel::Status ExternalAttributeRead(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, uint16_t maxReadLength);
-
+    chip::Protocols::InteractionModel::Status ExternalAttributeWrite(const EmberAfAttributeMetadata * attributeMetadata,
+                                                                     uint8_t * buffer);
+    chip::Protocols::InteractionModel::Status ExternalAttributeRead(const EmberAfAttributeMetadata * attributeMetadata,
+                                                                    uint8_t * buffer, uint16_t maxReadLength);
 };
 
-} // namespace ResourceMonitor
-
+} // namespace ResourceMonitoring
 
 namespace HepaFilterMonitoring {
 class HepaFilterMonitoringDelegate : public ResourceMonitoring::Delegate
@@ -86,6 +87,11 @@ void Shutdown();
 } // namespace app
 } // namespace chip
 
-chip::Protocols::InteractionModel::Status chefResourceMonitoringExternalWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+chip::Protocols::InteractionModel::Status
+chefResourceMonitoringExternalWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                            const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
-chip::Protocols::InteractionModel::Status chefResourceMonitoringExternalReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status
+chefResourceMonitoringExternalReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                           const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                           uint16_t maxReadLength);

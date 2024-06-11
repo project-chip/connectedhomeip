@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include <utility>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
-#include <resource-monitoring/chef-resource-monitoring-delegates.h>
 #include <lib/core/TLVReader.h>
+#include <resource-monitoring/chef-resource-monitoring-delegates.h>
+#include <utility>
 
 using namespace chip;
 using namespace chip::app;
@@ -98,49 +98,47 @@ void HepaFilterMonitoring::Shutdown()
     gHepaFilterDelegate.reset();
 }
 
-chip::Protocols::InteractionModel::Status ChefResourceMonitorInstance::ExternalAttributeWrite(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+chip::Protocols::InteractionModel::Status
+ChefResourceMonitorInstance::ExternalAttributeWrite(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
-    AttributeId attributeId                            = attributeMetadata->attributeId;
+    AttributeId attributeId                 = attributeMetadata->attributeId;
 
-    switch (attributeId) {
-    case HepaFilterMonitoring::Attributes::Condition::Id:
+    switch (attributeId)
     {
-            uint8_t newCondition = *(uint8_t *)buffer;
-            ret =  UpdateCondition(newCondition);
+    case HepaFilterMonitoring::Attributes::Condition::Id: {
+        uint8_t newCondition = *(uint8_t *) buffer;
+        ret                  = UpdateCondition(newCondition);
     }
-        break;
-    case HepaFilterMonitoring::Attributes::ChangeIndication::Id:
-    {
-        ResourceMonitoring::ChangeIndicationEnum newIndication = static_cast<ResourceMonitoring::ChangeIndicationEnum>(*(uint8_t *)buffer);
-        ret =  UpdateChangeIndication(newIndication);
+    break;
+    case HepaFilterMonitoring::Attributes::ChangeIndication::Id: {
+        ResourceMonitoring::ChangeIndicationEnum newIndication =
+            static_cast<ResourceMonitoring::ChangeIndicationEnum>(*(uint8_t *) buffer);
+        ret = UpdateChangeIndication(newIndication);
     }
-        break;
-    case HepaFilterMonitoring::Attributes::InPlaceIndicator::Id:
-    {
-        bool newInPlaceIndicator = *(bool *)buffer;
-        ret =  UpdateInPlaceIndicator(newInPlaceIndicator);
+    break;
+    case HepaFilterMonitoring::Attributes::InPlaceIndicator::Id: {
+        bool newInPlaceIndicator = *(bool *) buffer;
+        ret                      = UpdateInPlaceIndicator(newInPlaceIndicator);
     }
-        break;
-    case HepaFilterMonitoring::Attributes::LastChangedTime::Id:
-    {
-        uint32_t newValue  = 0;
-        uint16_t tlvLen = *(uint16_t *) buffer;
+    break;
+    case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
+        uint32_t newValue = 0;
+        uint16_t tlvLen   = *(uint16_t *) buffer;
         chip::TLV::TLVReader reader;
         reader.Init(buffer + sizeof(uint16_t), tlvLen);
         reader.Next();
         reader.Get(newValue);
         DataModel::Nullable<uint32_t> newLastChangedTime = DataModel::MakeNullable(newValue);
-        ret =  UpdateLastChangedTime(newLastChangedTime);
+        ret                                              = UpdateLastChangedTime(newLastChangedTime);
     }
-        break;
+    break;
     case HepaFilterMonitoring::Attributes::DegradationDirection::Id:
-    default:
-    {
+    default: {
         ChipLogError(Zcl, "Unsupported External Attribute Read: %d", static_cast<int>(attributeId));
-        ret =  Protocols::InteractionModel::Status::UnsupportedWrite;
+        ret = Protocols::InteractionModel::Status::UnsupportedWrite;
     }
-        break;
+    break;
     }
 
     return ret;
@@ -159,81 +157,89 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
     gActivatedCarbonFilterInstance->Init();
 }
 
-chip::Protocols::InteractionModel::Status chefResourceMonitoringExternalWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+chip::Protocols::InteractionModel::Status
+chefResourceMonitoringExternalWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                            const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
-    AttributeId attributeId                            = attributeMetadata->attributeId;
-    ChipLogProgress(Zcl, "chefResourceMonitoringExternalWriteCallback EP: %d, Cluster: %d, Att: %d", static_cast<int>(endpoint), static_cast<int>(clusterId), static_cast<int>(attributeId));
+    AttributeId attributeId                 = attributeMetadata->attributeId;
+    ChipLogProgress(Zcl, "chefResourceMonitoringExternalWriteCallback EP: %d, Cluster: %d, Att: %d", static_cast<int>(endpoint),
+                    static_cast<int>(clusterId), static_cast<int>(attributeId));
 
-    switch (clusterId) {
-    case HepaFilterMonitoring::Id:
-        ret =  gHepaFilterInstance->ExternalAttributeWrite(attributeMetadata, buffer);
-        break;
-    case ActivatedCarbonFilterMonitoring::Id:
-        ret =  gActivatedCarbonFilterInstance->ExternalAttributeWrite(attributeMetadata, buffer);
-        break;
-    default:
-        ret =  Protocols::InteractionModel::Status::UnsupportedWrite;
-        break;
-    }
-
-    return ret;
-}
-
-chip::Protocols::InteractionModel::Status chefResourceMonitoringExternalReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, uint16_t maxReadLength)
-{
-    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
-    AttributeId attributeId                            = attributeMetadata->attributeId;
-    ChipLogProgress(Zcl, "chefResourceMonitoringExternalReadCallback EP: %d, Cluster: %d, Att: %d", static_cast<int>(endpoint), static_cast<int>(clusterId), static_cast<int>(attributeId));
-
-    switch (clusterId) {
-    case HepaFilterMonitoring::Id:
-        ret =  gHepaFilterInstance->ExternalAttributeRead(attributeMetadata, buffer, maxReadLength);
-        break;
-    case ActivatedCarbonFilterMonitoring::Id:
-        ret =  gActivatedCarbonFilterInstance->ExternalAttributeRead(attributeMetadata, buffer, maxReadLength);
-        break;
-    default:
-        ret =  Protocols::InteractionModel::Status::UnsupportedRead;
-        break;
-    }
-
-    return ret;
-}
-
-chip::Protocols::InteractionModel::Status ChefResourceMonitorInstance::ExternalAttributeRead(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, uint16_t maxReadLength)
-{
-    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
-    AttributeId attributeId                            = attributeMetadata->attributeId;
-
-    switch (attributeId) {
-    case HepaFilterMonitoring::Attributes::Condition::Id:
+    switch (clusterId)
     {
+    case HepaFilterMonitoring::Id:
+        ret = gHepaFilterInstance->ExternalAttributeWrite(attributeMetadata, buffer);
+        break;
+    case ActivatedCarbonFilterMonitoring::Id:
+        ret = gActivatedCarbonFilterInstance->ExternalAttributeWrite(attributeMetadata, buffer);
+        break;
+    default:
+        ret = Protocols::InteractionModel::Status::UnsupportedWrite;
+        break;
+    }
+
+    return ret;
+}
+
+chip::Protocols::InteractionModel::Status
+chefResourceMonitoringExternalReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                           const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                           uint16_t maxReadLength)
+{
+    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
+    AttributeId attributeId                 = attributeMetadata->attributeId;
+    ChipLogProgress(Zcl, "chefResourceMonitoringExternalReadCallback EP: %d, Cluster: %d, Att: %d", static_cast<int>(endpoint),
+                    static_cast<int>(clusterId), static_cast<int>(attributeId));
+
+    switch (clusterId)
+    {
+    case HepaFilterMonitoring::Id:
+        ret = gHepaFilterInstance->ExternalAttributeRead(attributeMetadata, buffer, maxReadLength);
+        break;
+    case ActivatedCarbonFilterMonitoring::Id:
+        ret = gActivatedCarbonFilterInstance->ExternalAttributeRead(attributeMetadata, buffer, maxReadLength);
+        break;
+    default:
+        ret = Protocols::InteractionModel::Status::UnsupportedRead;
+        break;
+    }
+
+    return ret;
+}
+
+chip::Protocols::InteractionModel::Status
+ChefResourceMonitorInstance::ExternalAttributeRead(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength)
+{
+    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
+    AttributeId attributeId                 = attributeMetadata->attributeId;
+
+    switch (attributeId)
+    {
+    case HepaFilterMonitoring::Attributes::Condition::Id: {
         *buffer = GetCondition();
     }
-        break;
-    case HepaFilterMonitoring::Attributes::ChangeIndication::Id:
-    {
+    break;
+    case HepaFilterMonitoring::Attributes::ChangeIndication::Id: {
         ResourceMonitoring::ChangeIndicationEnum changeIndication = GetChangeIndication();
         // The underlying type of ResourceMonitoring::ChangeIndicationEnum is uint8_t
         *buffer = to_underlying(changeIndication);
     }
-        break;
-    case HepaFilterMonitoring::Attributes::InPlaceIndicator::Id:
-    {
-        *(bool *)buffer = GetInPlaceIndicator();
+    break;
+    case HepaFilterMonitoring::Attributes::InPlaceIndicator::Id: {
+        *(bool *) buffer = GetInPlaceIndicator();
     }
-        break;
-    case HepaFilterMonitoring::Attributes::LastChangedTime::Id:
-    {
+    break;
+    case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
         DataModel::Nullable<uint32_t> lastChangedTime = GetLastChangedTime();
-        *(uint32_t *)buffer = lastChangedTime.IsNull() ? 0 : lastChangedTime.Value();
+        *(uint32_t *) buffer                          = lastChangedTime.IsNull() ? 0 : lastChangedTime.Value();
     }
-        break;
+    break;
     case HepaFilterMonitoring::Attributes::DegradationDirection::Id:
     default:
         ChipLogError(Zcl, "Unsupported External Attribute Read: %d", static_cast<int>(attributeId));
-        ret =  Protocols::InteractionModel::Status::UnsupportedRead;
+        ret = Protocols::InteractionModel::Status::UnsupportedRead;
         break;
     }
 
