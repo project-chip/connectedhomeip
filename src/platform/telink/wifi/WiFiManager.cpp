@@ -148,6 +148,8 @@ CHIP_ERROR WiFiManager::Init()
     mNetIf = InetUtils::GetWiFiInterface();
     VerifyOrReturnError(mNetIf != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
 
+    net_if_down(mNetIf); // block netif auto start
+
     net_mgmt_init_event_callback(&mWiFiMgmtClbk, WifiMgmtEventHandler, kWifiManagementEvents);
     net_mgmt_add_event_callback(&mWiFiMgmtClbk);
 

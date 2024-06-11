@@ -27,6 +27,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include "ThreadUtil.h"
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/Zephyr/InetUtils.h>
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
 #endif
 
@@ -651,6 +652,7 @@ void AppTaskCommon::StartWiFiHandler(AppEvent * aEvent)
 
     if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
     {
+        net_if_up(InetUtils::GetWiFiInterface());
         NetworkCommissioning::TelinkWiFiDriver().StartDefaultWiFiNetwork();
     }
     else
