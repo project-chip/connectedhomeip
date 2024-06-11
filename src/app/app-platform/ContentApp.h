@@ -118,7 +118,7 @@ public:
     inline EndpointId GetEndpointId() { return mEndpointId; };
 
     const std::vector<SupportedCluster>& GetSupportedClusters() const { return mSupportedClusters; };
-    bool HasSupportedCluster(chip::ClusterId clusterId) const; 
+    bool HasSupportedCluster(chip::ClusterId clusterId) const;
 
     virtual AccountLoginDelegate * GetAccountLoginDelegate()               = 0;
     virtual ApplicationBasicDelegate * GetApplicationBasicDelegate()       = 0;
