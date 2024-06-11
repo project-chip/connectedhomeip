@@ -110,6 +110,7 @@ public:
         {}
     };
 
+    ContentApp() = default;
     ContentApp(std::vector<SupportedCluster> supportedClusters) : mSupportedClusters{ supportedClusters } {}
 
     virtual ~ContentApp() = default;
