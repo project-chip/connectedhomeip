@@ -14,31 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
-
-#include <app/AttributePathParams.h>
+#include <app/data-model-interface/MetadataTypes.h>
 
 namespace chip {
 namespace app {
 namespace InteractionModel {
 
-/// Notification listener for attribute changes.
-///
-/// Used to notify that a specific attribute path (or several attributes
-/// via wildcards) have changed their underlying content.
-///
-/// Methods on this class MUST be called from within the matter
-/// main loop as they will likely trigger interaction model
-/// internal updates and subscription data reporting.
-class Paths
-{
-public:
-    virtual ~Paths() = 0;
+const AttributeEntry AttributeEntry::kInvalid{ .path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId,
+                                                                             kInvalidAttributeId) };
 
-    /// Mark all attributes matching the given path (which may be a wildcard) dirty.
-    ///
-    /// Wildcards are supported.
-    virtual void MarkDirty(const AttributePathParams & path) = 0;
+const CommandEntry CommandEntry::kInvalid{ .path = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId) };
+
+const ClusterEntry ClusterEntry::kInvalid{
+    .path = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId),
+    .info = ClusterInfo(0 /* version */), // version of invalid cluster entry does not matter
 };
 
 } // namespace InteractionModel

@@ -13,13 +13,23 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/app/codegen-data-model/model.gni")
+
+source_set("mock_model") {
+  sources = codegen_interaction_model_SOURCES
+
+  public_deps = codegen_interaction_model_PUBLIC_DEPS
+
+  # this ties in the codegen model to an actual ember implementation
+  public_deps += [ "${chip_root}/src/app/util/mock:mock_ember" ]
+}
 
 chip_test_suite("tests") {
-  output_name = "libIMInterfaceTests"
+  output_name = "libCodegenInteractionModelTests"
 
-  test_sources = [ "TestEventEmitting.cpp" ]
+  test_sources = [ "TestCodegenModelViaMocks.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/app/interaction-model" ]
+  public_deps = [ ":mock_model" ]
 }
