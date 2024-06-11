@@ -143,11 +143,18 @@ chip_test_suite("tests") {
   test_sources = [
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
+    "TestAttributePathParams.cpp",
     "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
+    "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestCommandPathParams.cpp",
+    "TestConcreteAttributePath.cpp",
+    "TestDataModelSerialization.cpp",
+    "TestDefaultOTARequestorStorage.cpp",
+    "TestEventPathParams.cpp",
     "TestMessageDef.cpp",
     "TestNullable.cpp",
     "TestNumericAttributeTraits.cpp",
@@ -193,6 +200,17 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
   ]
+
+  if (chip_device_platform != "android") {
+    test_sources += [
+      "TestExtensionFieldSets.cpp",
+      "TestSceneTable.cpp",
+    ]
+    public_deps += [
+      ":power-cluster-test-srcs",
+      ":scenes-table-test-srcs",
+    ]
+  }
 }
 
 chip_test_suite_using_nltest("tests_nltest") {
@@ -201,16 +219,9 @@ chip_test_suite_using_nltest("tests_nltest") {
   test_sources = [
     "TestAclAttribute.cpp",
     "TestAclEvent.cpp",
-    "TestBasicCommandPathRegistry.cpp",
-    "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
-    "TestCommandPathParams.cpp",
-    "TestConcreteAttributePath.cpp",
-    "TestDataModelSerialization.cpp",
-    "TestDefaultOTARequestorStorage.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
-    "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
     "TestInteractionModelEngine.cpp",
     "TestReadInteraction.cpp",
@@ -257,17 +268,6 @@ chip_test_suite_using_nltest("tests_nltest") {
     "${chip_root}/src/lib/support:testing_nlunit",
     "${nlunit_test_root}:nlunit-test",
   ]
-
-  if (chip_device_platform != "android") {
-    test_sources += [
-      "TestExtensionFieldSets.cpp",
-      "TestSceneTable.cpp",
-    ]
-    public_deps += [
-      ":power-cluster-test-srcs",
-      ":scenes-table-test-srcs",
-    ]
-  }
 
   if (chip_config_network_layer_ble &&
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
