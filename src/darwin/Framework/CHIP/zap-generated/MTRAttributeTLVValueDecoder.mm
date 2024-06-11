@@ -12830,7 +12830,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
     case Attributes::ColorLoopTime::Id: {
