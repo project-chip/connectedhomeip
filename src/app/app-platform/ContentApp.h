@@ -38,7 +38,6 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <string>
-#include <vector>
 
 namespace chip {
 namespace AppPlatform {
