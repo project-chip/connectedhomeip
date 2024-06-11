@@ -102,10 +102,10 @@ public:
         std::vector<chip::CommandId> optionalCommandIdentifiers;
         std::vector<chip::AttributeId> optionalAttributesIdentifiers;
 
-        SupportedCluster(chip::ClusterId clusterId, uint32_t feats, const std::vector<chip::CommandId> & commandIds,
+        SupportedCluster(chip::ClusterId clusterId, uint32_t features, const std::vector<chip::CommandId> & commandIds,
                          const std::vector<chip::AttributeId> & attributeIds) :
             clusterIdentifier{ clusterId },
-            features{ feats }, optionalCommandIdentifiers{ commandIds }, optionalAttributesIdentifiers{ attributeIds }
+            features{ features }, optionalCommandIdentifiers{ commandIds }, optionalAttributesIdentifiers{ attributeIds }
         {}
     };
 
