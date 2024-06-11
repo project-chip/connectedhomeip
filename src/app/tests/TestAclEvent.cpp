@@ -101,7 +101,6 @@ private:
 
 void GenerateEvents()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
     chip::app::EventOptions options1;
     options1.mPath     = { kTestEndpointId, chip::Test::kTestDeniedClusterId2, kTestEventIdDebug };
@@ -115,11 +114,10 @@ void GenerateEvents()
 
     ChipLogDetail(DataManagement, "Generating Events");
     testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options1, eid1), CHIP_NO_ERROR);
+
     testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options2, eid2);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options2, eid2), CHIP_NO_ERROR);
 }
 
 class MockInteractionModelApp : public chip::app::ReadClient::Callback
@@ -229,7 +227,6 @@ chip::Test::AppContext * TestAclEvent::mpTestContext = nullptr;
 
 TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
     Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
@@ -238,9 +235,10 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     GenerateEvents();
 
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                                 app::reporting::GetDefaultReportScheduler());
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
 
     // A custom AccessControl::Delegate has been installed that grants privilege to any cluster except the test cluster.
     // When reading events with concrete paths without enough privilege, we will get a EventStatusIB
@@ -261,8 +259,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Read);
 
-        err = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         mpTestContext->DrainAndServiceIO();
 
@@ -292,8 +289,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Read);
 
-        err = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         mpTestContext->DrainAndServiceIO();
         EXPECT_FALSE(delegate.mGotEventResponse);
@@ -320,8 +316,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Read);
 
-        err = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         mpTestContext->DrainAndServiceIO();
         EXPECT_TRUE(delegate.mGotEventResponse);
@@ -353,8 +348,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Read);
 
-        err = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         mpTestContext->DrainAndServiceIO();
         EXPECT_TRUE(delegate.mGotEventResponse);

@@ -114,7 +114,6 @@ public:
 
 TEST_F(TestEventOverflow, TestCheckLogEventOverFlow)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
     chip::EventNumber oldEid = 0;
     chip::EventNumber eid    = 0;
     chip::app::EventOptions options;
@@ -165,8 +164,7 @@ TEST_F(TestEventOverflow, TestCheckLogEventOverFlow)
         }
         alternate = i % 10;
 
-        err = logMgmt.LogEvent(&testEventGenerator, options, eid);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options, eid), CHIP_NO_ERROR);
         if (eid > 0)
         {
             EXPECT_EQ(eid, oldEid + 1);

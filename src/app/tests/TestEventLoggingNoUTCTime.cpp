@@ -149,15 +149,13 @@ void PrintEventLog()
 static void CheckLogState(chip::app::EventManagement & aLogMgmt, size_t expectedMinNumEvents, size_t expectedMaxNumEvents,
                           chip::app::PriorityLevel aPriority)
 {
-    CHIP_ERROR err;
+
     chip::TLV::TLVReader reader;
     size_t elementCount;
     chip::app::CircularEventBufferWrapper bufWrapper;
-    err = aLogMgmt.GetEventReader(reader, aPriority, &bufWrapper);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(aLogMgmt.GetEventReader(reader, aPriority, &bufWrapper), CHIP_NO_ERROR);
 
-    err = chip::TLV::Utilities::Count(reader, elementCount, false);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(chip::TLV::Utilities::Count(reader, elementCount, false), CHIP_NO_ERROR);
 
     EXPECT_GE(elementCount, expectedMinNumEvents);
     EXPECT_LE(elementCount, expectedMaxNumEvents);
@@ -189,8 +187,7 @@ static void CheckLogReadOut(chip::app::EventManagement & alogMgmt, chip::EventNu
 
     reader.Init(backingStore.Get(), writer.GetLengthWritten());
 
-    err = chip::TLV::Utilities::Count(reader, totalNumElements, false);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(chip::TLV::Utilities::Count(reader, totalNumElements, false), CHIP_NO_ERROR);
 
     printf("totalNumElements vs expectedNumEvents vs eventCount : %u vs %u vs %u \n", static_cast<unsigned int>(totalNumElements),
            static_cast<unsigned int>(expectedNumEvents), static_cast<unsigned int>(eventCount));
@@ -220,7 +217,6 @@ private:
 
 TEST_F(TestEventLoggingNoUTCTime, TestCheckLogEventWithEvictToNextBuffer)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2, eid3, eid4, eid5, eid6;
     chip::app::EventOptions options1;
     chip::app::EventOptions options2;
@@ -232,38 +228,32 @@ TEST_F(TestEventLoggingNoUTCTime, TestCheckLogEventWithEvictToNextBuffer)
     options2.mPriority                   = chip::app::PriorityLevel::Info;
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
     testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options1, eid1), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 1, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 1, chip::app::PriorityLevel::Info);
     testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options1, eid2);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options1, eid2), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 2, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 2, chip::app::PriorityLevel::Info);
     testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options1, eid3);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options1, eid3), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 3, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 3, chip::app::PriorityLevel::Info);
     // Start to copy info event to next buffer since current debug buffer is full and info event is higher priority
     testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options2, eid4);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options2, eid4), CHIP_NO_ERROR);
     // At this point depending on timing and hence event sizes we might have
     // either 3 or 4 events in the Debug buffer.
     CheckLogState(logMgmt, 3, 4, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 4, chip::app::PriorityLevel::Info);
 
     testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options2, eid5);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options2, eid5), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 3, 4, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 5, chip::app::PriorityLevel::Info);
 
     testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options2, eid6);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options2, eid6), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 3, 4, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 6, chip::app::PriorityLevel::Info);
 
@@ -310,7 +300,6 @@ TEST_F(TestEventLoggingNoUTCTime, TestCheckLogEventWithEvictToNextBuffer)
 
 TEST_F(TestEventLoggingNoUTCTime, TestCheckLogEventWithDiscardLowEvent)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2, eid3, eid4, eid5, eid6;
     chip::app::EventOptions options;
     options.mPath     = { kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent };
@@ -322,37 +311,31 @@ TEST_F(TestEventLoggingNoUTCTime, TestCheckLogEventWithDiscardLowEvent)
     CheckLogState(logMgmt, 0, chip::app::PriorityLevel::Info);
 
     testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid1);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options, eid1), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 1, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 1, chip::app::PriorityLevel::Info);
     testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid2);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options, eid2), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 2, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 2, chip::app::PriorityLevel::Info);
     testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid3);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options, eid3), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 3, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 3, chip::app::PriorityLevel::Info);
     testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid4);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options, eid4), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 4, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 4, chip::app::PriorityLevel::Info);
 
     // Start to drop off debug event since debug event can only be saved in debug buffer
 
     testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid5);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options, eid5), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 4, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 4, chip::app::PriorityLevel::Info);
 
     testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid6);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(logMgmt.LogEvent(&testEventGenerator, options, eid6), CHIP_NO_ERROR);
     CheckLogState(logMgmt, 4, chip::app::PriorityLevel::Debug);
     CheckLogState(logMgmt, 4, chip::app::PriorityLevel::Info);
 }

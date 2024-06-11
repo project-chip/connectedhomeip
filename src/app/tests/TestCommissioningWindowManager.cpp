@@ -155,9 +155,10 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
     EXPECT_FALSE(sAdminVendorIdDirty);
 
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    CHIP_ERROR err                             = commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
-                                                                                            CommissioningWindowAdvertisement::kDnssdOnly);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kDnssdOnly),
+              CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
     EXPECT_EQ(commissionMgr.CommissioningWindowStatusForCluster(),
               chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
@@ -192,9 +193,9 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     constexpr auto fabricIndex                 = static_cast<chip::FabricIndex>(1);
     constexpr auto vendorId                    = static_cast<chip::VendorId>(0xFFF3);
-    CHIP_ERROR err                             = commissionMgr.OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
-        commissionMgr.MaxCommissioningTimeout(), fabricIndex, vendorId);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
+                  commissionMgr.MaxCommissioningTimeout(), fabricIndex, vendorId),
+              CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
     EXPECT_EQ(commissionMgr.CommissioningWindowStatusForCluster(),
               chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kBasicWindowOpen);
@@ -253,8 +254,8 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     constexpr uint16_t kTimeoutMs              = 1000;
     constexpr unsigned kSleepPadding           = 100;
     commissionMgr.OverrideMinCommissioningTimeout(kTimeoutSeconds);
-    CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly),
+              CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
     EXPECT_EQ(commissionMgr.CommissioningWindowStatusForCluster(),
               chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
@@ -304,11 +305,14 @@ void CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsT
     constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds16(1);
     constexpr uint16_t kTimeoutMs              = 1000;
     constexpr unsigned kSleepPadding           = 100;
-    CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly),
+              CHIP_NO_ERROR);
+
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
     EXPECT_EQ(commissionMgr.CommissioningWindowStatusForCluster(),
               chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
+
     EXPECT_FALSE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     EXPECT_FALSE(sWindowStatusDirty);
     EXPECT_FALSE(sAdminFabricIndexDirty);
@@ -333,8 +337,7 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     uint16_t originDiscriminator;
-    CHIP_ERROR err = chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator), CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
     Spake2pVerifier verifier;
     constexpr uint32_t kIterations = kSpake2p_Min_PBKDF_Iterations;
@@ -347,9 +350,9 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
 
     constexpr auto fabricIndex = static_cast<chip::FabricIndex>(1);
     constexpr auto vendorId    = static_cast<chip::VendorId>(0xFFF3);
-    err = commissionMgr.OpenEnhancedCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), newDiscriminator, verifier,
-                                                        kIterations, saltData, fabricIndex, vendorId);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(commissionMgr.OpenEnhancedCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), newDiscriminator, verifier,
+                                                            kIterations, saltData, fabricIndex, vendorId),
+              CHIP_NO_ERROR);
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
     EXPECT_EQ(commissionMgr.CommissioningWindowStatusForCluster(),
               chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);

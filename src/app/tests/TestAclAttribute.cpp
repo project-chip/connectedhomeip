@@ -155,16 +155,14 @@ chip::Test::AppContext * TestAclAttribute::mpTestContext = nullptr;
 // report to client, and client is closed.
 TEST_F(TestAclAttribute, TestACLDeniedAttribute)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
-                                 app::reporting::GetDefaultReportScheduler());
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
 
     {
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
@@ -183,8 +181,7 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
-        err = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         mpTestContext->DrainAndServiceIO();
         EXPECT_EQ(delegate.mError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
@@ -209,8 +206,7 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
-        err = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         mpTestContext->DrainAndServiceIO();
         EXPECT_EQ(delegate.mError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
@@ -236,8 +232,7 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
-        err = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         mpTestContext->DrainAndServiceIO();
         EXPECT_EQ(delegate.mError, CHIP_NO_ERROR);

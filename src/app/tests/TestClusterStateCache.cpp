@@ -588,13 +588,12 @@ void RunAndValidateSequence(AttributeInstructionListType list)
         TLV::TLVWriter writer;
         writer.Init(buf);
         DataVersionFilterIBs::Builder builder;
-        CHIP_ERROR err = builder.Init(&writer);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(builder.Init(&writer), CHIP_NO_ERROR);
         bool encodedDataVersionList = false;
-        err = cache.GetBufferedCallback().OnUpdateDataVersionFilterList(builder, pathSpan, encodedDataVersionList);
 
         // We had nothing to encode so far.
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(cache.GetBufferedCallback().OnUpdateDataVersionFilterList(builder, pathSpan, encodedDataVersionList),
+                  CHIP_NO_ERROR);
         EXPECT_FALSE(encodedDataVersionList);
     }
 
@@ -621,10 +620,10 @@ void RunAndValidateSequence(AttributeInstructionListType list)
             // We had enough space to start the list.  Now try encoding the data
             // version filters.
             bool encodedDataVersionList = false;
-            err = cache.GetBufferedCallback().OnUpdateDataVersionFilterList(builder, pathSpan, encodedDataVersionList);
 
             // We should be rolling back properly if we run out of space.
-            EXPECT_EQ(err, CHIP_NO_ERROR);
+            EXPECT_EQ(cache.GetBufferedCallback().OnUpdateDataVersionFilterList(builder, pathSpan, encodedDataVersionList),
+                      CHIP_NO_ERROR);
             EXPECT_EQ(builder.GetError(), CHIP_NO_ERROR);
 
             if (writer.GetRemainingFreeLength() > 40)

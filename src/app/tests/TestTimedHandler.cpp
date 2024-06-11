@@ -124,14 +124,12 @@ void TestTimedHandler::GenerateTimedRequest(uint16_t aTimeoutValue, System::Pack
     writer.Init(std::move(aPayload));
 
     TimedRequestMessage::Builder builder;
-    CHIP_ERROR err = builder.Init(&writer);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(builder.Init(&writer), CHIP_NO_ERROR);
 
     builder.TimeoutMs(aTimeoutValue);
     EXPECT_EQ(builder.GetError(), CHIP_NO_ERROR);
 
-    err = writer.Finalize(&aPayload);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
 }
 
 void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
@@ -149,8 +147,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
 
     delegate.mKeepExchangeOpen = true;
 
-    CHIP_ERROR err = exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
     pTestContext->DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
@@ -165,8 +162,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
     delegate.mKeepExchangeOpen   = false;
     delegate.mNewMessageReceived = false;
 
-    err = exchange->SendMessage(aMsgType, std::move(payload), SendMessageFlags::kExpectResponse);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(exchange->SendMessage(aMsgType, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
     pTestContext->DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
@@ -199,8 +195,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(MsgType aMsgType)
 
     delegate.mKeepExchangeOpen = true;
 
-    CHIP_ERROR err = exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
     pTestContext->DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
@@ -218,8 +213,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(MsgType aMsgType)
     delegate.mKeepExchangeOpen   = false;
     delegate.mNewMessageReceived = false;
 
-    err = exchange->SendMessage(aMsgType, std::move(payload), SendMessageFlags::kExpectResponse);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(exchange->SendMessage(aMsgType, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
     pTestContext->DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
@@ -251,8 +245,7 @@ TEST_F(TestTimedHandler, TestInvokeNeverComes)
 
     EXPECT_FALSE(delegate.mNewMessageReceived);
 
-    CHIP_ERROR err = exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
     pTestContext->DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
