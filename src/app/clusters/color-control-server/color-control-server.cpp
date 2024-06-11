@@ -204,7 +204,7 @@ public:
         ColorControl::EnhancedColorModeEnum targetColorMode = ColorControl::EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
         uint8_t loopActiveValue                             = 0x00;
         uint8_t loopDirectionValue                          = 0x00;
-        uint16_t loopTimeValue                                  = 0x0019; // Default loop time value according to spec
+        uint16_t loopTimeValue                              = 0x0019; // Default loop time value according to spec
 
         while (pair_iterator.Next())
         {
