@@ -24,6 +24,14 @@
 #endif
 
 
+#if defined(MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER) || defined(MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER)
+#include "chef-rvc-mode-delegate.h"
+#endif
+
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+#include "chef-rvc-operational-state-delegate.h"
+#endif
+
 using chip::app::DataModel::Nullable;
 
 using namespace chip;
@@ -67,6 +75,18 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::HepaFilterMonitoring::Id:
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return chefResourceMonitoringExternalReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+    case chip::app::Clusters::RvcRunMode::Id:
+        return chefRvcRunModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+    case chip::app::Clusters::RvcCleanMode::Id:
+        return chefRvcCleanModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+    case chip::app::Clusters::RvcOperationalState::Id:
+        return chefRvcOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
     default:
         break;
@@ -121,6 +141,18 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::HepaFilterMonitoring::Id:
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return chefResourceMonitoringExternalWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+    case chip::app::Clusters::RvcRunMode::Id:
+        return chefRvcRunModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+    case chip::app::Clusters::RvcCleanMode::Id:
+        return chefRvcCleanModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
+    case chip::app::Clusters::RvcOperationalState::Id:
+        return chefRvcOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
     default:
         break;
@@ -252,6 +284,16 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
     WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
 }
 #endif
+
+void ApplicationInit()
+{
+    ChipLogProgress(NotSpecified, "Chef Application Init !!!")
+}
+
+void ApplicationShutdown()
+{
+    ChipLogProgress(NotSpecified, "Chef Application Down !!!")
+}
 
 // No-op function, used to force linking this file,
 // instead of the weak functions from other files

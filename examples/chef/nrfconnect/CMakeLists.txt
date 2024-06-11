@@ -99,6 +99,8 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp
     ${CHEF}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp
+    ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp
+    ${CHEF}/common/clusters/switch/SwitchManager.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
     ${CHEF}/common/stubs.cpp

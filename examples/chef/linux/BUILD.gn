@@ -46,6 +46,7 @@ executable("${sample_name}") {
     "${project_dir}/common/chef-laundry-washer-controls-delegate-impl.cpp",
     "${project_dir}/common/chef-laundry-washer-mode.cpp",
     "${project_dir}/common/chef-operational-state-delegate-impl.cpp",
+    "${project_dir}/common/chef-rpc-actions-worker.cpp",
     "${project_dir}/common/chef-rvc-mode-delegate.cpp",
     "${project_dir}/common/chef-rvc-operational-state-delegate.cpp",
     "${project_dir}/common/clusters/audio-output/AudioOutputManager.cpp",
@@ -58,6 +59,8 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/media-input/MediaInputManager.cpp",
     "${project_dir}/common/clusters/media-playback/MediaPlaybackManager.cpp",
     "${project_dir}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp",
+    "${project_dir}/common/clusters/switch/SwitchEventHandler.cpp",
+    "${project_dir}/common/clusters/switch/SwitchManager.cpp",
     "${project_dir}/common/clusters/target-navigator/TargetNavigatorManager.cpp",
     "${project_dir}/common/clusters/wake-on-lan/WakeOnLanManager.cpp",
     "${project_dir}/common/stubs.cpp",
@@ -80,6 +83,7 @@ executable("${sample_name}") {
   if (chip_enable_pw_rpc) {
     defines = [
       "PW_RPC_ENABLED",
+      "PW_RPC_ACTIONS_SERVICE=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BOOLEAN_STATE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
@@ -107,6 +111,7 @@ executable("${sample_name}") {
       "$dir_pw_trace_tokenized",
       "$dir_pw_trace_tokenized:trace_rpc_service",
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:actions_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:boolean_state_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
