@@ -563,6 +563,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './src/python_testing/test_testing/test_TC_DA_1_2.py'
                   scripts/run_in_python_env.sh out/venv './src/python_testing/test_testing/test_TC_ICDM_2_1.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestIdChecks.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 .src/python_testing/TestConformanceSupport.py'
 
             - name: Uploading core files
               uses: actions/upload-artifact@v4
