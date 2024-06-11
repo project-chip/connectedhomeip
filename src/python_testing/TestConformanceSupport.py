@@ -19,10 +19,9 @@ import xml.etree.ElementTree as ElementTree
 from typing import Callable
 
 from chip.tlv import uint
-
-from conformance_support import (Choice, Conformance, ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated, disallowed,
-                                 mandatory, optional, parse_basic_callable_from_xml, parse_callable_from_xml,
-                                 parse_device_type_callable_from_xml, provisional, zigbee)
+from conformance_support import (Choice, Conformance, ConformanceDecision, ConformanceException, ConformanceParseParameters,
+                                 deprecated, disallowed, mandatory, optional, parse_basic_callable_from_xml,
+                                 parse_callable_from_xml, parse_device_type_callable_from_xml, provisional, zigbee)
 from matter_testing_support import MatterBaseTest, default_matter_test_main
 from mobly import asserts
 
