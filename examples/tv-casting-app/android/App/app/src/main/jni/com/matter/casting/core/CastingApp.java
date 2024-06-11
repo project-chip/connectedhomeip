@@ -37,6 +37,8 @@ import com.matter.casting.support.MatterError;
  */
 public final class CastingApp {
   private static final String TAG = CastingApp.class.getSimpleName();
+  private static final long BROWSE_SERVICE_TIMEOUT = 2500;
+  private static final long RESOLVE_SERVICE_TIMEOUT = 3000;
 
   private static CastingApp sInstance;
 
@@ -44,6 +46,7 @@ public final class CastingApp {
   private AppParameters appParameters;
   private NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
   private ChipAppServer chipAppServer;
+  private AndroidChipPlatform chipPlatform;
 
   private CastingApp() {}
 
@@ -60,7 +63,7 @@ public final class CastingApp {
    * @param appParameters
    */
   public MatterError initialize(AppParameters appParameters) {
-    Log.i(TAG, "CastingApp.initialize called");
+    Log.i(TAG, "CastingApp.initialize() called");
     if (mState != CastingAppState.UNINITIALIZED) {
       return MatterError.CHIP_ERROR_INCORRECT_STATE;
     }
@@ -70,16 +73,45 @@ public final class CastingApp {
         new NsdManagerServiceResolver.NsdManagerResolverAvailState();
 
     Context applicationContext = appParameters.getApplicationContext();
-    AndroidChipPlatform chipPlatform =
+    chipPlatform =
         new AndroidChipPlatform(
             new AndroidBleManager(),
             new PreferencesKeyValueStoreManager(appParameters.getApplicationContext()),
             appParameters.getConfigurationManagerProvider().get(),
-            new NsdManagerServiceResolver(applicationContext, nsdManagerResolverAvailState),
-            new NsdManagerServiceBrowser(applicationContext),
+            new NsdManagerServiceResolver(
+                applicationContext, nsdManagerResolverAvailState, RESOLVE_SERVICE_TIMEOUT),
+            new NsdManagerServiceBrowser(applicationContext, BROWSE_SERVICE_TIMEOUT),
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
+    MatterError err = updateAndroidChipPlatformWithCommissionableData();
+    if (err.hasError()) {
+      Log.e(
+          TAG,
+          "CastingApp.initialize() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
+      return err;
+    }
+
+    err = finishInitialization(appParameters);
+
+    if (err.hasNoError()) {
+      chipAppServer = new ChipAppServer(); // get a reference to the Matter server now
+      mState = CastingAppState.NOT_RUNNING; // initialization done, set state to NOT_RUNNING
+    }
+    return err;
+  }
+
+  /**
+   * Updates the Android CHIP platform with the CommissionableData. This function retrieves
+   * commissionable data from the AppParameters and updates the Android CHIP platform using this
+   * data. The commissionable data includes information such as the SPAKE2+ verifier, salt,
+   * iteration count, setup passcode, and discriminator.
+   *
+   * @return MatterError.NO_ERROR if the update was successful,
+   *     MatterError.CHIP_ERROR_INVALID_ARGUMENT otherwise.
+   */
+  MatterError updateAndroidChipPlatformWithCommissionableData() {
+    Log.i(TAG, "CastingApp.updateAndroidChipPlatformWithCommissionableData()");
     CommissionableData commissionableData = appParameters.getCommissionableDataProvider().get();
     boolean updated =
         chipPlatform.updateCommissionableDataProviderData(
@@ -90,17 +122,11 @@ public final class CastingApp {
             commissionableData.getDiscriminator());
     if (!updated) {
       Log.e(
-          TAG, "CastingApp.initApp failed to updateCommissionableDataProviderData on chipPlatform");
+          TAG,
+          "CastingApp.updateAndroidChipPlatformWithCommissionableData() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
       return MatterError.CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    MatterError err = finishInitialization(appParameters);
-
-    if (err.hasNoError()) {
-      chipAppServer = new ChipAppServer(); // get a reference to the Matter server now
-      mState = CastingAppState.NOT_RUNNING; // initialization done, set state to NOT_RUNNING
-    }
-    return err;
+    return MatterError.NO_ERROR;
   }
 
   /**
@@ -146,6 +172,16 @@ public final class CastingApp {
 
     return MatterError.NO_ERROR;
   }
+
+  /** @brief Tears down all active subscriptions. */
+  public native MatterError shutdownAllSubscriptions();
+
+  /**
+   * Clears app cache that contains the information about CastingPlayers previously connected to
+   *
+   * @return
+   */
+  public native MatterError clearCache();
 
   /**
    * Sets DeviceAttestationCrdentials provider and RotatingDeviceIdUniqueId

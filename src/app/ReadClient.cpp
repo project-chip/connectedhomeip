@@ -135,6 +135,11 @@ uint32_t ReadClient::ComputeTimeTillNextSubscription()
         waitTimeInMsec    = minWaitTimeInMsec + (Crypto::GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
     }
 
+    if (mMinimalResubscribeDelay.count() > waitTimeInMsec)
+    {
+        waitTimeInMsec = mMinimalResubscribeDelay.count();
+    }
+
     return waitTimeInMsec;
 }
 
@@ -933,24 +938,26 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
 
     //
     // To calculate the duration we're willing to wait for a report to come to us, we take into account the maximum interval of
-    // the subscription AND the time it takes for the report to make it to us in the worst case. This latter bit involves
-    // computing the Ack timeout from the publisher for the ReportData message being sent to us using our IDLE interval as the
-    // basis for that computation.
+    // the subscription AND the time it takes for the report to make it to us in the worst case.
     //
-    // Make sure to use the retransmission computation that includes backoff.  For purposes of that computation, treat us as
-    // active now (since we are right now sending/receiving messages), and use the default "how long are we guaranteed to stay
-    // active" threshold for now.
+    // We have no way to estimate what the network latency will be, but we do know the other side will time out its ReportData
+    // after its computed round-trip timeout plus the processing time it gives us (app::kExpectedIMProcessingTime).  Once it
+    // times out, assuming it sent the report at all, there's no point in us thinking we still have a subscription.
     //
-    // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
-    // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
+    // We can't use ComputeRoundTripTimeout() on the session for two reasons: we want the roundtrip timeout from the point of
+    // view of the peer, not us, and we want to start off with the assumption the peer will likely have, which is that we are
+    // idle, whereas ComputeRoundTripTimeout() uses the current activity state of the peer.
     //
-    const auto & localMRPConfig   = GetLocalMRPConfig();
-    const auto & defaultMRPConfig = GetDefaultMRPConfig();
-    const auto & ourMrpConfig     = localMRPConfig.ValueOr(defaultMRPConfig);
-    auto publisherTransmissionTimeout =
-        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
-    *aTimeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
+    // So recompute the round-trip timeout directly.  Assume MRP, since in practice that is likely what is happening.
+    auto & peerMRPConfig = mReadPrepareParams.mSessionHolder->GetRemoteMRPConfig();
+    // Peer will assume we are idle (hence we pass kZero to GetMessageReceiptTimeout()), but will assume we treat it as active
+    // for the response, so to match the retransmission timeout computation for the message back to the peeer, we should treat
+    // it as active.
+    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero) +
+        kExpectedIMProcessingTime +
+        GetRetransmissionTimeout(peerMRPConfig.mActiveRetransTimeout, peerMRPConfig.mIdleRetransTimeout,
+                                 System::SystemClock().GetMonotonicTimestamp(), peerMRPConfig.mActiveThresholdTime);
+    *aTimeout = System::Clock::Seconds16(mMaxInterval) + roundTripTimeout;
     return CHIP_NO_ERROR;
 }
 
@@ -1058,6 +1065,10 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 
 CHIP_ERROR ReadClient::SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams)
 {
+    // Make sure we don't use minimal resubscribe delays from previous attempts
+    // for this one.
+    mMinimalResubscribeDelay = System::Clock::kZero;
+
     mReadPrepareParams = std::move(aReadPrepareParams);
     CHIP_ERROR err     = SendSubscribeRequest(mReadPrepareParams);
     if (err != CHIP_NO_ERROR)
@@ -1239,14 +1250,28 @@ void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManage
     }
 }
 
-void ReadClient::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
+void ReadClient::HandleDeviceConnectionFailure(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
 
-    ChipLogError(DataManagement, "Failed to establish CASE for re-subscription with error '%" CHIP_ERROR_FORMAT "'", err.Format());
+    ChipLogError(DataManagement, "Failed to establish CASE for re-subscription with error '%" CHIP_ERROR_FORMAT "'",
+                 failureInfo.error.Format());
 
-    _this->Close(err);
+#if CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+#if CHIP_DETAIL_LOGGING
+    if (failureInfo.requestedBusyDelay.HasValue())
+    {
+        ChipLogDetail(DataManagement, "Will delay resubscription by %u ms due to BUSY response",
+                      failureInfo.requestedBusyDelay.Value().count());
+    }
+#endif // CHIP_DETAIL_LOGGING
+    _this->mMinimalResubscribeDelay = failureInfo.requestedBusyDelay.ValueOr(System::Clock::kZero);
+#else
+    _this->mMinimalResubscribeDelay = System::Clock::kZero;
+#endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+
+    _this->Close(failureInfo.error);
 }
 
 void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts being used, fix callers that pass nullptr */,

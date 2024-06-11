@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2023 Project CHIP Authors
+ *   Copyright (c) 2024 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,16 @@
  */
 package com.matter.casting.core;
 
-import com.matter.casting.support.EndpointFilter;
+import android.util.Log;
+import com.matter.casting.support.ConnectionCallbacks;
+import com.matter.casting.support.IdentificationDeclarationOptions;
+import com.matter.casting.support.MatterError;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 /**
- * A Matter Casting Player represents a Matter commissioner that is able to play media to a physical
+ * A Matter Casting Player represents a Matter Commissioner that is able to play media to a physical
  * output or to a display screen which is part of the device (e.g. TV). It is discovered on the
  * local network using Matter Commissioner discovery over DNS. It contains all the information about
  * the service discovered/resolved.
@@ -34,7 +36,7 @@ public class MatterCastingPlayer implements CastingPlayer {
    * Time (in sec) to keep the commissioning window open, if commissioning is required. Must be >= 3
    * minutes.
    */
-  public static final long MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
+  public static final short MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
 
   private boolean connected;
   private String deviceId;
@@ -46,6 +48,8 @@ public class MatterCastingPlayer implements CastingPlayer {
   private int productId;
   private int vendorId;
   private long deviceType;
+  private boolean supportsCommissionerGeneratedPasscode;
+
   protected long _cppCastingPlayer;
 
   public MatterCastingPlayer(
@@ -58,7 +62,8 @@ public class MatterCastingPlayer implements CastingPlayer {
       int port,
       int productId,
       int vendorId,
-      long deviceType) {
+      long deviceType,
+      boolean supportsCommissionerGeneratedPasscode) {
     this.connected = connected;
     this.deviceId = deviceId;
     this.hostName = hostName;
@@ -69,6 +74,7 @@ public class MatterCastingPlayer implements CastingPlayer {
     this.productId = productId;
     this.vendorId = vendorId;
     this.deviceType = deviceType;
+    this.supportsCommissionerGeneratedPasscode = supportsCommissionerGeneratedPasscode;
   }
 
   /**
@@ -131,6 +137,14 @@ public class MatterCastingPlayer implements CastingPlayer {
   }
 
   @Override
+  public boolean getSupportsCommissionerGeneratedPasscode() {
+    return this.supportsCommissionerGeneratedPasscode;
+  }
+
+  @Override
+  public native List<Endpoint> getEndpoints();
+
+  @Override
   public String toString() {
     return this.deviceId;
   }
@@ -149,41 +163,108 @@ public class MatterCastingPlayer implements CastingPlayer {
   }
 
   /**
-   * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
-   * If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on
-   * disk, this will execute the user directed commissioning process.
-   *
+   * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
+   *     commissioning session request. If the CastingApp does not have the nodeId and fabricIndex
+   *     of this CastingPlayer cached on disk, this will execute the User Directed Commissioning
+   *     (UDC) process by sending an IdentificationDeclaration message to the Commissioner. For
+   *     certain UDC features, where a Commissioner reply is expected, this API needs to be followed
+   *     up with the continueConnecting() API defiend below. See the Matter UDC specification or
+   *     parameter class definitions for details on features not included in the description below.
+   * @param connectionCallbacks contains the onSuccess (Required), onFailure (Required) and
+   *     onCommissionerDeclaration (Optional) callbacks defiend in ConnectCallbacks.java.
+   *     <p>For example: During CastingPlayer/Commissioner-Generated passcode commissioning, the
+   *     Commissioner replies with a CommissionerDeclaration message with PasscodeDialogDisplayed
+   *     and CommissionerPasscode set to true. Given these Commissioner state details, the client is
+   *     expected to perform some actions, detailed in the continueConnecting() API below, and then
+   *     call the continueConnecting() API to complete the process.
    * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window
-   *     open, if commissioning is required. Needs to be >= MIN_CONNECTION_TIMEOUT_SEC.
-   * @param desiredEndpointFilter (Optional) Attributes (such as VendorId) describing an Endpoint
-   *     that the client wants to interact with after commissioning. If this value is passed in, the
-   *     VerifyOrEstablishConnection will force User Directed Commissioning, in case the desired
-   *     Endpoint is not found in the on device CastingStore.
-   * @return A CompletableFuture that completes when the VerifyOrEstablishConnection is completed.
-   *     The CompletableFuture will be completed with a Void value if the
-   *     VerifyOrEstablishConnection is successful. Otherwise, the CompletableFuture will be
-   *     completed with an Exception. The Exception will be of type
-   *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
-   *     CastingException will contain the error code and message from the CastingApp.
+   *     open, if commissioning is required. Needs to be >= kCommissioningWindowTimeoutSec.
+   * @param idOptions (Optional) Parameters in the IdentificationDeclaration message sent by the
+   *     Commissionee to the Commissioner. These parameters specify the information relating to the
+   *     requested commissioning session.
+   *     <p>For example: To invoke the CastingPlayer/Commissioner-Generated passcode commissioning
+   *     flow, the client would call this API with IdentificationDeclarationOptions containing
+   *     CommissionerPasscode set to true. See IdentificationDeclarationOptions.java for a complete
+   *     list of optional parameters.
+   *     <p>Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants
+   *     to interact with after commissioning. If this value is passed in,
+   *     verifyOrEstablishConnection() will force UDC, in case the desired TargetApp is not found in
+   *     the on-device CastingStore.
+   * @return MatterError - MatterError.NO_ERROR if request submitted successfully, otherwise a
+   *     MatterError object corresponding to the error.
    */
   @Override
-  public native CompletableFuture<Void> VerifyOrEstablishConnection(
-      long commissioningWindowTimeoutSec, EndpointFilter desiredEndpointFilter);
+  public native MatterError verifyOrEstablishConnection(
+      ConnectionCallbacks connectionCallbacks,
+      short commissioningWindowTimeoutSec,
+      IdentificationDeclarationOptions idOptions);
 
   /**
-   * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
-   * If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on
-   * disk, this will execute the user directed commissioning process.
+   * The simplified version of the verifyOrEstablishConnection() API above.
    *
-   * @return A CompletableFuture that completes when the VerifyOrEstablishConnection is completed.
-   *     The CompletableFuture will be completed with a Void value if the
-   *     VerifyOrEstablishConnection is successful. Otherwise, the CompletableFuture will be
-   *     completed with an Exception. The Exception will be of type
-   *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
-   *     CastingException will contain the error code and message from the CastingApp.
+   * @param connectionCallbacks contains the onSuccess (Required), onFailure (Required) and
+   *     onCommissionerDeclaration (Optional) callbacks defiend in ConnectCallbacks.java.
+   * @return MatterError - MatterError.NO_ERROR if request submitted successfully, otherwise a
+   *     MatterError object corresponding to the error.
    */
   @Override
-  public CompletableFuture<Void> VerifyOrEstablishConnection() {
-    return VerifyOrEstablishConnection(MIN_CONNECTION_TIMEOUT_SEC, null);
+  public MatterError verifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks) {
+    Log.d(TAG, "verifyOrEstablishConnection() (ConnectionCallbacks)");
+    return verifyOrEstablishConnection(connectionCallbacks, MIN_CONNECTION_TIMEOUT_SEC, null);
   }
+
+  /**
+   * @brief This is a continuation of the CastingPlayer/Commissioner-Generated passcode
+   *     commissioning flow started via the verifyOrEstablishConnection() API above. It continues
+   *     the UDC process by sending a second IdentificationDeclaration message to Commissioner
+   *     containing CommissionerPasscode and CommissionerPasscodeReady set to true. At this point it
+   *     is assumed that the following have occurred:
+   *     <p>1. Client (Commissionee) has sent the first IdentificationDeclaration message, via
+   *     verifyOrEstablishConnection(), to the Commissioner containing CommissionerPasscode set to
+   *     true.
+   *     <p>2. Commissioner generated and displayed a passcode.
+   *     <p>3. The Commissioner replied with a CommissionerDecelration message with
+   *     PasscodeDialogDisplayed and CommissionerPasscode set to true.
+   *     <p>4. Client has handled the Commissioner's CommissionerDecelration message.
+   *     <p>5. Client prompted user to input Passcode from Commissioner.
+   *     <p>6. Client has updated the CastingApp's AppParameters DataProvider<CommissionableData>
+   *     via the following function call: DataProvider.updateCommissionableDataSetupPasscode(long
+   *     setupPasscode, int discriminator). This allows continueConnecting() to update the
+   *     commissioning session's PAKE verifier with the user entered passcode.
+   *     <p>Note: The same connectionCallbacks and commissioningWindowTimeoutSec parameters passed
+   *     into verifyOrEstablishConnection() will be used.
+   * @return MatterError - MatterError.NO_ERROR if request submitted successfully, otherwise a
+   *     MatterError object corresponding to the error.
+   */
+  public MatterError continueConnecting() {
+    Log.d(TAG, "continueConnecting()");
+    // Update AndroidChipPlatform's CommissionableData with the user entered passcode.
+    MatterError err = CastingApp.getInstance().updateAndroidChipPlatformWithCommissionableData();
+    if (err != MatterError.NO_ERROR) {
+      Log.e(TAG, "continueConnecting() Error updating AndroidChipPlatform with CommissionableData");
+      return err;
+    }
+    Log.d(TAG, "continueConnecting() calling continueConnectingNative()");
+    return continueConnectingNative();
+  }
+
+  public native MatterError continueConnectingNative();
+
+  /**
+   * @brief This cancels the CastingPlayer/Commissioner-Generated passcode commissioning flow
+   *     started via the VerifyOrEstablishConnection() API above. It constructs and sends an
+   *     IdentificationDeclaration message to the CastingPlayer/Commissioner containing
+   *     CancelPasscode set to true. It is used to indicate that the user, and thus the
+   *     Client/Commissionee, have cancelled the commissioning process. This indicates that the
+   *     CastingPlayer/Commissioner can dismiss any dialogs corresponding to commissioning, such as
+   *     a Passcode input dialog or a Passcode display dialog.
+   *     <p>Note: stopConnecting() does not call the onSuccess() callback passed to the
+   *     VerifyOrEstablishConnection() API above since no connection is established.
+   * @return MatterError - MatterError.NO_ERROR if request submitted successfully, otherwise a
+   *     MatterError object corresponding to the error.
+   */
+  public native MatterError stopConnecting();
+
+  @Override
+  public native void disconnect();
 }

@@ -21,6 +21,8 @@
  *          Configuration of RAM storage metadata: key IDs and NVM IDs.
  */
 
+#pragma once
+
 /* Base key IDs used when creating new keys for RAM storage instances. */
 /**
  * @def kKeyId_Factory
@@ -111,9 +113,33 @@
  * KVS buffer can become quite big, so this PDM
  * id is used as base id for subsequent PDM ids
  * used to store data in chunks of PDM page size.
+ * This will use the extended search feature, so
+ * subsequent PDM ids should not be used.
  */
 #ifndef kNvmId_KvsValues
 #define kNvmId_KvsValues (uint16_t) 0x6001
+#endif
+
+/**
+ * @def kNvmId_KvsSubscription
+ *
+ * PDM ID used for KVS subscription RAM storage.
+ * It will store both keys and values for those keys.
+ */
+#ifndef kNvmId_KvsSubscription
+#define kNvmId_KvsSubscription (uint16_t) 0x6100
+#endif
+
+/**
+ * @def kNvmId_KvsGroups
+ *
+ * PDM ID used for KVS groups RAM storage.
+ * It will store both keys and values for those keys.
+ * This will use the extended search feature, so
+ * subsequent PDM ids should not be used.
+ */
+#ifndef kNvmId_KvsGroups
+#define kNvmId_KvsGroups (uint16_t) 0x6200
 #endif
 
 /**
@@ -145,14 +171,3 @@
 #define kNvmId_FactoryDataBackup (uint16_t) 0x7000
 #endif
 #endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-
-/**
- * @def kKVS_RamBufferSize
- *
- * Size of KVS values RAM storage buffer.
- * This value is empirical, based on some minimal resource requirements tests.
- * Applications should overwrite this value if necessary.
- */
-#ifndef kKVS_RamBufferSize
-#define kKVS_RamBufferSize (12 * 1024)
-#endif

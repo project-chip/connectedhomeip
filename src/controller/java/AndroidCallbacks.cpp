@@ -21,7 +21,7 @@
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 #include <controller/java/CHIPEventTLVValueDecoder.h>
 #endif
-#include <app/MessageDef/EventLoggingTypes.h>
+#include <app/EventLoggingTypes.h>
 #include <jni.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPJNIError.h>
@@ -31,6 +31,7 @@
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
+#include <string>
 #include <type_traits>
 
 namespace chip {

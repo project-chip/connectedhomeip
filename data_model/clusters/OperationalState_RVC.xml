@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
     <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Deprecate the Start and Stop commands. Add the GoHome command."/>
@@ -66,21 +66,6 @@ Davis, CA 95616, USA
     <clusterId id="0x0061" name="RVC Operational State"/>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Operational State" role="application" picsCode="RVCOPSTATE" scope="Endpoint"/>
-  <commands>
-    <command id="0x00" name="Pause"/>
-    <command id="0x01" name="Stop">
-      <deprecateConform/>
-    </command>
-    <command id="0x02" name="Start">
-      <deprecateConform/>
-    </command>
-    <command id="0x03" name="Resume"/>
-    <command id="0x04" name="OperationalCommandResponse"/>
-    <command id="0x80" name="GoHome" direction="commandToServer" response="OperationalCommandResponse">
-      <access invokePrivilege="operate"/>
-      <optionalConform/>
-    </command>
-  </commands>
   <dataTypes>
     <enum name="ErrorStateEnum">
       <item value="0x40" name="FailedToFindChargingDock" summary="The device has failed to find or reach the charging dock">
@@ -120,4 +105,22 @@ Davis, CA 95616, USA
       </item>
     </enum>
   </dataTypes>
+  <commands>
+    <command id="0x00" name="Pause"/>
+    <command id="0x01" name="Stop">
+      <deprecateConform/>
+    </command>
+    <command id="0x02" name="Start">
+      <deprecateConform/>
+    </command>
+    <command id="0x03" name="Resume"/>
+    <command id="0x04" name="OperationalCommandResponse"/>
+    <command id="0x80" name="GoHome" direction="commandToServer" response="OperationalCommandResponse">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </command>
+  </commands>
 </cluster>

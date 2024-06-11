@@ -55,11 +55,11 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0202" name="Window Covering" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0202" name="Window Covering" revision="3">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0."/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="New data model format and notation"/>
+    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -77,6 +77,7 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="server">
       <otherwiseConform>
+        <provisionalConform/>
         <mandatoryConform>
           <attribute name="Active"/>
         </mandatoryConform>
@@ -93,25 +94,29 @@ Davis, CA 95616, USA
         </feature>
       </features>
       <commands>
-        <command id="" name="GoToLiftPercentage">
-          <field name="LiftPercentageValue">
+        <command id="" name="GoToLiftPercentage.LiftPercentageValue">
+          <field>
             <mandatoryConform>
               <condition name="Zigbee"/>
             </mandatoryConform>
           </field>
-          <field name="LiftPercent100thsValue">
+        </command>
+        <command id="" name="GoToTiltPercentage.TiltPercentageValue">
+          <field>
+            <mandatoryConform>
+              <condition name="Zigbee"/>
+            </mandatoryConform>
+          </field>
+        </command>
+        <command id="" name="GoToLiftPercentage.LiftPercent100thsValue">
+          <field>
             <mandatoryConform>
               <condition name="Matter"/>
             </mandatoryConform>
           </field>
         </command>
-        <command id="" name="GoToTiltPercentage">
-          <field name="TiltPercentageValue">
-            <mandatoryConform>
-              <condition name="Zigbee"/>
-            </mandatoryConform>
-          </field>
-          <field name="TiltPercent100thsValue">
+        <command id="" name="GoToTiltPercentage.TiltPercent100thsValue">
+          <field>
             <mandatoryConform>
               <condition name="Matter"/>
             </mandatoryConform>

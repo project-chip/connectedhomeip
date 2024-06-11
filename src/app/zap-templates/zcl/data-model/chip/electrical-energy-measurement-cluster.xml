@@ -16,14 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0091"/>
-    <field name="ImportedEnergy" mask="0x01"/>
-    <field name="ExportedEnergy" mask="0x02"/>
-    <field name="CumulativeEnergy" mask="0x04"/>
-    <field name="PeriodicEnergy" mask="0x08"/>
-  </bitmap>
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Electrical Energy Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <code>0x0091</code>
@@ -32,6 +25,22 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
     <description>This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.</description>
+
+    <features>
+      <feature bit="0" code="IMPE" name="ImportedEnergy" summary="Measurement of energy imported by the server">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="EXPE" name="ExportedEnergy" summary="Measurement of energy provided by the server">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="CUME" name="CumulativeEnergy" summary="Measurements are cumulative">
+        <optionalConform choice="b" more="true"/>
+      </feature>
+      <feature bit="3" code="PERE" name="PeriodicEnergy" summary="Measurements are periodic">
+        <optionalConform choice="b" more="true"/>
+      </feature>
+    </features>
+
     <!--Attributes-->
     <attribute code="0x0000" side="server" define="ACCURACY" type="MeasurementAccuracyStruct">Accuracy</attribute>
     <attribute code="0x0001" side="server" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
@@ -43,25 +52,25 @@ limitations under the License.
     <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyExported</attribute>
     <attribute code="0x0005" side="server" define="CUMULATIVE_ENERGY_RESET" type="CumulativeEnergyResetStruct" isNullable="true" optional="true">CumulativeEnergyReset</attribute>
     <!--Conformance feature EXPE & PERE - for now optional-->
-    <event code="0x00" side="server" name="CumulativeEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
+    <event code="0x00" side="server" name="CumulativeEnergyMeasured" priority="info" optional="true">
       <description>CumulativeEnergyMeasured</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
-    <event code="0x01" side="server" name="PeriodicEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
+    <event code="0x01" side="server" name="PeriodicEnergyMeasured" priority="info" optional="true">
       <description>PeriodicEnergyMeasured</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
   </cluster>
-  <struct name="CumulativeEnergyResetStruct" apiMaturity="provisional">
+  <struct name="CumulativeEnergyResetStruct">
     <cluster code="0x0091"/>
     <item fieldId="0" name="ImportedResetTimestamp" type="epoch_s" isNullable="true" optional="true"/>
     <item fieldId="1" name="ExportedResetTimestamp" type="epoch_s" isNullable="true" optional="true"/>
     <item fieldId="2" name="ImportedResetSystime" type="systime_ms" isNullable="true" optional="true"/>
     <item fieldId="3" name="ExportedResetSystime" type="systime_ms" isNullable="true" optional="true"/>
   </struct>
-  <struct name="EnergyMeasurementStruct" apiMaturity="provisional">
+  <struct name="EnergyMeasurementStruct">
     <cluster code="0x0091"/>
     <item fieldId="0" name="Energy" type="energy_mwh" min="0" max="4611686018427387904"/>
     <item fieldId="1" name="StartTimestamp" type="epoch_s" optional="true"/>

@@ -33,71 +33,46 @@
 
 namespace chip {
 
-// Spec 5.1.4.2 CHIPCommon tag numbers are in the range [0x00, 0x7F]
-bool SetupPayload::IsCommonTag(uint8_t tag)
-{
-    return tag < 0x80;
-}
-
-// Spec 5.1.4.1 Manufacture-specific tag numbers are in the range [0x80, 0xFF]
-bool SetupPayload::IsVendorTag(uint8_t tag)
-{
-    return !IsCommonTag(tag);
-}
-
 // Check the Setup Payload for validity
 //
 // `vendor_id` and `product_id` are allowed all of uint16_t
-bool PayloadContents::isValidQRCodePayload() const
+bool PayloadContents::isValidQRCodePayload(ValidationMode mode) const
 {
     // 3-bit value specifying the QR code payload version.
-    if (version >= 1 << kVersionFieldLengthInBits)
-    {
-        return false;
-    }
+    VerifyOrReturnValue(version < (1 << kVersionFieldLengthInBits), false);
 
-    if (static_cast<uint8_t>(commissioningFlow) > static_cast<uint8_t>((1 << kCommissioningFlowFieldLengthInBits) - 1))
-    {
-        return false;
-    }
+    VerifyOrReturnValue(static_cast<uint8_t>(commissioningFlow) < (1 << kCommissioningFlowFieldLengthInBits), false);
 
     // Device Commissioning Flow
+    // Even in ValidationMode::kConsume we can only handle modes that we understand.
     // 0: Standard commissioning flow: such a device, when uncommissioned, always enters commissioning mode upon power-up, subject
     // to the rules in [ref_Announcement_Commencement]. 1: User-intent commissioning flow: user action required to enter
     // commissioning mode. 2: Custom commissioning flow: interaction with a vendor-specified means is needed before commissioning.
     // 3: Reserved
-    if (commissioningFlow != CommissioningFlow::kStandard && commissioningFlow != CommissioningFlow::kUserActionRequired &&
-        commissioningFlow != CommissioningFlow::kCustom)
-    {
-        return false;
-    }
+    VerifyOrReturnValue(commissioningFlow == CommissioningFlow::kStandard ||
+                            commissioningFlow == CommissioningFlow::kUserActionRequired ||
+                            commissioningFlow == CommissioningFlow::kCustom,
+                        false);
 
-    chip::RendezvousInformationFlags allvalid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
-                                              RendezvousInformationFlag::kSoftAP);
-    if (!rendezvousInformation.HasValue() || !rendezvousInformation.Value().HasOnly(allvalid))
-    {
-        return false;
-    }
+    // General discriminator validity is enforced by the SetupDiscriminator class, but it can't be short for QR a code.
+    VerifyOrReturnValue(!discriminator.IsShortDiscriminator(), false);
 
-    // Discriminator validity is enforced by the SetupDiscriminator class.
-
-    if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
+    // RendevouzInformation must be present for a QR code.
+    VerifyOrReturnValue(rendezvousInformation.HasValue(), false);
+    if (mode == ValidationMode::kProduce)
     {
-        return false;
+        chip::RendezvousInformationFlags valid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
+                                               RendezvousInformationFlag::kSoftAP);
+        VerifyOrReturnValue(rendezvousInformation.Value().HasOnly(valid), false);
     }
 
     return CheckPayloadCommonConstraints();
 }
 
-bool PayloadContents::isValidManualCode() const
+bool PayloadContents::isValidManualCode(ValidationMode mode) const
 {
-    // Discriminator validity is enforced by the SetupDiscriminator class.
-
-    if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
-    {
-        return false;
-    }
-
+    // No additional constraints apply to Manual Pairing Codes.
+    // (If the payload has a long discriminator it will be converted automatically.)
     return CheckPayloadCommonConstraints();
 }
 
@@ -117,36 +92,27 @@ bool PayloadContents::IsValidSetupPIN(uint32_t setupPIN)
 
 bool PayloadContents::CheckPayloadCommonConstraints() const
 {
-    // A version not equal to 0 would be invalid for v1 and would indicate new format (e.g. version 2)
-    if (version != 0)
-    {
-        return false;
-    }
+    // Validation rules in this method apply to all validation modes.
 
-    if (!IsValidSetupPIN(setUpPINCode))
-    {
-        return false;
-    }
+    // Even in ValidationMode::kConsume we don't understand how to handle any payload version other than 0.
+    VerifyOrReturnValue(version == 0, false);
+
+    VerifyOrReturnValue(IsValidSetupPIN(setUpPINCode), false);
 
     // VendorID must be unspecified (0) or in valid range expected.
-    if (!IsVendorIdValidOperationally(vendorID) && (vendorID != VendorId::Unspecified))
-    {
-        return false;
-    }
+    VerifyOrReturnValue((vendorID == VendorId::Unspecified) || IsVendorIdValidOperationally(vendorID), false);
 
     // A value of 0x0000 SHALL NOT be assigned to a product since Product ID = 0x0000 is used for these specific cases:
     //  * To announce an anonymized Product ID as part of device discovery
     //  * To indicate an OTA software update file applies to multiple Product IDs equally.
     //  * To avoid confusion when presenting the Onboarding Payload for ECM with multiple nodes
-    if (productID == 0 && vendorID != VendorId::Unspecified)
-    {
-        return false;
-    }
+    // In these special cases the vendorID must be 0 (Unspecified)
+    VerifyOrReturnValue(productID != 0 || vendorID == VendorId::Unspecified, false);
 
     return true;
 }
 
-bool PayloadContents::operator==(PayloadContents & input) const
+bool PayloadContents::operator==(const PayloadContents & input) const
 {
     return (this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
             this->commissioningFlow == input.commissioningFlow && this->rendezvousInformation == input.rendezvousInformation &&
@@ -257,10 +223,11 @@ CHIP_ERROR SetupPayload::addOptionalExtensionData(const OptionalQRCodeInfoExtens
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetupPayload::getOptionalVendorData(uint8_t tag, OptionalQRCodeInfo & info)
+CHIP_ERROR SetupPayload::getOptionalVendorData(uint8_t tag, OptionalQRCodeInfo & info) const
 {
-    VerifyOrReturnError(optionalVendorData.find(tag) != optionalVendorData.end(), CHIP_ERROR_KEY_NOT_FOUND);
-    info = optionalVendorData[tag];
+    const auto it = optionalVendorData.find(tag);
+    VerifyOrReturnError(it != optionalVendorData.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    info = it->second;
 
     return CHIP_NO_ERROR;
 }
@@ -273,7 +240,7 @@ CHIP_ERROR SetupPayload::getOptionalExtensionData(uint8_t tag, OptionalQRCodeInf
     return CHIP_NO_ERROR;
 }
 
-optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)
+optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag) const
 {
     optionalQRCodeInfoType elemType = optionalQRCodeInfoTypeUnknown;
 
@@ -289,7 +256,7 @@ optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)
     return elemType;
 }
 
-std::vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData()
+std::vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData() const
 {
     std::vector<OptionalQRCodeInfoExtension> returnedOptionalInfo;
     for (auto & entry : optionalExtensionData)
@@ -299,7 +266,7 @@ std::vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionDa
     return returnedOptionalInfo;
 }
 
-bool SetupPayload::operator==(SetupPayload & input)
+bool SetupPayload::operator==(const SetupPayload & input) const
 {
     std::vector<OptionalQRCodeInfo> inputOptionalVendorData;
     std::vector<OptionalQRCodeInfoExtension> inputOptionalExtensionData;

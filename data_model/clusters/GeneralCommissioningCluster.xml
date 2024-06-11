@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0030" name="General Commissioning" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0030" name="General Commissioning Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -128,5 +128,62 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </attribute>
   </attributes>
-  <commands/>
+  <commands>
+    <command id="0x00" name="ArmFailSafe" direction="commandToServer" response="ArmFailSafeResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform/>
+      <field id="0" name="ExpiryLengthSeconds" type="uint16" default="900">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Breadcrumb" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="ArmFailSafeResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="OK">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DebugText" type="String" default="&quot;">
+        <mandatoryConform/>
+        <constraint type="max" value="128"/>
+      </field>
+    </command>
+    <command id="0x02" name="SetRegulatoryConfig" direction="commandToServer" response="SetRegulatoryConfigResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform/>
+      <field id="0" name="NewRegulatoryConfig" type="RegulatoryLocationTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="CountryCode" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="2"/>
+      </field>
+      <field id="2" name="Breadcrumb" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="SetRegulatoryConfigResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="OK">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DebugText" type="String" default="&quot;">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="CommissioningComplete" direction="commandToServer" response="CommissioningCompleteResponse">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x05" name="CommissioningCompleteResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="OK">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DebugText" type="String" default="&quot;">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
 </cluster>

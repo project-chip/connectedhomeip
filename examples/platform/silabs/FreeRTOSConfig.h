@@ -107,7 +107,7 @@ extern "C" {
 
 #include <stdint.h>
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #include "si91x_device.h"
 extern uint32_t SystemCoreClock;
 #else // For EFR32
@@ -141,11 +141,21 @@ extern uint32_t SystemCoreClock;
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #define configUSE_TICKLESS_IDLE 1
+#elif SL_ICD_ENABLED && SI917_M4_SLEEP_ENABLED
+#define configUSE_TICKLESS_IDLE 1
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 70
+#define configPRE_SUPPRESS_TICKS_AND_SLEEP_PROCESSING(x) vTaskPreSuppressTicksAndSleepProcessing(&x)
+#define configPRE_SLEEP_PROCESSING(x) sl_wfx_host_si91x_sleep(&x)
+#define configPOST_SLEEP_PROCESSING(x) sl_si91x_post_sleep_update_ticks(&x)
 #else
 #define configUSE_TICKLESS_IDLE 0
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
+#if defined(SLI_SI91X_MCU_INTERFACE)
+#define configTICK_RATE_HZ (1000)
+#else
 #define configTICK_RATE_HZ (1024)
+#endif // SLI_SI91X_MCU_INTERFACE
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
 
@@ -169,25 +179,25 @@ extern uint32_t SystemCoreClock;
 #define configTIMER_QUEUE_LENGTH (10)
 #define configTIMER_TASK_STACK_DEPTH (1024)
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #ifdef __NVIC_PRIO_BITS
 #undef __NVIC_PRIO_BITS
 #endif
 #define configPRIO_BITS 6 /* 6 priority levels. */
-#endif                    // SIWX_917
+#endif                    // SLI_SI91X_MCU_INTERFACE
 
 /* Interrupt priorities used by the kernel port layer itself.  These are generic
 to all Cortex-M ports, and do not rely on any particular library functions. */
 #define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 20
 #else
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 48
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 
-#define configENABLE_FPU 0
+#define configENABLE_FPU 1
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
 #define configRUN_FREERTOS_SECURE_ONLY 1
@@ -201,8 +211,11 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION (0)
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG (1) /* See into vPortSuppressTicksAndSleep source code for explanation */
 #define configMAX_PRIORITIES (56)
-#define configMINIMAL_STACK_SIZE (320) /* Number of words to use for Idle and Timer stacks */
-
+#if SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED
+#define configMINIMAL_STACK_SIZE (1024) /* Number of words to use for Idle and Timer stacks */
+#else                                   // For EFR32
+#define configMINIMAL_STACK_SIZE (320)  /* Number of words to use for Idle and Timer stacks */
+#endif                                  // SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED
 #ifdef HEAP_MONITORING
 #define configMAX_TASK_NAME_LEN (24)
 #else
@@ -232,11 +245,11 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
 #ifdef DIC_ENABLE
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #define configTOTAL_HEAP_SIZE ((size_t) ((75 + EXTRA_HEAP_k) * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t) ((68 + EXTRA_HEAP_k) * 1024))
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 #else
 #define configTOTAL_HEAP_SIZE ((size_t) ((42 + EXTRA_HEAP_k) * 1024))
 #endif // DIC

@@ -6270,7 +6270,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 3;
+  revision 4;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
@@ -9186,7 +9186,7 @@ endpoint 1 {
     ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 3;
+    callback attribute clusterRevision default = 4;
   }
 }
 

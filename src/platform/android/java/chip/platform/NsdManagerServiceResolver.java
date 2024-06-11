@@ -22,13 +22,14 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.MulticastLock;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,30 +39,45 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private static final long RESOLVE_SERVICE_TIMEOUT = 30000;
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
-  private Handler mainThreadHandler;
+  private MulticastLock publishMulticastLock;
   private List<NsdManager.RegistrationListener> registrationListeners = new ArrayList<>();
   private final CopyOnWriteArrayList<String> mMFServiceName = new CopyOnWriteArrayList<>();
   @Nullable private final NsdManagerResolverAvailState nsdManagerResolverAvailState;
+  private final long timeout;
 
   /**
    * @param context application context
    * @param nsdManagerResolverAvailState Passing NsdManagerResolverAvailState allows
    *     NsdManagerServiceResolver to synchronize on the usage of NsdManager's resolveService() API
+   * @param timeout Timeout value in case there is no response after calling resolve
    */
   public NsdManagerServiceResolver(
-      Context context, @Nullable NsdManagerResolverAvailState nsdManagerResolverAvailState) {
+      Context context,
+      @Nullable NsdManagerResolverAvailState nsdManagerResolverAvailState,
+      long timeout) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
-    this.mainThreadHandler = new Handler(Looper.getMainLooper());
 
     this.multicastLock =
         ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
             .createMulticastLock("chipMulticastLock");
     this.multicastLock.setReferenceCounted(true);
+
+    this.publishMulticastLock =
+        ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
+            .createMulticastLock("chipPublishMulticastLock");
+    this.publishMulticastLock.setReferenceCounted(true);
+
     this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
+    this.timeout = timeout;
   }
 
   public NsdManagerServiceResolver(Context context) {
-    this(context, null);
+    this(context, null, RESOLVE_SERVICE_TIMEOUT);
+  }
+
+  public NsdManagerServiceResolver(
+      Context context, @Nullable NsdManagerResolverAvailState nsdManagerResolverAvailState) {
+    this(context, nsdManagerResolverAvailState, RESOLVE_SERVICE_TIMEOUT);
   }
 
   @Override
@@ -82,6 +98,10 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             + serviceType
             + "'");
 
+    if (nsdManagerResolverAvailState != null) {
+      nsdManagerResolverAvailState.acquireResolver();
+    }
+
     Runnable timeoutRunnable =
         new Runnable() {
           @Override
@@ -92,13 +112,17 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             Log.d(TAG, "resolve: Timing out");
             if (multicastLock.isHeld()) {
               multicastLock.release();
+            }
 
-              if (nsdManagerResolverAvailState != null) {
-                nsdManagerResolverAvailState.signalFree();
-              }
+            if (nsdManagerResolverAvailState != null) {
+              nsdManagerResolverAvailState.signalFree();
             }
           }
         };
+
+    ScheduledFuture<?> resolveTimeoutExecutor =
+        Executors.newSingleThreadScheduledExecutor()
+            .schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
 
     NsdServiceFinderAndResolver serviceFinderResolver =
         new NsdServiceFinderAndResolver(
@@ -107,13 +131,10 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             callbackHandle,
             contextHandle,
             chipMdnsCallback,
-            timeoutRunnable,
             multicastLock,
-            mainThreadHandler,
+            resolveTimeoutExecutor,
             nsdManagerResolverAvailState);
     serviceFinderResolver.start();
-
-    mainThreadHandler.postDelayed(timeoutRunnable, RESOLVE_SERVICE_TIMEOUT);
   }
 
   @Override
@@ -190,7 +211,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         };
     if (registrationListeners.size() == 0) {
-      multicastLock.acquire();
+      publishMulticastLock.acquire();
     }
     registrationListeners.add(registrationListener);
     mMFServiceName.add(serviceName);
@@ -202,8 +223,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   @Override
   public void removeServices() {
     Log.d(TAG, "removeServices: ");
-    if (registrationListeners.size() > 0) {
-      multicastLock.release();
+    if (registrationListeners.size() > 0 && publishMulticastLock.isHeld()) {
+      publishMulticastLock.release();
     }
     for (NsdManager.RegistrationListener l : registrationListeners) {
       Log.i(TAG, "Remove " + l);

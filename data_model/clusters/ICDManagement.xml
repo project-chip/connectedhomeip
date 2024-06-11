@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 // Update Name
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICD Management" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICD Management Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Addition of LIT ICD support, UserActiveModeTrigger, ActiveModeDuration, StayActiveResponse; removal of field Key in MonitoringRegistrationStruct"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0046" name="ICDManagement"/>
@@ -69,11 +70,30 @@ Davis, CA 95616, USA
     <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
       <otherwiseConform>
         <provisionalConform/>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="1" code="UAT" name="UserActiveModeTrigger" summary="Device supports the user active mode trigger feature.">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="2" code="LITS" name="LongIdleTimeSupport" summary="Device supports operating as a Long Idle Time ICD.">
+      <otherwiseConform>
+        <provisionalConform/>
         <optionalConform/>
       </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
+    <number name="UserActiveModeTriggerBitmap" type=""/>
     <enum name="OperatingModeEnum">
       <item value="0" name="SIT" summary="ICD is operating as a Short Idle Time ICD.">
         <mandatoryConform/>
@@ -137,6 +157,31 @@ Davis, CA 95616, USA
         <feature name="CIP"/>
       </mandatoryConform>
       <constraint type="min" value="1"/>
+    </attribute>
+    <attribute id="0x0006" name="UserActiveModeTriggerHint" type="UserActiveModeTriggerBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="UAT"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0007" name="UserActiveModeTriggerInstruction" type="string" default="&quot;">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <constraint type="maxLength" value="128"/>
+    </attribute>
+    <attribute id="0x0008" name="OperatingMode" type="OperatingModeEnum">
+      <access read="true" readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
   </attributes>
   <commands>

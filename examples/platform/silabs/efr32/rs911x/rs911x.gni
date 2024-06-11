@@ -4,7 +4,7 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 rs911x_src_plat = [
   "${examples_plat_dir}/rs911x/rsi_if.c",
-  "${examples_plat_dir}/rs911x/wfx_rsi_host.c",
+  "${examples_plat_dir}/rs911x/wfx_rsi_host.cpp",
   "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_interrupt.c",
   "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_ioports.c",
   "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_timer.c",

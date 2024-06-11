@@ -55,11 +55,11 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010A" name="On/Off Plug" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010A" name="On/Off Plug" revision="3">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="New data model format and notation"/>
+    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -78,7 +78,7 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="LT">
+        <feature code="" name="Lighting">
           <mandatoryConform/>
         </feature>
       </features>
@@ -86,10 +86,10 @@ Davis, CA 95616, USA
     <cluster id="0x0008" name="Level Control" side="server">
       <optionalConform/>
       <features>
-        <feature code="" name="OO">
+        <feature code="" name="OnOff">
           <mandatoryConform/>
         </feature>
-        <feature code="" name="LT">
+        <feature code="" name="Lighting">
           <mandatoryConform/>
         </feature>
       </features>
@@ -106,10 +106,16 @@ Davis, CA 95616, USA
       </attributes>
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="server">
-      <mandatoryConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
       <commands>
         <command id="" name="CopyScene">
-          <mandatoryConform/>
+          <otherwiseConform>
+            <provisionalConform/>
+            <mandatoryConform/>
+          </otherwiseConform>
         </command>
       </commands>
     </cluster>

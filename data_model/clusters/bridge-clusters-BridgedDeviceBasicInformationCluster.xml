@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :sectnums:
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
@@ -150,6 +150,9 @@ Davis, CA 95616, USA
     <event id="0x02" name="Leave">
       <access readPrivilege="view"/>
       <optionalConform/>
+      <field id="0" name="FabricIndex">
+        <disallowConform/>
+      </field>
     </event>
     <event id="0x03" name="ReachableChanged">
       <access readPrivilege="view"/>

@@ -146,9 +146,14 @@ public:
 private:
     CHIP_ERROR InitOperation(psa_key_id_t hkdfKey, const ByteSpan & salt, const ByteSpan & info);
 
-    psa_key_id_t mSecretKeyId                 = 0;
+    psa_key_id_t mSecretKeyId                 = PSA_KEY_ID_NULL;
     psa_key_derivation_operation_t mOperation = PSA_KEY_DERIVATION_OPERATION_INIT;
 };
+
+/**
+ * @brief Log PSA status code if it indicates an error.
+ */
+void LogPsaError(psa_status_t status);
 
 } // namespace Crypto
 } // namespace chip

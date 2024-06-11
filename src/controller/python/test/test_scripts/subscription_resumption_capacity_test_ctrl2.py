@@ -19,6 +19,7 @@
 
 # Commissioning test.
 
+import asyncio
 import os
 import sys
 from optparse import OptionParser
@@ -125,8 +126,9 @@ def main():
         "Failed on on-network commissioing")
 
     FailIfNot(
-        test.TestSubscriptionResumptionCapacityStep2(options.nodeid, TEST_ENDPOINT_ID, options.deviceAddress,
-                                                     TEST_SSH_PORT, options.remoteServerApp, options.subscriptionCapacity),
+        asyncio.run(
+            test.TestSubscriptionResumptionCapacityStep2(options.nodeid, TEST_ENDPOINT_ID, options.deviceAddress,
+                                                         TEST_SSH_PORT, options.remoteServerApp, options.subscriptionCapacity)),
         "Failed on testing subscription resumption capacity")
 
     timeoutTicker.stop()

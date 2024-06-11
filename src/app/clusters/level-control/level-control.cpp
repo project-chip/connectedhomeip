@@ -18,12 +18,14 @@
 // clusters specific header
 #include "level-control.h"
 
+#include <algorithm>
+
 // this file contains all the common includes for clusters in the util
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
 
@@ -606,14 +608,16 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
                               INVALID_STORED_LEVEL); // Don't revert to the stored level
 }
 
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 chip::scenes::SceneHandler * GetSceneHandler()
 {
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sLevelControlSceneHandler;
 #else
     return nullptr;
-#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
+#endif // ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 } // namespace LevelControlServer
 
@@ -904,7 +908,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
-    state->eventDurationMs = state->transitionTimeMs / actualStepSize;
+    state->eventDurationMs = state->transitionTimeMs / std::max(static_cast<uint8_t>(1u), actualStepSize);
     state->elapsedTimeMs   = 0;
 
     state->storedLevel = storedLevel;
@@ -954,6 +958,14 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
 
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
+        status = Status::Success;
+        goto send_default_response;
+    }
+
+    if (!rate.IsNull() && (rate.Value() == 0))
+    {
+        // Move at a rate of zero is no move at all. Immediately succeed without touching anything.
+        ChipLogProgress(Zcl, "Immediate success due to move rate of 0 (would move at no rate).");
         status = Status::Success;
         goto send_default_response;
     }
@@ -1034,12 +1046,13 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
                 status = Status::Success;
                 goto send_default_response;
             }
+            // Already checked that defaultMoveRate.Value() != 0.
             state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / defaultMoveRate.Value();
         }
     }
     else
     {
-        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / rate.Value();
+        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / std::max(static_cast<uint8_t>(1u), rate.Value());
     }
 #else
     // Transition/rate is not supported so always use fastest transition time and ignore
@@ -1175,7 +1188,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
         // milliseconds to reduce rounding errors in integer division.
         if (stepSize != actualStepSize)
         {
-            state->transitionTimeMs = (state->transitionTimeMs * actualStepSize / stepSize);
+            state->transitionTimeMs = (state->transitionTimeMs * actualStepSize / std::max(static_cast<uint8_t>(1u), stepSize));
         }
     }
 #else
@@ -1187,7 +1200,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
-    state->eventDurationMs = state->transitionTimeMs / actualStepSize;
+    state->eventDurationMs = state->transitionTimeMs / std::max(static_cast<uint8_t>(1u), actualStepSize);
     state->elapsedTimeMs   = 0;
 
     // storedLevel is not used for Step commands

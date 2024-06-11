@@ -30,8 +30,9 @@
 
 #include <platform/mbed/BLEManagerImpl.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/internal/BLEManager.h>
@@ -62,12 +63,8 @@ namespace {
 const UUID ShortUUID_CHIPoBLEService(0xFFF6);
 // RX = BleLayer::CHIP_BLE_CHAR_1_ID
 const UUID LongUUID_CHIPoBLEChar_RX("18EE2EF5-263D-4559-959F-4F9C429F9D11");
-const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x11 } };
 // TX = BleLayer::CHIP_BLE_CHAR_2_ID
 const UUID LongUUID_CHIPoBLEChar_TX("18EE2EF5-263D-4559-959F-4F9C429F9D12");
-const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x12 } };
 } // namespace
 
 #if _BLEMGRIMPL_USE_LEDS
@@ -904,7 +901,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipDeviceEvent connEstEvent;
 
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
         PlatformMgrImpl().PostEventOrDie(&connEstEvent);
     }
@@ -912,13 +909,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEUnsubscribe: {
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEUnsubscribe");
-        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
     }
     break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived: {
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEWriteReceived");
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
     }
     break;
@@ -931,7 +928,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm: {
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
     }
     break;
 
@@ -984,12 +981,15 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     ble::GattServer & gatt_server = ble::BLE::Instance().gattServer();
     ble::attribute_handle_t att_handle;
 
+    // For BLE, the buffer is capped at UINT16_MAX.
+    VerifyOrExit(CanCastTo<uint16_t>(pBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+
     // No need to do anything fancy here. Only 3 handles are used in this impl.
-    if (UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX))
+    if (UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID))
     {
         att_handle = sCHIPService.getTxHandle();
     }
-    else if (UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX))
+    else if (UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_1_UUID))
     {
         // TODO does this make sense?
         att_handle = sCHIPService.getRxHandle();
@@ -1007,7 +1007,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                   "(connHandle=%d, attHandle=%d, data_len=%u)",
                   conId, att_handle, pBuf->DataLength());
 
-    mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);
+    mbed_err = gatt_server.write(att_handle, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()), false);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:

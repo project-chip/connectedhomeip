@@ -76,15 +76,31 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         success = True
         allow_provisional = self.user_params.get("allow_provisional", False)
+        # TODO: automate this once https://github.com/csa-data-model/projects/issues/454 is done.
+        provisional_cluster_ids = [Clusters.ContentControl.id, Clusters.ScenesManagement.id, Clusters.BallastConfiguration.id,
+                                   Clusters.EnergyPreference.id, Clusters.DeviceEnergyManagement.id, Clusters.DeviceEnergyManagementMode.id, Clusters.PulseWidthModulation.id,
+                                   Clusters.ProxyConfiguration.id, Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id]
+        # TODO: Remove this once the latest 1.3 lands with the clusters removed from the DM XML and change the warning below about missing DM XMLs into a proper error
+        # These are clusters that weren't part of the 1.3 spec that landed in the SDK before the branch cut
+        provisional_cluster_ids.extend([Clusters.DemandResponseLoadControl.id])
+        # These clusters are zigbee only. I don't even know why they're part of the codegen, but we should get rid of them.
+        provisional_cluster_ids.extend([Clusters.BarrierControl.id, Clusters.OnOffSwitchConfiguration.id,
+                                       Clusters.BinaryInputBasic.id, Clusters.ElectricalMeasurement.id])
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
+                cluster_location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+
+                if not allow_provisional and cluster_id in provisional_cluster_ids:
+                    record_error(location=cluster_location, problem='Provisional cluster found on device')
+                    continue
+
                 if cluster_id not in self.xml_clusters.keys():
                     if (cluster_id & 0xFFFF_0000) != 0:
                         # manufacturer cluster
                         continue
-                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
                     # TODO: update this from a warning once we have all the data
-                    record_warning(location=location, problem='Standard cluster found on device, but is not present in spec data')
+                    record_warning(location=cluster_location,
+                                   problem='Standard cluster found on device, but is not present in spec data')
                     continue
 
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]

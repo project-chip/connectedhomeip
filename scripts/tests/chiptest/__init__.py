@@ -276,7 +276,9 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
 def _GetPurposefulFailureTests() -> Set[str]:
     """Tests that fail in YAML on purpose."""
     return {
-        "TestPurposefulFailureEqualities.yaml"
+        "TestPurposefulFailureEqualities.yaml",
+        "TestPurposefulFailureExtraReportingOnToggle.yaml",
+        "TestPurposefulFailureNotNullConstraint.yaml",
     }
 
 
@@ -418,8 +420,8 @@ def AllReplYamlTests():
         yield test
 
 
-def AllChipToolYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=True):
+def AllChipToolYamlTests(use_short_run_name: bool = True):
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=use_short_run_name):
         yield test
 
 

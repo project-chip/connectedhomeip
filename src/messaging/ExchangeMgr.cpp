@@ -21,14 +21,6 @@
  *
  */
 
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <cstring>
 #include <inttypes.h>
 #include <stddef.h>
@@ -85,6 +77,9 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
 
     sessionManager->SetMessageDelegate(this);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    sessionManager->SetConnectionDelegate(this);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     mReliableMessageMgr.Init(sessionManager->SystemLayer());
 
     mState = State::kState_Initialized;
@@ -111,8 +106,13 @@ ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, Exc
 {
     if (!session->IsActiveSession())
     {
+#if CHIP_ERROR_LOGGING
+        const ScopedNodeId & peer = session->GetPeer();
+        ChipLogError(ExchangeManager, "NewContext failed: session %u to " ChipLogFormatScopedNodeId " is inactive",
+                     session->SessionIdForLogging(), ChipLogValueScopedNodeId(peer));
+#endif // CHIP_ERROR_LOGGING
+
         // Disallow creating exchange on an inactive session
-        ChipLogError(ExchangeManager, "NewContext failed: session inactive");
         return nullptr;
     }
     return mContextPool.CreateObject(this, mNextExchangeId++, session, isInitiator, delegate);
@@ -420,6 +420,19 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
         return Loop::Continue;
     });
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+void ExchangeManager::OnTCPConnectionClosed(const SessionHandle & session, CHIP_ERROR conErr)
+{
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec->HasSessionHandle() && ec->GetSessionHandle() == session)
+        {
+            ec->OnSessionConnectionClosed(conErr);
+        }
+        return Loop::Continue;
+    });
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace Messaging
 } // namespace chip

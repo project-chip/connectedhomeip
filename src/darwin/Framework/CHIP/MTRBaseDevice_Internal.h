@@ -23,9 +23,9 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
+#include <app/EventHeader.h>
+#include <app/EventLoggingTypes.h>
 #include <app/EventPathParams.h>
-#include <app/MessageDef/EventHeader.h>
-#include <app/MessageDef/EventLoggingTypes.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/TLVTags.h>
 #include <system/SystemPacketBuffer.h>

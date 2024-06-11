@@ -2,6 +2,7 @@
     "description": "Matter SDK ZCL data",
     "category": "matter",
     "version": 1,
+    "requiredFeatureLevel": 102,
     "xmlRoot": [
         ".",
         "./data-model/chip/",
@@ -113,6 +114,7 @@
         "thermostat-cluster.xml",
         "thermostat-user-interface-configuration-cluster.xml",
         "thread-network-diagnostics-cluster.xml",
+        "thread-network-directory-cluster.xml",
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
         "timer-cluster.xml",
@@ -122,6 +124,7 @@
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
+        "wifi-network-management-cluster.xml",
         "window-covering.xml",
         "matter-devices.xml",
         "sample-mei-cluster.xml",
@@ -348,7 +351,7 @@
             "ChannelPage0Mask",
             "OperationalDatasetComponents"
         ],
-        "WiFi Network Diagnostics": [
+        "Wi-Fi Network Diagnostics": [
             "BSSID",
             "SecurityType",
             "WiFiVersion",
@@ -630,7 +633,8 @@
         ],
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
-        "Boolean State Configuration": ["CurrentSensitivityLevel"]
+        "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Wi-Fi Network Management": ["SSID"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

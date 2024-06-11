@@ -25,11 +25,15 @@
 
 #pragma once
 
+// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
+#include <lib/core/CHIPCore.h>
+
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
-#include <app/CommandHandler.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -46,6 +50,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/ReportScheduler.h>
 #include <app/util/attribute-metadata.h>
@@ -65,6 +70,10 @@
 
 #include <app/CASESessionManager.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDManager.h> // nogncheck
+#endif                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 namespace chip {
 namespace app {
 
@@ -77,11 +86,13 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
-                               public CommandHandler::Callback,
+                               public CommandResponseSender::Callback,
+                               public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
-                               public TimedHandlerDelegate
+                               public TimedHandlerDelegate,
+                               public WriteHandlerDelegate
 {
 public:
     /**
@@ -124,6 +135,10 @@ public:
                     SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
 
     void Shutdown();
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    void SetICDManager(ICDManager * manager) { mICDManager = manager; };
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
 
@@ -178,11 +193,6 @@ public:
      */
     WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
 
-    /**
-     * The Magic number of this InteractionModelEngine, the magic number is set during Init()
-     */
-    uint32_t GetMagicNumber() const { return mMagic; }
-
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
     reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
@@ -225,6 +235,9 @@ public:
                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+
+    // WriteHandlerDelegate implementation
+    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & apath) override;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
@@ -271,12 +284,6 @@ public:
     size_t GetNumDirtySubscriptions() const;
 
     /**
-     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
-     * transaction is in the middle of processing the chunked value of the given path.)
-     */
-    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
-
-    /**
      * Select the oldest (and the one that exceeds the per subscription resource minimum if there are any) read handler on the
      * fabric with the given fabric index. Evict it when the fabric uses more resources than the per fabric quota or aForceEvict is
      * true.
@@ -314,6 +321,15 @@ public:
     bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
+     *        This should be called after we have completed a re-subscribe attempt on a persisted subscription wether the attempt
+     *        was succesful or not.
+     */
+    void DecrementNumSubscriptionsToResume();
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
@@ -402,7 +418,8 @@ private:
     friend class SubscriptionResumptionSessionEstablisher;
     using Status = Protocols::InteractionModel::Status;
 
-    void OnDone(CommandHandler & apCommandObj) override;
+    void OnDone(CommandResponseSender & apResponderObj) override;
+    void OnDone(CommandHandlerImpl & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
     void TryToResumeSubscriptions();
@@ -482,7 +499,7 @@ private:
     Status OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                    System::PacketBufferHandle && aPayload);
 
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
@@ -599,7 +616,11 @@ private:
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
 
-    ObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ICDManager * mICDManager = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    ObjectPool<CommandResponseSender, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandResponderObjs;
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
@@ -657,97 +678,28 @@ private:
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     * mNumOfSubscriptionsToResume tracks the number of subscriptions that the device will try to resume at its next resumption
+     * attempt. At boot up, the attempt will be at the highest min interval of all the subscriptions to resume.
+     * When the subscription timeout resumption feature is present, after the boot up attempt, the next attempt will be determined
+     * by ComputeTimeSecondsTillNextSubscriptionResumption.
+     */
+    int8_t mNumOfSubscriptionsToResume = 0;
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool HasSubscriptionsToResume();
     uint32_t ComputeTimeSecondsTillNextSubscriptionResumption();
     uint32_t mNumSubscriptionResumptionRetries = 0;
     bool mSubscriptionResumptionScheduled      = false;
-#endif
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
     FabricTable * mpFabricTable;
 
     CASESessionManager * mpCASESessionMgr = nullptr;
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
-
-    // A magic number for tracking values between stack Shutdown()-s and Init()-s.
-    // An ObjectHandle is valid iff. its magic equals to this one.
-    uint32_t mMagic = 0;
 };
-
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj);
-
-/**
- *  Check whether the given cluster exists on the given endpoint and supports
- *  the given command.  If it does, Success will be returned.  If it does not,
- *  one of UnsupportedEndpoint, UnsupportedCluster, or UnsupportedCommand
- *  will be returned, depending on how the command fails to exist.
- */
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
-
-/**
- *  Fetch attribute value and version info and write to the AttributeReport provided.
- *  The ReadSingleClusterData will do everything required for encoding an attribute, i.e. it will try to put one or more
- * AttributeReportIB to the AttributeReportIBs::Builder.
- *  When the endpoint / cluster / attribute data specified by aPath does not exist, corresponding interaction
- * model error code will be put into aAttributeReports, and CHIP_NO_ERROR will be returned. If the data exists on the server, the
- * data (with tag kData) and the data version (with tag kDataVersion) will be put into aAttributeReports. TLVWriter error will be
- * returned if any error occurred while encoding these values. This function is implemented by CHIP as a part of cluster data
- * storage & management.
- *
- *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
- *  @param[in]    aPath                 The concrete path of the data being read.
- *  @param[in]    aAttributeReports      The TLV Builder for Cluter attribute builder.
- *
- *  @retval  CHIP_NO_ERROR on success
- */
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState);
-
-/**
- *  Check whether concrete attribute path is an "existent attribute path" in spec terms.
- *  @param[in]    aPath                 The concrete path of the data being read.
- *  @retval  boolean   true if the concrete attribute path indicates an attribute that exists on the node.
- */
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath);
-
-/**
- *  Get the registered attribute access override. nullptr when attribute access override is not found.
- *
- * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
- */
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
-
-/**
- * TODO: Document.
- */
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                  const ConcreteDataAttributePath & aAttributePath, TLV::TLVReader & aReader,
-                                  WriteHandler * apWriteHandler);
-
-/**
- * Check if the given cluster has the given DataVersion.
- */
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
-
-/**
- * Returns true if device type is on endpoint, false otherwise.
- */
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
-
-/**
- * Returns the metadata of the attribute for the given path.
- *
- * @retval The metadata of the attribute, will return null if the given attribute does not exists.
- */
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath);
-
-/**
- * Returns the event support status for the given event, as an interaction model status.
- */
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath);
 
 } // namespace app
 } // namespace chip

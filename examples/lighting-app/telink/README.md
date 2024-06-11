@@ -28,7 +28,7 @@ a reference for creating your own application.
     ```
 
 3. In the example dir run (replace _<build_target>_ with your board name, for
-   example, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9258a`):
+   example, `tlsr9118bdk40d`, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9258a`):
 
     ```bash
     $ west build -b <build_target>
@@ -97,30 +97,6 @@ be used to specify the the effect. It is able to be in following effects:
 | Blinks (1000 ms on/1000 ms off) | Channel Change ( `Clusters::Identify::EffectIdentifierEnum::kChannelChange`) |
 | Blinks (950 ms on/50 ms off)    | Finish ( `Clusters::Identify::EffectIdentifierEnum::kFinishEffect`)          |
 | LED off                         | Stop (`Clusters::Identify::EffectIdentifierEnum::kStopEffect`)               |
-
-#### Indicate current state of lightbulb
-
-By default, only **Blue** LED is used to show current state of lightbulb (only
-for lightning-app).
-
-To enable RGB functionality in Your application set this config:
-
-In Matter examples/lighting-app/telink/include/**AppConfig.h**, set the define
-`USE_RGB_PWM`:
-
-```bash
-    define USE_RGB_PWM 1
-```
-
-To get current state of lightbulb in RGB mode, connect 3-color LED module to
-following pins:
-
-| Name  |         Pin         |
-| :---: | :-----------------: |
-|  Red  | PE2 (pin 8 of J34)  |
-| Green | PE0 (pin 5 of J34)  |
-| Blue  | PB4 (pin 20 of J34) |
-|  GND  | GND (pin 24 of J50) |
 
 ### CHIP tool commands
 

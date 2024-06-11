@@ -28,6 +28,8 @@
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
+#include <string>
+
 using namespace ::chip;
 using namespace ::chip::Controller;
 
@@ -134,7 +136,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetDSTOffsets(mDSTOffsetList);
     }
 
-    if (!mSkipICDRegistration.ValueOr(false))
+    if (mICDRegistration.ValueOr(false))
     {
         params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
 
@@ -154,6 +156,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         // These Optionals must have values now.
         // The commissioner will verify these values.
         params.SetICDSymmetricKey(mICDSymmetricKey.Value());
+        if (mICDStayActiveDurationMsec.HasValue())
+        {
+            params.SetICDStayActiveDurationMsec(mICDStayActiveDurationMsec.Value());
+        }
         params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
         params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
     }
@@ -426,9 +432,11 @@ void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioning
         ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
                         userActiveModeTriggerInstruction.c_str());
     }
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
+                    info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
 }
 
-void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounter)
+void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icdCounter)
 {
     char icdSymmetricKeyHex[chip::Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
@@ -436,7 +444,7 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = ScopedNodeId(nodeId, CurrentCommissioner().GetFabricIndex());
+    clientInfo.peer_node         = nodeId;
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
     clientInfo.start_icd_counter = icdCounter;
 
@@ -449,7 +457,7 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
     if (err != CHIP_NO_ERROR)
     {
         CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
-        ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
+        ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId.GetNodeId()),
                      err.AsString());
         SetCommandExitStatus(err);
         return;
@@ -457,20 +465,26 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
 
     mDeviceIsICD = true;
 
-    ChipLogProgress(chipTool, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    ChipLogProgress(chipTool, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId.GetNodeId()));
     ChipLogProgress(chipTool,
                     "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
-                    " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s",
-                    ChipLogValueX64(nodeId), ChipLogValueX64(mICDCheckInNodeId.Value()),
-                    ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex);
+                    " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s / ICDCounter %u",
+                    ChipLogValueX64(nodeId.GetNodeId()), ChipLogValueX64(mICDCheckInNodeId.Value()),
+                    ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex, icdCounter);
 }
 
-void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void PairingCommand::OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t promisedActiveDuration)
+{
+    ChipLogProgress(chipTool, "ICD Stay Active Complete for device " ChipLogFormatX64 " / promisedActiveDuration: %u",
+                    ChipLogValueX64(deviceId.GetNodeId()), promisedActiveDuration);
+}
+
+void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
 {
     // Ignore nodes with closed commissioning window
-    VerifyOrReturn(nodeData.commissionData.commissioningMode != 0);
+    VerifyOrReturn(nodeData.commissioningMode != 0);
 
-    auto & resolutionData = nodeData.resolutionData;
+    auto & resolutionData = nodeData;
 
     const uint16_t port = resolutionData.port;
     char buf[chip::Inet::IPAddress::kMaxStringLength];

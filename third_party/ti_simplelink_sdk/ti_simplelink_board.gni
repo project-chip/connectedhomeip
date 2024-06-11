@@ -28,51 +28,25 @@ assert(ti_simplelink_board != "", "ti_simplelink_board must be specified")
 #
 # | Development Kit     | Device Family   | SoC           |                     |
 # | -----------------   | --------------- | ----------    | ------------------- |
-# | CC1352R1_LAUNCHXL   | cc13x2_26x2     | cc1352r1f3    | Thread MTD + no BLE |
-# | CC2652R1_LAUNCHXL   | cc13x2_26x2     | cc2652r1f3    | Thread MTD + no BLE |
-# | LP_CC2652R7         | cc13x2x7_26x2x7 | cc2652r1f7    | Thread FTD + BLE    |
 # | CC134P10_6_LAUNCHXL | cc13x4_26x4     | cc1354p10     | Thread FTD + BLE    |
 # | CC2674              | cc13x4_24x4     | CC2674P10RGZ  | Thread FTD + BLE    |
 # | CC2674              | cc13x4_24x4     | CC2674R10RGZ  | Thread FTD + BLE    |
 # | CC3220SF_LAUNCHXL   | cc32xx          | cc3220SF      | Wi-Fi               |
 # | CC3235SF_LAUNCHXL   | cc32xx          | cc3235SF      | Wi-Fi               |
 
-# XXX: Can we do an array with a case statement?
-if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
-  ti_simplelink_device_family = "cc13x2_26x2"
-  ti_simplelink_soc_family = "cc13x2"
-  ti_simplelink_isa = "m4f"
-
-  # set -DDeviceFamily_CC13X2?
-  ti_simplelink_soc = "cc1352r1f3"
-  ti_simplelink_bim_name = "cc1352r1lp"
-} else if (ti_simplelink_board == "CC2652R1_LAUNCHXL") {
-  ti_simplelink_device_family = "cc13x2_26x2"
-  ti_simplelink_soc_family = "cc26x2"
-  ti_simplelink_isa = "m4f"
-
-  # set -DDeviceFamily_CC26X2?
-  ti_simplelink_soc = "cc2652r1f3"
-  ti_simplelink_bim_name = "cc2652r1lp"
-} else if (ti_simplelink_board == "LP_EM_CC1354P10_6" ||
-           ti_simplelink_board == "LP_EM_CC1354P10_1") {
+if (ti_simplelink_board == "LP_EM_CC1354P10_6" ||
+    ti_simplelink_board == "LP_EM_CC1354P10_1") {
   ti_simplelink_device_family = "cc13x4_26x4"
+  ti_simplelink_device_family_driverlib = "cc13x4_cc26x4"
   ti_simplelink_soc_family = "cc13x4"
   ti_simplelink_isa = "m33f"
   ti_simplelink_soc = "cc1354p10"
   ti_simplelink_bim_name = "cc1354p10"
 } else if (ti_simplelink_board == "CC2674") {
   ti_simplelink_device_family = "cc13x4_26x4"  #driverlib paths
+  ti_simplelink_device_family_driverlib = "cc13x4_cc26x4"
   ti_simplelink_soc_family = "cc13x4"  #ble path
   ti_simplelink_isa = "m33f"
-} else if (ti_simplelink_board == "LP_CC2652R7") {
-  ti_simplelink_device_family = "cc13x2x7_26x2x7"
-  ti_simplelink_soc_family = "cc26x2x7"
-  ti_simplelink_isa = "m4f"
-
-  # set -DDeviceFamily_CC26X2?
-  ti_simplelink_soc = "cc2652r1f7"
-  ti_simplelink_bim_name = "cc2652r7lp"
 } else if (ti_simplelink_board == "CC3220SF_LAUNCHXL") {
   ti_simplelink_device_family = "cc32xx"
   ti_simplelink_soc_family = "cc32xx"

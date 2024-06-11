@@ -160,6 +160,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256Serial
     memcpy(mPublicKey.Bytes(), input.ConstBytes(), mPublicKey.Length());
 
 exit:
+    LogPsaError(status);
     psa_reset_key_attributes(&attributes);
 
     return error;

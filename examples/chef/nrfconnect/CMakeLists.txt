@@ -84,17 +84,25 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
     ${CHEF}/common/chef-fan-control-manager.cpp
+    ${CHEF}/common/chef-laundry-washer-controls-delegate-impl.cpp
+    ${CHEF}/common/chef-laundry-washer-mode.cpp
+    ${CHEF}/common/chef-operational-state-delegate-impl.cpp
     ${CHEF}/common/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
-    ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
+    ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
+    ${CHEF}/common/clusters/channel/ChannelManager.cpp
+    ${CHEF}/common/clusters/door-lock/chef-doorlock-stubs.cpp
+    ${CHEF}/common/clusters/door-lock/chef-lock-endpoint.cpp
+    ${CHEF}/common/clusters/door-lock/chef-lock-manager.cpp
+    ${CHEF}/common/clusters/keypad-input/KeypadInputManager.cpp
     ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
+    ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp
+    ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp
+    ${CHEF}/common/clusters/switch/SwitchManager.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
-    ${CHEF}/common/clusters/channel/ChannelManager.cpp
-    ${CHEF}/common/clusters/keypad-input/KeypadInputManager.cpp
-    ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
     ${CHEF}/common/stubs.cpp
     ${CHEF}/nrfconnect/main.cpp
 )

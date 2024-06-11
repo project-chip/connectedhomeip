@@ -21,7 +21,7 @@
 #import <Foundation/Foundation.h>
 
 #include <app/ConcreteAttributePath.h>
-#include <app/MessageDef/EventLoggingTypes.h>
+#include <app/EventLoggingTypes.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 

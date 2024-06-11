@@ -17,24 +17,22 @@
 
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
+#include <lib/shell/SubShellCommand.h>
+#include <lib/shell/commands/WiFi.h>
 #include <lib/shell/streamer.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/NetworkCommissioning.h>
 
 using chip::DeviceLayer::ConnectivityManager;
 using chip::DeviceLayer::ConnectivityMgr;
+using namespace chip::DeviceLayer::NetworkCommissioning;
 
 namespace chip {
 namespace Shell {
 
-static chip::Shell::Engine sShellWiFiSubCommands;
-
-static CHIP_ERROR WiFiHelpHandler(int argc, char ** argv)
-{
-    sShellWiFiSubCommands.ForEachCommand(PrintCommandHelp, nullptr);
-    return CHIP_NO_ERROR;
-}
+static DeviceLayer::NetworkCommissioning::WiFiDriver * sDriver;
 
 static CHIP_ERROR PrintWiFiMode()
 {
@@ -104,36 +102,61 @@ static CHIP_ERROR WiFiModeHandler(int argc, char ** argv)
 
 static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
 {
-    if (argc != 2)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    uint8_t networkIndex;
+    char debugBuffer[CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE];
+    MutableCharSpan debugText(debugBuffer);
 
-    // TODO:Provision WiFi using WirelessDriver
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(GetWiFiDriver() != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    /* Command accepts running with SSID and password as parameters */
+    VerifyOrReturnError((argc == 2), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ByteSpan ssidSpan     = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
+    ByteSpan passwordSpan = ByteSpan(Uint8::from_const_char(argv[1]), strlen(argv[1]));
+
+    VerifyOrReturnError(IsSpanUsable(ssidSpan) && IsSpanUsable(passwordSpan), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ChipLogProgress(Shell, "Adding/Updating network %s", argv[0]);
+
+    /* AddOrUpdateNetwork() checks ssid length and password length. The network info is not persistent. */
+    GetWiFiDriver()->AddOrUpdateNetwork(ssidSpan, passwordSpan, debugText, networkIndex);
+
+    ChipLogProgress(Shell, "Connecting to network");
+    /* Connection event will be returned in OnWiFiConnectivityChange from DeviceCallbacks.cpp */
+    GetWiFiDriver()->ConnectNetwork(ssidSpan, nullptr);
+
+    return error;
 }
 
-static CHIP_ERROR WiFiDispatch(int argc, char ** argv)
+static CHIP_ERROR WiFiDisconnectHandler(int argc, char ** argv)
 {
-    if (argc == 0)
-    {
-        return WiFiHelpHandler(argc, argv);
-    }
-    return sShellWiFiSubCommands.ExecCommand(argc, argv);
+    VerifyOrReturnError((argc == 0), CHIP_ERROR_INVALID_ARGUMENT);
+
+    return ConnectivityMgr().DisconnectNetwork();
+}
+
+void SetWiFiDriver(WiFiDriver * driver)
+{
+    sDriver = driver;
+}
+
+WiFiDriver * GetWiFiDriver()
+{
+    return sDriver;
 }
 
 void RegisterWiFiCommands()
 {
-    /// Subcommands for root command: `device <subcommand>`
-    static const shell_command_t sWiFiSubCommands[] = {
-        { &WiFiHelpHandler, "help", "" },
-        { &WiFiModeHandler, "mode", "Get/Set wifi mode. Usage: wifi mode [disable|ap|sta]." },
-        { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect ssid psk." },
+    static constexpr Command subCommands[] = {
+        { &WiFiModeHandler, "mode", "Get/Set wifi mode. Usage: wifi mode [disable|ap|sta]" },
+        { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect <ssid> <psk>" },
+        { &WiFiDisconnectHandler, "disconnect", "Disconnect device from AP. Usage: wifi disconnect" },
     };
-    static const shell_command_t sWiFiCommand = { &WiFiDispatch, "wifi", "Usage: wifi <subcommand>" };
 
-    sShellWiFiSubCommands.RegisterCommands(sWiFiSubCommands, ArraySize(sWiFiSubCommands));
-    Engine::Root().RegisterCommands(&sWiFiCommand, 1);
+    static constexpr Command wifiCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "wifi", "Wi-Fi commands" };
+
+    Engine::Root().RegisterCommands(&wifiCommand, 1);
 }
 
 } // namespace Shell

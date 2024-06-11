@@ -55,9 +55,10 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0072" name="Room Air Conditioner" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0072" name="Room Air Conditioner" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Thermostat User Interface Configuration cluster added; Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -71,19 +72,30 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="DF">
+        <feature code="" name="DeadFrontBehavior">
           <mandatoryConform/>
         </feature>
       </features>
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="server">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0202" name="Fan Control" side="server">
       <optionalConform/>
+    </cluster>
+    <cluster id="0x0204" name="Thermostat User Interface Configuration" side="server">
+      <optionalConform/>
+      <attributes>
+        <attribute code="" name="KeypadLockout">
+          <optionalConform/>
+        </attribute>
+      </attributes>
     </cluster>
     <cluster id="0x0402" name="Temperature Measurement" side="server">
       <optionalConform/>

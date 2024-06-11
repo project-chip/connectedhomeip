@@ -30,8 +30,11 @@
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemClock.h>
+#include <tracing/metric_event.h>
 
 constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
+
+using namespace chip::Tracing;
 
 namespace chip {
 namespace Controller {
@@ -59,15 +62,16 @@ CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
                                        DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
 {
-    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(remoteId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, remoteId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
 
     SetupPayload payload;
     ReturnErrorOnFailure(GetPayload(setUpCode, payload));
 
     if (resolutionData.HasValue())
     {
-        VerifyOrReturnError(discoveryType != DiscoveryType::kAll, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, discoveryType != DiscoveryType::kAll,
+                                      CHIP_ERROR_INVALID_ARGUMENT);
         if (mRemoteId == remoteId && mSetUpPINCode == payload.setUpPINCode && mConnectionType == commission &&
             mDiscoveryType == discoveryType)
         {
@@ -89,10 +93,16 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
         return CHIP_NO_ERROR;
     }
 
-    ReturnErrorOnFailure(Connect(payload));
-    return mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback,
-                                    this);
+    ReturnErrorOnFailureWithMetric(kMetricSetupCodePairerPairDevice, Connect(payload));
+    auto errorCode =
+        mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback, this);
+    if (CHIP_NO_ERROR == errorCode)
+    {
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupCodePairerPairDevice);
+    }
+    return errorCode;
 }
+
 CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -330,25 +340,29 @@ bool SetUpCodePairer::IdIsPresent(uint16_t vendorOrProductID)
     return vendorOrProductID != kNotAvailable;
 }
 
-bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const
+bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & discNodeData) const
 {
-    if (nodeData.commissionData.commissioningMode == 0)
+    if (!discNodeData.Is<Dnssd::CommissionNodeData>())
+    {
+        return false;
+    }
+
+    const Dnssd::CommissionNodeData & nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+    if (nodeData.commissioningMode == 0)
     {
         ChipLogProgress(Controller, "Discovered device does not have an open commissioning window.");
         return false;
     }
 
     // The advertisement may not include a vendor id.
-    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.commissionData.vendorId) &&
-        mPayloadVendorID != nodeData.commissionData.vendorId)
+    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.vendorId) && mPayloadVendorID != nodeData.vendorId)
     {
         ChipLogProgress(Controller, "Discovered device does not match our vendor id.");
         return false;
     }
 
     // The advertisement may not include a product id.
-    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.commissionData.productId) &&
-        mPayloadProductID != nodeData.commissionData.productId)
+    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.productId) && mPayloadProductID != nodeData.productId)
     {
         ChipLogProgress(Controller, "Discovered device does not match our product id.");
         return false;
@@ -358,10 +372,10 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     switch (mCurrentFilter.type)
     {
     case Dnssd::DiscoveryFilterType::kShortDiscriminator:
-        discriminatorMatches = (((nodeData.commissionData.longDiscriminator >> 8) & 0x0F) == mCurrentFilter.code);
+        discriminatorMatches = (((nodeData.longDiscriminator >> 8) & 0x0F) == mCurrentFilter.code);
         break;
     case Dnssd::DiscoveryFilterType::kLongDiscriminator:
-        discriminatorMatches = (nodeData.commissionData.longDiscriminator == mCurrentFilter.code);
+        discriminatorMatches = (nodeData.longDiscriminator == mCurrentFilter.code);
         break;
     default:
         ChipLogError(Controller, "Unknown filter type; all matches will fail");
@@ -383,7 +397,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
 
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
-    NotifyCommissionableDeviceDiscovered(nodeData.resolutionData);
+    NotifyCommissionableDeviceDiscovered(nodeData.Get<Dnssd::CommissionNodeData>());
 }
 
 void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonResolutionData & resolutionData)
@@ -529,9 +543,10 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
 
     if (CHIP_NO_ERROR == error)
     {
-        ChipLogProgress(Controller, "Pairing with commissionee successful, stopping discovery");
+        ChipLogProgress(Controller, "PASE session established with commissionee. Stopping discovery.");
         ResetDiscoveryState();
         mRemoteId = kUndefinedNodeId;
+        MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
         if (pairingDelegate != nullptr)
         {
             pairingDelegate->OnPairingComplete(error);
@@ -564,6 +579,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
         return;
     }
 
+    MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
     if (pairingDelegate != nullptr)
     {
         pairingDelegate->OnPairingComplete(error);
@@ -604,6 +620,7 @@ void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, v
         {
             err = CHIP_ERROR_TIMEOUT;
         }
+        MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, err);
         pairer->mCommissioner->OnSessionEstablishmentError(err);
     }
 }
@@ -616,14 +633,14 @@ SetUpCodePairerParameters::SetUpCodePairerParameters(const Dnssd::CommonResoluti
     auto & ip = data.ipAddress[index];
     SetPeerAddress(Transport::PeerAddress::UDP(ip, data.port, ip.IsIPv6LinkLocal() ? data.interfaceId : Inet::InterfaceId::Null()));
 
-    if (data.mrpRetryIntervalIdle.HasValue())
+    if (data.mrpRetryIntervalIdle.has_value())
     {
-        SetIdleInterval(data.mrpRetryIntervalIdle.Value());
+        SetIdleInterval(*data.mrpRetryIntervalIdle);
     }
 
-    if (data.mrpRetryIntervalActive.HasValue())
+    if (data.mrpRetryIntervalActive.has_value())
     {
-        SetActiveInterval(data.mrpRetryIntervalActive.Value());
+        SetActiveInterval(*data.mrpRetryIntervalActive);
     }
 }
 

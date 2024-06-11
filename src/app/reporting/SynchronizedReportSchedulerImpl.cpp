@@ -109,7 +109,9 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMinInterval(const Timestamp 
     System::Clock::Timestamp latest = now;
 
     mNodesPool.ForEachActiveObject([&latest, this](ReadHandlerNode * node) {
-        // We only consider the min interval if the handler is reportable to prevent holding the reports
+        // We only consider the min interval if the handler is reportable. This is done to have only reportable handlers
+        // contribute to setting the next min interval and avoid delaying a report for a handler that would not generate
+        // a one on its min interval anyway.
         if (node->GetMinTimestamp() > latest && this->IsReadHandlerReportable(node->GetReadHandler()) &&
             node->GetMinTimestamp() <= this->mNextMaxTimestamp)
         {
@@ -135,8 +137,9 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
 
     // Find out if any handler is reportable now or at the next min interval
     mNodesPool.ForEachActiveObject([&reportableNow, &reportableAtMin, this, now](ReadHandlerNode * node) {
-        // If a node is already scheduled, we don't need to check if it is reportable now, unless a chunked report is in progress
-        // in which case we need to keep scheduling engine runs until the report is complete
+        // If a node is already scheduled, we don't need to check if it is reportable now unless a chunked report is in progress.
+        // In this case, the node will be Reportable, as it is impossible to have node->IsChunkedReport() == true without being
+        // reportable, therefore we need to keep scheduling engine runs until the report is complete
         if (!node->IsEngineRunScheduled() || node->IsChunkedReport())
         {
             if (node->IsReportableNow(now))
@@ -182,7 +185,8 @@ void SynchronizedReportSchedulerImpl::TimerFired()
     mNodesPool.ForEachActiveObject([now, &firedEarly](ReadHandlerNode * node) {
         if (node->GetMinTimestamp() <= now)
         {
-            // Mark the handler as CanBeSynced if the min interval has elapsed so it will emit a report on the next engine run
+            // Since this handler can now report whenever it wants to, mark it as allowed to report if any other handler is
+            // reporting using the CanBeSynced flag.
             node->SetCanBeSynced(true);
         }
 
@@ -201,14 +205,17 @@ void SynchronizedReportSchedulerImpl::TimerFired()
 
     if (firedEarly)
     {
-        // If we fired the timer early, we need to recalculate the next report timeout and reschedule the report
+        // If we fired the timer early, we need to recalculate the next report timeout and reschedule the report so it can run when
+        // at least one read handler is reportable. Here we can't set the SetEngineRunScheduled flag to true, because this flag
+        // allows handlers to generate reports before their min (assuming their min has elapsed from the timer's perspective but not
+        // from the monotonic timer), and we don't know which handler was the one that should be reportable.
         Timeout timeout = Milliseconds32(0);
         ReturnOnFailure(CalculateNextReportTimeout(timeout, nullptr, now));
         ScheduleReport(timeout, nullptr, now);
     }
     else
     {
-        // If we did not fire the timer early, we can schedule an engine run
+        // If we have a reportable handler, we can schedule an engine run
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 }

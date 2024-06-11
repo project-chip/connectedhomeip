@@ -22,12 +22,13 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/util.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -48,6 +49,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <string>
 #include <vector>
 
 using namespace chip;
@@ -897,13 +899,11 @@ void ApplicationInit()
     // Setup Mock Devices
     Light1.SetReachable(true);
     Light2.SetReachable(true);
-
     Light1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     Light2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
 
     TempSensor1.SetReachable(true);
-    TempSensor1.SetReachable(true);
-
+    TempSensor2.SetReachable(true);
     TempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     TempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
 
@@ -912,7 +912,6 @@ void ApplicationInit()
     ActionLight2.SetReachable(true);
     ActionLight3.SetReachable(true);
     ActionLight4.SetReachable(true);
-
     ActionLight1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     ActionLight2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     ActionLight3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
@@ -927,7 +926,6 @@ void ApplicationInit()
     ComposedTempSensor2.SetReachable(true);
     ComposedPowerSource.SetReachable(true);
     ComposedPowerSource.SetBatChargeLevel(58);
-
     ComposedTempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     ComposedTempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     ComposedPowerSource.SetChangeCallback(&HandleDevicePowerSourceStatusChanged);

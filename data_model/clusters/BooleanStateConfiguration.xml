@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0080" name="Boolean State Configuration" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0080" name="Boolean State Configuration Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -104,7 +104,7 @@ Davis, CA 95616, USA
     </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="CurrentSensitivityLevel" type="uint8">
+    <attribute id="0x0000" name="CurrentSensitivityLevel" type="uint8" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform>
@@ -112,7 +112,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="max" value="SupportedSensitivityLevels - 1"/>
     </attribute>
-    <attribute id="0x0001" name="SupportedSensitivityLevels" type="uint8">
+    <attribute id="0x0001" name="SupportedSensitivityLevels" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
@@ -120,7 +120,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="between" from="2" to="10"/>
     </attribute>
-    <attribute id="0x0002" name="DefaultSensitivityLevel" type="uint8">
+    <attribute id="0x0002" name="DefaultSensitivityLevel" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform>
@@ -128,7 +128,7 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="max" value="SupportedSensitivityLevels - 1"/>
     </attribute>
-    <attribute id="0x0003" name="AlarmsActive" type="AlarmModeBitmap">
+    <attribute id="0x0003" name="AlarmsActive" type="AlarmModeBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <orTerm>
@@ -137,13 +137,13 @@ Davis, CA 95616, USA
         </orTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0004" name="AlarmsSuppressed" type="AlarmModeBitmap">
+    <attribute id="0x0004" name="AlarmsSuppressed" type="AlarmModeBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="SPRS"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0005" name="AlarmsEnabled" type="AlarmModeBitmap">
+    <attribute id="0x0005" name="AlarmsEnabled" type="AlarmModeBitmap" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <optionalConform>
@@ -153,7 +153,7 @@ Davis, CA 95616, USA
         </orTerm>
       </optionalConform>
     </attribute>
-    <attribute id="0x0006" name="AlarmsSupported" type="AlarmModeBitmap">
+    <attribute id="0x0006" name="AlarmsSupported" type="AlarmModeBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>

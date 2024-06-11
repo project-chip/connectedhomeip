@@ -130,13 +130,24 @@ public:
     virtual void OnICDRegistrationInfoRequired() {}
 
     /**
-     * @bried
+     * @brief
      *   Called when the registration flow for the ICD completes.
      *
      * @param[in] icdNodeId    The node id of the ICD.
      * @param[in] icdCounter   The ICD Counter received from the device.
      */
-    virtual void OnICDRegistrationComplete(NodeId icdNodeId, uint32_t icdCounter) {}
+    virtual void OnICDRegistrationComplete(ScopedNodeId icdNodeId, uint32_t icdCounter) {}
+
+    /**
+     * @brief
+     *   Called upon completion of the LIT ICD commissioning flow, when ICDStayActiveDuration is set
+     *   and the corresponding stayActive command response is received
+     *
+     * @param[in] icdNodeId    The node id of the ICD.
+     * @param[in] promisedActiveDurationMsec   The actual duration that the ICD server can stay active
+     *            from the time it receives the StayActiveRequest command.
+     */
+    virtual void OnICDStayActiveComplete(ScopedNodeId icdNodeId, uint32_t promisedActiveDurationMsec) {}
 };
 
 } // namespace Controller

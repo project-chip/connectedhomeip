@@ -19,8 +19,6 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <algorithm>
-
 using namespace chip;
 
 namespace mdns {
@@ -53,30 +51,6 @@ void ActiveResolveAttempts::Complete(const PeerId & peerId)
     // and advertise their IP without any explicit queries for them
     ChipLogProgress(Discovery, "Discovered node without a pending query");
 #endif
-}
-
-void ActiveResolveAttempts::CompleteCommissioner(const chip::Dnssd::DiscoveredNodeData & data)
-{
-    for (auto & item : mRetryQueue)
-    {
-        if (item.attempt.Matches(data, chip::Dnssd::DiscoveryType::kCommissionerNode))
-        {
-            item.attempt.Clear();
-            return;
-        }
-    }
-}
-
-void ActiveResolveAttempts::CompleteCommissionable(const chip::Dnssd::DiscoveredNodeData & data)
-{
-    for (auto & item : mRetryQueue)
-    {
-        if (item.attempt.Matches(data, chip::Dnssd::DiscoveryType::kCommissionableNode))
-        {
-            item.attempt.Clear();
-            return;
-        }
-    }
 }
 
 bool ActiveResolveAttempts::HasBrowseFor(chip::Dnssd::DiscoveryType type) const
@@ -220,9 +194,9 @@ void ActiveResolveAttempts::MarkPending(ScheduledAttempt && attempt)
     entryToUse->nextRetryDelay = System::Clock::Seconds16(1);
 }
 
-Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpectedResponse() const
+std::optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpectedResponse() const
 {
-    Optional<System::Clock::Timeout> minDelay = Optional<System::Clock::Timeout>::Missing();
+    std::optional<System::Clock::Timeout> minDelay = std::nullopt;
 
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
@@ -236,20 +210,20 @@ Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpected
         if (now >= entry.queryDueTime)
         {
             // found an entry that needs processing right now
-            return Optional<System::Clock::Timeout>::Value(0);
+            return std::make_optional<System::Clock::Timeout>(0);
         }
 
         System::Clock::Timeout entryDelay = entry.queryDueTime - now;
-        if (!minDelay.HasValue() || (minDelay.Value() > entryDelay))
+        if (!minDelay.has_value() || (*minDelay > entryDelay))
         {
-            minDelay.SetValue(entryDelay);
+            minDelay.emplace(entryDelay);
         }
     }
 
     return minDelay;
 }
 
-Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextScheduled()
+std::optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextScheduled()
 {
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
@@ -275,13 +249,39 @@ Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextSch
         entry.queryDueTime = now + entry.nextRetryDelay;
         entry.nextRetryDelay *= 2;
 
-        Optional<ScheduledAttempt> attempt = MakeOptional(entry.attempt);
-        entry.attempt.firstSend            = false;
+        std::optional<ScheduledAttempt> attempt = std::make_optional(entry.attempt);
+        entry.attempt.firstSend                 = false;
 
         return attempt;
     }
 
-    return Optional<ScheduledAttempt>::Missing();
+    return std::nullopt;
+}
+
+bool ActiveResolveAttempts::ShouldResolveIpAddress(PeerId peerId) const
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (item.attempt.IsEmpty())
+        {
+            continue;
+        }
+        if (item.attempt.IsBrowse())
+        {
+            return true;
+        }
+
+        if (item.attempt.IsResolve())
+        {
+            auto & data = item.attempt.ResolveData();
+            if (data.peerId == peerId)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 bool ActiveResolveAttempts::IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const

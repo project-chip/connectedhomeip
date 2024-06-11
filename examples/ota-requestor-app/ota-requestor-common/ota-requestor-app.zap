@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 99,
+  "featureLevel": 102,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -2946,27 +2946,27 @@
       "id": 3,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "code": 4293984258,
+        "code": 25,
         "profileId": 259,
-        "label": "MA-secondary-network-commissioning",
-        "name": "MA-secondary-network-commissioning"
+        "label": "MA-secondary-network-interface",
+        "name": "MA-secondary-network-interface"
       },
       "deviceTypes": [
         {
-          "code": 4293984258,
+          "code": 25,
           "profileId": 259,
-          "label": "MA-secondary-network-commissioning",
-          "name": "MA-secondary-network-commissioning"
+          "label": "MA-secondary-network-interface",
+          "name": "MA-secondary-network-interface"
         }
       ],
       "deviceVersions": [
         1
       ],
       "deviceIdentifiers": [
-        4293984258
+        25
       ],
-      "deviceTypeName": "MA-secondary-network-commissioning",
-      "deviceTypeCode": 4293984258,
+      "deviceTypeName": "MA-secondary-network-interface",
+      "deviceTypeCode": 25,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -3456,21 +3456,24 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 65534,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     }
   ]
 }

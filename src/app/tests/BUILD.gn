@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/app/icd/icd.gni")
@@ -29,7 +30,6 @@ static_library("helpers") {
     "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
     "AppTestContext.cpp",
     "AppTestContext.h",
-    "integration/RequiredPrivilegeStubs.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -38,9 +38,10 @@ static_library("helpers") {
     "${chip_root}/src/access",
     "${chip_root}/src/app",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
   ]
+
+  public_deps = [ "${chip_root}/src/messaging/tests:helpers" ]
 }
 
 source_set("binding-test-srcs") {
@@ -120,30 +121,40 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
-chip_test_suite_using_nltest("tests") {
+source_set("app-test-stubs") {
+  sources = [
+    "test-ember-api.cpp",
+    "test-ember-api.h",
+    "test-interaction-model-api.cpp",
+    "test-interaction-model-api.h",
+  ]
+  public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
+
+  public_deps = [
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
-    "TestAclEvent.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
+    "TestAttributePathParams.cpp",
     "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
-    "TestClusterInfo.cpp",
-    "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestConcreteAttributePath.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
-    "TestEventLoggingNoUTCTime.cpp",
-    "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
-    "TestFabricScopedEventLogging.cpp",
-    "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNullable.cpp",
     "TestNumericAttributeTraits.cpp",
@@ -151,26 +162,74 @@ chip_test_suite_using_nltest("tests") {
     "TestPendingNotificationMap.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
-    "TestReadInteraction.cpp",
-    "TestReportingEngine.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
     "TestTimeSyncDataProvider.cpp",
-    "TestTimedHandler.cpp",
-    "TestWriteInteraction.cpp",
   ]
 
   if (!chip_fake_platform) {
     test_sources += [ "TestFailSafeContext.cpp" ]
   }
 
-  test_sources += [ "TestAclAttribute.cpp" ]
-
   # DefaultICDClientStorage assumes that raw AES key is used by the application
   if (chip_crypto != "psa") {
     test_sources += [ "TestDefaultICDClientStorage.cpp" ]
   }
+
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":app-test-stubs",
+    ":binding-test-srcs",
+    ":operational-state-test-srcs",
+    ":ota-requestor-test-srcs",
+    ":power-cluster-test-srcs",
+    ":time-sync-data-provider-test-srcs",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
+  ]
+
+  if (chip_device_platform != "android") {
+    test_sources += [
+      "TestExtensionFieldSets.cpp",
+      "TestSceneTable.cpp",
+    ]
+    public_deps += [
+      ":power-cluster-test-srcs",
+      ":scenes-table-test-srcs",
+    ]
+  }
+}
+
+chip_test_suite_using_nltest("tests_nltest") {
+  output_name = "libAppTestsNL"
+
+  test_sources = [
+    "TestAclAttribute.cpp",
+    "TestAclEvent.cpp",
+    "TestCommandInteraction.cpp",
+    "TestEventLoggingNoUTCTime.cpp",
+    "TestEventOverflow.cpp",
+    "TestFabricScopedEventLogging.cpp",
+    "TestInteractionModelEngine.cpp",
+    "TestReadInteraction.cpp",
+    "TestReportScheduler.cpp",
+    "TestReportingEngine.cpp",
+    "TestTimedHandler.cpp",
+    "TestWriteInteraction.cpp",
+  ]
 
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
@@ -190,19 +249,10 @@ chip_test_suite_using_nltest("tests") {
     test_sources += [ "TestEventLogging.cpp" ]
   }
 
-  # The platform manager is not properly clearing queues in test teardown, which results in
-  # DrainIO calls not being able to run in expected time (5seconds) if unprocessed reported engine
-  # runs are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
-  # running all tests in one file. We need to figure out how to properly clean the event queues
-  # before enabling this test for these platforms.
-  if (chip_device_platform != "nrfconnect" &&
-      chip_device_platform != "openiotsdk") {
-    test_sources += [ "TestReportScheduler.cpp" ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":app-test-stubs",
     ":binding-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
@@ -219,30 +269,6 @@ chip_test_suite_using_nltest("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd/server:manager" ]
-
-    test_sources += [ "TestICDManager.cpp" ]
-  }
-
-  if (chip_enable_icd_checkin) {
-    test_sources += [ "TestICDMonitoringTable.cpp" ]
-  }
-
-  if (chip_device_platform != "android") {
-    test_sources += [
-      "TestExtensionFieldSets.cpp",
-      "TestSceneTable.cpp",
-    ]
-    public_deps += [
-      ":power-cluster-test-srcs",
-      ":scenes-table-test-srcs",
-    ]
-  }
-
-  # Do not run TestCommissionManager when running ICD specific unit tests.
-  # ICDManager has a dependency on the Accessors.h file which causes a link error
-  # when building the TestCommissionManager
   if (chip_config_network_layer_ble &&
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissionManager.cpp" ]
@@ -250,9 +276,5 @@ chip_test_suite_using_nltest("tests") {
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
-  }
-
-  if (chip_persist_subscriptions) {
-    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
   }
 }

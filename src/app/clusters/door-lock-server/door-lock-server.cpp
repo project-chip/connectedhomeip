@@ -25,10 +25,11 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <cinttypes>
 
 #include <app/CommandHandler.h>
@@ -1003,17 +1004,10 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         return;
     }
 
-    // appclusters, 5.2.4.14 - spec does not allow setting the schedule for multiple days in the bitmask
-    int setBitsInDaysMask = 0;
-    uint8_t rawDaysMask   = daysMask.Raw();
-    for (size_t i = 0; i < sizeof(rawDaysMask) * 8; ++i)
-    {
-        setBitsInDaysMask += rawDaysMask & 0x1;
-        rawDaysMask = static_cast<uint8_t>(rawDaysMask >> 1);
-    }
+    uint8_t rawDaysMask = daysMask.Raw();
 
-    // TODO: Check that bits are within range
-    if (setBitsInDaysMask == 0 || setBitsInDaysMask > 1)
+    // Check that bits are within range
+    if ((0 == rawDaysMask) || (rawDaysMask & 0x80))
     {
         ChipLogProgress(Zcl,
                         "[SetWeekDaySchedule] Unable to add schedule - daysMask is out of range "
@@ -3042,6 +3036,24 @@ Status DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip::Fabri
             return status;
         }
         ChipLogProgress(Zcl, "[clearCredentials] All face credentials were cleared [endpointId=%d]", endpointId);
+    }
+
+    if (SupportsAliroProvisioning(endpointId))
+    {
+        for (auto & credentialType :
+             { CredentialTypeEnum::kAliroEvictableEndpointKey, CredentialTypeEnum::kAliroCredentialIssuerKey,
+               CredentialTypeEnum::kAliroNonEvictableEndpointKey })
+        {
+            auto status = clearCredentials(endpointId, modifier, sourceNodeId, credentialType);
+            if (Status::Success != status)
+            {
+                ChipLogError(Zcl,
+                             "[clearCredentials] Unable to clear all Aliro credentials [endpointId=%d,credentialType=%d,status=%d]",
+                             endpointId, to_underlying(credentialType), to_underlying(status));
+                return status;
+            }
+        }
+        ChipLogProgress(Zcl, "[clearCredentials] All Aliro credentials were cleared [endpointId=%d]", endpointId);
     }
 
     return Status::Success;

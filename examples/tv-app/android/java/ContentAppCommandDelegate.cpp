@@ -34,6 +34,8 @@
 #include <platform/PlatformManager.h>
 #include <zap-generated/endpoint_config.h>
 
+#include <string>
+
 namespace chip {
 namespace AppPlatform {
 
@@ -195,7 +197,7 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
         }
         else
         {
-            handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, launchResponse);
+            handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, launchResponse);
         }
         break;
     }
@@ -209,7 +211,7 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
         }
         else
         {
-            handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, navigateTargetResponse);
+            handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, navigateTargetResponse);
         }
         break;
     }
@@ -223,7 +225,7 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
         }
         else
         {
-            handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, playbackResponse);
+            handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, playbackResponse);
         }
         break;
     }
@@ -242,7 +244,7 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
         }
         else
         {
-            handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, getSetupPINresponse);
+            handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, getSetupPINresponse);
         }
         break;
     }

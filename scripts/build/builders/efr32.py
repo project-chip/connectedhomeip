@@ -17,6 +17,7 @@ import shlex
 import subprocess
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -100,6 +101,7 @@ class Efr32Board(Enum):
     BRD4187C = 9
     BRD4186C = 10
     BRD4338A = 11
+    BRD2703A = 12
 
     def GnArgName(self):
         if self == Efr32Board.BRD4161A:
@@ -124,6 +126,8 @@ class Efr32Board(Enum):
             return 'BRD4187C'
         elif self == Efr32Board.BRD4338A:
             return 'BRD4338A'
+        elif self == Efr32Board.BRD2703A:
+            return 'BRD2703A'
         else:
             raise Exception('Unknown board #: %r' % self)
 
@@ -146,8 +150,9 @@ class Efr32Builder(GnBuilder):
                  enable_icd: bool = False,
                  enable_low_power: bool = False,
                  enable_wifi: bool = False,
-                 enable_rs911x: bool = False,
+                 enable_rs9116: bool = False,
                  enable_wf200: bool = False,
+                 enable_917_ncp: bool = False,
                  enable_wifi_ipv4: bool = False,
                  enable_additional_data_advertising: bool = False,
                  enable_ot_lib: bool = False,
@@ -196,19 +201,22 @@ class Efr32Builder(GnBuilder):
 
         if enable_wifi:
             self.dotfile += self.root + '/build_for_wifi_gnfile.gn'
-            if board == Efr32Board.BRD4161A:
-                self.extra_gn_options.append('is_debug=false chip_logging=false')
-            else:
-                self.extra_gn_options.append('disable_lcd=true use_external_flash=false')
-
-            if enable_rs911x:
-                self.extra_gn_options.append('use_rs911x=true')
-            elif enable_wf200:
-                self.extra_gn_options.append('use_wf200=true')
-            elif enable_917_soc:
+            if enable_917_soc:
+                # Wifi SoC platform
                 self.extra_gn_options.append('chip_device_platform=\"SiWx917\"')
             else:
-                raise Exception('Wifi usage: ...-wifi-[rs911x|wf200]-...')
+                # EFR32 + WiFi NCP combos
+                if board == Efr32Board.BRD4161A:
+                    self.extra_gn_options.append('is_debug=false chip_logging=false')
+
+                if enable_rs9116:
+                    self.extra_gn_options.append('use_rs9116=true chip_device_platform =\"efr32\"')
+                elif enable_wf200:
+                    self.extra_gn_options.append('use_wf200=true chip_device_platform =\"efr32\"')
+                elif enable_917_ncp:
+                    self.extra_gn_options.append('use_SiWx917=true chip_device_platform =\"efr32\"')
+                else:
+                    raise Exception('Wifi usage: ...-wifi-[rs9116|wf200|siwx917]-...')
 
         if enable_wifi_ipv4:
             self.extra_gn_options.append('chip_enable_wifi_ipv4=true')
@@ -230,10 +238,10 @@ class Efr32Builder(GnBuilder):
                 ['git', 'describe', '--always', '--dirty', '--exclude', '*']).decode('ascii').strip()
             branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
             self.extra_gn_options.append(
-                'sl_matter_version_str="v1.2-%s-%s"' % (branchName, shortCommitSha))
-        if enable_917_soc:
-            if use_rps_extension is False:
-                self.extra_gn_options.append('use_rps_extension=false')
+                'sl_matter_version_str="v1.3-%s-%s"' % (branchName, shortCommitSha))
+
+        if use_rps_extension is False:
+            self.extra_gn_options.append('use_rps_extension=false')
 
         if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the
@@ -244,11 +252,11 @@ class Efr32Builder(GnBuilder):
         if "GSDK_ROOT" in os.environ and not enable_wifi:
             self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/util/third_party/openthread\"")
 
-        if "WISECONNECT_SDK_ROOT" in os.environ and enable_rs911x:
+        if "WISECONNECT_SDK_ROOT" in os.environ:
             wiseconnect_sdk_path = shlex.quote(os.environ['WISECONNECT_SDK_ROOT'])
             self.extra_gn_options.append(f"wiseconnect_sdk_root=\"{wiseconnect_sdk_path}\"")
 
-        if "WIFI_SDK_ROOT" in os.environ and enable_917_soc:
+        if "WIFI_SDK_ROOT" in os.environ:
             wifi_sdk_path = shlex.quote(os.environ['WIFI_SDK_ROOT'])
             self.extra_gn_options.append(f"wifi_sdk_root=\"{wifi_sdk_path}\"")
 
@@ -256,26 +264,27 @@ class Efr32Builder(GnBuilder):
         return self.extra_gn_options
 
     def build_outputs(self):
-        items = {}
-        for extension in ["out", "out.map", "hex"]:
-            name = '%s.%s' % (self.app.AppNamePrefix(), extension)
-            items[name] = os.path.join(self.output_dir, name)
+        extensions = ["out", "hex"]
+        if self.options.enable_link_map_file:
+            extensions.append("out.map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
         if self.app == Efr32App.UNIT_TEST:
             # Include test runner python wheels
             for root, dirs, files in os.walk(os.path.join(self.output_dir, 'chip_nl_test_runner_wheels')):
                 for file in files:
-                    items["chip_nl_test_runner_wheels/" +
-                          file] = os.path.join(root, file)
+                    yield BuilderOutput(
+                        os.path.join(root, file),
+                        os.path.join("chip_nl_test_runner_wheels", file))
 
         # Figure out flash bundle files and build accordingly
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
-            for line in f.readlines():
-                name = line.strip()
-                items['flashbundle/%s' %
-                      name] = os.path.join(self.output_dir, name)
-
-        return items
+            for name in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, name),
+                    os.path.join("flashbundle", name))
 
     def generate(self):
         cmd = [
@@ -290,6 +299,9 @@ class Efr32Builder(GnBuilder):
 
         if self.options.pw_command_launcher:
             extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
+
+        if self.options.enable_link_map_file:
+            extra_args.append('chip_generate_link_map_file=true')
 
         if self.options.pregen_dir:
             extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)

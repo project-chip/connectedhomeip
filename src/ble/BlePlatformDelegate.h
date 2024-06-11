@@ -24,12 +24,15 @@
 
 #pragma once
 
-#include <ble/BleConfig.h>
-
-#include <ble/BleUUID.h>
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
 
 #include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>
+
+#include "BleConfig.h"
+#include "BleUUID.h"
 
 namespace chip {
 namespace Ble {

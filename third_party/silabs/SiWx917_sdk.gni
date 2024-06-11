@@ -26,10 +26,13 @@ examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
 declare_args() {
   # Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled
-  si91x_alarm_based_wakeup = false
+  si91x_alarm_based_periodic_wakeup = false
 
   # Periodic time at which the 917 SoC should wakeup
   si91x_alarm_periodic_time = 30
+
+  # enable 917 SoC M4 sleep wakeup
+  si917_m4_sleep_enabled = false
 }
 
 # Defines an siwx917 SDK build target.
@@ -43,6 +46,7 @@ template("siwx917_sdk") {
   config("${sdk_target_name}_config") {
     include_dirs = []
     libs = []
+    defines = []
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
@@ -143,16 +147,28 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/inc",
     ]
 
+    if (use_system_view) {
+      _include_dirs += [
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/init/",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
+      ]
+
+      defines += [
+        "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT",
+        "SEGGER_SYSVIEW_RTT_BUFFER_SIZE=8192",
+      ]
+    }
+
     # Note that we're setting the mbedTLS and PSA configuration files through a
     # define. This means the build system by default does not pick up changes in
     # the content of these, only when changing the filename itself.
     # To fix this, these files are also manually depended upon in the source set
     # declared in siwx917_mbedtls_config further down this file.
-    defines = [
+    defines += [
       "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
-      "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
       "CCP_SI917_BRINGUP=1",
@@ -160,7 +176,8 @@ template("siwx917_sdk") {
       "RS911X_WIFI=1",
       "RSI_WLAN_ENABLE",
       "SLI_SI91X_ENABLE_OS=1",
-      "SLI_SI91X_MCU_INTERFACE=1",  #Enable CCP bus Interface
+      "SLI_SI91X_MCU_INTERFACE=1",  #Enable CCP bus Interface, Differentiation:
+                                    # 1->SOC and 0->NCP
       "RSI_WLAN_API_ENABLE",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
@@ -171,8 +188,6 @@ template("siwx917_sdk") {
       "__HEAP_SIZE=0",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
-      "SIWX_917=1",
-      "CHIP_9117=1",
       "SLI_SI91X_ENABLE_BLE=1",
       "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
       "TINYCRYPT_PRIMITIVES",
@@ -183,7 +198,6 @@ template("siwx917_sdk") {
       "SLI_SI91X_MCU_ENABLE_FLASH_BASED_EXECUTION=1",
       "SL_WIFI_COMPONENT_INCLUDED=1",
       "SLI_SI917=1",
-      "SI917=1",
       "ROMDRIVER_PRESENT=1",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER=1",
@@ -195,7 +209,7 @@ template("siwx917_sdk") {
       "SPI_MULTI_SLAVE=1",
       "SYSCALLS_WRITE=1",
       "__STATIC_INLINE=static inline",
-      "SL_SI91X_SI917_RAM_MEM_CONFIG=2",
+      "SL_SI91X_SI917_RAM_MEM_CONFIG=3",
       "SL_SI91x_DUAL_INTERRUPTS_ERRATA=1",
       "EXT_IRQ_COUNT=75",
       "FLASH_PAGE_SIZE=1",
@@ -203,7 +217,6 @@ template("siwx917_sdk") {
       "ENABLE_DEBUG_MODULE=1",
       "SI91X_SYSRTC_PRESENT=1",
       "TA_DEEP_SLEEP_COMMON_FLASH=1",
-      "SI917_SOC=1",
       "SI91X_PLATFORM=1",
       "SL_NET_COMPONENT_INCLUDED=1",
       "SRAM_BASE=0x0cUL",
@@ -211,7 +224,14 @@ template("siwx917_sdk") {
       "SLI_SI91X_MCU_ENABLE_IPMU_APIS=1",
       "RADIO_CONFIG_DMP_SUPPORT=1",
       "configUSE_POSIX_ERRNO=1",
+      "NVM3_LOCK_OVERRIDE=1",
     ]
+
+    if (silabs_log_enabled && chip_logging) {
+      defines += [ "SILABS_LOG_ENABLED=1" ]
+    } else {
+      defines += [ "SILABS_LOG_ENABLED=0" ]
+    }
 
     if (chip_build_libshell) {
       defines += [ "ENABLE_CHIP_SHELL" ]
@@ -255,12 +275,19 @@ template("siwx917_sdk") {
         "SI91X_SYSRTC_COUNT=1",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
+        "SL_ULP_TIMER",
+        "SL_SLEEP_TIMER",
       ]
     }
 
     # Enabling led interface
     if (use_wstk_leds) {
-      defines += [ "ENABLE_WSTK_LEDS" ]
+      defines += [
+        "ENABLE_WSTK_LEDS",
+
+        # TODO: remove this when it is added to the board config from wifi sdk
+        "SL_CATALOG_SIMPLE_LED_LED1_PRESENT",
+      ]
     }
 
     if (chip_enable_icd_server) {
@@ -272,12 +299,17 @@ template("siwx917_sdk") {
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
         "SL_SI91X_MCU_WIRELESS_BASED_WAKEUP=1",
         "SL_SI91X_MCU_BUTTON_BASED_WAKEUP=1",
+        "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
       ]
 
-      if (si91x_alarm_based_wakeup) {
+      if (si91x_alarm_based_periodic_wakeup) {
+        defines += [ "ALARM_PERIODIC_TIME=${si91x_alarm_periodic_time}" ]
+      }
+
+      if (si917_m4_sleep_enabled) {
         defines += [
-          "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
-          "ALARM_PERIODIC_TIME=${si91x_alarm_periodic_time}",
+          "SI917_M4_SLEEP_ENABLED=1",
+          "XTAL_OFF",
         ]
       }
     }
@@ -478,6 +510,17 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c",
     ]
 
+    if (use_system_view) {
+      sources += [
+        "${chip_root}/examples/platform/silabs/sl_systemview_config.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/Global.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/SEGGER_RTT_Conf.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_SYSVIEW.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/init/SEGGER_SYSVIEW_Init.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/SEGGER_SYSVIEW_FreeRTOS.c",
+      ]
+    }
+
     if (!disable_lcd) {
       sources += [
         "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
@@ -505,7 +548,7 @@ template("siwx917_sdk") {
 
     if (chip_enable_icd_server) {
       sources += [
-        "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/src/sl_si91x_m4_ps.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/sl_si91x_m4_ps.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
       ]

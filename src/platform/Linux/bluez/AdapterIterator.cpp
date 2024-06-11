@@ -17,78 +17,36 @@
 
 #include "AdapterIterator.h"
 
+#include <cstdio>
+
+#include <gio/gio.h>
+
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/PlatformManager.h>
+#include <platform/Linux/dbus/bluez/DbusBluez.h>
+
+#include "BluezObjectIterator.h"
+#include "BluezObjectList.h"
+#include "BluezObjectManager.h"
+#include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-AdapterIterator::~AdapterIterator()
-{
-    if (mManager != nullptr)
-    {
-        g_object_unref(mManager);
-    }
-
-    if (mObjectList != nullptr)
-    {
-        g_list_free_full(mObjectList, g_object_unref);
-    }
-}
-
-CHIP_ERROR AdapterIterator::Initialize(AdapterIterator * self)
-{
-    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
-    // all D-Bus signals will be delivered to the GLib global default main context.
-    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    GAutoPtr<GError> error;
-
-    self->mManager = g_dbus_object_manager_client_new_for_bus_sync(
-        G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
-        bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-        nullptr /* destroy notify */, nullptr /* cancellable */, &error.GetReceiver());
-
-    VerifyOrExit(self->mManager != nullptr, ChipLogError(DeviceLayer, "Failed to get DBUS object manager for listing adapters.");
-                 err = CHIP_ERROR_INTERNAL);
-
-    self->mObjectList      = g_dbus_object_manager_get_objects(self->mManager);
-    self->mCurrentListItem = self->mObjectList;
-
-exit:
-    if (error != nullptr)
-    {
-        ChipLogError(DeviceLayer, "DBus error: %s", error->message);
-    }
-
-    return err;
-}
-
 bool AdapterIterator::Advance()
 {
-    if (mCurrentListItem == nullptr)
+    for (; mIterator != BluezObjectList::end(); ++mIterator)
     {
-        return false;
-    }
-
-    while (mCurrentListItem != nullptr)
-    {
-        BluezAdapter1 * adapter = bluez_object_get_adapter1(BLUEZ_OBJECT(mCurrentListItem->data));
-        if (adapter == nullptr)
+        BluezAdapter1 * adapter = bluez_object_get_adapter1(&(*mIterator));
+        if (adapter != nullptr)
         {
-            mCurrentListItem = mCurrentListItem->next;
-            continue;
+            mCurrentAdapter.reset(adapter);
+            ++mIterator;
+            return true;
         }
-
-        mCurrentAdapter.reset(adapter);
-
-        mCurrentListItem = mCurrentListItem->next;
-
-        return true;
     }
 
     return false;
@@ -112,10 +70,15 @@ uint32_t AdapterIterator::GetIndex() const
 
 bool AdapterIterator::Next()
 {
-    if (mManager == nullptr)
+    if (!mIsInitialized)
     {
-        CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(Initialize, this);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, false, ChipLogError(DeviceLayer, "Failed to initialize adapter iterator"));
+        CHIP_ERROR err = mObjectManager.Init();
+        VerifyOrReturnError(
+            err == CHIP_NO_ERROR, false,
+            ChipLogError(DeviceLayer, "Failed to initialize BlueZ object manager: %" CHIP_ERROR_FORMAT, err.Format()));
+        mObjectList.Init(mObjectManager.GetObjectManager());
+        mIterator      = mObjectList.begin();
+        mIsInitialized = true;
     }
 
     return Advance();

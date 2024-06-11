@@ -82,6 +82,9 @@ public:
      */
     Status GetNetworkPassword(char * credentials);
 
+    /* Returns all supported WiFi bands */
+    uint32_t GetSupportedWiFiBandsMask() const override;
+
     // WiFiDriver
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;

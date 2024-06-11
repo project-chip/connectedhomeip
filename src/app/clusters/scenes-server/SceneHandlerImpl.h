@@ -17,6 +17,7 @@
 
 #include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/types_stub.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {

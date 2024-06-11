@@ -22,23 +22,8 @@ from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
                                     MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
+from pics_support import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
 from spec_parsing_support import build_xml_clusters
-
-
-def attribute_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.A{id:04x}'
-
-
-def accepted_cmd_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02x}.Rsp'
-
-
-def generated_cmd_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02x}.Tx'
-
-
-def feature_pics(pics_base: str, bit: int) -> str:
-    return f'{pics_base}.S.F{bit:02x}'
 
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
@@ -64,14 +49,14 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
         try:
             if attribute_id_of_element_list == GlobalAttributeIds.ATTRIBUTE_LIST_ID:
                 all_spec_elements_to_check = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
-                pics_mapper = attribute_pics
+                pics_mapper = attribute_pics_str
             elif attribute_id_of_element_list == GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID:
                 all_spec_elements_to_check = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]
-                pics_mapper = accepted_cmd_pics
+                pics_mapper = accepted_cmd_pics_str
 
             elif attribute_id_of_element_list == GlobalAttributeIds.GENERATED_COMMAND_LIST_ID:
                 all_spec_elements_to_check = Clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id]
-                pics_mapper = generated_cmd_pics
+                pics_mapper = generated_cmd_pics_str
             else:
                 asserts.fail("add_pics_for_list function called for non-list attribute")
         except KeyError:
@@ -122,6 +107,11 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
         checkable_clusters = {cluster_id: cluster for cluster_id, cluster in Clusters.ClusterObjects.ALL_CLUSTERS.items(
         ) if cluster_id in self.xml_clusters and self.xml_clusters[cluster_id].pics is not None}
 
+        # TODO: consider what we want to do with the OTA clusters. They do not currently have PICS codes.
+        ota_ids = [Clusters.OtaSoftwareUpdateProvider.id, Clusters.OtaSoftwareUpdateRequestor.id]
+        checkable_clusters = {cluster_id: cluster for cluster_id,
+                              cluster in checkable_clusters.items() if cluster_id not in ota_ids}
+
         self.step(2)
         for cluster_id, cluster in checkable_clusters.items():
             # Ensure the PICS.S code is correctly marked
@@ -159,8 +149,20 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                 # Codegen in python uses feature masks (0x01, 0x02, 0x04 etc.)
                 # PICS uses the mask bit number (1, 2, 3)
                 # Convert the mask to a bit number so we can check the PICS.
-                feature_bit = int(math.log2(feature_mask))
-                pics = feature_pics(pics_base, feature_bit)
+                try:
+                    feature_bit = int(math.log2(feature_mask))
+                except ValueError:
+                    location = FeaturePathLocation(endpoint_id=self.endpoint_id,
+                                                   cluster_id=cluster_id, feature_code=str(feature_mask))
+                    # The feature_mask is from the code generated feature masks, not the features as listed on the
+                    # device. If we get an error here, this is a problem with the codegen or spec, not with the device
+                    # under test. We still want the problem recorded, but this does not indicate a problem on the DUT.
+                    # There are two clusters with known bad features here - RvcRunMode and RvcCleanMode both have a
+                    # feature mask of kNoFeatures and an empty "mask" of 0x0.
+                    self.record_warning("PICS check", location=location,
+                                        problem=f"Unable to parse feature mask {feature_mask} from cluster {cluster}")
+                    continue
+                pics = feature_pics_str(pics_base, feature_bit)
                 if feature_mask & feature_map:
                     required = True
                 else:

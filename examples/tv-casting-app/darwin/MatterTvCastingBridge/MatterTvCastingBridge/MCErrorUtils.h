@@ -34,6 +34,8 @@
 
 + (NSError * _Nonnull)NSErrorFromMatterError:(MatterError * _Nonnull)matterError;
 
++ (MatterError * _Nonnull)MatterErrorFromNsError:(NSError * _Nonnull)nsError;
+
 @end
 
 #endif /* MCErrorUtils_h */

@@ -23,9 +23,9 @@
 
 #include <access/SubjectDescriptor.h>
 #include <app/EventLoggingDelegate.h>
+#include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/EventLoggingTypes.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
@@ -84,22 +84,21 @@ class TestContext : public chip::Test::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite() override
+    static void SetUpTestSuite()
     {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUpTestSuite());
-        mClock.Emplace(chip::System::SystemClock());
-        return CHIP_NO_ERROR;
+        chip::Test::AppContext::SetUpTestSuite();
+        sClock.Emplace(chip::System::SystemClock());
     }
 
     // Performs shared teardown for all tests in the test suite
-    void TearDownTestSuite() override
+    static void TearDownTestSuite()
     {
-        mClock.ClearValue();
+        sClock.ClearValue();
         chip::Test::AppContext::TearDownTestSuite();
     }
 
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override
+    void SetUp() override
     {
         const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
@@ -107,16 +106,14 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+        chip::Test::AppContext::SetUp();
 
         CHIP_ERROR err = CHIP_NO_ERROR;
-        VerifyOrExit((err = mEventCounter.Init(0)) == CHIP_NO_ERROR,
-                     ChipLogError(AppServer, "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format()));
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
+                           "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
-
-    exit:
-        return err;
     }
 
     // Performs teardown for each individual test in the test suite
@@ -128,8 +125,10 @@ public:
 
 private:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
-    chip::Optional<MockClock> mClock;
+    static chip::Optional<MockClock> sClock;
 };
+
+chip::Optional<MockClock> TestContext::sClock;
 
 void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
 {
@@ -373,10 +372,10 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "EventLogging",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 
 } // namespace

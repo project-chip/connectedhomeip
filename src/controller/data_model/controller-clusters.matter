@@ -2804,7 +2804,7 @@ provisional cluster Timer = 71 {
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
-provisional cluster OvenCavityOperationalState = 72 {
+cluster OvenCavityOperationalState = 72 {
   revision 1;
 
   enum ErrorStateEnum : enum8 {
@@ -2870,7 +2870,7 @@ provisional cluster OvenCavityOperationalState = 72 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster OvenMode = 73 {
+cluster OvenMode = 73 {
   revision 1;
 
   enum ModeTag : enum16 {
@@ -3526,7 +3526,7 @@ cluster DishwasherAlarm = 93 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster MicrowaveOvenMode = 94 {
+cluster MicrowaveOvenMode = 94 {
   revision 1;
 
   enum ModeTag : enum16 {
@@ -3560,7 +3560,7 @@ provisional cluster MicrowaveOvenMode = 94 {
 }
 
 /** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
-provisional cluster MicrowaveOvenControl = 95 {
+cluster MicrowaveOvenControl = 95 {
   revision 1; // NOTE: Default/not specifically set
 
   bitmap Feature : bitmap32 {
@@ -3988,7 +3988,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 }
 
 /** This cluster is used to configure a boolean sensor. */
-provisional cluster BooleanStateConfiguration = 128 {
+cluster BooleanStateConfiguration = 128 {
   revision 1;
 
   bitmap AlarmModeBitmap : bitmap8 {
@@ -4046,7 +4046,7 @@ provisional cluster BooleanStateConfiguration = 128 {
 }
 
 /** This cluster is used to configure a valve. */
-provisional cluster ValveConfigurationAndControl = 129 {
+cluster ValveConfigurationAndControl = 129 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {
@@ -4112,7 +4112,7 @@ provisional cluster ValveConfigurationAndControl = 129 {
 }
 
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
-provisional cluster ElectricalPowerMeasurement = 144 {
+cluster ElectricalPowerMeasurement = 144 {
   revision 1;
 
   enum MeasurementTypeEnum : enum16 {
@@ -4217,7 +4217,7 @@ provisional cluster ElectricalPowerMeasurement = 144 {
 }
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
-provisional cluster ElectricalEnergyMeasurement = 145 {
+cluster ElectricalEnergyMeasurement = 145 {
   revision 1;
 
   enum MeasurementTypeEnum : enum16 {
@@ -4803,7 +4803,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
-provisional cluster EnergyEvse = 153 {
+cluster EnergyEvse = 153 {
   revision 2;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
@@ -5015,7 +5015,7 @@ provisional cluster EnergyPreference = 155 {
 }
 
 /** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
-provisional cluster PowerTopology = 156 {
+cluster PowerTopology = 156 {
   revision 1;
 
   bitmap Feature : bitmap32 {
@@ -5036,7 +5036,7 @@ provisional cluster PowerTopology = 156 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster EnergyEvseMode = 157 {
+cluster EnergyEvseMode = 157 {
   revision 1;
 
   enum ModeTag : enum16 {
@@ -7045,7 +7045,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 3;
+  revision 4;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
@@ -7652,6 +7652,74 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Functionality to retrieve operational information about a managed Wi-Fi network. */
+cluster WiFiNetworkManagement = 1105 {
+  revision 1;
+
+  readonly attribute nullable octet_string<32> ssid = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct NetworkPassphraseResponse = 1 {
+    octet_string<64> passphrase = 0;
+  }
+
+  /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
+  command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
+}
+
+/** Manages the names and credentials of Thread networks visible to the user. */
+cluster ThreadNetworkDirectory = 1107 {
+  revision 1;
+
+  struct ThreadNetworkStruct {
+    int64u extendedPanID = 0;
+    char_string<16> networkName = 1;
+    int16u channel = 2;
+  }
+
+  info event access(read: operate) NetworkChanged = 0 {
+    int64u extendedPanID = 0;
+  }
+
+  attribute access(read: manage, write: manage) nullable int64u preferredExtendedPanID = 0;
+  readonly attribute access(read: operate) ThreadNetworkStruct threadNetworks[] = 1;
+  readonly attribute int8u threadNetworkTableSize = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddNetworkRequest {
+    octet_string<254> operationalDataset = 0;
+  }
+
+  request struct RemoveNetworkRequest {
+    int64u extendedPanID = 0;
+  }
+
+  request struct GetOperationalDatasetRequest {
+    int64u extendedPanID = 0;
+  }
+
+  response struct OperationalDatasetResponse = 3 {
+    octet_string<254> operationalDataset = 0;
+  }
+
+  /** Adds an entry to the ThreadNetworks list. */
+  timed command access(invoke: manage) AddNetwork(AddNetworkRequest): DefaultSuccess = 0;
+  /** Removes an entry from the ThreadNetworks list. */
+  timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
+  /** Retrieves a Thread Operational Dataset from the ThreadNetworks list. */
+  timed command GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */

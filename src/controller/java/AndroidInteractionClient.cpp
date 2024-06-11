@@ -24,9 +24,10 @@
 #include "AndroidInteractionClient.h"
 
 #include "AndroidCallbacks.h"
-#include "AndroidDeviceControllerWrapper.h"
 
 #include <lib/support/jsontlv/JsonToTlv.h>
+
+#include <string>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -45,7 +46,7 @@ static CHIP_ERROR ParseDataVersionFilterList(jobject dataVersionFilterList,
 
 CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList,
                      jobject eventPathList, jobject dataVersionFilterList, jint minInterval, jint maxInterval,
-                     jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
+                     jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin, jboolean isPeerLIT)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err               = CHIP_NO_ERROR;
@@ -126,6 +127,9 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
     {
         params.mEventNumber.SetValue(static_cast<chip::EventNumber>(JniReferences::GetInstance().LongToPrimitive(eventMin)));
     }
+
+    params.mIsPeerLIT = (isPeerLIT == JNI_TRUE);
+    ChipLogProgress(Controller, "Peer ICD type is set to %s", params.mIsPeerLIT ? "LIT-ICD" : "non LIT-ICD");
 
     if (eventPathList != nullptr)
     {
@@ -627,6 +631,45 @@ exit:
     return err;
 }
 
+CHIP_ERROR shutdownSubscriptions(JNIEnv * env, jlong handle, jobject fabricIndex, jobject peerNodeId, jobject subscriptionId)
+{
+    chip::DeviceLayer::StackLock lock;
+    if (fabricIndex == nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
+    {
+        app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+        return CHIP_NO_ERROR;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId == nullptr)
+    {
+        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        jlong jPeerNodeId = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex),
+                                                                          static_cast<chip::NodeId>(jPeerNodeId));
+        return CHIP_NO_ERROR;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
+    {
+        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex));
+        return CHIP_NO_ERROR;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId != nullptr)
+    {
+        jint jFabricIndex     = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        jlong jPeerNodeId     = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
+        jlong jSubscriptionId = chip::JniReferences::GetInstance().LongToPrimitive(subscriptionId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
+            chip::ScopedNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex)),
+            static_cast<chip::SubscriptionId>(jSubscriptionId));
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement,
                   jint timedRequestTimeoutMs, jint imTimeoutMs)
 {
@@ -762,6 +805,30 @@ exit:
         }
     }
     return err;
+}
+
+jlong getRemoteDeviceId(jlong devicePtr)
+{
+    OperationalDeviceProxy * chipDevice = reinterpret_cast<OperationalDeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return static_cast<jlong>(chip::kUndefinedNodeId);
+    }
+
+    return static_cast<jlong>(chipDevice->GetDeviceId());
+}
+
+jint getFabricIndex(jlong devicePtr)
+{
+    OperationalDeviceProxy * chipDevice = reinterpret_cast<OperationalDeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return static_cast<jint>(chip::kUndefinedFabricIndex);
+    }
+
+    return static_cast<jint>(chipDevice->GetPeerScopedNodeId().GetFabricIndex());
 }
 
 /**

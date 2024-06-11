@@ -142,7 +142,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
         }
 
         status = mCurrentProcessor->Process(block);
-        if (status == CHIP_OTA_CHANGE_PROCESSOR)
+        if (status == CHIP_ERROR_OTA_CHANGE_PROCESSOR)
         {
             mAccumulator.Clear();
             mAccumulator.Init(sizeof(OTATlvHeader));
@@ -179,11 +179,11 @@ CHIP_ERROR OTAImageProcessorImpl::SelectProcessor(ByteSpan & block)
     auto pair = mProcessorMap.find(header.tag);
     if (pair == mProcessorMap.end())
     {
-        ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %lu", header.tag);
-        return CHIP_OTA_PROCESSOR_NOT_REGISTERED;
+        ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %" PRIu32, header.tag);
+        return CHIP_ERROR_OTA_PROCESSOR_NOT_REGISTERED;
     }
 
-    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %lu", pair->first);
+    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %ld", pair->first);
     mCurrentProcessor = pair->second;
     mCurrentProcessor->SetLength(header.length);
     mCurrentProcessor->SetWasSelected(true);
@@ -196,8 +196,8 @@ CHIP_ERROR OTAImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcesso
     auto pair = mProcessorMap.find(tag);
     if (pair != mProcessorMap.end())
     {
-        ChipLogError(SoftwareUpdate, "A processor for tag %lu is already registered.", tag);
-        return CHIP_OTA_PROCESSOR_ALREADY_REGISTERED;
+        ChipLogError(SoftwareUpdate, "A processor for tag %" PRIu32 " is already registered.", tag);
+        return CHIP_ERROR_OTA_PROCESSOR_ALREADY_REGISTERED;
     }
 
     mProcessorMap.insert({ tag, processor });
@@ -249,7 +249,7 @@ void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
         mParams.downloadedBytes += mBlock.size();
         FetchNextData(0);
     }
-    else if (status == CHIP_OTA_FETCH_ALREADY_SCHEDULED)
+    else if (status == CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED)
     {
         mParams.downloadedBytes += mBlock.size();
     }
@@ -298,8 +298,8 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
     if (currentVersion != targetVersion)
     {
-        ChipLogError(SoftwareUpdate, "Current sw version %lu is different than the expected sw version = %lu", currentVersion,
-                     targetVersion);
+        ChipLogError(SoftwareUpdate, "Current sw version %" PRIu32 " is different than the expected sw version = %" PRIu32,
+                     currentVersion, targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -384,17 +384,14 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     imageProcessor->mAccumulator.Clear();
 
     ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
+    PlatformMgr().HandleServerShuttingDown();
 
     // Set the necessary information to inform the SSBL that a new image is available
     // and trigger the actual device reboot after some time, to take into account
     // queued actions, e.g. sending events to a subscription
     SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
-        [](chip::System::Layer *, void *) {
-            PlatformMgr().HandleServerShuttingDown();
-            OtaHookReset();
-        },
-        nullptr);
+        [](chip::System::Layer *, void *) { OtaHookReset(); }, nullptr);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
@@ -410,7 +407,6 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 
 void OTAImageProcessorImpl::FetchNextData(uint32_t context)
 {
-    CHIP_ERROR error      = CHIP_NO_ERROR;
     auto * imageProcessor = &OTAImageProcessorImpl::GetDefaultInstance();
     SystemLayer().ScheduleLambda([imageProcessor] {
         if (imageProcessor->mDownloader)

@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/Session.h>
 #include <transport/raw/MessageHeader.h>
@@ -79,6 +80,15 @@ public:
      *   establishment.
      */
     virtual void OnSessionEstablished(const SessionHandle & session) {}
+
+    /**
+     * Called when the responder has responded with a "busy" status code and
+     * provided a requested delay.
+     *
+     * This call will be followed by an OnSessionEstablishmentError with
+     * CHIP_ERROR_BUSY as the error.
+     */
+    virtual void OnResponderBusy(System::Clock::Milliseconds16 requestedDelay) {}
 
     virtual ~SessionEstablishmentDelegate() {}
 };

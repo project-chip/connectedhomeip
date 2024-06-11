@@ -18,12 +18,14 @@
 
 #include "messaging/ExchangeContext.h"
 #include <app/AppConfig.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/TypeTraits.h>
 
@@ -34,10 +36,12 @@ using namespace Protocols::InteractionModel;
 using Status                         = Protocols::InteractionModel::Status;
 constexpr uint8_t kListAttributeType = 0x48;
 
-CHIP_ERROR WriteHandler::Init()
+CHIP_ERROR WriteHandler::Init(WriteHandlerDelegate * apWriteHandlerDelegate)
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(apWriteHandlerDelegate, CHIP_ERROR_INVALID_ARGUMENT);
 
+    mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
 
     mACLCheckCache.ClearValue();
@@ -239,7 +243,8 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
 
         processingConcreteAttributePath.mEndpointId = mapping.endpoint_id;
 
-        if (!InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, processingConcreteAttributePath))
+        VerifyOrReturnError(mDelegate, CHIP_ERROR_INCORRECT_STATE);
+        if (!mDelegate->HasConflictWriteRequests(this, processingConcreteAttributePath))
         {
             DeliverListWriteEnd(processingConcreteAttributePath, writeWasSuccessful);
         }
@@ -304,7 +309,8 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
 
-        if (InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, dataAttributePath) ||
+        VerifyOrExit(mDelegate, err = CHIP_ERROR_INCORRECT_STATE);
+        if (mDelegate->HasConflictWriteRequests(this, dataAttributePath) ||
             // Per chunking protocol, we are processing the list entries, but the initial empty list is not processed, so we reject
             // it with Busy status code.
             (dataAttributePath.IsListItemOperation() && !IsSameAttribute(mProcessingAttributePath, dataAttributePath)))
@@ -327,7 +333,9 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         mProcessingAttributeIsList = dataAttributePath.IsListOperation();
         mProcessingAttributePath.SetValue(dataAttributePath);
 
-        MatterPreAttributeWriteCallback(dataAttributePath);
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                              DataModelCallbacks::OperationOrder::Pre, dataAttributePath);
+
         TLV::TLVWriter backup;
         DataVersion version = 0;
         mWriteResponseBuilder.GetWriteResponses().Checkpoint(backup);
@@ -347,7 +355,9 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             mWriteResponseBuilder.GetWriteResponses().Rollback(backup);
             err = AddStatus(dataAttributePath, StatusIB(err));
         }
-        MatterPostAttributeWriteCallback(dataAttributePath);
+
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                              DataModelCallbacks::OperationOrder::Post, dataAttributePath);
         SuccessOrExit(err);
     }
 
@@ -452,13 +462,15 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             {
                 auto processingConcreteAttributePath        = mProcessingAttributePath.Value();
                 processingConcreteAttributePath.mEndpointId = mapping.endpoint_id;
-                if (!InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, processingConcreteAttributePath))
+                VerifyOrExit(mDelegate, err = CHIP_ERROR_INCORRECT_STATE);
+                if (mDelegate->HasConflictWriteRequests(this, processingConcreteAttributePath))
                 {
                     DeliverListWriteEnd(processingConcreteAttributePath, true /* writeWasSuccessful */);
                 }
             }
 
-            if (InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, dataAttributePath))
+            VerifyOrExit(mDelegate, err = CHIP_ERROR_INCORRECT_STATE);
+            if (mDelegate->HasConflictWriteRequests(this, dataAttributePath))
             {
                 ChipLogDetail(DataManagement,
                               "Writing attribute endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI
@@ -481,7 +493,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
             chip::TLV::TLVReader tmpDataReader(dataReader);
 
-            MatterPreAttributeWriteCallback(dataAttributePath);
+            DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                                  DataModelCallbacks::OperationOrder::Pre, dataAttributePath);
             err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, tmpDataReader, this);
 
             if (err != CHIP_NO_ERROR)
@@ -492,7 +505,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                              mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                              ChipLogValueMEI(dataAttributePath.mAttributeId), err.Format());
             }
-            MatterPostAttributeWriteCallback(dataAttributePath);
+            DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                                  DataModelCallbacks::OperationOrder::Post, dataAttributePath);
         }
 
         dataAttributePath.mEndpointId = kInvalidEndpointId;
@@ -676,6 +690,3 @@ void WriteHandler::MoveToState(const State aTargetState)
 
 } // namespace app
 } // namespace chip
-
-void __attribute__((weak)) MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-void __attribute__((weak)) MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}

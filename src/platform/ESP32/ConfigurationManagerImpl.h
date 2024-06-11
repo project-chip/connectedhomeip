@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <platform/ESP32/CHIPDevicePlatformConfig.h>
+
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
