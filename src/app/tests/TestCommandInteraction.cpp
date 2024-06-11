@@ -127,7 +127,8 @@ public:
 
         TLV::TLVType outerContainerType;
         ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outerContainerType));
-        ReturnErrorOnFailure(app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer_.Get(), mBuffer_.AllocatedSize())));
+        ReturnErrorOnFailure(
+            app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer_.Get(), mBuffer_.AllocatedSize())));
         return aWriter.EndContainer(outerContainerType);
     }
 
@@ -363,8 +364,7 @@ public:
     static void TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerAcceptMultipleCommands(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked(nlTestSuite * apSuite,
-                                                                                                  void * apContext);
+    static void TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
                                                                                                   void * apContext);
     static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(nlTestSuite * apSuite,
@@ -1947,8 +1947,7 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     NL_TEST_ASSERT(apSuite, commandDispatchedCount == 2);
 }
 
-void TestCommandInteraction::TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked(
-    nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1966,7 +1965,7 @@ void TestCommandInteraction::TestCommandSender_ValidateSecondLargeAddRequestData
     // The specific values chosen here are arbitrary.
     uint16_t firstCommandRef  = 1;
     uint16_t secondCommandRef = 2;
-    auto commandPathParams = MakeTestCommandPath();
+    auto commandPathParams    = MakeTestCommandPath();
     SimpleTLVPayload simplePayloadWriter;
     addRequestDataParams.SetCommandRef(firstCommandRef);
 
@@ -1990,7 +1989,8 @@ void TestCommandInteraction::TestCommandSender_ValidateSecondLargeAddRequestData
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite,
-                   mockCommandSenderExtendedDelegate.onResponseCalledTimes == 1 && mockCommandSenderExtendedDelegate.onFinalCalledTimes == 1 &&
+                   mockCommandSenderExtendedDelegate.onResponseCalledTimes == 1 &&
+                       mockCommandSenderExtendedDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderExtendedDelegate.onErrorCalledTimes == 0);
 }
 

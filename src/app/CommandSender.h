@@ -517,7 +517,8 @@ private:
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
-    struct RollbackData {
+    struct RollbackData
+    {
         TLV::TLVWriter backupWriter;
         State backupState;
         bool rollbackIsValid = false;

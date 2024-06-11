@@ -135,7 +135,7 @@ void CommandSender::CreateBackupForRequestRollback(RollbackData & aRollbackData)
     VerifyOrReturn(mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
     VerifyOrReturn(mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
     mInvokeRequestBuilder.Checkpoint(aRollbackData.backupWriter);
-    aRollbackData.backupState = mState;
+    aRollbackData.backupState     = mState;
     aRollbackData.rollbackIsValid = true;
 }
 
@@ -570,7 +570,7 @@ CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath,
     CreateBackupForRequestRollback(rollbackData);
     PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
     TLV::TLVWriter * writer = nullptr;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     SuccessOrExit(err = PrepareCommand(aCommandPath, prepareCommandParams));
     writer = GetCommandDataIBTLVWriter();
     VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -580,7 +580,8 @@ CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath,
         SuccessOrExit(err = FinishCommand(finishCommandParams));
     }
 exit:
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         RollbackRequest(rollbackData);
     }
     return err;
