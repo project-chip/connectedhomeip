@@ -475,77 +475,68 @@ Status Instance::ValidateTargets(
 
 void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData)
 {
+    Commands::GetTargetsResponse::Type response;
 
-    CHIP_ERROR err                               = CHIP_NO_ERROR;
-    app::CommandHandler::Handle commandHandleRef = CommandHandler::Handle(&ctx.mCommandHandler);
-    auto commandHandle                           = commandHandleRef.Get();
-
-    TLV::TLVWriter * writer;
-    TLV::TLVType listContainerType;
     EvseTargetIterator * it = nullptr;
 
     EvseTargetEntry chargingTargetScheduleEntry;
-    Structs::ChargingTargetScheduleStruct::Type entry;
-    Structs::ChargingTargetStruct::Type array[kEvseTargetsMaxTargetsPerDay];
 
-    if (commandHandle == nullptr)
+    // See if we can get an targest iterator. If not return with a bad command
+    CHIP_ERROR err = mDelegate.PrepareGetTargets(&it);
+    if (err != CHIP_NO_ERROR || it == nullptr)
     {
-        // When the platform has shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        if (err == CHIP_NO_ERROR)
+        {
+            err = CHIP_ERROR_UNINITIALIZED;
+        }
+
+        ChipLogError(Zcl, "Failed to GetTargets: %" CHIP_ERROR_FORMAT, err.Format());
+
+        // Release iterator and any memory
+        mDelegate.GetTargetsFinished();
+
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, StatusIB(err).mStatus);
         return;
     }
 
-    const CommandHandler::InvokeResponseParameters prepareParams(ctx.mRequestPath);
-    SuccessOrExit(
-        err = commandHandle->PrepareInvokeResponseCommand(
-            ConcreteCommandPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, Commands::GetTargetsResponse::Id),
-            prepareParams));
+    // Going to iterate over each chargingTargetScheduleEntry building up the chargingTargets
+    EnergyEvse::Structs::ChargingTargetStruct::Type chargingTargets[kEvseTargetsMaxNumberOfDays][kEvseTargetsMaxTargetsPerDay];
 
-    VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    Structs::ChargingTargetScheduleStruct::Type chargingTargetSchedulesArray[kEvseTargetsMaxNumberOfDays];
 
-    SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::GetTargetsResponse::Fields::kChargingTargetSchedules),
-                                               TLV::TLVType::kTLVType_Array, listContainerType));
-
-    SuccessOrExit(err = mDelegate.PrepareGetTargets(&it));
-    VerifyOrExit(it != nullptr, err = CHIP_ERROR_UNINITIALIZED);
-
+    uint16_t chargingTargetSchedulesIdx = 0;
     while (it->Next(chargingTargetScheduleEntry))
     {
-        entry.dayOfWeekForSequence = chargingTargetScheduleEntry.dayOfWeekMap;
+        uint8_t chargingTargetStructIdx = 0;
 
-        uint8_t index = 0;
-        // copy from our vector to a local array of structs which we can reduce to the length required
-        // so we can pass it into our Encode engine
         for (const EvseChargingTarget & chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
         {
-            array[index].targetTimeMinutesPastMidnight = chargingTarget.targetTimeMinutesPastMidnight;
-            array[index].targetSoC                     = chargingTarget.targetSoC;
-            array[index].addedEnergy                   = chargingTarget.addedEnergy;
-            index++;
+            chargingTargets[chargingTargetSchedulesIdx][chargingTargetStructIdx].targetTimeMinutesPastMidnight = chargingTarget.targetTimeMinutesPastMidnight;
+            chargingTargets[chargingTargetSchedulesIdx][chargingTargetStructIdx].targetSoC                     = chargingTarget.targetSoC;
+            chargingTargets[chargingTargetSchedulesIdx][chargingTargetStructIdx].addedEnergy                   = chargingTarget.addedEnergy;
+
+            chargingTargetStructIdx++;
         }
 
-        DataModel::List<Structs::ChargingTargetStruct::Type> mSpan(array, index);
-        entry.chargingTargets = mSpan;
+        chargingTargetSchedulesArray[chargingTargetSchedulesIdx].chargingTargets =
+            chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(chargingTargets[chargingTargetSchedulesIdx], chargingTargetStructIdx);
 
-        SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), entry));
+        chargingTargetSchedulesArray[chargingTargetSchedulesIdx].dayOfWeekForSequence = chargingTargetScheduleEntry.dayOfWeekMap;
+
+        chargingTargetSchedulesIdx++;
     }
 
-    SuccessOrExit(err = writer->EndContainer(listContainerType));
-    SuccessOrExit(err = commandHandle->FinishCommand());
+    DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedulesList(chargingTargetSchedulesArray, chargingTargetSchedulesIdx);
+
+    response.chargingTargetSchedules = chargingTargetSchedulesList;
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+
     // Release iterator and any memory
     mDelegate.GetTargetsFinished();
-    return;
-
-exit:
-    // Release iterator and any memory
-    mDelegate.GetTargetsFinished();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to encode response: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, StatusIB(err).mStatus);
 }
+
 void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData)
 {
     // Call the delegate
