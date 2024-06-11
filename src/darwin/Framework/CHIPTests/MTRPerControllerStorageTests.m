@@ -16,7 +16,10 @@
 
 #import <Matter/Matter.h>
 
+#import <os/lock.h>
+
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
@@ -31,6 +34,7 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
+static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -158,6 +162,8 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                                                            nodeID:self.nextNodeID
                                                             caseAuthenticatedTags:nil
                                                                             error:&error];
+    // Release no-longer-needed key before we do anything else.
+    CFRelease(publicKey);
     XCTAssertNil(error);
     XCTAssertNotNil(operationalCert);
 
@@ -185,6 +191,10 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)setUp
 {
+    // Set detectLeaks true first, in case our superclass wants to do something
+    // in setUp when it's set.
+    self.detectLeaks = YES;
+
     // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];
@@ -221,6 +231,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)commissionWithController:(MTRDeviceController *)controller newNodeID:(NSNumber *)newNodeID
 {
+    [self commissionWithController:controller newNodeID:newNodeID onboardingPayload:kOnboardingPayload];
+}
+
+- (void)commissionWithController:(MTRDeviceController *)controller newNodeID:(NSNumber *)newNodeID onboardingPayload:(NSString *)onboardingPayload
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
     __auto_type * deviceControllerDelegate = [[MTRPerControllerStorageTestsControllerDelegate alloc] initWithExpectation:expectation
@@ -230,7 +245,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 
     NSError * error;
-    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:&error];
     XCTAssertNil(error);
     XCTAssertNotNil(payload);
 
@@ -245,10 +260,12 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                                      fabricID:(NSNumber *)fabricID
                                                        nodeID:(NSNumber *)nodeID
                                                       storage:(MTRTestPerControllerStorage *)storage
-                                        caseAuthenticatedTags:(nullable NSSet *)caseAuthenticatedTags
+                                        caseAuthenticatedTags:(NSSet * _Nullable)caseAuthenticatedTags
                                                         error:(NSError * __autoreleasing *)error
                                             certificateIssuer:
                                                 (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+                               concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+                                 storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration * _Nullable)storageBehaviorConfiguration
 {
     XCTAssertTrue(error != NULL);
 
@@ -293,7 +310,72 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     [params setOperationalCertificateIssuer:ourCertificateIssuer queue:dispatch_get_main_queue()];
 
+    if (concurrentSubscriptionPoolSize > 0) {
+        params.concurrentSubscriptionEstablishmentsAllowedOnThread = concurrentSubscriptionPoolSize;
+    }
+
+    if (storageBehaviorConfiguration) {
+        params.storageBehaviorConfiguration = storageBehaviorConfiguration;
+    }
+
     return [[MTRDeviceController alloc] initWithParameters:params error:error];
+}
+
+- (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
+                                              operationalKeys:(MTRTestKeys *)operationalKeys
+                                                     fabricID:(NSNumber *)fabricID
+                                                       nodeID:(NSNumber *)nodeID
+                                                      storage:(MTRTestPerControllerStorage *)storage
+                                        caseAuthenticatedTags:(nullable NSSet *)caseAuthenticatedTags
+                                                        error:(NSError * __autoreleasing *)error
+                                            certificateIssuer:
+                                                (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+{
+    return [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys fabricID:fabricID nodeID:nodeID storage:storage caseAuthenticatedTags:caseAuthenticatedTags error:error certificateIssuer:certificateIssuer concurrentSubscriptionPoolSize:0 storageBehaviorConfiguration:nil];
+}
+
+- (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
+                                              operationalKeys:(MTRTestKeys *)operationalKeys
+                                                     fabricID:(NSNumber *)fabricID
+                                                       nodeID:(NSNumber *)nodeID
+                                                      storage:(MTRTestPerControllerStorage *)storage
+                                                        error:(NSError * __autoreleasing *)error
+                                            certificateIssuer:
+                                                (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+                               concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+{
+    return [self startControllerWithRootKeys:rootKeys
+                             operationalKeys:operationalKeys
+                                    fabricID:fabricID
+                                      nodeID:nodeID
+                                     storage:storage
+                       caseAuthenticatedTags:nil
+                                       error:error
+                           certificateIssuer:certificateIssuer
+              concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
+                storageBehaviorConfiguration:nil];
+}
+
+- (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
+                                              operationalKeys:(MTRTestKeys *)operationalKeys
+                                                     fabricID:(NSNumber *)fabricID
+                                                       nodeID:(NSNumber *)nodeID
+                                                      storage:(MTRTestPerControllerStorage *)storage
+                                                        error:(NSError * __autoreleasing *)error
+                                            certificateIssuer:
+                                                (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+                                 storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration * _Nullable)storageBehaviorConfiguration
+{
+    return [self startControllerWithRootKeys:rootKeys
+                             operationalKeys:operationalKeys
+                                    fabricID:fabricID
+                                      nodeID:nodeID
+                                     storage:storage
+                       caseAuthenticatedTags:nil
+                                       error:error
+                           certificateIssuer:certificateIssuer
+              concurrentSubscriptionPoolSize:0
+                storageBehaviorConfiguration:storageBehaviorConfiguration];
 }
 
 - (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
@@ -312,7 +394,9 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                      storage:storage
                        caseAuthenticatedTags:nil
                                        error:error
-                           certificateIssuer:certificateIssuer];
+                           certificateIssuer:certificateIssuer
+              concurrentSubscriptionPoolSize:0
+                storageBehaviorConfiguration:nil];
 }
 
 - (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
@@ -330,7 +414,9 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                      storage:storage
                        caseAuthenticatedTags:caseAuthenticatedTags
                                        error:error
-                           certificateIssuer:nil];
+                           certificateIssuer:nil
+              concurrentSubscriptionPoolSize:0
+                storageBehaviorConfiguration:nil];
 }
 
 - (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
@@ -351,8 +437,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)test001_BasicControllerStartup
 {
-    self.detectLeaks = YES;
-
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -401,8 +485,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)test002_TryStartingTwoControllersWithSameNodeID
 {
-    self.detectLeaks = YES;
-
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
@@ -1305,7 +1387,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertFalse([controller isRunning]);
 }
 
-- (void)doDataStoreMTRDeviceTestWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+- (void)doDataStoreMTRDeviceTestWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate disableStorageBehaviorOptimization:(BOOL)disableStorageBehaviorOptimization
 {
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -1324,13 +1406,18 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     NSError * error;
 
     MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
+    if (disableStorageBehaviorOptimization) {
+        storageBehaviorConfiguration = [MTRDeviceStorageBehaviorConfiguration configurationWithStorageBehaviorOptimizationDisabled];
+    }
     MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
                                                          operationalKeys:operationalKeys
                                                                 fabricID:fabricID
                                                                   nodeID:nodeID
                                                                  storage:storageDelegate
                                                                    error:&error
-                                                       certificateIssuer:&certificateIssuer];
+                                                       certificateIssuer:&certificateIssuer
+                                            storageBehaviorConfiguration:storageBehaviorConfiguration];
     XCTAssertNil(error);
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
@@ -1349,14 +1436,29 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
 
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    XCTestExpectation * gotClusterDataPersisted = nil;
+    if (!disableStorageBehaviorOptimization) {
+        gotClusterDataPersisted = [self expectationWithDescription:@"Cluster data persisted"];
+    }
 
     delegate.onReportEnd = ^{
         [subscriptionExpectation fulfill];
     };
+    delegate.onClusterDataPersisted = ^{
+        [gotClusterDataPersisted fulfill];
+    };
+
+    // Verify that initially (before we have ever subscribed while using this
+    // datastore) the device has no estimate for subscription latency.
+    XCTAssertNil(device.estimatedSubscriptionLatency);
 
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    if (!disableStorageBehaviorOptimization) {
+        [self waitForExpectations:@[ gotClusterDataPersisted ] timeout:60];
+    }
 
     NSUInteger dataStoreValuesCount = 0;
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
@@ -1392,18 +1494,35 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValuesCount;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
 
+    // Check that the new device has an estimated subscription latency.
+    XCTAssertNotNil(device.estimatedSubscriptionLatency);
+
+    // Check that this estimate is positive, since subscribing must have taken
+    // some time.
+    XCTAssertGreaterThan(device.estimatedSubscriptionLatency.doubleValue, 0);
+
     // Now set up new delegate for the new device and verify that once subscription reestablishes, the data version filter loaded from storage will work
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
 
     XCTestExpectation * newDeviceSubscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up for new device"];
+    XCTestExpectation * newDeviceGotClusterDataPersisted = nil;
+    if (!disableStorageBehaviorOptimization) {
+        newDeviceGotClusterDataPersisted = [self expectationWithDescription:@"Cluster data persisted on new device"];
+    }
 
     newDelegate.onReportEnd = ^{
         [newDeviceSubscriptionExpectation fulfill];
+    };
+    newDelegate.onClusterDataPersisted = ^{
+        [newDeviceGotClusterDataPersisted fulfill];
     };
 
     [newDevice setDelegate:newDelegate queue:queue];
 
     [self waitForExpectations:@[ newDeviceSubscriptionExpectation ] timeout:60];
+    if (!disableStorageBehaviorOptimization) {
+        [self waitForExpectations:@[ newDeviceGotClusterDataPersisted ] timeout:60];
+    }
     newDelegate.onReportEnd = nil;
 
     // 1) MTRDevice actually gets some attributes reported more than once
@@ -1423,7 +1542,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)test009_TestDataStoreMTRDevice
 {
-    [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]]];
+    [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]] disableStorageBehaviorOptimization:NO];
 }
 
 - (void)test010_TestDataStoreMTRDeviceWithBulkReadWrite
@@ -1431,7 +1550,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
 
     // First do the same test as the above
-    [self doDataStoreMTRDeviceTestWithStorageDelegate:storageDelegate];
+    [self doDataStoreMTRDeviceTestWithStorageDelegate:storageDelegate disableStorageBehaviorOptimization:NO];
 
     // Then restart controller with same storage and see that bulk read through MTRDevice initialization works
 
@@ -1474,6 +1593,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
+}
+
+- (void)test011_TestDataStoreMTRDeviceWithStorageBehaviorOptimizationDisabled
+{
+    [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]] disableStorageBehaviorOptimization:YES];
 }
 
 // TODO: This might want to go in a separate test file, with some shared setup
@@ -2000,6 +2124,156 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     [controllerClient shutdown];
     [controllerServer shutdown];
+}
+
+- (void)testSetMRPParametersWithRunningController
+{
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerWithRootKeys:[[MTRTestKeys alloc] init]
+                                                         operationalKeys:[[MTRTestKeys alloc] init]
+                                                                fabricID:@555
+                                                                  nodeID:@888
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue(controller.running);
+    MTRSetMessageReliabilityParameters(@2000, @2000, @2000, @2000);
+    [controller shutdown];
+
+    // Now reset back to the default state, so timings in other tests are not
+    // affected.
+    MTRSetMessageReliabilityParameters(nil, nil, nil, nil);
+}
+
+// TODO: This might also want to go in a separate test file, with some shared setup for commissioning devices per test
+- (void)doTestSubscriptionPoolWithSize:(NSInteger)subscriptionPoolSize
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * nodeID = @(555);
+    NSNumber * fabricID = @(555);
+
+    NSError * error;
+
+    // Test DeviceController with a Subscription pool
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer
+                                          concurrentSubscriptionPoolSize:subscriptionPoolSize];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // QRCodes generated for discriminators 101~105 and passcodes 1001~1005
+    NSArray<NSNumber *> * orderedDeviceIDs = @[ @(101), @(102), @(103), @(104), @(105) ];
+    NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
+        @(101) : @"MT:00000EBQ15IZC900000",
+        @(102) : @"MT:00000MNY16-AD900000",
+        @(103) : @"MT:00000UZ427GOD900000",
+        @(104) : @"MT:00000CQM00Z.D900000",
+        @(105) : @"MT:00000K0V01FDE900000",
+    };
+
+    // Commission 5 devices
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        certificateIssuer.nextNodeID = deviceID;
+        [self commissionWithController:controller newNodeID:deviceID onboardingPayload:deviceOnboardingPayloads[deviceID]];
+    }
+
+    // Set up expectations and delegates
+
+    NSDictionary<NSNumber *, XCTestExpectation *> * subscriptionExpectations = @{
+        @(101) : [self expectationWithDescription:@"Subscription 1 has been set up"],
+        @(102) : [self expectationWithDescription:@"Subscription 2 has been set up"],
+        @(103) : [self expectationWithDescription:@"Subscription 3 has been set up"],
+        @(104) : [self expectationWithDescription:@"Subscription 4 has been set up"],
+        @(105) : [self expectationWithDescription:@"Subscription 5 has been set up"],
+    };
+
+    NSDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = @{
+        @(101) : [[MTRDeviceTestDelegate alloc] init],
+        @(102) : [[MTRDeviceTestDelegate alloc] init],
+        @(103) : [[MTRDeviceTestDelegate alloc] init],
+        @(104) : [[MTRDeviceTestDelegate alloc] init],
+        @(105) : [[MTRDeviceTestDelegate alloc] init],
+    };
+
+    // Test with counters
+    __block os_unfair_lock counterLock = OS_UNFAIR_LOCK_INIT;
+    __block NSUInteger subscriptionRunningCount = 0;
+    __block NSUInteger subscriptionDequeueCount = 0;
+
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
+        delegate.pretendThreadEnabled = YES;
+
+        delegate.onSubscriptionPoolDequeue = ^{
+            // Count subscribing when dequeued from the subscription pool
+            os_unfair_lock_lock(&counterLock);
+            subscriptionRunningCount++;
+            subscriptionDequeueCount++;
+            // At any given moment, only up to subscriptionPoolSize subcriptions can be going on
+            XCTAssertLessThanOrEqual(subscriptionRunningCount, subscriptionPoolSize);
+            os_unfair_lock_unlock(&counterLock);
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            // Stop counting subscribing right before calling work item completion
+            os_unfair_lock_lock(&counterLock);
+            subscriptionRunningCount--;
+            os_unfair_lock_unlock(&counterLock);
+        };
+        __weak __auto_type weakDelegate = delegate;
+        delegate.onReportEnd = ^{
+            [subscriptionExpectations[deviceID] fulfill];
+            // reset callback so expectation not fulfilled twice, given the run time of this can be long due to subscription pool
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReportEnd = nil;
+        };
+    }
+
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+        [device setDelegate:deviceDelegates[deviceID] queue:queue];
+    }
+
+    // Make the wait time depend on pool size and device count (can expand number of devices in the future)
+    [self waitForExpectations:subscriptionExpectations.allValues timeout:(kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count / subscriptionPoolSize)];
+
+    XCTAssertEqual(subscriptionDequeueCount, orderedDeviceIDs.count);
+
+    // Reset our commissionees.
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+        ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+    }
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)testSubscriptionPool
+{
+    [self doTestSubscriptionPoolWithSize:1];
+    [self doTestSubscriptionPoolWithSize:2];
 }
 
 @end

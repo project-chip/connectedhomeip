@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2022-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -114,6 +114,7 @@ class TelinkApp(Enum):
 
 
 class TelinkBoard(Enum):
+    TLRS9118BDK40D = auto()
     TLSR9518ADK80D = auto()
     TLSR9528A = auto()
     TLSR9528A_RETENTION = auto()
@@ -121,7 +122,9 @@ class TelinkBoard(Enum):
     TLSR9258A_RETENTION = auto()
 
     def GnArgName(self):
-        if self == TelinkBoard.TLSR9518ADK80D:
+        if self == TelinkBoard.TLRS9118BDK40D:
+            return 'tlsr9118bdk40d'
+        elif self == TelinkBoard.TLSR9518ADK80D:
             return 'tlsr9518adk80d'
         elif self == TelinkBoard.TLSR9528A:
             return 'tlsr9528a'

@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:47
+            image: ghcr.io/project-chip/chip-build:50
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -63,8 +63,6 @@ jobs:
                         --enable-flashbundle \
                         --target qpg-qpg6105-lock \
                         --target qpg-qpg6105-light \
-                        --target qpg-qpg6105-shell \
-                        --target qpg-qpg6105-persistent-storage \
                         --target qpg-qpg6105-light-switch \
                         --target qpg-qpg6105-thermostat \
                         build \

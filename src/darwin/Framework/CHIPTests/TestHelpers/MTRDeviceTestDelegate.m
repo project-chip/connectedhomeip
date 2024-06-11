@@ -69,4 +69,47 @@
 {
     return self.forceAttributeReportsIfMatchingCache;
 }
+
+- (void)deviceConfigurationChanged:(MTRDevice *)device
+{
+    if (self.onDeviceConfigurationChanged != nil) {
+        self.onDeviceConfigurationChanged();
+    }
+}
+
+- (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device
+{
+    return self.pretendThreadEnabled;
+}
+
+- (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device
+{
+    if (self.onSubscriptionPoolDequeue != nil) {
+        self.onSubscriptionPoolDequeue();
+    }
+}
+
+- (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device
+{
+    if (self.onSubscriptionPoolWorkComplete != nil) {
+        self.onSubscriptionPoolWorkComplete();
+    }
+}
+
+- (void)unitTestClusterDataPersisted:(MTRDevice *)device
+{
+    if (self.onClusterDataPersisted != nil) {
+        self.onClusterDataPersisted();
+    }
+}
+
+@end
+
+@implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride
+
+- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device
+{
+    return !_skipSetupSubscription;
+}
+
 @end

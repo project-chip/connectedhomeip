@@ -96,7 +96,9 @@
 #endif /* CHIP_ENABLE_OPENTHREAD */
 #endif /* defined(SL_WIFI) */
 
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+#endif
 
 #if defined(SL_WIFI)
 

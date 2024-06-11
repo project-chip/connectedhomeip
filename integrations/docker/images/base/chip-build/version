@@ -1,1 +1,1 @@
-49 : [Silabs] Update SDKs to new versions
+53 : [Tizen] Add libatomic.so to QEMU Docker image

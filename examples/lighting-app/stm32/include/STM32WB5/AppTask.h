@@ -26,6 +26,7 @@
 #include "LightingManager.h"
 #include "app_entry.h"
 
+#include <DeviceInfoProviderImpl.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/stm32/FactoryDataProvider.h>
 #define APP_NAME "Lighting-app"
@@ -55,9 +56,10 @@ private:
     static void FunctionHandler(AppEvent * aEvent);
     static void LightingActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
-    static void DelayNvmHandler(TimerHandle_t xTimer);
     static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+#if (OTA_SUPPORT == 0)
     static void UpdateLCD(void);
+#endif
     static void UpdateNvmEventHandler(AppEvent * aEvent);
 
     enum Function_t

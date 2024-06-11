@@ -308,6 +308,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "stm32") {
       device_layer_target_define = "STM32"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=stm32" ]
+    } else if (chip_device_platform == "nuttx") {
+      device_layer_target_define = "NUTTX"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=NuttX",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
     } else {
       device_layer_target_define = ""
     }
@@ -346,6 +352,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "OPEN_IOT_SDK",
       "ASR",
       "STM32",
+      "NUTTX",
     ]
     foreach(possible_device_layer_target_define,
             possible_device_layer_target_defines) {
@@ -418,7 +425,9 @@ if (chip_device_platform != "none") {
   source_set("platform_base") {
     public_deps = [
       ":platform_config_header",
+      "${chip_root}/src/app/icd/server:icd-server-config",
       "${chip_root}/src/ble",
+      "${chip_root}/src/credentials:build_time_header",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
@@ -507,10 +516,7 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
-      "${chip_root}/src/app:app_config",
       "${chip_root}/src/app/common:cluster-objects",
-      "${chip_root}/src/app/icd/server:icd-server-config",
-      "${chip_root}/src/credentials:build_time_header",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]
@@ -577,6 +583,8 @@ if (chip_device_platform != "none") {
       _platform_target = "ASR"
     } else if (chip_device_platform == "stm32") {
       _platform_target = "stm32"
+    } else if (chip_device_platform == "nuttx") {
+      _platform_target = "NuttX"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }

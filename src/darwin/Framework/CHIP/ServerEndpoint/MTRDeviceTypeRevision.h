@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
  * specification.  This has an identifier and a version number.
  */
 NS_SWIFT_SENDABLE
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceTypeRevision : NSObject <NSCopying>
 
 - (instancetype)init NS_UNAVAILABLE;

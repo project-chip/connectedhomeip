@@ -24,7 +24,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/Ble.h>
+#include <ble/BleUUID.h>
+#include <ble/CHIPBleServiceData.h>
 #include <platform/internal/BLEManager.h>
 
 #include <lib/support/CodeUtils.h>
@@ -445,7 +446,15 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     mFlags.Clear(Flags::kRestartAdvertising);
 
-    APP_BLE_Adv_Request(APP_BLE_FAST_ADV);
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        APP_BLE_Adv_Request(APP_BLE_FAST_ADV);
+    }
+    else
+    {
+        APP_BLE_Adv_Request(APP_BLE_LP_ADV);
+    }
+
     // Flag updated asynchronously by BLE host callback
     mFlags.Set(Flags::kAdvertising);
 
@@ -700,16 +709,8 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        /* Stop advertising and defer restart for when stop confirmation is received from the stack */
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertisement");
-        sInstance.StopAdvertising();
-        sInstance.mFlags.Set(Flags::kRestartAdvertising);
-    }
-    else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
-    {
-        // Advertisement time expired. Stop advertising
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertisement");
-        BLEMgr().SetAdvertisingEnabled(false);
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
+        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     }
 }
 

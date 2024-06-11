@@ -17,6 +17,8 @@
 
 #pragma once
 
+#define MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT
+
 /**
  * \def MBEDTLS_AES_ALT
  *
@@ -66,6 +68,17 @@
 #define MBEDTLS_SHA256_ALT
 // #define MBEDTLS_SHA512_ALT
 // #define MBEDTLS_XTEA_ALT
+
+/*
+ * When replacing the elliptic curve module, please consider, that it is
+ * implemented with two .c files:
+ *      - ecp.c
+ *      - ecp_curves.c
+ * You can replace them very much like all the other MBEDTLS__MODULE_NAME__ALT
+ * macros as described above. The only difference is that you have to make sure
+ * that you provide functionality for both .c files.
+ */
+#define MBEDTLS_ECP_ALT
 
 /**
  * \def MBEDTLS_ERROR_STRERROR_DUMMY
@@ -175,6 +188,39 @@
  */
 #define MBEDTLS_PKCS5_C
 
+/**
+ * \def MBEDTLS_X509_USE_C
+ *
+ * Enable X.509 core for using certificates.
+ *
+ * Module:  library/x509.c
+ * Caller:  library/x509_crl.c
+ *          library/x509_crt.c
+ *          library/x509_csr.c
+ *
+ * Requires: MBEDTLS_ASN1_PARSE_C, MBEDTLS_BIGNUM_C, MBEDTLS_OID_C,
+ *           MBEDTLS_PK_PARSE_C
+ *
+ * This module is required for the X.509 parsing modules.
+ */
+#define MBEDTLS_X509_USE_C
+
+/**
+ * \def MBEDTLS_X509_CRT_PARSE_C
+ *
+ * Enable X.509 certificate parsing.
+ *
+ * Module:  library/x509_crt.c
+ * Caller:  library/ssl_cli.c
+ *          library/ssl_srv.c
+ *          library/ssl_tls.c
+ *
+ * Requires: MBEDTLS_X509_USE_C
+ *
+ * This module is required for X.509 certificate parsing.
+ */
+
+#define MBEDTLS_X509_CRT_PARSE_C
 /**
  * \def MBEDTLS_X509_CREATE_C
  *

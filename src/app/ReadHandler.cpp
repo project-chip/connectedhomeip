@@ -175,6 +175,16 @@ void ReadHandler::Close(CloseOptions options)
         }
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+#if CHIP_PROGRESS_LOGGING
+    if (IsType(InteractionType::Subscribe))
+    {
+        const ScopedNodeId & peer = mSessionHandle ? mSessionHandle->GetPeer() : ScopedNodeId();
+        ChipLogProgress(DataManagement, "Subscription id 0x%" PRIx32 " from node " ChipLogFormatScopedNodeId " torn down",
+                        mSubscriptionId, ChipLogValueScopedNodeId(peer));
+    }
+#endif // CHIP_PROGRESS_LOGGING
+
     MoveToState(HandlerState::AwaitingDestruction);
     mManagementCallback.OnDone(*this);
 }

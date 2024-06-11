@@ -25,6 +25,59 @@ namespace DeviceLayer {
 
 using namespace chip::DeviceLayer::Internal;
 
+CHIP_ERROR FactoryDataProvider::Init()
+{
+    return CHIP_NO_ERROR;
+}
+
+/*
+ * Members functions that implement the CommissionableDataProvider
+ */
+CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
+{
+    return CYW30739Config::ReadConfigValue(CYW30739Config::kConfigKey_SetupDiscriminator, setupDiscriminator);
+}
+
+CHIP_ERROR FactoryDataProvider::SetSetupDiscriminator(uint16_t setupDiscriminator)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
+{
+    return CYW30739Config::ReadConfigValue(CYW30739Config::kConfigKey_Spake2pIterationCount, iterationCount);
+}
+
+CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
+{
+    size_t read_size;
+    ReturnErrorOnFailure(
+        CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_Spake2pSalt, saltBuf.data(), saltBuf.size(), read_size));
+    saltBuf.reduce_size(read_size);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & outVerifierLen)
+{
+    ReturnErrorOnFailure(CYW30739Config::ReadConfigValueBin(CYW30739Config::kConfigKey_Spake2pVerifier, verifierBuf.data(),
+                                                            verifierBuf.size(), outVerifierLen));
+    verifierBuf.reduce_size(outVerifierLen);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
+{
+    return CYW30739Config::ReadConfigValue(CYW30739Config::kConfigKey_SetupPinCode, setupPasscode);
+}
+
+CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+/*
+ * Members functions that implement the DeviceAttestationCredentialsProvider
+ */
 CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
 {
     size_t read_size;
@@ -75,6 +128,90 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);
+}
+
+/*
+ * Members functions that implement the DeviceInstanceInfoProvider
+ */
+CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
+{
+    size_t read_size;
+    return CYW30739Config::ReadConfigValueStr(CYW30739Config::kConfigKey_VendorName, buf, bufSize, read_size);
+}
+
+CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
+{
+    return CYW30739Config::ReadConfigValue(CYW30739Config::kConfigKey_VendorId, vendorId);
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
+{
+    size_t read_size;
+    return CYW30739Config::ReadConfigValueStr(CYW30739Config::kConfigKey_ProductName, buf, bufSize, read_size);
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
+{
+    return CYW30739Config::ReadConfigValue(CYW30739Config::kConfigKey_ProductId, productId);
+}
+
+CHIP_ERROR FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
+{
+    size_t read_size;
+    return CYW30739Config::ReadConfigValueStr(CYW30739Config::kConfigKey_SerialNum, buf, bufSize, read_size);
+}
+
+CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+{
+    return CYW30739Config::ReadConfigValue(CYW30739Config::kConfigKey_HardwareVersion, hardwareVersion);
+}
+
+CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
+{
+    size_t read_size;
+    return CYW30739Config::ReadConfigValueStr(CYW30739Config::kConfigKey_HardwareVersionString, buf, bufSize, read_size);
+}
+
+CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+{
+    ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    if (chip::DeviceLayer::ConfigurationMgr().GetRotatingDeviceIdUniqueId(uniqueIdSpan) != CHIP_NO_ERROR)
+    {
+        static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >=
+                          ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
+                      "Length of unique ID for rotating device ID is smaller than minimum.");
+
+        constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+
+        ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+        uniqueIdSpan.reduce_size(sizeof(uniqueId));
+    }
+    return CHIP_NO_ERROR;
+#endif
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCertKey(MutableByteSpan & out_key_buffer)

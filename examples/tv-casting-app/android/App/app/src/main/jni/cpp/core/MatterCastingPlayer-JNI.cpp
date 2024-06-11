@@ -24,6 +24,7 @@
 #include "core/CastingApp.h"             // from tv-casting-common
 #include "core/CastingPlayer.h"          // from tv-casting-common
 #include "core/CastingPlayerDiscovery.h" // from tv-casting-common
+#include "core/ConnectionCallbacks.h"    // from tv-casting-common
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
@@ -53,9 +54,14 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
 
+    matter::casting::core::IdentificationDeclarationOptions idOptions;
+
+    // TODO: In the following PRs. Replace EndpointFilter Java class with IdentificationDeclarationOptions Java class.
     matter::casting::core::EndpointFilter desiredEndpointFilter;
     if (desiredEndpointFilterJavaObject != nullptr)
     {
+        chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+
         // Convert the EndpointFilter Java class to a C++ EndpointFilter
         jclass endpointFilterJavaClass = env->GetObjectClass(desiredEndpointFilterJavaObject);
         jfieldID vendorIdFieldId       = env->GetFieldID(endpointFilterJavaClass, "vendorId", "Ljava/lang/Integer;");
@@ -66,37 +72,56 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
         // "Ljava/util/List;");
 
         // Value of 0 means unspecified
-        desiredEndpointFilter.vendorId  = vendorIdIntegerObject != nullptr
+        targetAppInfo.vendorId  = vendorIdIntegerObject != nullptr
              ? static_cast<uint16_t>(env->CallIntMethod(
                   vendorIdIntegerObject, env->GetMethodID(env->GetObjectClass(vendorIdIntegerObject), "intValue", "()I")))
              : 0;
-        desiredEndpointFilter.productId = productIdIntegerObject != nullptr
+        targetAppInfo.productId = productIdIntegerObject != nullptr
             ? static_cast<uint16_t>(env->CallIntMethod(
                   productIdIntegerObject, env->GetMethodID(env->GetObjectClass(productIdIntegerObject), "intValue", "()I")))
             : 0;
-        // TODO: In following PRs. Translate the Java requiredDeviceTypes list to a C++ requiredDeviceTypes vector. For now we're
-        // passing an empty list of DeviceTypeStruct.
+
+        CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
+        if (result != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer,
+                         "MatterCastingPlayer-JNI::verifyOrEstablishConnection() failed to add targetAppInfo: %" CHIP_ERROR_FORMAT,
+                         result.Format());
+        }
     }
 
     MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
     MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
-    castingPlayer->VerifyOrEstablishConnection(
-        [](CHIP_ERROR err, CastingPlayer * playerPtr) {
-            ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback called");
-            if (err == CHIP_NO_ERROR)
-            {
-                ChipLogProgress(AppServer, "MatterCastingPlayer-JNI:: Connected to Casting Player with device ID: %s",
-                                playerPtr->GetId());
-                MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.Handle(nullptr);
-            }
-            else
-            {
-                ChipLogError(AppServer, "MatterCastingPlayer-JNI:: ConnectCallback, connection error: %" CHIP_ERROR_FORMAT,
-                             err.Format());
-                MatterCastingPlayerJNIMgr().mConnectionFailureHandler.Handle(err);
-            }
-        },
-        static_cast<unsigned long long int>(commissioningWindowTimeoutSec), desiredEndpointFilter);
+
+    auto connectCallback = [](CHIP_ERROR err, CastingPlayer * playerPtr) {
+        ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback()");
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(AppServer,
+                            "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback() Connected to Casting Player "
+                            "with device ID: %s",
+                            playerPtr->GetId());
+            // The Java jSuccessCallback is expecting a Void v callback parameter which translates to a nullptr. When calling the
+            // Java method from C++ via JNI, passing nullptr is equivalent to passing a Void object in Java.
+            MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.Handle(nullptr);
+        }
+        else
+        {
+            ChipLogError(
+                AppServer,
+                "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback() Connection error: %" CHIP_ERROR_FORMAT,
+                err.Format());
+            MatterCastingPlayerJNIMgr().mConnectionFailureHandler.Handle(err);
+        }
+    };
+
+    // TODO: In the following PRs. Add optional CommissionerDeclarationHandler callback parameter for the Commissioner-Generated
+    // passcode commissioning flow.
+    matter::casting::core::ConnectionCallbacks connectionCallbacks;
+    connectionCallbacks.mOnConnectionComplete = connectCallback;
+
+    castingPlayer->VerifyOrEstablishConnection(connectionCallbacks, static_cast<uint16_t>(commissioningWindowTimeoutSec),
+                                               idOptions);
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 

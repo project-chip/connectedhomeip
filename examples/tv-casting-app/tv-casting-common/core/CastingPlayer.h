@@ -18,7 +18,10 @@
 
 #pragma once
 
+#include "CommissionerDeclarationHandler.h"
+#include "ConnectionCallbacks.h"
 #include "Endpoint.h"
+#include "IdentificationDeclarationOptions.h"
 #include "Types.h"
 #include "support/ChipDeviceEventHandler.h"
 #include "support/EndpointListLoader.h"
@@ -35,8 +38,8 @@ namespace core {
 
 const int kPortMaxLength = 5; // port is uint16_t
 // +1 for the : between the hostname and the port.
-const int kIdMaxLength                                      = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
-const unsigned long long int kCommissioningWindowTimeoutSec = 3 * 60; // 3 minutes
+const int kIdMaxLength                        = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
+const uint16_t kCommissioningWindowTimeoutSec = 3 * 60; // 3 minutes
 
 /**
  * @brief Describes an Endpoint that the client wants to connect to
@@ -84,7 +87,6 @@ enum ConnectionState
 
 class ConnectionContext;
 class CastingPlayer;
-using ConnectCallback = std::function<void(CHIP_ERROR, CastingPlayer *)>;
 
 /**
  * @brief CastingPlayer represents a Matter commissioner that is able to play media to a physical
@@ -110,26 +112,80 @@ public:
     }
 
     /**
+     * @brief Define the copy constructor
+     */
+    CastingPlayer(const CastingPlayer & other);
+
+    /**
+     * @brief Define the assignment operator
+     */
+    CastingPlayer & operator=(const CastingPlayer & other);
+
+    /**
      * @return true if this CastingPlayer is connected to the CastingApp
      */
     bool IsConnected() const { return mConnectionState == CASTING_PLAYER_CONNECTED; }
 
     /**
-     * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new session
-     * request. If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk,
-     * this will execute the user directed commissioning process.
+     * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new commissioning session request. If the
+     * CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk, this will execute the User Directed
+     * Commissioning (UDC) process by sending an IdentificationDeclaration message to the Commissioner. For certain UDC features,
+     * where a Commissioner reply is expected, this API needs to be followed up with the ContinueConnecting() API defiend below. See
+     * the Matter UDC specification or parameter class definitions for details on features not included in the description below.
      *
-     * @param onCompleted for success - called back with CHIP_NO_ERROR and CastingPlayer *.
-     * For failure - called back with an error and nullptr.
+     * @param connectionCallbacks contains the ConnectCallback (Required) and CommissionerDeclarationCallback (Optional) defiend in
+     * ConnectCallbacks.h.
+     *
+     * ConnectCallback: The callback called when the connection process has ended, regardless of whether it was successful or not.
+     *
+     * CommissionerDeclarationCallback: The callback called when the Commissionee receives a CommissionerDeclaration message from
+     * the Commissioner. This callback is needed to support UDC features where a reply from the Commissioner is expected. It
+     * provides information indicating the Commissioner’s pre-commissioning state.
+     *
+     * For example: During Commissioner-Generated passcode commissioning, the Commissioner replies with a CommissionerDeclaration
+     * message with PasscodeDialogDisplayed and CommissionerPasscode set to true. Given these Commissioner state details, the client
+     * is expected to perform some actions, detailed in the ContinueConnecting() API below, and then call the ContinueConnecting()
+     * API to complete the process.
+     *
      * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
      * required. Needs to be >= kCommissioningWindowTimeoutSec.
-     * @param desiredEndpointFilter (Optional) Attributes (such as VendorId) describing an Endpoint that the client wants to
-     * interact with after commissioning. If this value is passed in, the VerifyOrEstablishConnection will force User Directed
-     * Commissioning, in case the desired Endpoint is not found in the on device CastingStore.
+     *
+     * @param idOptions (Optional) Parameters in the IdentificationDeclaration message sent by the Commissionee to the Commissioner.
+     * These parameters specify the information relating to the requested commissioning session.
+     *
+     * For example: To invoke the Commissioner-Generated passcode commissioning flow, the client would call this API with
+     * IdentificationDeclarationOptions containing CommissionerPasscode set to true. See IdentificationDeclarationOptions.h for a
+     * complete list of optional parameters.
+     *
+     * Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants to interact with after commissioning.
+     * If this value is passed in, VerifyOrEstablishConnection() will force UDC, in case the desired
+     * TargetApp is not found in the on-device CastingStore.
      */
-    void VerifyOrEstablishConnection(ConnectCallback onCompleted,
-                                     unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec,
-                                     EndpointFilter desiredEndpointFilter                 = EndpointFilter());
+    void VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks,
+                                     uint16_t commissioningWindowTimeoutSec     = kCommissioningWindowTimeoutSec,
+                                     IdentificationDeclarationOptions idOptions = IdentificationDeclarationOptions());
+
+    /**
+     * @brief This is a continuation of the Commissioner-Generated passcode commissioning flow started via the
+     * VerifyOrEstablishConnection() API above. It continues the UDC process by sending a second IdentificationDeclaration message
+     * to Commissioner containing CommissionerPasscode and CommissionerPasscodeReady set to true. At this point it is assumed that
+     * the following have occurred:
+     *
+     * 1. Client (Commissionee) has sent the first IdentificationDeclaration message, via VerifyOrEstablishConnection(), to the
+     * Commissioner containing CommissionerPasscode set to true.
+     * 2. Commissioner generated and displayed a passcode.
+     * 3. The Commissioner replied with a CommissionerDecelration message with PasscodeDialogDisplayed and CommissionerPasscode set
+     * to true.
+     * 3. Client has handled the Commissioner's CommissionerDecelration message.
+     * 4. Client prompted user to input Passcode from Commissioner.
+     * 5. Client has updated the commissioning session's PAKE verifier using the user input Passcode by updating the CastingApps
+     * CommissionableDataProvider
+     * (matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(CommissionableDataProvider)).
+     *
+     * The same connectionCallbacks and commissioningWindowTimeoutSec parameters passed into VerifyOrEstablishConnection() will be
+     * used.
+     */
+    void ContinueConnecting();
 
     /**
      * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
@@ -197,9 +253,16 @@ private:
     std::vector<memory::Strong<Endpoint>> mEndpoints;
     ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
     CastingPlayerAttributes mAttributes;
+    IdentificationDeclarationOptions mIdOptions;
     static CastingPlayer * mTargetCastingPlayer;
-    unsigned long long int mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-    ConnectCallback mOnCompleted                          = {};
+    uint16_t mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
+    ConnectCallback mOnCompleted            = {};
+
+    /**
+     * @brief resets this CastingPlayer's state and calls mOnCompleted with the CHIP_ERROR. Also, after calling mOnCompleted, it
+     * clears mOnCompleted by setting it to a nullptr.
+     */
+    void resetState(CHIP_ERROR err);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     /**
@@ -217,12 +280,12 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     /**
-     * @brief Checks if the cachedCastingPlayer contains an Endpoint that matches the description of the desiredEndpointFilter
-     *
-     * @return true - cachedCastingPlayer contains at least one endpoint that matches all the (non-default) values in
-     * desiredEndpointFilter, false otherwise
+     * @brief Checks if the cachedCastingPlayer contains at least one Endpoint/TargetApp described in the desiredTargetApps list.
+     * @return true - cachedCastingPlayer contains at least one endpoints with matching (non-default) values for vendorID and
+     * productID as described in the desiredTargetApps list, false otherwise.
      */
-    bool ContainsDesiredEndpoint(core::CastingPlayer * cachedCastingPlayer, EndpointFilter desiredEndpointFilter);
+    bool ContainsDesiredTargetApp(core::CastingPlayer * cachedCastingPlayer,
+                                  std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> desiredTargetApps);
 
     // ChipDeviceEventHandler handles chip::DeviceLayer::ChipDeviceEvent events and helps the CastingPlayer class commission with
     // and connect to a CastingPlayer

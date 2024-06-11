@@ -16,6 +16,12 @@
 
 #import <XCTest/XCTest.h>
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#define HAVE_NSTASK 0
+#else
+#define HAVE_NSTASK 1
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRTestCase : XCTestCase
@@ -23,6 +29,31 @@ NS_ASSUME_NONNULL_BEGIN
 // on every single sub-test is slow, and some of our tests seem to have leaks
 // outside Matter.framework.  So have it be opt-in for now, and improve later.
 @property (nonatomic) BOOL detectLeaks;
+
+#if HAVE_NSTASK
+/**
+ * Create an NSTask for the given path.  Path should be relative to the Matter
+ * SDK root.
+ */
+- (NSTask *)createTaskForPath:(NSString *)path;
+
+/**
+ * Run a task to completion and make sure it succeeds.
+ */
+- (void)runTask:(NSTask *)task;
+
+/**
+ * Launch a task.  The task will be automatically terminated when the testcase
+ * tearDown happens.
+ */
+- (void)launchTask:(NSTask *)task;
+#endif // HAVE_NSTASK
+
+/**
+ * Get an absolute path from a path relative to the Matter SDK root.
+ */
+- (NSString *)absolutePathFor:(NSString *)matterRootRelativePath;
+
 @end
 
 NS_ASSUME_NONNULL_END

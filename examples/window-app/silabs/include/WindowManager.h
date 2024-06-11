@@ -40,6 +40,7 @@ public:
         typedef void (*Callback)(Timer & timer);
 
         Timer(uint32_t timeoutInMs, Callback callback, void * context);
+        ~Timer();
 
         void Start();
         void Stop();
@@ -57,23 +58,33 @@ public:
 
     struct Cover
     {
+        enum ControlAction : uint8_t
+        {
+            Lift = 0,
+            Tilt = 1
+        };
+
         void Init(chip::EndpointId endpoint);
 
-        void LiftUpdate(bool newTarget);
-        void LiftGoToTarget() { LiftUpdate(true); }
-        void LiftContinueToTarget() { LiftUpdate(false); }
-        void LiftStepToward(OperationalState direction);
-        void LiftSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, false); }
-        void LiftScheduleOperationalStateSet(OperationalState opState) { ScheduleOperationalStateSet(opState, false); }
+        /**
+         * @brief Schedule a lift or a tilt related attribute transition on the ChipEvent queue
+         * **This function allocates a CoverWorkData which needs to be freed by the Worker callback**
+         *
+         * @param action : ControlAction::Lift will ScheduleWork LiftUpdateWorker, while ControlAction::Tilt will ScheduleWork
+         * TilitUpdateWorker
+         * @param setNewTarget : True will stop any ongoing transition and start a new one. False will continue the active
+         * transition updates
+         */
+        void ScheduleControlAction(ControlAction action, bool setNewTarget);
+        // Helper functions that schedule Lift transitions
+        inline void LiftGoToTarget() { ScheduleControlAction(ControlAction::Lift, true); }
+        inline void LiftContinueToTarget() { ScheduleControlAction(ControlAction::Lift, false); }
+        // Helper functions that schedule Tilt transitions
+        inline void TiltGoToTarget() { ScheduleControlAction(ControlAction::Tilt, true); }
+        inline void TiltContinueToTarget() { ScheduleControlAction(ControlAction::Tilt, false); }
 
-        void TiltUpdate(bool newTarget);
-        void TiltGoToTarget() { TiltUpdate(true); }
-        void TiltContinueToTarget() { TiltUpdate(false); }
-        void TiltStepToward(OperationalState direction);
-        void TiltSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, true); }
-        void TiltScheduleOperationalStateSet(OperationalState opState) { ScheduleOperationalStateSet(opState, true); }
-
-        void UpdateTargetPosition(OperationalState direction, bool isTilt);
+        void PositionSet(chip::EndpointId endpointId, chip::Percent100ths position, ControlAction action);
+        void UpdateTargetPosition(OperationalState direction, ControlAction action);
 
         Type CycleType();
 
@@ -88,22 +99,23 @@ public:
         OperationalState mLiftOpState = OperationalState::Stall;
         OperationalState mTiltOpState = OperationalState::Stall;
 
-        struct CoverWorkData
-        {
-            chip::EndpointId mEndpointId;
-            bool isTilt;
+        /**
+         * @brief Worker callbacks for the ScheduleControlAction.
+         * Those functions compute the operational state, and transititon movement based on the current and target positions
+         * for the cover.
+         * @param arg Context passed to the schedule worker. In this case, a CoverWorkData pointer
+         * The referenced CoverWorkData was allocated by ScheduleControlAction and must be freed by the worker.
+         */
+        static void LiftUpdateWorker(intptr_t arg);
+        static void TiltUpdateWorker(intptr_t arg);
+    };
 
-            union
-            {
-                chip::Percent100ths percent100ths;
-                OperationalState opState;
-            };
-        };
-
-        void SchedulePositionSet(chip::Percent100ths position, bool isTilt);
-        static void CallbackPositionSet(intptr_t arg);
-        void ScheduleOperationalStateSet(OperationalState opState, bool isTilt);
-        static void CallbackOperationalStateSet(intptr_t arg);
+    struct CoverWorkData
+    {
+        Cover * cover     = nullptr;
+        bool setNewTarget = false;
+        CoverWorkData(Cover * c, bool t) : cover(c), setNewTarget(t) {}
+        ~CoverWorkData() { cover = nullptr; }
     };
 
     static WindowManager & Instance();
@@ -144,7 +156,7 @@ private:
 
     LEDWidget mActionLED;
 #ifdef DISPLAY_ENABLED
-    Timer mIconTimer;
-    LcdIcon mIcon = LcdIcon::None;
+    Timer * mIconTimer = nullptr;
+    LcdIcon mIcon      = LcdIcon::None;
 #endif
 };
