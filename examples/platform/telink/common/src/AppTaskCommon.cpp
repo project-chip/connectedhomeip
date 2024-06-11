@@ -368,7 +368,6 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
     case kButtonId_FactoryReset:
         FactoryResetButtonEventHandler();
         break;
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case kButtonId_StartThread:
         StartThreadButtonEventHandler();
@@ -378,7 +377,6 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
         StartWiFiButtonEventHandler();
         break;
 #endif
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
     case kButtonId_StartBleAdv:
         StartBleAdvButtonEventHandler();
         break;
@@ -448,13 +446,11 @@ void AppTaskCommon::LinkButtons(ButtonManager & buttonManager)
     buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
     buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
     buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     buttonManager.addCallback(StartThreadButtonEventHandler, 3, true);
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     buttonManager.addCallback(StartWiFiButtonEventHandler, 3, true);
 #endif
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
 }
 
 void AppTaskCommon::UpdateStatusLED()
@@ -597,7 +593,6 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
@@ -667,7 +662,6 @@ void AppTaskCommon::StartWiFiHandler(AppEvent * aEvent)
     }
 }
 #endif
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
 
 void AppTaskCommon::ExampleActionButtonEventHandler(void)
 {
