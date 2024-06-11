@@ -119,7 +119,6 @@ void TestTimedHandler::GenerateTimedRequest(uint16_t aTimeoutValue, System::Pack
 
 void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
 {
-    // TestContext & ctx = *static_cast<TestContext *>(aContext);
 
     System::PacketBufferHandle payload;
     GenerateTimedRequest(500, payload);
@@ -167,7 +166,6 @@ TEST_F(TestTimedHandler, TestWriteFastEnough)
 
 void TestTimedHandler::TestFollowingMessageTooSlow(MsgType aMsgType)
 {
-    // TestContext & ctx = *static_cast<TestContext *>(aContext);
 
     System::PacketBufferHandle payload;
     GenerateTimedRequest(50, payload);
@@ -219,7 +217,6 @@ TEST_F(TestTimedHandler, TestWriteTooSlow)
 
 TEST_F(TestTimedHandler, TestInvokeNeverComes)
 {
-    // TestContext & ctx = *static_cast<TestContext *>(aContext);
 
     System::PacketBufferHandle payload;
     GenerateTimedRequest(50, payload);
