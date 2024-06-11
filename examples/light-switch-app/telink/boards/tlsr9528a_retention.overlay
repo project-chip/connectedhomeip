@@ -24,7 +24,7 @@
 		};
 		motor_detect: motor_switch {
 			label = "MOTOR SWITCH";
-			gpios = <&gpioc 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			gpios = <&gpioc 1 (GPIO_ACTIVE_LOW| GPIO_PULL_DOWN)>;
 		};
 		motor_limited_1: motor_stop_1 {
 			label = "MOTOR LIMIT 1";

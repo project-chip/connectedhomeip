@@ -17,11 +17,11 @@
 
 #pragma once
 
+#include <PWMDevice.h>
 #include <cstdint>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/kernel.h>
-#include <PWMDevice.h>
 
 class MotorWidget
 {
@@ -42,16 +42,33 @@ public:
     void MotorStop();
     void PollIRQ(const struct device * dev, uint32_t pins);
 
-private:
+    void Restart();
+    bool GetMotorState();
 
+    bool isMotorStop;
+    static MotorWidget sInstance;
+
+    // 电机急停的标志位
+    bool isStopFlag = false;
+
+    // 电机运行时间
+    int mMotorRunTime = 0;
+
+    // static bool mMotorStopTimerFlag = false;
+
+private:
     struct gpio_callback mStalling_cb_data;
     struct gpio_callback mLimit1_cb_data;
     struct gpio_callback mLimit2_cb_data;
 
     bool mState;
-    bool isMotorStopped = true;
+    // bool isMotorStopped = true;
     k_timer mMotorTimer;
     k_timer mSkipDetectStallTimer;
+
+    // 轮询代替中断，让电机停转
+    k_timer mMotorStopTimer;
+    static void MotorStopPollTimerHandler(k_timer * timer);
 
     static void MotorStopTimerHandler(k_timer * timer);
     static void ActionMotorStateUpdateHandler(k_timer * timer);
@@ -63,12 +80,12 @@ private:
     void DoSet(bool state);
     void ScheduleStateChange();
 
-    //static void ActionIdentifyStateUpdateHandler(k_timer * timer);
-    //static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
+    // static void ActionIdentifyStateUpdateHandler(k_timer * timer);
+    // static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 
     friend MotorWidget & MotorWidgetInst(void);
 
-    static MotorWidget sInstance;
+    // static MotorWidget sInstance;
 };
 
 /**

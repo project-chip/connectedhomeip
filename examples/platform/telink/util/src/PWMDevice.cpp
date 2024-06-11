@@ -25,7 +25,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-//LOG_MODULE_REGISTER(PWMDevice);
+// LOG_MODULE_REGISTER(PWMDevice);
 LOG_MODULE_DECLARE(PWMDevice, CONFIG_CHIP_APP_LOG_LEVEL);
 
 constexpr uint32_t kBreatheStepTimeMS = 20;
@@ -121,7 +121,7 @@ bool PWMDevice::InitiateAction(Action_t aAction, int32_t aActor, uint8_t * value
 
 void PWMDevice::SetLevel(uint8_t aLevel)
 {
-    //LOG_DBG("Setting brightness level to %u", aLevel);
+    // LOG_DBG("Setting brightness level to %u", aLevel);
     mLevel = aLevel;
     UpdateLight();
 }
@@ -134,17 +134,17 @@ void PWMDevice::Set(bool aOn)
 
 void PWMDevice::UpdateLight(void)
 {
-    //LOG_INF("########UpdateLight mState: %d", mState);
+    // LOG_INF("########UpdateLight mState: %d", mState);
     if (!device_is_ready(mPwmDevice->dev))
     {
         return;
     }
     constexpr uint32_t kPwmWidthUs  = 80u;
-    const uint8_t maxEffectiveLevel = mMaxLevel - mMinLevel;//120
-    //const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel - mMinLevel, maxEffectiveLevel) : 0;
-    const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel, maxEffectiveLevel) : 0;//80
-    //LOG_INF("$$$$$$$$$$$UpdateLight:(mLevel - mMinLevel)):%d mState:%d", (mLevel - mMinLevel), mState);
-   // LOG_INF("$$$$$$$$$$$UpdateLight: maxEffectiveLevel:%d effectiveLevel:%d", maxEffectiveLevel, effectiveLevel);
+    const uint8_t maxEffectiveLevel = mMaxLevel - mMinLevel; // 120
+    // const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel - mMinLevel, maxEffectiveLevel) : 0;
+    const uint8_t effectiveLevel = mState == kState_On ? chip::min<uint8_t>(mLevel, maxEffectiveLevel) : 0; // 80
+    // LOG_INF("$$$$$$$$$$$UpdateLight:(mLevel - mMinLevel)):%d mState:%d", (mLevel - mMinLevel), mState);
+    // LOG_INF("$$$$$$$$$$$UpdateLight: maxEffectiveLevel:%d effectiveLevel:%d", maxEffectiveLevel, effectiveLevel);
 
     pwm_set(mPwmDevice->dev, mPwmDevice->channel, PWM_USEC(kPwmWidthUs), PWM_USEC(kPwmWidthUs * effectiveLevel / maxEffectiveLevel),
             0);
@@ -207,17 +207,33 @@ void PWMDevice::InitiateMotorAction(uint32_t cycleTimeMS)
     ClearAction();
 
     mBreatheType      = kBreatheType_Rising;
-    mBreatheStepNumb  = cycleTimeMS / kBreatheStepTimeMS;//40
-    mBreatheStepLevel = (mMaxLevel- mMinLevel) / mBreatheStepNumb;//3
-    mLevel = mMinLevel;//+80;
-    mBreatheStepCntr = 0;
-    //LOG_INF("@@InitiateMotorAction mBreatheType:%d addr: %d mBreatheStepNumb:%d mBreatheStepLevel:%d",mBreatheType, &mBreatheType, mBreatheStepNumb, mBreatheStepLevel);
+    mBreatheStepNumb  = cycleTimeMS / kBreatheStepTimeMS;           // 40
+    mBreatheStepLevel = (mMaxLevel - mMinLevel) / mBreatheStepNumb; // 3
+    mLevel            = mMinLevel;                                  //+80;
+    mBreatheStepCntr  = 0;
+    // LOG_INF("@@InitiateMotorAction mBreatheType:%d addr: %d mBreatheStepNumb:%d mBreatheStepLevel:%d",mBreatheType,
+    // &mBreatheType, mBreatheStepNumb, mBreatheStepLevel);
+    Set(true);
+    StartBreatheTimer(kBreatheStepTimeMS);
+}
+
+void PWMDevice::InitiateMotorStopAction(uint32_t cycleTimeMS)
+{
+    ClearAction();
+
+    mBreatheType      = kBreatheType_Rising;
+    mBreatheStepNumb  = cycleTimeMS / kBreatheStepTimeMS;           // 40
+    mBreatheStepLevel = (mMaxLevel - mMinLevel) / mBreatheStepNumb; // 3
+    mLevel            = mMaxLevel;                                  //+80;
+    mBreatheStepCntr  = 0;
+
     Set(true);
     StartBreatheTimer(kBreatheStepTimeMS);
 }
 
 void PWMDevice::StopAction(void)
 {
+    // LOG_INF("++++StopAction++++");
     ClearAction();
     Set(false);
 }
@@ -293,19 +309,19 @@ void PWMDevice::UpdateMotorAction(void)
         if (mBreatheStepCntr == mBreatheStepNumb)
         {
             mBreatheStepCntr = 0;
-            mLevel = mMaxLevel;
-            mBreatheType = kBreatheType_Invalid;
+            mLevel           = mMaxLevel;
+            mBreatheType     = kBreatheType_Invalid;
         }
         else
         {
             mLevel += mBreatheStepLevel;
-            if(mLevel <= (mMaxLevel-mMinLevel))
+            if (mLevel <= (mMaxLevel - mMinLevel - 0))
             {
-                //if(mLevel == 104)
-                //    mLevel = 103;
+                // if(mLevel == 104)
+                //     mLevel = 103;
                 mBreatheStepCntr++;
                 Set(true);
-                StartBreatheTimer(kBreatheStepTimeMS);
+                // StartBreatheTimer(kBreatheStepTimeMS);
             }
             else
             {
@@ -313,6 +329,7 @@ void PWMDevice::UpdateMotorAction(void)
             }
         }
     }
+    StartBreatheTimer(kBreatheStepTimeMS);
 }
 
 void PWMDevice::StartBlinkTimer(void)
@@ -334,7 +351,7 @@ void PWMDevice::ClearAction(void)
     mBreatheStepNumb      = 0;
     mBlinkOnTimeMS        = 0;
     mBlinkOffTimeMS       = 0;
-    mLevel                = mMaxLevel;
+    mLevel                = mMaxLevel - mMinLevel;
 }
 
 void PWMDevice::PwmLedTimerHandler(k_timer * timer)

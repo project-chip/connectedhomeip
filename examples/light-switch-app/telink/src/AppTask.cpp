@@ -17,11 +17,13 @@
  */
 
 #include "AppTask.h"
+#include "MotorWidget.h"
 #include "binding-handler.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/af-enums.h>
 #include <app/util/attribute-storage.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include "MotorWidget.h"
+
+#define SLEEP_TIME 3500
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -29,10 +31,13 @@ AppTask AppTask::sAppTask;
 
 const struct gpio_dt_spec sFactoryResetButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_switch), gpios);
 MotorWidget sStatusMotor;
-bool direction = false;
+bool direction    = false;
 bool switch_state = false;
 static k_timer mButtonReleaseCheckTimer;
 static int buttonPressCounter = 0;
+
+// 按键检测标志位
+// bool isButtonPressed = false;
 
 CHIP_ERROR AppTask::Init(void)
 {
@@ -45,13 +50,34 @@ CHIP_ERROR AppTask::Init(void)
 
     InitCommonParts();
 
-    //Init motor control
+    // Init motor control
     MotorWidget::SetCallback(MotorStateUpdateHandler, MotorStopHandler);
     sStatusMotor.Init();
     UpdateMotor();
 
     ContactSensorMgr().Init();
     ContactSensorMgr().SetCallback(OnStateChanged);
+
+    // sStatusMotor.Start(false);
+    // k_sleep(K_MSEC(2250));
+    // sStatusMotor.Start(true);
+    // sStatusMotor.Restart();
+
+    // 获得上电时开关的状态(On/Off)
+    if (!sStatusMotor.GetMotorState())
+    {
+        ContactSensorMgr().setstate(ContactSensorManager::State::kContactOpened);
+    }
+    else
+    {
+        ContactSensorMgr().setstate(ContactSensorManager::State::kContactClosed);
+    }
+
+    if (sAppTask.IsSyncClusterToButtonAction())
+    {
+        sAppTask.UpdateClusterState();
+    }
+    UpdateClusterStateInternal(NULL); // 能更新开关on/off的状态，没这个函数开关上电后第一次按可能会没反应
 
     // Configure Bindings
     CHIP_ERROR err = InitBindingHandler();
@@ -61,14 +87,25 @@ CHIP_ERROR AppTask::Init(void)
         return err;
     }
 
+    // k_sleep(K_MSEC(3000));
+    // OnStateChanged(ContactSensorManager::State::kContactOpened);
+    // int ret = gpio_pin_configure_dt(&sFactoryResetButtonDt, GPIO_INPUT | GPIO_PULL_DOWN);
+    // k_sleep(K_MSEC(200));
+    // ret = gpio_pin_configure_dt(&sFactoryResetButtonDt, GPIO_INPUT | GPIO_PULL_UP);
+    // k_sleep(K_MSEC(3000));
+    // OnStateChanged(ContactSensorManager::State::kContactClosed);
+    // ret = gpio_pin_configure_dt(&sFactoryResetButtonDt, GPIO_INPUT | GPIO_PULL_DOWN);
+    // k_sleep(K_MSEC(200));
+    // ret = gpio_pin_configure_dt(&sFactoryResetButtonDt, GPIO_INPUT | GPIO_PULL_UP);
+
     return CHIP_NO_ERROR;
 }
 
 void AppTask::MotorStopHandler(MotorWidget * motorWidget)
 {
     AppEvent event;
-    event.Type                          = AppEvent::kEventType_MotorStop;
-    event.Handler                       = UpdateMotorEventHandler;
+    event.Type                              = AppEvent::kEventType_MotorStop;
+    event.Handler                           = UpdateMotorEventHandler;
     event.UpdateMotorStateEvent.motorWidget = motorWidget;
     GetAppTask().PostEvent(&event);
 }
@@ -76,8 +113,8 @@ void AppTask::MotorStopHandler(MotorWidget * motorWidget)
 void AppTask::MotorStateUpdateHandler(MotorWidget * motorWidget)
 {
     AppEvent event;
-    event.Type                          = AppEvent::kEventType_MotorStateUpdate;
-    event.Handler                       = UpdateMotorEventHandler;
+    event.Type                              = AppEvent::kEventType_MotorStateUpdate;
+    event.Handler                           = UpdateMotorEventHandler;
     event.UpdateMotorStateEvent.motorWidget = motorWidget;
     GetAppTask().PostEvent(&event);
 }
@@ -88,11 +125,13 @@ void AppTask::UpdateMotorEventHandler(AppEvent * aEvent)
     {
         aEvent->UpdateMotorStateEvent.motorWidget->UpdateState();
         UpdateStatusLEDExt(true, false);
+        // LOG_INF("UpdateStatusLEDExt(true, false);");
     }
     if (aEvent->Type == AppEvent::kEventType_MotorStop)
     {
         aEvent->UpdateMotorStateEvent.motorWidget->MotorStop();
         UpdateStatusLEDExt(false, false);
+        // LOG_INF("UpdateStatusLEDExt(false, false);");
     }
 }
 
@@ -105,7 +144,7 @@ void AppTask::FactoryResetEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if(switch_state == false)
+        if (switch_state == false)
         {
             switch_state = true;
         }
@@ -122,7 +161,6 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         LOG_INF("App button pressed");
-
         k_timer_start(&mButtonReleaseCheckTimer, K_MSEC(20), K_NO_WAIT);
     }
 }
@@ -130,19 +168,25 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 void AppTask::buttonReleaseCheckTimerHandler(k_timer * timer)
 {
     AppEvent event;
-    event.Type                          = AppEvent::kEventType_ButtonReleaseCheck;
-    event.Handler                       = buttonReleaseCheckEventHandler;
+    event.Type    = AppEvent::kEventType_ButtonReleaseCheck;
+    event.Handler = buttonReleaseCheckEventHandler;
     GetAppTask().PostEvent(&event);
 }
 
 void AppTask::buttonReleaseCheckEventHandler(AppEvent * aEvent)
 {
+    if (MotorWidget::sInstance.isMotorStop == false)
+    {
+        LOG_INF("AppTask ----> sInstance.isMotorStop == false");
+        return;
+    }
     if (aEvent->Type == AppEvent::kEventType_ButtonReleaseCheck)
     {
-        if(gpio_pin_get_dt(&sFactoryResetButtonDt) == 0)
+        if (gpio_pin_get_dt(&sFactoryResetButtonDt) == 0)
         {
-            if(buttonPressCounter < 250)
+            if (buttonPressCounter < 250)
             {
+                // isButtonPressed = true;
                 if (ContactSensorMgr().IsContactClosed() == true)
                 {
                     LOG_INF("Switch state from close to open");
@@ -155,7 +199,7 @@ void AppTask::buttonReleaseCheckEventHandler(AppEvent * aEvent)
                 }
                 UpdateClusterStateInternal(NULL);
             }
-            else if(buttonPressCounter < 500)
+            else if (buttonPressCounter < 500)
             {
                 UpdateStatusLEDExt(false, false);
             }
@@ -170,12 +214,12 @@ void AppTask::buttonReleaseCheckEventHandler(AppEvent * aEvent)
         {
             k_timer_start(&mButtonReleaseCheckTimer, K_MSEC(20), K_NO_WAIT);
             buttonPressCounter++;
-            if(buttonPressCounter == 250)
+            if (buttonPressCounter == 250)
             {
                 UpdateStatusLEDExt(false, true);
                 LOG_INF("Wait another 5s to do factory reset");
             }
-            if(buttonPressCounter == 500)
+            if (buttonPressCounter == 500)
             {
                 LOG_INF("Release to do factory reset");
                 UpdateStatusLEDExt(false, false);
@@ -184,7 +228,7 @@ void AppTask::buttonReleaseCheckEventHandler(AppEvent * aEvent)
     }
 }
 
-//void AppTask::UpdateClusterState() {}
+// void AppTask::UpdateClusterState() {}
 void AppTask::UpdateClusterState()
 {
     PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
@@ -192,6 +236,10 @@ void AppTask::UpdateClusterState()
 
 void AppTask::OnStateChanged(ContactSensorManager::State aState)
 {
+    // if (isButtonPressed == false)
+    // {
+    //     return;
+    // }
     // If the contact state was changed, update LED state and cluster state (only if button was pressed).
     //  - turn on the contact LED if contact sensor is in closed state.
     //  - turn off the lock LED if contact sensor is in opened state.
@@ -212,11 +260,14 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
     {
         sAppTask.UpdateClusterState();
     }
+
+    // isButtonPressed = false;
 }
 
 void AppTask::UpdateClusterStateInternal(intptr_t arg)
 {
     bool newValue = ContactSensorMgr().IsContactClosed();
+    // bool newValue = sStatusMotor.GetMotorState();
 
     ChipLogProgress(NotSpecified, "emberAfWriteAttribute : %d", newValue);
 

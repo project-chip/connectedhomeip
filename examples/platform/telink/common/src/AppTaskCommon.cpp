@@ -461,7 +461,7 @@ void AppTaskCommon::UpdateStatusLED()
     }
     else
     {
-        if(sIsBLEAdvertising)
+        if (sIsBLEAdvertising)
             sStatusLED.Blink(200, 200);
         else
             sStatusLED.Set(false);
@@ -470,8 +470,8 @@ void AppTaskCommon::UpdateStatusLED()
 
 void AppTaskCommon::UpdateStatusLEDExt(bool MotorIsOn, bool WaitFactoryReset)
 {
-    sMotorIsOn             = MotorIsOn;
-    sWaitFactoryReset      = WaitFactoryReset;
+    sMotorIsOn        = MotorIsOn;
+    sWaitFactoryReset = WaitFactoryReset;
     if (!sMotorIsOn && !sWaitFactoryReset)
     {
         UpdateStatusLED();
@@ -588,10 +588,10 @@ void AppTaskCommon::FactoryResetButtonEventHandler(void)
     AppEvent event;
     event.Type               = AppEvent::kEventType_Button;
     event.ButtonEvent.Action = kButtonPushEvent;
-    if(GetAppTask().UserFactoryResetHandler)
-        event.Handler            = GetAppTask().UserFactoryResetHandler;
+    if (GetAppTask().UserFactoryResetHandler)
+        event.Handler = GetAppTask().UserFactoryResetHandler;
     else
-        event.Handler            = FactoryResetHandler;
+        event.Handler = FactoryResetHandler;
     GetAppTask().PostEvent(&event);
 }
 

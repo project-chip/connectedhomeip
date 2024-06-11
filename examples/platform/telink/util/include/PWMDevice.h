@@ -67,6 +67,9 @@ public:
     void InitiateBlinkAction(uint32_t onTimeMS, uint32_t offTimeMS);
     void InitiateBreatheAction(BreatheType_t type, uint32_t cycleTimeMS);
     void InitiateMotorAction(uint32_t cycleTimeMS);
+
+    void InitiateMotorStopAction(uint32_t cycleTimeMS);
+
     void StopAction(void);
     void UpdateAction(void);
     void UpdateMotorAction(void);
@@ -84,6 +87,7 @@ private:
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
     k_timer mPwmLedTimer;
+
     const pwm_dt_spec * mPwmDevice;
 
     PWMCallback_fn mActionInitiated_CB;
