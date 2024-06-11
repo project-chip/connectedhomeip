@@ -14,20 +14,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/interaction-model/MetadataTypes.h>
+#pragma once
+
+#include <app/data-model-interface/ActionContext.h>
+#include <app/data-model-interface/DataModelChangeListener.h>
+#include <app/data-model-interface/EventsGenerator.h>
 
 namespace chip {
 namespace app {
 namespace InteractionModel {
 
-const AttributeEntry AttributeEntry::kInvalid{ .path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId,
-                                                                             kInvalidAttributeId) };
-
-const CommandEntry CommandEntry::kInvalid{ .path = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId) };
-
-const ClusterEntry ClusterEntry::kInvalid{
-    .path = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId),
-    .info = ClusterInfo(0 /* version */), // version of invalid cluster entry does not matter
+/// Data provided to data models in order to interface with the interaction model environment.
+///
+/// Provides callback-style functionality to notify the interaction model of changes
+/// (e.g. using paths to notify of attribute data changes or events to generate events)
+/// as well as fetching current state (via actionContext)
+struct InteractionModelContext
+{
+    EventsGenerator * eventsGenerator;
+    DataModelChangeListener * dataModelChangeListener;
+    ActionContext * actionContext;
 };
 
 } // namespace InteractionModel
