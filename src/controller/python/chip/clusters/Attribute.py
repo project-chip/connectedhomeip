@@ -465,6 +465,13 @@ class SubscriptionTransaction:
             lambda: handle.pychip_ReadClient_OverrideLivenessTimeout(self._readTransaction._pReadClient, timeoutMs)
         )
 
+    async def TriggerResubscribeIfScheduled(self, reason: str):
+        handle = chip.native.GetLibraryHandle()
+        await builtins.chipStack.CallAsync(
+            lambda: handle.pychip_ReadClient_TriggerResubscribeIfScheduled(
+                self._readTransaction._pReadClient, reason.encode("utf-8"))
+        )
+
     def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
         '''
         Retrieve the reporting intervals associated with an active subscription.

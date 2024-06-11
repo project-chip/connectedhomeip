@@ -216,7 +216,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
 
     // advertise operational since we are an admin
-    app::DnssdServer::Instance().AdvertiseOperational();
+    ReturnLogErrorOnFailure(app::DnssdServer::Instance().AdvertiseOperational());
 
     ChipLogProgress(Support,
                     "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabric.fabricId=0x" ChipLogFormatX64 " fabricIndex=0x%x",
