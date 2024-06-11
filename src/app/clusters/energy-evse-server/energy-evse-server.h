@@ -45,14 +45,14 @@ constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
 struct EvseChargingTarget
 {
     uint16_t targetTimeMinutesPastMidnight;
-    Optional<chip::Percent> targetSoC;
+    Optional<Percent> targetSoC;
     Optional<int64_t> addedEnergy;
 };
 
 class EvseTargetEntry
 {
 public:
-    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekMap;
+    BitMask<TargetDayOfWeekBitmap> dayOfWeekMap;
     std::vector<EvseChargingTarget> dailyChargingTargets;
 };
 
