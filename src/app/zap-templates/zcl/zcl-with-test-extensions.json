@@ -353,7 +353,7 @@
             "ChannelPage0Mask",
             "OperationalDatasetComponents"
         ],
-        "WiFi Network Diagnostics": [
+        "Wi-Fi Network Diagnostics": [
             "BSSID",
             "SecurityType",
             "WiFiVersion",
