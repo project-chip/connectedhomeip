@@ -123,10 +123,10 @@ public:
             }
             AddAttributeValuePair(pairs, Attributes::ColorLoopActive::Id, loopActiveValue, attributeCount);
 
-            ColorControl::ColorLoopDirectionEnum loopDirectionValue;
+            uint8_t loopDirectionValue;
             if (Status::Success != Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue))
             {
-                loopDirectionValue = ColorControl::ColorLoopDirectionEnum::kDecrement;
+                loopDirectionValue = 0x00;
             }
             AddAttributeValuePair(pairs, Attributes::ColorLoopDirection::Id, static_cast<uint32_t>(loopDirectionValue),
                                   attributeCount);
@@ -201,7 +201,7 @@ public:
         // Initialize action attributes to default values in case they are not in the scene
         ColorControl::EnhancedColorModeEnum targetColorMode = ColorControl::EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
         uint8_t loopActiveValue                             = 0x00;
-        ColorControl::ColorLoopDirectionEnum loopDirectionValue = ColorControl::ColorLoopDirectionEnum::kDecrement;
+        uint8_t loopDirectionValue                          = 0x00;
         uint16_t loopTimeValue                                  = 0x0019; // Default loop time value according to spec
 
         while (pair_iterator.Next())
@@ -242,7 +242,7 @@ public:
                 loopActiveValue = static_cast<uint8_t>(decodePair.attributeValue);
                 break;
             case Attributes::ColorLoopDirection::Id:
-                loopDirectionValue = static_cast<ColorControl::ColorLoopDirectionEnum>(decodePair.attributeValue);
+                loopDirectionValue = static_cast<uint8_t>(decodePair.attributeValue);
                 break;
             case Attributes::ColorLoopTime::Id:
                 loopTimeValue = static_cast<uint16_t>(decodePair.attributeValue);
@@ -934,7 +934,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
     VerifyOrReturn(colorHueTransitionState != nullptr);
 
-    ColorControl::ColorLoopDirectionEnum direction = ColorControl::ColorLoopDirectionEnum::kDecrement;
+    uint8_t direction = 0;
     Attributes::ColorLoopDirection::Get(endpoint, &direction);
 
     uint16_t time = 0x0019;
@@ -957,7 +957,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
 
     colorHueTransitionState->initialEnhancedHue = startHue;
 
-    if (direction == ColorLoopDirectionEnum::kIncrement)
+    if (direction == to_underlying(ColorLoopDirectionEnum::kIncrement))
     {
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue - 1);
     }
@@ -966,7 +966,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue + 1);
     }
 
-    colorHueTransitionState->up     = (direction == ColorLoopDirectionEnum::kIncrement);
+    colorHueTransitionState->up     = (direction == to_underlying(ColorLoopDirectionEnum::kIncrement));
     colorHueTransitionState->repeat = true;
 
     colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_STEPS_PER_1S);
@@ -1904,7 +1904,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
 
     if (updateFlags.Has(UpdateFlagsBitmap::kUpdateDirection))
     {
-        Attributes::ColorLoopDirection::Set(endpoint, direction);
+        Attributes::ColorLoopDirection::Set(endpoint, to_underlying(direction));
 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
