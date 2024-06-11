@@ -217,7 +217,6 @@ class HostApp(Enum):
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_pw_test_runner_wheels'
-            yield 'chip_nl_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'

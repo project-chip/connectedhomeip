@@ -132,9 +132,6 @@ group("runner") {
   deps = [
     "${efr32_project_dir}/py:pw_test_runner.install",
     "${efr32_project_dir}/py:pw_test_runner_wheel",
-    # TODO [PW_MIGRATION]: remove the following when transition from nlunit-test is complete.
-    "${efr32_project_dir}/py:nl_test_runner.install",
-    "${efr32_project_dir}/py:nl_test_runner_wheel",
   ]
 }
 

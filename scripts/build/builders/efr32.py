@@ -277,12 +277,6 @@ class Efr32Builder(GnBuilder):
                 for file in files:
                     items["chip_pw_test_runner_wheels/" +
                           file] = os.path.join(root, file)
-            # TODO [PW_MIGRATION]: remove the nl wheels once transition away from nlunit-test is completed
-            for root, dirs, files in os.walk(os.path.join(self.output_dir, 'chip_nl_test_runner_wheels')):
-                for file in files:
-                    yield BuilderOutput(
-                        os.path.join(root, file),
-                        os.path.join("chip_nl_test_runner_wheels", file))
 
         # Figure out flash bundle files and build accordingly
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
