@@ -520,7 +520,7 @@
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00004000, 2, ZAP_TYPE(INT16U), 0 },                           /* EnhancedCurrentHue */ \
             { ZAP_SIMPLE_DEFAULT(0x01), 0x00004001, 1, ZAP_TYPE(ENUM8), 0 },                              /* EnhancedColorMode */  \
             { ZAP_SIMPLE_DEFAULT(0x00), 0x00004002, 1, ZAP_TYPE(INT8U), 0 },                              /* ColorLoopActive */    \
-            { ZAP_SIMPLE_DEFAULT(0x00), 0x00004003, 1, ZAP_TYPE(ENUM8), 0 },                              /* ColorLoopDirection */ \
+            { ZAP_SIMPLE_DEFAULT(0x00), 0x00004003, 1, ZAP_TYPE(INT8U), 0 },                              /* ColorLoopDirection */ \
             { ZAP_SIMPLE_DEFAULT(0x0019), 0x00004004, 2, ZAP_TYPE(INT16U), 0 },                           /* ColorLoopTime */      \
             { ZAP_SIMPLE_DEFAULT(0x2300), 0x00004005, 2, ZAP_TYPE(INT16U), 0 }, /* ColorLoopStartEnhancedHue */                    \
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00004006, 2, ZAP_TYPE(INT16U), 0 }, /* ColorLoopStoredEnhancedHue */                   \

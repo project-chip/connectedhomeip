@@ -32933,9 +32933,9 @@ struct TypeInfo
 namespace ColorLoopDirection {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ColorControl::ColorLoopDirectionEnum;
-    using DecodableType    = chip::app::Clusters::ColorControl::ColorLoopDirectionEnum;
-    using DecodableArgType = chip::app::Clusters::ColorControl::ColorLoopDirectionEnum;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopDirection::Id; }
@@ -33128,9 +33128,8 @@ struct TypeInfo
         Attributes::EnhancedCurrentHue::TypeInfo::DecodableType enhancedCurrentHue = static_cast<uint16_t>(0);
         Attributes::EnhancedColorMode::TypeInfo::DecodableType enhancedColorMode =
             static_cast<chip::app::Clusters::ColorControl::EnhancedColorModeEnum>(0);
-        Attributes::ColorLoopActive::TypeInfo::DecodableType colorLoopActive = static_cast<uint8_t>(0);
-        Attributes::ColorLoopDirection::TypeInfo::DecodableType colorLoopDirection =
-            static_cast<chip::app::Clusters::ColorControl::ColorLoopDirectionEnum>(0);
+        Attributes::ColorLoopActive::TypeInfo::DecodableType colorLoopActive                       = static_cast<uint8_t>(0);
+        Attributes::ColorLoopDirection::TypeInfo::DecodableType colorLoopDirection                 = static_cast<uint8_t>(0);
         Attributes::ColorLoopTime::TypeInfo::DecodableType colorLoopTime                           = static_cast<uint16_t>(0);
         Attributes::ColorLoopStartEnhancedHue::TypeInfo::DecodableType colorLoopStartEnhancedHue   = static_cast<uint16_t>(0);
         Attributes::ColorLoopStoredEnhancedHue::TypeInfo::DecodableType colorLoopStoredEnhancedHue = static_cast<uint16_t>(0);

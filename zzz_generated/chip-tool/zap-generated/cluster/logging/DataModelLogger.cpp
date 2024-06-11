@@ -15740,7 +15740,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ColorLoopActive", 1, value);
         }
         case ColorControl::Attributes::ColorLoopDirection::Id: {
-            chip::app::Clusters::ColorControl::ColorLoopDirectionEnum value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ColorLoopDirection", 1, value);
         }

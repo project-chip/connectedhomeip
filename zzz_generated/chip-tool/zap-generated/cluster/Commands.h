@@ -23783,9 +23783,8 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
             credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "color-loop-active", 0, UINT8_MAX, Attributes::ColorLoopActive::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ColorControl::ColorLoopDirectionEnum>>(
-            Id, "color-loop-direction", 0, UINT8_MAX, Attributes::ColorLoopDirection::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "color-loop-direction", 0, UINT8_MAX, Attributes::ColorLoopDirection::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-loop-time", 0, UINT16_MAX, Attributes::ColorLoopTime::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "color-loop-start-enhanced-hue", 0, UINT16_MAX,

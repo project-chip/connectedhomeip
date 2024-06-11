@@ -29335,10 +29335,9 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 namespace ColorLoopDirection {
 
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        chip::app::Clusters::ColorControl::ColorLoopDirectionEnum * value)
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::ColorLoopDirectionEnum>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
@@ -29352,10 +29351,9 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
     return status;
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::ColorLoopDirectionEnum value,
-                                        MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::ColorLoopDirectionEnum>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -29363,12 +29361,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE, markDirty);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE, markDirty);
 }
 
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::ColorLoopDirectionEnum value)
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::ColorLoopDirectionEnum>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -29376,7 +29374,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorLoopDirection
