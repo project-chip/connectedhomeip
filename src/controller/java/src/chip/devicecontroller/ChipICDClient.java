@@ -30,5 +30,7 @@ public class ChipICDClient {
     return clientInfo.stream().anyMatch(info -> info.getPeerNodeId() == deviceId);
   }
 
+  public static native void removeICDClientInfo(int fabricIndex, long deviceId);
+
   public static native List<ICDClientInfo> getICDClientInfo(int fabricIndex);
 }

@@ -25,4 +25,6 @@ object MatterICDClientImpl {
   }
 
   external fun getICDClientInfo(fabricIndex: Int): List<ICDClientInfo>?
+
+  external fun removeICDClientInfo(fabricIndex: Int, deviceId: Long)
 }

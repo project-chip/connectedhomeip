@@ -29,4 +29,6 @@
 
 jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFabricIndex);
 
+jlong removeICDClientInfo(JNIEnv * env, jint jFabricIndex, jlong jNodeId);
+
 chip::app::DefaultICDClientStorage * getICDClientStorage();

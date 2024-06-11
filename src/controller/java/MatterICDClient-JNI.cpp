@@ -27,3 +27,9 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jint jFabricIn
 
     return getICDClientInfo(env, "matter/controller/ICDClientInfo", jFabricIndex);
 }
+
+JNI_METHOD(void, removeICDClientInfo)(JNIEnv * env, jobject self, jint jFabricIndex, jlong jNodeId)
+{
+    chip::DeviceLayer::StackLock lock;
+    removeICDClientInfo(env, jFabricIndex, jNodeId);
+}

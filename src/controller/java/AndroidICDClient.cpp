@@ -93,6 +93,19 @@ jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFab
     return jInfo;
 }
 
+jlong removeICDClientInfo(JNIEnv * env, jint jFabricIndex, jlong jNodeId)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::ScopedNodeId scopedNodeId(static_cast<chip::NodeId>(jNodeId), static_cast<chip::FabricIndex>(jFabricIndex));
+    err = getICDClientStorage()->DeleteEntry(scopedNodeId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "removeICDClientInfo error!: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return static_cast<jlong>(err.AsInteger());
+}
+
 chip::app::DefaultICDClientStorage * getICDClientStorage()
 {
     return &sICDClientStorage;
