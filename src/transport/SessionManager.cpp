@@ -703,7 +703,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
 
     if (!session.HasValue())
     {
-        ChipLogError(Inet, "Data received on an unknown session (LSID=%d). Dropping it!", packetHeader.GetSessionId());
+        SecureUnicastMessageDispatch(partialPacketHeader, peerAddress, std::move(msg));
+        ChipLogError(Inet, "---Data received on an unknown session (LSID=%d). Dropping it!", packetHeader.GetSessionId());
         return;
     }
 

@@ -325,7 +325,7 @@ config CHIP_ENABLE_DNS_CLIENT
 
 config CHIP_ENABLE_ICD_SUPPORT
 	bool "Matter Intermittently Connected Devices support"
-	default n
+	default y
 	imply OPENTHREAD_MTD_SED if NET_L2_OPENTHREAD
 	help
 	  Enables the Intermittently Connected Device (ICD) support in Matter.
@@ -334,7 +334,7 @@ if CHIP_ENABLE_ICD_SUPPORT
 
 config CHIP_ICD_SLOW_POLL_INTERVAL
 	int "Intermittently Connected Device slow polling interval (ms)"
-	default 1000
+	default 2000
 	help
 	  Provides the Intermittently Connected Device slow polling interval in milliseconds while the
 	  device is in the idle mode. It determines the fastest frequency at which the device will be able
