@@ -397,26 +397,12 @@ public:
     static void TearDownTestSuite()
     {
         mpTestContext->TearDownTestSuite();
-        if (mpTestContext != nullptr)
-        {
-            delete mpTestContext;
-        }
+        delete mpTestContext;
     }
 
-    void SetUp() override
-    {
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->SetUp();
-        }
-    }
-    void TearDown() override
-    {
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->TearDown();
-        }
-    }
+    void SetUp() override { mpTestContext->SetUp(); }
+    void TearDown() override { mpTestContext->TearDown(); }
+
     static TestContext * mpTestContext;
 
     static size_t GetNumActiveCommandResponderObjects()

@@ -289,11 +289,9 @@ public:
     static void TearDownTestSuite()
     {
         chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
+
         mpTestContext->TearDownTestSuite();
-        if (mpTestContext != nullptr)
-        {
-            delete mpTestContext;
-        }
+        delete mpTestContext;
     }
 
     void SetUp()
@@ -303,10 +301,9 @@ public:
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->SetUp();
-        }
+
+        mpTestContext->SetUp();
+
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&mpTestContext->GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
@@ -314,10 +311,7 @@ public:
     void TearDown()
     {
         chip::app::EventManagement::DestroyEventManagement();
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->TearDown();
-        }
+        mpTestContext->TearDown();
     }
 
     static chip::Test::AppContext * mpTestContext;
@@ -1238,8 +1232,7 @@ TEST_F(TestReadInteraction, TestSetDirtyBetweenChunks)
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 

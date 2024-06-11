@@ -116,36 +116,23 @@ public:
     {
 
         mpTestContext = new chip::Test::AppContext;
-
         mpTestContext->SetUpTestSuite();
     }
     static void TearDownTestSuite()
     {
         mpTestContext->TearDownTestSuite();
-        if (mpTestContext != nullptr)
-        {
-            delete mpTestContext;
-        }
+        delete mpTestContext;
     }
 
     void SetUp() override
     {
+        mpTestContext->SetUp();
 
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->SetUp();
+        Access::GetAccessControl().Finish();
+        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
+    }
+    void TearDown() override { mpTestContext->TearDown(); }
 
-            Access::GetAccessControl().Finish();
-            Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
-        }
-    }
-    void TearDown() override
-    {
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->TearDown();
-        }
-    }
     static chip::Test::AppContext * mpTestContext;
 };
 

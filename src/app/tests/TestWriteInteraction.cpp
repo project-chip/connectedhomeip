@@ -101,17 +101,12 @@ public:
     static void TearDownTestSuite()
     {
         mpTestContext->TearDownTestSuite();
-        if (mpTestContext != nullptr)
-        {
-            delete mpTestContext;
-        }
+        delete mpTestContext;
     }
     void SetUp() override
     {
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->SetUp();
-        }
+
+        mpTestContext->SetUp();
 
         gTestStorage.ClearStorage();
         gGroupsProvider.SetStorageDelegate(&gTestStorage);
@@ -131,11 +126,9 @@ public:
         {
             provider->Finish();
         }
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->TearDown();
-        }
+        mpTestContext->TearDown();
     }
+
     static TestContext * mpTestContext;
 
     void TestWriteClient();

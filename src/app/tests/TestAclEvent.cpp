@@ -179,16 +179,12 @@ public:
     {
 
         mpTestContext = new chip::Test::AppContext;
-
         mpTestContext->SetUpTestSuite();
     }
     static void TearDownTestSuite()
     {
         mpTestContext->TearDownTestSuite();
-        if (mpTestContext != nullptr)
-        {
-            delete mpTestContext;
-        }
+        delete mpTestContext;
     }
 
     // Performs setup for each individual test in the test suite

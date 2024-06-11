@@ -58,20 +58,15 @@ class TestReportingEngine : public ::testing::Test
 public:
     static void SetUpTestSuite()
     {
-        if (mpTestContext == nullptr)
-        {
-            mpTestContext = std::make_unique<TestContext>();
-            ASSERT_NE(mpTestContext, nullptr);
-        }
+
+        mpTestContext = std::make_unique<TestContext>();
+        ASSERT_NE(mpTestContext, nullptr);
         mpTestContext->SetUpTestSuite();
     }
     static void TearDownTestSuite()
     {
         mpTestContext->TearDownTestSuite();
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext.reset();
-        }
+        mpTestContext.reset();
     }
     void SetUp() { mpTestContext->SetUp(); }
     void TearDown() { mpTestContext->TearDown(); }
