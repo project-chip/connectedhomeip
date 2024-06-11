@@ -21,24 +21,47 @@ import subprocess
 import sys
 import tempfile
 import time
-from typing import List, Optional, TextIO, Tuple, Union
+from typing import List, Optional, TextIO, Tuple
 
 import click
+
+"""
+This test script automates the verification of the casting experience between the Linux tv-casting-app and the Linux tv-app.
+
+It checks for expected output lines from the tv-casting-app and the tv-app in a deterministic order. If these lines are not 
+found, it indicates an issue with the casting experience.
+
+The script currently verifies the general casting flow that includes discovery, commissioning, launchURL, and subscription 
+state. Future updates will enable testing different workflows like the commissioner-generated passcode flow.
+
+To add a new workflow, define a test sequence list with Step objects containing:
+- `subprocess` to parse for output_msg or send input_cmd
+- `timeout_sec` specified the timeout duration for parsing the `output_msg` (optional, defaults to DEFAULT_TIMEOUT_SEC)
+- `output_msg` or `input_cmd` (mutually exclusive)
+- `commissioner_number_handler` (optional if we need to update the commissioner number variable in the `input_cmd`)
+
+Note: The first entry in the test sequence list should always be the output string to verify that the tv-app is up and running.
+
+For output message blocks, define the start line, relevant lines, and the last line. If the last line contains trivial closing 
+characters (e.g., closing brackets, braces, or commas), include the line before it with actual content. For example:
+    `Step(subprocess_='tv-casting-app', output_msg=['InvokeResponseMessage =', 'exampleData', 'InteractionModelRevision =', '},'])`
+
+For input commands, define the command string with placeholders for variables that need to be updated. For example:
+    `Step(subprocess_='tv-casting-app', input_cmd='cast request {valid_discovered_commissioner_number}\n', 
+        commissioner_number_handler=commissioner_number_handler)`
+The `commissioner_number_handler` is passed in to help update the `valid_discovered_commissioner_number` placeholder with the 
+actual valid discovered commissioner number.
+
+Users should add a click.option for the desired test flow and update the `examples-linux-tv-casting-app.yaml` workflow file for 
+CI testing of additional flows (to be implemented in future PR(s)).
+"""
+
 
 # Configure logging format.
 logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 
 # The maximum amount of time to wait for the Linux tv-app to start before timeout.
 TV_APP_MAX_START_WAIT_SEC = 2
-
-# The maximum amount of time to commission the Linux tv-casting-app and the tv-app before timeout.
-COMMISSIONING_STAGE_MAX_WAIT_SEC = 15
-
-# The maximum amount of time to test that the launchURL is sent from the Linux tv-casting-app and received on the tv-app before timeout.
-TEST_LAUNCHURL_MAX_WAIT_SEC = 10
-
-# The maximum amount of time to verify the subscription state in the Linux tv-casting-app output before timeout.
-VERIFY_SUBSCRIPTION_STATE_MAX_WAIT_SEC = 10
 
 # File names of logs for the Linux tv-casting-app and the Linux tv-app.
 LINUX_TV_APP_LOGS = 'Linux-tv-app-logs.txt'
@@ -49,6 +72,8 @@ LINUX_TV_CASTING_APP_LOGS = 'Linux-tv-casting-app-logs.txt'
 VENDOR_ID = 0xFFF1   # Spec 7.20.2.1 MEI code: test vendor IDs are 0xFFF1 to 0xFFF4
 PRODUCT_ID = 0x8001  # Test product id
 DEVICE_TYPE_CASTING_VIDEO_PLAYER = 0x23    # Device type library 10.3: Casting Video Player
+
+TEST_TV_CASTING_APP_DEVICE_NAME = 'Test TV casting app'  # Test device name for identifying the tv-casting-app
 
 # Values to verify the subscription state against from the `ReportDataMessage` in the Linux tv-casting-app output.
 CLUSTER_MEDIA_PLAYBACK = '0x506'  # Application Cluster Spec 6.10.3 Cluster ID: Media Playback
@@ -82,18 +107,77 @@ class LogValueExtractor:
     This class provides a centralized way to extract values from log lines and manage the error handling and logging process.
     """
 
-    def __init__(self, casting_state: str, log_paths: List[str]):
-        self.casting_state = casting_state
+    def __init__(self, log_paths: List[str]):
         self.log_paths = log_paths
 
     def extract_from(self, line: str, value_name: str):
         if value_name in line:
             try:
-                return extract_value_from_string(line, value_name, self.casting_state, self.log_paths)
+                return extract_value_from_string(line, value_name, self.log_paths)
             except ValueError:
                 logging.error(f'Failed to extract `{value_name}` value from line: {line}')
-                handle_casting_failure(self.casting_state, self.log_paths)
+                handle_casting_failure(self.log_paths)
         return None
+
+
+class CommissionerNumberHandler:
+    """A class to manage updating the commissioner number placeholder.
+
+    This class provides functionality to update the commissioner number placeholder in an input command with the actual valid discovered commissioner number.
+    """
+
+    INVALID_COMMISSIONER_NUMBER = '-1'
+
+    def __init__(self):
+        self._current_commissioner_number = self.INVALID_COMMISSIONER_NUMBER
+
+    @property
+    def commissioner_number(self) -> str:
+        return self._current_commissioner_number
+
+    @commissioner_number.setter
+    def commissioner_number(self, new_value: str):
+        self._current_commissioner_number = new_value
+
+    def is_valid(self) -> bool:
+        return self._current_commissioner_number != self.INVALID_COMMISSIONER_NUMBER
+
+
+class Step:
+    """A class to represent a step in a test sequence for validation.
+
+    A Step object contains attributes relevant to a test step.
+    """
+
+    # The maximum default time to wait while parsing for output string(s).
+    DEFAULT_TIMEOUT_SEC = 10
+
+    def __init__(
+        self,
+        subprocess_: str,
+        timeout_sec: Optional[int] = DEFAULT_TIMEOUT_SEC,
+        output_msg: Optional[List[str]] = None,
+        input_cmd: Optional[str] = None,
+        commissioner_number_handler: Optional[CommissionerNumberHandler] = None
+    ):
+        self.subprocess_ = subprocess_
+        self.timeout_sec = timeout_sec
+        self.output_msg = output_msg
+        self.input_cmd = input_cmd
+        self.commissioner_number_handler = commissioner_number_handler
+
+    @property
+    def input_cmd(self):
+        if self._input_cmd is None:
+            return None
+        elif self.commissioner_number_handler is None:
+            return self._input_cmd
+        else:
+            return self._input_cmd.format(valid_discovered_commissioner_number=self.commissioner_number_handler.commissioner_number)
+
+    @input_cmd.setter
+    def input_cmd(self, new_input_cmd: str):
+        self._input_cmd = new_input_cmd
 
 
 def dump_temporary_logs_to_console(log_file_path: str):
@@ -106,9 +190,8 @@ def dump_temporary_logs_to_console(log_file_path: str):
             print(line.rstrip())
 
 
-def handle_casting_failure(casting_state: str, log_file_paths: List[str]):
-    """Log '{casting_state} failed!' as error, dump log files to console, exit on error."""
-    logging.error(f'{casting_state} failed!')
+def handle_casting_failure(log_file_paths: List[str]):
+    """Dump log files to console, exit on error."""
 
     for log_file_path in log_file_paths:
         try:
@@ -119,31 +202,16 @@ def handle_casting_failure(casting_state: str, log_file_paths: List[str]):
     sys.exit(1)
 
 
-def extract_value_from_string(line: str, value_name: str, casting_state: str, log_paths) -> str:
+def extract_value_from_string(line: str, value_name: str, log_paths) -> str:
     """Extract and return value from given input string.
 
-    Some string examples as they are received from the Linux tv-casting-app and/or tv-app output:
+    Some string examples as they are received from the Linux tv-casting-app output:
     1. On 'darwin' machines:
-        \x1b[0;34m[1715206773402] [20056:2842184] [DMG]  Cluster = 0x506,\x1b[0m
-        The substring to be extracted here is '0x506'.
-
-        Or:
         \x1b[0;32m[1714582264602] [77989:2286038] [SVR] Discovered Commissioner #0\x1b[0m
         The integer value to be extracted here is '0'.
 
-        Or:
-        \x1b[0;34m[1713741926895] [7276:9521344] [DIS] Vendor ID: 65521\x1b[0m
-        The integer value to be extracted here is '65521'.
-
-        Or:
-        \x1b[0;34m[1714583616179] [7029:2386956] [SVR] 	device Name: Test TV casting app\x1b[0m
-        The substring to be extracted here is 'Test TV casting app'.
-
     2. On 'linux' machines:
-        [1716224960.316809][6906:6906] CHIP:DMG: \t\t\t\t\tCluster = 0x506,\n
         [1716224958.576320][6906:6906] CHIP:SVR: Discovered Commissioner #0
-        [1716224958.576407][6906:6906] CHIP:DIS: \tVendor ID: 65521\n
-        [1716224959.580746][6906:6906] CHIP:SVR: \tdevice Name: Test TV casting app\n
     """
     log_line_pattern = ''
     if sys.platform == 'darwin':
@@ -156,453 +224,153 @@ def extract_value_from_string(line: str, value_name: str, casting_state: str, lo
     if log_line_match:
         log_text_of_interest = log_line_match.group(1)
 
-        if '=' in log_text_of_interest:
-            delimiter = '='
-        elif '#' in log_text_of_interest:
+        if '#' in log_text_of_interest:
             delimiter = '#'
-        else:
-            delimiter = ':'
 
-        return log_text_of_interest.split(delimiter)[-1].strip(' ,')
+        return log_text_of_interest.split(delimiter)[-1].strip(' ')
     else:
         raise ValueError(f'Could not extract {value_name} from the following line: {line}')
 
 
-def validate_value(casting_state: str, expected_value: Union[str, int], log_paths: List[str], line: str, value_name: str) -> Optional[str]:
-    """Validate a value in a string against an expected value during a given casting state."""
-    log_value_extractor = LogValueExtractor(casting_state, log_paths)
-    value = log_value_extractor.extract_from(line, value_name)
-    if not value:
-        logging.error(f'Failed to extract {value_name} value from the following line: {line}')
-        logging.error(f'Failed to validate against the expected {value_name} value: {expected_value}!')
-        handle_casting_failure(casting_state, log_paths)
+def get_general_flow_test_sequence(commissioner_number_handler: CommissionerNumberHandler) -> List[Step]:
+    """Retrieve the test sequence pertaining to the general flow for validating the casting experience between the Linux tv-casting-app and the Linux tv-app."""
 
-    if isinstance(expected_value, int):
-        value = int(value)
+    general_flow_test_sequence = [
+        # Validate that the tv-app is up and running.
+        Step(subprocess_='tv-app', timeout_sec=TV_APP_MAX_START_WAIT_SEC, output_msg=['Started commissioner']),
 
-    if value != expected_value:
-        logging.error(f'{value_name} does not match the expected value!')
-        logging.error(f'Expected {value_name}: {expected_value}')
-        logging.error(line.rstrip('\n'))
-        handle_casting_failure(casting_state, log_paths)
+        # Validate that there is a valid discovered commissioner with {VENDOR_ID}, {PRODUCT_ID}, and {DEVICE_TYPE_CASTING_VIDEO_PLAYER} in the tv-casting-app output.
+        Step(subprocess_='tv-casting-app', output_msg=['Discovered Commissioner #', f'Vendor ID: {VENDOR_ID}', f'Product ID: {PRODUCT_ID}',
+             f'Device Type: {DEVICE_TYPE_CASTING_VIDEO_PLAYER}', 'Supports Commissioner Generated Passcode: true']),
 
-    # Return the line containing the valid value.
-    return line.rstrip('\n')
+        # Validate that we are ready to send `cast request` command to the tv-casting-app subprocess.
+        Step(subprocess_='tv-casting-app', output_msg=['Example: cast request 0']),
+
+        # Send `cast request {valid_discovered_commissioner_number}\n` command to the tv-casting-app subprocess.
+        Step(subprocess_='tv-casting-app',
+             input_cmd='cast request {valid_discovered_commissioner_number}\n', commissioner_number_handler=commissioner_number_handler),
+
+        # Validate that the `Identification Declaration` message block in the tv-casting-app output has the expected values for `device Name`, `vendor id`, and `product id`.
+        Step(subprocess_='tv-casting-app', output_msg=['Identification Declaration Start', f'device Name: {TEST_TV_CASTING_APP_DEVICE_NAME}',
+             f'vendor id: {VENDOR_ID}', f'product id: {PRODUCT_ID}', 'Identification Declaration End']),
+
+        # Validate that the `Identification Declaration` message block in the tv-app output has the expected values for `device Name`, `vendor id`, and `product id`.
+        Step(subprocess_='tv-app', output_msg=['Identification Declaration Start', f'device Name: {TEST_TV_CASTING_APP_DEVICE_NAME}',
+             f'vendor id: {VENDOR_ID}', f'product id: {PRODUCT_ID}', 'Identification Declaration End']),
+
+        # Validate that we received the cast request from the tv-casting-app on the tv-app output.
+        Step(subprocess_='tv-app',
+             output_msg=['PROMPT USER: Test TV casting app is requesting permission to cast to this TV, approve?']),
+
+        # Validate that we received the instructions on the tv-app output for sending the `controller ux ok` command.
+        Step(subprocess_='tv-app', output_msg=['Via Shell Enter: controller ux ok|cancel']),
+
+        # Send `controller ux ok` command to the tv-app subprocess.
+        Step(subprocess_='tv-app', input_cmd='controller ux ok\n'),
+
+        # Validate that pairing succeeded between the tv-casting-app and the tv-app.
+        Step(subprocess_='tv-app', output_msg=['Secure Pairing Success']),
+
+        # Validate that commissioning succeeded in the tv-casting-app output.
+        Step(subprocess_='tv-casting-app', output_msg=['Commissioning completed successfully']),
+
+        # Validate that commissioning succeeded in the tv-app output.
+        Step(subprocess_='tv-app', output_msg=['------PROMPT USER: commissioning success']),
+
+        # Validate the subscription state by looking at the `Cluster` and `Attribute` values in the `ReportDataMessage` block in the tv-casting-app output.
+        Step(subprocess_='tv-casting-app', output_msg=[
+             'ReportDataMessage =', f'Cluster = {CLUSTER_MEDIA_PLAYBACK}', f'Attribute = {ATTRIBUTE_CURRENT_PLAYBACK_STATE}', 'InteractionModelRevision =', '}']),
+
+        # Validate the LaunchURL in the tv-app output.
+        Step(subprocess_='tv-app',
+             output_msg=['ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://www.test.com/videoid DisplayString=Test video']),
+
+        # Validate the LaunchURL in the tv-casting-app output.
+        Step(subprocess_='tv-casting-app', output_msg=['InvokeResponseMessage =',
+             'exampleData', 'InteractionModelRevision =', '},'])
+    ]
+
+    return general_flow_test_sequence
 
 
-def start_up_tv_app_success(tv_app_process: subprocess.Popen, linux_tv_app_log_file: TextIO) -> bool:
-    """Check if the Linux tv-app is able to successfully start or until timeout occurs."""
+def parse_output_msg_in_subprocess(
+    tv_casting_app_info: Tuple[subprocess.Popen, TextIO],
+    tv_app_info: Tuple[subprocess.Popen, TextIO],
+    log_paths: List[str],
+    step: Step,
+    commissioner_number_handler: CommissionerNumberHandler
+):
+    """Parse the output of a given `subprocess` and validate its output against the expected `output_msg` in the given `Step`."""
+
+    app_subprocess, app_log_file = (tv_casting_app_info if step.subprocess_ == 'tv-casting-app' else tv_app_info)
+
     start_wait_time = time.time()
+    msg_block = []
 
-    while True:
-        # Check if the time elapsed since the start wait time exceeds the maximum allowed startup time for the TV app.
-        if time.time() - start_wait_time > TV_APP_MAX_START_WAIT_SEC:
-            logging.error('The Linux tv-app process did not start successfully within the timeout.')
-            return False
-
-        tv_app_output_line = tv_app_process.stdout.readline()
-
-        linux_tv_app_log_file.write(tv_app_output_line)
-        linux_tv_app_log_file.flush()
-
-        # Check if the Linux tv-app started successfully.
-        if "Started commissioner" in tv_app_output_line:
-            logging.info('Linux tv-app is up and running!')
-            return True
-
-
-def initiate_cast_request_success(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], valid_discovered_commissioner_number: str) -> bool:
-    """Initiate commissioning between Linux tv-casting-app and tv-app by sending `cast request {valid_discovered_commissioner_number}` via Linux tv-casting-app process."""
-    tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
-
-    start_wait_time = time.time()
-
-    while True:
-        # Check if we exceeded the maximum wait time for initiating 'cast request' from the Linux tv-casting-app to the Linux tv-app.
-        if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
+    i = 0
+    while i < len(step.output_msg):
+        # Check if we exceeded the maximum wait time to parse for the output string(s).
+        if time.time() - start_wait_time > step.timeout_sec:
             logging.error(
-                f'The command `cast request {valid_discovered_commissioner_number}` was not issued to the Linux tv-casting-app process within the timeout.')
+                f'Did not find the expected output string(s) in the {step.subprocess_} subprocess within the timeout: {step.output_msg}')
             return False
 
-        tv_casting_app_output_line = tv_casting_app_process.stdout.readline()
-        if tv_casting_app_output_line:
-            linux_tv_casting_app_log_file.write(tv_casting_app_output_line)
-            linux_tv_casting_app_log_file.flush()
+        output_line = app_subprocess.stdout.readline()
 
-            if 'cast request 0' in tv_casting_app_output_line:
-                tv_casting_app_process.stdin.write('cast request ' + valid_discovered_commissioner_number + '\n')
-                tv_casting_app_process.stdin.flush()
-                # Move to the next line otherwise we will keep entering this code block
-                next_line = tv_casting_app_process.stdout.readline()
-                linux_tv_casting_app_log_file.write(next_line)
-                linux_tv_casting_app_log_file.flush()
-                next_line = next_line.rstrip('\n')
-                logging.info(f'Sent `{next_line}` to the Linux tv-casting-app process.')
+        if output_line:
+            app_log_file.write(output_line)
+            app_log_file.flush()
+
+            if (step.output_msg[i] in output_line):
+                msg_block.append(output_line.rstrip('\n'))
+                i += 1
+            elif msg_block:
+                msg_block.append(output_line.rstrip('\n'))
+                if (step.output_msg[0] in output_line):
+                    msg_block.clear()
+                    msg_block.append(output_line.rstrip('\n'))
+                    i = 1
+
+            if i == len(step.output_msg):
+                logging.info(f'Found the expected output string(s) in the {step.subprocess_} subprocess:')
+                for line in msg_block:
+                    if 'Discovered Commissioner #' in line:
+                        log_value_extractor = LogValueExtractor(log_paths)
+                        # Update the current commissioner number to the valid discovered commissioner number
+                        commissioner_number_handler.commissioner_number = log_value_extractor.extract_from(
+                            line, 'Discovered Commissioner #')
+
+                    logging.info(line)
 
                 return True
 
 
-def extract_device_info_from_tv_casting_app(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], casting_state: str, log_paths: List[str]) -> Tuple[Optional[str], Optional[int], Optional[int]]:
-    """Extract device information from the 'Identification Declaration' block in the Linux tv-casting-app output."""
-    tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
-    log_value_extractor = LogValueExtractor(casting_state, log_paths)
-
-    device_name = None
-    vendor_id = None
-    product_id = None
-
-    for line in tv_casting_app_process.stdout:
-        linux_tv_casting_app_log_file.write(line)
-        linux_tv_casting_app_log_file.flush()
-
-        if value := log_value_extractor.extract_from(line, 'device Name'):
-            device_name = value
-        elif value := log_value_extractor.extract_from(line, 'vendor id'):
-            vendor_id = int(value)
-        elif value := log_value_extractor.extract_from(line, 'product id'):
-            product_id = int(value)
-
-        if device_name and vendor_id and product_id:
-            break
-
-    return device_name, vendor_id, product_id
-
-
-def validate_identification_declaration_message_on_tv_app(tv_app_info: Tuple[subprocess.Popen, TextIO], expected_device_name: str, expected_vendor_id: int, expected_product_id: int, log_paths: List[str]) -> bool:
-    """Validate device information from the 'Identification Declaration' block from the Linux tv-app output against the expected values."""
-    tv_app_process, linux_tv_app_log_file = tv_app_info
-
-    parsing_identification_block = False
-    start_wait_time = time.time()
-
-    while True:
-        # Check if we exceeded the maximum wait time for validating the device information from the Linux tv-app to the corresponding values from the Linux tv-app.
-        if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
-            logging.error(
-                'The device information from the Linux tv-app output was not validated against the corresponding values from the Linux tv-casting-app output within the timeout.')
-            return False
-
-        tv_app_line = tv_app_process.stdout.readline()
-
-        if tv_app_line:
-            linux_tv_app_log_file.write(tv_app_line)
-            linux_tv_app_log_file.flush()
-
-            if 'Identification Declaration Start' in tv_app_line:
-                logging.info('Found the `Identification Declaration` block in the Linux tv-app output:')
-                logging.info(tv_app_line.rstrip('\n'))
-                parsing_identification_block = True
-            elif parsing_identification_block:
-                logging.info(tv_app_line.rstrip('\n'))
-                if 'device Name' in tv_app_line:
-                    validate_value('Commissioning', expected_device_name, log_paths, tv_app_line, 'device Name')
-                elif 'vendor id' in tv_app_line:
-                    validate_value('Commissioning', expected_vendor_id, log_paths, tv_app_line, 'vendor id')
-                elif 'product id' in tv_app_line:
-                    validate_value('Commissioning', expected_product_id, log_paths, tv_app_line, 'product id')
-                elif 'Identification Declaration End' in tv_app_line:
-                    parsing_identification_block = False
-                    return True
-
-
-def validate_tv_casting_request_approval(tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]) -> bool:
-    """Validate that the TV casting request from the Linux tv-casting-app to the Linux tv-app is approved by sending `controller ux ok` via Linux tv-app process."""
-    tv_app_process, linux_tv_app_log_file = tv_app_info
-
-    start_wait_time = time.time()
-
-    while True:
-        # Check if we exceeded the maximum wait time for sending 'controller ux ok' from the Linux tv-app to the Linux tv-casting-app.
-        if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
-            logging.error('The cast request from the Linux tv-casting-app to the Linux tv-app was not approved within the timeout.')
-            return False
-
-        tv_app_line = tv_app_process.stdout.readline()
-
-        if tv_app_line:
-            linux_tv_app_log_file.write(tv_app_line)
-            linux_tv_app_log_file.flush()
-
-            if 'PROMPT USER: Test TV casting app is requesting permission to cast to this TV, approve?' in tv_app_line:
-                logging.info(tv_app_line.rstrip('\n'))
-            elif 'Via Shell Enter: controller ux ok|cancel' in tv_app_line:
-                logging.info(tv_app_line.rstrip('\n'))
-
-                tv_app_process.stdin.write('controller ux ok\n')
-                tv_app_process.stdin.flush()
-
-                tv_app_line = tv_app_process.stdout.readline()
-                linux_tv_app_log_file.write(tv_app_line)
-                linux_tv_app_log_file.flush()
-                tv_app_line = tv_app_line.rstrip('\n')
-                logging.info(f'Sent `{tv_app_line}` to the Linux tv-app process.')
-                return True
-
-
-def validate_commissioning_success(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]) -> bool:
-    """Parse output of Linux tv-casting-app and Linux tv-app output for strings indicating commissioning status."""
-    tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
-    tv_app_process, linux_tv_app_log_file = tv_app_info
-
-    start_wait_time = time.time()
-
-    while True:
-        # Check if we exceeded the maximum wait time for validating commissioning success between the Linux tv-casting-app and the Linux tv-app.
-        if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
-            logging.error(
-                'The commissioning between the Linux tv-casting-app process and the Linux tv-app process did not complete successfully within the timeout.')
-            return False
-
-        tv_casting_line = tv_casting_app_process.stdout.readline()
-        tv_app_line = tv_app_process.stdout.readline()
-
-        if tv_casting_line:
-            linux_tv_casting_app_log_file.write(tv_casting_line)
-            linux_tv_casting_app_log_file.flush()
-
-            if 'Commissioning completed successfully' in tv_casting_line:
-                logging.info('Commissioning success noted on the Linux tv-casting-app output:')
-                logging.info(tv_casting_line.rstrip('\n'))
-            elif 'Commissioning failed' in tv_casting_line:
-                logging.error('Commissioning failed noted on the Linux tv-casting-app output:')
-                logging.error(tv_casting_line.rstrip('\n'))
-                return False
-
-        if tv_app_line:
-            linux_tv_app_log_file.write(tv_app_line)
-            linux_tv_app_log_file.flush()
-
-            if 'PROMPT USER: commissioning success' in tv_app_line:
-                logging.info('Commissioning success noted on the Linux tv-app output:')
-                logging.info(tv_app_line)
-                return True
-
-
-def parse_tv_casting_app_for_report_data_msg(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
-    """Parse the Linux tv-casting-app for `ReportDataMessage` block and return the first message block with valid `Cluster` and `Attribute` values."""
-    tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
-    log_value_extractor = LogValueExtractor('Testing subscription', log_paths)
-
-    continue_parsing = False
-    report_data_message = []
-
-    start_wait_time = time.time()
-
-    while True:
-        # Check if we exceeded the maximum wait time to parse the Linux tv-casting-app output for `ReportDataMessage` block.
-        if time.time() - start_wait_time > VERIFY_SUBSCRIPTION_STATE_MAX_WAIT_SEC:
-            logging.error(
-                'The relevant `ReportDataMessage` block for the MediaPlayback:CurrentState subscription was not found in the Linux tv-casting-app process within the timeout.')
-            report_data_message.clear()
-            return report_data_message
-
-        tv_casting_line = tv_casting_app_process.stdout.readline()
-
-        if tv_casting_line:
-            linux_tv_casting_app_log_file.write(tv_casting_line)
-            linux_tv_casting_app_log_file.flush()
-
-            if 'ReportDataMessage =' in tv_casting_line:
-                report_data_message.append(tv_casting_line.rstrip('\n'))
-                continue_parsing = True
-            elif continue_parsing:
-                report_data_message.append(tv_casting_line.rstrip('\n'))
-
-                if cluster_value := log_value_extractor.extract_from(tv_casting_line, 'Cluster ='):
-                    if cluster_value != CLUSTER_MEDIA_PLAYBACK:
-                        report_data_message.clear()
-                        continue_parsing = False
-
-                elif attribute_value := log_value_extractor.extract_from(tv_casting_line, 'Attribute ='):
-                    if attribute_value != ATTRIBUTE_CURRENT_PLAYBACK_STATE:
-                        report_data_message.clear()
-                        continue_parsing = False
-
-                elif 'InteractionModelRevision' in tv_casting_line:
-                    # Capture the closing brace `}` of the `ReportDataMessage` block.
-                    tv_casting_line = tv_casting_app_process.stdout.readline()
-                    linux_tv_casting_app_log_file.write(tv_casting_line)
-                    linux_tv_casting_app_log_file.flush()
-                    report_data_message.append(tv_casting_line.rstrip('\n'))
-                    return report_data_message
-
-
-def parse_tv_app_output_for_launchUrl_msg_success(tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
-    """Parse the Linux tv-app output for the relevant string indicating that the launchUrl was received."""
-
-    tv_app_process, linux_tv_app_log_file = tv_app_info
-
-    start_wait_time = time.time()
-
-    while True:
-        # Check if we exceeded the maximum wait time to parse the Linux tv-app output for the string related to the launchUrl.
-        if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
-            logging.error(
-                'The relevant launchUrl string was not found in the Linux tv-app process within the timeout.')
-            return False
-
-        tv_app_line = tv_app_process.stdout.readline()
-
-        if tv_app_line:
-            linux_tv_app_log_file.write(tv_app_line)
-            linux_tv_app_log_file.flush()
-
-            if 'ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://www.test.com/videoid DisplayString=Test video' in tv_app_line:
-                logging.info('Found the launchUrl in the Linux tv-app output:')
-                logging.info(tv_app_line.rstrip('\n'))
-                return True
-
-
-def parse_tv_casting_app_output_for_launchUrl_msg_success(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
-    """Parse the Linux tv-casting-app output for relevant strings indicating that the launchUrl was sent."""
-
-    tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
-
-    continue_parsing_invoke_response_msg_block = False
-    found_example_data_msg = False
-    start_wait_time = time.time()
-
-    while True:
-        # Check if we exceeded the maximum wait time to parse the Linux tv-casting-app output for strings related to the launchUrl.
-        if time.time() - start_wait_time > TEST_LAUNCHURL_MAX_WAIT_SEC:
-            logging.error(
-                'The relevant launchUrl strings were not found in the Linux tv-casting-app process within the timeout.')
-            return False
-
-        tv_casting_line = tv_casting_app_process.stdout.readline()
-
-        if tv_casting_line:
-            linux_tv_casting_app_log_file.write(tv_casting_line)
-            linux_tv_casting_app_log_file.flush()
-
-            if 'InvokeResponseMessage =' in tv_casting_line:
-                logging.info('Found the `InvokeResponseMessage` block in the Linux tv-casting-app output:')
-                logging.info(tv_casting_line.rstrip('\n'))
-                continue_parsing_invoke_response_msg_block = True
-
-            elif continue_parsing_invoke_response_msg_block:
-                # Sanity check for `exampleData` in the `InvokeResponseMessage` block.
-                if 'exampleData' in tv_casting_line:
-                    found_example_data_msg = True
-
-                elif 'Received Command Response Data' in tv_casting_line:
-                    if not found_example_data_msg:
-                        logging.error('The `exampleData` string was not found in the `InvokeResponseMessage` block.')
-                        return False
-
-                    logging.info('Found the `Received Command Response Data` string in the Linux tv-casting-app output:')
-                    logging.info(tv_casting_line.rstrip('\n'))
-                    return True
-
-                logging.info(tv_casting_line.rstrip('\n'))
-
-
-def test_discovery_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]) -> Optional[str]:
-    """Parse the output of the Linux tv-casting-app to find a valid commissioner."""
-    tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
-
-    valid_discovered_commissioner = None
-    valid_vendor_id = None
-    valid_product_id = None
-    valid_device_type = None
-
-    # Read the output as we receive it from the tv-casting-app subprocess.
-    for line in tv_casting_app_process.stdout:
-        linux_tv_casting_app_log_file.write(line)
-        linux_tv_casting_app_log_file.flush()
-
-        # Fail fast if "No commissioner discovered" string found.
-        if 'No commissioner discovered' in line:
-            logging.error(line.rstrip('\n'))
-            handle_casting_failure('Discovery', log_paths)
-
-        elif 'Discovered Commissioner' in line:
-            valid_discovered_commissioner = line.rstrip('\n')
-
-        elif valid_discovered_commissioner:
-            # Continue parsing the output for the information of interest under 'Discovered Commissioner'
-            if 'Vendor ID:' in line:
-                valid_vendor_id = validate_value('Discovery', VENDOR_ID, log_paths, line, 'Vendor ID')
-
-            elif 'Product ID:' in line:
-                valid_product_id = validate_value('Discovery', PRODUCT_ID, log_paths, line, 'Product ID')
-
-            elif 'Device Type:' in line:
-                valid_device_type = validate_value('Discovery', DEVICE_TYPE_CASTING_VIDEO_PLAYER, log_paths, line, 'Device Type')
-
-        # A valid commissioner has VENDOR_ID, PRODUCT_ID, and DEVICE TYPE in its list of entries.
-        if valid_vendor_id and valid_product_id and valid_device_type:
-            logging.info('Found a valid commissioner in the Linux tv-casting-app output:')
-            logging.info(valid_discovered_commissioner)
-            logging.info(valid_vendor_id)
-            logging.info(valid_product_id)
-            logging.info(valid_device_type)
-            logging.info('Discovery success!\n')
-            break
-
-    return valid_discovered_commissioner
-
-
-def test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_info: Tuple[subprocess.Popen, TextIO], tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
-    """Test commissioning between Linux tv-casting-app and Linux tv-app."""
-
-    if not initiate_cast_request_success(tv_casting_app_info, valid_discovered_commissioner_number):
-        handle_casting_failure('Commissioning', log_paths)
-
-    # Extract the values from the 'Identification Declaration' block in the tv-casting-app output that we want to validate against.
-    expected_device_name, expected_vendor_id, expected_product_id = extract_device_info_from_tv_casting_app(
-        tv_casting_app_info, 'Commissioning', log_paths)
-
-    if not expected_device_name or not expected_vendor_id or not expected_product_id:
-        logging.error('There is an error with the expected device info values that were extracted from the `Identification Declaration` block.')
-        logging.error(
-            f'expected_device_name: {expected_device_name}, expected_vendor_id: {expected_vendor_id}, expected_product_id: {expected_product_id}')
-        handle_casting_failure('Commissioning', log_paths)
-
-    if not validate_identification_declaration_message_on_tv_app(tv_app_info, expected_device_name, expected_vendor_id, expected_product_id, log_paths):
-        handle_casting_failure('Commissioning', log_paths)
-
-    if not validate_tv_casting_request_approval(tv_app_info, log_paths):
-        handle_casting_failure('Commissioning', log_paths)
-
-    if not validate_commissioning_success(tv_casting_app_info, tv_app_info, log_paths):
-        handle_casting_failure('Commissioning', log_paths)
-
-
-def test_subscription_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
-    """Test the subscription state of the Linux tv-casting-app by validating the `ReportDataMessage` block."""
-
-    valid_report_data_msg = parse_tv_casting_app_for_report_data_msg(tv_casting_app_info, log_paths)
-
-    if valid_report_data_msg:
-        logging.info('Found the `ReportDataMessage` block in the Linux tv-casting-app output:')
-
-        for line in valid_report_data_msg:
-            logging.info(line)
-
-        logging.info('Testing subscription success!\n')
-        valid_report_data_msg.clear()
-    else:
-        handle_casting_failure('Testing subscription', log_paths)
-
-
-def test_launchUrl_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
-    """Test that the Linux tv-casting-app sent the launchUrl and that the Linux tv-app received the launchUrl."""
-
-    if not parse_tv_app_output_for_launchUrl_msg_success(tv_app_info, log_paths):
-        handle_casting_failure('Testing launchUrl', log_paths)
-
-    if not parse_tv_casting_app_output_for_launchUrl_msg_success(tv_casting_app_info, log_paths):
-        handle_casting_failure('Testing launchUrl', log_paths)
-
-    logging.info('Testing launchUrl success!')
+def send_input_cmd_to_subprocess(
+    tv_casting_app_info: Tuple[subprocess.Popen, TextIO],
+    tv_app_info: Tuple[subprocess.Popen, TextIO],
+    step: Step
+):
+    """Send a given input command (`input_cmd`) from the `Step` to its given `subprocess`."""
+
+    app_subprocess, app_log_file = (tv_casting_app_info if step.subprocess_ == 'tv-casting-app' else tv_app_info)
+
+    app_subprocess.stdin.write(step.input_cmd)
+    app_subprocess.stdin.flush()
+
+    # Read in the next line which should be the `input_cmd` that was issued.
+    next_line = app_subprocess.stdout.readline()
+    app_log_file.write(next_line)
+    app_log_file.flush()
+    next_line = next_line.rstrip('\n')
+
+    logging.info(f'Sent `{next_line}` to the {step.subprocess_} subprocess.')
 
 
 @click.command()
 @click.option('--tv-app-rel-path', type=str, default='out/tv-app/chip-tv-app', help='Path to the Linux tv-app executable.')
 @click.option('--tv-casting-app-rel-path', type=str, default='out/tv-casting-app/chip-tv-casting-app', help='Path to the Linux tv-casting-app executable.')
 def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
-    """Test if the Linux tv-casting-app is able to discover and commission the Linux tv-app as part of casting.
+    """Test if the casting experience between the Linux tv-casting-app and the Linux tv-app continues to work.
 
     Default paths for the executables are provided but can be overridden via command line arguments.
     For example: python3 run_tv_casting_test.py --tv-app-rel-path=path/to/tv-app
@@ -624,32 +392,32 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
             tv_app_abs_path = os.path.abspath(tv_app_rel_path)
             # Run the Linux tv-app subprocess.
             with ProcessManager(disable_stdout_buffering_cmd + [tv_app_abs_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_app_process:
+                tv_app_info = (tv_app_process, linux_tv_app_log_file)
 
-                if not start_up_tv_app_success(tv_app_process, linux_tv_app_log_file):
-                    handle_casting_failure('Discovery', [linux_tv_app_log_path])
+                commissioner_number_handler = CommissionerNumberHandler()
+                test_sequence = get_general_flow_test_sequence(commissioner_number_handler)
+
+                # Verify that the tv-app is up and running.
+                if not parse_output_msg_in_subprocess(None, tv_app_info, [linux_tv_app_log_path], test_sequence[0], commissioner_number_handler):
+                    handle_casting_failure([linux_tv_app_log_path])
 
                 tv_casting_app_abs_path = os.path.abspath(tv_casting_app_rel_path)
                 # Run the Linux tv-casting-app subprocess.
                 with ProcessManager(disable_stdout_buffering_cmd + [tv_casting_app_abs_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_casting_app_process:
                     log_paths = [linux_tv_app_log_path, linux_tv_casting_app_log_path]
                     tv_casting_app_info = (tv_casting_app_process, linux_tv_casting_app_log_file)
-                    tv_app_info = (tv_app_process, linux_tv_app_log_file)
-                    valid_discovered_commissioner = test_discovery_fn(tv_casting_app_info, log_paths)
 
-                    if not valid_discovered_commissioner:
-                        handle_casting_failure('Discovery', log_paths)
+                    i = 1
+                    while i < len(test_sequence):
+                        step = test_sequence[i]
 
-                    # We need the valid discovered commissioner number to continue with commissioning.
-                    log_value_extractor = LogValueExtractor('Commissioning', log_paths)
-                    valid_discovered_commissioner_number = log_value_extractor.extract_from(
-                        valid_discovered_commissioner, 'Discovered Commissioner #')
-                    if not valid_discovered_commissioner_number:
-                        logging.error(f'Failed to find `Discovered Commissioner #` in line: {valid_discovered_commissioner}')
-                        handle_casting_failure('Commissioning', log_paths)
+                        if step.output_msg:
+                            if not parse_output_msg_in_subprocess(tv_casting_app_info, tv_app_info, log_paths, step, commissioner_number_handler):
+                                handle_casting_failure(log_paths)
+                        elif step.input_cmd:
+                            send_input_cmd_to_subprocess(tv_casting_app_info, tv_app_info, step)
 
-                    test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_info, tv_app_info, log_paths)
-                    test_subscription_fn(tv_casting_app_info, log_paths)
-                    test_launchUrl_fn(tv_casting_app_info, tv_app_info, log_paths)
+                        i += 1
 
 
 if __name__ == '__main__':
