@@ -108,7 +108,7 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
         Crypto::DRBG_get_bytes(attestationNonceBuf, sizeof(attestationNonceBuf));
 
         VendorId vid = TestVendor1;
-        uint16_t pid = strstr(entry->d_name, "_vidpid_fallback_encoding_") ? 0x00B1 : 0x8000;
+        uint16_t pid = dacProvider.GetPid();
 
         EXPECT_EQ(dacProvider.GetCertificationDeclaration(certDeclSpan), CHIP_NO_ERROR);
         EXPECT_EQ(dacProvider.GetDeviceAttestationCert(dacCertSpan), CHIP_NO_ERROR);

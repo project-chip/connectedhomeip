@@ -250,7 +250,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
 
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
         {
-            // If WiFi Network Diagnostics cluster is implemented on this endpoint
+            // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
             Events::Disconnection::Type event{ reasonCode };
             EventNumber eventNumber;
 
@@ -271,7 +271,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
 
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
         {
-            // If WiFi Network Diagnostics cluster is implemented on this endpoint
+            // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
             EventNumber eventNumber;
 
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
@@ -290,7 +290,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
         Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
         {
-            // If WiFi Network Diagnostics cluster is implemented on this endpoint
+            // If Wi-Fi Network Diagnostics cluster is implemented on this endpoint
             EventNumber eventNumber;
 
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
