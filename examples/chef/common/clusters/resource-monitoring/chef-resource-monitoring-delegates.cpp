@@ -137,7 +137,7 @@ chip::Protocols::InteractionModel::Status ChefResourceMonitorInstance::ExternalA
     case HepaFilterMonitoring::Attributes::DegradationDirection::Id:
     default:
     {
-        ChipLogError(Zcl, "Unsupported External Attribute Read: %d", static_cast<int>(attributeId));  
+        ChipLogError(Zcl, "Unsupported External Attribute Read: %d", static_cast<int>(attributeId));
         ret =  Protocols::InteractionModel::Status::UnsupportedWrite;
     }
         break;
@@ -163,7 +163,7 @@ chip::Protocols::InteractionModel::Status chefResourceMonitoringExternalWriteCal
 {
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
     AttributeId attributeId                            = attributeMetadata->attributeId;
-    ChipLogProgress(Zcl, "chefResourceMonitoringExternalWriteCallback EP: %d, Cluster: %d, Att: %d", static_cast<int>(endpoint), static_cast<int>(clusterId), static_cast<int>(attributeId));  
+    ChipLogProgress(Zcl, "chefResourceMonitoringExternalWriteCallback EP: %d, Cluster: %d, Att: %d", static_cast<int>(endpoint), static_cast<int>(clusterId), static_cast<int>(attributeId));
 
     switch (clusterId) {
     case HepaFilterMonitoring::Id:
@@ -184,7 +184,7 @@ chip::Protocols::InteractionModel::Status chefResourceMonitoringExternalReadCall
 {
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
     AttributeId attributeId                            = attributeMetadata->attributeId;
-    ChipLogProgress(Zcl, "chefResourceMonitoringExternalReadCallback EP: %d, Cluster: %d, Att: %d", static_cast<int>(endpoint), static_cast<int>(clusterId), static_cast<int>(attributeId));  
+    ChipLogProgress(Zcl, "chefResourceMonitoringExternalReadCallback EP: %d, Cluster: %d, Att: %d", static_cast<int>(endpoint), static_cast<int>(clusterId), static_cast<int>(attributeId));
 
     switch (clusterId) {
     case HepaFilterMonitoring::Id:
@@ -232,7 +232,7 @@ chip::Protocols::InteractionModel::Status ChefResourceMonitorInstance::ExternalA
         break;
     case HepaFilterMonitoring::Attributes::DegradationDirection::Id:
     default:
-        ChipLogError(Zcl, "Unsupported External Attribute Read: %d", static_cast<int>(attributeId));  
+        ChipLogError(Zcl, "Unsupported External Attribute Read: %d", static_cast<int>(attributeId));
         ret =  Protocols::InteractionModel::Status::UnsupportedRead;
         break;
     }
