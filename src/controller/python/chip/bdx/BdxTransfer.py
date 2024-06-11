@@ -1,0 +1,51 @@
+#
+#    Copyright (c) 2024 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+@dataclass
+class InitMessage:
+    TransferControlFlags: int
+    MaxBlockSize: int
+    StartOffset: int
+    Length: int
+    FileDesignator
+    Metadata
+
+class BdxTransfer:
+    __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data = None):
+        self.init_message = init_message
+        self._bdx_transfer = bdx_transfer
+        self._data = data
+
+    async def accept(self):
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        if self._data != None:
+            res = await Bdx.AcceptReceiveTransfer(self._bdx_transfer, self._data, future)
+            res.raise_on_error()
+            return await future
+        else:
+            self._data = []
+            res = await Bdx.AcceptSendTransfer(self._bdx_transfer, lambda data: self._data.extend(data), future)
+            res.raise_on_error()
+            await future
+            return self._data
+
+    async def reject(self):
+        res = await Bdx.RejectTransfer(self._bdx_transfer)
+        res.raise_on_error()
+        return res
