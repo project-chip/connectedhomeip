@@ -1599,7 +1599,7 @@ chip::Protocols::InteractionModel::Status MatterThreadNetworkDiagnosticsClusterS
 void emberAfThreadNetworkDiagnosticsClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// WiFi Network Diagnostics Cluster
+// Wi-Fi Network Diagnostics Cluster
 //
 
 /**
@@ -5567,7 +5567,7 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
- * @brief WiFi Network Diagnostics Cluster ResetCounts Command callback (from client)
+ * @brief Wi-Fi Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
 bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
