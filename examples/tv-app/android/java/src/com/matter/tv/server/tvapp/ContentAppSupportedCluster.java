@@ -21,14 +21,19 @@ package com.matter.tv.server.tvapp;
  * Mirrors com.matter.tv.app.api.SupportedCluster.aidl
  */
 public class ContentAppSupportedCluster {
-    public ContentAppSupportedCluster(int clusterIdentifier, int features, int[] optionalCommandIdentifiers, int[] optionalAttributesIdentifiers) {
-        this.clusterIdentifier = clusterIdentifier;
-        this.features = features;
-        this.optionalCommandIdentifiers = optionalCommandIdentifiers;
-        this.optionalAttributesIdentifiers = optionalAttributesIdentifiers;
-    }
-    int clusterIdentifier;
-    int features;
-    int[] optionalCommandIdentifiers;
-    int[] optionalAttributesIdentifiers;
+  public ContentAppSupportedCluster(
+      int clusterIdentifier,
+      int features,
+      int[] optionalCommandIdentifiers,
+      int[] optionalAttributesIdentifiers) {
+    this.clusterIdentifier = clusterIdentifier;
+    this.features = features;
+    this.optionalCommandIdentifiers = optionalCommandIdentifiers;
+    this.optionalAttributesIdentifiers = optionalAttributesIdentifiers;
+  }
+
+  int clusterIdentifier;
+  int features;
+  int[] optionalCommandIdentifiers;
+  int[] optionalAttributesIdentifiers;
 }

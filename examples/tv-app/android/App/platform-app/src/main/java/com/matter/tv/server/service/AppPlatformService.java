@@ -195,15 +195,19 @@ public class AppPlatformService {
     }
   }
 
-  private Collection<ContentAppSupportedCluster> mapSupportedClusters(Collection<SupportedCluster> supportedClusters) {
-    supportedClusters.stream().map(AppPlatformService::mapSupportedCluster).collect(Collectors.toList());
+  private Collection<ContentAppSupportedCluster> mapSupportedClusters(
+      Collection<SupportedCluster> supportedClusters) {
+    supportedClusters
+        .stream()
+        .map(AppPlatformService::mapSupportedCluster)
+        .collect(Collectors.toList());
   }
 
   private static ContentAppSupportedCluster mapSupportedCluster(SupportedCluster cluster) {
     return new ContentAppSupportedCluster(
-      cluster.clusterIdentifier,
-      cluster.features,
-      cluster.optionalCommandIdentifiers,
-      cluster.optionalAttributesIdentifiers);
+        cluster.clusterIdentifier,
+        cluster.features,
+        cluster.optionalCommandIdentifiers,
+        cluster.optionalAttributesIdentifiers);
   }
 }
