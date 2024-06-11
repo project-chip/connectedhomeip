@@ -35,6 +35,8 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
+#import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
@@ -209,6 +211,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _attributes[attribute] = value;
 }
 
+- (void)removeValueForAttribute:(NSNumber *)attribute
+{
+    [_attributes removeObjectForKey:attribute];
+}
+
 - (NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)attributes
 {
     return _attributes;
@@ -301,6 +308,13 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 // happen more often than once every 10 minutes.
 #define MTRDEVICE_MIN_RESUBSCRIBE_DUE_TO_READ_INTERVAL_SECONDS (10 * 60)
 
+// Weight of new data in determining subscription latencies.  To avoid random
+// outliers causing too much noise in the value, treat an existing value (if
+// any) as having 2/3 weight and the new value as having 1/3 weight.  These
+// weights are subject to change, if it's determined that different ones give
+// better behavior.
+#define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
+
 @interface MTRDevice ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
@@ -369,6 +383,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
 - (void)unitTestClusterDataPersisted:(MTRDevice *)device;
+- (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
 @end
 #endif
 
@@ -670,7 +685,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                                  completion:setDSTOffsetResponseHandler];
 }
 
-- (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(NSDictionary *)dataDictionary
+- (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary
 {
     if (![MTRArrayValueType isEqual:dataDictionary[MTRTypeKey]]) {
         return nil;
@@ -773,9 +788,18 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // attempt, since we now have no delegate.
     _reattemptingSubscription = NO;
 
-    // We do not change _internalDeviceState here, because we might still have a
-    // subscription.  In that case, _internalDeviceState will update when the
-    // subscription is actually terminated.
+    [_deviceController asyncDispatchToMatterQueue:^{
+        // Destroy the read client and callback (has to happen on the Matter
+        // queue, to avoid deleting objects that are being referenced), to
+        // tear down the subscription.  We will get no more callbacks from
+        // the subscrption after this point.
+        std::lock_guard lock(self->_lock);
+        self->_currentReadClient = nullptr;
+        self->_currentSubscriptionCallback = nullptr;
+
+        [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
+    }
+                                     errorHandler:nil];
 
     [self _stopConnectivityMonitoring];
 
@@ -958,6 +982,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
 
         /* BEGIN DRAGONS: This is a huge hack for a specific use case, do not rename, remove or modify behavior here */
+        // TODO: This should only be called for thread devices
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if ([delegate respondsToSelector:@selector(_deviceInternalStateChanged:)]) {
             dispatch_async(_delegateQueue, ^{
@@ -1006,7 +1031,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // We want time interval from initialSubscribeStart to now, not the other
         // way around.
         NSTimeInterval subscriptionLatency = -[initialSubscribeStart timeIntervalSinceNow];
-        _estimatedSubscriptionLatency = @(subscriptionLatency);
+        if (_estimatedSubscriptionLatency == nil) {
+            _estimatedSubscriptionLatency = @(subscriptionLatency);
+        } else {
+            NSTimeInterval newSubscriptionLatencyEstimate = MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT * subscriptionLatency + (1 - MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT) * _estimatedSubscriptionLatency.doubleValue;
+            _estimatedSubscriptionLatency = @(newSubscriptionLatencyEstimate);
+        }
         [self _storePersistedDeviceData];
     }
 
@@ -1880,9 +1910,16 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         && isFromSubscription
         && !_receivingPrimingReport
         && AttributeHasChangesOmittedQuality(path)) {
-        // Do not persist new values for Changes Omitted Quality attributes unless
-        // they're part of a Priming Report or from a read response.
+        // Do not persist new values for Changes Omitted Quality (aka C Quality)
+        // attributes unless they're part of a Priming Report or from a read response.
         // (removals are OK)
+
+        // log when a device violates expectations for Changes Omitted Quality attributes.
+        using namespace chip::Tracing::DarwinFramework;
+        MATTER_LOG_METRIC_BEGIN(kMetricUnexpectedCQualityUpdate);
+        [self _addInformationalAttributesToCurrentMetricScope];
+        MATTER_LOG_METRIC_END(kMetricUnexpectedCQualityUpdate);
+
         return;
     }
 
@@ -1890,6 +1927,17 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         _clusterDataToPersist = [NSMutableDictionary dictionary];
     }
     _clusterDataToPersist[clusterPath] = clusterData;
+}
+
+- (void)_removeCachedAttribute:(NSNumber *)attributeID fromCluster:(MTRClusterPath *)clusterPath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (_clusterDataToPersist == nil) {
+        return;
+    }
+    auto * clusterData = _clusterDataToPersist[clusterPath];
+    [clusterData removeValueForAttribute:attributeID];
 }
 
 - (void)_createDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions dataVersionFilterList:(DataVersionFilter **)dataVersionFilterList count:(size_t *)count sizeReduction:(size_t)sizeReduction
@@ -1988,15 +2036,24 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
 
-    // Set up a timer to mark as not reachable if it takes too long to set up a subscription
-    MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
-        MTRDevice * strongSelf = weakSelf.strongObject;
-        if (strongSelf != nil) {
-            std::lock_guard lock(strongSelf->_lock);
-            [strongSelf _markDeviceAsUnreachableIfNeverSubscribed];
-        }
-    });
+    bool markUnreachableAfterWait = true;
+#ifdef DEBUG
+    if (delegate && [delegate respondsToSelector:@selector(unitTestSuppressTimeBasedReachabilityChanges:)]) {
+        markUnreachableAfterWait = ![delegate unitTestSuppressTimeBasedReachabilityChanges:self];
+    }
+#endif
+
+    if (markUnreachableAfterWait) {
+        // Set up a timer to mark as not reachable if it takes too long to set up a subscription
+        MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
+            MTRDevice * strongSelf = weakSelf.strongObject;
+            if (strongSelf != nil) {
+                std::lock_guard lock(strongSelf->_lock);
+                [strongSelf _markDeviceAsUnreachableIfNeverSubscribed];
+            }
+        });
+    }
 
     [_deviceController
         getSessionForNode:_nodeID.unsignedLongLongValue
@@ -2956,7 +3013,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 // Utility to return data value dictionary without data version
-- (NSDictionary *)_dataValueWithoutDataVersion:(NSDictionary *)attributeValue;
+- (NSDictionary *)_dataValueWithoutDataVersion:(NSDictionary *)attributeValue
 {
     // Sanity check for nil - return the same input to fail gracefully
     if (!attributeValue || !attributeValue[MTRTypeKey]) {
@@ -3018,6 +3075,117 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return NO;
 }
 
+- (void)_removeClusters:(NSSet<MTRClusterPath *> *)clusterPathsToRemove
+    doRemoveFromDataStore:(BOOL)doRemoveFromDataStore
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [_persistedClusters minusSet:clusterPathsToRemove];
+
+    for (MTRClusterPath * path in clusterPathsToRemove) {
+        [_persistedClusterData removeObjectForKey:path];
+        [_clusterDataToPersist removeObjectForKey:path];
+        if (doRemoveFromDataStore) {
+            [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:path.endpoint clusterID:path.cluster];
+        }
+    }
+}
+
+- (void)_removeAttributes:(NSSet<NSNumber *> *)attributes fromCluster:(MTRClusterPath *)clusterPath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    for (NSNumber * attribute in attributes) {
+        [self _removeCachedAttribute:attribute fromCluster:clusterPath];
+    }
+    // Just clear out the NSCache entry for this cluster, so we'll load it from storage as needed.
+    [_persistedClusterData removeObjectForKey:clusterPath];
+    [self.deviceController.controllerDataStore removeAttributes:attributes fromCluster:clusterPath forNodeID:self.nodeID];
+}
+
+- (void)_pruneEndpointsIn:(MTRDeviceDataValueDictionary)previousPartsListValue
+              missingFrom:(MTRDeviceDataValueDictionary)newPartsListValue
+{
+    // If the parts list changed and one or more endpoints were removed, remove all the
+    // clusters for all those endpoints from our data structures.
+    // Also remove those endpoints from the data store.
+    NSMutableSet<NSNumber *> * toBeRemovedEndpoints = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousPartsListValue]];
+    NSSet<NSNumber *> * endpointsOnDevice = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newPartsListValue]];
+    [toBeRemovedEndpoints minusSet:endpointsOnDevice];
+
+    for (NSNumber * endpoint in toBeRemovedEndpoints) {
+        NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
+        for (MTRClusterPath * path in _persistedClusters) {
+            if ([path.endpoint isEqualToNumber:endpoint]) {
+                [clusterPathsToRemove addObject:path];
+            }
+        }
+        [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:NO];
+        [self.deviceController.controllerDataStore clearStoredClusterDataForNodeID:self.nodeID endpointID:endpoint];
+    }
+}
+
+- (void)_pruneClustersIn:(MTRDeviceDataValueDictionary)previousServerListValue
+             missingFrom:(MTRDeviceDataValueDictionary)newServerListValue
+             forEndpoint:(NSNumber *)endpointID
+{
+    // If the server list changed and clusters were removed, remove those clusters from our data structures.
+    // Also remove them from the data store.
+    NSMutableSet<NSNumber *> * toBeRemovedClusters = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousServerListValue]];
+    NSSet<NSNumber *> * clustersStillOnEndpoint = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newServerListValue]];
+    [toBeRemovedClusters minusSet:clustersStillOnEndpoint];
+
+    NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
+    for (MTRClusterPath * path in _persistedClusters) {
+        if ([path.endpoint isEqualToNumber:endpointID] && [toBeRemovedClusters containsObject:path.cluster]) {
+            [clusterPathsToRemove addObject:path];
+        }
+    }
+    [self _removeClusters:clusterPathsToRemove doRemoveFromDataStore:YES];
+}
+
+- (void)_pruneAttributesIn:(MTRDeviceDataValueDictionary)previousAttributeListValue
+               missingFrom:(MTRDeviceDataValueDictionary)newAttributeListValue
+                forCluster:(MTRClusterPath *)clusterPath
+{
+    // If the attribute list changed and attributes were removed, remove the attributes from our
+    // data structures.
+    NSMutableSet<NSNumber *> * toBeRemovedAttributes = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousAttributeListValue]];
+    NSSet<NSNumber *> * attributesStillInCluster = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:newAttributeListValue]];
+
+    [toBeRemovedAttributes minusSet:attributesStillInCluster];
+    [self _removeAttributes:toBeRemovedAttributes fromCluster:clusterPath];
+}
+
+- (void)_pruneStoredDataForPath:(MTRAttributePath *)attributePath
+                    missingFrom:(MTRDeviceDataValueDictionary)newAttributeDataValue
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (![self _dataStoreExists] && !_clusterDataToPersist.count) {
+        MTR_LOG_DEBUG("%@ No data store to prune from", self);
+        return;
+    }
+
+    // Check if parts list changed or server list changed for the descriptor cluster or the attribute list changed for a cluster.
+    // If yes, we might need to prune any deleted endpoints, clusters or attributes from the storage and persisted cluster data.
+    if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID) {
+        if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributePartsListID && [attributePath.endpoint isEqualToNumber:@(kRootEndpointId)]) {
+            [self _pruneEndpointsIn:[self _cachedAttributeValueForPath:attributePath] missingFrom:newAttributeDataValue];
+            return;
+        }
+
+        if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID) {
+            [self _pruneClustersIn:[self _cachedAttributeValueForPath:attributePath] missingFrom:newAttributeDataValue forEndpoint:attributePath.endpoint];
+            return;
+        }
+    }
+
+    if (attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeAttributeListID) {
+        [self _pruneAttributesIn:[self _cachedAttributeValueForPath:attributePath] missingFrom:newAttributeDataValue forCluster:[MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster]];
+    }
+}
+
 // assume lock is held
 - (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues fromSubscription:(BOOL)isFromSubscription
 {
@@ -3071,13 +3239,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
                 }
 
-                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
+                [self _pruneStoredDataForPath:attributePath missingFrom:attributeDataValue];
+
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
                     if (_deviceConfigurationChanged) {
                         MTR_LOG("Device configuration changed due to changes in attribute %@", attributePath);
                     }
                 }
+
+                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
             }
 
 #ifdef DEBUG
@@ -3229,6 +3400,22 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     [datastore storeDeviceData:[data copy] forNodeID:self.nodeID];
 }
+
+#ifdef DEBUG
+- (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path
+{
+    std::lock_guard lock(_lock);
+
+    return [[self _clusterDataForPath:path] copy];
+}
+
+- (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path
+{
+    std::lock_guard lock(_lock);
+
+    return [_persistedClusters containsObject:path];
+}
+#endif
 
 - (BOOL)deviceCachePrimed
 {
@@ -3495,6 +3682,48 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
 
+#pragma mark Log Help
+
+- (nullable NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath
+{
+    auto * cachedData = [self _cachedAttributeValueForPath:attributePath];
+
+    auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
+        MTRAttributePathKey : attributePath,
+        MTRDataKey : cachedData,
+    }
+                                                                    error:nil];
+
+    return attrReport.value;
+}
+
+- (nullable NSNumber *)_informationalVendorID
+{
+    auto * vendorIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                              clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                            attributeID:@(MTRClusterBasicAttributeVendorIDID)];
+
+    return [self _informationalNumberAtAttributePath:vendorIDPath];
+}
+
+- (nullable NSNumber *)_informationalProductID
+{
+    auto * productIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                               clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                             attributeID:@(MTRClusterBasicAttributeProductIDID)];
+
+    return [self _informationalNumberAtAttributePath:productIDPath];
+}
+
+- (void)_addInformationalAttributesToCurrentMetricScope
+{
+    using namespace chip::Tracing::DarwinFramework;
+    MATTER_LOG_METRIC(kMetricDeviceVendorID, [self _informationalVendorID].unsignedShortValue);
+    MATTER_LOG_METRIC(kMetricDeviceProductID, [self _informationalProductID].unsignedShortValue);
+    BOOL usesThread = [self _deviceUsesThread];
+    MATTER_LOG_METRIC(kMetricDeviceUsesThread, usesThread);
+}
+
 @end
 
 /* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
@@ -3505,17 +3734,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     std::lock_guard lock(_lock);
 
+    // TODO: This should always return YES for thread devices
     return HaveSubscriptionEstablishedRightNow(_internalDeviceState);
 }
 
 - (void)_deviceMayBeReachable
 {
-    assertChipStackLockedByCurrentThread();
-
     MTR_LOG("%@ _deviceMayBeReachable called", self);
-
-    [self _triggerResubscribeWithReason:@"SPI client indicated the device may now be reachable"
-                    nodeLikelyReachable:YES];
+    // TODO: This should only be allowed for thread devices
+    [_deviceController asyncDispatchToMatterQueue:^{
+        [self _triggerResubscribeWithReason:@"SPI client indicated the device may now be reachable"
+                        nodeLikelyReachable:YES];
+    } errorHandler:nil];
 }
 
 /* END DRAGONS */

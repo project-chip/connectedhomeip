@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Class that configures how MTRDevice objects persist its attributes to storage, so as to not
  * overwhelm the underlying storage system.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceStorageBehaviorConfiguration : NSObject <NSCopying>
 
 /**

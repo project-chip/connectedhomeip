@@ -464,6 +464,12 @@ void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_
     pReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(livenessTimeoutMs));
 }
 
+void pychip_ReadClient_TriggerResubscribeIfScheduled(ReadClient * pReadClient, const char * reason)
+{
+    VerifyOrDie(pReadClient != nullptr);
+    pReadClient->TriggerResubscribeIfScheduled(reason);
+}
+
 PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, uint16_t * minIntervalSec, uint16_t * maxIntervalSec)
 {
     VerifyOrDie(pReadClient != nullptr);

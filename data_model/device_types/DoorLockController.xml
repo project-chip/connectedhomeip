@@ -68,7 +68,10 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
     <cluster id="0x0005" name="Scenes Management" side="client">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
     <cluster id="0x0038" name="Time Synchronization" side="server">
       <otherwiseConform>
