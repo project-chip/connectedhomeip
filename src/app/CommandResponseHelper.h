@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <protocols/interaction_model/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -40,9 +41,21 @@ public:
         return CHIP_NO_ERROR;
     };
 
+    // WARNING: Do not use for basic response-payload-free success, as SUCCESS status
+    // code should be handled without a cluster-specific status.
     CHIP_ERROR Success(ClusterStatus aClusterStatus)
     {
-        CHIP_ERROR err = mCommandHandler->AddClusterSpecificSuccess(mCommandPath, aClusterStatus);
+        CHIP_ERROR err = mCommandHandler->FallibleAddStatus(mCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(aClusterStatus));
+        if (err == CHIP_NO_ERROR)
+        {
+            mSentResponse = true;
+        }
+        return err;
+    }
+
+    CHIP_ERROR Success()
+    {
+        CHIP_ERROR err = mCommandHandler->FallibleAddStatus(mCommandPath, Protocols::InteractionModel::Status::Success);
         if (err == CHIP_NO_ERROR)
         {
             mSentResponse = true;
@@ -62,7 +75,7 @@ public:
 
     CHIP_ERROR Failure(ClusterStatus aClusterStatus)
     {
-        CHIP_ERROR err = mCommandHandler->AddClusterSpecificFailure(mCommandPath, aClusterStatus);
+        CHIP_ERROR err = mCommandHandler->FallibleAddStatus(mCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
         if (err == CHIP_NO_ERROR)
         {
             mSentResponse = true;

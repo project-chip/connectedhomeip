@@ -31,6 +31,7 @@
 #include <messaging/ExchangeContext.h>
 #include <platform/LockTracker.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -592,11 +593,11 @@ CHIP_ERROR CommandHandlerImpl::AddStatusInternal(const ConcreteCommandPath & aCo
     return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddStatusInternal(aCommandPath, aStatus); });
 }
 
-void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
+void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::ClusterStatusCode& status,
                                    const char * context)
 {
 
-    CHIP_ERROR error = FallibleAddStatus(aCommandPath, aStatus, context);
+    CHIP_ERROR error = FallibleAddStatus(aCommandPath, status, context);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -610,10 +611,10 @@ void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath, con
     }
 }
 
-CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::Status status,
+CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::ClusterStatusCode& status,
                                                  const char * context)
 {
-    if (status != Status::Success)
+    if (!status.IsSuccess())
     {
         if (context == nullptr)
         {
@@ -623,20 +624,15 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
         ChipLogError(DataManagement,
                      "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus " (%s)",
                      path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                     ChipLogValueIMStatus(status), context);
+                     ChipLogValueIMStatus(status.GetStatus()), context);
     }
 
-    return AddStatusInternal(path, StatusIB(status));
-}
+    if (status.HasClusterSpecificCode())
+    {
+      return AddStatusInternal(path, StatusIB{(status.IsSuccess() ? Status::Success : Status::Failure), status.GetClusterSpecificCode().Value()});
+    }
 
-CHIP_ERROR CommandHandlerImpl::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
-{
-    return AddStatusInternal(aCommandPath, StatusIB(Status::Success, aClusterStatus));
-}
-
-CHIP_ERROR CommandHandlerImpl::AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
-{
-    return AddStatusInternal(aCommandPath, StatusIB(Status::Failure, aClusterStatus));
+    return AddStatusInternal(path, StatusIB{status.GetStatus()});
 }
 
 CHIP_ERROR CommandHandlerImpl::PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,
