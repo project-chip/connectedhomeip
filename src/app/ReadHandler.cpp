@@ -921,11 +921,11 @@ void ReadHandler::ClearStateFlag(ReadHandlerFlags aFlag)
 
 size_t ReadHandler::GetReportBufferMaxSize()
 {
-    size_t maxBufSize                  = chip::app::kMaxSecureSduLengthBytes;
+    size_t maxBufSize                  = kMaxSecureSduLengthBytes;
     Transport::SecureSession * session = GetSession();
     if (session && session->AllowsLargePayload())
     {
-        maxBufSize = chip::app::kMaxLargeSecureSduLengthBytes;
+        maxBufSize = kMaxLargeSecureSduLengthBytes;
     }
 
     return maxBufSize;

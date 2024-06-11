@@ -335,9 +335,10 @@ private:
 
     /*
      * Get the appropriate size of a packet buffer to allocate for encoding a Report message.
-     * Depending on the underlying session, which may or may not support large
-     * payloads, a buffer with the corresponding max size would be allocated.
+     * This size might depend on the underlying session used by the ReadHandler.
      *
+     * The size returned here is the size not including the various prepended headers
+     * (what System::PacketBuffer calls the "available size").
      */
     size_t GetReportBufferMaxSize();
 
