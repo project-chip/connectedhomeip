@@ -751,7 +751,6 @@ class TestConformanceSupport(MatterBaseTest):
         xml_callable = parse_device_type_callable_from_xml(et)
         asserts.assert_equal(str(xml_callable), 'CD, testy', msg)
         asserts.assert_equal(xml_callable(0, [], []), ConformanceDecision.OPTIONAL)
-    
 
     def test_choice_conformance(self):
         # Choice conformances can appear on:
@@ -885,8 +884,8 @@ class TestConformanceSupport(MatterBaseTest):
             asserts.assert_equal(conformance(CD, [], []), ConformanceDecision.OPTIONAL, 'Unexpected conformance')
             asserts.assert_equal(conformance(CD, [], []).get_choice(), Choice('b', False), 'Unexpected choice in conformance')
 
-
             # Ones that should throw exceptions
+
             def check_bad_choice(xml: str):
                 msg = f'Choice conformance string should cause exception, but did not: {xml}'
                 et = ElementTree.fromstring(xml)
@@ -923,7 +922,6 @@ class TestConformanceSupport(MatterBaseTest):
                    '</mandatoryConform>')
             check_bad_choice(xml)
 
-
             xml = ('<mandatoryConform>'
                    '<notTerm>'
                    f'<optionalConform {xml_attrs} />'
@@ -954,6 +952,7 @@ class TestConformanceSupport(MatterBaseTest):
 
             xml = (f'<deprecateConform {xml_attrs}/>')
             check_bad_choice(xml)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
