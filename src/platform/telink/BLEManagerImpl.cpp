@@ -949,6 +949,9 @@ CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * eve
     {
         SwitchToIeee802154();
     }
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    // TODO: Implement ReadyToAttach for WiFi if needed
+    SwitchToWiFi();
 #endif
 
     return CHIP_NO_ERROR;

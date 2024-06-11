@@ -120,12 +120,13 @@ private:
     CHIP_ERROR HandleBleConnectionClosed(const ChipDeviceEvent * event);
 
     /*
-        @todo WORKAROUND: Due to abscense of non-cuncurrent mode in Matter
-        we are emulating connection to Thread with this events and manually
+        WORKAROUND: Due to abscense of non-cuncurrent mode in Matter
+        we are emulating connection to Thread/WiFi with this events and manually
         disconnect BLE ass soon as OperationalNetworkEnabled occures.
         This functionality shall be removed as soon as non-cuncurrent mode
         would be implemented
      */
+    // TODO: Implement something like HandleThreadStateChange for WiFi if needed
     CHIP_ERROR HandleThreadStateChange(const ChipDeviceEvent * event);
     CHIP_ERROR HandleOperationalNetworkEnabled(const ChipDeviceEvent * event);
 
