@@ -157,7 +157,7 @@ void ServerInstance::HandleSetActiveDatasetRequest(HandlerContext & ctx,
     mPath               = ctx.mRequestPath;
     mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
     ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
-    mBreadcrumb = req.breadcrumb;
+    mBreadcrumb    = req.breadcrumb;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if ((err = mDelegate->SetActiveDataset(activeDataset, this)) != CHIP_NO_ERROR)
     {

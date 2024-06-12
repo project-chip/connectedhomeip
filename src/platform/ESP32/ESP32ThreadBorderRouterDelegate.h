@@ -38,9 +38,9 @@ namespace ThreadBorderRouterManagement {
 class ESP32ThreadBorderRouterDelegate : public Delegate
 {
 public:
-    static constexpr char kThreadBorderRourterName[]        = "Espressif-ThreadBR";
+    static constexpr char kThreadBorderRourterName[]      = "Espressif-ThreadBR";
     static constexpr char kFailsafeThreadDatasetTlvsKey[] = "g/fs/td";
-    static constexpr char kFailsafeThreadEnabledKey[] = "g/fs/te";
+    static constexpr char kFailsafeThreadEnabledKey[]     = "g/fs/te";
 
     ESP32ThreadBorderRouterDelegate()  = default;
     ~ESP32ThreadBorderRouterDelegate() = default;
@@ -74,7 +74,8 @@ public:
 
     CHIP_ERROR GetPendingDataset(chip::Thread::OperationalDataset & pendingDataset) override;
 
-    CHIP_ERROR SetActiveDataset(const chip::Thread::OperationalDataset & activeDataset, ActivateDatasetCallback *callback) override;
+    CHIP_ERROR SetActiveDataset(const chip::Thread::OperationalDataset & activeDataset,
+                                ActivateDatasetCallback * callback) override;
 
     CHIP_ERROR RevertActiveDataset() override;
 
