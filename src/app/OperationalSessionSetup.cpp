@@ -293,7 +293,7 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
 {
-    auto config = result.mrpRemoteConfig;
+    auto & config = result.mrpRemoteConfig;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // TODO: Combine LargePayload flag with DNS-SD advertisements from peer.
     // Issue #32348.
