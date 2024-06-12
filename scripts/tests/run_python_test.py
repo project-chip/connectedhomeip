@@ -32,7 +32,7 @@ import typing
 import click
 import coloredlogs
 from colorama import Fore, Style
-from py.metadata import MetadataReader, Metadata
+from py.metadata import Metadata, MetadataReader
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
