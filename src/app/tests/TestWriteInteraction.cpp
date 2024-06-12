@@ -39,40 +39,6 @@
 #include <messaging/Flags.h>
 #include <pw_unit_test/framework.h>
 
-/**
- * Helper macro we can use to pretend we got a reply from the server in cases
- * when the reply was actually dropped due to us not wanting the client's state
- * machine to advance.
- *
- * When this macro is used, the client has sent a message and is waiting for an
- * ack+response, and the server has sent a response that got dropped and is
- * waiting for an ack (and maybe a response).
- *
- * What this macro then needs to do is:
- *
- * 1. Pretend that the client got an ack (and clear out the corresponding ack
- *    state).
- * 2. Pretend that the client got a message from the server, with the id of the
- *    message that was dropped, which requires an ack, so the client will send
- *    that ack in its next message.
- *
- * This is a macro so we get useful line numbers on assertion failures
- */
-#define PretendWeGotReplyFromServer(aContext, aClientExchange)                                                                     \
-    {                                                                                                                              \
-        Messaging::ReliableMessageMgr * localRm    = (aContext).GetExchangeManager().GetReliableMessageMgr();                      \
-        Messaging::ExchangeContext * localExchange = aClientExchange;                                                              \
-        EXPECT_EQ(localRm->TestGetCountRetransTable(), 2);                                                                         \
-                                                                                                                                   \
-        localRm->ClearRetransTable(localExchange);                                                                                 \
-        EXPECT_EQ(localRm->TestGetCountRetransTable(), 1);                                                                         \
-                                                                                                                                   \
-        localRm->EnumerateRetransTable([localExchange](auto * entry) {                                                             \
-            localExchange->SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());                                \
-            return Loop::Break;                                                                                                    \
-        });                                                                                                                        \
-    }
-
 namespace {
 
 constexpr chip::DataVersion kAcceptedDataVersion = 5;
