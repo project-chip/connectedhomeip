@@ -135,7 +135,7 @@ ChefResourceMonitorInstance::ExternalAttributeWrite(const EmberAfAttributeMetada
     break;
     case HepaFilterMonitoring::Attributes::DegradationDirection::Id:
     default: {
-        ChipLogError(Zcl, "Unsupported External Attribute Read: %d", static_cast<int>(attributeId));
+        ChipLogError(Zcl, "Unsupported External Attribute Write: %d", static_cast<int>(attributeId));
         ret = Protocols::InteractionModel::Status::UnsupportedWrite;
     }
     break;
