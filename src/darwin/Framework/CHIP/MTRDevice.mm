@@ -69,7 +69,7 @@ MTR_DIRECT_MEMBERS
 @private
     void * _delegatePointerValue;
     __weak id _delegate;
-    __weak dispatch_queue_t _queue;
+    dispatch_queue_t _queue;
     NSArray * _interestedPathsForAttributes;
 }
 
