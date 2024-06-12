@@ -26,39 +26,40 @@ namespace app {
 namespace Clusters {
 namespace ServiceArea {
 
-inline constexpr size_t kLocationtNameMaxSize   = 128u;
+inline constexpr size_t kLocationNameMaxSize    = 128u;
 inline constexpr size_t kMapNameMaxSize         = 64u;
 
 
 /**
- * A class which wraps a Service Area Cluster LocStruct instance, adding string storage and string utility functions.
+ * This class is used to wrap the LocationStruct object and provide a more user-friendly interface for the data.
+ * It provides a way to store the location name in a buffer, and provides a way to compare the location name with a given string.
  */
 struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::LocationStruct::Type
 {
     /**
-     * @brief default constructor
+     * @brief This is a default constructor that initializes the location object with default values.
      */
-    LocationStructureWrapper()
+    LocationStructureWrapper() : mLocationNameBuffer()
     {
-        Set( 0, 0, 
+        Set(0, 0, 
              CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<AreaTypeTag>(),
              DataModel::Nullable<LandmarkTag>(), DataModel::Nullable<PositionTag>(), DataModel::Nullable<FloorSurfaceTag>());
     }
 
     /**
-     * @brief full constructor (deep copy)
-     * @param[in] aLocationId unique identifier of this location
-     * @param[in] aMapId identifier of supported map
-     * @param[in]aLocationName human readable name for this location (empty string if not used)
-     * @param[in] aFloorNumber represents floor level - negative values for below ground
-     * @param[in] aAreaTypeTag common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a home
-     * @param[in] aLandmarkTag common namespace Landmak tag - indicates an association of the location with a home landmark
-     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark
-     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type
+     * @brief This is a full constructor that initializes the location object with the given values. All values are deep copied.
+     * @param[in] aLocationId The unique identifier of this location.
+     * @param[in] aMapId The identifier of the supported map associated with this location.
+     * @param[in] aLocationName A human readable name for this location (empty string if not used).
+     * @param[in] aFloorNumber The floor level of this location - use negative values for below ground.
+     * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a home.
+     * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
+     * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the landmark.
+     * @param[in] aSurfaceTag A common namespace Floor Surface tag - indicates an association of the location with a surface type.
      * 
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
-     * @note if aLocationName is larger than kLocationtNameMaxSize, it will be truncated
-     * @note if aLocationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null
+     * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
+     * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
     LocationStructureWrapper( uint32_t                                     aLocationId, 
                               const DataModel::Nullable<uint8_t>         & aMapId, 
@@ -67,7 +68,8 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
                               const DataModel::Nullable<AreaTypeTag>     & aAreaTypeTag,
                               const DataModel::Nullable<LandmarkTag>     & aLandmarkTag,
                               const DataModel::Nullable<PositionTag>     & aPositionTag,
-                              const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  )
+                              const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  ) :
+        mLocationNameBuffer()
     {
         Set( aLocationId, aMapId, 
              aLocationName, aFloorNumber, aAreaTypeTag, 
@@ -75,52 +77,53 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     }
 
     /**
-     * @brief Copy constructor (deep copy)
-     * @param[in] op initialization object
+     * @brief This is a copy constructor that initializes the location object with the values from another location object. All values are deep copied.
+     * @param[in] originalObject The location object to copy.
      * 
-     * @note if locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null
+     * @note If the locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    LocationStructureWrapper(const LocationStructureWrapper & op) { *this = op; }
+    LocationStructureWrapper(const LocationStructureWrapper & originalObject) : mLocationNameBuffer() { *this = originalObject; }
 
     /**
-     * @brief Assignment operator (deep copy)
-     * @param[in] op 
+     * @brief This is an assignment operator that initializes the location object with the values from another location object. All values are deep copied.
+     * @param[in] aOriginalObject The location object to copy.
      * 
-     * @note if locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null
+     * @note If the locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    LocationStructureWrapper & operator=(const LocationStructureWrapper & op)
+    LocationStructureWrapper & operator=(const LocationStructureWrapper & aOriginalObject)
     {
-        if (op.locationInfo.locationInfo.IsNull())
+        if (aOriginalObject.locationInfo.locationInfo.IsNull())
         {
-            Set(op.locationID, op.mapID, 
+            Set(aOriginalObject.locationID, aOriginalObject.mapID,
                 CharSpan(), NullOptional, NullOptional,
-                op.locationInfo.landmarkTag, op.locationInfo.positionTag, op.locationInfo.surfaceTag);
+                aOriginalObject.locationInfo.landmarkTag, aOriginalObject.locationInfo.positionTag,
+                aOriginalObject.locationInfo.surfaceTag);
         }
         else
         {
-            Set(op.locationID, op.mapID, 
-                op.locationInfo.locationInfo.Value().locationName, op.locationInfo.locationInfo.Value().floorNumber,
-                op.locationInfo.locationInfo.Value().areaType,
-                op.locationInfo.landmarkTag, op.locationInfo.positionTag, op.locationInfo.surfaceTag);
+            Set(aOriginalObject.locationID, aOriginalObject.mapID, aOriginalObject.locationInfo.locationInfo.Value().locationName,
+                aOriginalObject.locationInfo.locationInfo.Value().floorNumber,
+                aOriginalObject.locationInfo.locationInfo.Value().areaType, aOriginalObject.locationInfo.landmarkTag,
+                aOriginalObject.locationInfo.positionTag, aOriginalObject.locationInfo.surfaceTag);
         }
 
         return *this;
     }
 
     /**
-     * @brief Set all fields of the location object (deep copy)
-     * @param[in] aLocationId unique identifier of this location
-     * @param[in] aMapId identifier of supported map
-     * @param[in] aLocationName human readable name for this location (empty string if not used)
-     * @param[in] aFloorNumber represents floor level - negative values for below ground
-     * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a home
-     * @param[in] aLandmarkTag common namespace Landmak tag - indicates an association of the location with a home landmark
-     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark
-     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type
-     * 
+     * @brief Set all fields of the location object. All values are deep copied.
+     * @param[in] aLocationId The unique identifier of this location.
+     * @param[in] aMapId The identifier of the supported map associated with this location.
+     * @param[in] aLocationName A human readable name for this location (empty string if not used).
+     * @param[in] aFloorNumber The floor level of this location - use negative values for below ground.
+     * @param[in] aAreaTypeTag A common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a home.
+     * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
+     * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the landmark.
+     * @param[in] aSurfaceTag A common namespace Floor Surface tag - indicates an association of the location with a surface type.
+     *
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
-     * @note if aLocationName is larger than kLocationtNameMaxSize, it will be truncated
-     * @note if aLocationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null
+     * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
+     * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
     void Set( uint32_t                                     aLocationId, 
               const DataModel::Nullable<uint8_t>         & aMapId, 
@@ -131,15 +134,15 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
               const DataModel::Nullable<PositionTag>     & aPositionTag,
               const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  )
     {
-        locationID   = aLocationId;
-        mapID        = aMapId;
+        locationID = aLocationId;
+        mapID      = aMapId;
 
-        // if there is at least one non-null value for locationInfo, add it to the location structure
-        if ((!aLocationName.size() == 0)  ||    
-            (!aFloorNumber.IsNull())      ||
+        // If there is at least one non-null value for locationInfo, add it to the location structure.
+        if ((!aLocationName.empty()) ||
+            (!aFloorNumber.IsNull()) ||
             (!aAreaType.IsNull())  )
         {
-            // create home location info and fill in (except for locationInfo - see below)
+            // Create a home location info structure and fill it in except for the location name. This is done below.
             locationInfo.locationInfo.SetNonNull(Structs::HomeLocationStruct::Type());
 
             locationInfo.locationInfo.Value().floorNumber    = aFloorNumber;
@@ -147,36 +150,34 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         }
         else
         {
-            // home location info is null
             locationInfo.locationInfo.SetNull();
         }
                                                                          
         locationInfo.landmarkTag   = aLandmarkTag;
         locationInfo.positionTag   = aPositionTag;
         locationInfo.surfaceTag    = aSurfaceTag;
-        
 
-        // Save location name to buffer, so access and lifetime is controlled.
+        // Save the location name to buffer, so access and lifetime is controlled.
         // If aLocationName is not null, create a CharSpan to reference the text.
-        // Make sure there is always a terminating character, mainly so we can  get c_str for logging.
+        // Make sure there is always a terminating character, mainly so we can get c_str for logging.
         memset(mLocationNameBuffer, 0, sizeof(mLocationNameBuffer+1));
 
         // this assumes locationInfo structure was created above, if appropriate
         if (!locationInfo.locationInfo.IsNull())
         {
-            if (aLocationName.size() == 0)
+            if (aLocationName.empty())
             {
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, 0);
             }
             else if (aLocationName.size() > sizeof(mLocationNameBuffer))
             {
-                // save truncated name that fits into available size
+                // Save the truncated name that fits into available size.
                 memcpy(mLocationNameBuffer, aLocationName.data(), sizeof(mLocationNameBuffer));
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeof(mLocationNameBuffer));
             }
             else
             {
-                // save full name
+                // Save full name.
                 memcpy(mLocationNameBuffer, aLocationName.data(), aLocationName.size());
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, aLocationName.size());
             }
@@ -184,38 +185,27 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     }
 
     /**
-     * @brief Compare the location's name with given text
-     * @param[in] aLocationName name to compare
-     * @return true if location structure's name field matches aLocationName
+     * @brief Compare the location's name with the given text.
+     * @param[in] aLocationName The name to compare.
+     * @return true if the location structure's name field matches aLocationName.
      * 
-     * @note  if locations structure's name field is null, returns false
+     * @note if locations structure's name field is null, returns false.
      */
     bool DoesNameMatch(const CharSpan & aLocationName) const
     {
-        if ((!locationInfo.locationInfo.IsNull())   &&
-            (locationInfo.locationInfo.Value().locationName.size() == aLocationName.size()))
+        if (!locationInfo.locationInfo.IsNull())
         {
-            if (locationInfo.locationInfo.Value().locationName.size() == 0)
-            {
-                return true;  // both "empty" string
-            }
-            else
-            {
-                return (0 == memcmp(locationInfo.locationInfo.Value().locationName.data(), aLocationName.data(), 
-                                        locationInfo.locationInfo.Value().locationName.size()));
-            }
+            return locationInfo.locationInfo->locationName.data_equal(aLocationName);
         }
-        else
-        {
-            return false;  // name is Null or text sizes do not match
-        }
+
+        return false;  // name is Null or text sizes do not match
     }
 
     /**
-     * @brief get the location name (for logging)
-     * @return the map name as a c style char string
+     * @brief Get the location name (for logging).
+     * @return The map name as a c style char string.
      * 
-     * @note only available through the LocationStructure object (no access from base structure)
+     * @note This is only available through the LocationStructure object (no access from base structure).
      */
     const char* name_c_str() const
     {
@@ -225,69 +215,68 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
 
 private:
     // extra char to allow for terminating 0 ( or name_c_str())
-    char mLocationNameBuffer[kLocationtNameMaxSize+1];
+    char mLocationNameBuffer[kLocationNameMaxSize +1];
 };
 
 
 /**
- * A class which wraps a Service Area Cluster MapStruct instance, adding string storage and string utility functions.
+ * This class wraps the MapStruct object and provides a more user-friendly interface for the data.
  */
 struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::MapStruct::Type
 {
     /**
-     * @brief default constructor
+     * @brief This is a default constructor that initializes the map object with default values.
      */
-    MapStructureWrapper()
+    MapStructureWrapper() : mMapNameBuffer()
     {
         Set( 0, CharSpan());
     }
 
     /**
-     * @brief full constructor (deep copy)
-     * @param[in] aMapId identifier of this map
-     * @param[in] aMapName human readable name (should not be empty string)
+     * @brief This is a full constructor that initializes the map object with the given values. All values are deep copied.
+     * @param[in] aMapId The identifier of this map.
+     * @param[in] aMapName A human readable name (should not be empty string).
      * 
      * @note Requirements regarding what combinations of fields and values are 'valid' are not checked by this class.
-     * @note if aMapName is larger than kMapNameMaxSize, it will be truncated
+     * @note If aMapName is larger than kMapNameMaxSize, it will be truncated.
      */
-    MapStructureWrapper( uint8_t aMapId, 
-                         const CharSpan & aMapName)
+    MapStructureWrapper (uint8_t aMapId, const CharSpan & aMapName) : mMapNameBuffer()
     {
         Set(aMapId, aMapName);
     }
 
     /**
-     * @brief Copy constructor (deep copy)
-     * @param[in] op initialization object
+     * @brief This is a copy constructor that initializes the map object with the values from another map object. All values are deep copied.
+     * @param[in] originalMap The map object to copy.
      */
-    MapStructureWrapper(const MapStructureWrapper & op) { *this = op; }
+    MapStructureWrapper(const MapStructureWrapper & originalMap) { *this = originalMap; }
 
     /**
-     * @brief Assignment operator (deep copy)
-     * @param[in] op 
+     * @brief This is an assignment operator that initializes the map object with the values from another map object. All values are deep copied.
+     * @param[in] originalMap The map object to copy.
      */
-    MapStructureWrapper & operator=(const MapStructureWrapper & op)
+    MapStructureWrapper & operator=(const MapStructureWrapper & originalMap)
     {
-        Set(op.mapID, op.name);
+        Set(originalMap.mapID, originalMap.name);
         return *this;
     }
 
     /**
-     * @brief Set all fields of the map object (deep copy)
-     * @param[in] aMapId identifier of this map
-     * @param[in] aMapName human readable name (should not be empty string)
+     * @brief Set all fields of the mop object. All values are deep copied.
+     * @param[in] aMapId The identifier of this map.
+     * @param[in] aMapName A human readable name (should not be empty string).
+     *
      * @note Requirements regarding what combinations of fields and values are 'valid' are not checked by this class.
-     * 
-     * @note if aMapName is larger than kMapNameMaxSize, it will be truncated
+     * @note if aMapName is larger than kMapNameMaxSize, it will be truncated.
      */
     void Set( uint8_t aMapId, 
               const CharSpan & aMapName)
     {
         mapID = aMapId;
 
-        // Save map name to buffer, so access and lifetime is controlled.
+        // Save the map name to the buffer so that access and lifetime is controlled.
         // Create a CharSpan reference the text.
-        // Make sure there is always a terminating character, mainly so we can  get c_str for logging.
+        // Make sure there is always a terminating character, mainly so we can get c_str for logging.
         memset(mMapNameBuffer, 0, sizeof(mMapNameBuffer+1));
 
         if (aMapName.size() == 0)
@@ -296,40 +285,33 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
         }
         else if (aMapName.size() > sizeof(mMapNameBuffer))
         {
-            // save truncated name that fits into available size
+            // Save the truncated name that fits into available size.
             memcpy(mMapNameBuffer, aMapName.data(), sizeof(mMapNameBuffer));
             name = CharSpan(mMapNameBuffer, sizeof(mMapNameBuffer));
         }
         else
         {
-            // save full name
+            // Save full name.
             memcpy(mMapNameBuffer, aMapName.data(), aMapName.size());
             name = CharSpan(mMapNameBuffer, aMapName.size());
         }
     }
 
     /**
-     * @brief Compare the map's name with given text
-     * @param[in] aMapName name to compare
-     * @return true if map structure's name field matches aMapName
+     * @brief Compare the map's name with given text.
+     * @param[in] aMapName The name to compare.
+     * @return true if the map structure's name field matches aMapName.
      */
     bool DoesNameMatch(const CharSpan & aMapName) const
     {
-        if (name.size() == 0)
-        {
-            return (aMapName.size() == 0);
-        }
-        else
-        {
-            return ((name.size() == aMapName.size()) && memcmp(name.data(), aMapName.data(), name.size()));
-        }
+        return name.data_equal(aMapName);
     }
 
     /**
-     * @brief get the map name (for logging)
-     * @return the map name as a c style char string
+     * @brief Get the map name (for logging).
+     * @return The map name as a c style char string.
      * 
-     * @note only available through the MapStructure object (no access from base structure)
+     * @note This is only available through the MapStructure object (no access from base structure).
      */
     const char* name_c_str() const
     {
