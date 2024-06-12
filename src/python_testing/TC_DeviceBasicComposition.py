@@ -749,8 +749,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test("Problems with tags lists")
 
     def steps_TC_IDM_12_1(self):
-        return [TestStep(0, "TH performs a wildcard read of the device"),
-                TestStep(1, "TH creates a dump of the wildcard attribute for submission to certification.")]
+        return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
+                TestStep(1, "TH creates a MatterTlvJson dump of the wildcard attributes for submission to certification.")]
 
     def test_TC_IDM_12_1(self):
         # wildcard read - already done.
