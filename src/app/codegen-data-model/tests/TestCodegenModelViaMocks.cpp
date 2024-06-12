@@ -368,7 +368,7 @@ CHIP_ERROR DecodeList(TLV::TLVReader & reader, std::vector<T> & out)
         ReturnErrorOnFailure(err);
 
         T value;
-        ReturnErrorOnFailure(DataModel::Decode(reader, value));
+        ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, value));
         out.emplace_back(std::move(value));
     }
 }
