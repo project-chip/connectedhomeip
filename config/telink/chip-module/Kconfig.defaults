@@ -108,7 +108,6 @@ config GPIO
 # Bluetooth Low Energy configs
 
 config BT
-    default n if BOARD_TLSR9118BDK40D
     default y
 
 if BT
