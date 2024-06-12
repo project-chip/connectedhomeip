@@ -300,7 +300,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(Commi
 {
     if (IsSecondaryNetworkSupported())
     {
-        if (IsTriedSecondaryNetwork())
+        if (TryingSecondaryNetwork())
         {
             // Try secondary network interface.
             return mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? CommissioningStage::kThreadNetworkSetup
@@ -729,12 +729,12 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             }
         }
 
-        if (err != CHIP_NO_ERROR && IsSecondaryNetworkSupported() && !IsTriedSecondaryNetwork() &&
+        if (err != CHIP_NO_ERROR && IsSecondaryNetworkSupported() && !TryingSecondaryNetwork() &&
             completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup &&
             completionStatus.failedStage.Value() <= kICDSendStayActive)
         {
             // Primary network failed, disable primary network interface and try secondary network interface.
-            SetTrySecondaryNetwork();
+            TrySecondaryNetwork();
             err                   = CHIP_NO_ERROR;
             report.stageCompleted = CommissioningStage::kPrimaryOperationalNetworkFailed;
         }
@@ -856,6 +856,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
         case CommissioningStage::kCleanup:
+            if (IsSecondaryNetworkSupported() && TryingSecondaryNetwork())
+            {
+                ResetTryingSecondaryNetwork();
+            }
             ReleasePAI();
             ReleaseDAC();
             mCommissioneeDeviceProxy = nullptr;

@@ -2756,7 +2756,7 @@ CHIP_ERROR DeviceCommissioner::SendCommissioningWriteRequest(DeviceProxy * devic
     auto onSuccessCb = [this, successCb](const app::ConcreteAttributePath & aPath) { successCb(this); };
     auto onFailureCb = [this, failureCb](const app::ConcreteAttributePath * aPath, CHIP_ERROR aError) { failureCb(this, aError); };
     return WriteAttribute(device->GetSecureSession().Value(), endpoint, cluster, attribute, requestData, onSuccessCb, onFailureCb,
-                          NullOptional, nullptr, NullOptional);
+                          /* aTimedWriteTimeoutMs = */ NullOptional, /* onDoneCb = */ nullptr, /* aDataVersion = */ NullOptional);
 }
 
 void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
@@ -3444,16 +3444,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kPrimaryOperationalNetworkFailed: {
-        // nothing to do. This stage indicates that the primary operation network failed and the network interface should be
+        // nothing to do. This stage indicates that the primary operational network failed and the network interface should be
         // disabled later.
         break;
     }
     case CommissioningStage::kDisablePrimaryNetworkInterface: {
         NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo::Type request = false;
-        CHIP_ERROR err                                                             = SendCommissioningWriteRequest(
-            proxy, endpoint, NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo::GetClusterId(),
-            NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo::GetAttributeId(), request,
-            OnInterfaceEnableWriteSuccessResponse, OnBasicFailure);
+        CHIP_ERROR err = SendCommissioningWriteRequest(proxy, endpoint, NetworkCommissioning::Id,
+                                                       NetworkCommissioning::Attributes::InterfaceEnabled::Id, request,
+                                                       OnInterfaceEnableWriteSuccessResponse, OnBasicFailure);
         if (err != CHIP_NO_ERROR)
         {
             // We won't get any async callbacks here, so just complete our stage.

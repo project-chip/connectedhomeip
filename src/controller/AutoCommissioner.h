@@ -105,9 +105,10 @@ private:
                 mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId);
     }
 
-    void SetTrySecondaryNetwork() { mAttemptedSecondaryNetwork = true; }
-    bool IsTriedSecondaryNetwork() const { return mAttemptedSecondaryNetwork; }
-    bool mAttemptedSecondaryNetwork = false;
+    void TrySecondaryNetwork() { mTryingSecondaryNetwork = true; }
+    bool TryingSecondaryNetwork() const { return mTryingSecondaryNetwork; }
+    void ResetTryingSecondaryNetwork() { mTryingSecondaryNetwork = false; }
+    bool mTryingSecondaryNetwork = false;
 
     bool mStopCommissioning = false;
 
