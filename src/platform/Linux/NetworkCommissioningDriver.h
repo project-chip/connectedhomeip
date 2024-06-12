@@ -29,6 +29,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
+static constexpr uint8_t kMaxNetworks = CHIP_CONFIG_MAX_WIFI_NETWORK;
+
 template <typename T>
 class LinuxScanResponseIterator : public Iterator<T>
 {
@@ -71,7 +73,8 @@ public:
 
     private:
         LinuxWiFiDriver * driver;
-        bool exhausted = false;
+        bool exhausted               = false;
+        uint8_t networkIteratorIndex = 0;
     };
 
     void Set5gSupport(bool is5gSupported) { mIs5gSupported = is5gSupported; }
@@ -82,7 +85,7 @@ public:
     void Shutdown() override;
 
     // WirelessDriver
-    uint8_t GetMaxNetworks() override { return 1; }
+    uint8_t GetMaxNetworks() override { return kMaxNetworks; }
     uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
     uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
 
@@ -147,11 +150,17 @@ private:
         Platform::SharedPtr<Crypto::P256Keypair> clientIdentityKeypair;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
-
-    WiFiNetwork mSavedNetwork;
-    WiFiNetwork mStagingNetwork;
+    // Stores the index location of the most recent WiFi Network added. The value is increments if a new
+    // WiFi network is added and decrements if a network is removed
+    uint8_t mCurrentNetworkIndex   = 0;
+    // The index of the WiFi network the device is connected to
+    uint8_t mConnectedNetworkIndex = 0;
+    WiFiNetwork mSavedNetworks[kMaxNetworks];
+    WiFiNetwork mStagingNetworks[kMaxNetworks];
     // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
     bool mIs5gSupported = false;
+    bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
+    void ShiftNetworkAfterRemove();
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
