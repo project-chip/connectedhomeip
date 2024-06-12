@@ -505,7 +505,7 @@ bool RvcDevice::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIn
 
     while (listIndex < listSize)
     {
-        if (mSupportedLocations[listIndex].locationId == aLocationId)
+        if (mSupportedLocations[listIndex].locationID == aLocationId)
         {
             aSupportedLocation = mSupportedLocations[listIndex];
             ret_value = true;
@@ -536,7 +536,7 @@ bool RvcDevice::AddSupportedLocation(const LocationStructureWrapper & newLocatio
     else
     {
         ChipLogError(Zcl,  "AddSupportedLocation %u - supported locations list is already at maximum size %u",
-                            newLocation.locationId, (uint32_t)kMaxNumSupportedLocations);
+                            newLocation.locationID, (uint32_t)kMaxNumSupportedLocations);
     }
 
     return ret_value;
@@ -549,10 +549,10 @@ bool RvcDevice::ModifySupportedLocation(uint32_t listIndex, const LocationStruct
 
     // server instance (caller) is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
 
-    // double check that locationId's match
-    VerifyOrExit((modifiedLocation.locationId == mSupportedLocations[listIndex].locationId), 
-        ChipLogError(Zcl,  "ModifySupportedLocation - new locationId %u does not match existing locationId %u", 
-                        modifiedLocation.locationId, mSupportedLocations[listIndex].locationId));   
+    // double check that locationID's match
+    VerifyOrExit((modifiedLocation.locationID == mSupportedLocations[listIndex].locationID), 
+        ChipLogError(Zcl,  "ModifySupportedLocation - new locationID %u does not match existing locationID %u", 
+                        modifiedLocation.locationID, mSupportedLocations[listIndex].locationID));   
 
 
     // checks passed, update the attribute
@@ -618,7 +618,7 @@ bool RvcDevice::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStr
 
     while (listIndex < listSize)
     {
-        if (mSupportedMaps[listIndex].mapId == aMapId)
+        if (mSupportedMaps[listIndex].mapID == aMapId)
         {
             aSupportedMap = mSupportedMaps[listIndex];
             ret_value = true;
@@ -648,7 +648,7 @@ bool RvcDevice::AddSupportedMap(const MapStructureWrapper & newMap, uint32_t & l
     else
     {
         ChipLogError(Zcl,  "AddSupportedMap %u - supported maps list is already at maximum size %u",
-                                newMap.mapId, (uint32_t)kMaxNumSupportedMaps);
+                                newMap.mapID, (uint32_t)kMaxNumSupportedMaps);
     }
 
     return ret_value;
@@ -661,10 +661,10 @@ bool RvcDevice::ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper
 
     // server instance (caller) is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
 
-    // double check that mapId's match
-    VerifyOrExit((modifiedMap.mapId == mSupportedMaps[listIndex].mapId),
-        ChipLogError(Zcl,  "ModifySupportedMap - mapId's do not match, new lmapId %u, existing mapId %u", 
-                        modifiedMap.mapId, mSupportedMaps[listIndex].mapId));   
+    // double check that mapID's match
+    VerifyOrExit((modifiedMap.mapID == mSupportedMaps[listIndex].mapID),
+        ChipLogError(Zcl,  "ModifySupportedMap - mapID's do not match, new lmapID %u, existing mapID %u", 
+                        modifiedMap.mapID, mSupportedMaps[listIndex].mapID));   
 
     // save modified map
     mSupportedMaps[listIndex] = modifiedMap;
@@ -784,7 +784,7 @@ bool RvcDevice::GetProgressElementById(uint32_t aLocationId, uint32_t & listInde
 
     while (listIndex < listSize)
     {
-        if (mProgressList[listIndex].locationId == aLocationId)
+        if (mProgressList[listIndex].locationID == aLocationId)
         {
             aProgressElement = mProgressList[listIndex];
             ret_value = true;
@@ -814,7 +814,7 @@ bool RvcDevice::AddProgressElement(const Structs::ProgressStruct::Type & newProg
     else
     {
         ChipLogError(Zcl,  "AddProgressElement %u -progress list is already at maximum size %u", 
-                            newProgressElement.locationId, (uint32_t)kMaxNumProgressElements);
+                            newProgressElement.locationID, (uint32_t)kMaxNumProgressElements);
     }
 
     return ret_value;
