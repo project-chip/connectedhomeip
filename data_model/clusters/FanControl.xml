@@ -126,29 +126,29 @@ Davis, CA 95616, USA
           </notTerm>
         </optionalConform>
       </item>
-      <item value="1" name="OffLowHighAuto" summary="Fan is capable of off, low and high modes">
+      <item value="1" name="Off" summary="Fan is capable of off, low and high modes">
         <optionalConform choice="a">
           <notTerm>
             <feature name="AUT"/>
           </notTerm>
         </optionalConform>
       </item>
-      <item value="2" name="OffLowMediumHighAuto" summary="Fan is capable of off, low, medium, high and auto modes">
+      <item value="2" name="Off" summary="Fan is capable of off, low, medium, high and auto modes">
         <optionalConform choice="a">
           <feature name="AUT"/>
         </optionalConform>
       </item>
-      <item value="3" name="OffLowHighAuto" summary="Fan is capable of off, low, high and auto modes">
+      <item value="3" name="Off" summary="Fan is capable of off, low, high and auto modes">
         <optionalConform choice="a">
           <feature name="AUT"/>
         </optionalConform>
       </item>
-      <item value="4" name="OffHighAuto" summary="Fan is capable of off, high and auto modes">
+      <item value="4" name="Off" summary="Fan is capable of off, high and auto modes">
         <optionalConform choice="a">
           <feature name="AUT"/>
         </optionalConform>
       </item>
-      <item value="5" name="OffHigh" summary="Fan is capable of off and high modes">
+      <item value="5" name="Off" summary="Fan is capable of off and high modes">
         <optionalConform choice="a">
           <notTerm>
             <feature name="AUT"/>
