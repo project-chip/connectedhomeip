@@ -120,17 +120,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Adds a delegate to receive asynchronous callbacks about the device.
  *
  * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.
+ *
+ * MTRDevice holds a weak reference to the delegate object.
  */
 - (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
 
 /**
- * Adds a delegate to receive asynchronous callbacks about the device, and limit attribute reports to a specific set of paths.
+ * Adds a delegate to receive asynchronous callbacks about the device, and limit attribute and/or event reports to a specific set of paths.
  *
- * interestedAttributePaths may contain either MTRClusterPath or MTRAttributePath.
+ * interestedPathsForAttributes may contain either MTRClusterPath or MTRAttributePath to specify interested clusters and attributes, or NSNumber for endpoints.
  *
- * MTRDevice does not hold a strong reference to the delegate object.
+ * interestedPathsForAttributes may contain either MTRClusterPath or MTREventPath to specify interested clusters and events, or NSNumber for endpoints.
+ *
+ * For both interested paths arguments, if nil is specified, then no filter will be applied.
+ *
+ * Calling addDelegate: again with the same delegate object will update the interested paths for attributes and events for this delegate.
+ *
+ * MTRDevice holds a weak reference to the delegate object.
  */
-- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray *)interestedPathsForAttributes MTR_NEWLY_AVAILABLE;
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents MTR_NEWLY_AVAILABLE;
 
 /**
  * Removes the delegate from receiving callbacks about the device.
