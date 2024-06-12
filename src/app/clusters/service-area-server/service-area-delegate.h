@@ -206,8 +206,8 @@ protected:
     virtual bool GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & supportedLocation) = 0;
 
     /**
-     * @brief Get a supported location that matches a locationId
-     * @param[in] aLocationId the locationId to search for
+     * @brief Get a supported location that matches a locationID
+     * @param[in] aLocationId the locationID to search for
      * @param[out] listIndex the location's index in the list, if found
      * @param[out] aSupportedLocation  copy of the location contents, if found
      * @return true if location found
@@ -220,10 +220,10 @@ protected:
 
         listIndex = 0;
 
-        // simple linear iteration to find the location with the desired locationId.
+        // simple linear iteration to find the location with the desired locationID.
         while (GetSupportedLocationByIndex(listIndex, aSupportedLocation))
         {
-            if (aSupportedLocation.locationId == aLocationId)
+            if (aSupportedLocation.locationID == aLocationId)
             {
                 ret_value = true;
                 break;
@@ -253,7 +253,7 @@ protected:
      * @return true if successful
      * 
      * @note caller MUST guarantee modified location is a valid, unique location
-     * @note this function SHOULD double check that newLocation's locationId matches the object at listIndex
+     * @note this function SHOULD double check that newLocation's locationID matches the object at listIndex
      */
     virtual bool ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation) = 0;
 
@@ -300,8 +300,8 @@ protected:
     virtual bool GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & supportedMap) = 0;
 
     /**
-     * @brief Get a supported map that matches a mapId
-     * @param[in] aMapId the mapId to search for
+     * @brief Get a supported map that matches a mapID
+     * @param[in] aMapId the mapID to search for
      * @param[out] listIndex the map's index in the list, if found
      * @param[out] aSupportedMap copy of the location contents, if found
      * @return bool if map found
@@ -316,7 +316,7 @@ protected:
 
         while (GetSupportedMapByIndex(listIndex, aSupportedMap))
         {
-            if (aSupportedMap.mapId == aMapId)
+            if (aSupportedMap.mapID == aMapId)
             {
                 ret_value = true;
                 break;
@@ -346,7 +346,7 @@ protected:
      * @return true if successful
      * 
      * @note caller MUST guarantee modified map is a valid, unique map
-     * @note this function SHOULD double check that modifedMap's mapId matches the object at listIndex
+     * @note this function SHOULD double check that modifedMap's mapID matches the object at listIndex
      */
     virtual bool ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper & modifiedMap) = 0;
 
@@ -379,8 +379,8 @@ protected:
     virtual bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) = 0;
 
     /**
-     * @brief Check if a locationId is in the selected locations list
-     * @param[in] aLocationId the locationId to search for
+     * @brief Check if a locationID is in the selected locations list
+     * @param[in] aLocationId the locationID to search for
      * @return bool if location found
      * 
      * @note may be overloaded in device implementation for optimization, if desired
@@ -407,8 +407,8 @@ protected:
     };
 
     /**
-     * @brief Add a locationId to the selected locations list.
-     * @param[in] aLocationId new locationId to add
+     * @brief Add a locationID to the selected locations list.
+     * @param[in] aLocationId new locationID to add
      * @param[in] listIndex filled with the list index of the new location, if successful
      * @return true if successful
      * 
@@ -449,8 +449,8 @@ protected:
     virtual bool GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & progressElement) = 0;
 
     /**
-     * @brief Get a progress element that matches a locationId
-     * @param[in] aLocationId the locationId to search for
+     * @brief Get a progress element that matches a locationID
+     * @param[in] aLocationId the locationID to search for
      * @param[out] listIndex the location's index in the list, if found
      * @param[out] aProgressElement  copy of the progress element contents, if found
      * @return bool if location found
@@ -463,10 +463,10 @@ protected:
 
         listIndex = 0;
 
-        // simple linear iteration to find the progress element with the desired locationId.
+        // simple linear iteration to find the progress element with the desired locationID.
         while (GetProgressElementByIndex(listIndex, aProgressElement))
         {
-            if (aProgressElement.locationId == aLocationId)
+            if (aProgressElement.locationID == aLocationId)
             {
                 ret_value = true;
                 break;
@@ -496,7 +496,7 @@ protected:
      * @return true if successful
      * 
      * @note caller MUST guarantee modified location is a valid, unique location
-     * @note this function SHOULD double check that modifedLocation's locationId matches the object at listIndex
+     * @note this function SHOULD double check that modifedLocation's locationID matches the object at listIndex
      */
     virtual bool ModifyProgressElement(uint32_t listIndex, const Structs::ProgressStruct::Type & modifedProgressElement) = 0;
 

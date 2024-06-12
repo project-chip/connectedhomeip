@@ -165,10 +165,10 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSelectLocationsCmd(ctx, req); });
         break;
 
-    case Commands::SkipCurrent::Id:
+    case Commands::SkipCurrentLocation::Id:
 
-        CommandHandlerInterface::HandleCommand<Commands::SkipCurrent::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipCurrentCmd(ctx); });
+        CommandHandlerInterface::HandleCommand<Commands::SkipCurrentLocation::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipCurrentLocationCmd(ctx); });
         break;
 
     default:
@@ -395,21 +395,21 @@ exit:
     // If the Status field is set to DuplicatedLocations, the StatusText field SHALL be an empty string.
     case SelectLocationsStatus::kUnsupportedLocation:
     case SelectLocationsStatus::kDuplicatedLocations:
-        response.statusText = chip::CharSpan::fromCharString("");
+        response.statusText = chip::Optional(chip::CharSpan::fromCharString(""));
         break;
 
     // If the Status field is set to Success, the StatusText field is optional.
     case SelectLocationsStatus::kSuccess:
         if (useLocationStatusText)
         {
-            response.statusText = chip::CharSpan::fromCharString( locationStatusText);
+            response.statusText = chip::Optional(chip::CharSpan::fromCharString( locationStatusText));
         }
         break;
 
     // If the Status field is not set to Success, or UnsupportedLocation, or DuplicatedLocations,
     // the StatusText field SHALL include a vendor-defined error description
     default:
-        response.statusText = chip::CharSpan::fromCharString( locationStatusText);
+        response.statusText = chip::Optional(chip::CharSpan::fromCharString( locationStatusText));
         break;
 
     } // end switch
@@ -420,29 +420,29 @@ exit:
 }
 
 
-void Instance::HandleSkipCurrentCmd(HandlerContext & ctx)
+void Instance::HandleSkipCurrentLocationCmd(HandlerContext & ctx)
 {
-    ChipLogDetail(Zcl, "Location Location: HandleSkipCurrent");
+    ChipLogDetail(Zcl, "Location Location: HandleSkipCurrentLocation");
 
-    SkipCurrentStatus skipStatus                  = SkipCurrentStatus::kSuccess;
+    SkipCurrentLocationStatus skipStatus                  = SkipCurrentLocationStatus::kSuccess;
     char   skipStatusText[kMaxSizeStatusText + 1] = {'\0'};
     Status cmdStatus                              = Status::Success;
 
     // On receipt of this command the device SHALL respond with a SkipCurrentLocationResponse command. 
-    Commands::SkipCurrentResponse::Type response;
+    Commands::SkipCurrentLocationResponse::Type response;
 
     // InvalidLocationList | The SelectedLocations attribute is null.
     // If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string.
     VerifyOrExit((mDelegate->GetNumberOfSelectedLocations() == 0), 
-                            skipStatus  = SkipCurrentStatus::kInvalidLocationList;
+                            skipStatus  = SkipCurrentLocationStatus::kInvalidLocationList;
                             ChipLogError(Zcl, "Skip Current Location command - Selected Locations atttribute is null");
                             cmdStatus = Status::Failure );
 
     // InvalidInMode  | The received request cannot be handled due to the current mode of the device. For example, the CurrentLocation attribute is null.
     // If the Status field is not set to Success, or InvalidLocationList, the StatusText field SHALL include a vendor defined error description.
     VerifyOrExit(!mCurrentLocation.IsNull(), 
-                            skipStatus  = SkipCurrentStatus::kInvalidInMode;
-                            strncat(skipStatusText, "SkipCurrent command - Current Location attribute is null", kMaxSizeStatusText);
+                            skipStatus  = SkipCurrentLocationStatus::kInvalidInMode;
+                            strncat(skipStatusText, "SkipCurrentLocation command - Current Location attribute is null", kMaxSizeStatusText);
                             ChipLogError(Zcl, "%s", skipStatusText);
                             cmdStatus = Status::Failure );
 
@@ -450,7 +450,7 @@ void Instance::HandleSkipCurrentCmd(HandlerContext & ctx)
     // If the Status field is not set to Success, or InvalidLocationList, the StatusText field SHALL include a vendor defined error description. 
     // InvalidInMode | The received request cannot be handled due to the current mode of the device.    
     // (skipStatusText to be filled out by delegated function on failure.)   
-    VerifyOrExit(mDelegate->HandleSkipCurrentLocation(skipStatusText), skipStatus  = SkipCurrentStatus::kInvalidInMode; cmdStatus = Status::Failure);
+    VerifyOrExit(mDelegate->HandleSkipCurrentLocation(skipStatusText), skipStatus  = SkipCurrentLocationStatus::kInvalidInMode; cmdStatus = Status::Failure);
 
 
 exit:
@@ -459,17 +459,17 @@ exit:
     switch (skipStatus)
     {
     // If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string
-    case SkipCurrentStatus::kInvalidLocationList:
-        response.statusText = chip::CharSpan::fromCharString("");
+    case SkipCurrentLocationStatus::kInvalidLocationList:
+        response.statusText = chip::Optional(chip::CharSpan::fromCharString(""));
         break;
 
-    case SkipCurrentStatus::kSuccess:
+    case SkipCurrentLocationStatus::kSuccess:
         break;
 
     // If the Status field is not set to Success, or InvalidLocationList,
     // the StatusText field SHALL include a vendor defined error description
     default:
-        response.statusText = chip::CharSpan::fromCharString(skipStatusText);
+        response.statusText = chip::Optional(chip::CharSpan::fromCharString(skipStatusText));
         break;
 
     } // end switch
@@ -532,39 +532,39 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
 
     // If the HomeLocationInfo field is null, the LandmarkTag field SHALL NOT be null.
     // If the LandmarkTag field is null, the HomeLocationInfo field SHALL NOT be null.
-    VerifyOrExit((!aLocation.locationInfo.homeLocationInfo.IsNull()) || (!aLocation.locationInfo.landmarkTag.IsNull()),
-                ChipLogError(Zcl,  "IsValidSupportedLocation %u - must have homeLocationInfo and/or LandmarkTag", aLocation.locationId));
+    VerifyOrExit((!aLocation.locationInfo.locationInfo.IsNull()) || (!aLocation.locationInfo.landmarkTag.IsNull()),
+                ChipLogError(Zcl,  "IsValidSupportedLocation %u - must have locationInfo and/or LandmarkTag", aLocation.locationID));
 
 
-    if (!aLocation.locationInfo.homeLocationInfo.IsNull())
+    if (!aLocation.locationInfo.locationInfo.IsNull())
     {
         // If HomeLocationInfo is not null, and its LocationName field is an empty string, at least one of the following SHALL NOT be null:
         // HomeLocationInfo's FloorNumber field, HomeLocationInfo's AreaType field, the LandmarkTag field
 
         // If all three of the following are null, HomeLocationInfo's LocationName field SHALL NOT be an empty string:
         // HomeLocationInfo's FloorNumber field HomeLocationInfo's AreaType field, the LandmarkTag field
-        VerifyOrExit(  ((aLocation.locationInfo.homeLocationInfo.Value().locationName.size() != 0) ||
-                        !aLocation.locationInfo.homeLocationInfo.Value().floorNumber.IsNull() || 
-                        !aLocation.locationInfo.homeLocationInfo.Value().areaType.IsNull() ||
+        VerifyOrExit(  ((aLocation.locationInfo.locationInfo.Value().locationName.size() != 0) ||
+                        !aLocation.locationInfo.locationInfo.Value().floorNumber.IsNull() || 
+                        !aLocation.locationInfo.locationInfo.Value().areaType.IsNull() ||
                         !aLocation.locationInfo.landmarkTag.IsNull()),
-                    ChipLogError(Zcl,  "IsValidSupportedLocation %u - LocationName is empty string, Floornumber, AreaType, LandmarkTag are null", aLocation.locationId));
+                    ChipLogError(Zcl,  "IsValidSupportedLocation %u - LocationName is empty string, Floornumber, AreaType, LandmarkTag are null", aLocation.locationID));
     }
 
     // If the LandmarkTag field is null, the PositionTag field SHALL be null.
     VerifyOrExit((!aLocation.locationInfo.landmarkTag.IsNull() || aLocation.locationInfo.positionTag.IsNull()),
-                ChipLogError(Zcl,  "IsValidSupportedLocation %u - PositionTag with no LandmarkTag", aLocation.locationId));
+                ChipLogError(Zcl,  "IsValidSupportedLocation %u - PositionTag with no LandmarkTag", aLocation.locationID));
 
     if (mDelegate->GetNumberOfSupportedMaps()== 0)
     {
         // If the SupportedMaps attribute is null, mapid SHALL be null.
-        VerifyOrExit(aLocation.mapId.IsNull(),
-                    ChipLogError(Zcl,  "IsValidSupportedLocation %u - map Id %u is not in empty supported map list ", aLocation.locationId, aLocation.mapId.Value()));
+        VerifyOrExit(aLocation.mapID.IsNull(),
+                    ChipLogError(Zcl,  "IsValidSupportedLocation %u - map Id %u is not in empty supported map list ", aLocation.locationID, aLocation.mapID.Value()));
     }
     else
     {
-        // If the SupportedMaps attribute is not null, mapId SHALL be the ID of an entry from the SupportedMaps attribute.
-        VerifyOrExit((IsSupportedMap(aLocation.mapId.Value())),
-                    ChipLogError(Zcl,  "IsValidSupportedLocation %u - map Id %u is not in supported map list ", aLocation.locationId, aLocation.mapId.Value()));
+        // If the SupportedMaps attribute is not null, mapID SHALL be the ID of an entry from the SupportedMaps attribute.
+        VerifyOrExit((IsSupportedMap(aLocation.mapID.Value())),
+                    ChipLogError(Zcl,  "IsValidSupportedLocation %u - map Id %u is not in supported map list ", aLocation.locationID, aLocation.mapID.Value()));
     }
 
     //success
@@ -591,34 +591,34 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
     {
         // this function may be used for uniqueness checking of a location that is a member of supported locations, (for validating modifications)
         // so do not test it against itself.
-        // skip location if locationId's match
-        if (aLocation.locationId == entry.locationId)
+        // skip location if locationID's match
+        if (aLocation.locationID == entry.locationID)
         {
             locationInSupportedList = true; // flag that Id already exists in supported locations.
             continue;
         }
 
-        // check for non-matching mapId
-        // if mapId is not null, skip locations with null mapId's
-        // if mapId is null, skip locations with non-null mapId's
-        // if both location's mapId are not null, skip locations with non matching mapId's
-        if ((aLocation.mapId.IsNull() != (entry.mapId.IsNull()))  ||
+        // check for non-matching mapID
+        // if mapID is not null, skip locations with null mapID's
+        // if mapID is null, skip locations with non-null mapID's
+        // if both location's mapID are not null, skip locations with non matching mapID's
+        if ((aLocation.mapID.IsNull() != (entry.mapID.IsNull()))  ||
 
-            (!aLocation.mapId.IsNull() && (!entry.mapId.IsNull()) && (aLocation.mapId.Value() != entry.mapId.Value())))
+            (!aLocation.mapID.IsNull() && (!entry.mapID.IsNull()) && (aLocation.mapID.Value() != entry.mapID.Value())))
         {
             continue;
         }
 
         // check for null vs non-null HomeLocationInfo
-        if (aLocation.locationInfo.homeLocationInfo.IsNull() != (entry.locationInfo.homeLocationInfo.IsNull()))
+        if (aLocation.locationInfo.locationInfo.IsNull() != (entry.locationInfo.locationInfo.IsNull()))
         {
-             continue;
+            continue;
         }
 
         // if both locations have non-null HomeLocationInfo, check fields
-        if (!aLocation.locationInfo.homeLocationInfo.IsNull() && (!entry.locationInfo.homeLocationInfo.IsNull()))
+        if (!aLocation.locationInfo.locationInfo.IsNull() && (!entry.locationInfo.locationInfo.IsNull()))
         {
-            if (!aLocation.DoesNameMatch(entry.locationInfo.homeLocationInfo.Value().locationName))
+            if (!aLocation.DoesNameMatch(entry.locationInfo.locationInfo.Value().locationName))
             {
                 continue;
             }
@@ -628,10 +628,10 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
             // if FloorNumber is not null, skip locations with null FloorNumber's
             // if FloorNumber is null, skip locations with non-null FloorNumber's
             // if both location's FloorNumber are not null, skip locations with non matching FloorNumber's
-            if ((aLocation.locationInfo.homeLocationInfo.Value().floorNumber.IsNull() != entry.locationInfo.homeLocationInfo.Value().floorNumber.IsNull()) ||
+            if ((aLocation.locationInfo.locationInfo.Value().floorNumber.IsNull() != entry.locationInfo.locationInfo.Value().floorNumber.IsNull()) ||
 
-                ((!aLocation.locationInfo.homeLocationInfo.Value().floorNumber.IsNull() && !entry.locationInfo.homeLocationInfo.Value().floorNumber.IsNull()) 
-                    && (aLocation.locationInfo.homeLocationInfo.Value().floorNumber.Value() != entry.locationInfo.homeLocationInfo.Value().floorNumber.Value()))  )
+                ((!aLocation.locationInfo.locationInfo.Value().floorNumber.IsNull() && !entry.locationInfo.locationInfo.Value().floorNumber.IsNull()) 
+                    && (aLocation.locationInfo.locationInfo.Value().floorNumber.Value() != entry.locationInfo.locationInfo.Value().floorNumber.Value()))  )
             {
                 continue;
             }
@@ -641,10 +641,10 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
             // if AreaType is not null, skip locations with null AreaType's
             // if AreaType is null, skip locations with non-null AreaType's
             // if both location's AreaType are not null, skip locations with non matching AreaType's
-            if ((aLocation.locationInfo.homeLocationInfo.Value().areaType.IsNull() != entry.locationInfo.homeLocationInfo.Value().areaType.IsNull()) ||
+            if ((aLocation.locationInfo.locationInfo.Value().areaType.IsNull() != entry.locationInfo.locationInfo.Value().areaType.IsNull()) ||
 
-                ((!aLocation.locationInfo.homeLocationInfo.Value().areaType.IsNull() && !entry.locationInfo.homeLocationInfo.Value().areaType.IsNull()) 
-                    && (aLocation.locationInfo.homeLocationInfo.Value().areaType.Value() != entry.locationInfo.homeLocationInfo.Value().areaType.Value()))  )
+                ((!aLocation.locationInfo.locationInfo.Value().areaType.IsNull() && !entry.locationInfo.locationInfo.Value().areaType.IsNull()) 
+                    && (aLocation.locationInfo.locationInfo.Value().areaType.Value() != entry.locationInfo.locationInfo.Value().areaType.Value()))  )
             {
                 continue;
             }
@@ -739,15 +739,15 @@ bool Instance::AddSupportedLocation( uint32_t                                   
 
     // verify cluster requirements concerning valid fields and field relationships
     VerifyOrExit(IsValidSupportedLocation(aNewLocation), 
-                ChipLogError(Zcl,  "AddSupportedLocation %u - not a valid location object", aNewLocation.locationId));
+                ChipLogError(Zcl,  "AddSupportedLocation %u - not a valid location object", aNewLocation.locationID));
 
     // must not match existing location description
     VerifyOrExit(IsUniqueSupportedLocation(aNewLocation, locationAlreadyExists),
-                ChipLogError(Zcl,  "AddSupportedLocation %u - not a unique location object", aNewLocation.locationId));
+                ChipLogError(Zcl,  "AddSupportedLocation %u - not a unique location object", aNewLocation.locationID));
 
     // Each entry in Supported Locations SHALL have a unique value for the ID field.
     VerifyOrExit(!locationAlreadyExists,
-                ChipLogError(Zcl,  "AddSupportedLocation %u - supported location with this Id already exists", aNewLocation.locationId));
+                ChipLogError(Zcl,  "AddSupportedLocation %u - supported location with this Id already exists", aNewLocation.locationID));
 
     // add to supported locations attribute
     VerifyOrExit( mDelegate->AddSupportedLocation(aNewLocation, dummyIndex), /* log error in delegate function*/);
@@ -773,7 +773,7 @@ bool Instance::ModifySupportedLocation( uint32_t                                
                                         const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  )
 {
     bool ret_value = false;
-    bool mapIdChanged = false;
+    bool mapIDChanged = false;
     uint32_t listIndex;
 
     // get existing supported location to modify
@@ -781,19 +781,19 @@ bool Instance::ModifySupportedLocation( uint32_t                                
     bool locationExists = mDelegate->GetSupportedLocationById(aLocationId, listIndex, supportedLocation);
 
     VerifyOrExit(locationExists,
-            ChipLogError(Zcl,  "ModifySupportedLocation %u - not a supported locationId", aLocationId)); 
+            ChipLogError(Zcl,  "ModifySupportedLocation %u - not a supported locationID", aLocationId)); 
 
     {
-        // check for mapId change
-        if ((aMapId.IsNull() != supportedLocation.mapId.IsNull())  ||
+        // check for mapID change
+        if ((aMapId.IsNull() != supportedLocation.mapID.IsNull())  ||
 
-            (!aMapId.IsNull() && !supportedLocation.mapId.IsNull()
-             && (aMapId.Value() != supportedLocation.mapId.Value()))  )    
+            (!aMapId.IsNull() && !supportedLocation.mapID.IsNull()
+             && (aMapId.Value() != supportedLocation.mapID.Value()))  )    
         {
             // does device mode allow this attribute to be updated?
             VerifyOrExit(mDelegate->IsSupportedLocationChangeAllowed(), /* if false, should be logged as error in delegate function */);
 
-            mapIdChanged = true;
+            mapIDChanged = true;
         }
 
         // create new location object for validation
@@ -803,11 +803,11 @@ bool Instance::ModifySupportedLocation( uint32_t                                
 
         // verify cluster requirements concerning valid fields and field relationships
         VerifyOrExit(IsValidSupportedLocation(aNewLocation), 
-                    ChipLogError(Zcl,  "ModifySupportedLocation %u - not a valid location object", aNewLocation.locationId));
+                    ChipLogError(Zcl,  "ModifySupportedLocation %u - not a valid location object", aNewLocation.locationID));
 
         // updated location description must not match another existing location description
         VerifyOrExit(IsUniqueSupportedLocation(aNewLocation, locationExists),
-                    ChipLogError(Zcl,  "ModifySupportedLocation %u - not a unique location object", aNewLocation.locationId));
+                    ChipLogError(Zcl,  "ModifySupportedLocation %u - not a unique location object", aNewLocation.locationID));
 
         // note: we already checked locationExists, we don't need to do it again here.
 
@@ -816,7 +816,7 @@ bool Instance::ModifySupportedLocation( uint32_t                                
     }
 
     ret_value = true;
-    if (mapIdChanged)
+    if (mapIDChanged)
     {
         HandleSupportedLocationsUpdated();
     }
@@ -887,7 +887,7 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
                 ChipLogError(Zcl,  "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.name_c_str()));
 
         //  Each entry in this list SHALL have a unique value for the MapID field.
-        VerifyOrExit((aMapId != entry.mapId),
+        VerifyOrExit((aMapId != entry.mapID),
                 ChipLogError(Zcl,  "AddSupportedMap - non-unique Id %u", aMapId));
     }
  
@@ -929,7 +929,7 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
 
 
     // update the local copy of the map
-    modifiedMap.Set(modifiedMap.mapId, newMapName);
+    modifiedMap.Set(modifiedMap.mapID, newMapName);
 
     // Each entry in this list SHALL have a unique value for the Name field.
     while (mDelegate->GetSupportedMapByIndex(loopIndex, entry))

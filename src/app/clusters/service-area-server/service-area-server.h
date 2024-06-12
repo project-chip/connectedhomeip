@@ -155,7 +155,7 @@ private:
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
      */
-    void HandleSkipCurrentCmd(HandlerContext & ctx);
+    void HandleSkipCurrentLocationCmd(HandlerContext & ctx);
 
 
 public:
@@ -216,11 +216,11 @@ public:
     /**
      * @brief check if location contents are unique with regard to supported locations
      * @param[in] aLocation id of the location
-     * @param[out] locationInSupportedList set to true if locationId already exists in supported locations attribute
+     * @param[out] locationInSupportedList set to true if locationID already exists in supported locations attribute
      * @return true if meets all checks
      * 
      * @note this can be used to check a new location, or a modified location that is already a member of supported locations 
-     *       (does not check uniqueness against location with same locationId, if one exists in the supported locations attribute)
+     *       (does not check uniqueness against location with same locationID, if one exists in the supported locations attribute)
      */
     bool IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool & locationInSupportedList);
 
@@ -277,7 +277,7 @@ public:
      * @return true if the location is a member of supported locations, the modifications pass all validation checks and the location was modified 
      *
      * @note if aLocationName is larger than kLocationtNameMaxSize, it will be truncated
-     * @note if mapId is changed, SelectedLocations, CurrentLocation, and Progress are cleared.
+     * @note if mapID is changed, SelectedLocations, CurrentLocation, and Progress are cleared.
      * @note MATTER change notifications are made for the attributes that change
      */
     bool ModifySupportedLocation( uint32_t                                     aLocationId, 
@@ -348,7 +348,7 @@ public:
 
     /**
      * @brief Add a selected location
-     * @param[in] aSelectedLocation locationId to add
+     * @param[in] aSelectedLocation locationID to add
      * @bool true if successfully added
      * 
      * @note selected locations are normally set through the SelectLocations command, 
@@ -431,8 +431,8 @@ public:
     bool AddPendingProgressElement(uint32_t aLocationId);
 
     /**
-     * @brief Set the status of progress element identified by locationId
-     * @param[in] aLocationId the locationId to use
+     * @brief Set the status of progress element identified by locationID
+     * @param[in] aLocationId the locationID to use
      * @param[in] status location cluster operation status for this location
      * @return true if progress element is found and status is set
      *
@@ -442,8 +442,8 @@ public:
     bool SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opStatus);
 
     /**
-     * @brief Set the total operational time for the progress element identified by locationId
-     * @param[in] aLocationId the locationId to use
+     * @brief Set the total operational time for the progress element identified by locationID
+     * @param[in] aLocationId the locationID to use
      * @param[in] aTotalOperationalTime total operational time for thus location
      * @return true if progress element is found and operational time is set
      * 
@@ -452,8 +452,8 @@ public:
     bool SetProgressTotalOperationalTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime);
 
     /**
-     * @brief Set the estimated time for the  progress element identified by locationId
-     * @param[in] aLocationId the locationId to use
+     * @brief Set the estimated time for the  progress element identified by locationID
+     * @param[in] aLocationId the locationID to use
      * @param[in] aEstimatedTime total operational time for thus location
      * @return true if progress element is found and operational time is set
      * 

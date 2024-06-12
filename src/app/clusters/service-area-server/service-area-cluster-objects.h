@@ -58,7 +58,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * 
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
      * @note if aLocationName is larger than kLocationtNameMaxSize, it will be truncated
-     * @note if aLocationName is empty string and aFloorNumber and aAreaTypeTag are null, homeLocationInfo will be set to null
+     * @note if aLocationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null
      */
     LocationStructureWrapper( uint32_t                                     aLocationId, 
                               const DataModel::Nullable<uint8_t>         & aMapId, 
@@ -78,7 +78,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * @brief Copy constructor (deep copy)
      * @param[in] op initialization object
      * 
-     * @note if locationName is empty string and aFloorNumber and aAreaTypeTag are null, homeLocationInfo will be set to null
+     * @note if locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null
      */
     LocationStructureWrapper(const LocationStructureWrapper & op) { *this = op; }
 
@@ -86,21 +86,21 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * @brief Assignment operator (deep copy)
      * @param[in] op 
      * 
-     * @note if locationName is empty string and aFloorNumber and aAreaTypeTag are null, homeLocationInfo will be set to null
+     * @note if locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null
      */
     LocationStructureWrapper & operator=(const LocationStructureWrapper & op)
     {
-        if (op.locationInfo.homeLocationInfo.IsNull())
+        if (op.locationInfo.locationInfo.IsNull())
         {
-            Set(op.locationId, op.mapId, 
+            Set(op.locationID, op.mapID, 
                 CharSpan(), NullOptional, NullOptional,
                 op.locationInfo.landmarkTag, op.locationInfo.positionTag, op.locationInfo.surfaceTag);
         }
         else
         {
-            Set(op.locationId, op.mapId, 
-                op.locationInfo.homeLocationInfo.Value().locationName, op.locationInfo.homeLocationInfo.Value().floorNumber,
-                op.locationInfo.homeLocationInfo.Value().areaType,
+            Set(op.locationID, op.mapID, 
+                op.locationInfo.locationInfo.Value().locationName, op.locationInfo.locationInfo.Value().floorNumber,
+                op.locationInfo.locationInfo.Value().areaType,
                 op.locationInfo.landmarkTag, op.locationInfo.positionTag, op.locationInfo.surfaceTag);
         }
 
@@ -120,7 +120,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * 
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
      * @note if aLocationName is larger than kLocationtNameMaxSize, it will be truncated
-     * @note if aLocationName is empty string and aFloorNumber and aAreaTypeTag are null, homeLocationInfo will be set to null
+     * @note if aLocationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null
      */
     void Set( uint32_t                                     aLocationId, 
               const DataModel::Nullable<uint8_t>         & aMapId, 
@@ -131,24 +131,24 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
               const DataModel::Nullable<PositionTag>     & aPositionTag,
               const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  )
     {
-        locationId   = aLocationId;
-        mapId        = aMapId;
+        locationID   = aLocationId;
+        mapID        = aMapId;
 
-        // if there is at least one non-null value for homeLocationInfo, add it to the location structure
+        // if there is at least one non-null value for locationInfo, add it to the location structure
         if ((!aLocationName.size() == 0)  ||    
             (!aFloorNumber.IsNull())      ||
             (!aAreaType.IsNull())  )
         {
-            // create home location info and fill in (except for homeLocationInfo - see below)
-            locationInfo.homeLocationInfo.SetNonNull(Structs::HomeLocationStruct::Type());
+            // create home location info and fill in (except for locationInfo - see below)
+            locationInfo.locationInfo.SetNonNull(Structs::HomeLocationStruct::Type());
 
-            locationInfo.homeLocationInfo.Value().floorNumber    = aFloorNumber;
-            locationInfo.homeLocationInfo.Value().areaType       = aAreaType;
+            locationInfo.locationInfo.Value().floorNumber    = aFloorNumber;
+            locationInfo.locationInfo.Value().areaType       = aAreaType;
         }
         else
         {
             // home location info is null
-            locationInfo.homeLocationInfo.SetNull();
+            locationInfo.locationInfo.SetNull();
         }
                                                                          
         locationInfo.landmarkTag   = aLandmarkTag;
@@ -161,24 +161,24 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         // Make sure there is always a terminating character, mainly so we can  get c_str for logging.
         memset(mLocationNameBuffer, 0, sizeof(mLocationNameBuffer+1));
 
-        // this assumes homeLocationInfo structure was created above, if appropriate
-        if (!locationInfo.homeLocationInfo.IsNull())
+        // this assumes locationInfo structure was created above, if appropriate
+        if (!locationInfo.locationInfo.IsNull())
         {
             if (aLocationName.size() == 0)
             {
-                locationInfo.homeLocationInfo.Value().locationName = CharSpan(mLocationNameBuffer, 0);
+                locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, 0);
             }
             else if (aLocationName.size() > sizeof(mLocationNameBuffer))
             {
                 // save truncated name that fits into available size
                 memcpy(mLocationNameBuffer, aLocationName.data(), sizeof(mLocationNameBuffer));
-                locationInfo.homeLocationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeof(mLocationNameBuffer));
+                locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeof(mLocationNameBuffer));
             }
             else
             {
                 // save full name
                 memcpy(mLocationNameBuffer, aLocationName.data(), aLocationName.size());
-                locationInfo.homeLocationInfo.Value().locationName = CharSpan(mLocationNameBuffer, aLocationName.size());
+                locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, aLocationName.size());
             }
         }
     }
@@ -192,17 +192,17 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      */
     bool DoesNameMatch(const CharSpan & aLocationName) const
     {
-        if ((!locationInfo.homeLocationInfo.IsNull())   &&
-            (locationInfo.homeLocationInfo.Value().locationName.size() == aLocationName.size()))
+        if ((!locationInfo.locationInfo.IsNull())   &&
+            (locationInfo.locationInfo.Value().locationName.size() == aLocationName.size()))
         {
-            if (locationInfo.homeLocationInfo.Value().locationName.size() == 0)
+            if (locationInfo.locationInfo.Value().locationName.size() == 0)
             {
                 return true;  // both "empty" string
             }
             else
             {
-                return (0 == memcmp(locationInfo.homeLocationInfo.Value().locationName.data(), aLocationName.data(), 
-                                        locationInfo.homeLocationInfo.Value().locationName.size()));
+                return (0 == memcmp(locationInfo.locationInfo.Value().locationName.data(), aLocationName.data(), 
+                                        locationInfo.locationInfo.Value().locationName.size()));
             }
         }
         else
@@ -268,7 +268,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      */
     MapStructureWrapper & operator=(const MapStructureWrapper & op)
     {
-        Set(op.mapId, op.name);
+        Set(op.mapID, op.name);
         return *this;
     }
 
@@ -283,7 +283,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     void Set( uint8_t aMapId, 
               const CharSpan & aMapName)
     {
-        mapId = aMapId;
+        mapID = aMapId;
 
         // Save map name to buffer, so access and lifetime is controlled.
         // Create a CharSpan reference the text.
