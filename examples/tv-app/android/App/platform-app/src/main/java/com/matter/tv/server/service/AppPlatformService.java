@@ -172,7 +172,6 @@ public class AppPlatformService {
               app.getAppName(),
               app.getProductId(),
               app.getVersion(),
-              app.getSupportedClusters(),
               mapSupportedClusters(app.getSupportedClusters()),
               desiredEndpointId,
               new ContentAppEndpointManagerImpl(context));
@@ -197,7 +196,7 @@ public class AppPlatformService {
 
   private Collection<ContentAppSupportedCluster> mapSupportedClusters(
       Collection<SupportedCluster> supportedClusters) {
-    supportedClusters
+    return supportedClusters
         .stream()
         .map(AppPlatformService::mapSupportedCluster)
         .collect(Collectors.toList());
