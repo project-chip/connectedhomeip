@@ -84,7 +84,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)assertMutable
 {
-    NSAssert(_state == MTRAsyncWorkItemMutable, @"work item is not mutable (%ld)", (long) _state);
+    NSAssert(_state == MTRAsyncWorkItemMutable, @"work item is not mutable (%ld)", static_cast<long>(_state));
 }
 
 #pragma mark Management by the work queue (queue lock held)
@@ -109,7 +109,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)callReadyHandlerWithContext:(id)context completion:(MTRAsyncWorkCompletionBlock)completion
 {
-    NSAssert(_state >= MTRAsyncWorkItemEnqueued, @"work item is not enqueued (%ld)", (long) _state);
+    NSAssert(_state >= MTRAsyncWorkItemEnqueued, @"work item is not enqueued (%ld)", static_cast<long>(_state));
     NSInteger retryCount = 0;
     if (_state == MTRAsyncWorkItemEnqueued) {
         _state = MTRAsyncWorkItemRunning;
@@ -126,9 +126,9 @@ MTR_DIRECT_MEMBERS
     auto readyHandler = _readyHandler;
     dispatch_async(_queue, ^{
         if (!retryCount) {
-            MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> executing work item [%llu]", context, uniqueID);
+            MTR_LOG("MTRAsyncWorkQueue<%@> executing work item [%llu]", context, uniqueID);
         } else {
-            MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> executing work item [%llu] (retry %zd)", context, uniqueID, retryCount);
+            MTR_LOG("MTRAsyncWorkQueue<%@> executing work item [%llu] (retry %zd)", context, uniqueID, retryCount);
         }
         if (readyHandler) {
             readyHandler(context, retryCount, completion);
@@ -161,7 +161,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)markComplete
 {
-    NSAssert(_state >= MTRAsyncWorkItemEnqueued, @"work item was not enqueued (%ld)", (long) _state);
+    NSAssert(_state >= MTRAsyncWorkItemEnqueued, @"work item was not enqueued (%ld)", static_cast<long>(_state));
     _state = MTRAsyncWorkItemComplete;
 
     // Clear all handlers in case any of them captured this object.
@@ -185,7 +185,7 @@ MTR_DIRECT_MEMBERS
         state = @"enqueued";
         break;
     default:
-        return [NSString stringWithFormat:@"<%@ %llu running retry: %tu>", self.class, _uniqueID, self.retryCount];
+        return [NSString stringWithFormat:@"<%@ %llu running retry: %ld>", self.class, _uniqueID, static_cast<long>(self.retryCount)];
     }
     return [NSString stringWithFormat:@"<%@ %llu %@>", self.class, _uniqueID, state];
 }
@@ -236,7 +236,7 @@ struct ContextSnapshot {
 {
     ContextSnapshot context(self);
     std::lock_guard lock(_lock);
-    return [NSString stringWithFormat:@"<%@ context: %@, items count: %tu>", self.class, context.description, _items.count];
+    return [NSString stringWithFormat:@"<%@ context: %@, items count: %lu>", self.class, context.description, static_cast<unsigned long>(_items.count)];
 }
 
 - (void)enqueueWorkItem:(MTRAsyncWorkItem *)item
@@ -268,9 +268,9 @@ struct ContextSnapshot {
         // Logging the description once is enough because other log messages
         // related to the work item (execution, completion etc) can easily be
         // correlated using the unique id.
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@, items count: %tu> enqueued work item [%llu]: %@", context.description, _items.count, item.uniqueID, description);
+        MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> enqueued work item [%llu]: %@", context.description, static_cast<unsigned long>(_items.count), item.uniqueID, description);
     } else {
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@, items count: %tu> enqueued work item [%llu]", context.description, _items.count, item.uniqueID);
+        MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> enqueued work item [%llu]", context.description, static_cast<unsigned long>(_items.count), item.uniqueID);
     }
 
     [self _callNextReadyWorkItemWithContext:context];
@@ -280,7 +280,7 @@ struct ContextSnapshot {
 {
     ContextSnapshot context(self); // outside of lock
     std::lock_guard lock(_lock);
-    MTR_LOG_INFO("MTRAsyncWorkQueue<%@> invalidate %tu items", context.description, _items.count);
+    MTR_LOG("MTRAsyncWorkQueue<%@> invalidate %lu items", context.description, static_cast<unsigned long>(_items.count));
     for (MTRAsyncWorkItem * item in _items) {
         [item cancel];
     }
@@ -309,14 +309,14 @@ struct ContextSnapshot {
 
     // already part of the running work items allowed by width - retry directly
     if (retry) {
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> retry needed for work item [%llu]", context.description, workItem.uniqueID);
+        MTR_LOG("MTRAsyncWorkQueue<%@> retry needed for work item [%llu]", context.description, workItem.uniqueID);
         [self _callWorkItem:workItem withContext:context];
         return;
     }
 
     [workItem markComplete];
     [_items removeObjectAtIndex:indexOfWorkItem];
-    MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@, items count: %tu> completed work item [%llu]", context.description, _items.count, workItem.uniqueID);
+    MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> completed work item [%llu]", context.description, static_cast<unsigned long>(_items.count), workItem.uniqueID);
 
     // sanity check running work item count is positive
     if (_runningWorkItemCount == 0) {
@@ -398,11 +398,11 @@ struct ContextSnapshot {
             case MTRNotBatched:
                 goto done; // can't merge anything else
             case MTRBatchedPartially:
-                MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> partially merged work item [%llu] into %llu",
+                MTR_LOG("MTRAsyncWorkQueue<%@> partially merged work item [%llu] into %llu",
                     context.description, nextWorkItem.uniqueID, workItem.uniqueID);
                 goto done; // can't merge anything else
             case MTRBatchedFully:
-                MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> fully merged work item [%llu] into %llu",
+                MTR_LOG("MTRAsyncWorkQueue<%@> fully merged work item [%llu] into %llu",
                     context.description, nextWorkItem.uniqueID, workItem.uniqueID);
                 [_items removeObjectAtIndex:1];
                 continue; // try to batch the next item (if any)

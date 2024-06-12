@@ -18,11 +18,9 @@
 
 #pragma once
 
-#include "../clusters/DataModelLogger.h"
-#include "../common/CHIPCommand.h"
-#include "../common/Commands.h"
-
-#include <websocket-server/WebSocketServer.h>
+#include <commands/clusters/DataModelLogger.h>
+#include <commands/common/CHIPCommand.h>
+#include <commands/common/Commands.h>
 
 #include <string>
 
@@ -66,3 +64,5 @@ private:
     char * GetCommand(char * command);
     std::string GetHistoryFilePath() const;
 };
+
+void PushCommand(const std::string & command);

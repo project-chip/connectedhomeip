@@ -201,6 +201,15 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         packetHeader.SetSecureSessionControlMsg(true);
     }
 
+    if (sessionHandle->AllowsLargePayload())
+    {
+        VerifyOrReturnError(message->TotalLength() <= kMaxLargeAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
+    }
+    else
+    {
+        VerifyOrReturnError(message->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
+    }
+
 #if CHIP_PROGRESS_LOGGING
     NodeId destination;
     FabricIndex fabricIndex;

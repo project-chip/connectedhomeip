@@ -44,14 +44,6 @@ namespace Ble {
 namespace {
 
 constexpr ChipBleUUID uuidZero{};
-constexpr ChipBleUUID uuidSvc   = { { 0x00, 0x00, 0xFF, 0xF6, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34,
-                                      0xFB } };
-constexpr ChipBleUUID uuidChar1 = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D,
-                                      0x11 } };
-constexpr ChipBleUUID uuidChar2 = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D,
-                                      0x12 } };
-constexpr ChipBleUUID uuidChar3 = { { 0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83, 0x21, 0x8F,
-                                      0x04 } };
 
 }; // namespace
 
@@ -111,14 +103,14 @@ public:
     {
         constexpr uint8_t capReq[] = { 0x65, 0x6c, 0x54, 0x00, 0x00, 0x00, 0xc8, 0x00, 0x06 };
         auto buf                   = System::PacketBufferHandle::NewWithData(capReq, sizeof(capReq));
-        return HandleWriteReceived(connObj, &uuidSvc, &uuidChar1, std::move(buf));
+        return HandleWriteReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID, std::move(buf));
     }
 
     // Processing subscription request after capabilities request should finalize
     // connection establishment.
     bool HandleSubscribeReceivedOnChar2(BLE_CONNECTION_OBJECT connObj)
     {
-        return HandleSubscribeReceived(connObj, &uuidSvc, &uuidChar2);
+        return HandleSubscribeReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID);
     }
 
     ///
@@ -150,16 +142,6 @@ public:
     }
     bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                           PacketBufferHandle pBuf) override
-    {
-        return true;
-    }
-    bool SendReadRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                         PacketBufferHandle pBuf) override
-    {
-        return true;
-    }
-    bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                          const ChipBleUUID * charId) override
     {
         return true;
     }
@@ -220,7 +202,7 @@ TEST_F(TestBleLayer, HandleSubscribeReceivedInvalidUUID)
 {
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleSubscribeReceived(connObj, &uuidZero, &uuidZero));
-    EXPECT_FALSE(HandleSubscribeReceived(connObj, &uuidSvc, &uuidChar1));
+    EXPECT_FALSE(HandleSubscribeReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID));
 }
 
 TEST_F(TestBleLayer, HandleSubscribeReceived)
@@ -234,7 +216,7 @@ TEST_F(TestBleLayer, HandleSubscribeCompleteInvalidUUID)
 {
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleSubscribeComplete(connObj, &uuidZero, &uuidZero));
-    EXPECT_FALSE(HandleSubscribeComplete(connObj, &uuidSvc, &uuidChar1));
+    EXPECT_FALSE(HandleSubscribeComplete(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID));
 }
 
 TEST_F(TestBleLayer, HandleSubscribeComplete)
@@ -243,14 +225,14 @@ TEST_F(TestBleLayer, HandleSubscribeComplete)
     ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
     ASSERT_TRUE(HandleSubscribeReceivedOnChar2(connObj));
 
-    EXPECT_TRUE(HandleSubscribeComplete(connObj, &uuidSvc, &uuidChar2));
+    EXPECT_TRUE(HandleSubscribeComplete(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID));
 }
 
 TEST_F(TestBleLayer, HandleUnsubscribeReceivedInvalidUUID)
 {
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleUnsubscribeReceived(connObj, &uuidZero, &uuidZero));
-    EXPECT_FALSE(HandleUnsubscribeReceived(connObj, &uuidSvc, &uuidChar1));
+    EXPECT_FALSE(HandleUnsubscribeReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID));
 }
 
 TEST_F(TestBleLayer, HandleUnsubscribeReceived)
@@ -259,14 +241,14 @@ TEST_F(TestBleLayer, HandleUnsubscribeReceived)
     ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
     ASSERT_TRUE(HandleSubscribeReceivedOnChar2(connObj));
 
-    EXPECT_TRUE(HandleUnsubscribeReceived(connObj, &uuidSvc, &uuidChar2));
+    EXPECT_TRUE(HandleUnsubscribeReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID));
 }
 
 TEST_F(TestBleLayer, HandleUnsubscribeCompleteInvalidUUID)
 {
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleUnsubscribeComplete(connObj, &uuidZero, &uuidZero));
-    EXPECT_FALSE(HandleUnsubscribeComplete(connObj, &uuidSvc, &uuidChar1));
+    EXPECT_FALSE(HandleUnsubscribeComplete(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID));
 }
 
 TEST_F(TestBleLayer, HandleUnsubscribeComplete)
@@ -275,7 +257,7 @@ TEST_F(TestBleLayer, HandleUnsubscribeComplete)
     ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
     ASSERT_TRUE(HandleSubscribeReceivedOnChar2(connObj));
 
-    EXPECT_TRUE(HandleUnsubscribeComplete(connObj, &uuidSvc, &uuidChar2));
+    EXPECT_TRUE(HandleUnsubscribeComplete(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID));
 }
 
 TEST_F(TestBleLayer, HandleWriteReceivedInvalidUUID)
@@ -285,7 +267,7 @@ TEST_F(TestBleLayer, HandleWriteReceivedInvalidUUID)
     ASSERT_FALSE(buf.IsNull());
 
     EXPECT_FALSE(HandleWriteReceived(connObj, &uuidZero, &uuidZero, buf.Retain()));
-    EXPECT_FALSE(HandleWriteReceived(connObj, &uuidSvc, &uuidChar3, std::move(buf)));
+    EXPECT_FALSE(HandleWriteReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_3_UUID, std::move(buf)));
 }
 
 TEST_F(TestBleLayer, HandleWriteReceived)
@@ -300,14 +282,14 @@ TEST_F(TestBleLayer, HandleWriteReceived)
     auto buf                 = System::PacketBufferHandle::NewWithData(data, sizeof(data));
     ASSERT_FALSE(buf.IsNull());
 
-    EXPECT_TRUE(HandleWriteReceived(connObj, &uuidSvc, &uuidChar1, std::move(buf)));
+    EXPECT_TRUE(HandleWriteReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID, std::move(buf)));
 }
 
 TEST_F(TestBleLayer, HandleWriteConfirmationInvalidUUID)
 {
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleWriteConfirmation(connObj, &uuidZero, &uuidZero));
-    EXPECT_FALSE(HandleWriteConfirmation(connObj, &uuidSvc, &uuidChar2));
+    EXPECT_FALSE(HandleWriteConfirmation(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID));
 }
 
 TEST_F(TestBleLayer, HandleWriteConfirmationUninitialized)
@@ -320,7 +302,7 @@ TEST_F(TestBleLayer, HandleWriteConfirmation)
     auto connObj = GetConnectionObject();
     ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
 
-    EXPECT_TRUE(HandleWriteConfirmation(connObj, &uuidSvc, &uuidChar1));
+    EXPECT_TRUE(HandleWriteConfirmation(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID));
 }
 
 TEST_F(TestBleLayer, HandleIndicationReceivedInvalidUUID)
@@ -330,7 +312,7 @@ TEST_F(TestBleLayer, HandleIndicationReceivedInvalidUUID)
     ASSERT_FALSE(buf.IsNull());
 
     EXPECT_FALSE(HandleIndicationReceived(connObj, &uuidZero, &uuidZero, buf.Retain()));
-    EXPECT_FALSE(HandleIndicationReceived(connObj, &uuidSvc, &uuidChar1, std::move(buf)));
+    EXPECT_FALSE(HandleIndicationReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID, std::move(buf)));
 }
 
 TEST_F(TestBleLayer, HandleIndicationReceived)
@@ -345,14 +327,14 @@ TEST_F(TestBleLayer, HandleIndicationReceived)
     auto buf                 = System::PacketBufferHandle::NewWithData(data, sizeof(data));
     ASSERT_FALSE(buf.IsNull());
 
-    EXPECT_TRUE(HandleIndicationReceived(connObj, &uuidSvc, &uuidChar2, std::move(buf)));
+    EXPECT_TRUE(HandleIndicationReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID, std::move(buf)));
 }
 
 TEST_F(TestBleLayer, HandleIndicationConfirmationInvalidUUID)
 {
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleIndicationConfirmation(connObj, &uuidZero, &uuidZero));
-    EXPECT_FALSE(HandleIndicationConfirmation(connObj, &uuidSvc, &uuidChar1));
+    EXPECT_FALSE(HandleIndicationConfirmation(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID));
 }
 
 TEST_F(TestBleLayer, HandleIndicationConfirmation)
@@ -360,7 +342,7 @@ TEST_F(TestBleLayer, HandleIndicationConfirmation)
     auto connObj = GetConnectionObject();
     ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
 
-    EXPECT_TRUE(HandleIndicationConfirmation(connObj, &uuidSvc, &uuidChar2));
+    EXPECT_TRUE(HandleIndicationConfirmation(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID));
 }
 
 TEST_F(TestBleLayer, HandleConnectionError)
