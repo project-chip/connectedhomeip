@@ -173,6 +173,7 @@ RUN mkdir -p /tmp/workdir/linux \
 	&& echo -n \
 	"#!/bin/bash\n" \
 	"grep -q 'rootshell' /proc/cmdline && exit\n" \
+	"[[ -n $$SSH_CONNECTION ]] && exit \n" \
 	"if [[ -x /chip/runner.sh ]]; then\n" \
 	"  echo '### RUNNER START ###'\n" \
 	"  cd /chip\n" \
