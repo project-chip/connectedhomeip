@@ -107,14 +107,15 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
                 factoryreset_app_only=factoryreset_app_only,
                 script_gdb=script_gdb,
                 quiet=quiet
-                )
-            ]
+            )
+        ]
 
     for run in runs:
         print(f"Executing run: {run.py_script_path}")
-        main_impl(run.app, run.factoryreset, run.factoryreset_app_only, run.app_args, run.py_script_path, run.script_args, run.script_gdb, run.quiet)
-                           
-            
+        main_impl(run.app, run.factoryreset, run.factoryreset_app_only, run.app_args,
+                  run.py_script_path, run.script_args, run.script_gdb, run.quiet)
+
+
 def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str, script: str, script_args: str, script_gdb: bool, quiet: bool):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -221,6 +222,7 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
 
     if exit_code != 0:
         sys.exit(exit_code)
+
 
 if __name__ == '__main__':
     main(auto_envvar_prefix='CHIP')

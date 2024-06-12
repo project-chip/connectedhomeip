@@ -107,7 +107,6 @@ class MetadataReader:
                 arg_val = arg_val.replace(f'${{{name}}}', value)
             metadata_dict[arg] = arg_val
 
-
     def parse_script(self, py_script_path: str) -> List[Metadata]:
         """
         Parses a script and returns a list of metadata object where
