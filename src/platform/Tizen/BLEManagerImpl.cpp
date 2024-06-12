@@ -625,7 +625,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     ret = bt_gatt_server_start();
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_start() failed: %s", get_error_message(ret)));
 
-    BLEManagerImpl::NotifyBLEPeripheralGATTServerRegisterComplete(CHIP_NO_ERROR);
+    NotifyBLEPeripheralGATTServerRegisterComplete(CHIP_NO_ERROR);
 
     // Save the Local Peripheral char1 & char2 handles
     mGattCharC1Handle = char1;
@@ -633,7 +633,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     return CHIP_NO_ERROR;
 
 exit:
-    BLEManagerImpl::NotifyBLEPeripheralGATTServerRegisterComplete(TizenToChipError(ret));
+    NotifyBLEPeripheralGATTServerRegisterComplete(TizenToChipError(ret));
     return TizenToChipError(ret);
 }
 
@@ -702,7 +702,7 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_le_set_advertising_device_name() failed: %s", get_error_message(ret)));
 
-    BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(CHIP_NO_ERROR);
+    NotifyBLEPeripheralAdvConfiguredComplete(CHIP_NO_ERROR);
 
     ret = bt_adapter_le_start_advertising_new(
         mAdvertiser,
@@ -718,7 +718,7 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
 
 exit:
     err = ret != BT_ERROR_NONE ? TizenToChipError(ret) : err;
-    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(err);
+    NotifyBLEPeripheralAdvStartComplete(err);
     return err;
 }
 
@@ -734,7 +734,7 @@ CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
     return CHIP_NO_ERROR;
 
 exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(TizenToChipError(ret));
+    NotifyBLEPeripheralAdvStopComplete(TizenToChipError(ret));
     return TizenToChipError(ret);
 }
 
@@ -857,7 +857,7 @@ void BLEManagerImpl::RemoveConnectionData(const char * remoteAddr)
     VerifyOrReturn(conn != nullptr,
                    ChipLogError(DeviceLayer, "Connection does not exist for [%s]", StringOrNullMarker(remoteAddr)));
 
-    BLEManagerImpl::NotifyBLEDisconnection(conn);
+    NotifyBLEDisconnection(conn);
     g_hash_table_remove(mConnectionMap, remoteAddr);
 
     ChipLogProgress(DeviceLayer, "Connection Removed");
