@@ -55,7 +55,6 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
-      "${chip_root}/src/app/codegen-data-model/tests",
       "${chip_root}/src/app/data-model-interface/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
@@ -82,7 +81,10 @@ if (chip_build_tests) {
     }
 
     if (current_os != "zephyr" && current_os != "mbed") {
-      tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
+      tests += [ 
+        "${chip_root}/src/app/codegen-data-model/tests",  # contains mock-ember functions
+        "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests",
+      ]
     }
 
     if (current_os != "zephyr" && current_os != "mbed" &&
