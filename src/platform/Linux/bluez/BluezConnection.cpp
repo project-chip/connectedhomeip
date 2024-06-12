@@ -59,12 +59,6 @@ gboolean BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService
 
 } // namespace
 
-BluezConnection::BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 & aDevice) :
-    mDevice(reinterpret_cast<BluezDevice1 *>(g_object_ref(&aDevice)))
-{
-    Init(aEndpoint);
-}
-
 BluezConnection::IOChannel::~IOChannel()
 {
     if (mWatchSource != nullptr)
@@ -84,63 +78,66 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
         mService.reset(reinterpret_cast<BluezGattService1 *>(g_object_ref(aEndpoint.mService.get())));
         mC1.reset(reinterpret_cast<BluezGattCharacteristic1 *>(g_object_ref(aEndpoint.mC1.get())));
         mC2.reset(reinterpret_cast<BluezGattCharacteristic1 *>(g_object_ref(aEndpoint.mC2.get())));
+        return CHIP_NO_ERROR;
     }
-    else
+
+    for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
     {
-        for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
+        BluezGattService1 * service = bluez_object_get_gatt_service1(&object);
+        if (service != nullptr)
         {
-            BluezGattService1 * service = bluez_object_get_gatt_service1(&object);
-            if (service != nullptr)
+            if ((BluezIsServiceOnDevice(service, mDevice.get())) == TRUE &&
+                (strcmp(bluez_gatt_service1_get_uuid(service), Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0))
             {
-                if ((BluezIsServiceOnDevice(service, mDevice.get())) == TRUE &&
-                    (strcmp(bluez_gatt_service1_get_uuid(service), Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0))
-                {
-                    mService.reset(service);
-                    break;
-                }
-                g_object_unref(service);
+                ChipLogDetail(DeviceLayer, "CHIP service found on %s", GetPeerAddress());
+                mService.reset(service);
+                break;
             }
+            g_object_unref(service);
         }
-
-        VerifyOrExit(mService, ChipLogError(DeviceLayer, "FAIL: NULL service in %s", __func__));
-
-        for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
-        {
-            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(&object);
-            if (char1 != nullptr)
-            {
-                if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
-                    (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0))
-                {
-                    ChipLogDetail(DeviceLayer, "C1 found: %s", Ble::CHIP_BLE_CHAR_1_UUID_STR);
-                    mC1.reset(char1);
-                }
-                else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
-                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0))
-                {
-                    ChipLogDetail(DeviceLayer, "C2 found: %s", Ble::CHIP_BLE_CHAR_2_UUID_STR);
-                    mC2.reset(char1);
-                }
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-                else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
-                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_3_UUID_STR) == 0))
-                {
-                    ChipLogDetail(DeviceLayer, "C3 found: %s", Ble::CHIP_BLE_CHAR_3_UUID_STR);
-                    mC3.reset(char1);
-                }
-#endif
-                else
-                {
-                    g_object_unref(char1);
-                }
-            }
-        }
-
-        VerifyOrExit(mC1, ChipLogError(DeviceLayer, "FAIL: NULL C1 in %s", __func__));
-        VerifyOrExit(mC2, ChipLogError(DeviceLayer, "FAIL: NULL C2 in %s", __func__));
     }
 
-exit:
+    VerifyOrReturnError(
+        mService, BLE_ERROR_NOT_CHIP_DEVICE,
+        ChipLogError(DeviceLayer, "CHIP service (%s) not found on %s", Ble::CHIP_BLE_SERVICE_LONG_UUID_STR, GetPeerAddress()));
+
+    for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
+    {
+        BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(&object);
+        if (char1 != nullptr)
+        {
+            if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
+                (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0))
+            {
+                ChipLogDetail(DeviceLayer, "C1 found on %s", GetPeerAddress());
+                mC1.reset(char1);
+            }
+            else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
+                     (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0))
+            {
+                ChipLogDetail(DeviceLayer, "C2 found on %s", GetPeerAddress());
+                mC2.reset(char1);
+            }
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+            else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
+                     (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_3_UUID_STR) == 0))
+            {
+                ChipLogDetail(DeviceLayer, "C3 found on %s", GetPeerAddress());
+                mC3.reset(char1);
+            }
+#endif
+            else
+            {
+                g_object_unref(char1);
+            }
+        }
+    }
+
+    VerifyOrReturnError(mC1, BLE_ERROR_NOT_CHIP_DEVICE,
+                        ChipLogError(DeviceLayer, "C1 (%s) not found on %s", Ble::CHIP_BLE_CHAR_1_UUID_STR, GetPeerAddress()));
+    VerifyOrReturnError(mC1, BLE_ERROR_NOT_CHIP_DEVICE,
+                        ChipLogError(DeviceLayer, "C2 (%s) not found on %s", Ble::CHIP_BLE_CHAR_2_UUID_STR, GetPeerAddress()));
+
     return CHIP_NO_ERROR;
 }
 

@@ -39,8 +39,10 @@ class BluezEndpoint;
 class BluezConnection
 {
 public:
-    BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 & aDevice);
+    BluezConnection(BluezDevice1 & aDevice) : mDevice(reinterpret_cast<BluezDevice1 *>(g_object_ref(&aDevice))) {}
     ~BluezConnection() = default;
+
+    CHIP_ERROR Init(const BluezEndpoint & aEndpoint);
 
     const char * GetPeerAddress() const;
 
@@ -96,8 +98,6 @@ private:
         const BluezConnection & mConn;
         GAutoPtr<GVariant> mData;
     };
-
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint);
 
     static CHIP_ERROR BluezDisconnect(BluezConnection * apConn);
 

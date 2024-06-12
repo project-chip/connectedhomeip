@@ -319,6 +319,7 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
 {
     VerifyOrReturn(bluez_device1_get_connected(&aDevice));
     VerifyOrReturn(!mIsCentral || bluez_device1_get_services_resolved(&aDevice));
+    CHIP_ERROR err;
 
     const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
     BluezConnection * conn  = GetBluezConnection(objectPath);
@@ -326,13 +327,21 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
                    ChipLogError(DeviceLayer, "FAIL: Connection already tracked: conn=%p device=%s path=%s", conn,
                                 conn->GetPeerAddress(), objectPath));
 
-    conn                       = chip::Platform::New<BluezConnection>(*this, aDevice);
+    conn = chip::Platform::New<BluezConnection>(aDevice);
+    VerifyOrExit(conn != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    SuccessOrExit(err = conn->Init(*this));
+
     mpPeerDevicePath           = g_strdup(objectPath);
     mConnMap[mpPeerDevicePath] = conn;
 
     ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
     BLEManagerImpl::HandleNewConnection(conn);
+    return;
+
+exit:
+    chip::Platform::Delete(conn);
+    BLEManagerImpl::HandleConnectFailed(err);
 }
 
 void BluezEndpoint::OnDeviceAdded(BluezDevice1 & device)
