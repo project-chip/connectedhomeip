@@ -341,7 +341,7 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
     record.clusterId                           = request.path.mClusterId;
     record.attributeId                         = request.path.mAttributeId;
     Protocols::InteractionModel::Status status = emAfReadOrWriteAttribute(
-        &record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(), gEmberAttributeIOBufferSpan.size(),
+        &record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(), static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
         /* write = */ false);
 
     if (status != Protocols::InteractionModel::Status::Success)
