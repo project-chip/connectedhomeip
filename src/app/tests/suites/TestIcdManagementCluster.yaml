@@ -215,7 +215,22 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Register 1.1"
+    - label: "Register 1.1 - Invalid ClientType"
+      command: "RegisterClient"
+      arguments:
+          values:
+              - name: "CheckInNodeID"
+                value: 101
+              - name: "MonitoredSubject"
+                value: 1001
+              - name: "Key"
+                value: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+              - name: "ClientType"
+                value: ClientTypeEnum.UnknownEnumValue
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Register 1.2"
       command: "RegisterClient"
       arguments:
           values:

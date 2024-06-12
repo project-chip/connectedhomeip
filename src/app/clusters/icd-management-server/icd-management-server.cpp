@@ -259,7 +259,7 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
     bool isClientAdmin                 = false;
 
     // Check if ClientType is valid
-    VerifyOrReturnError(clientType < ClientTypeEnum::kUnknownEnumValue, InteractionModel::Status::ConstraintError);
+    VerifyOrReturnError(clientType != ClientTypeEnum::kUnknownEnumValue, InteractionModel::Status::ConstraintError);
 
     // Check if client is admin
     VerifyOrReturnError(CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, isClientAdmin), InteractionModel::Status::Failure);
