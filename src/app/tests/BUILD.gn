@@ -141,6 +141,8 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
+    "TestAclAttribute.cpp",
+    "TestAclEvent.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributePathParams.cpp",
@@ -150,11 +152,16 @@ chip_test_suite("tests") {
     "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestConcreteAttributePath.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
+    "TestEventLoggingNoUTCTime.cpp",
+    "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
+    "TestFabricScopedEventLogging.cpp",
+    "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNullable.cpp",
     "TestNumericAttributeTraits.cpp",
@@ -162,24 +169,16 @@ chip_test_suite("tests") {
     "TestPendingNotificationMap.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
+    "TestReadInteraction.cpp",
+    "TestReportScheduler.cpp",
+    "TestReportingEngine.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
     "TestTimeSyncDataProvider.cpp",
+    "TestTimedHandler.cpp",
+    "TestWriteInteraction.cpp",
   ]
-
-  if (!chip_fake_platform) {
-    test_sources += [ "TestFailSafeContext.cpp" ]
-  }
-
-  # DefaultICDClientStorage assumes that raw AES key is used by the application
-  if (chip_crypto != "psa") {
-    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
-  }
-
-  if (chip_persist_subscriptions) {
-    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
-  }
 
   cflags = [ "-Wconversion" ]
 
@@ -199,6 +198,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
   ]
 
   if (chip_device_platform != "android") {
@@ -211,27 +211,29 @@ chip_test_suite("tests") {
       ":scenes-table-test-srcs",
     ]
   }
-}
 
-chip_test_suite_using_nltest("tests_nltest") {
-  output_name = "libAppTestsNL"
+  if (chip_config_network_layer_ble &&
+      (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+    test_sources += [ "TestCommissioningWindowManager.cpp" ]
+    public_deps += [
+      "${chip_root}/src/app/server",
+      "${chip_root}/src/messaging/tests/echo:common",
+    ]
+  }
 
-  test_sources = [
-    "TestAclAttribute.cpp",
-    "TestAclEvent.cpp",
-    "TestCommandInteraction.cpp",
-    "TestEventLoggingNoUTCTime.cpp",
-    "TestEventOverflow.cpp",
-    "TestFabricScopedEventLogging.cpp",
-    "TestInteractionModelEngine.cpp",
-    "TestReadInteraction.cpp",
-    "TestReportScheduler.cpp",
-    "TestReportingEngine.cpp",
-    "TestTimedHandler.cpp",
-    "TestWriteInteraction.cpp",
-  ]
+  if (!chip_fake_platform) {
+    test_sources += [ "TestFailSafeContext.cpp" ]
+  }
 
-  #
+  # DefaultICDClientStorage assumes that raw AES key is used by the application
+  if (chip_crypto != "psa") {
+    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
+  }
+
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
+  }
+
   # On NRF platforms, the allocation of a large number of pbufs in this test
   # to exercise chunking causes it to run out of memory. For now, disable it there.
   #
@@ -247,34 +249,5 @@ chip_test_suite_using_nltest("tests_nltest") {
   if (chip_device_platform != "nrfconnect" &&
       chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
-  }
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    ":app-test-stubs",
-    ":binding-test-srcs",
-    ":operational-state-test-srcs",
-    ":ota-requestor-test-srcs",
-    ":time-sync-data-provider-test-srcs",
-    "${chip_root}/src/app",
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/icd/client:manager",
-    "${chip_root}/src/app/tests:helpers",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support:test_utils",
-    "${chip_root}/src/lib/support:testing",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${nlunit_test_root}:nlunit-test",
-  ]
-
-  if (chip_config_network_layer_ble &&
-      (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
-    test_sources += [ "TestCommissionManager.cpp" ]
-    public_deps += [
-      "${chip_root}/src/app/server",
-      "${chip_root}/src/messaging/tests/echo:common",
-    ]
   }
 }
