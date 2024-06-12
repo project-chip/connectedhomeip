@@ -74,8 +74,7 @@ BluezConnection::IOChannel::~IOChannel()
 
 BluezConnection::ConnectionDataBundle::ConnectionDataBundle(const BluezConnection & aConn,
                                                             const chip::System::PacketBufferHandle & aBuf) :
-    mConn(aConn),
-    mData(g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, aBuf->Start(), aBuf->DataLength(), sizeof(uint8_t)))
+    mConn(aConn), mData(g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, aBuf->Start(), aBuf->DataLength(), sizeof(uint8_t)))
 {}
 
 CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
@@ -113,27 +112,26 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
                 if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
                     (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0))
                 {
+                    ChipLogDetail(DeviceLayer, "C1 found: %s", Ble::CHIP_BLE_CHAR_1_UUID_STR);
                     mC1.reset(char1);
                 }
                 else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
                          (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0))
                 {
+                    ChipLogDetail(DeviceLayer, "C2 found: %s", Ble::CHIP_BLE_CHAR_2_UUID_STR);
                     mC2.reset(char1);
                 }
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
                 else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
                          (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_3_UUID_STR) == 0))
                 {
+                    ChipLogDetail(DeviceLayer, "C3 found: %s", Ble::CHIP_BLE_CHAR_3_UUID_STR);
                     mC3.reset(char1);
                 }
 #endif
                 else
                 {
                     g_object_unref(char1);
-                }
-                if (mC1 && mC2)
-                {
-                    break;
                 }
             }
         }
