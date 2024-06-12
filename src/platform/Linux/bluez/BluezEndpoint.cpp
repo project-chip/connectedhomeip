@@ -295,21 +295,21 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 /// Update the table of open BLE connections whenever a new device is spotted or its attributes have changed.
 void BluezEndpoint::UpdateConnectionTable(BluezDevice1 & aDevice)
 {
-    const char * objectPath      = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
-    BluezConnection * connection = GetBluezConnection(objectPath);
+    const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
+    BluezConnection * conn  = GetBluezConnection(objectPath);
 
-    if (connection != nullptr && !bluez_device1_get_connected(&aDevice))
+    if (conn != nullptr && !bluez_device1_get_connected(&aDevice))
     {
-        ChipLogDetail(DeviceLayer, "Bluez disconnected");
-        BLEManagerImpl::CHIPoBluez_ConnectionClosed(connection);
+        ChipLogDetail(DeviceLayer, "BLE connection closed: conn=%p", conn);
+        BLEManagerImpl::HandleConnectionClosed(conn);
         mConnMap.erase(objectPath);
         // TODO: the connection object should be released after BLEManagerImpl finishes cleaning up its resources
         // after the disconnection. Releasing it here doesn't cause any issues, but it's error-prone.
-        chip::Platform::Delete(connection);
+        chip::Platform::Delete(conn);
         return;
     }
 
-    if (connection == nullptr)
+    if (conn == nullptr)
     {
         HandleNewDevice(aDevice);
     }
@@ -541,8 +541,7 @@ CHIP_ERROR BluezEndpoint::Init(BluezAdapter1 * apAdapter, bool aIsCentral)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to subscribe for notifications: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization: %" CHIP_ERROR_FORMAT, err.Format()));
 
