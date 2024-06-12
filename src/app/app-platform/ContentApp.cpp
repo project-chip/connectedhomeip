@@ -98,7 +98,7 @@ bool ContentApp::HasSupportedCluster(chip::ClusterId clusterId) const
 {
     for (const auto & supportedCluster : mSupportedClusters)
     {
-        if (clusterId == supportedCluster.clusterIdentifier)
+        if (clusterId == supportedCluster.mClusterIdentifier)
         {
             return true;
         }

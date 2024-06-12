@@ -97,15 +97,15 @@ class DLL_EXPORT ContentApp
 public:
     struct SupportedCluster
     {
-        chip::ClusterId clusterIdentifier{ chip::kInvalidClusterId };
-        uint32_t features{ 0 };
-        std::vector<chip::CommandId> optionalCommandIdentifiers;
-        std::vector<chip::AttributeId> optionalAttributesIdentifiers;
+        chip::ClusterId mClusterIdentifier{ chip::kInvalidClusterId };
+        uint32_t mFeatures{ 0 };
+        std::vector<chip::CommandId> mOptionalCommandIdentifiers;
+        std::vector<chip::AttributeId> mOptionalAttributesIdentifiers;
 
         SupportedCluster(chip::ClusterId clusterId, uint32_t features, const std::vector<chip::CommandId> & commandIds,
                          const std::vector<chip::AttributeId> & attributeIds) :
-            clusterIdentifier{ clusterId },
-            features{ features }, optionalCommandIdentifiers{ commandIds }, optionalAttributesIdentifiers{ attributeIds }
+            mClusterIdentifier{ clusterId },
+            mFeatures{ features }, mOptionalCommandIdentifiers{ commandIds }, mOptionalAttributesIdentifiers{ attributeIds }
         {}
     };
 
