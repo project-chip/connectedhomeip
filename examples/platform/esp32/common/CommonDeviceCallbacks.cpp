@@ -84,6 +84,14 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
         }
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
+        {
+            appDelegate = DeviceCallbacksDelegate::Instance().GetAppDelegate();
+            if (appDelegate != nullptr)
+            {
+                appDelegate->OnIPv6ConnectivityEstablished();
+            }
+        }
         break;
     }
 

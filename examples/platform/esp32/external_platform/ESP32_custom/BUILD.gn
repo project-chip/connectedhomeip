@@ -29,7 +29,6 @@ declare_args() {
   chip_bt_bluedroid_enabled = true
   chip_max_discovered_ip_addresses = 5
   chip_enable_route_hook = false
-  chip_enable_thread_border_router = false
 }
 
 buildconfig_header("custom_buildconfig") {

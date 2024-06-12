@@ -467,6 +467,13 @@ if(NOT CONFIG_USE_MINIMAL_MDNS)
     endif()
 endif()
 
+if(CONFIG_OPENTHREAD_BORDER_ROUTER)
+    idf_component_get_property(rcp_update_lib espressif__esp_rcp_update COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${rcp_update_lib}>)
+    idf_component_get_property(serial_flasher_lib espressif__esp-serial-flasher COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${serial_flasher_lib}>)
+endif()
+
 if (CONFIG_ENABLE_ENCRYPTED_OTA)
     idf_component_get_property(esp_encrypted_img_lib espressif__esp_encrypted_img COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
