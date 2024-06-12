@@ -466,7 +466,7 @@ struct TestReadRequest
         request.path              = path;
     }
 
-    std::unique_ptr<AttributeValueEncoder> StartEncoding(chip::app::InteractionModel::Model * model,
+    std::unique_ptr<AttributeValueEncoder> StartEncoding(chip::app::InteractionModel::DataModel * model,
                                                          AttributeEncodeState state = AttributeEncodeState())
     {
         std::optional<ClusterInfo> info = model->GetClusterInfo(request.path);
