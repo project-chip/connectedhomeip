@@ -197,7 +197,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
 
 void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & addr, const ResolveResult & result)
 {
-    auto config = result.mrpRemoteConfig;
+    auto & config = result.mrpRemoteConfig;
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Make sure to clear out our reason for trying the next result first thing,
     // so it does not stick around in various error cases.
