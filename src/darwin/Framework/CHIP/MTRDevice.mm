@@ -1047,7 +1047,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (!_delegates.count) {
-        MTR_LOG("%@ no delegates to iterate", self);
+        MTR_LOG_DEBUG("%@ no delegates to iterate", self);
         return NO;
     }
 
