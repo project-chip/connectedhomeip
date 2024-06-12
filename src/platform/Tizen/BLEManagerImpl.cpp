@@ -90,7 +90,6 @@ struct BLEConnection
 {
     char * peerAddr;
     unsigned int mtu;
-    bool subscribed;
     bt_gatt_h gattCharC1Handle;
     bt_gatt_h gattCharC2Handle;
     bool isChipDevice;
