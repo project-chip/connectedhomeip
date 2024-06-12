@@ -1063,10 +1063,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // Opportunistically remove defunct delegate references on every iteration
     NSMutableSet * delegatesToRemove = [NSMutableSet set];
     for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
-        if ([delegateInfo delegateIsNull]) {
-            [delegatesToRemove addObject:delegateInfo];
-        } else {
+        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
+        if (strongDelegate) {
             block(delegateInfo);
+            (void)strongDelegate; // ensure it stays alive
+        } else {
+            [delegatesToRemove addObject:delegateInfo];
         }
     }
 
