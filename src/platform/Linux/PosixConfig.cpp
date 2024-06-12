@@ -97,7 +97,8 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 
 CHIP_ERROR PosixConfig::Init()
 {
-    return PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    std::string filePath = GetFilePath(CHIP_DEFAULT_CONFIG_KVS_FILE_NAME);
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(filePath.c_str());
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
@@ -453,17 +454,17 @@ bool PosixConfig::ConfigValueExists(Key key)
     return storage->HasValue(key.Name);
 }
 
-std::string PosixConfig::GetFilePath(std::string defaultFileName)
+std::string PosixConfig::GetFilePath(const std::string &defaultFileName)
 {
     // Match what GetFilename in ExamplePersistentStorage.cpp does.
-    const char * dir = getenv("TMPDIR");
+    const char *dir = std::getenv("TMPDIR");
     if (dir == nullptr)
     {
         dir = "/tmp";
     }
-    std::string storageDir = dir;
-
-    return storageDir + "/" + defaultFileName;
+    std::filesystem::path storageDir(dir);
+    std::filesystem::path filePath = storageDir / defaultFileName;
+    return filePath.string();
 }
 
 CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)

@@ -25,6 +25,7 @@
 
 #include <functional>
 #include <string>
+#include <filesystem>
 #include <inttypes.h>
 
 #include <lib/core/CHIPError.h>
@@ -112,7 +113,7 @@ public:
 
 private:
     static ChipLinuxStorage * GetStorageForNamespace(Key key);
-    static std::string GetFilePath(std::string defaultFileName);
+    static std::string GetFilePath(const std::string &defaultFileName);
 };
 
 struct PosixConfig::Key
