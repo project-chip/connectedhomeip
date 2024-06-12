@@ -127,7 +127,7 @@ CHIP_ERROR RemoveICDEntryWithKey(JNIEnv * env, jint jFabricIndex, jobject jicdCl
     chip::app::ICDClientInfo info;
     err = ParseICDClientInfo(env, jFabricIndex, jicdClientInfo, info);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, err, ChipLogError(Controller, "Failed to parse ICD Client info: %" CHIP_ERROR_FORMAT, err.Format()));
-    
+
     getICDClientStorage()->RemoveKey(info);
 
     return err;
