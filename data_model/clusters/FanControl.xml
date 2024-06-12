@@ -119,7 +119,7 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="FanModeSequenceEnum">
-      <item value="0" name="OffLowMediumHigh" summary="Fan is capable of off, low, medium and high modes">
+      <item value="0" name="Off" summary="Fan is capable of off, low, medium and high modes">
         <optionalConform choice="a">
           <notTerm>
             <feature name="AUT"/>
