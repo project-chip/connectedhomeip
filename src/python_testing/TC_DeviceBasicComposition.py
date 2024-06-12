@@ -757,7 +757,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         vid = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorID]
         software_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
         filename = f'device_dump_0x{vid:04X}_0x{pid:04X}_{software_version}.json'
-        dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", filename)
+        dump_device_composition_path = self.user_params.get("dump_device_composition_path", filename)
         self.dump_wildcard(dump_device_composition_path)
 
 
