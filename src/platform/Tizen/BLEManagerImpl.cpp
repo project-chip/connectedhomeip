@@ -1166,7 +1166,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    return (conId != nullptr) ? static_cast<uint16_t>(conId->mtu) : 0;
+    return (conId != BLE_CONNECTION_UNINITIALIZED) ? static_cast<uint16_t>(conId->mtu) : 0;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
@@ -1176,7 +1176,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 
     ChipLogProgress(DeviceLayer, "SubscribeCharacteristic");
 
-    VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED, ChipLogError(DeviceLayer, "Invalid Connection"));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
@@ -1204,7 +1204,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 
     ChipLogProgress(DeviceLayer, "UnSubscribeCharacteristic");
 
-    VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED, ChipLogError(DeviceLayer, "Invalid Connection"));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "UnSubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
@@ -1232,7 +1232,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     ChipLogProgress(DeviceLayer, "Close BLE Connection");
 
     conId = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, conId->peerAddr));
-    VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
     ChipLogProgress(DeviceLayer, "Send GATT disconnect to [%s]", conId->peerAddr);
     ret = bt_gatt_disconnect(conId->peerAddr);
@@ -1251,7 +1251,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::Chip
     int ret;
 
     conId = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, conId->peerAddr));
-    VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
     ret = bt_gatt_set_value(mGattCharC2Handle, Uint8::to_const_char(pBuf->Start()), pBuf->DataLength());
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
@@ -1281,7 +1281,7 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
 {
     int ret;
 
-    VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED, ChipLogError(DeviceLayer, "Invalid Connection"));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_1_UUID),
