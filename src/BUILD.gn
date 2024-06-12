@@ -81,15 +81,21 @@ if (chip_build_tests) {
     }
 
     if (current_os != "zephyr" && current_os != "mbed") {
-      tests += [ 
-        "${chip_root}/src/app/codegen-data-model/tests",  # contains mock-ember functions
-        "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests",
-      ]
+      tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
     if (current_os != "zephyr" && current_os != "mbed" &&
         chip_device_platform != "efr32") {
+
+      # Avoid these items from "one single binary" test executions. Once tests
+      # are split, we can re-visit this (and likely many others)
+      #
+      # In particular:
+      #   "app/codegen-data-model/tests" contains symbols for ember mocks which
+      #                                  are used by other tests
+
       tests += [
+        "${chip_root}/src/app/codegen-data-model/tests",
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]
