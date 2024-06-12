@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-interaction-model/CodegenDataModel.h>
+#include <app/codegen-data-model/CodegenDataModel.h>
 
-#include <app/codegen-interaction-model/tests/EmberReadWriteOverride.h>
-#include <app/codegen-interaction-model/tests/TestAttributeReportIBsEncoding.h>
+#include <app/codegen-data-model/tests/EmberReadWriteOverride.h>
+#include <app/codegen-data-model/tests/TestAttributeReportIBsEncoding.h>
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
