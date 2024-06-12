@@ -64,6 +64,7 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 #pragma mark - Utility Classes
 
 // container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
+MTR_DIRECT_MEMBERS
 @interface MTRDeviceDelegateInfo : NSObject {
 @private
     void * _delegatePointerValue;
