@@ -4309,6 +4309,19 @@ enum class Feature : uint32_t
 };
 } // namespace RadonConcentrationMeasurement
 
+namespace WiFiNetworkManagement {} // namespace WiFiNetworkManagement
+
+namespace ThreadBorderRouterManagement {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPANChange = 0x1,
+};
+} // namespace ThreadBorderRouterManagement
+
+namespace ThreadNetworkDirectory {} // namespace ThreadNetworkDirectory
+
 namespace WakeOnLan {} // namespace WakeOnLan
 
 namespace Channel {

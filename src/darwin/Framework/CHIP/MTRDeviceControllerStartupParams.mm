@@ -614,7 +614,7 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
             // Our NOC has changed in a way that would affect ACL checks.  Clear
             // out our session resumption storage, because resuming those CASE
             // sessions will end up doing ACL checks against our old NOC.
-            MTR_LOG_DEFAULT("Node ID or CATs changed.  Clearing CASE resumption storage.");
+            MTR_LOG("Node ID or CATs changed.  Clearing CASE resumption storage.");
             [controller.controllerDataStore clearAllResumptionInfo];
         }
     }

@@ -16,16 +16,30 @@
  *
  */
 
-#include "commands/common/Commands.h"
-
-#include "commands/clusters/SubscriptionsCommands.h"
-#include "commands/interactive/Commands.h"
-#include "commands/pairing/Commands.h"
+#include <commands/clusters/SubscriptionsCommands.h>
+#include <commands/common/Commands.h>
+#include <commands/fabric-sync/Commands.h>
+#include <commands/interactive/Commands.h>
+#include <commands/pairing/Commands.h>
 #include <zap-generated/cluster/Commands.h>
 
 #include <iostream>
 #include <string>
 #include <vector>
+
+#if defined(PW_RPC_ENABLED)
+#include <rpc/RpcServer.h>
+#endif
+
+using namespace chip;
+
+void ApplicationInit()
+{
+#if defined(PW_RPC_ENABLED)
+    InitRpcServer(kFabricAdminServerPort);
+    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
+#endif
+}
 
 // ================================================================================
 // Main Code
@@ -46,6 +60,7 @@ int main(int argc, char * argv[])
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
 
+    registerCommandsFabricSync(commands, &credIssuerCommands);
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPairing(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
@@ -56,6 +71,8 @@ int main(int argc, char * argv[])
     {
         c_args.push_back(const_cast<char *>(arg.c_str()));
     }
+
+    ApplicationInit();
 
     return commands.Run(static_cast<int>(c_args.size()), c_args.data());
 }

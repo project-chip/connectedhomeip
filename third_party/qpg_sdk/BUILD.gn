@@ -102,11 +102,10 @@ static_library("qpg_mbedtls_alt_lib") {
 
 qpg_make_build("qpg_stack") {
   make_sources = [ "${qpg_sdk_root}/Components/Qorvo" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}.a" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}${qpg_flavour}.a" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) +
-        "/Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_${qpg_target_ic}",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_${qpg_target_ic}${qpg_flavour}",
     "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
         "/third_party/freertos/repo",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
@@ -116,15 +115,15 @@ qpg_make_build("qpg_stack") {
 
 static_library("qpg_stack_lib") {
   deps = [ "${chip_root}/third_party/qpg_sdk:qpg_stack" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}.a" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}${qpg_flavour}.a" ]
 }
 
 qpg_make_build("qpg_glue") {
   make_sources = [ "${qpg_sdk_root}/Components/Qorvo/Matter" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}${qpg_flavour}_libbuild.a" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_${qpg_target_ic}_libbuild",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_${qpg_target_ic}${qpg_flavour}_libbuild",
     "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
         "/third_party/freertos/repo",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
@@ -133,7 +132,11 @@ qpg_make_build("qpg_glue") {
 }
 static_library("qpg_glue_lib") {
   deps = [ "${chip_root}/third_party/qpg_sdk:qpg_glue" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a" ]
+  if (qpg_target_ic == "qpg6105") {
+    libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}${qpg_flavour}_libbuild.a" ]
+  } else {
+    assert(false, "QPG target not specified")
+  }
 }
 
 # openthread toevoegen
@@ -141,16 +144,16 @@ static_library("qpg_glue_lib") {
 #
 qpg_make_build("qpg_bootloader") {
   make_sources = [ "${qpg_sdk_root}/Libraries/Qorvo/Bootloader" ]
-  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr_secure/libBootloader_${qpg_target_ic}_compr_secure.a" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr_secure/libBootloaderSections_${qpg_target_ic}_compr_secure.a" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/Bootloader/Makefile.Bootloader_${qpg_target_ic}_compr_secure",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/Bootloader/Makefile.BootloaderSections_${qpg_target_ic}_compr_secure",
     "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
         "/third_party/freertos/repo",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr_secure",
+        "/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr_secure",
     "UMB_WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
-        "/${qpg_sdk_lib_dir}/UMB_${qpg_target_board}_nrt_flash_compr_secure",
+        "/${qpg_sdk_lib_dir}/Bootloader_QPG6105DK_B01_nrt_flash_compr_secure",
   ]
 }
 config("qpg_retain_bootloader") {
@@ -163,7 +166,7 @@ config("qpg_retain_bootloader") {
 
 static_library("qpg_bootloader_lib") {
   deps = [ "${chip_root}/third_party/qpg_sdk:qpg_bootloader" ]
-  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr_secure/libBootloader_${qpg_target_ic}_compr_secure.a" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr_secure/libBootloaderSections_${qpg_target_ic}_compr_secure.a" ]
   public_configs = [ ":qpg_retain_bootloader" ]
 }
 
