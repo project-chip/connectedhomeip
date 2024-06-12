@@ -115,11 +115,8 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
 {
-    if (self.delegateIsNull) {
-        return NO;
-    }
-
     id<MTRDeviceDelegate> strongDelegate = _delegate;
+    VerifyOrReturnValue(strongDelegate, NO);
     dispatch_async(_queue, ^{
         block(strongDelegate);
     });
