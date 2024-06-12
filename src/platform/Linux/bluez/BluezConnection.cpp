@@ -135,18 +135,18 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
     VerifyOrReturnError(mC1, BLE_ERROR_NOT_CHIP_DEVICE,
                         ChipLogError(DeviceLayer, "C1 (%s) not found on %s", Ble::CHIP_BLE_CHAR_1_UUID_STR, GetPeerAddress()));
-    VerifyOrReturnError(mC1, BLE_ERROR_NOT_CHIP_DEVICE,
+    VerifyOrReturnError(mC2, BLE_ERROR_NOT_CHIP_DEVICE,
                         ChipLogError(DeviceLayer, "C2 (%s) not found on %s", Ble::CHIP_BLE_CHAR_2_UUID_STR, GetPeerAddress()));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezConnection::BluezDisconnect(BluezConnection * conn)
+CHIP_ERROR BluezConnection::CloseConnectionImpl(BluezConnection * conn)
 {
     GAutoPtr<GError> error;
     gboolean success;
 
-    ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, conn->GetPeerAddress());
+    ChipLogDetail(DeviceLayer, "Close BLE connection: peer=%s", conn->GetPeerAddress());
 
     success = bluez_device1_call_disconnect_sync(conn->mDevice.get(), nullptr, &error.GetReceiver());
     VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message));
@@ -157,7 +157,7 @@ exit:
 
 CHIP_ERROR BluezConnection::CloseConnection()
 {
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezDisconnect, this);
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(CloseConnectionImpl, this);
 }
 
 const char * BluezConnection::GetPeerAddress() const

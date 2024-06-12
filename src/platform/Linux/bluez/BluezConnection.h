@@ -99,7 +99,7 @@ private:
         GAutoPtr<GVariant> mData;
     };
 
-    static CHIP_ERROR BluezDisconnect(BluezConnection * apConn);
+    static CHIP_ERROR CloseConnectionImpl(BluezConnection * apConn);
 
     static gboolean WriteHandlerCallback(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn);
     static gboolean NotifyHandlerCallback(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn);
