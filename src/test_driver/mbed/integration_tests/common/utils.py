@@ -14,6 +14,7 @@
 # limitations under the License.
 
 
+import asyncio
 import logging
 import platform
 import random
@@ -114,21 +115,33 @@ def send_zcl_command(devCtrl, line):
         if len(args) < 5:
             raise exceptions.InvalidArgumentCount(5, len(args))
 
-        if args[0] not in all_commands:
-            raise exceptions.UnknownCluster(args[0])
-        command = all_commands.get(args[0]).get(args[1], None)
+        cluster = args[0]
+        command = args[1]
+        if cluster not in all_commands:
+            raise exceptions.UnknownCluster(cluster)
+        commandObj = all_commands.get(cluster).get(command, None)
         # When command takes no arguments, (not command) is True
-        if command is None:
-            raise exceptions.UnknownCommand(args[0], args[1])
-        err, res = devCtrl.ZCLSend(args[0], args[1], int(
-            args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
-        if err != 0:
-            log.error("Failed to send ZCL command [{}] {}.".format(err, res))
-        elif res is not None:
-            log.info("Success, received command response:")
-            log.info(res)
-        else:
-            log.info("Success, no command response.")
+        if commandObj is None:
+            raise exceptions.UnknownCommand(cluster, command)
+
+        try:
+            req = commandObj(**FormatZCLArguments(args[5:], commandObj))
+        except BaseException:
+            raise exceptions.UnknownCommand(cluster, command)
+
+        nodeid = int(args[2])
+        endpoint = int(args[3])
+        try:
+            res = asyncio.run(devCtrl.SendCommand(nodeid, endpoint, req))
+            logging.debug(f"CommandResponse {res}")
+            if res is not None:
+                log.info("Success, received command response:")
+                log.info(res)
+            else:
+                log.info("Success, no command response.")
+        except exceptions.InteractionModelError as ex:
+            return (int(ex.status), None)
+            log.error("Failed to send ZCL command [{}] {}.".format(int(ex.status), None))
     except exceptions.ChipStackException as ex:
         log.error("An exception occurred during processing ZCL command:")
         log.error(str(ex))

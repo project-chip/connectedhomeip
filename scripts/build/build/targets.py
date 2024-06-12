@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -130,6 +130,7 @@ def BuildHostTarget():
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
         TargetPart('bridge', app=HostApp.BRIDGE),
+        TargetPart('fabric-admin', app=HostApp.FABRIC_ADMIN),
         TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE),
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
@@ -737,6 +738,7 @@ def BuildTelinkTarget():
     target = BuildTarget('telink', TelinkBuilder)
 
     target.AppendFixedTargets([
+        TargetPart('tlsr9118bdk40d', board=TelinkBoard.TLRS9118BDK40D),
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),

@@ -22,14 +22,14 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 #include <stdio.h>
 
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/verhoeff/Verhoeff.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
-
-#include <lib/support/verhoeff/Verhoeff.h>
 
 #include <algorithm>
 #include <math.h>

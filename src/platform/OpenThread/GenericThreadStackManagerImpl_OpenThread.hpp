@@ -76,7 +76,8 @@ static_assert(OPENTHREAD_API_VERSION >= 219, "OpenThread version too old");
 namespace {
 #ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
 NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
-app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
+app::Clusters::NetworkCommissioning::Instance
+    sThreadNetworkCommissioningInstance(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */, &sGenericThreadDriver);
 #endif
 
 void initNetworkCommissioningThreadDriver(void)
@@ -227,23 +228,29 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 
             ThreadDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetThreadDiagnosticsDelegate();
 
-            if (mIsAttached)
+            if (delegate)
             {
-                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
-            }
-            else
-            {
-                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
+                if (mIsAttached)
+                {
+                    delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
+                }
+                else
+                {
+                    delegate->OnConnectionStatusChanged(
+                        app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
 
-                GeneralFaults<kMaxNetworkFaults> current;
-                current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
-                delegate->OnNetworkFaultChanged(mNetworkFaults, current);
-                mNetworkFaults = current;
+                    GeneralFaults<kMaxNetworkFaults> current;
+                    current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
+                    delegate->OnNetworkFaultChanged(mNetworkFaults, current);
+                    mNetworkFaults = current;
+                }
             }
         }
 
 #if CHIP_DETAIL_LOGGING
+        Impl()->LockThreadStack();
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
+        Impl()->UnlockThreadStack();
 #endif // CHIP_DETAIL_LOGGING
     }
 }

@@ -77,7 +77,10 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="server">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
     <cluster id="0x0200" name="Pump Configuration and Control" side="server">
       <mandatoryConform/>

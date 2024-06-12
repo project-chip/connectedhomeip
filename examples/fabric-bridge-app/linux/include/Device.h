@@ -32,21 +32,13 @@ class Device
 public:
     static const int kDeviceNameSize = 32;
 
-    enum Changed_t
-    {
-        kChanged_Reachable = 1u << 0,
-        kChanged_Location  = 1u << 1,
-        kChanged_Name      = 1u << 2,
-        kChanged_Last      = kChanged_Name,
-    } Changed;
-
-    Device(const char * szDeviceName, std::string szLocation);
+    Device(chip::NodeId nodeId, const char * name);
     virtual ~Device() {}
 
     bool IsReachable();
-    void SetReachable(bool aReachable);
-    void SetName(const char * szDeviceName);
-    void SetLocation(std::string szLocation);
+    void SetReachable(bool reachable);
+    void SetName(const char * name);
+    void SetLocation(std::string location) { mLocation = location; };
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
@@ -56,13 +48,11 @@ public:
     inline std::string GetZone() { return mZone; };
     inline void SetZone(std::string zone) { mZone = zone; };
 
-private:
-    virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
-
 protected:
     bool mReachable;
     char mName[kDeviceNameSize];
     std::string mLocation;
+    chip::NodeId mNodeId;
     chip::EndpointId mEndpointId;
     chip::EndpointId mParentEndpointId;
     std::string mZone;

@@ -141,7 +141,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-          value: 0x110D
+          value: 0x111D
 
     - label: "Read UserActiveModeTriggerInstruction"
       command: "readAttribute"

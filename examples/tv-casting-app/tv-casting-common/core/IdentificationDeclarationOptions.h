@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Types.h"
+#include <app/server/Dnssd.h>
 #include <vector>
 
 namespace matter {
@@ -61,8 +62,15 @@ public:
      */
     bool mCancelPasscode = false;
 
+    /**
+     * Commissionee's (random) DNS-SD instance name. This field is mandatory and will be auto generated if not provided by the
+     * client.
+     */
+    char mCommissioneeInstanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1] = "";
+
     CHIP_ERROR addTargetAppInfo(const chip::Protocols::UserDirectedCommissioning::TargetAppInfo & targetAppInfo)
     {
+        ChipLogProgress(AppServer, "IdentificationDeclarationOptions::addTargetAppInfo()");
         if (mTargetAppInfos.size() >= CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS)
         {
             ChipLogError(AppServer,
@@ -76,6 +84,16 @@ public:
     }
 
     std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> getTargetAppInfoList() const { return mTargetAppInfos; }
+
+    void resetState()
+    {
+        mNoPasscode                = false;
+        mCdUponPasscodeDialog      = false;
+        mCommissionerPasscode      = false;
+        mCommissionerPasscodeReady = false;
+        mCancelPasscode            = false;
+        mTargetAppInfos.clear();
+    }
 
     /**
      * @brief Builds an IdentificationDeclaration message to be sent to a CastingPlayer, given the options state specified in this
@@ -94,21 +112,59 @@ public:
         id.SetNoPasscode(mNoPasscode);
         id.SetCdUponPasscodeDialog(mCdUponPasscodeDialog);
         id.SetCancelPasscode(mCancelPasscode);
-
-        ChipLogProgress(AppServer,
-                        "IdentificationDeclarationOptions::buildIdentificationDeclarationMessage() mCommissionerPasscode: %s",
-                        mCommissionerPasscode ? "true" : "false");
         id.SetCommissionerPasscode(mCommissionerPasscode);
-
-        ChipLogProgress(AppServer,
-                        "IdentificationDeclarationOptions::buildIdentificationDeclarationMessage() mCommissionerPasscodeReady: %s",
-                        mCommissionerPasscodeReady ? "true" : "false");
         if (mCommissionerPasscodeReady)
         {
             id.SetCommissionerPasscodeReady(true);
-            mCommissionerPasscodeReady = false;
+            id.SetInstanceName(mCommissioneeInstanceName);
         }
+        else
+        {
+            ChipLogProgress(AppServer,
+                            "IdentificationDeclarationOptions::buildIdentificationDeclarationMessage() generating InstanceName");
+            CHIP_ERROR err = chip::app::DnssdServer::Instance().GetCommissionableInstanceName(mCommissioneeInstanceName,
+                                                                                              sizeof(mCommissioneeInstanceName));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "IdentificationDeclarationOptions::buildIdentificationDeclarationMessage() Failed to get mdns "
+                             "instance name error: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+            else
+            {
+                id.SetInstanceName(mCommissioneeInstanceName);
+                ChipLogProgress(AppServer,
+                                "IdentificationDeclarationOptions::buildIdentificationDeclarationMessage() InstanceName set to: %s",
+                                mCommissioneeInstanceName);
+            }
+        }
+        LogDetail();
         return id;
+    }
+
+    void LogDetail()
+    {
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::LogDetail() - cpp");
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mNoPasscode:                %s",
+                      mNoPasscode ? "true" : "false");
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCdUponPasscodeDialog:      %s",
+                      mCdUponPasscodeDialog ? "true" : "false");
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCommissionerPasscode:      %s",
+                      mCommissionerPasscode ? "true" : "false");
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCommissionerPasscodeReady: %s",
+                      mCommissionerPasscodeReady ? "true" : "false");
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCancelPasscode:            %s",
+                      mCancelPasscode ? "true" : "false");
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCommissioneeInstanceName:  %s", mCommissioneeInstanceName);
+
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::TargetAppInfos list:");
+        for (size_t i = 0; i < mTargetAppInfos.size(); i++)
+        {
+            const chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info = mTargetAppInfos[i];
+            ChipLogDetail(AppServer, "\t\tTargetAppInfo %d, Vendor ID: %u, Product ID: %u", int(i + 1), info.vendorId,
+                          info.productId);
+        }
     }
 
 private:

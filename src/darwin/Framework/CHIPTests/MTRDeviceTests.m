@@ -26,6 +26,7 @@
 
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
@@ -35,6 +36,7 @@
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
+#import <os/lock.h>
 
 // system dependencies
 #import <XCTest/XCTest.h>
@@ -218,6 +220,56 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 {
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    // Ensure the test starts with clean slate in terms of stored data.
+    if (sController != nil) {
+        [sController.controllerDataStore clearAllStoredClusterData];
+        NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+        XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+    }
+}
+
+- (void)tearDown
+{
+    // Make sure our MTRDevice instances, which are stateful, do not keep that
+    // state between different tests.
+    if (sController != nil) {
+        __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+        [sController removeDevice:device];
+    }
+
+    // Try to make sure we don't have any outstanding subscriptions from
+    // previous tests, by sending a subscribe request that will get rid of
+    // existing subscriptions and then fail out due to requesting a subscribe to
+    // a nonexistent cluster.
+    if (mConnectedDevice != nil) {
+        dispatch_queue_t queue = dispatch_get_main_queue();
+
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
+        params.resubscribeAutomatically = NO;
+        params.replaceExistingSubscriptions = YES;
+
+        XCTestExpectation * errorExpectation = [self expectationWithDescription:@"Canceled all subscriptions"];
+
+        // There should be no Basic Information cluster on random endpoints.
+        [mConnectedDevice subscribeToAttributesWithEndpointID:@10000
+            clusterID:@(MTRClusterIDTypeBasicInformationID)
+            attributeID:@(0)
+            params:params
+            queue:queue
+            reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                XCTAssertNil(values);
+                XCTAssertNotNil(error);
+                [errorExpectation fulfill];
+            }
+            subscriptionEstablished:^() {
+                XCTFail("Did not expect subscription to Basic Information on random endpoint to succeed");
+            }];
+
+        [self waitForExpectations:@[ errorExpectation ] timeout:kTimeoutInSeconds];
+    }
+
+    [super tearDown];
 }
 
 - (void)test001_ReadAttribute
@@ -406,6 +458,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
         attributeID:@0
@@ -1278,8 +1331,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type clusterStateCacheContainer = [[MTRAttributeCacheContainer alloc] init];
     __auto_type * params = [[MTRSubscribeParams alloc] init];
     params.resubscribeAutomatically = NO;
-    params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not
-    // affect this subscription erroring out correctly.
+    params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not affect this subscription erroring out correctly.
     [device subscribeWithQueue:queue
         minInterval:1
         maxInterval:2
@@ -1387,11 +1439,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test017_TestMTRDeviceBasics
 {
-    // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -2149,6 +2196,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
 
     NSNumber * failClusterId = @5678;
     NSNumber * failEndpointId = @1000;
@@ -2406,6 +2454,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe multiple events"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
 
     NSArray<MTREventRequestPath *> * eventPaths = @[
         // Startup event.
@@ -2415,7 +2464,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ];
 
     XCTestExpectation * startupEventExpectation = [self expectationWithDescription:@"report startup event"];
-    __auto_type reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+    __block __auto_type reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
 
@@ -2455,18 +2504,26 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     };
 
     [device subscribeToAttributePaths:nil
-                           eventPaths:eventPaths
-                               params:params
-                                queue:queue
-                        reportHandler:reportHandler
-              subscriptionEstablished:^{
-                  NSLog(@"subscribe complete");
-                  [expectation fulfill];
-              }
-              resubscriptionScheduled:nil];
+        eventPaths:eventPaths
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+            if (reportHandler != nil) {
+                reportHandler(values, error);
+            }
+        }
+        subscriptionEstablished:^{
+            NSLog(@"subscribe complete");
+            [expectation fulfill];
+        }
+        resubscriptionScheduled:nil];
 
     // Wait till establishment
     [self waitForExpectations:@[ startupEventExpectation, expectation ] timeout:kTimeoutInSeconds];
+
+    // Null out reportHandler, so we don't notify it when the
+    // subscription tears down.
+    reportHandler = nil;
 }
 
 - (void)test026_LocationAttribute
@@ -2634,11 +2691,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test029_MTRDeviceWriteCoalescing
 {
-    // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -2971,17 +3023,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
+    // Get the subscription primed
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
-    [sController removeDevice:device];
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
-    // Now recreate device and get subscription primed
-    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    NSTimeInterval baseTestDelayTime = 1;
+    MTRDeviceStorageBehaviorConfiguration * config = [MTRDeviceStorageBehaviorConfiguration
+        configurationWithReportToPersistenceDelayTime:baseTestDelayTime
+                      reportToPersistenceDelayTimeMax:baseTestDelayTime * 2
+                            recentReportTimesMaxCount:5
+                  timeBetweenReportsTooShortThreshold:baseTestDelayTime * 0.4
+               timeBetweenReportsTooShortMinThreshold:baseTestDelayTime * 0.2
+                reportToPersistenceDelayMaxMultiplier:baseTestDelayTime * 5
+          deviceReportingExcessivelyIntervalThreshold:baseTestDelayTime * 10];
+    [device setStorageBehaviorConfiguration:config];
+
     XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
     XCTestExpectation * gotDeviceCachePrimed = [self expectationWithDescription:@"Device cache primed for the first time"];
+    XCTestExpectation * gotClusterDataPersisted1 = [self expectationWithDescription:@"Cluster data persisted 1"];
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
     __weak __auto_type weakDelegate = delegate;
     delegate.onReportEnd = ^{
@@ -2992,9 +3050,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     delegate.onDeviceCachePrimed = ^{
         [gotDeviceCachePrimed fulfill];
     };
+    delegate.onClusterDataPersisted = ^{
+        [gotClusterDataPersisted1 fulfill];
+    };
     [device setDelegate:delegate queue:queue];
 
-    [self waitForExpectations:@[ gotReportsExpectation, gotDeviceCachePrimed ] timeout:60];
+    [self waitForExpectations:@[ gotReportsExpectation, gotDeviceCachePrimed, gotClusterDataPersisted1 ] timeout:60];
 
     NSUInteger attributesReportedWithFirstSubscription = [device unitTestAttributesReportedSinceLastCheck];
 
@@ -3006,6 +3067,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
 
     XCTestExpectation * resubGotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received for resubscription"];
+    XCTestExpectation * gotClusterDataPersisted2 = [self expectationWithDescription:@"Cluster data persisted 2"];
     delegate.onReportEnd = ^{
         [resubGotReportsExpectation fulfill];
         __strong __auto_type strongDelegate = weakDelegate;
@@ -3015,9 +3077,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     delegate.onDeviceCachePrimed = ^{
         onDeviceCachePrimedCalled = YES;
     };
+    delegate.onClusterDataPersisted = ^{
+        [gotClusterDataPersisted2 fulfill];
+    };
     [device setDelegate:delegate queue:queue];
 
-    [self waitForExpectations:@[ resubGotReportsExpectation ] timeout:60];
+    [self waitForExpectations:@[ resubGotReportsExpectation, gotClusterDataPersisted2 ] timeout:60];
 
     // Make sure that the new callback is only ever called once, the first time subscription was primed
     XCTAssertFalse(onDeviceCachePrimedCalled);
@@ -3038,12 +3103,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
     NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreAttributeCountAfterSecondSubscription - attributesReportedWithSecondSubscription;
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
-
-    // We need to remove the device here since the MTRDevice retains its reachable state. So if the next test needs to start with a clean state,
-    // it can't do that since the MTRDevice becomes reachable in the previous test. Since there are no changes detected in reachability,
-    // the onReachable callback to the delegate is not called.
-    // TODO: #33205 Ensure we have a clean slate w.r.t MTRDevice before running each test.
-    [sController removeDevice:device];
 }
 
 - (void)test032_MTRPathClassesEncoding
@@ -3165,7 +3224,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         wasOnDeviceConfigurationChangedCallbackCalled = YES;
     };
 
-    [device unitTestInjectAttributeReport:attributeReport];
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
 
     [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
     if (!expectConfigurationChanged) {
@@ -3175,11 +3234,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test033_TestMTRDeviceDeviceConfigurationChanged
 {
-    // Ensure the test starts with clean slate.
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -3274,7 +3328,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device setDelegate:delegate queue:queue];
 
-    // Wait for subscription set up and intitial reports received.
+    // Wait for subscription set up and initial reports received.
     [self waitForExpectations:@[
         subscriptionExpectation,
         gotInitialReportsExpectation,
@@ -3498,13 +3552,357 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes fulfill];
     };
 
-    [device unitTestInjectAttributeReport:attributeReport];
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
     [self waitForExpectations:@[ gotAttributeReportWithMultipleAttributesExpectation, gotAttributeReportWithMultipleAttributesEndExpectation, deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes ] timeout:kTimeoutInSeconds];
+}
 
-    // We need to remove the device here, because we injected data into its attribute cache
-    // that does not match the actual server.
-    // TODO: #33205 Ensure we have a clean slate w.r.t MTRDevice before running each test.
+- (void)test034_TestMTRDeviceHistoricalEvents
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    // Set up a subscription via mConnectedDevice that will send us continuous
+    // reports.
+    XCTestExpectation * firstSubscriptionExpectation = [self expectationWithDescription:@"First subscription established"];
+
+    MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(0)];
+    params.resubscribeAutomatically = NO;
+
+    [mConnectedDevice subscribeToAttributesWithEndpointID:@(0)
+        clusterID:@(MTRClusterIDTypeBasicInformationID)
+        attributeID:@(0)
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+        }
+        subscriptionEstablished:^() {
+            [firstSubscriptionExpectation fulfill];
+        }];
+
+    [self waitForExpectations:@[ firstSubscriptionExpectation ] timeout:kTimeoutInSeconds];
+
+    // Now set up our MTRDevice and do a subscribe.  Make sure all the events we
+    // get are marked "historical".
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    XCTestExpectation * secondSubscriptionExpectation = [self expectationWithDescription:@"Second subscription established"];
+    XCTestExpectation * gotFirstReportsExpectation = [self expectationWithDescription:@"First Attribute and Event reports have been received"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.onReachable = ^() {
+        [secondSubscriptionExpectation fulfill];
+    };
+
+    __block unsigned eventReportsReceived = 0;
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
+        eventReportsReceived += eventReport.count;
+        for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+            NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+            XCTAssertTrue(reportIsHistorical.boolValue);
+        }
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotFirstReportsExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ secondSubscriptionExpectation, gotFirstReportsExpectation ] timeout:60];
+
+    // Must have gotten some events (at least StartUp!)
+    XCTAssertTrue(eventReportsReceived > 0);
+
+    // Remove the device, then try again, now with us having stored cluster
+    // data.  All the events should still be reported as historical.
     [sController removeDevice:device];
+
+    eventReportsReceived = 0;
+
+    device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    XCTestExpectation * thirdSubscriptionExpectation = [self expectationWithDescription:@"Third subscription established"];
+    XCTestExpectation * gotSecondReportsExpectation = [self expectationWithDescription:@"Second Attribute and Event reports have been received"];
+
+    delegate.onReachable = ^() {
+        [thirdSubscriptionExpectation fulfill];
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotSecondReportsExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ thirdSubscriptionExpectation, gotSecondReportsExpectation ] timeout:60];
+
+    // Must have gotten some events (at least StartUp!)
+    XCTAssertTrue(eventReportsReceived > 0);
+}
+
+- (void)test035_TestMTRDeviceSubscriptionNotEstablishedOverXPC
+{
+    NSString * const MTRDeviceControllerId = @"MTRController";
+    __auto_type remoteController = [MTRDeviceController
+        sharedControllerWithID:MTRDeviceControllerId
+               xpcConnectBlock:^NSXPCConnection * _Nonnull {
+                   return nil;
+               }];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:remoteController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    subscriptionExpectation.inverted = YES;
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:5];
+
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)_testAttributeReportWithValue:(unsigned int)testValue
+{
+    return @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(testValue),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(testValue),
+        }
+    } ];
+}
+
+- (void)test036_TestStorageBehaviorConfiguration
+{
+    // Use separate queue for timing sensitive test
+    dispatch_queue_t queue = dispatch_queue_create("storage-behavior-queue", DISPATCH_QUEUE_SERIAL);
+
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    __block os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
+    __block NSDate * reportEndTime = nil;
+    __block NSDate * dataPersistedTime = nil;
+
+    XCTestExpectation * dataPersistedInitial = [self expectationWithDescription:@"data persisted initial"];
+    delegate.onReportEnd = ^() {
+        os_unfair_lock_lock(&lock);
+        if (!reportEndTime) {
+            reportEndTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+    };
+
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersistedInitial fulfill];
+    };
+
+    // Do not subscribe - only inject sequence of reports to control the timing
+    delegate.skipSetupSubscription = YES;
+
+    NSTimeInterval baseTestDelayTime = 3;
+
+    // Set up a config of relatively short timers so this test doesn't take too long
+    MTRDeviceStorageBehaviorConfiguration * config = [MTRDeviceStorageBehaviorConfiguration
+        configurationWithReportToPersistenceDelayTime:baseTestDelayTime
+                      reportToPersistenceDelayTimeMax:baseTestDelayTime * 2
+                            recentReportTimesMaxCount:5
+                  timeBetweenReportsTooShortThreshold:baseTestDelayTime * 0.4
+               timeBetweenReportsTooShortMinThreshold:baseTestDelayTime * 0.2
+                reportToPersistenceDelayMaxMultiplier:baseTestDelayTime * 5
+          deviceReportingExcessivelyIntervalThreshold:baseTestDelayTime * 7];
+    [device setStorageBehaviorConfiguration:config];
+
+    [device setDelegate:delegate queue:queue];
+
+    // Use a counter that will be incremented for each report as the value.
+    unsigned int currentTestValue = 1;
+
+    // Initial setup: Inject report and see that the attribute persisted.  No delay is
+    // expected for the first (priming) report.
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    [self waitForExpectations:@[ dataPersistedInitial ] timeout:60];
+
+    XCTestExpectation * dataPersisted1 = [self expectationWithDescription:@"data persisted 1"];
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersisted1 fulfill];
+    };
+
+    // Test 1: Inject report and see that the attribute persisted, with a delay
+    reportEndTime = nil;
+    dataPersistedTime = nil;
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    [self waitForExpectations:@[ dataPersisted1 ] timeout:60];
+
+    os_unfair_lock_lock(&lock);
+    NSTimeInterval reportToPersistenceDelay = [dataPersistedTime timeIntervalSinceDate:reportEndTime];
+    os_unfair_lock_unlock(&lock);
+    // Check delay exists
+    XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime / 2);
+    // Check delay is expectd - use base delay plus small fudge in case of CPU slowness with dispatch_after
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 1.3);
+
+    XCTestExpectation * dataPersisted2 = [self expectationWithDescription:@"data persisted 2"];
+
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersisted2 fulfill];
+    };
+
+    // Test 2: Inject multiple reports with delay and see that the attribute persisted eventually
+    reportEndTime = nil;
+    dataPersistedTime = nil;
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    double frequentReportMultiplier = 0.5;
+    usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    // At this point, the threshold for reportToPersistenceDelayTimeMax should have hit, and persistence
+    // should have happened with timer running down to persist again with the 5th report above. Need to
+    // wait for expectation and immediately clear the onClusterDataPersisted callback
+
+    [self waitForExpectations:@[ dataPersisted2 ] timeout:60];
+
+    os_unfair_lock_lock(&lock);
+    reportToPersistenceDelay = [dataPersistedTime timeIntervalSinceDate:reportEndTime];
+    os_unfair_lock_unlock(&lock);
+    // Check delay exists and approximately reportToPersistenceDelayTimeMax, which is base delay times 2
+    XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 0.9);
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 1.3); // larger upper limit in case machine is slow
+
+    delegate.onClusterDataPersisted = nil;
+
+    // sleep the base delay interval to allow the onClusterDataPersisted callback to happen.
+    usleep((useconds_t) (baseTestDelayTime * 1.1 * USEC_PER_SEC));
+
+    // Test 3: test reporting frequently, and see that the delay time increased
+    reportEndTime = nil;
+    dataPersistedTime = nil;
+    XCTestExpectation * dataPersisted3 = [self expectationWithDescription:@"data persisted 3"];
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersisted3 fulfill];
+    };
+
+    // Set report times with short delay and check that the multiplier is engaged
+    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.3 * 4)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.3 * 3)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.3 * 2)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.3)],
+    ]]];
+
+    // Inject final report that makes MTRDevice recalculate delay with multiplier
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    [self waitForExpectations:@[ dataPersisted3 ] timeout:60];
+
+    // 0.3 is between 0.4 and 0.2, which should get us at least 50% of the multiplier.
+    // The multiplier is 5, which is +400% of the base delay, and so 50% of the multiplier
+    // is +200% of the base delay, meaning 3x the base delay.
+
+    os_unfair_lock_lock(&lock);
+    reportToPersistenceDelay = [dataPersistedTime timeIntervalSinceDate:reportEndTime];
+    os_unfair_lock_unlock(&lock);
+    // Check delay exists and at least base delay times 3
+    XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime * 3 * 0.9);
+    // upper limit at most max delay times full multiplier + extra in case machine is slow
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 5 * 1.3);
+
+    // Test 4: test reporting excessively, and see that persistence does not happen until
+    // reporting frequency goes back above the threshold
+    reportEndTime = nil;
+    dataPersistedTime = nil;
+    XCTestExpectation * dataPersisted4 = [self expectationWithDescription:@"data persisted 4"];
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersisted4 fulfill];
+    };
+
+    // Set report times with short delay and check that the multiplier is engaged
+    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 4)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 3)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 2)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1)],
+    ]]];
+
+    // Inject report that makes MTRDevice detect the device is reporting excessively
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    // Now keep reporting excessively for base delay time max times max multiplier, plus a bit more
+    NSDate * excessiveStartTime = [NSDate now];
+    for (;;) {
+        usleep((useconds_t) (baseTestDelayTime * 0.1 * USEC_PER_SEC));
+        [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+        NSTimeInterval elapsed = -[excessiveStartTime timeIntervalSinceNow];
+        if (elapsed > (baseTestDelayTime * 2 * 5 * 1.2)) {
+            break;
+        }
+    }
+
+    // Check that persistence has not happened because it's now turned off
+    XCTAssertNil(dataPersistedTime);
+
+    // Now force report times to large number, to simulate time passage
+    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 10)],
+    ]]];
+
+    // And inject a report to trigger MTRDevice to recalculate that this device is no longer
+    // reporting excessively
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    [self waitForExpectations:@[ dataPersisted4 ] timeout:60];
+
+    delegate.onReportEnd = nil;
+    delegate.onClusterDataPersisted = nil;
 }
 
 @end

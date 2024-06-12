@@ -20,6 +20,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/test-interaction-model-api.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
@@ -40,9 +41,6 @@
 
 namespace {
 
-uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-size_t attributeDataTLVLen                       = 0;
-constexpr chip::DataVersion kRejectedDataVersion = 1;
 constexpr chip::DataVersion kAcceptedDataVersion = 5;
 constexpr uint16_t kMaxGroupsPerFabric           = 5;
 constexpr uint16_t kMaxGroupKeysPerFabric        = 8;
@@ -338,7 +336,7 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             app::WriteHandler writeHandler;
 
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-            err                            = writeHandler.Init();
+            err                            = writeHandler.Init(chip::app::InteractionModelEngine::GetInstance());
 
             GenerateWriteRequest(apSuite, apContext, messageIsTimed, buf);
 
@@ -361,28 +359,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
         }
     }
-}
-
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
-{
-    // Note: This test does not make use of the real attribute metadata.
-    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
-    return &stub;
-}
-
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
-{
-    if (aPath.mDataVersion.HasValue() && aPath.mDataVersion.Value() == kRejectedDataVersion)
-    {
-        return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
-    }
-
-    TLV::TLVWriter writer;
-    writer.Init(attributeDataTLV);
-    writer.CopyElement(TLV::AnonymousTag(), aReader);
-    attributeDataTLVLen = writer.GetLengthWritten();
-    return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
 }
 
 void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext)
@@ -434,7 +410,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     {
         app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataRx;
         TLV::TLVReader reader;
-        reader.Init(attributeDataTLV, attributeDataTLVLen);
+        reader.Init(chip::Test::attributeDataTLV, chip::Test::attributeDataTLVLen);
         reader.Next();
         NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == DataModel::Decode(reader, dataRx));
         NL_TEST_ASSERT(apSuite, dataRx.a == dataTx.a);
@@ -531,7 +507,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch(n
     dataTxValue.b = true;
     DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
     dataTx.SetNonNull(dataTxValue);
-    Optional<DataVersion> version(kRejectedDataVersion);
+    Optional<DataVersion> version(chip::Test::kRejectedDataVersion);
     writeClient.EncodeAttribute(attributePathParams, dataTx, version);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -1063,10 +1039,10 @@ const nlTest sTests[] =
 nlTestSuite sSuite = {
     "TestWriteInteraction",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 
 } // namespace

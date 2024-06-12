@@ -24,6 +24,7 @@
 #include <app/MessageDef/EventDataIB.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/test-interaction-model-api.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -46,18 +47,13 @@ namespace {
 using namespace chip;
 using namespace chip::Access;
 
-chip::ClusterId kTestClusterId        = 1;
-chip::ClusterId kTestDeniedClusterId1 = 1000;
-chip::ClusterId kTestDeniedClusterId2 = 3;
-chip::EndpointId kTestEndpointId      = 4;
-
 class TestAccessControlDelegate : public AccessControl::Delegate
 {
 public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const chip::Access::RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        if (requestPath.cluster == kTestDeniedClusterId2)
+        if (requestPath.cluster == chip::Test::kTestDeniedClusterId2)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -125,21 +121,6 @@ public:
 namespace chip {
 namespace app {
 
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return aPath.mClusterId != kTestDeniedClusterId1;
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    if (aPath.mClusterId == kTestDeniedClusterId1)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedCluster;
-    }
-
-    return Protocols::InteractionModel::Status::Success;
-}
-
 class TestAclAttribute
 {
 public:
@@ -166,12 +147,12 @@ void TestAclAttribute::TestACLDeniedAttribute(nlTestSuite * apSuite, void * apCo
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
-        attributePathParams[0].mEndpointId  = kTestEndpointId;
-        attributePathParams[0].mClusterId   = kTestDeniedClusterId1;
+        attributePathParams[0].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mEndpointId  = kTestEndpointId;
-        attributePathParams[1].mClusterId   = kTestDeniedClusterId1;
+        attributePathParams[1].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[1].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[1].mAttributeId = 2;
 
         ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
@@ -194,10 +175,10 @@ void TestAclAttribute::TestACLDeniedAttribute(nlTestSuite * apSuite, void * apCo
 
         chip::app::AttributePathParams attributePathParams[2];
 
-        attributePathParams[0].mClusterId   = kTestDeniedClusterId2;
+        attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId2;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mClusterId   = kTestDeniedClusterId2;
+        attributePathParams[1].mClusterId   = chip::Test::kTestDeniedClusterId2;
         attributePathParams[1].mAttributeId = 2;
 
         ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
@@ -219,12 +200,12 @@ void TestAclAttribute::TestACLDeniedAttribute(nlTestSuite * apSuite, void * apCo
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
-        attributePathParams[0].mEndpointId  = kTestEndpointId;
-        attributePathParams[0].mClusterId   = kTestDeniedClusterId1;
+        attributePathParams[0].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mEndpointId  = kTestEndpointId;
-        attributePathParams[1].mClusterId   = kTestClusterId;
+        attributePathParams[1].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[1].mClusterId   = chip::Test::kTestClusterId;
         attributePathParams[1].mAttributeId = 2;
 
         ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
@@ -259,10 +240,10 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "TestAclAttribute",
     &sTests[0],
-    TestAccessContext::nlTestSetUpTestSuite,
-    TestAccessContext::nlTestTearDownTestSuite,
-    TestAccessContext::nlTestSetUp,
-    TestAccessContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestAccessContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestAccessContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestAccessContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestAccessContext, TearDown),
 };
 
 } // namespace

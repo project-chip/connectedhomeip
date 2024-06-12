@@ -22,6 +22,8 @@
  *
  */
 
+#include "app/tests/test-interaction-model-api.h"
+
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeValueEncoder.h>
@@ -61,7 +63,6 @@ chip::EndpointId kTestEndpointId        = 1;
 chip::EndpointId kTestEventEndpointId   = chip::Test::kMockEndpoint1;
 chip::EventId kTestEventIdDebug         = chip::Test::MockEventId(1);
 chip::EventId kTestEventIdCritical      = chip::Test::MockEventId(2);
-uint8_t kTestFieldValue1                = 1;
 chip::TLV::Tag kTestEventTag            = chip::TLV::ContextTag(1);
 chip::EndpointId kInvalidTestEndpointId = 3;
 chip::DataVersion kTestDataVersion1     = 3;
@@ -79,13 +80,13 @@ class TestContext : public chip::Test::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    void SetUpTestSuite() override
+    static void SetUpTestSuite()
     {
         chip::Test::AppContext::SetUpTestSuite();
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
 
-        if (mSyncScheduler)
+        if (sSyncScheduler)
         {
             gReportScheduler = chip::app::reporting::GetSynchronizedReportScheduler();
             sUsingSubSync    = true;
@@ -96,14 +97,8 @@ public:
         }
     }
 
-    static int nlTestSetUpTestSuite_Sync(void * context)
-    {
-        static_cast<TestContext *>(context)->mSyncScheduler = true;
-        return nlTestSetUpTestSuite(context);
-    }
-
     // Performs shared teardown for all tests in the test suite
-    void TearDownTestSuite() override
+    static void TearDownTestSuite()
     {
         chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
         chip::Test::AppContext::TearDownTestSuite();
@@ -133,9 +128,21 @@ public:
         chip::Test::AppContext::TearDown();
     }
 
-private:
+protected:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
-    bool mSyncScheduler = false;
+    static bool sSyncScheduler;
+};
+
+bool TestContext::sSyncScheduler = false;
+
+class TestSyncContext : public TestContext
+{
+public:
+    static void SetUpTestSuite()
+    {
+        sSyncScheduler = true;
+        TestContext::SetUpTestSuite();
+    }
 };
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
@@ -294,54 +301,6 @@ using ReadHandlerNode     = chip::app::reporting::ReportScheduler::ReadHandlerNo
 
 namespace chip {
 namespace app {
-
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState)
-{
-    if (aPath.mClusterId >= Test::kMockEndpointMin)
-    {
-        return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
-    }
-
-    if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
-    {
-        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-        ReturnErrorOnFailure(aAttributeReports.GetError());
-        ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aPath.mClusterId, aPath.mAttributeId);
-
-        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-        ReturnErrorOnFailure(attributeReport.GetError());
-        AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePath.GetError());
-        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
-        ReturnErrorOnFailure(errorStatus.GetError());
-        ReturnErrorOnFailure(attributeStatus.EndOfAttributeStatusIB());
-        return attributeReport.EndOfAttributeReportIB();
-    }
-
-    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(kTestFieldValue1);
-}
-
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    if (kTestDataVersion1 == aRequiredVersion)
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
-}
 
 class TestReadInteraction
 {
@@ -5146,19 +5105,19 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "TestReadInteraction",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 
 nlTestSuite sSyncSuite = {
     "TestSyncReadInteraction",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite_Sync,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestSyncContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestSyncContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestSyncContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestSyncContext, TearDown),
 };
 
 } // namespace
