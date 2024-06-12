@@ -104,14 +104,14 @@ std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, En
 
 } // namespace internal
 
-/// Exposes event access capabilities.
+/// Exposes event generation capabilities.
 ///
 /// Allows callers to "generate events" which effectively notifies of an event having
 /// ocurred.
-class Events
+class EventsGenerator
 {
 public:
-    virtual ~Events() = default;
+    virtual ~EventsGenerator() = default;
 
     /// Generates the given event.
     ///

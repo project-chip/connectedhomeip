@@ -22,10 +22,10 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 
-#include <app/interaction-model/Context.h>
-#include <app/interaction-model/InvokeResponder.h>
-#include <app/interaction-model/IterationTypes.h>
-#include <app/interaction-model/OperationTypes.h>
+#include <app/data-model-interface/Context.h>
+#include <app/data-model-interface/InvokeResponder.h>
+#include <app/data-model-interface/MetadataTypes.h>
+#include <app/data-model-interface/OperationTypes.h>
 
 namespace chip {
 namespace app {
@@ -38,10 +38,10 @@ namespace InteractionModel {
 ///     thread or equivalent
 ///   - class is allowed to attempt to cache indexes/locations for faster
 ///     lookups of things (e.g during iterations)
-class Model : public AttributeTreeIterator
+class DataModel : public DataModelMetadataTree
 {
 public:
-    virtual ~Model() = default;
+    virtual ~DataModel() = default;
 
     // `context` pointers  will be guaranteed valid until Shutdown is called()
     virtual CHIP_ERROR Startup(InteractionModelContext context)
@@ -76,11 +76,6 @@ public:
     ///
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - cluster `data version` has been checked for the incoming request if applicable
-    ///
-    /// List operation support:
-    ///    - the first list write will have `request.writeFlags.Has(WriteFlags::kListBegin)`
-    ///    - the last list write will have `request.writeFlags.Has(WriteFlags::kListEnd)`
-    ///    - the last list write MAY have empty data (no list items)
     ///
     /// When `request.writeFlags.Has(WriteFlags::kForceInternal)` the request is from an internal app update
     /// and SHOULD bypass some internal checks (like timed enforcement, potentially read-only restrictions)
