@@ -1834,7 +1834,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 }
 
 // Returns filtered set of attributes using an interestedPaths array.
-// Returns nil if no attribute reports has a path that matches the paths in the interestedPaths array.
+// Returns nil if no attribute report has a path that matches the paths in the interestedPaths array.
 - (NSArray<NSDictionary<NSString *, id> *> *)_filteredAttributes:(NSArray<NSDictionary<NSString *, id> *> *)attributes forInterestedPaths:(NSArray * _Nullable)interestedPaths
 {
     if (!interestedPaths.count) {
