@@ -1056,8 +1056,10 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
         id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
         if (strongDelegate) {
-            @autoreleasepool {
-                block(delegateInfo);
+            if (block) {
+                @autoreleasepool {
+                    block(delegateInfo);
+                }
             }
             (void) strongDelegate; // ensure it stays alive
         } else {
