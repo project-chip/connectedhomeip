@@ -72,7 +72,7 @@
   {% endfor %}
 
   {%- for a in cluster.attributes %}
-  {{a.qualities | idltxt}}attribute {{a | attribute_access}}{{render_field(a.definition)}}
+  {{"%s" | format(a.api_maturity|idltxt)}}{{a.qualities | idltxt}}attribute {{a | attribute_access}}{{render_field(a.definition)}}
   {% endfor %}
 
   {%- for s in cluster.structs | selectattr("tag") %}
