@@ -1250,8 +1250,6 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::Chip
 {
     int ret;
 
-    ChipLogProgress(DeviceLayer, "SendIndication");
-
     conId = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, conId->peerAddr));
     VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
@@ -1282,8 +1280,6 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
                                       System::PacketBufferHandle pBuf)
 {
     int ret;
-
-    ChipLogProgress(DeviceLayer, "SendWriteRequest");
 
     VerifyOrExit(conId != nullptr, ChipLogError(DeviceLayer, "Invalid Connection"));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &Ble::CHIP_BLE_SVC_ID),
