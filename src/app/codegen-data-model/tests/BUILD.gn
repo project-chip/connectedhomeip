@@ -13,7 +13,7 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
-import("${chip_root}/src/app/codegen-interaction-model/model.gni")
+import("${chip_root}/src/app/codegen-data-model/model.gni")
 
 source_set("ember_extra_files") {
   sources = [
@@ -36,9 +36,9 @@ source_set("ember_extra_files") {
 }
 
 source_set("mock_model") {
-  sources = codegen_interaction_model_SOURCES
+  sources = codegen_data_model_SOURCES
 
-  public_deps = codegen_interaction_model_PUBLIC_DEPS
+  public_deps = codegen_data_model_PUBLIC_DEPS
 
   # this ties in the codegen model to an actual ember implementation
   public_deps += [
@@ -49,7 +49,7 @@ source_set("mock_model") {
 }
 
 chip_test_suite("tests") {
-  output_name = "libCodegenInteractionModelTests"
+  output_name = "libCodegenDataModelTests"
 
   test_sources = [ "TestCodegenModelViaMocks.cpp" ]
 
