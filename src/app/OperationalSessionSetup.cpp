@@ -197,9 +197,10 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     Connect(onConnection, nullptr, onSetupFailure, transportPayloadCapability);
 }
 
-void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & addr, const ResolveResult & result)
+void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
 {
     auto & config = result.mrpRemoteConfig;
+    auto addr = result.address;
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // Make sure to clear out our reason for trying the next result first thing,
     // so it does not stick around in various error cases.
@@ -297,10 +298,7 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
 {
     auto & config = result.mrpRemoteConfig;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // TODO: Combine LargePayload flag with DNS-SD advertisements from peer.
-    // Issue #32348.
-    if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload && result.supportsTcpServer &&
-        result.supportsTcpClient)
+    if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload && result.supportsTcpServer)
     {
         // Set the transport type for carrying large payloads
         mDeviceAddress.SetTransportType(chip::Transport::Type::kTcp);
@@ -664,7 +662,7 @@ void OperationalSessionSetup::PerformAddressUpdate()
 
 void OperationalSessionSetup::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
 {
-    UpdateDeviceData(result.address, result);
+    UpdateDeviceData(result);
 }
 
 void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)

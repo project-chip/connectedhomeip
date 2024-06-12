@@ -421,7 +421,7 @@ private:
     /**
      * This function will set new IP address, port and MRP retransmission intervals of the device.
      */
-    void UpdateDeviceData(const Transport::PeerAddress & addr, const AddressResolve::ResolveResult & result);
+    void UpdateDeviceData(const AddressResolve::ResolveResult & result);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     /**
