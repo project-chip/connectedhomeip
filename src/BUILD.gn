@@ -86,7 +86,6 @@ if (chip_build_tests) {
 
     if (current_os != "zephyr" && current_os != "mbed" &&
         chip_device_platform != "efr32") {
-
       # Avoid these items from "one single binary" test executions. Once tests
       # are split, we can re-visit this (and likely many others)
       #
