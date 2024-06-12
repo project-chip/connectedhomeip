@@ -25,8 +25,10 @@
 #include "AndroidICDClient.h"
 
 #include <app/icd/client/ICDClientInfo.h>
+#include <lib/support/JniTypeWrappers.h>
 
 chip::app::DefaultICDClientStorage sICDClientStorage;
+static CHIP_ERROR ParseICDClientInfo(JNIEnv * env, jint jFabricIndex, jobject jIcdClientInfo, chip::app::ICDClientInfo & icdClientInfo);
 
 jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFabricIndex)
 {
@@ -93,7 +95,45 @@ jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFab
     return jInfo;
 }
 
-jlong removeICDClientInfo(JNIEnv * env, jint jFabricIndex, jlong jNodeId)
+CHIP_ERROR StoreICDEntryWithKey(JNIEnv * env, jint jFabricIndex, jobject jicdClientInfo, jbyteArray jKey)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::app::ICDClientInfo clientInfo;
+    chip::JniByteArray jniKey(env, jKey);
+
+    err = ParseICDClientInfo(env, jFabricIndex, jicdClientInfo, clientInfo);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err, ChipLogError(Controller, "Failed to parse ICD Client info: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = getICDClientStorage()->SetKey(clientInfo, jniKey.byteSpan());
+
+    if (err == CHIP_NO_ERROR)
+    {
+        err = getICDClientStorage()->StoreEntry(clientInfo);
+    }
+    else
+    {
+        getICDClientStorage()->RemoveKey(clientInfo);
+        ChipLogError(Controller, "Failed to persist symmetric key with error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return err;
+}
+
+CHIP_ERROR RemoveICDEntryWithKey(JNIEnv * env, jint jFabricIndex, jobject jicdClientInfo)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::app::ICDClientInfo info;
+    err = ParseICDClientInfo(env, jFabricIndex, jicdClientInfo, info);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err, ChipLogError(Controller, "Failed to parse ICD Client info: %" CHIP_ERROR_FORMAT, err.Format()));
+    
+    getICDClientStorage()->RemoveKey(info);
+
+    return err;
+}
+
+CHIP_ERROR ClearICDClientInfo(JNIEnv * env, jint jFabricIndex, jlong jNodeId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -101,9 +141,48 @@ jlong removeICDClientInfo(JNIEnv * env, jint jFabricIndex, jlong jNodeId)
     err = getICDClientStorage()->DeleteEntry(scopedNodeId);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "removeICDClientInfo error!: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "ClearICDClientInfo error!: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    return static_cast<jlong>(err.AsInteger());
+    return err;
+}
+
+CHIP_ERROR ParseICDClientInfo(JNIEnv * env, jint jFabricIndex, jobject jIcdClientInfo, chip::app::ICDClientInfo & icdClientInfo)
+{
+    VerifyOrReturnError(jIcdClientInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    jmethodID getPeerNodeIdMethod  = nullptr;
+    jmethodID getStartCounterMethod   = nullptr;
+    jmethodID getOffsetMethod = nullptr;
+    jmethodID getMonitoredSubjectMethod = nullptr;
+    jmethodID getIcdAesKeyMethod = nullptr;
+    jmethodID getIcdHmacKeyMethod = nullptr;
+
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getPeerNodeId", "()J", &getPeerNodeIdMethod));
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getStartCounter", "()J", &getStartCounterMethod));
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getOffset", "()J", &getOffsetMethod));
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getMonitoredSubject", "()J", &getMonitoredSubjectMethod));
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getIcdAesKey", "()[B", &getIcdAesKeyMethod));
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getIcdHmacKey", "()[B", &getIcdHmacKeyMethod));
+
+    jlong jPeerNodeId  = env->CallLongMethod(jIcdClientInfo, getPeerNodeIdMethod);
+    jlong jStartCounter   = env->CallLongMethod(jIcdClientInfo, getStartCounterMethod);
+    jlong jOffset = env->CallLongMethod(jIcdClientInfo, getOffsetMethod);
+    jlong jMonitoredSubject = env->CallLongMethod(jIcdClientInfo, getMonitoredSubjectMethod);
+    jbyteArray jIcdAesKey = static_cast<jbyteArray>(env->CallObjectMethod(jIcdClientInfo, getIcdAesKeyMethod));
+    jbyteArray jIcdHmacKey = static_cast<jbyteArray>(env->CallObjectMethod(jIcdClientInfo, getIcdHmacKeyMethod));
+
+    chip::ScopedNodeId scopedNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex));
+    chip::JniByteArray jniIcdAesKey(env, jIcdAesKey);
+    chip::JniByteArray jniIcdHmacKey(env, jIcdHmacKey);
+
+    icdClientInfo.peer_node  = scopedNodeId;
+    icdClientInfo.start_icd_counter   = static_cast<uint32_t>(jStartCounter);
+    icdClientInfo.offset = static_cast<uint32_t>(jOffset);
+    icdClientInfo.monitored_subject = static_cast<uint64_t>(jMonitoredSubject);
+    memcpy(icdClientInfo.aes_key_handle.AsMutable<chip::Crypto::Symmetric128BitsKeyByteArray>(), jniIcdAesKey.data(), sizeof(chip::Crypto::Symmetric128BitsKeyByteArray));
+    memcpy(icdClientInfo.hmac_key_handle.AsMutable<chip::Crypto::Symmetric128BitsKeyByteArray>(), jniIcdHmacKey.data(), sizeof(chip::Crypto::Symmetric128BitsKeyByteArray));
+
+    return CHIP_NO_ERROR;
 }
 
 chip::app::DefaultICDClientStorage * getICDClientStorage()

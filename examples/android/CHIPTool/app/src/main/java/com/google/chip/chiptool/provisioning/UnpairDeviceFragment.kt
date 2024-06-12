@@ -68,10 +68,7 @@ class UnpairDeviceFragment : Fragment() {
 
     // Remove ICD Client info
     if (addressUpdateFragment.isICDDevice()) {
-      ChipICDClient.removeICDClientInfo(
-        deviceController.fabricIndex,
-        addressUpdateFragment.deviceId
-      )
+      ChipICDClient.clearICDClientInfo(deviceController.fabricIndex, addressUpdateFragment.deviceId)
 
       Log.d(TAG, "ICDClientInfo : ${ChipICDClient.getICDClientInfo(deviceController.fabricIndex)}")
     }

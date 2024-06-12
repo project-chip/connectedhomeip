@@ -24,7 +24,11 @@ object MatterICDClientImpl {
     return clientInfo.firstOrNull { it.peerNodeId == deviceId } != null
   }
 
-  external fun getICDClientInfo(fabricIndex: Int): List<ICDClientInfo>?
+  external fun storeICDEntryWithKey(fabricIndex: Int, icdClientInfo: ICDClientInfo, key: ByteArray)
 
-  external fun removeICDClientInfo(fabricIndex: Int, deviceId: Long)
+  external fun removeICDEntryWithKey(fabricIndex: Int, icdClientInfo: ICDClientInfo)
+
+  external fun clearICDClientInfo(fabricIndex: Int, deviceId: Long)
+
+  external fun getICDClientInfo(fabricIndex: Int): List<ICDClientInfo>?
 }
