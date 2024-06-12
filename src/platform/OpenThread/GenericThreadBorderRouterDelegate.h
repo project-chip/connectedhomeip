@@ -32,11 +32,11 @@ namespace ThreadBorderRouterManagement {
 class GenericOpenThreadBorderRouterDelegate : public Delegate
 {
 public:
-    static constexpr char kFailsafeThreadDatasetTlvsKey[] = "g/fs/td";
+    static constexpr char kFailsafeThreadBorderRouterCommissioned[] = "g/fs/tbrc";
 
-    GenericOpenThreadBorderRouterDelegate(const CharSpan & name)
+    GenericOpenThreadBorderRouterDelegate(const char *name)
     {
-        strncpy(mThreadBorderRouterName, name.data(), std::min(name.size(), kBorderRouterNameMaxLength));
+        strncpy(mThreadBorderRouterName, name, kBorderRouterNameMaxLength);
     }
     ~GenericOpenThreadBorderRouterDelegate() = default;
 
@@ -79,9 +79,8 @@ public:
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
-    CHIP_ERROR BackupActiveDataset();
+    CHIP_ERROR SaveThreadBorderRouterCommissioned(bool commissioned);
     ActivateDatasetCallback * mCallback        = nullptr;
-    Thread::OperationalDataset mStagingDataset = {};
     uint32_t mSequenceNum;
     char mThreadBorderRouterName[kBorderRouterNameMaxLength + 1];
 };

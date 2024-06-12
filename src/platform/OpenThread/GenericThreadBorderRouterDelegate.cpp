@@ -56,6 +56,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::Init()
 {
     mCallback = nullptr;
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    // When the Thread Border Router is reboot during SetActiveDataset, we need to revert the active dateset.
     ReturnErrorOnFailure(RevertActiveDataset());
     return CHIP_NO_ERROR;
 }
@@ -121,7 +122,8 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetDataset(Thread::Operational
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
                                                                    uint32_t sequenceNum, ActivateDatasetCallback * callback)
 {
-    CHIP_ERROR err = BackupActiveDataset();
+    // This function will never be invoked when there is an Active Dataset already configured.
+    CHIP_ERROR err = SaveThreadBorderRouterCommissioned(false);
     if (err == CHIP_NO_ERROR)
     {
         err = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(activeDataset, nullptr);
@@ -145,55 +147,34 @@ void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceL
             event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established)
         {
             delegate->mCallback->OnActivateDatasetComplete(delegate->mSequenceNum, CHIP_NO_ERROR);
-            // Delete Failsafe Keys after activating dataset is completed
-            DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadDatasetTlvsKey);
             delegate->mCallback = nullptr;
         }
     }
 }
 
-CHIP_ERROR GenericOpenThreadBorderRouterDelegate::BackupActiveDataset()
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SaveThreadBorderRouterCommissioned(bool commissioned)
 {
-    // If active dataset is already backed up, return with no error
-    CHIP_ERROR err = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadDatasetTlvsKey, nullptr, 0);
-    if (err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL)
-    {
-        return CHIP_NO_ERROR;
-    }
-    GetDataset(mStagingDataset, DatasetType::kActive);
-    ByteSpan dataset = mStagingDataset.AsByteSpan();
-    return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFailsafeThreadDatasetTlvsKey, dataset.data(), dataset.size());
+    return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFailsafeThreadBorderRouterCommissioned, commissioned);
 }
 
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::CommitActiveDataset()
 {
-    // Delete Failsafe Key when committing.
-    DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadDatasetTlvsKey);
-    return CHIP_NO_ERROR;
+    return SaveThreadBorderRouterCommissioned(true);
 }
 
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
 {
     // The FailSafe Timer is triggered and the previous command request should be handled, so reset the callback.
     mCallback = nullptr;
-    uint8_t datasetBytes[Thread::kSizeOperationalDataset];
-    size_t datasetLength;
-    CHIP_ERROR err = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadDatasetTlvsKey, datasetBytes,
-                                                                           sizeof(datasetBytes), &datasetLength);
-    // If no backup could be found, it means the active datset has not been modified since the fail-safe was armed,
-    // so return with no error.
-    ReturnErrorCodeIf(err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
-    if (err == CHIP_NO_ERROR)
+    bool threadCommissioned = true;
+    DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadBorderRouterCommissioned, &threadCommissioned);
+    if (!threadCommissioned)
     {
-        err = mStagingDataset.Init(ByteSpan(datasetBytes, datasetLength));
+        // If Thread is not commissioned, we will try to attach an empty Thread dataset and the Thread Border Router
+        // will stay uncommissioned
+        Thread::OperationalDataset emptyDataset = {};
+        return DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(emptyDataset, nullptr);
     }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingDataset, nullptr);
-    }
-
-    // Always delete the backup, regardless if it can be successfully restored.
-    DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadDatasetTlvsKey);
     return CHIP_NO_ERROR;
 }
 
