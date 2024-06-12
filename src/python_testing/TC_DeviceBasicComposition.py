@@ -29,7 +29,7 @@ from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObje
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
 from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
                                     async_test_body, default_matter_test_main)
 from mobly import asserts
 from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
@@ -747,6 +747,18 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         if problems or root_problems:
             self.fail_current_test("Problems with tags lists")
+
+    def steps_TC_IDM_12_1(self):
+        return [TestStep(1, "Create a dump of the wildcard attribute for submission to certification.")]
+
+    def test_TC_IDM_12_1(self):
+        self.step(1)
+        pid = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ProductID]
+        vid = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.VendorID]
+        software_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SoftwareVersion]
+        filename = f'device_dump_0x{vid:04X}_0x{pid:04X}_{software_version}.json'
+        dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", filename)
+        self.dump_wildcard(dump_device_composition_path)
 
 
 if __name__ == "__main__":
