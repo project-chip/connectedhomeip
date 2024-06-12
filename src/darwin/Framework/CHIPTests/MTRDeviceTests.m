@@ -4185,7 +4185,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * gotReportEnd4again = [self expectationWithDescription:@"Report end for delegate 4 again"];
     delegate4.onReportEnd = ^{
         [gotReportEnd4again fulfill];
-        __strong __auto_type strongDelegate = weakDelegate3;
+        __strong __auto_type strongDelegate = weakDelegate4;
         strongDelegate.onReportEnd = nil;
     };
 
