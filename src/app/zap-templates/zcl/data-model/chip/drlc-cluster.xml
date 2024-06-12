@@ -1,13 +1,10 @@
 <?xml version="1.0"?>
 <!--
 Copyright (c) 2023 Project CHIP Authors
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,28 +12,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="Energy Management"/>
+  <domain name="Energy"/>
 
-
-  <bitmap name="DeviceClassBitmap" type="bitmap32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0096"/>
-    <field name="HVAC" mask="0x01"/>
-    <field name="StripHeater" mask="0x02"/>
-    <field name="WaterHeater" mask="0x04"/>
-    <field name="PoolPump" mask="0x08"/>
-    <field name="SmartAppliance" mask="0x10"/>
-    <field name="IrrigationPump" mask="0x20"/>
-    <field name="CommercialLoad" mask="0x40"/>
-    <field name="ResidentialLoad" mask="0x80"/>
-    <field name="ExteriorLighting" mask="0x0100"/>
-    <field name="InteriorLighting" mask="0x0200"/>
-    <field name="EV" mask="0x0400"/>
-    <field name="GenerationSystem" mask="0x0800"/>
-    <field name="SmartInverter" mask="0x1000"/>
-    <field name="EVSE" mask="0x2000"/>
-    <field name="RESU" mask="0x4000"/>
-    <field name="EMS" mask="0x8000"/>
-    <field name="SEM" mask="0x10000"/>
+    <field name="TemperatureOffset" mask="0x1"/>
+    <field name="TemperatureSetpoint" mask="0x2"/>
+    <field name="LoadAdjustment" mask="0x4"/>
+    <field name="DutyCycle" mask="0x08"/>
+    <field name="PowerSavings" mask="0x10"/>
+    <field name="HeatingSource" mask="0x20"/>
   </bitmap>
 
   <bitmap name="EventControlBitmap" type="bitmap16">
@@ -87,9 +72,6 @@ limitations under the License.
     <item name="Level3" value="0x04"/>
     <item name="Level4" value="0x05"/>
     <item name="Level5" value="0x06"/>
-    <item name="Emergency" value="0x07"/>
-    <item name="PlannedOutage" value="0x08"/>
-    <item name="ServiceDisconnect" value="0x09"/>
   </enum>
 
   <enum name="HeatingSourceEnum" type="enum8">
@@ -120,7 +102,7 @@ limitations under the License.
 
   <struct name="PowerSavingsControlStruct">
     <cluster code="0x0096"/>
-    <item fieldId="0" name="PowerSavings" type="percent" />
+    <item fieldId="0" name="PowerSavings" type="percent"/>
   </struct>
 
   <struct name="HeatingSourceControlStruct">
@@ -139,35 +121,28 @@ limitations under the License.
     <item fieldId="6" name="HeatingSourceControl" type="HeatingSourceControlStruct" optional="true"/>
   </struct>
 
-  <!-- This does not quite match the spec, which has LoadControlEventStruct as a
-       fabric-scoped struct with some fabric-sensitive fields, but that doesn't
-       really make sense in all the places where the struct is used, and the spec
-       does not really define other things in a way that would work with that at
-       the moment. -->
   <struct name="LoadControlEventStruct">
     <cluster code="0x0096"/>
     <item fieldId="0" name="EventID" type="octet_string" length="16"/>
     <item fieldId="1" name="ProgramID" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="2" name="Control" type="EventControlBitmap" />
-    <item fieldId="3" name="DeviceClass" type="DeviceClassBitmap" />
-    <item fieldId="4" name="EnrollmentGroup" type="int8u" optional="true" />
-    <item fieldId="5" name="Criticality" type="CriticalityLevelEnum" defaut="0" />
-    <item fieldId="6" name="StartTime" type="epoch_s" isNullable="true" />
-    <item fieldId="7" name="Transitions" array="true" type="LoadControlEventTransitionStruct" />
+    <item fieldId="2" name="Status" type="LoadControlEventStatusEnum" defaut="0" />
+    <item fieldId="3" name="Control" type="EventControlBitmap" />
+    <item fieldId="4" name="Criticality" type="CriticalityLevelEnum" defaut="0" />
+    <item fieldId="5" name="StartTime" type="epoch_s" isNullable="true" />
+    <item fieldId="6" name="Transitions" array="true" type="LoadControlEventTransitionStruct" />
   </struct>
 
   <struct name="LoadControlProgramStruct">
     <cluster code="0x0096"/>
     <item fieldId="0" name="ProgramID" type="octet_string" length="16"/>
     <item fieldId="1" name="Name" type="long_char_string" length="32"/>
-    <item fieldId="2" name="EnrollmentGroup" type="int8u" isNullable="true" min="1" max="0xFF"/>
-    <item fieldId="3" name="RandomStartMinutes" type="int8u" isNullable="true" min="0x00" max="0x3C"/>
-    <item fieldId="4" name="RandomDurationMinutes" type="int8u" isNullable="true" min="0x00" max="0x3C"/>
+    <item fieldId="2" name="RandomStartMinutes" type="int8u" isNullable="true" min="0x00" max="0x3C"/>
+    <item fieldId="3" name="RandomDurationMinutes" type="int8u" isNullable="true" min="0x00" max="0x3C"/>
   </struct>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Demand Response Load Control</name>
-    <domain>Energy Management</domain>
+    <domain>Energy</domain>
     <description>This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control.</description>
     <code>0x0096</code>
     <define>DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER</define>
@@ -175,34 +150,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
-    <features>
-      <feature bit="0" code="ENRLG" name="Enrollment Groups" summary="Supports enrollment groups">
-        <optionalConform/>
-      </feature>
-      <feature bit="1" code="TEMPO" name="TemperatureOffset" summary="Supports temperature offsets">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="2" code="TEMPS" name="TemperatureSetpoint" summary="Supports temperature setpoints">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="3" code="LOADA" name="LoadAdjustment" summary="Supports average load adjustment percentage">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="4" code="DUTYC" name="DutyCycle" summary="Supports duty cycle adjustment">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="5" code="PWRSV" name="PowerSavings" summary="Supports power savings">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-      <feature bit="6" code="HEATS" name="HeatingSource" summary="Supports selecting heating source">
-        <optionalConform choice="a" more="true"/>
-      </feature>
-    </features>
-
-    <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="array" entryType="LoadControlProgramStruct" writable="false">LoadControlPrograms</attribute>
+    <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="ARRAY" entryType="LoadControlProgramStruct" writable="false">LoadControlPrograms</attribute>
     <attribute side="server" code="0x0001" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" writable="false" default="5">NumberOfLoadControlPrograms</attribute>
-    <attribute side="server" code="0x0002" define="LOAD_CONTROL_EVENTS" type="array" entryType="LoadControlEventStruct" writable="false">Events</attribute>
-    <attribute side="server" code="0x0003" define="LOAD_CONTROL_ACTIVE_EVENTS" type="array" entryType="LoadControlEventStruct" writable="false">ActiveEvents</attribute>
+    <attribute side="server" code="0x0002" define="LOAD_CONTROL_EVENTS" type="ARRAY" entryType="LoadControlEventStruct" writable="false">Events</attribute>
+    <attribute side="server" code="0x0003" define="LOAD_CONTROL_ACTIVE_EVENTS" type="ARRAY" entryType="LoadControlEventStruct" writable="false">ActiveEvents</attribute>
     <attribute side="server" code="0x0004" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" writable="false" default="10">NumberOfEventsPerProgram</attribute>
     <attribute side="server" code="0x0005" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" writable="false" default="3">NumberOfTransitions</attribute>
     <attribute side="server" code="0x0006" define="DEFAULT_RANDOM_START" type="int8u" min="0" max="0x3C" default="0x1E" writable="true">
@@ -241,14 +192,6 @@ limitations under the License.
       <arg name="EventID" type="octet_string" length="16"/>
       <arg name="CancelControl" type="CancelControlBitmap"/>
     </command>
-    <command source="client" code="0x04" name="ClearLoadControlEventsRequest" optional="true">
-      <!-- Note: Maybe this command needs to have fields?  Who knows!
-           Spec does not define anything about it other than its existence.
-           See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/8514 -->
-      <description>
-        Upon receipt, this SHALL clear all the load control events.
-      </description>
-    </command>
 
     <event side="server" code="0x00" name="LoadControlEventStatusChange" priority="info" optional="false">
       <description>This event SHALL be generated when the status of a LoadControlEventStruct changes.</description>
@@ -262,9 +205,6 @@ limitations under the License.
       <field id="7" name="DutyCycleControl" type="DutyCycleControlStruct" isNullable="true" optional="true" />
       <field id="8" name="PowerSavingsControl" type="PowerSavingsControlStruct" isNullable="true" optional="true" />
       <field id="9" name="HeatingSourceControl" type="HeatingSourceControlStruct" isNullable="true" optional="true" />
-      <!-- Spec has an invalid field ID that cannot be used, so not enabling the Signature field for now.  See
-           https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/8515 -->
-      <!-- <field id="0xFF" name="Signature" type="octet_string" length="48" isNullable="true"/> -->
     </event>
   </cluster>
 </configurator>
