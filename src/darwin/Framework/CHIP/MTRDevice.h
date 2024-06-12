@@ -133,7 +133,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray *)interestedPathsForAttributes MTR_NEWLY_AVAILABLE;
 
 /**
- * Removes the delegate from receiving callbacks abou the device.
+ * Removes the delegate from receiving callbacks about the device.
  */
 - (void)removeDelegate:(id<MTRDeviceDelegate>)delegate MTR_NEWLY_AVAILABLE;
 
