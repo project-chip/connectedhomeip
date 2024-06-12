@@ -92,7 +92,6 @@ struct BLEConnection
     unsigned int mtu;
     bt_gatt_h gattCharC1Handle;
     bt_gatt_h gattCharC2Handle;
-    bool isChipDevice;
 };
 
 static void __BLEConnectionFree(BLEConnection * conn)
@@ -769,7 +768,6 @@ static bool __GattClientForeachServiceCb(int total, int index, bt_gatt_h svcHand
     bt_gatt_type_e type;
     GAutoPtr<char> uuid;
     auto conn = static_cast<BLEConnection *>(data);
-    ChipLogProgress(DeviceLayer, "__GattClientForeachServiceCb");
 
     int ret = __GetAttInfo(svcHandle, &uuid.GetReceiver(), &type);
     VerifyOrExit(ret == BT_ERROR_NONE,
@@ -779,8 +777,9 @@ static bool __GattClientForeachServiceCb(int total, int index, bt_gatt_h svcHand
     {
         ChipLogProgress(DeviceLayer, "CHIP Service UUID Found [%s]", StringOrNullMarker(uuid.get()));
 
-        if (bt_gatt_service_foreach_characteristics(svcHandle, __GattClientForeachCharCb, conn) == BT_ERROR_NONE)
-            conn->isChipDevice = true;
+        ret = bt_gatt_service_foreach_characteristics(svcHandle, __GattClientForeachCharCb, conn);
+        VerifyOrExit(ret == BT_ERROR_NONE,
+                     ChipLogError(DeviceLayer, "Failed to browse GATT service characteristics: %s", get_error_message(ret)));
 
         /* Got CHIP Device, no need to process further service */
         return false;
@@ -793,10 +792,11 @@ exit:
 
 bool BLEManagerImpl::IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId)
 {
-    int ret;
-    if ((ret = bt_gatt_client_foreach_services(mGattClient, __GattClientForeachServiceCb, conId)) != BT_ERROR_NONE)
-        ChipLogError(DeviceLayer, "Failed to browse GATT services: %s", get_error_message(ret));
-    return (conId->isChipDevice ? true : false);
+    int ret = bt_gatt_client_foreach_services(mGattClient, __GattClientForeachServiceCb, conId);
+    VerifyOrReturnValue(ret == BT_ERROR_NONE, false,
+                        ChipLogError(DeviceLayer, "Failed to browse GATT services: %s", get_error_message(ret)));
+    // If C1 and C2 characteristics were found, then it is a CHIP peripheral device.
+    return conId->gattCharC1Handle != nullptr && conId->gattCharC2Handle != nullptr;
 }
 
 void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
@@ -833,8 +833,6 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
         }
         else
         {
-            /* Local Device is BLE Peripheral Role, assume remote is CHIP Central */
-            conn->isChipDevice = true;
 
             /* Save own gatt handles */
             conn->gattCharC1Handle = mGattCharC1Handle;
