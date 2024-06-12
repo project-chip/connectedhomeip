@@ -132,7 +132,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
-    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {};
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
@@ -191,8 +191,8 @@ private:
     void AddConnectionData(const char * remoteAddr);
     void RemoveConnectionData(const char * remoteAddr);
 
-    void HandleC1CharWriteEvent(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
-    void HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
+    void HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
+    void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
     static void HandleConnectionTimeout(System::Layer * layer, void * appState);
     bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
@@ -204,7 +204,6 @@ private:
     void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
     void NotifyBLESubscribed(BLE_CONNECTION_OBJECT conId, bool indicationsEnabled);
     void NotifyBLEIndicationConfirmation(BLE_CONNECTION_OBJECT conId);
-    void NotifyBLEWriteReceived(BLE_CONNECTION_OBJECT conId, System::PacketBufferHandle & buf);
     static void HandleAdvertisingTimeout(chip::System::Layer *, void * appState);
     AdvertisingIntervals GetAdvertisingIntervals() const;
 
@@ -216,7 +215,6 @@ private:
     void NotifyHandleConnectFailed(CHIP_ERROR error);
     void NotifyHandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     void NotifySubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool isSubscribed);
-    void NotifyBLENotificationReceived(BLE_CONNECTION_OBJECT conId, System::PacketBufferHandle & buf);
 
     CHIP_ERROR RegisterGATTServer();
     CHIP_ERROR StartBLEAdvertising();
