@@ -126,11 +126,10 @@ MTR_DIRECT_MEMBERS
 #ifdef DEBUG
 - (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block
 {
-    if (self.delegateIsNull) {
-        return NO;
-    }
-
-    block(_delegate);
+    id<MTRDeviceDelegate> strongDelegate = _delegate;
+    VerifyOrReturnValue(strongDelegate, NO);
+    
+    block(strongDelegate);
 
     return YES;
 }
