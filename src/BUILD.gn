@@ -55,8 +55,8 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
-      "${chip_root}/src/app/codegen-interaction-model/tests",
-      "${chip_root}/src/app/interaction-model/tests",
+      "${chip_root}/src/app/codegen-data-model/tests",
+      "${chip_root}/src/app/data-model-interface/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
