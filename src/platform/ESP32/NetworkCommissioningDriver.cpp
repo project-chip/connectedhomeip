@@ -147,11 +147,6 @@ CHIP_ERROR ESPWiFiDriver::CommitConfiguration()
 CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
 {
     mStagingNetwork = mSavedNetwork;
-    if (!GetEnabled())
-    {
-        // When reverting, set InterfaceEnabled to default value (true).
-        ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
-    }
     return CHIP_NO_ERROR;
 }
 
@@ -201,12 +196,6 @@ Status ESPWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableC
 
 CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    if (!GetEnabled())
-    {
-        // Set InterfaceEnabled to default value (true).
-        ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
-    }
-
     // If device is already connected to WiFi, then disconnect the WiFi,
     // clear the WiFi configurations and add the newly provided WiFi configurations.
     if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
@@ -316,44 +305,6 @@ exit:
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
-}
-
-CHIP_ERROR ESPWiFiDriver::SetEnabled(bool enabled)
-{
-    if (enabled == GetEnabled())
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kInterfaceEnabled, &enabled, sizeof(enabled)));
-
-    if (!enabled)
-    {
-        if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
-        {
-            ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
-            esp_err_t err = esp_wifi_disconnect();
-            if (err != ESP_OK)
-            {
-                ChipLogError(DeviceLayer, "esp_wifi_disconnect() failed: %s", esp_err_to_name(err));
-                return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
-            }
-            return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_ApplicationControlled);
-        }
-    }
-    else
-    {
-        ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
-    }
-    return CHIP_NO_ERROR;
-}
-
-bool ESPWiFiDriver::GetEnabled()
-{
-    bool value;
-    // InterfaceEnabled default value is true.
-    VerifyOrReturnValue(PersistedStorage::KeyValueStoreMgr().Get(kInterfaceEnabled, &value, sizeof(value)) == CHIP_NO_ERROR, true);
-    return value;
 }
 
 CHIP_ERROR ESPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)

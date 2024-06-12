@@ -95,12 +95,6 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     // since the fail-safe was armed, so return with no error.
     ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
 
-    if (!GetEnabled())
-    {
-        // If backup is found, set InterfaceEnabled to default value (true).
-        ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
-    }
-
     ChipLogProgress(NetworkProvisioning, "Reverting Thread operational dataset");
 
     if (error == CHIP_NO_ERROR)
@@ -172,12 +166,6 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
 {
     NetworkCommissioning::Status status = MatchesNetworkId(mStagingNetwork, networkId);
 
-    if (!GetEnabled())
-    {
-        // Set InterfaceEnabled to default value (true).
-        ReturnOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
-    }
-
     if (status == Status::kSuccess && BackupConfiguration() != CHIP_NO_ERROR)
     {
         status = Status::kUnknownError;
@@ -193,31 +181,6 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
     {
         callback->OnResult(status, CharSpan(), 0);
     }
-}
-
-CHIP_ERROR GenericThreadDriver::SetEnabled(bool enabled)
-{
-    if (enabled == GetEnabled())
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kInterfaceEnabled, &enabled, sizeof(enabled)));
-
-    if ((!enabled && DeviceLayer::ThreadStackMgrImpl().IsThreadEnabled()) ||
-        (enabled && DeviceLayer::ThreadStackMgrImpl().IsThreadProvisioned()))
-    {
-        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().SetThreadEnabled(enabled));
-    }
-    return CHIP_NO_ERROR;
-}
-
-bool GenericThreadDriver::GetEnabled()
-{
-    bool value;
-    // InterfaceEnabled default value is true.
-    VerifyOrReturnValue(PersistedStorage::KeyValueStoreMgr().Get(kInterfaceEnabled, &value, sizeof(value)) == CHIP_NO_ERROR, true);
-    return value;
 }
 
 void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
