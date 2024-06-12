@@ -1052,7 +1052,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     return NO;
 }
 
-- (void)_iterateDelegatesWithBlock:(void (^)(MTRDeviceDelegateInfo * delegateInfo))block
+- (void)_iterateDelegatesWithBlock:(void (NS_NOESCAPE ^)(MTRDeviceDelegateInfo * delegateInfo))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
