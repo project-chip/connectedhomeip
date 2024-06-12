@@ -30,7 +30,8 @@ public class ChipICDClient {
     return clientInfo.stream().anyMatch(info -> info.getPeerNodeId() == deviceId);
   }
 
-  public static native void storeICDEntryWithKey(int fabricIndex, ICDClientInfo icdClientInfo, byte[] key);
+  public static native void storeICDEntryWithKey(
+      int fabricIndex, ICDClientInfo icdClientInfo, byte[] key);
 
   public static native void removeICDEntryWithKey(int fabricIndex, ICDClientInfo icdClientInfo);
 
