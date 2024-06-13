@@ -431,14 +431,14 @@ void Instance::HandleSkipCurrentLocationCmd(HandlerContext & ctx)
     // On receipt of this command the device SHALL respond with a SkipCurrentLocationResponse command. 
     Commands::SkipCurrentLocationResponse::Type response;
 
-    // InvalidLocationList | The SelectedLocations attribute is null.
+    // If the SelectedLocations attribute is null, the response status should be set to InvalidLocationList.
     // If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string.
-    VerifyOrExit((mDelegate->GetNumberOfSelectedLocations() == 0), 
+    VerifyOrExit((mDelegate->GetNumberOfSelectedLocations() != 0), 
                             skipStatus  = SkipCurrentLocationStatus::kInvalidLocationList;
                             ChipLogError(Zcl, "Skip Current Location command - Selected Locations atttribute is null");
                             cmdStatus = Status::Failure );
 
-    // InvalidInMode  | The received request cannot be handled due to the current mode of the device. For example, the CurrentLocation attribute is null.
+    // If the CurrentLocation attribute is null, the status should be set to InvalidInMode.
     // If the Status field is not set to Success, or InvalidLocationList, the StatusText field SHALL include a vendor defined error description.
     VerifyOrExit(!mCurrentLocation.IsNull(), 
                             skipStatus  = SkipCurrentLocationStatus::kInvalidInMode;
@@ -634,7 +634,7 @@ bool Instance::AddSupportedLocation( uint32_t                                   
 
     // check max# of list entries
     VerifyOrExit((kMaxNumSupportedLocations > mDelegate->GetNumberOfSupportedLocations()),
-                ChipLogError(Zcl,  "AddSupportedLocation %u - to many entries", aLocationId));
+                ChipLogError(Zcl,  "AddSupportedLocation %u - too many entries", aLocationId));
 
 
     // verify cluster requirements concerning valid fields and field relationships

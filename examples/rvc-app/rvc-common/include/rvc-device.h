@@ -13,7 +13,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class RvcDevice :  public ServiceArea::Delegate
+class RvcDevice : public ServiceArea::Delegate
 {
 private:
     RvcRunMode::RvcRunModeDelegate mRunModeDelegate;
@@ -104,7 +104,7 @@ public:
 
     /**
      * @brief Handles the check to see if the Selected Locations can be changed
-     * @param locationText if failure description of mode or condition prohibiting change
+     * @param locationText if setting the selected location failed, a description of the mode or condition prohibiting the change
      *        size kMaxSizeStatusText + 1 for termination char
      * @return true if Selected Locations can be changed
     */

@@ -110,7 +110,7 @@ protected:
                         SelectLocationsStatus & locationStatus, char* statusText, bool & useStatusText) = 0;
 
     /**
-     * @brief ask the device attempt to skip the current location
+     * @brief ask the device to attempt to skip the current location
      * @param[out] skipStatusText text describing why current location cannot be skipped
      * @return true if command is successful, failure if the received skip request cannot be handled due to the current mode of the device.
      * 
@@ -212,7 +212,7 @@ protected:
      * @param [out] listIndex filled with the list index for the new location, if successful
      * @return true if successful
 
-     * @note caller MUST guarantee newLocation  is a valid, unique location
+     * @note caller MUST guarantee newLocation is a valid, unique location
      * @note this function SHOULD double check that the added location won't exceed the maximum list size
      */
     virtual bool AddSupportedLocation(const LocationStructureWrapper & newLocation, uint32_t & listIndex) = 0;
@@ -265,7 +265,7 @@ protected:
      * @brief Get a supported map using the position in the list
      * @param[in] listIndex the position in the list
      * @param[out] aSupportedMap  copy of the map contents - if found
-     * @return bool if map found
+     * @return true if a supported map is found.
      * @note can be used to iterate through supported locations
     */
     virtual bool GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & supportedMap) = 0;
@@ -275,7 +275,7 @@ protected:
      * @param[in] aMapId the mapID to search for
      * @param[out] listIndex the map's index in the list, if found
      * @param[out] aSupportedMap copy of the location contents, if found
-     * @return bool if map found
+     * @return true if a supported map is found.
      * 
      * @note may be overloaded in device implementation for optimization, if desired
     */
@@ -343,7 +343,7 @@ protected:
      * @brief Get a selected location using the position in the list
      * @param[in] listIndex the position in the list
      * @param[in] selectedLocation the selected location value, if found
-     * @return bool if map found
+     * @return true if a selected location is found.
      * 
      * @note can be used to iterate through supported locations
     */
@@ -413,7 +413,7 @@ protected:
      * @brief Get a progress element using the position in the list
      * @param[in] listIndex the position in the list
      * @param[out] aProgressElement  copy of the progress element contents - if found
-     * @return bool if location found
+     * @return true if a progress element is found.
      * 
      * @note can be used to iterate through the progress list
     */
@@ -424,7 +424,7 @@ protected:
      * @param[in] aLocationId the locationID to search for
      * @param[out] listIndex the location's index in the list, if found
      * @param[out] aProgressElement  copy of the progress element contents, if found
-     * @return bool if location found
+     * @return true if a progress element is found.
      * 
      * @note may be overloaded in device implementation for optimization, if desired
     */

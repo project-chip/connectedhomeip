@@ -70,7 +70,6 @@ public:
 
     /**
      * @brief Initialise the Service Area server instance.
-
      * @return an error if the given endpoint and cluster Id have not been enabled in zap or if the
      *         CommandHandler or AttributeHandler registration fails, else CHIP_NO_ERROR.
      *         This method also checks if the feature setting is valid, if invalid return value will be CHIP_ERROR_INVALID_ARGUMENT.
@@ -151,7 +150,7 @@ private:
     void HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::SelectLocations::DecodableType & req);
                             
     /**
-     * @brief Handle Command: SelectLocations.
+     * @brief Handle Command: SkipCurrentLocation.
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
      */
@@ -199,7 +198,7 @@ public:
 
     /**
      * @brief Is the location in the supported locations list?
-     * @param[in] aLocationId id of the location
+     * @param[in] aLocationId ID of the location.
      * @return true if the location identified by Id is in the supported locations list
      * 
      * @note  use GetSupportedLocartionById if location contents are needed.
@@ -208,7 +207,7 @@ public:
 
     /**
      * @brief check Location against cluster requirements for supported locations
-     * @param[in] aLocation id of the location
+     * @param[in] aLocation the location structure to be validated.
      * @return true if meets all checks
      */
     bool IsValidSupportedLocation(const LocationStructureWrapper & aLocation);
@@ -405,7 +404,7 @@ public:
      * @param[in] aEstimatedEndTime The estimated epoch time in seconds when operation at the location indicated by the CurrentLocation attribute will be completed, in seconds.
      * @return true if attribute is set
      * 
-     * @note @note MATTER change notification is made if the change meets the requirements for EstimatedEndTime notification (depends on old and new values)
+     * @note MATTER change notification is made if the change meets the requirements for EstimatedEndTime notification (depends on old and new values).
      */ 
     bool SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
 
@@ -443,7 +442,7 @@ public:
     /**
      * @brief Set the total operational time for the progress element identified by locationID
      * @param[in] aLocationId the locationID to use
-     * @param[in] aTotalOperationalTime total operational time for thus location
+     * @param[in] aTotalOperationalTime total operational time for this location.
      * @return true if progress element is found and operational time is set
      * 
      * @note MATTER change notification is made if the attribute changes
