@@ -50,7 +50,7 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 target_include_directories(app PRIVATE
                            main/include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/include                           
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${NRFCONNECT_COMMON}/util/include)
@@ -65,11 +65,12 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/device-energy-management-stub.cpp               
+               ${ALL_CLUSTERS_COMMON_DIR}/src/device-energy-management-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ChargingTargetsMemMgr.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ElectricalPowerMeasurementDelegate.cpp
