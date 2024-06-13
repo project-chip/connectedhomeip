@@ -107,9 +107,12 @@ public:
             mClusterIdentifier{ clusterId },
             mFeatures{ features }, mOptionalCommandIdentifiers{ commandIds }, mOptionalAttributesIdentifiers{ attributeIds }
         {}
+
+        SupportedCluster(chip::ClusterId clusterId) :
+            mClusterIdentifier{ clusterId }
+        {}
     };
 
-    ContentApp() = default;
     ContentApp(std::vector<SupportedCluster> supportedClusters) : mSupportedClusters{ supportedClusters } {}
 
     virtual ~ContentApp() = default;
