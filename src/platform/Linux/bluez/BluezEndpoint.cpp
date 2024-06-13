@@ -413,7 +413,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
                                                                          additionalDataFields);
     SuccessOrExit(err);
 
-    data = g_memdup(bufferHandle->Start(), bufferHandle->DataLength());
+    data = g_memdup2(bufferHandle->Start(), bufferHandle->DataLength());
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), data, bufferHandle->DataLength(), TRUE, g_free, data);
     bluez_gatt_characteristic1_set_value(characteristic, cValue);
