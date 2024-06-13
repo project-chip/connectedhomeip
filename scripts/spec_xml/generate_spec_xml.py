@@ -82,10 +82,10 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
     # Clusters need to be scraped first because the cluster directory is passed to the device type directory
     if not output_dir:
         output_dir = DEFAULT_OUTPUT_DIR_TOT if include_in_progress else DEFAULT_OUTPUT_DIR_1_3
-    # scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
-    # scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
+    scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
+    scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
     if not dry_run:
-        # dump_versions(scraper, spec_root, output_dir)
+        dump_versions(scraper, spec_root, output_dir)
         dump_cluster_ids(output_dir)
 
 
