@@ -117,7 +117,7 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
 
     // If the encoder tried to encode, then a value should have been written.
     //   - if encode, assueme DONE (i.e. FINAL CHIP_NO_ERROR)
-    //     - if no encode, say that processing must continue
+    //   - if no encode, say that processing must continue
     return encoder.TriedEncode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
 }
 
