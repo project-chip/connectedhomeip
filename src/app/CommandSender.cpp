@@ -128,23 +128,6 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
     return SendInvokeRequest();
 }
 
-void CommandSender::CreateBackupForRequestRollback(RollbackData & aRollbackData)
-{
-    VerifyOrReturn(mBufferAllocated);
-    VerifyOrReturn(mState == State::Idle || mState == State::AddedCommand);
-    VerifyOrReturn(mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
-    VerifyOrReturn(mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
-    aRollbackData.Checkpoint(*this);
-}
-
-void CommandSender::RollbackRequest(RollbackData & aRollbackData)
-{
-    VerifyOrReturn(aRollbackData.RollbackIsValid());
-    VerifyOrReturn(mState == State::AddingCommand);
-    ChipLogDetail(DataManagement, "Rolling back response");
-    LogErrorOnFailure(aRollbackData.Rollback(*this));
-}
-
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 CHIP_ERROR CommandSender::TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
                                                                                  Optional<System::Clock::Timeout> timeout)
@@ -560,7 +543,7 @@ CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath,
     ReturnErrorOnFailure(AllocateBuffer());
 
     RollbackData rollbackData;
-    CreateBackupForRequestRollback(rollbackData);
+    rollbackData.Checkpoint(*this);
     PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
     TLV::TLVWriter * writer = nullptr;
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -575,7 +558,7 @@ CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath,
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        RollbackRequest(rollbackData);
+        LogErrorOnFailure(rollbackData.Rollback(*this));
     }
     return err;
 }
@@ -690,7 +673,10 @@ void CommandSender::MoveToState(const State aTargetState)
 
 void CommandSender::RollbackData::Checkpoint(CommandSender & aCommandSender)
 {
-    // InvokeRequestMessage::Builder& aInvokeRequestBuilder, const State& aState) {
+    VerifyOrReturn(aCommandSender.mBufferAllocated);
+    VerifyOrReturn(aCommandSender.mState == State::Idle || aCommandSender.mState == State::AddedCommand);
+    VerifyOrReturn(aCommandSender.mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
+    VerifyOrReturn(aCommandSender.mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
     aCommandSender.mInvokeRequestBuilder.Checkpoint(mBackupWriter);
     mBackupState     = aCommandSender.mState;
     mRollbackIsValid = true;
@@ -698,9 +684,11 @@ void CommandSender::RollbackData::Checkpoint(CommandSender & aCommandSender)
 
 CHIP_ERROR CommandSender::RollbackData::Rollback(CommandSender & aCommandSender)
 {
+    VerifyOrReturnError(mRollbackIsValid, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(aCommandSender.mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    ChipLogDetail(DataManagement, "Rolling back response");
     // TODO(#30453): Rollback of mInvokeRequestBuilder should handle resetting
     // InvokeResponses.
-    VerifyOrReturnError(mRollbackIsValid, CHIP_ERROR_INCORRECT_STATE);
     aCommandSender.mInvokeRequestBuilder.GetInvokeRequests().ResetError();
     aCommandSender.mInvokeRequestBuilder.Rollback(mBackupWriter);
     aCommandSender.MoveToState(mBackupState);

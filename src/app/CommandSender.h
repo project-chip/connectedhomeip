@@ -520,7 +520,22 @@ private:
     class RollbackData
     {
     public:
+        /**
+         * Creates a backup to enable rolling back CommandSender's buffer containing
+         * InvokeRequestMessage in case subsequent calls to add request fail.
+         *
+         * A successful backup will only be created if the InvokeRequestMessage is
+         * in a known good state.
+         *
+         * @param [in] aCommandSender reference to CommandSender.
+         */
         void Checkpoint(CommandSender & aCommandSender);
+        /**
+         * Rolls back CommandSender's buffer containing InvokeRequestMessage to a previously
+         * saved state. Must have previously called Checkpoint in a known good state.
+         *
+         * @param [in] aCommandSender reference to CommandSender.
+         */
         CHIP_ERROR Rollback(CommandSender & aCommandSender);
         bool RollbackIsValid() { return mRollbackIsValid; }
 
@@ -584,26 +599,6 @@ private:
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 
     CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout);
-
-    /**
-     * Creates a backup to enable rolling back buffer containing InvokeRequestMessage
-     * in case subsequent calls to add request fail.
-     *
-     * A successful backup will only be created if the InvokeRequestMessage is
-     * in a known good state.
-     *
-     * @param [in] aRollbackData reference to rollback data that can be on the stack.
-     */
-    void CreateBackupForRequestRollback(RollbackData & aRollbackData);
-
-    /**
-     * Rolls back buffer containing InvokeRequestMessage  to a previously saved state.
-     *
-     * @param [in] aRollbackData reference to rollback data that was previously provided
-     *             to CreateBackupForRequestRollback. This rollbackData must be valid for
-     *             a successful rollback.
-     */
-    void RollbackRequest(RollbackData & aRollbackData);
 
     void OnResponseCallback(const ResponseData & aResponseData)
     {
