@@ -145,7 +145,11 @@ void CurrentFabricRemover::OnCommandFailure(void * context, CHIP_ERROR err)
 
 void CurrentFabricRemover::FinishRemoveCurrentFabric(void * context, CHIP_ERROR err)
 {
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Remove Current Fabric succeeded.");
+    }
+    else
     {
         ChipLogError(Controller, "Remove Current Fabric Failed : %" CHIP_ERROR_FORMAT, err.Format());
     }
