@@ -162,7 +162,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     // Boolean attribute of unit testing cluster triggers "multiple errors" case.
     if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
     {
-        InteractionModel::ClusterStatusCode status{Protocols::InteractionModel::Status::InvalidValue};
+        InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
 
         if (gResponseDirective == kSendMultipleSuccess)
         {
@@ -187,7 +187,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
     if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
     {
-        InteractionModel::ClusterStatusCode status{Protocols::InteractionModel::Status::InvalidValue};
+        InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
         if (gResponseDirective == kSendClusterSpecificSuccess)
         {
             status = InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
@@ -210,41 +210,41 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
 class SingleWriteCallback : public WriteClient::Callback
 {
-  public:
+public:
     explicit SingleWriteCallback(ConcreteAttributePath path) : mPath(path) {}
 
-    void OnResponse(const WriteClient * apWriteClient, const ConcreteDataAttributePath & aPath,
-                                StatusIB attributeStatus) override
+    void OnResponse(const WriteClient * apWriteClient, const ConcreteDataAttributePath & aPath, StatusIB attributeStatus) override
     {
 
-      if (aPath.MatchesConcreteAttributePath(mPath))
-      {
-        mPathWasReponded = true;
-        mPathStatus = attributeStatus;
-      }
+        if (aPath.MatchesConcreteAttributePath(mPath))
+        {
+            mPathWasReponded = true;
+            mPathStatus      = attributeStatus;
+        }
     }
 
     void OnError(const WriteClient * apWriteClient, CHIP_ERROR aError) override
     {
-      (void)apWriteClient;
-      mLastChipError = aError;
+        (void) apWriteClient;
+        mLastChipError = aError;
     }
 
     void OnDone(WriteClient * apWriteClient) override
     {
-      (void)apWriteClient;
-      mOnDoneCalled = true;
+        (void) apWriteClient;
+        mOnDoneCalled = true;
     }
 
     bool WasDone() const { return mOnDoneCalled; }
     bool PathWasResponded() const { return mOnDoneCalled; }
     CHIP_ERROR GetLastChipError() const { return mLastChipError; }
     StatusIB GetPathStatus() const { return mPathStatus; }
-  private:
+
+private:
     ConcreteAttributePath mPath;
-    bool mOnDoneCalled = false;
+    bool mOnDoneCalled        = false;
     CHIP_ERROR mLastChipError = CHIP_NO_ERROR;
-    bool mPathWasReponded = false;
+    bool mPathWasReponded     = false;
     StatusIB mPathStatus;
 };
 
@@ -278,20 +278,11 @@ public:
         }
     }
 
-    void ResetCallback()
-    {
-      mSingleWriteCallback.reset();
-    }
+    void ResetCallback() { mSingleWriteCallback.reset(); }
 
-    void PrepareWriteCallback(ConcreteAttributePath path)
-    {
-      mSingleWriteCallback = std::make_unique<SingleWriteCallback>(path);
-    }
+    void PrepareWriteCallback(ConcreteAttributePath path) { mSingleWriteCallback = std::make_unique<SingleWriteCallback>(path); }
 
-    SingleWriteCallback * GetWriteCallback()
-    {
-      return mSingleWriteCallback.get();
-    }
+    SingleWriteCallback * GetWriteCallback() { return mSingleWriteCallback.get(); }
 
 protected:
     // Performs setup for each individual test in the test suite
@@ -556,64 +547,68 @@ TEST_F(TestWrite, TestMultipleFailureResponses)
 
 TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 {
-    auto sessionHandle  = mpContext->GetSessionBobToAlice();
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     // Cluster-specific success code case
     {
-      gResponseDirective = kSendClusterSpecificSuccess;
+        gResponseDirective = kSendClusterSpecificSuccess;
 
-      this->ResetCallback();
-      this->PrepareWriteCallback(ConcreteAttributePath{kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int8u::Id});
+        this->ResetCallback();
+        this->PrepareWriteCallback(
+            ConcreteAttributePath{ kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int8u::Id });
 
-      SingleWriteCallback * writeCb = this->GetWriteCallback();
+        SingleWriteCallback * writeCb = this->GetWriteCallback();
 
-      WriteClient writeClient(&mpContext->GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
-      AttributePathParams attributePath{kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int8u::Id};
-      ASSERT_EQ(writeClient.EncodeAttribute(attributePath, 1u), CHIP_NO_ERROR);
-      ASSERT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
+        WriteClient writeClient(&mpContext->GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
+        AttributePathParams attributePath{ kTestEndpointId, Clusters::UnitTesting::Id,
+                                           Clusters::UnitTesting::Attributes::Int8u::Id };
+        ASSERT_EQ(writeClient.EncodeAttribute(attributePath, 1u), CHIP_NO_ERROR);
+        ASSERT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
 
-      mpContext->DrainAndServiceIO();
+        mpContext->DrainAndServiceIO();
 
-      EXPECT_TRUE(writeCb->WasDone());
-      EXPECT_TRUE(writeCb->PathWasResponded());
-      EXPECT_EQ(writeCb->GetLastChipError(), CHIP_NO_ERROR);
+        EXPECT_TRUE(writeCb->WasDone());
+        EXPECT_TRUE(writeCb->PathWasResponded());
+        EXPECT_EQ(writeCb->GetLastChipError(), CHIP_NO_ERROR);
 
-      StatusIB pathStatus = writeCb->GetPathStatus();
-      EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Success);
-      ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
-      EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificSuccess);
+        StatusIB pathStatus = writeCb->GetPathStatus();
+        EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Success);
+        ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
+        EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificSuccess);
 
-      EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-      EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
+        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
     }
 
     // Cluster-specific failure code case
     {
-      gResponseDirective = kSendClusterSpecificFailure;
+        gResponseDirective = kSendClusterSpecificFailure;
 
-      this->ResetCallback();
-      this->PrepareWriteCallback(ConcreteAttributePath{kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int8u::Id});
+        this->ResetCallback();
+        this->PrepareWriteCallback(
+            ConcreteAttributePath{ kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int8u::Id });
 
-      SingleWriteCallback * writeCb = this->GetWriteCallback();
+        SingleWriteCallback * writeCb = this->GetWriteCallback();
 
-      WriteClient writeClient(&mpContext->GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
-      AttributePathParams attributePath{kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int8u::Id};
-      ASSERT_EQ(writeClient.EncodeAttribute(attributePath, 2u), CHIP_NO_ERROR);
-      ASSERT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
+        WriteClient writeClient(&mpContext->GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
+        AttributePathParams attributePath{ kTestEndpointId, Clusters::UnitTesting::Id,
+                                           Clusters::UnitTesting::Attributes::Int8u::Id };
+        ASSERT_EQ(writeClient.EncodeAttribute(attributePath, 2u), CHIP_NO_ERROR);
+        ASSERT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
 
-      mpContext->DrainAndServiceIO();
+        mpContext->DrainAndServiceIO();
 
-      EXPECT_TRUE(writeCb->WasDone());
-      EXPECT_TRUE(writeCb->PathWasResponded());
-      EXPECT_EQ(writeCb->GetLastChipError(), CHIP_NO_ERROR);
+        EXPECT_TRUE(writeCb->WasDone());
+        EXPECT_TRUE(writeCb->PathWasResponded());
+        EXPECT_EQ(writeCb->GetLastChipError(), CHIP_NO_ERROR);
 
-      StatusIB pathStatus = writeCb->GetPathStatus();
-      EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Failure);
-      ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
-      EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificFailure);
+        StatusIB pathStatus = writeCb->GetPathStatus();
+        EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Failure);
+        ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
+        EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificFailure);
 
-      EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-      EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
+        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
     }
 }
 

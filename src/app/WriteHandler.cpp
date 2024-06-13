@@ -616,13 +616,16 @@ exit:
     return status;
 }
 
-CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::ClusterStatusCode& aStatus)
+CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath,
+                                   const Protocols::InteractionModel::ClusterStatusCode & aStatus)
 {
-    if (aStatus.HasClusterSpecificCode()) {
-      return AddStatusInternal(aPath, StatusIB{(aStatus.IsSuccess() ? Status::Success : Status::Failure), aStatus.GetClusterSpecificCode().Value()});
+    if (aStatus.HasClusterSpecificCode())
+    {
+        return AddStatusInternal(
+            aPath, StatusIB{ (aStatus.IsSuccess() ? Status::Success : Status::Failure), aStatus.GetClusterSpecificCode().Value() });
     }
 
-    return AddStatusInternal(aPath, StatusIB{aStatus.GetStatus()});
+    return AddStatusInternal(aPath, StatusIB{ aStatus.GetStatus() });
 }
 
 CHIP_ERROR WriteHandler::AddClusterSpecificSuccess(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)

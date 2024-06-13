@@ -100,10 +100,10 @@ public:
     CHIP_ERROR ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
 
-    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::ClusterStatusCode& aStatus);
+    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus);
     CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)
     {
-        return AddStatus(aPath, Protocols::InteractionModel::ClusterStatusCode{aStatus});
+        return AddStatus(aPath, Protocols::InteractionModel::ClusterStatusCode{ aStatus });
     }
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteDataAttributePath & aAttributePathParams, ClusterStatus aClusterStatus);

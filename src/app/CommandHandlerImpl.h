@@ -120,9 +120,10 @@ public:
 
     void FlushAcksRightAwayOnSlowCommand() override;
 
-    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode& aStatus,
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
+                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                                  const char * context = nullptr) override;
-    void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::ClusterStatusCode& aStatus,
+    void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                    const char * context = nullptr) override;
 
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,

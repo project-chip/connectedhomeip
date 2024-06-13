@@ -45,7 +45,8 @@ public:
     // code should be handled without a cluster-specific status.
     CHIP_ERROR Success(ClusterStatus aClusterStatus)
     {
-        CHIP_ERROR err = mCommandHandler->FallibleAddStatus(mCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(aClusterStatus));
+        CHIP_ERROR err = mCommandHandler->FallibleAddStatus(
+            mCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(aClusterStatus));
         if (err == CHIP_NO_ERROR)
         {
             mSentResponse = true;
@@ -75,7 +76,8 @@ public:
 
     CHIP_ERROR Failure(ClusterStatus aClusterStatus)
     {
-        CHIP_ERROR err = mCommandHandler->FallibleAddStatus(mCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
+        CHIP_ERROR err = mCommandHandler->FallibleAddStatus(
+            mCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
         if (err == CHIP_NO_ERROR)
         {
             mSentResponse = true;

@@ -30,8 +30,8 @@
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <platform/LockTracker.h>
-#include <protocols/secure_channel/Constants.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <protocols/secure_channel/Constants.h>
 
 namespace chip {
 namespace app {
@@ -593,8 +593,8 @@ CHIP_ERROR CommandHandlerImpl::AddStatusInternal(const ConcreteCommandPath & aCo
     return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddStatusInternal(aCommandPath, aStatus); });
 }
 
-void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::ClusterStatusCode& status,
-                                   const char * context)
+void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath,
+                                   const Protocols::InteractionModel::ClusterStatusCode & status, const char * context)
 {
 
     CHIP_ERROR error = FallibleAddStatus(aCommandPath, status, context);
@@ -611,7 +611,8 @@ void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath, con
     }
 }
 
-CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::ClusterStatusCode& status,
+CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & path,
+                                                 const Protocols::InteractionModel::ClusterStatusCode & status,
                                                  const char * context)
 {
     if (!status.IsSuccess())
@@ -629,10 +630,11 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
 
     if (status.HasClusterSpecificCode())
     {
-      return AddStatusInternal(path, StatusIB{(status.IsSuccess() ? Status::Success : Status::Failure), status.GetClusterSpecificCode().Value()});
+        return AddStatusInternal(
+            path, StatusIB{ (status.IsSuccess() ? Status::Success : Status::Failure), status.GetClusterSpecificCode().Value() });
     }
 
-    return AddStatusInternal(path, StatusIB{status.GetStatus()});
+    return AddStatusInternal(path, StatusIB{ status.GetStatus() });
 }
 
 CHIP_ERROR CommandHandlerImpl::PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,
