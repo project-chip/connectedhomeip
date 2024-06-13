@@ -189,4 +189,3 @@ RUN case ${TARGETPLATFORM} in \
 # Some things that save space
 # Protoc goes from 108M to 4.6M
 RUN strip /usr/local/bin/protoc*
-
