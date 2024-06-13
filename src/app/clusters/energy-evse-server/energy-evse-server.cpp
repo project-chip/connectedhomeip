@@ -451,7 +451,8 @@ Status Instance::ValidateTargets(
             // Validate the value of addedEnergy, if specified is >= 0
             if (targetStruct.addedEnergy.HasValue() && targetStruct.addedEnergy.Value() < 0)
             {
-                ChipLogError(AppServer, "AddedEnergy has invalid value (%ld)", static_cast<signed long int>(targetStruct.addedEnergy.Value()));
+                ChipLogError(AppServer, "AddedEnergy has invalid value (%ld)",
+                             static_cast<signed long int>(targetStruct.addedEnergy.Value()));
                 return Status::ConstraintError;
             }
             innerIdx++;

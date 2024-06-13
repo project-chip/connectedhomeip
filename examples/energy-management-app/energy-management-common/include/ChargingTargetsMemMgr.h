@@ -54,12 +54,14 @@
  * 3. When in SetTargets, a new list of chargingTargets needs to be added to a day schedule, the following
  *    should be called:
  *
- *    ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets)
+ *    ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> &
+ * chargingTargets)
  *
  * Having allocated and copied the chargingTargets accordingly, they can be added to a
  * DataModel::List<const Structs::ChargingTargetStruct::Type as follows:
  *
- * chargingTargetsList = DataModel::List<Structs::ChargingTargetStruct::Type>(ChargingTargetsMemMgr::GetChargingTargets(), ChargingTargetsMemMgr::GetNumChargingTargets());
+ * chargingTargetsList = DataModel::List<Structs::ChargingTargetStruct::Type>(ChargingTargetsMemMgr::GetChargingTargets(),
+ * ChargingTargetsMemMgr::GetNumChargingTargets());
  *
  * All memory allocated by this object is released When the ChargingTargetsMemMgr destructor is called.
  *
@@ -77,7 +79,6 @@ namespace app {
 namespace Clusters {
 namespace EnergyEvse {
 
-
 class ChargingTargetsMemMgr
 {
 public:
@@ -90,16 +91,15 @@ public:
     void AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets);
     CHIP_ERROR AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets);
 
-    EnergyEvse::Structs::ChargingTargetStruct::Type *GetChargingTargets() const;
+    EnergyEvse::Structs::ChargingTargetStruct::Type * GetChargingTargets() const;
     uint16_t GetNumChargingTargets() const;
 
 private:
-    EnergyEvse::Structs::ChargingTargetStruct::Type *mpChargingTargets[kEvseTargetsMaxNumberOfDays];
+    EnergyEvse::Structs::ChargingTargetStruct::Type * mpChargingTargets[kEvseTargetsMaxNumberOfDays];
     EnergyEvse::Structs::ChargingTargetStruct::Type mChargingTargets[kEvseTargetsMaxTargetsPerDay];
     uint16_t mChargingTargetSchedulesIdx;
     uint16_t mNumChargingTargets;
 };
-
 
 } // namespace EnergyEvse
 } // namespace Clusters

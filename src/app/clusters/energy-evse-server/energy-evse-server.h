@@ -103,7 +103,8 @@ public:
      *
      * @param[out]  The full targets structure
      */
-    virtual Protocols::InteractionModel::Status GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules) = 0;
+    virtual Protocols::InteractionModel::Status
+    GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules) = 0;
 
     /**
      * @brief Delegate should implement a handler for ClearTargets command.
@@ -211,8 +212,8 @@ private:
     void HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData);
 
     // Check that the targets are valid
-    Protocols::InteractionModel::Status ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
-
+    Protocols::InteractionModel::Status
+    ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
 };
 
 } // namespace EnergyEvse

@@ -121,7 +121,8 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
     EnergyEvseDelegate * dg = mn->GetEvseDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    const DataModel::List<const EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules = dg->GetEvseTargetsDelegate()->GetTargets();
+    const DataModel::List<const EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules =
+        dg->GetEvseTargetsDelegate()->GetTargets();
     for (auto & chargingTargetScheduleEntry : chargingTargetSchedules)
     {
         if (chargingTargetScheduleEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F)) & dayOfWeekMap)

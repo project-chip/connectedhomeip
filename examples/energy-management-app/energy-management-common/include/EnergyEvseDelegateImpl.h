@@ -177,16 +177,17 @@ public:
      * @brief Delegate should implement a handler for LoadTargets
      *
      * This needs to load any stored targets into memory and MUST be called before
-	 * GetTargets is called.
+     * GetTargets is called.
      */
     Status LoadTargets() override;
 
     /**
      * @brief    Called when EVSE cluster receives the GetTargets command
-	 *
-	 * NOTE: LoadTargets MUST be called GetTargets is called.
+     *
+     * NOTE: LoadTargets MUST be called GetTargets is called.
      */
-    Protocols::InteractionModel::Status GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules) override;
+    Protocols::InteractionModel::Status
+    GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules) override;
 
     /**
      * @brief    Called when EVSE cluster receives ClearTargets command

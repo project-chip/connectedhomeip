@@ -37,7 +37,6 @@ namespace EnergyEvse {
 class EvseTargetsDelegate
 {
 public:
-
     EvseTargetsDelegate();
     ~EvseTargetsDelegate();
 
@@ -65,7 +64,8 @@ public:
      * set that matches the new target dayOfWeek bits. If there is an existing
      * matching day then it replaces the days existing targets with the new entry
      */
-    CHIP_ERROR SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedulesChanges);
+    CHIP_ERROR SetTargets(
+        const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedulesChanges);
 
     /**
      *  @brief   This deletes all targets and resets the list to empty
@@ -106,7 +106,6 @@ private:
     // Pointer to the PeristentStorage
     PersistentStorageDelegate * mpTargetStore = nullptr;
 };
-
 
 } // namespace EnergyEvse
 } // namespace Clusters
