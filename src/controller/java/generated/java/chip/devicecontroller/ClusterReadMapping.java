@@ -9619,17 +9619,6 @@ public class ClusterReadMapping {
           readDeviceEnergyManagementAbsMaxPowerCommandParams
         );
         result.put("readAbsMaxPowerAttribute", readDeviceEnergyManagementAbsMaxPowerAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readDeviceEnergyManagementPowerAdjustmentCapabilityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readDeviceEnergyManagementPowerAdjustmentCapabilityAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.DeviceEnergyManagementCluster) cluster).readPowerAdjustmentCapabilityAttribute(
-              (ChipClusters.DeviceEnergyManagementCluster.PowerAdjustmentCapabilityAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedDeviceEnergyManagementClusterPowerAdjustmentCapabilityAttributeCallback(),
-          readDeviceEnergyManagementPowerAdjustmentCapabilityCommandParams
-        );
-        result.put("readPowerAdjustmentCapabilityAttribute", readDeviceEnergyManagementPowerAdjustmentCapabilityAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readDeviceEnergyManagementOptOutStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDeviceEnergyManagementOptOutStateAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

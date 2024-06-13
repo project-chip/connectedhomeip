@@ -7151,7 +7151,7 @@ public:
     DeviceEnergyManagementModifyForecastRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("modify-forecast-request", credsIssuerConfig), mComplex_SlotAdjustments(&mRequest.slotAdjustments)
     {
-        AddArgument("ForecastId", 0, UINT32_MAX, &mRequest.forecastId);
+        AddArgument("ForecastID", 0, UINT32_MAX, &mRequest.forecastID);
         AddArgument("SlotAdjustments", &mComplex_SlotAdjustments);
         AddArgument("Cause", 0, UINT8_MAX, &mRequest.cause);
         ClusterCommand::AddArguments();
@@ -20979,7 +20979,7 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
         make_unique<WriteAttribute<int64_t>>(Id, "abs-max-power", INT64_MIN, INT64_MAX, Attributes::AbsMaxPower::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
-            chip::app::DataModel::List<const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>>>>(
+            chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>>>(
             Id, "power-adjustment-capability", Attributes::PowerAdjustmentCapability::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
