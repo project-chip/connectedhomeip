@@ -157,10 +157,13 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
 
             ReturnErrorOnFailure(reader.ExitContainer(chargingTargetsStructType));
 
-            ChipLogProgress(AppServer, "LoadingTargets: targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy %ld",
-                            chargingTarget.targetTimeMinutesPastMidnight,
-                            chargingTarget.targetSoC.HasValue() ? chargingTarget.targetSoC.Value() : 0,
-                            chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0);
+            int64_t addedEnergy = chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0;
+
+            ChipLogProgress(
+                AppServer, "LoadingTargets: targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x" ChipLogFormatX64,
+                chargingTarget.targetTimeMinutesPastMidnight,
+                chargingTarget.targetSoC.HasValue() ? chargingTarget.targetSoC.Value() : 0,
+                ChipLogValueX64(addedEnergy));
 
             // Update mChargingTargets which is tracking the chargingTargets
             mChargingTargets.AddChargingTarget(chargingTarget);
@@ -446,7 +449,7 @@ void EvseTargetsDelegate::PrintTargets(
             int64_t addedEnergy = chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0;
 
             ChipLogProgress(
-                AppServer, "chargingTargetIdx %u targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x " ChipLogFormatX64,
+                AppServer, "chargingTargetIdx %u targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x" ChipLogFormatX64,
                 chargingTargetIdx, chargingTarget.targetTimeMinutesPastMidnight,
                 chargingTarget.targetSoC.HasValue() ? chargingTarget.targetSoC.Value() : 0, ChipLogValueX64(addedEnergy));
 
