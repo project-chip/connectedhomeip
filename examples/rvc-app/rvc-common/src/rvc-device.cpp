@@ -237,17 +237,17 @@ bool RvcDevice::HandleIsSetSelectedLocationCallback(char* statusText)
 
     case RvcRunMode::ModeCleaning:
         canSet = false;
-        strncat(statusText, "SelectLocations command - cannot select locations while cleaning", ServiceArea::kMaxSizeStatusText);
+        strncat(statusText, "Cannot select locations while cleaning", ServiceArea::kMaxSizeStatusText);
         break;
 
     case RvcRunMode::ModeMapping:
         canSet = false;
-        strncat(statusText, "SelectLocations command - cannot select locations while mapping", ServiceArea::kMaxSizeStatusText);
+        strncat(statusText, "Cannot select locations while mapping", ServiceArea::kMaxSizeStatusText);
         break;
 
     default:
         canSet = false;
-        strncat(statusText, "SelectLocations command - cannot select locations - unknown mode", ServiceArea::kMaxSizeStatusText);
+        strncat(statusText, "Cannot select locations - unknown mode", ServiceArea::kMaxSizeStatusText);
         break;
     }
 
@@ -440,7 +440,7 @@ using namespace chip::app::Clusters::ServiceArea;
 //*************************************************************************
 // command support
 
-bool RvcDevice::IsSetSelectedLocationAllowed(char* statusText)
+bool RvcDevice::IsSetSelectedLocationsAllowed(char* statusText)
 {
     return true; // TODO IMPLEMENT
 };
@@ -468,7 +468,7 @@ bool RvcDevice::HandleSkipCurrentLocation(char* skipStatusText)
 //*************************************************************************
 // Supported Locations accessors
 
-bool RvcDevice::IsSupportedLocationChangeAllowed()
+bool RvcDevice::IsSupportedLocationsChangeAllowed()
 {
     return true; // TODO
 }

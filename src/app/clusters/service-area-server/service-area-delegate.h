@@ -79,18 +79,18 @@ protected:
      * @note The statusText field SHOULD indicate why the request is not allowed, given the current mode
      *       of the device, which may involve other clusters.
     */
-    virtual bool IsSetSelectedLocationAllowed(char* statusText) = 0;
+    virtual bool IsSetSelectedLocationsAllowed(char* statusText) = 0;
 
     /**
      * @brief New selected locations have been requested by the client.
-     * @param[in] newSelectLocations List of new selected locations
-     * @param[out] locationStatus Success if all checks pass, error code if fallure.
+     * @param[in] req List of new selected locations.
+     * @param[out] locationStatus Success if all checks pass, error code if failure.
      * @param[out] statusText text describing failure (see notes), size kMaxSizeStatusText + 1 byte for terminating character
      * @param[out] useStatusText if true, the statusText value should be returned in the command response
      * @return true if success
      * 
      * @note newSelectLocations pre-checked no unsupported locations before this function is called.
-     * @note IsSetSelectedLocationAllowed() MUST be called with a return value of true before this function can be called. (InvalidInMode)
+     * @note IsSetSelectedLocationsAllowed() MUST be called with a return value of true before this function can be called. (InvalidInMode)
      * @note Fail with DuplicatedLocations if the same value is selected more than once.
      *       Fail with InvalidSet if newSelectLocations contains values the device cannot handle (e.g. locations on different floors), with failure description in locationStatusText
      * 
@@ -158,7 +158,7 @@ protected:
      *       data matching the constraints listed in the requirements for each attribute.
      * 
     */
-    virtual bool IsSupportedLocationChangeAllowed() = 0;
+    virtual bool IsSupportedLocationsChangeAllowed() = 0;
 
     /**
      * @brief Get the number of entries in the supported locations attribute
@@ -174,7 +174,7 @@ protected:
      * 
      * @note can be used to iterate through supported locations
     */
-    virtual bool GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & supportedLocation) = 0;
+    virtual bool GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation) = 0;
 
     /**
      * @brief Get a supported location that matches a locationID
@@ -268,7 +268,7 @@ protected:
      * @return true if a supported map is found.
      * @note can be used to iterate through supported locations
     */
-    virtual bool GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & supportedMap) = 0;
+    virtual bool GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap) = 0;
 
     /**
      * @brief Get a supported map that matches a mapID
@@ -383,9 +383,6 @@ protected:
      * @param[in] listIndex filled with the list index of the new location, if successful
      * @return true if successful
      * 
-     * @note selected locations are normally set through the SelectLocations command, 
-     *       this function is provided for testing
-     * 
      * @note caller MUST guarantee aLocationId references a SUPPORTED location, and is unique within selected locations
      * @note this function SHOULD double check that the added location won't exceed the maximum list size
      */
@@ -417,7 +414,7 @@ protected:
      * 
      * @note can be used to iterate through the progress list
     */
-    virtual bool GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & progressElement) = 0;
+    virtual bool GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement) = 0;
 
     /**
      * @brief Get a progress element that matches a locationID

@@ -156,9 +156,6 @@ private:
      */
     void HandleSkipCurrentLocationCmd(HandlerContext & ctx);
 
-
-public:
-
     //*************************************************************************
     // attribute notifications
 
@@ -191,7 +188,6 @@ public:
      * @brief Notify MATTER that the attribute has changed
      */
     void NotifyProgressChanged();
-
 
     //*************************************************************************
     // Supported Locations manipulators
@@ -234,6 +230,8 @@ public:
      * @note MATTER change notifications are made for the attributes that change
      */
     void HandleSupportedLocationsUpdated();
+
+public:
 
     /**
      * @brief Add new location to the supported locations list
@@ -348,9 +346,6 @@ public:
      * @brief Add a selected location
      * @param[in] aSelectedLocation locationID to add
      * @bool true if successfully added
-     * 
-     * @note selected locations are normally set through the SelectLocations command, 
-     *       this function is provided for testing
     */
     bool AddSelectedLocation(uint32_t & aSelectedLocation);
     

@@ -355,7 +355,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     // if the Status field is set to InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, 
     // given the current mode of the device, which may involve other clusters. 
     // (note - locationStatusText to be filled out by delegated function for if return value is false)
-    VerifyOrExit(mDelegate->IsSetSelectedLocationAllowed(locationStatusText), 
+    VerifyOrExit(mDelegate->IsSetSelectedLocationsAllowed(locationStatusText),
                                                             locationStatus = SelectLocationsStatus::kInvalidInMode;  
                                                             cmdStatus = Status::Failure);
 
@@ -630,7 +630,7 @@ bool Instance::AddSupportedLocation( uint32_t                                   
                                             aLandmarkTag, aPositionTag, aSurfaceTag);
 
     // does device mode allow this attribute to be updated?
-    VerifyOrExit(mDelegate->IsSupportedLocationChangeAllowed(), /* if false, should be logged as error in delegate function */);
+    VerifyOrExit(mDelegate->IsSupportedLocationsChangeAllowed(), /* if false, should be logged as error in delegate function */);
 
     // check max# of list entries
     VerifyOrExit((kMaxNumSupportedLocations > mDelegate->GetNumberOfSupportedLocations()),
@@ -689,7 +689,7 @@ bool Instance::ModifySupportedLocation( uint32_t                                
              && (aMapId.Value() != supportedLocation.mapID.Value()))  )    
         {
             // does device mode allow this attribute to be updated?
-            VerifyOrExit(mDelegate->IsSupportedLocationChangeAllowed(), /* if false, should be logged as error in delegate function */);
+            VerifyOrExit(mDelegate->IsSupportedLocationsChangeAllowed(), /* if false, should be logged as error in delegate function */);
 
             mapIDChanged = true;
         }
@@ -733,7 +733,7 @@ bool Instance::ClearSupportedLocations()
     bool ret_value = false;
 
     // does device mode allow this attribute to be updated?
-    VerifyOrExit(mDelegate->IsSupportedLocationChangeAllowed(), /* if false, should be logged as error in delegate function */);
+    VerifyOrExit(mDelegate->IsSupportedLocationsChangeAllowed(), /* if false, should be logged as error in delegate function */);
 
     if (mDelegate->ClearSupportedLocations())
     {
@@ -899,7 +899,7 @@ bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
                     ChipLogError(Zcl, "AddSelectedLocation %u - duplicated location", aSelectedLocation));
 
     // Does device mode allow modification of selected locations?
-    VerifyOrExit(mDelegate->IsSetSelectedLocationAllowed(locationStatusText), 
+    VerifyOrExit(mDelegate->IsSetSelectedLocationsAllowed(locationStatusText),
                     ChipLogError(Zcl, "AddSelectedLocation %u - %s", aSelectedLocation, locationStatusText));
 
 
@@ -947,6 +947,7 @@ bool Instance::SetCurrentLocation(const DataModel::Nullable<uint32_t> & aCurrent
     }
 
     mCurrentLocation = aCurrentLocation;
+    NotifyCurrentLocationChanged();
 
     // EstimatedEndTime SHALL be null if the CurrentLocation attribute is null.
     if (mCurrentLocation.IsNull())

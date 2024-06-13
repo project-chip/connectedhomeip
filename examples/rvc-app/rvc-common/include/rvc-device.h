@@ -143,7 +143,7 @@ public:
 
     // command support
 
-    bool IsSetSelectedLocationAllowed(char* statusText) override;
+    bool IsSetSelectedLocationsAllowed(char* statusText) override;
 
     bool HandleSetSelectLocations(const ServiceArea::Commands::SelectLocations::DecodableType & req, 
                         ServiceArea::SelectLocationsStatus & locationStatus, char* statusText, bool & useStatusText) override;
@@ -153,7 +153,7 @@ public:
     //*************************************************************************
     // Supported Locations accessors
 
-    bool IsSupportedLocationChangeAllowed();
+    bool IsSupportedLocationsChangeAllowed();
 
     uint32_t GetNumberOfSupportedLocations() override;
 
