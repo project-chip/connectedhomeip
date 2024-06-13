@@ -2269,7 +2269,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertNotNil(factory);
 
     __auto_type queue = dispatch_get_main_queue();
-    //    __auto_type queue = dispatch_queue_create("test.subscription.pool", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
