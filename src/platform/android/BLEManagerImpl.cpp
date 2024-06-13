@@ -406,20 +406,6 @@ exit:
     return rc;
 }
 
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                     chip::System::PacketBufferHandle pBuf)
-{
-    ChipLogError(DeviceLayer, "SendReadRequest: Not implemented");
-    return true;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId)
-{
-    ChipLogError(DeviceLayer, "SendReadRBluezonse: Not implemented");
-    return true;
-}
-
 // ===== end implement virtual methods on BlePlatformDelegate.
 
 // ===== start implement virtual methods on BleApplicationDelegate.
