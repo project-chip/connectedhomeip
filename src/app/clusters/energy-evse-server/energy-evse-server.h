@@ -28,7 +28,6 @@
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <vector>
 
 namespace chip {
 namespace app {
@@ -42,28 +41,12 @@ constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
 constexpr uint8_t kEvseTargetsMaxNumberOfDays   = 7;
 constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
 
-struct EvseChargingTarget
-{
-    uint16_t targetTimeMinutesPastMidnight;
-    Optional<Percent> targetSoC;
-    Optional<int64_t> addedEnergy;
-};
-
-class EvseTargetEntry
-{
-public:
-    BitMask<TargetDayOfWeekBitmap> dayOfWeekMap;
-    std::vector<EvseChargingTarget> dailyChargingTargets;
-};
-
 /** @brief
  *    Defines methods for implementing application-specific logic for the EVSE Management Cluster.
  */
 class Delegate
 {
 public:
-    using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
-
     virtual ~Delegate() = default;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
@@ -106,27 +89,21 @@ public:
      * return other Status codes if it fails
      */
     virtual Protocols::InteractionModel::Status
-    SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &) = 0;
+    SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules) = 0;
 
     /**
-     * @brief Delegate should implement a handler for PrepareGetTargets
+     * @brief Delegate should implement a handler for LoadTargets
      *
-     * This needs to load any stored targets into memory and hold it until the GetTargetsFinished is
-     * called by the cluster server.
-     *
-     * @param[out]  Reference to EvseTargetIterator class that implements the ability
-     *              for the cluster server to iterate through the target entries
+     * This needs to load any stored targets into memory
      */
-    virtual CHIP_ERROR PrepareGetTargets(EvseTargetIterator ** iterator) = 0;
+    virtual Protocols::InteractionModel::Status LoadTargets() = 0;
 
     /**
-     * @brief Delegate should implement a handler for GetTargetsFinished
+     * @brief Delegate should implement a handler for GetTargets
      *
-     * This is used by the cluster server to indicate it has finished preparing
-     * the GetTargetsResponse using the iterator and that the memory in the delegate can
-     * freed
+     * @param[out]  The full targets structure
      */
-    virtual CHIP_ERROR GetTargetsFinished() = 0;
+    virtual Protocols::InteractionModel::Status GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules) = 0;
 
     /**
      * @brief Delegate should implement a handler for ClearTargets command.

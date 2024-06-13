@@ -30,8 +30,6 @@ using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::EnergyEvse::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -477,64 +475,15 @@ void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets
 {
     Commands::GetTargetsResponse::Type response;
 
-    EvseTargetIterator * it = nullptr;
-
-    EvseTargetEntry chargingTargetScheduleEntry;
-
-    // See if we can get an targest iterator. If not return with a bad command
-    CHIP_ERROR err = mDelegate.PrepareGetTargets(&it);
-    if (err != CHIP_NO_ERROR || it == nullptr)
+    Status status = mDelegate.GetTargets(response.chargingTargetSchedules);
+    if (status != Status::Success)
     {
-        if (err == CHIP_NO_ERROR)
-        {
-            err = CHIP_ERROR_UNINITIALIZED;
-        }
-
-        ChipLogError(Zcl, "Failed to GetTargets: %" CHIP_ERROR_FORMAT, err.Format());
-
-        // Release iterator and any memory
-        mDelegate.GetTargetsFinished();
-
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, StatusIB(err).mStatus);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
-    // Going to iterate over each chargingTargetScheduleEntry building up the chargingTargets
-    EnergyEvse::Structs::ChargingTargetStruct::Type chargingTargets[kEvseTargetsMaxNumberOfDays][kEvseTargetsMaxTargetsPerDay];
-
-    Structs::ChargingTargetScheduleStruct::Type chargingTargetSchedulesArray[kEvseTargetsMaxNumberOfDays];
-
-    uint16_t chargingTargetSchedulesIdx = 0;
-    while (it->Next(chargingTargetScheduleEntry))
-    {
-        uint8_t chargingTargetStructIdx = 0;
-
-        for (const EvseChargingTarget & chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
-        {
-            chargingTargets[chargingTargetSchedulesIdx][chargingTargetStructIdx].targetTimeMinutesPastMidnight = chargingTarget.targetTimeMinutesPastMidnight;
-            chargingTargets[chargingTargetSchedulesIdx][chargingTargetStructIdx].targetSoC                     = chargingTarget.targetSoC;
-            chargingTargets[chargingTargetSchedulesIdx][chargingTargetStructIdx].addedEnergy                   = chargingTarget.addedEnergy;
-
-            chargingTargetStructIdx++;
-        }
-
-        chargingTargetSchedulesArray[chargingTargetSchedulesIdx].chargingTargets =
-            chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(chargingTargets[chargingTargetSchedulesIdx], chargingTargetStructIdx);
-
-        chargingTargetSchedulesArray[chargingTargetSchedulesIdx].dayOfWeekForSequence = chargingTargetScheduleEntry.dayOfWeekMap;
-
-        chargingTargetSchedulesIdx++;
-    }
-
-    DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedulesList(chargingTargetSchedulesArray, chargingTargetSchedulesIdx);
-
-    response.chargingTargetSchedules = chargingTargetSchedulesList;
-
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
-
-    // Release iterator and any memory
-    mDelegate.GetTargetsFinished();
 }
 
 void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData)

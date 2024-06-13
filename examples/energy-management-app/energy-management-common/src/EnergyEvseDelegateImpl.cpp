@@ -242,74 +242,43 @@ Status EnergyEvseDelegate::SetTargets(
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::SetTargets()");
 
-    Status status = SaveTargets(chargingTargetSchedules);
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrReturnError(targets != nullptr, Status::Failure);
+
+    CHIP_ERROR err = targets->SetTargets(chargingTargetSchedules);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, StatusIB(err).mStatus);
 
     /* The Application needs to be told that the Targets have been updated
      * so it can potentially re-optimize the charging start time etc
      */
     NotifyApplicationChargingPreferencesChange();
 
-    return status;
+    return Status::Success;
 }
 
-Status EnergyEvseDelegate::SaveTargets(
-    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules)
+Status EnergyEvseDelegate::LoadTargets()
 {
-    Status status = Status::Success;
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::LoadTargets()");
 
-    auto iter                     = chargingTargetSchedules.begin();
     EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
-    VerifyOrExit(targets != nullptr, status = Status::Failure);
+    VerifyOrReturnError(targets != nullptr, StatusIB(CHIP_ERROR_UNINITIALIZED).mStatus);
 
-    while (iter.Next())
-    {
-        auto & entry = iter.GetValue();
+    CHIP_ERROR err = targets->LoadTargets();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, StatusIB(err).mStatus);
 
-        targets->CopyTarget(entry);
-    }
-
-exit:
-    return status;
+    return Status::Success;
 }
 
-/**
- * @brief    Called when EVSE cluster receives GetTargets command to load the
- *           targets into RAM and create an iterator for the cluster server to use
- */
-CHIP_ERROR EnergyEvseDelegate::PrepareGetTargets(EvseTargetIterator ** iterator)
+Status EnergyEvseDelegate::GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules)
 {
-    CHIP_ERROR err;
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::GetTargets()");
 
     EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
-    VerifyOrReturnError(targets != nullptr, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(targets != nullptr, StatusIB(CHIP_ERROR_UNINITIALIZED).mStatus);
 
-    EvseTargetIteratorImpl * tempIterator = targets->GetEvseTargetsIterator();
-    VerifyOrReturnError(tempIterator != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chargingTargetSchedules = targets->GetTargets();
 
-    *iterator = tempIterator; // Assign the value to iterator
-
-    err = tempIterator->Load(); // Load data into the iterator
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-/**
- * @brief    Called when EVSE cluster has finished copying the data into the
- *           GetTargetsResponse to free up memory
- */
-CHIP_ERROR EnergyEvseDelegate::GetTargetsFinished()
-{
-    CHIP_ERROR err;
-
-    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
-    VerifyOrReturnError(targets != nullptr, CHIP_ERROR_UNINITIALIZED);
-
-    EvseTargetIteratorImpl * tempIterator = targets->GetEvseTargetsIterator();
-    tempIterator->Release();
-
-    return err;
+    return Status::Success;
 }
 
 /**
@@ -317,12 +286,13 @@ CHIP_ERROR EnergyEvseDelegate::GetTargetsFinished()
  */
 Status EnergyEvseDelegate::ClearTargets()
 {
-    Status status = Status::Success;
-    CHIP_ERROR err;
     ChipLogProgress(AppServer, "EnergyEvseDelegate::ClearTargets()");
 
+    Status status = Status::Success;
+    CHIP_ERROR err;
+
     EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
-    VerifyOrExit(targets != nullptr, status = Status::Failure);
+    VerifyOrExit(targets != nullptr, status = StatusIB(CHIP_ERROR_UNINITIALIZED).mStatus);
 
     err = targets->ClearTargets();
     if (err != CHIP_NO_ERROR)

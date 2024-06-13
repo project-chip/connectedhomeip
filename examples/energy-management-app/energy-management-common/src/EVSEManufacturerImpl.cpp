@@ -110,7 +110,6 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    EvseTargetEntry chargingTargetScheduleEntry;
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
 
     uint16_t minTimeToTarget_m = 1440; // 24 hours
@@ -122,16 +121,13 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
     EnergyEvseDelegate * dg = mn->GetEvseDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    EvseTargetIterator * it = nullptr;
-    SuccessOrExit(err = dg->PrepareGetTargets(&it));
-    VerifyOrExit(it != nullptr, err = CHIP_ERROR_UNINITIALIZED);
-
-    while (it->Next(chargingTargetScheduleEntry))
+    const DataModel::List<const EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules = dg->GetEvseTargetsDelegate()->GetTargets();
+    for (auto & chargingTargetScheduleEntry : chargingTargetSchedules)
     {
-        if (chargingTargetScheduleEntry.dayOfWeekMap.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F)) & dayOfWeekMap)
+        if (chargingTargetScheduleEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F)) & dayOfWeekMap)
         {
             // We've found today's schedule - iterate through the targets on this day
-            for (const EvseChargingTarget & chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
+            for (auto & chargingTarget : chargingTargetScheduleEntry.chargingTargets)
             {
                 if ((chargingTarget.targetTimeMinutesPastMidnight < minutesPastMidnightNow_m) && (bAllowTargetsInPast == false))
                 {
@@ -180,9 +176,6 @@ CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint16_t minutesPastMidnig
         err = CHIP_ERROR_NOT_FOUND;
     }
 
-exit:
-    // Release iterator and any memory
-    dg->GetTargetsFinished();
     return err;
 }
 

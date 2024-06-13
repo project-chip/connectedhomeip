@@ -44,6 +44,7 @@ executable("chip-energy-management-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/PowerTopologyDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",

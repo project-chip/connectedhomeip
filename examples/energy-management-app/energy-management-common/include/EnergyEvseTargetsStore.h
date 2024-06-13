@@ -21,35 +21,39 @@
 #include <app/clusters/energy-evse-server/energy-evse-server.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/CommonIterator.h>
 #include <lib/support/Pool.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <vector>
+
+#include <ChargingTargetsMemMgr.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace EnergyEvse {
 
-class EvseTargetIteratorImpl;
 class EvseTargetsDelegate
 {
 public:
-    using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
 
+    EvseTargetsDelegate();
     ~EvseTargetsDelegate();
 
     CHIP_ERROR Init(PersistentStorageDelegate * targetStore);
-    EvseTargetIteratorImpl * GetEvseTargetsIterator();
-    CHIP_ERROR Load(std::vector<EvseTargetEntry> & targetEntryVector, size_t & targetsSize);
 
-    CHIP_ERROR IncreaseEntryCount();
-    CHIP_ERROR DecreaseEntryCount();
-    CHIP_ERROR UpdateEntryCount(bool increase);
-    CHIP_ERROR LoadCounter(size_t & count, size_t & targetsSize);
-    CHIP_ERROR SerializeToTlv(TLV::TLVWriter & writer, const std::vector<EvseTargetEntry> & targetEntryVector);
+    /**
+     * @brief Delegate should implement a handler for LoadTargets
+     *
+     * This needs to load any stored targets into memory
+     */
+    CHIP_ERROR LoadTargets();
+
+    /**
+     *  @brief   This returns a reference to the existing targets
+     */
+    const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & GetTargets();
 
     /**
      * @brief   Copies a ChargingTargetSchedule into our store
@@ -57,31 +61,24 @@ public:
      * @param [in] an entry from the SetTargets list containing:
      *             dayOfWeekForSequence and chargingTargets (list)
      *
-     * This routine scans the existing mTargets to see if we have a day of week
+     * This routine scans the existing targets to see if we have a day of week
      * set that matches the new target dayOfWeek bits. If there is an existing
      * matching day then it replaces the days existing targets with the new entry
      */
-    CHIP_ERROR
-    CopyTarget(const Structs::ChargingTargetScheduleStruct::DecodableType &);
+    CHIP_ERROR SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedulesChanges);
 
     /**
      *  @brief   This deletes all targets and resets the list to empty
      */
     CHIP_ERROR ClearTargets();
 
-    static constexpr size_t MaxTargetEntryCounterSize()
-    {
-        // All the fields added together
-        return TLV::EstimateStructOverhead(sizeof(size_t), sizeof(size_t));
-    }
+private:
+    static uint16_t GetTlvSizeEstimate();
 
-    static constexpr size_t MaxTargetEntrySize()
-    {
-        // All the fields added together
-        return TLV::EstimateStructOverhead(sizeof(chip::BitMask<TargetDayOfWeekBitmap>)) +
-            kEvseTargetsMaxNumberOfDays *
-            TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(Optional<chip::Percent>), sizeof(Optional<int64_t>));
-    }
+    CHIP_ERROR SaveTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList);
+
+    // For debug purposes
+    void PrintTargets(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules);
 
 protected:
     enum class TargetEntryTag : uint8_t
@@ -95,41 +92,24 @@ protected:
         kAddedEnergy           = 7,
     };
 
-    enum class CounterTag : uint8_t
-    {
-        kCount = 1,
-        kSize  = 2,
-    };
-
 private:
-    // The array itself has a control byte and an end-of-array marker.
-    static constexpr size_t kArrayOverHead = 2;
+    // Object to handle the allocation of memory for the chargingTargets
+    ChargingTargetsMemMgr mChargingTargets;
 
-    EvseTargetIteratorImpl * mEvseTargetsIterator = nullptr;
-    PersistentStorageDelegate * mpTargetStore     = nullptr;
+    // Need memory to store the ChargingTargetScheduleStruct as this is pointed to from a
+    // List<ChargingTargetScheduleStruct::Type>
+    Structs::ChargingTargetScheduleStruct::Type mChargingTargetSchedulesArray[kEvseTargetsMaxNumberOfDays];
+
+    // The current Target definition
+    DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> mChargingTargetSchedulesList;
+
+    // Pointer to the PeristentStorage
+    PersistentStorageDelegate * mpTargetStore = nullptr;
 };
 
-using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
-class EvseTargetIteratorImpl : public EvseTargetIterator
-{
-public:
-    EvseTargetIteratorImpl(EvseTargetsDelegate & aDelegate) : mDelegate(aDelegate)
-    {
-        mTargetEntryIndex = 0;
-        mTargetEntryVector.clear();
-    }
-    size_t Count() override;
-    bool Next(EvseTargetEntry & entry) override;
-    void Release() override;
-    CHIP_ERROR Load();
-
-private:
-    EvseTargetsDelegate & mDelegate;
-    size_t mTargetEntryIndex = 0;
-    std::vector<EvseTargetEntry> mTargetEntryVector;
-};
 
 } // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+

@@ -136,6 +136,8 @@ public:
     EnergyEvseDelegate(EvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate() { mEvseTargetsDelegate = &aDelegate; }
     ~EnergyEvseDelegate();
 
+    EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
+
     /**
      * @brief   Called when EVSE cluster receives Disable command
      */
@@ -171,27 +173,20 @@ public:
     Status SetTargets(
         const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules) override;
 
-    EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
+    /**
+     * @brief Delegate should implement a handler for LoadTargets
+     *
+     * This needs to load any stored targets into memory and MUST be called before
+	 * GetTargets is called.
+     */
+    Status LoadTargets() override;
 
     /**
-     * @brief Delegate should implement a handler to PrepareGetTargets
-     *
-     * This needs to load any stored targets into memory and hold it until the GetTargetsFinished is
-     * called by the cluster server.
-     *
-     * @param  Reference to EvseTargetIterator class that implements the ability
-     *         for the cluster server to iterate through the target entries
+     * @brief    Called when EVSE cluster receives the GetTargets command
+	 *
+	 * NOTE: LoadTargets MUST be called GetTargets is called.
      */
-    CHIP_ERROR PrepareGetTargets(EvseTargetIterator ** iterator) override;
-
-    /**
-     * @brief Delegate should implement a handler to GetTargetsFinished
-     *
-     * This is used by the cluster server to indicate it has finished preparing
-     * the GetTargetsResponse using the iterator and that the memory in the delegate can
-     * freed
-     */
-    CHIP_ERROR GetTargetsFinished() override;
+    Protocols::InteractionModel::Status GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules) override;
 
     /**
      * @brief    Called when EVSE cluster receives ClearTargets command
@@ -201,9 +196,6 @@ public:
     /* Helper functions for managing targets*/
     Status
     ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
-
-    Status
-    SaveTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
 
     /**
      * @brief    Called by EVSE Hardware to register a single callback handler
