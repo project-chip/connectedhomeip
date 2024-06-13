@@ -11648,9 +11648,9 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
-            0x00000005: {
+            0x00000004: {
                 "attributeName": "ActiveDatasetTimestamp",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },

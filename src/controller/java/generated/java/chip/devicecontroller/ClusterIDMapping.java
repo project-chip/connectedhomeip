@@ -14435,7 +14435,7 @@ public class ClusterIDMapping {
             BorderAgentID(1L),
             ThreadVersion(2L),
             InterfaceEnabled(3L),
-            ActiveDatasetTimestamp(5L),
+            ActiveDatasetTimestamp(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

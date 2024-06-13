@@ -41,7 +41,7 @@ limitations under the License.
 
     <attribute side="server" code="0x0003" define="INTERFACE_ENABLED" type="boolean" default="0">InterfaceEnabled</attribute>
 
-    <attribute side="server" code="0x0005" define="ACTIVE_DATASET_TIMESTAMP" type="int64u" isNullable="true">ActiveDatasetTimestamp</attribute>
+    <attribute side="server" code="0x0004" define="ACTIVE_DATASET_TIMESTAMP" type="int64u" isNullable="true">ActiveDatasetTimestamp</attribute>
 
 
     <command source="client" code="0x00" name="GetActiveDatasetRequest" response="DatasetResponse" optional="false">
