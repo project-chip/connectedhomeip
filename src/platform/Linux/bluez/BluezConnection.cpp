@@ -24,6 +24,7 @@
 #include <gio/gio.h>
 #include <glib.h>
 
+#include <ble/Ble.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/ConnectivityManager.h>
@@ -42,19 +43,19 @@ namespace Internal {
 
 namespace {
 
-gboolean BluezIsServiceOnDevice(BluezGattService1 * aService, BluezDevice1 * aDevice)
+bool BluezIsServiceOnDevice(BluezGattService1 * aService, BluezDevice1 * aDevice)
 {
     const auto * servicePath = bluez_gatt_service1_get_device(aService);
     const auto * devicePath  = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aDevice));
-    return strcmp(servicePath, devicePath) == 0 ? TRUE : FALSE;
+    return strcmp(servicePath, devicePath) == 0;
 }
 
-gboolean BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService1 * aService)
+bool BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService1 * aService)
 {
     const auto * charPath    = bluez_gatt_characteristic1_get_service(aChar);
     const auto * servicePath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aService));
     ChipLogDetail(DeviceLayer, "Char %s on service %s", charPath, servicePath);
-    return strcmp(charPath, servicePath) == 0 ? TRUE : FALSE;
+    return strcmp(charPath, servicePath) == 0;
 }
 
 } // namespace
@@ -86,7 +87,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
         BluezGattService1 * service = bluez_object_get_gatt_service1(&object);
         if (service != nullptr)
         {
-            if ((BluezIsServiceOnDevice(service, mDevice.get())) == TRUE &&
+            if (BluezIsServiceOnDevice(service, mDevice.get()) &&
                 (strcmp(bluez_gatt_service1_get_uuid(service), Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0))
             {
                 ChipLogDetail(DeviceLayer, "CHIP service found on %s", GetPeerAddress());
@@ -106,20 +107,20 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
         BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(&object);
         if (char1 != nullptr)
         {
-            if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
+            if (BluezIsCharOnService(char1, mService.get()) &&
                 (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0))
             {
                 ChipLogDetail(DeviceLayer, "C1 found on %s", GetPeerAddress());
                 mC1.reset(char1);
             }
-            else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
+            else if (BluezIsCharOnService(char1, mService.get()) &&
                      (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0))
             {
                 ChipLogDetail(DeviceLayer, "C2 found on %s", GetPeerAddress());
                 mC2.reset(char1);
             }
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-            else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
+            else if (BluezIsCharOnService(char1, mService.get()) &&
                      (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_3_UUID_STR) == 0))
             {
                 ChipLogDetail(DeviceLayer, "C3 found on %s", GetPeerAddress());
