@@ -601,7 +601,13 @@ class ChipDeviceControllerBase():
                 lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
                     self.devCtrl, setupPinCode, discriminator, nodeid)
             ).raise_on_error()
-            return self._pase_establishment_complete_future.result()
+
+            # TODO: This is a bit funky, but what the API returned with the previous
+            # implementation. We should revisit this.
+            err = self._pase_establishment_complete_future.result()
+            if not err.is_success:
+                return err.to_exception()
+            return None
         finally:
             self._pase_establishment_complete_future = None
 
@@ -615,7 +621,13 @@ class ChipDeviceControllerBase():
                 lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
                     self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
             ).raise_on_error()
-            return self._pase_establishment_complete_future.result()
+
+            # TODO: This is a bit funky, but what the API returned with the previous
+            # implementation. We should revisit this.
+            err = self._pase_establishment_complete_future.result()
+            if not err.is_success:
+                return err.to_exception()
+            return None
         finally:
             self._pase_establishment_complete_future = None
 
@@ -629,7 +641,13 @@ class ChipDeviceControllerBase():
                 lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
                     self.devCtrl, setUpCode.encode("utf-8"), nodeid)
             ).raise_on_error()
-            return self._pase_establishment_complete_future.result()
+
+            # TODO: This is a bit funky, but what the API returned with the previous
+            # implementation. We should revisit this.
+            err = self._pase_establishment_complete_future.result()
+            if not err.is_success:
+                return err.to_exception()
+            return None
         finally:
             self._pase_establishment_complete_future = None
 
