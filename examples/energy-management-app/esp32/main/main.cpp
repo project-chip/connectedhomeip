@@ -98,6 +98,15 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 DeviceLayer::ESP32SecureCertDACProvider gSecureCertDACProvider;
 #endif // CONFIG_SEC_CERT_DAC_PROVIDER
 
+// Keep track of the parsed featureMap option
+static chip::BitMask<DeviceEnergyManagement::Feature> sFeatureMap(DeviceEnergyManagement::Feature::kPowerAdjustment,
+                                                                  DeviceEnergyManagement::Feature::kPowerForecastReporting,
+                                                                  DeviceEnergyManagement::Feature::kStateForecastReporting,
+                                                                  DeviceEnergyManagement::Feature::kStartTimeAdjustment,
+                                                                  DeviceEnergyManagement::Feature::kPausable,
+                                                                  DeviceEnergyManagement::Feature::kForecastAdjustment,
+                                                                  DeviceEnergyManagement::Feature::kConstraintBasedAdjustment);
+
 chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 {
 #if CONFIG_SEC_CERT_DAC_PROVIDER
@@ -121,6 +130,11 @@ void ApplicationShutdown()
 {
     ESP_LOGD(TAG, "Energy Management App: ApplicationShutdown()");
     EvseApplicationShutdown();
+}
+
+chip::BitMask<DeviceEnergyManagement::Feature> GetFeatureMap()
+{
+    return sFeatureMap;
 }
 
 static void InitServer(intptr_t context)

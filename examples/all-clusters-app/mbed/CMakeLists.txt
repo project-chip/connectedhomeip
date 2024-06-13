@@ -77,7 +77,8 @@ target_sources(${APP_TARGET} PRIVATE
                ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
-
+               ${ENERGY_MANAGEMENT_COMMON}/src/EVSEManufacturerImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/utils.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}

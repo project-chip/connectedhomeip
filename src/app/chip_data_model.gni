@@ -384,6 +384,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/EnergyReportingTestEventTriggerHandler.h",
         ]
+      } else if (cluster == "device-energy-management-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/DeviceEnergyManagementTestEventTriggerHandler.h",
+        ]
       } else if (cluster == "thread-network-diagnostics-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",

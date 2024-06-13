@@ -55,7 +55,9 @@ target_sources(app PRIVATE
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp                  
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EVSEManufacturerImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/utils.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDManager.cpp

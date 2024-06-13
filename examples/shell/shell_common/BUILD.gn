@@ -72,14 +72,17 @@ static_library("shell_common") {
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
       "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
       "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp",
       "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
       "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
       "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    ]
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/utils.cpp",
+   ]
 
     include_dirs = [
       "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
       "${chip_root}/examples/energy-management-app/energy-management-common/include",
+      "${chip_root}/src/app/clusters/device-energy-management-server"
     ]
 
     public_deps +=

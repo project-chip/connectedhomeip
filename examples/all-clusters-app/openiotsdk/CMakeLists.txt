@@ -69,7 +69,9 @@ target_sources(${APP_TARGET}
         ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp        
+        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/EVSEManufacturerImpl.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/utils.cpp
 )
 
 target_link_libraries(${APP_TARGET}

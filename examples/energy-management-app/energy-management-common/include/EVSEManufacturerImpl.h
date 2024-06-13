@@ -19,6 +19,7 @@
 #pragma once
 
 #include <DeviceEnergyManagementManager.h>
+#include <DEMManufacturerDelegate.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseManager.h>
 #include <PowerTopologyDelegate.h>
@@ -33,20 +34,32 @@ namespace EnergyEvse {
  * The EVSEManufacturer example class
  */
 
-class EVSEManufacturer
+class EVSEManufacturer: public DEMManufacturerDelegate
 {
 public:
     EVSEManufacturer(EnergyEvseManager * aEvseInstance,
                      ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * aEPMInstance,
-                     PowerTopology::PowerTopologyInstance * aPTInstance)
+                     PowerTopology::PowerTopologyInstance * aPTInstance, DeviceEnergyManagementManager * aDEMInstance)
     {
         mEvseInstance = aEvseInstance;
         mEPMInstance  = aEPMInstance;
         mPTInstance   = aPTInstance;
+        mDEMInstance  = aDEMInstance;
     }
-    EnergyEvseManager * GetEvseInstance() { return mEvseInstance; }
-    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance() { return mEPMInstance; }
-    PowerTopology::PowerTopologyInstance * GetPTInstance() { return mPTInstance; }
+
+    virtual ~EVSEManufacturer()
+    {
+    }
+
+    EnergyEvseManager * GetEvseInstance()
+    {
+        return mEvseInstance;
+    }
+
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance()
+    {
+        return mEPMInstance;
+    }
 
     EnergyEvseDelegate * GetEvseDelegate()
     {
@@ -74,6 +87,35 @@ public:
         }
         return nullptr;
     }
+
+    DeviceEnergyManagementDelegate * GetDEMDelegate()
+    {
+        if (mDEMInstance)
+        {
+            return mDEMInstance->GetDelegate();
+        }
+        return nullptr;
+    }
+
+    /**
+     *
+     * Implement the DEMManufacturerDelegate interface
+     *
+     */
+    int64_t GetEnergyUse() override;
+    CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion() override;
+    CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementPauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion() override;
+    CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementCancelRequest() override;
+    CHIP_ERROR HandleModifyRequest(const uint32_t forecastID,
+                                   const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+                                   AdjustmentCauseEnum cause) override;
+    CHIP_ERROR RequestConstraintBasedForecast(const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
+                                              AdjustmentCauseEnum cause) override;
 
     /**
      * @brief   Called at start up to apply hardware settings
@@ -172,6 +214,7 @@ private:
     EnergyEvseManager * mEvseInstance;
     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * mEPMInstance;
     PowerTopology::PowerTopologyInstance * mPTInstance;
+    DeviceEnergyManagementManager * mDEMInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;
     int64_t mLastDischargingEnergyMeter = 0;
