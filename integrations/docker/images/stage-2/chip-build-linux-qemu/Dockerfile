@@ -173,7 +173,7 @@ RUN mkdir -p /tmp/workdir/linux \
 	&& echo -n \
 	"#!/bin/bash\n" \
 	"grep -q 'rootshell' /proc/cmdline && exit\n" \
-	"[[ -n $$SSH_CONNECTION ]] && exit \n" \
+	"[[ -n \$SSH_CONNECTION ]] && exit \n" \
 	"if [[ -x /chip/runner.sh ]]; then\n" \
 	"  echo '### RUNNER START ###'\n" \
 	"  cd /chip\n" \
@@ -185,7 +185,7 @@ RUN mkdir -p /tmp/workdir/linux \
 	"  read -r -t 5 -p 'Press ENTER to access root shell...' && exit || echo ' timeout.'\n" \
 	"fi\n" \
 	"echo 'Shutting down emulated system...'\n" \
-	"echo o > /proc/sysrq-trigger\n" \
+	"systemctl poweroff\n" \
 	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda3:/ upload - /launcher.sh : chmod 0755 /launcher.sh \
 	&& virt-sparsify --compress ${UBUNTU_QEMU_IMG} ${UBUNTU_QEMU_IMG}.compressed \
 	&& mv ${UBUNTU_QEMU_IMG}.compressed ${UBUNTU_QEMU_IMG} \
