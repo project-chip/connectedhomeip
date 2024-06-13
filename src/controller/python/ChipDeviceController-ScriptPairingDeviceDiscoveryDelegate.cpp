@@ -32,6 +32,9 @@ void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::Commi
     nodeData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
+    // Stop active discovery.
+    mActiveDeviceCommissioner->StopCommissionableDiscovery();
+
     // Cancel discovery timer.
     chip::DeviceLayer::SystemLayer().CancelTimer(OnDiscoveredTimeout, this);
 
