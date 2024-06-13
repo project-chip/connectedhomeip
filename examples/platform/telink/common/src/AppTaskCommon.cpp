@@ -725,7 +725,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     case DeviceEventType::kThreadStateChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
-        sIsThreadAttached     = ConnectivityMgr().IsThreadAttached();
+        sIsNetworkAttached    = ConnectivityMgr().IsThreadAttached();
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
