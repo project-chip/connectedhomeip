@@ -44,7 +44,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/utils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DEMUtils.cpp",
   ]
 
   deps = [

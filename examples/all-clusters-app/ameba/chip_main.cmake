@@ -193,7 +193,7 @@ list(
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/src/utils.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/DEMUtils.cpp
 
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c

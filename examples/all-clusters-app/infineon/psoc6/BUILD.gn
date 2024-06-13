@@ -124,7 +124,7 @@ psoc6_executable("clusters_app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/utils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DEMUtils.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_psoc6Platform.cpp",
     "src/AppTask.cpp",

@@ -92,7 +92,7 @@ mw320_executable("shell_mw320") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/utils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DEMUtils.cpp",
     "${chip_root}/src/lib/shell/streamer_mw320.cpp",
     "binding-handler.cpp",
     "include/CHIPProjectConfig.h",
