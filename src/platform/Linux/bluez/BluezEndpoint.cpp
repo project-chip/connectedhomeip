@@ -75,6 +75,10 @@
 #include "BluezConnection.h"
 #include "Types.h"
 
+#if !GLIB_CHECK_VERSION(2, 68, 0)
+#define g_memdup2(mem, size) g_memdup(mem, static_cast<unsigned int>(size))
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
