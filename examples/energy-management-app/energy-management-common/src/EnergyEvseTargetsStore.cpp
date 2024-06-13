@@ -400,9 +400,8 @@ CHIP_ERROR EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::Charg
 
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
 
-    const auto len = writer.GetLengthWritten();
-    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ChipLogProgress(AppServer, "SaveTargets: length written %u", len);
+    size_t len = writer.GetLengthWritten();
+    ChipLogProgress(AppServer, "SaveTargets: length written 0x" ChipLogFormatX64, ChipLogValueX64(len));
 
     writer.Finalize(backingBuffer);
 
@@ -436,11 +435,13 @@ void EvseTargetsDelegate::PrintTargets(const DataModel::List<const Structs::Char
         uint16_t chargingTargetIdx = 0;
         for (auto & chargingTarget : chargingTargetSchedule.chargingTargets)
         {
-            ChipLogProgress(AppServer, "chargingTargetIdx %u targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy %ld",
+            int64_t addedEnergy = chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0;
+
+            ChipLogProgress(AppServer, "chargingTargetIdx %u targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x " ChipLogFormatX64,
                             chargingTargetIdx,
                             chargingTarget.targetTimeMinutesPastMidnight,
                             chargingTarget.targetSoC.HasValue() ? chargingTarget.targetSoC.Value() : 0,
-                            chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0);
+                            ChipLogValueX64(addedEnergy));
 
             chargingTargetIdx++;
         }

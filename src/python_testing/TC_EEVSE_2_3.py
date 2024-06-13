@@ -20,7 +20,7 @@ import logging
 import chip.clusters as Clusters
 from datetime import datetime, timedelta, timezone
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
+from chip.interaction_model import Status
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
