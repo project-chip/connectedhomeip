@@ -93,6 +93,10 @@
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #endif
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/TestEventTriggerDelegate.h>
+#endif
+
 #ifndef CONFIG_THREAD_DEVICE_TYPE
 #define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_Router
 #endif
@@ -113,7 +117,7 @@ app::Clusters::NetworkCommissioning::Instance sNetworkCommissioningInstance(0,
                                                                             chip::NXP::App::GetAppTask().GetWifiDriverInstance());
 #endif
 
-#if CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#if CHIP_CONFIG_ENABLE_ICD_SERVER || (CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
@@ -147,6 +151,12 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sSmokeCOTestEventTriggerHandler) == CHIP_NO_ERROR);
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+#endif
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
 
