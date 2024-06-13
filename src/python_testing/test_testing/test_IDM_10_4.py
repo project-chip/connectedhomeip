@@ -88,29 +88,29 @@ def main():
     resp = create_read()
     print(resp)
     if not test_runner.run_test_with_mock_read(resp):
-        failures.append(f"Test case failure: Vendor ID included - expected pass")
+        failures.append("Test case failure: Vendor ID included - expected pass")
 
     # Failure because Vendor ID is not included in the read, but included in the PICS
     resp = create_read(include_vendor_id=False)
     if test_runner.run_test_with_mock_read(resp):
-        failures.append(f"Test case failure: Vendor ID not included - expected failure")
+        failures.append("Test case failure: Vendor ID not included - expected failure")
 
     # Failure because Reachable is included in the read, but not in the PICS
     resp = create_read(include_reachable=True)
     if test_runner.run_test_with_mock_read(resp):
-        failures.append(f"Test case failure: Reachable included but not in PICS- expected failure")
+        failures.append("Test case failure: Reachable included but not in PICS- expected failure")
 
     # Failure because MaxPathsPerInvoke is included in the read, but not in the PICS
     resp = create_read(include_max_paths=True)
     if test_runner.run_test_with_mock_read(resp):
-        failures.append(f"Test case failure: MaxPathsPerInvoke included but not in PICS- expected failure")
+        failures.append("Test case failure: MaxPathsPerInvoke included but not in PICS- expected failure")
 
     pics['PICS_SDK_CI_ONLY'] = True
     test_runner.config.pics = pics
     # This is a success case for the attributes (as seen above), but the test should fail because the CI PICS is added
     resp = create_read()
     if test_runner.run_test_with_mock_read(resp):
-        failures.append(f"Test case failure: SDK CI PICS is included - expected failure")
+        failures.append("Test case failure: SDK CI PICS is included - expected failure")
 
     test_runner.Shutdown()
 

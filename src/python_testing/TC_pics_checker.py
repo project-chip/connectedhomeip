@@ -20,7 +20,7 @@ import chip.clusters as Clusters
 from basic_composition_support import BasicCompositionTests
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
-                                    MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
+                                    MatterBaseTest, ProblemLocation, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 from pics_support import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
 from spec_parsing_support import build_xml_clusters
