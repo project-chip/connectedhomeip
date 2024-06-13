@@ -108,9 +108,7 @@ public:
             mFeatures{ features }, mOptionalCommandIdentifiers{ commandIds }, mOptionalAttributesIdentifiers{ attributeIds }
         {}
 
-        SupportedCluster(chip::ClusterId clusterId) :
-            mClusterIdentifier{ clusterId }
-        {}
+        SupportedCluster(chip::ClusterId clusterId) : mClusterIdentifier{ clusterId } {}
     };
 
     ContentApp(std::vector<SupportedCluster> supportedClusters) : mSupportedClusters{ supportedClusters } {}

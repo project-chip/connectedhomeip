@@ -70,7 +70,6 @@ static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 // for this platform, appid is just vendor id
 #define BuildAppId(vid) std::to_string(vid).c_str()
 
-
 class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
