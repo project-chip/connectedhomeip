@@ -44,11 +44,6 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mImageFile == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
-        return CHIP_ERROR_INTERNAL;
-    }
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -308,6 +303,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     }
 
     OTA_CancelImage();
+    OTA_ServiceDeInit();
 
     imageProcessor->ReleaseBlock();
 }

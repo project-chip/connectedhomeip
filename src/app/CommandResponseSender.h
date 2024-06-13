@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <app/CommandHandler.h>
 #include <app/CommandHandlerExchangeInterface.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/StatusResponse.h>
 #include <messaging/ExchangeHolder.h>
 #include <system/SystemPacketBuffer.h>
@@ -35,7 +35,7 @@ namespace app {
  * CommandHandlerExchangeInterface implementation to enable sending InvokeResponseMessage(s).
  */
 class CommandResponseSender : public Messaging::ExchangeDelegate,
-                              public CommandHandler::Callback,
+                              public CommandHandlerImpl::Callback,
                               public CommandHandlerExchangeInterface
 {
 public:
@@ -50,7 +50,7 @@ public:
         virtual void OnDone(CommandResponseSender & apResponderObj) = 0;
     };
 
-    CommandResponseSender(Callback * apCallback, CommandHandler::Callback * apDispatchCallback) :
+    CommandResponseSender(Callback * apCallback, CommandHandlerImpl::Callback * apDispatchCallback) :
         mpCallback(apCallback), mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this)
     {}
 
@@ -59,9 +59,9 @@ public:
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    void OnDone(CommandHandler & apCommandObj) override;
+    void OnDone(CommandHandlerImpl & apCommandObj) override;
 
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
 
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
@@ -149,7 +149,7 @@ public:
      * @param faultType The specific type of fault to inject into the response.
      */
     void TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
-                                                        bool isTimedInvoke, CommandHandler::NlFaultInjectionType faultType);
+                                                        bool isTimedInvoke, CommandHandlerImpl::NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
 
 private:
@@ -182,8 +182,8 @@ private:
     System::PacketBufferHandle mChunks;
 
     Callback * mpCallback;
-    CommandHandler::Callback * mpCommandHandlerCallback;
-    CommandHandler mCommandHandler;
+    CommandHandlerImpl::Callback * mpCommandHandlerCallback;
+    CommandHandlerImpl mCommandHandler;
     Messaging::ExchangeHolder mExchangeCtx;
     State mState = State::ReadyForInvokeResponses;
 
