@@ -51,7 +51,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("5c", "TH reads NextChargeRequiredEnergy attribute. Verify value is null."),
             TestStep("5d", "TH reads NextChargeTargetSoC attribute. Verify value is null."),
             TestStep("6", "TH sends GetTargets. Response DEM.S.C00.Tx(GetTargetsResponse) sent with no targets defined."),
-            TestStep("7", "TH sends SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1439, TargetSoC=null, AddedEnergy=25000000}. Verify Command response is Success"),
+            TestStep(
+                "7", "TH sends SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1439, TargetSoC=null, AddedEnergy=25000000}. Verify Command response is Success"),
             TestStep("7a", "TH reads NextChargeStartTime attribute. Verify value is null."),
             TestStep("7b", "TH reads NextChargeTargetTime attribute. Verify value is null."),
             TestStep("7c", "TH reads NextChargeRequiredEnergy attribute. Verify value is AddedEnergy above."),
@@ -62,7 +63,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("8c", "TH reads NextChargeRequiredEnergy attribute. Verify value is AddedEnergy above."),
             TestStep("8d", "TH reads NextChargeTargetSoC attribute. Verify value is null."),
             TestStep("9", "TH sends GetTargets. Response DEM.S.C00.Tx(GetTargetsResponse) sent with targets equivalent to the above (Note 1)."),
-            TestStep("10", "TH sends SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1, TargetSoC=100, AddedEnergy=null}. Verify Command response is Success"),
+            TestStep(
+                "10", "TH sends SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1, TargetSoC=100, AddedEnergy=null}. Verify Command response is Success"),
             TestStep("10a", "TH reads NextChargeStartTime attribute. Verify value is before the next TargetTime above."),
             TestStep("10b", "TH reads NextChargeTargetTime attribute. Verify value is TargetTime above."),
             TestStep("10c", "TH reads NextChargeRequiredEnergy attribute. Verify value is null."),
@@ -77,7 +79,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("15c", "TH reads NextChargeRequiredEnergy attribute. Verify value is null."),
             TestStep("15d", "TH reads NextChargeTargetSoC attribute. Verify value is null."),
             TestStep("16", "TH sends GetTargets. Response DEM.S.C00.Tx(GetTargetsResponse) sent with no targets defined."),
-            TestStep("17", "TH sends SetTargets with two identical ChargingTargetSchedules={DayOfTheWeekforSequence=0x01,ChargingTarget[0]={TargetTime=60,TargetSoC=null,AddedEnergy=2500000}}. Verify Command response is ConstraintError"),
+            TestStep(
+                "17", "TH sends SetTargets with two identical ChargingTargetSchedules={DayOfTheWeekforSequence=0x01,ChargingTarget[0]={TargetTime=60,TargetSoC=null,AddedEnergy=2500000}}. Verify Command response is ConstraintError"),
             TestStep("18", "TH sends SetTargets with DayOfTheWeekforSequence=0x40 and 11 ChargingTargets with TargetTimes=60,180,300,420,540,660,780,900,1020,1140,1260 and all with TargetSoC=null, AddedEnergy=2500000. Verify Command response is ResourceExhausted"),
             TestStep("19", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear. Verify Command response is Success and event DEM.S.E01(EVNotDetected) sent"),
             TestStep("20", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear. Verify Command response is Success"),
@@ -344,7 +347,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                              f"Unexpected 'GetTargets' response value - expected {empty_targets_response}, was {get_targets_response}")
 
         self.step("17")
-        daily_targets_step_17 = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=60, addedEnergy=25000000)]
+        daily_targets_step_17 = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(
+            targetTimeMinutesPastMidnight=60, addedEnergy=25000000)]
         targets_step_17 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(dayOfWeekForSequence=0x1, chargingTargets=daily_targets_step_17),
                            Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(dayOfWeekForSequence=0x1, chargingTargets=daily_targets_step_17)]
         await self.send_set_targets_command(chargingTargetSchedules=targets_step_17, expected_status=Status.ConstraintError)
@@ -375,7 +379,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                 targetTimeMinutesPastMidnight=1260, addedEnergy=25000000),
         ]
 
-        targets_step_18 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(dayOfWeekForSequence=0x40, chargingTargets=daily_targets_step_18)]
+        targets_step_18 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
+            dayOfWeekForSequence=0x40, chargingTargets=daily_targets_step_18)]
         await self.send_set_targets_command(chargingTargetSchedules=targets_step_18, expected_status=Status.ResourceExhausted)
 
         self.step("19")
