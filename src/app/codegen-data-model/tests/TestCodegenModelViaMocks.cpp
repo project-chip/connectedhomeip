@@ -497,8 +497,11 @@ struct TestReadRequest
             return nullptr;
         }
 
-        // TODO: isFabricFiltered? EncodeState?
-        return std::make_unique<AttributeValueEncoder>(reportBuilder, request.subjectDescriptor.value(), request.path, dataVersion,
+        // TODO: could we test isFabricFiltered and EncodeState?
+    
+        // request.subjectDescriptor is known non-null because it is set in the constructor
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+        return std::make_unique<AttributeValueEncoder>(reportBuilder, *request.subjectDescriptor, request.path, dataVersion,
                                                        false /* aIsFabricFiltered */, state);
     }
 
