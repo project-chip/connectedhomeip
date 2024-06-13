@@ -19,6 +19,7 @@
 #pragma once
 
 #include <commands/common/CHIPCommand.h>
+#include <commands/pairing/OpenCommissioningWindowCommand.h>
 
 class FabricSyncAddDeviceCommand : public CHIPCommand
 {
@@ -37,4 +38,25 @@ private:
     chip::NodeId mNodeId;
 
     CHIP_ERROR RunCommand(NodeId remoteId);
+};
+
+class FabricSyncDeviceCommand : public CHIPCommand, CommissioningWindowDelegate
+{
+public:
+    FabricSyncDeviceCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("sync-device", credIssuerCommands)
+    {
+        AddArgument("endpointid", 0, UINT16_MAX, &mEndpointId);
+    }
+
+    void OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload) override;
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override { return RunCommand(mEndpointId); }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+
+private:
+    chip::EndpointId mEndpointId;
+
+    CHIP_ERROR RunCommand(chip::EndpointId remoteId);
 };

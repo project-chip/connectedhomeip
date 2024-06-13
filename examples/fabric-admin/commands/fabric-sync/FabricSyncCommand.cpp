@@ -18,6 +18,8 @@
 
 #include "FabricSyncCommand.h"
 #include <commands/common/RemoteDataModelLogger.h>
+#include <commands/interactive/InteractiveCommands.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <thread>
 #include <unistd.h>
 
@@ -27,6 +29,13 @@
 
 using namespace ::chip;
 
+namespace {
+
+constexpr uint16_t kRetryIntervalS      = 3;
+constexpr uint16_t kMaxManaulCodeLength = 11;
+
+} // namespace
+
 CHIP_ERROR FabricSyncAddDeviceCommand::RunCommand(NodeId remoteId)
 {
 #if defined(PW_RPC_ENABLED)
@@ -35,4 +44,44 @@ CHIP_ERROR FabricSyncAddDeviceCommand::RunCommand(NodeId remoteId)
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
+}
+
+void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR err, chip::SetupPayload payload)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        char payloadBuffer[kMaxManaulCodeLength + 1];
+        MutableCharSpan manualCode(payloadBuffer);
+        CHIP_ERROR error = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualCode);
+        if (error == CHIP_NO_ERROR)
+        {
+            char command[64];
+            snprintf(command, sizeof(command), "pairing code 3 %s", payloadBuffer);
+            PushCommand(command);
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Unable to generate manual code for setup payload: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+    }
+}
+
+CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
+{
+    char command[64];
+    snprintf(command, sizeof(command), "pairing open-commissioning-window 1 %d 1 300 1000 3840", remoteId);
+
+    OpenCommissioningWindowCommand * openCommand =
+        static_cast<OpenCommissioningWindowCommand *>(CommandMgr().GetCommandByName("pairing", "open-commissioning-window"));
+
+    if (openCommand == nullptr)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
+    openCommand->RegisterDelegate(this);
+
+    PushCommand(command);
+
+    return CHIP_NO_ERROR;
 }
