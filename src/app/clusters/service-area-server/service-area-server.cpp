@@ -933,8 +933,6 @@ bool Instance::ClearSelectedLocations()
 
 DataModel::Nullable<uint32_t> Instance::GetCurrentLocation()
 {
-    // give the device a chance to make sure value is up-to-date
-    mDelegate->HandleVolatileCurrentLocation(mCurrentLocation); 
     return mCurrentLocation;
 }
 
@@ -965,8 +963,6 @@ bool Instance::SetCurrentLocation(const DataModel::Nullable<uint32_t> & aCurrent
 
 DataModel::Nullable<uint32_t> Instance::GetEstimatedEndTime()
 {
-    // give the device a chance to make sure value is up-to-date
-    mDelegate->HandleVolatileEstimatedEndTime(mEstimatedEndTime);
     return mEstimatedEndTime;
 }
 

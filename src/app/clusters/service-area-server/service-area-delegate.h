@@ -68,35 +68,6 @@ protected:
 
     friend class Instance;
 
-
-    //*************************************************************************
-    // volatile attribute support
-
-    /**
-     * @brief give the device a chance to update current location
-     * @param[in] prevCurrentLocation "current" current location value - use to determine if update notification should be triggered
-     * 
-     * @note this is called by the instance function GetCurrentLocation() to ensure the latest value is available
-     * @note default implementation can be used if current location is non-volatile (always expected to be up-to-date)
-    */
-    virtual void HandleVolatileCurrentLocation(const DataModel::Nullable<uint32_t> prevCurrentLocation)
-    {
-        return;
-    }
-
-    /**
-     * @brief give the device a chance to update estimated end time
-     * @param[in] prevEstimatedEndTime "current" estimated end time value - use to determine if update notification is triggered
-     * 
-     * @note this is called by the instance function GetEstimatedEndTime() to ensure the latest value is available
-     * @note default implementation can be used if progress entries are non-volatile (always expected to be up-to-date)
-    */
-    virtual void HandleVolatileEstimatedEndTime(const DataModel::Nullable<uint32_t> prevEstimatedEndTime)
-    {
-        return;
-    }
-
-
     //*************************************************************************
     // Command handling support
 
