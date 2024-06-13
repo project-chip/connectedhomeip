@@ -162,8 +162,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
             ChipLogProgress(
                 AppServer, "LoadingTargets: targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x" ChipLogFormatX64,
                 chargingTarget.targetTimeMinutesPastMidnight,
-                chargingTarget.targetSoC.HasValue() ? chargingTarget.targetSoC.Value() : 0,
-                ChipLogValueX64(addedEnergy));
+                chargingTarget.targetSoC.HasValue() ? chargingTarget.targetSoC.Value() : 0, ChipLogValueX64(addedEnergy));
 
             // Update mChargingTargets which is tracking the chargingTargets
             mChargingTargets.AddChargingTarget(chargingTarget);
