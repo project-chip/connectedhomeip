@@ -1091,6 +1091,47 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onErrorCalledTimes, 0);
 }
 
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked)
+{
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
+                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+
+    app::CommandSender::AddRequestDataParameters addRequestDataParams;
+
+    CommandSender::ConfigParameters config;
+    config.SetRemoteMaxPathsPerInvoke(2);
+    EXPECT_EQ(commandSender.SetCommandSenderConfig(config), CHIP_NO_ERROR);
+
+    // The specific values chosen here are arbitrary.
+    uint16_t firstCommandRef  = 1;
+    uint16_t secondCommandRef = 2;
+    auto commandPathParams    = MakeTestCommandPath();
+    SimpleTLVPayload simplePayloadWriter;
+    addRequestDataParams.SetCommandRef(firstCommandRef);
+
+    EXPECT_EQ(commandSender.AddRequestData(commandPathParams, simplePayloadWriter, addRequestDataParams), CHIP_NO_ERROR);
+
+    uint32_t remainingSize = commandSender.mInvokeRequestBuilder.GetWriter()->GetRemainingFreeLength();
+    // Because request is made of both request data and request path (commandPathParams), using
+    // `remainingSize` is large enough fail.
+    ForcedSizeBuffer requestData(remainingSize);
+
+    addRequestDataParams.SetCommandRef(secondCommandRef);
+    EXPECT_EQ(commandSender.AddRequestData(commandPathParams, requestData, addRequestDataParams), CHIP_ERROR_NO_MEMORY);
+
+    // Confirm that we can still send out a request with the first command.
+    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
+
+    mpTestContext->DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onResponseCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onErrorCalledTimes, 0);
+}
+
 TEST_F(TestCommandInteraction, TestCommandHandlerEncodeSimpleCommandData)
 {
     // Send response which has simple command data and command path
@@ -1740,55 +1781,6 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_AcceptMultipleCom
 
     EXPECT_EQ(commandDispatchedCount, 2u);
 }
-
-#if 0
-TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked)
-{
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    mockCommandSenderExtendedDelegate.ResetCounter();
-    PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager(),
-                                     &pendingResponseTracker);
-    app::CommandSender::AddRequestDataParameters addRequestDataParams;
-
-    CommandSender::ConfigParameters config;
-    config.SetRemoteMaxPathsPerInvoke(2);
-    err = commandSender.SetCommandSenderConfig(config);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    // The specific values chosen here are arbitrary.
-    uint16_t firstCommandRef  = 1;
-    uint16_t secondCommandRef = 2;
-    auto commandPathParams    = MakeTestCommandPath();
-    SimpleTLVPayload simplePayloadWriter;
-    addRequestDataParams.SetCommandRef(firstCommandRef);
-
-    err = commandSender.AddRequestData(commandPathParams, simplePayloadWriter, addRequestDataParams);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    uint32_t remainingSize = commandSender.mInvokeRequestBuilder.GetWriter()->GetRemainingFreeLength();
-    // Because request is made of both request data and request path (commandPathParams), using
-    // `remainingSize` is large enough fail.
-    ForcedSizeBuffer requestData(remainingSize);
-
-    addRequestDataParams.SetCommandRef(secondCommandRef);
-    err = commandSender.AddRequestData(commandPathParams, requestData, addRequestDataParams);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NO_MEMORY);
-
-    // Confirm that we can still send out a request with the first command.
-    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, commandSender.GetInvokeResponseMessageCount() == 0);
-
-    ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(apSuite,
-                   mockCommandSenderExtendedDelegate.onResponseCalledTimes == 1 &&
-                       mockCommandSenderExtendedDelegate.onFinalCalledTimes == 1 &&
-                       mockCommandSenderExtendedDelegate.onErrorCalledTimes == 0);
-}
-#endif
 
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse)
 {
