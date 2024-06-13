@@ -28,7 +28,7 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.test_definition import TestRunTime, TestTag
-from chipyaml.paths_finder import PathsFinder
+from yaml.paths_finder import PathsFinder
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))

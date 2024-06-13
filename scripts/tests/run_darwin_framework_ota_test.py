@@ -10,7 +10,7 @@ import click
 from chiptest.accessories import AppsRegister
 from chiptest.runner import Runner
 from chiptest.test_definition import App, ExecutionCapture
-from chipyaml.paths_finder import PathsFinder
+from yaml.paths_finder import PathsFinder
 
 TEST_NODE_ID = '0x12344321'
 TEST_VID = '0xFFF1'
