@@ -30,7 +30,7 @@ import asyncio
 import builtins
 import os
 from ctypes import CFUNCTYPE, Structure, c_bool, c_char_p, c_uint16, c_uint32, c_void_p, py_object, pythonapi
-from threading import Condition, Event, Lock
+from threading import Condition, Lock
 
 import chip.native
 from chip.native import PyChipError
@@ -144,14 +144,9 @@ class ChipStack(object):
     def __init__(self, persistentStoragePath: str, enableServerInteractions=True):
         builtins.enableDebugMode = False
 
-        self.completeEvent = Event()
-        self.commissioningCompleteEvent = Event()
         self._ChipStackLib = None
         self._chipDLLPath = None
         self.devMgr = None
-        self.callbackRes = None
-        self.commissioningEventRes = None
-        self.openCommissioningWindowPincode = {}
         self._enableServerInteractions = enableServerInteractions
 
         #
@@ -212,7 +207,6 @@ class ChipStack(object):
         self._ChipStackLib = None
         self._chipDLLPath = None
         self.devMgr = None
-        self.callbackRes = None
 
         delattr(builtins, "chipStack")
 
@@ -238,25 +232,6 @@ class ChipStack(object):
             raise res.to_exception()
 
         return await asyncio.wait_for(callObj.future, timeoutMs / 1000 if timeoutMs else None)
-
-    def CallAsyncWithCompleteCallback(self, callFunct):
-        '''Run a Python function on CHIP stack, and wait for the application specific response.
-        This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
-        Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
-        Make sure to register the necessary callbacks which release the function by setting the completeEvent.
-        '''
-        # throw error if op in progress
-        self.callbackRes = None
-        self.completeEvent.clear()
-        res = self.PostTaskOnChipThread(callFunct).Wait()
-
-        if not res.is_success:
-            self.completeEvent.set()
-            raise res.to_exception()
-        self.completeEvent.wait()
-        if isinstance(self.callbackRes, ChipStackException):
-            raise self.callbackRes
-        return self.callbackRes
 
     def PostTaskOnChipThread(self, callFunct) -> AsyncCallableHandle:
         '''Run a Python function on CHIP stack, and wait for the response.

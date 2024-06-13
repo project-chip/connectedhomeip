@@ -166,18 +166,6 @@ PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::Devic
                                                          chip::NodeId nodeid);
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                                 uint16_t long_discriminator);
-PyChipError pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl);
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                                  uint16_t short_discriminator);
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesVendor(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                      uint16_t vendor);
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                          uint16_t device_type);
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl);
-
 PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl,
                                                         chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                         uint64_t nodeId, uint32_t setupPasscode, const uint8_t filterType,
@@ -190,7 +178,6 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
                                                             chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
                                                             uint16_t discriminator, uint8_t optionInt);
 
-void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
 
@@ -694,46 +681,6 @@ PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissio
 {
     CommissioningParameters params;
     return ToPyChipError(devCtrl->Commission(nodeid, params));
-}
-
-PyChipError pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, static_cast<uint64_t>(0));
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                                 uint16_t long_discriminator)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kLongDiscriminator, long_discriminator);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                                  uint16_t short_discriminator)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kShortDiscriminator, short_discriminator);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesVendor(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                      uint16_t vendor)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kVendorId, vendor);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                          uint16_t device_type)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kDeviceType, device_type);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kCommissioningMode);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
 }
 
 PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(

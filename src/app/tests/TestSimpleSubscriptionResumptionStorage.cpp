@@ -105,8 +105,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionCount)
     EXPECT_EQ(count, std::make_unsigned_t<int>(CHIP_IM_MAX_NUM_SUBSCRIPTIONS / 2));
 
     // Delete all and verify iterator counts 0
-    CHIP_ERROR err = subscriptionStorage.DeleteAll(46);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.DeleteAll(46), CHIP_NO_ERROR);
     iterator = subscriptionStorage.IterateSubscriptions();
     EXPECT_EQ(iterator->Count(), 0u);
 
@@ -129,9 +128,9 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionMaxCount)
 
     // First set a large MaxCount before Init
     uint16_t countMaxToSave = 2 * CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
-    CHIP_ERROR err          = storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(),
-                                                      &countMaxToSave, sizeof(uint16_t));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMaxToSave,
+                                      sizeof(uint16_t)),
+              CHIP_NO_ERROR);
 
     // Then write something beyond CHIP_IM_MAX_NUM_SUBSCRIPTIONS
     chip::Platform::ScopedMemoryBuffer<uint8_t> junkBytes;
@@ -147,8 +146,8 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionMaxCount)
     // First check the MaxCount is reset to CHIP_IM_MAX_NUM_SUBSCRIPTIONS
     uint16_t countMax = 0;
     uint16_t len      = sizeof(countMax);
-    err = storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len),
+              CHIP_NO_ERROR);
     EXPECT_EQ(countMax, CHIP_IM_MAX_NUM_SUBSCRIPTIONS);
 
     // Then check the fake sub is no more
@@ -221,13 +220,9 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionState)
     subscriptionInfo3.mEventPaths[1].mEventId       = 8;
     subscriptionInfo2.mEventPaths[1].mIsUrgentEvent = false;
 
-    CHIP_ERROR err;
-    err = subscriptionStorage.Save(subscriptionInfo1);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    err = subscriptionStorage.Save(subscriptionInfo2);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    err = subscriptionStorage.Save(subscriptionInfo3);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.Save(subscriptionInfo1), CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.Save(subscriptionInfo2), CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.Save(subscriptionInfo3), CHIP_NO_ERROR);
 
     auto * iterator = subscriptionStorage.IterateSubscriptions();
     EXPECT_EQ(iterator->Count(), 3u);
@@ -265,8 +260,8 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionState)
 
     uint16_t countMax = 0;
     uint16_t len      = sizeof(countMax);
-    err = storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len);
-    EXPECT_EQ(err, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(), &countMax, len),
+              CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
 static constexpr chip::TLV::Tag kTestValue1Tag = chip::TLV::ContextTag(30);
