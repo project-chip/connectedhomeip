@@ -545,7 +545,11 @@ class ChipDeviceControllerBase():
                     self.devCtrl, discriminator, setupPinCode, nodeid)
             ).raise_on_error()
 
-            return self._commissioning_complete_future.result()
+            # TODO: Change return None. Only returning on success is not useful.
+            # but that is what the previous implementation did.
+            res = self._commissioning_complete_future.result()
+            res.raise_on_error()
+            return res
         finally:
             self._commissioning_complete_future = None
 
