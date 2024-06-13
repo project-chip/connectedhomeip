@@ -63,7 +63,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<Service
     mClusterId(aClusterId),
     mFeature(aFeature)
 {
-    ChipLogProgress(Zcl, "Location Location: Instance constructor");
+    ChipLogProgress(Zcl, "Service Area: Instance constructor");
 //    mDelegate->SetInstance(this);
 }
 
@@ -75,12 +75,12 @@ Instance::~Instance()
 
 CHIP_ERROR Instance::Init()
 {
-    ChipLogProgress(Zcl, "Location Location: INIT");
+    ChipLogProgress(Zcl, "Service Area: INIT");
 
     // Check if the cluster has been selected in zap
     VerifyOrReturnError(
         emberAfContainsServer(mEndpointId, chip::app::Clusters::ServiceArea::Id), CHIP_ERROR_INVALID_ARGUMENT,
-        ChipLogError(Zcl, "Location: The cluster with Id %lu was not enabled in zap.", long(chip::app::Clusters::ServiceArea::Id)));
+        ChipLogError(Zcl, "Service Area: The cluster with Id %lu was not enabled in zap.", long(chip::app::Clusters::ServiceArea::Id)));
 
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     
@@ -100,43 +100,43 @@ CHIP_ERROR Instance::Init()
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogError(Zcl, "Location Location: Reading");
+    ChipLogError(Zcl, "Service Area: Reading");
 
     switch (aPath.mAttributeId)
     {
 
     case ServiceArea::Attributes::SupportedLocations::Id: {
-        ChipLogProgress(Zcl, "Location Location: Read SupportedLocations");
+        ChipLogProgress(Zcl, "Service Area: Read SupportedLocations");
         ReturnErrorOnFailure(ReadSupportedLocations(aEncoder));
         break;
     }
 
     case ServiceArea::Attributes::SupportedMaps::Id: {
-        ChipLogProgress(Zcl, "Location Location: Read SupportedMaps");
+        ChipLogProgress(Zcl, "Service Area: Read SupportedMaps");
         ReturnErrorOnFailure(ReadSupportedMaps(aEncoder));
         break;
     } 
 
     case ServiceArea::Attributes::SelectedLocations::Id: {
-        ChipLogProgress(Zcl, "Location Location: Read SelectedLocations");
+        ChipLogProgress(Zcl, "Service Area: Read SelectedLocations");
         ReturnErrorOnFailure(ReadSelectedLocations(aEncoder));
         break;
     } 
 
     case ServiceArea::Attributes::CurrentLocation::Id: {
-        ChipLogProgress(Zcl, "Location Location: Read CurrentLocation");
+        ChipLogProgress(Zcl, "Service Area: Read CurrentLocation");
         ReturnErrorOnFailure(aEncoder.Encode(GetCurrentLocation()));
         break;     
     }
 
     case ServiceArea::Attributes::EstimatedEndTime::Id: {
-        ChipLogProgress(Zcl, "Location Location: Read EstimatedEndTime");
+        ChipLogProgress(Zcl, "Service Area: Read EstimatedEndTime");
         ReturnErrorOnFailure(aEncoder.Encode(GetEstimatedEndTime()));
         break;
     }
 
     case ServiceArea::Attributes::Progress::Id: {
-        ChipLogProgress(Zcl, "Location Location: Read Progress");
+        ChipLogProgress(Zcl, "Service Area: Read Progress");
         ReturnErrorOnFailure(ReadProgress(aEncoder));
         break;
     }
@@ -147,7 +147,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
   
     default:
-        ChipLogProgress(Zcl, "Location Location: Read unsupported attribute %u", aPath.mAttributeId);
+        ChipLogProgress(Zcl, "Service Area: Read unsupported attribute %u", aPath.mAttributeId);
         break;
     }
 
@@ -422,7 +422,7 @@ exit:
 
 void Instance::HandleSkipCurrentLocationCmd(HandlerContext & ctx)
 {
-    ChipLogDetail(Zcl, "Location Location: HandleSkipCurrentLocation");
+    ChipLogDetail(Zcl, "Service Area: HandleSkipCurrentLocation");
 
     SkipCurrentLocationStatus skipStatus                  = SkipCurrentLocationStatus::kSuccess;
     char   skipStatusText[kMaxSizeStatusText + 1] = {'\0'};
