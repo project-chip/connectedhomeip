@@ -67,10 +67,10 @@ class TestMetadataReader(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_file = self.generate_temp_file(temp_dir, self.test_file_content)
             env_file = self.generate_temp_file(temp_dir, self.env_file_content)
-            
+
             reader = MetadataReader(env_file)
             self.maxDiff = None
-            
+
             test_file_expected_arg_string = (
                 "scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py "
                 "--app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app "
