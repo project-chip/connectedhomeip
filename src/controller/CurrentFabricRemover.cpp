@@ -146,7 +146,9 @@ void CurrentFabricRemover::OnCommandFailure(void * context, CHIP_ERROR err)
 void CurrentFabricRemover::FinishRemoveCurrentFabric(void * context, CHIP_ERROR err)
 {
     if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(Controller, "Remove Current Fabric Failed : %" CHIP_ERROR_FORMAT, err.Format());
+    }
     auto * self     = static_cast<CurrentFabricRemover *>(context);
     self->mNextStep = Step::kAcceptRemoveFabricStart;
     if (self->mCurrentFabricRemoveCallback != nullptr)
