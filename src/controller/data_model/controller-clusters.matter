@@ -7687,7 +7687,7 @@ cluster WiFiNetworkManagement = 1105 {
 }
 
 /** Manage the Thread network of Thread Border Router */
-cluster ThreadBorderRouterManagement = 1106 {
+provisional cluster ThreadBorderRouterManagement = 1106 {
   revision 1;
 
   bitmap Feature : bitmap32 {

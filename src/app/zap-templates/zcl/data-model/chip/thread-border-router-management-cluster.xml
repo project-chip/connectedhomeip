@@ -22,7 +22,7 @@ limitations under the License.
     <field name="PANChange" mask="0x1"/>
   </bitmap>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain>HRAP</domain>
     <name>Thread Border Router Management</name>
     <code>0x0452</code>
