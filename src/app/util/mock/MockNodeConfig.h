@@ -69,7 +69,8 @@ struct MockEventConfig
 struct MockClusterConfig
 {
     MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes = {},
-                      std::initializer_list<MockEventConfig> aEvents = {});
+                      std::initializer_list<MockEventConfig> aEvents = {}, std::initializer_list<CommandId> aAcceptedCommands = {},
+                      std::initializer_list<CommandId> aGeneratedCommands = {});
 
     // Cluster-config is self-referential: mEmberCluster.attributes references  mAttributeMetaData.data()
     MockClusterConfig(const MockClusterConfig & other);
@@ -86,6 +87,8 @@ private:
     EmberAfCluster mEmberCluster;
     std::vector<EventId> mEmberEventList;
     std::vector<EmberAfAttributeMetadata> mAttributeMetaData;
+    std::vector<CommandId> mAcceptedCommands;
+    std::vector<CommandId> mGeneratedCommands;
 };
 
 struct MockEndpointConfig

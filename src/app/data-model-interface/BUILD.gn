@@ -13,16 +13,17 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
-source_set("interaction-model") {
+source_set("data-model-interface") {
   sources = [
     "ActionContext.h",
     "Context.h",
-    "Events.h",
+    "DataModel.h",
+    "DataModelChangeListener.h",
+    "EventsGenerator.h",
     "InvokeResponder.h",
-    "IterationTypes.h",
-    "Model.h",
+    "MetadataTypes.cpp",
+    "MetadataTypes.h",
     "OperationTypes.h",
-    "Paths.h",
   ]
 
   public_deps = [

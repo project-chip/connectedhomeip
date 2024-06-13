@@ -951,7 +951,8 @@ void DoorLockServer::clearCredentialCommandHandler(
     }
 
     commandObj->AddStatus(commandPath,
-                          clearCredential(commandPath.mEndpointId, modifier, sourceNodeId, credentialType, credentialIndex, false));
+                          clearCredential(commandPath.mEndpointId, modifier, sourceNodeId, credentialType, credentialIndex,
+                                          /* sendUserChangeEvent = */ true));
 }
 
 void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
@@ -3036,6 +3037,24 @@ Status DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip::Fabri
             return status;
         }
         ChipLogProgress(Zcl, "[clearCredentials] All face credentials were cleared [endpointId=%d]", endpointId);
+    }
+
+    if (SupportsAliroProvisioning(endpointId))
+    {
+        for (auto & credentialType :
+             { CredentialTypeEnum::kAliroEvictableEndpointKey, CredentialTypeEnum::kAliroCredentialIssuerKey,
+               CredentialTypeEnum::kAliroNonEvictableEndpointKey })
+        {
+            auto status = clearCredentials(endpointId, modifier, sourceNodeId, credentialType);
+            if (Status::Success != status)
+            {
+                ChipLogError(Zcl,
+                             "[clearCredentials] Unable to clear all Aliro credentials [endpointId=%d,credentialType=%d,status=%d]",
+                             endpointId, to_underlying(credentialType), to_underlying(status));
+                return status;
+            }
+        }
+        ChipLogProgress(Zcl, "[clearCredentials] All Aliro credentials were cleared [endpointId=%d]", endpointId);
     }
 
     return Status::Success;

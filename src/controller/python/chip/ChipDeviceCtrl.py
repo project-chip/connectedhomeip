@@ -709,66 +709,6 @@ class ChipDeviceControllerBase():
 
         return self.GetDiscoveredDevices()
 
-    def DiscoverCommissionableNodesLongDiscriminator(self, long_discriminator):
-        ''' Deprecated, use DiscoverCommissionableNodes
-        '''
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(
-                self.devCtrl, long_discriminator)
-        ).raise_on_error()
-
-    def DiscoverCommissionableNodesShortDiscriminator(self, short_discriminator):
-        ''' Deprecated, use DiscoverCommissionableNodes
-        '''
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(
-                self.devCtrl, short_discriminator)
-        ).raise_on_error()
-
-    def DiscoverCommissionableNodesVendor(self, vendor):
-        ''' Deprecated, use DiscoverCommissionableNodes
-        '''
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor(
-                self.devCtrl, vendor)
-        ).raise_on_error()
-
-    def DiscoverCommissionableNodesDeviceType(self, device_type):
-        ''' Deprecated, use DiscoverCommissionableNodes
-        '''
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType(
-                self.devCtrl, device_type)
-        ).raise_on_error()
-
-    def DiscoverCommissionableNodesCommissioningEnabled(self):
-        ''' Deprecated, use DiscoverCommissionableNodes
-        '''
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(
-                self.devCtrl)
-        ).raise_on_error()
-
-    def PrintDiscoveredDevices(self):
-        ''' Deprecated, use GetCommissionableNodes
-        '''
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_PrintDiscoveredDevices(
-                self.devCtrl)
-        )
-
     def GetDiscoveredDevices(self):
         def GetDevices(devCtrl):
             devices = []
@@ -792,16 +732,6 @@ class ChipDeviceControllerBase():
             lambda: self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice(
                 self.devCtrl, idx, addrStr, length)
         )
-
-    def DiscoverAllCommissioning(self):
-        ''' Deprecated, use DiscoverCommissionableNodes
-        '''
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes(
-                self.devCtrl)
-        ).raise_on_error()
 
     class CommissioningWindowPasscode(enum.IntEnum):
         kOriginalSetupCode = 0,
@@ -1669,26 +1599,6 @@ class ChipDeviceControllerBase():
                 c_void_p]
             self._dmLib.pychip_DeviceController_StopCommissionableDiscovery.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.argtypes = [
-                c_void_p, c_uint16]
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator.argtypes = [
-                c_void_p, c_uint16]
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor.argtypes = [
-                c_void_p, c_uint16]
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType.argtypes = [
-                c_void_p, c_uint16]
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.argtypes = [
-                c_void_p]
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.restype = PyChipError
-
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64, c_uint16]
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.restype = PyChipError
@@ -1700,15 +1610,6 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_EstablishPASESession.argtypes = [
                 c_void_p, c_char_p, c_uint64]
             self._dmLib.pychip_DeviceController_EstablishPASESession.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
-                c_void_p]
-            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
-                c_void_p]
-            self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
-                c_void_p, _ChipDeviceController_IterateDiscoveredCommissionableNodesFunct]
 
             self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode.argtypes = [c_void_p]
             self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode.restype = c_bool
