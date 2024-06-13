@@ -576,123 +576,24 @@ exit:
 }
 
 
-bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool & locationInSupportedList)
+bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreLocationId)
 {
-    bool ret_value = true;
-
-    // If the SupportedMaps attribute is not null, each entry in this list SHALL have a unique value for the combination of the MapID and LocationInfo fields.
-    // If the SupportedMaps attribute is null, each entry in this list SHALL have a unique value for the LocationInfo field.
-
-    // validate that the location is unique with regard to the supported locations list
     uint8_t                   locationIndex = 0;
     LocationStructureWrapper  entry;
 
+    // If the SupportedMaps attribute is not null, each entry in this list SHALL have a unique value for the combination of the MapID and LocationInfo fields.
+    // If the SupportedMaps attribute is null, each entry in this list SHALL have a unique value for the LocationInfo field.
+    bool isSupportedMapsNull = mDelegate->GetNumberOfSupportedMaps() == 0;
+
     while (mDelegate->GetSupportedLocationByIndex(locationIndex++, entry))
     {
-        // this function may be used for uniqueness checking of a location that is a member of supported locations, (for validating modifications)
-        // so do not test it against itself.
-        // skip location if locationID's match
-        if (aLocation.locationID == entry.locationID)
+        if (aLocation.IsEqual(entry, ignoreLocationId, isSupportedMapsNull))
         {
-            locationInSupportedList = true; // flag that Id already exists in supported locations.
-            continue;
+            return false;
         }
-
-        // check for non-matching mapID
-        // if mapID is not null, skip locations with null mapID's
-        // if mapID is null, skip locations with non-null mapID's
-        // if both location's mapID are not null, skip locations with non matching mapID's
-        if ((aLocation.mapID.IsNull() != (entry.mapID.IsNull()))  ||
-
-            (!aLocation.mapID.IsNull() && (!entry.mapID.IsNull()) && (aLocation.mapID.Value() != entry.mapID.Value())))
-        {
-            continue;
-        }
-
-        // check for null vs non-null HomeLocationInfo
-        if (aLocation.locationInfo.locationInfo.IsNull() != (entry.locationInfo.locationInfo.IsNull()))
-        {
-            continue;
-        }
-
-        // if both locations have non-null HomeLocationInfo, check fields
-        if (!aLocation.locationInfo.locationInfo.IsNull() && (!entry.locationInfo.locationInfo.IsNull()))
-        {
-            if (!aLocation.DoesNameMatch(entry.locationInfo.locationInfo.Value().locationName))
-            {
-                continue;
-            }
-
-
-            // check for non-matching FloorNumber
-            // if FloorNumber is not null, skip locations with null FloorNumber's
-            // if FloorNumber is null, skip locations with non-null FloorNumber's
-            // if both location's FloorNumber are not null, skip locations with non matching FloorNumber's
-            if ((aLocation.locationInfo.locationInfo.Value().floorNumber.IsNull() != entry.locationInfo.locationInfo.Value().floorNumber.IsNull()) ||
-
-                ((!aLocation.locationInfo.locationInfo.Value().floorNumber.IsNull() && !entry.locationInfo.locationInfo.Value().floorNumber.IsNull()) 
-                    && (aLocation.locationInfo.locationInfo.Value().floorNumber.Value() != entry.locationInfo.locationInfo.Value().floorNumber.Value()))  )
-            {
-                continue;
-            }
-
-
-            // check for non-matching AreaType
-            // if AreaType is not null, skip locations with null AreaType's
-            // if AreaType is null, skip locations with non-null AreaType's
-            // if both location's AreaType are not null, skip locations with non matching AreaType's
-            if ((aLocation.locationInfo.locationInfo.Value().areaType.IsNull() != entry.locationInfo.locationInfo.Value().areaType.IsNull()) ||
-
-                ((!aLocation.locationInfo.locationInfo.Value().areaType.IsNull() && !entry.locationInfo.locationInfo.Value().areaType.IsNull()) 
-                    && (aLocation.locationInfo.locationInfo.Value().areaType.Value() != entry.locationInfo.locationInfo.Value().areaType.Value()))  )
-            {
-                continue;
-            }
-        }
-
-        // check for non-matching landmarkTag
-        // if landmarkTag is not null, skip locations with null landmarkTag's
-        // if landmarkTag is null, skip locations with non-null landmarkTag's
-        // if both location's landmarkTag are not null, skip locations with non matching landmarkTag's
-        if ((aLocation.locationInfo.landmarkTag.IsNull() != entry.locationInfo.landmarkTag.IsNull()) ||
-
-            ((!aLocation.locationInfo.landmarkTag.IsNull() && !entry.locationInfo.landmarkTag.IsNull()) 
-                && (aLocation.locationInfo.landmarkTag.Value() != entry.locationInfo.landmarkTag.Value()))  )
-        {
-            continue;
-        }
-
-        // check for non-matching positionTag
-        // if positionTag is not null, skip locations with null positionTag's
-        // if positionTag is null, skip locations with non-null positionTag's
-        // if both location's positionTag are not null, skip locations with non matching positionTag's
-        if ((aLocation.locationInfo.positionTag.IsNull() != entry.locationInfo.positionTag.IsNull())  ||
-
-            ((!aLocation.locationInfo.positionTag.IsNull() && !entry.locationInfo.positionTag.IsNull()  
-                && (aLocation.locationInfo.positionTag.Value() != entry.locationInfo.positionTag.Value())))  )
-        {
-            continue;
-        }
-
-        // check for non-matching surfaceTag
-        // if surfaceTag is not null, skip locations with null surfaceTag's
-        // if surfaceTag is null, skip locations with non-null surfaceTag's
-        // if both location's surfaceTag are not null, skip locations with non matching surfaceTag's
-        if ((aLocation.locationInfo.surfaceTag.IsNull() != entry.locationInfo.surfaceTag.IsNull())  ||
-
-            ((!aLocation.locationInfo.surfaceTag.IsNull() && !entry.locationInfo.surfaceTag.IsNull()  
-                && (aLocation.locationInfo.surfaceTag.Value() != entry.locationInfo.surfaceTag.Value())))  )
-        {
-            continue;
-        }
-
-
-        // failure - not unique - no differences found between test location and this supported location entry
-        ret_value = false;
-        break;
     }
 
-    return ret_value;
+    return true;
 }
 
 
@@ -721,7 +622,6 @@ bool Instance::AddSupportedLocation( uint32_t                                   
                                      const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  )
 {
     bool ret_value = false;
-    bool locationAlreadyExists = false;
     uint32_t dummyIndex;
 
     // create location object for validation
@@ -741,13 +641,11 @@ bool Instance::AddSupportedLocation( uint32_t                                   
     VerifyOrExit(IsValidSupportedLocation(aNewLocation), 
                 ChipLogError(Zcl,  "AddSupportedLocation %u - not a valid location object", aNewLocation.locationID));
 
-    // must not match existing location description
-    VerifyOrExit(IsUniqueSupportedLocation(aNewLocation, locationAlreadyExists),
-                ChipLogError(Zcl,  "AddSupportedLocation %u - not a unique location object", aNewLocation.locationID));
-
     // Each entry in Supported Locations SHALL have a unique value for the ID field.
-    VerifyOrExit(!locationAlreadyExists,
-                ChipLogError(Zcl,  "AddSupportedLocation %u - supported location with this Id already exists", aNewLocation.locationID));
+    // If the SupportedMaps attribute is not null, each entry in this list SHALL have a unique value for the combination of the MapID and LocationInfo fields.
+    // If the SupportedMaps attribute is null, each entry in this list SHALL have a unique value for the LocationInfo field.
+    VerifyOrExit(IsUniqueSupportedLocation(aNewLocation, false),
+                ChipLogError(Zcl,  "AddSupportedLocation %u - not a unique location object", aNewLocation.locationID));
 
     // add to supported locations attribute
     VerifyOrExit( mDelegate->AddSupportedLocation(aNewLocation, dummyIndex), /* log error in delegate function*/);
@@ -805,8 +703,9 @@ bool Instance::ModifySupportedLocation( uint32_t                                
         VerifyOrExit(IsValidSupportedLocation(aNewLocation), 
                     ChipLogError(Zcl,  "ModifySupportedLocation %u - not a valid location object", aNewLocation.locationID));
 
-        // updated location description must not match another existing location description
-        VerifyOrExit(IsUniqueSupportedLocation(aNewLocation, locationExists),
+        // updated location description must not match another existing location description.
+        // We ignore comparing the location ID as one of the locations will match this one.
+        VerifyOrExit(IsUniqueSupportedLocation(aNewLocation, true),
                     ChipLogError(Zcl,  "ModifySupportedLocation %u - not a unique location object", aNewLocation.locationID));
 
         // note: we already checked locationExists, we don't need to do it again here.

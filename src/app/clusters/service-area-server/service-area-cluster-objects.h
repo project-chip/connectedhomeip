@@ -39,7 +39,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     /**
      * @brief This is a default constructor that initializes the location object with default values.
      */
-    LocationStructureWrapper() : mLocationNameBuffer()
+    LocationStructureWrapper()
     {
         Set(0, 0, 
              CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<AreaTypeTag>(),
@@ -68,8 +68,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
                               const DataModel::Nullable<AreaTypeTag>     & aAreaTypeTag,
                               const DataModel::Nullable<LandmarkTag>     & aLandmarkTag,
                               const DataModel::Nullable<PositionTag>     & aPositionTag,
-                              const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  ) :
-        mLocationNameBuffer()
+                              const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  )
     {
         Set( aLocationId, aMapId, 
              aLocationName, aFloorNumber, aAreaTypeTag, 
@@ -78,33 +77,31 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
 
     /**
      * @brief This is a copy constructor that initializes the location object with the values from another location object. All values are deep copied.
-     * @param[in] originalObject The location object to copy.
+     * @param[in] aOther The location object to copy.
      * 
      * @note If the locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    LocationStructureWrapper(const LocationStructureWrapper & originalObject) : mLocationNameBuffer() { *this = originalObject; }
+    LocationStructureWrapper(const LocationStructureWrapper & aOther) { *this = aOther; }
 
     /**
      * @brief This is an assignment operator that initializes the location object with the values from another location object. All values are deep copied.
-     * @param[in] aOriginalObject The location object to copy.
+     * @param[in] aOther The location object to copy.
      * 
      * @note If the locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    LocationStructureWrapper & operator=(const LocationStructureWrapper & aOriginalObject)
+    LocationStructureWrapper & operator=(const LocationStructureWrapper & aOther)
     {
-        if (aOriginalObject.locationInfo.locationInfo.IsNull())
+        if (aOther.locationInfo.locationInfo.IsNull())
         {
-            Set(aOriginalObject.locationID, aOriginalObject.mapID,
-                CharSpan(), NullOptional, NullOptional,
-                aOriginalObject.locationInfo.landmarkTag, aOriginalObject.locationInfo.positionTag,
-                aOriginalObject.locationInfo.surfaceTag);
+            Set(aOther.locationID, aOther.mapID,
+                CharSpan(), NullOptional, NullOptional, aOther.locationInfo.landmarkTag,
+                aOther.locationInfo.positionTag, aOther.locationInfo.surfaceTag);
         }
         else
         {
-            Set(aOriginalObject.locationID, aOriginalObject.mapID, aOriginalObject.locationInfo.locationInfo.Value().locationName,
-                aOriginalObject.locationInfo.locationInfo.Value().floorNumber,
-                aOriginalObject.locationInfo.locationInfo.Value().areaType, aOriginalObject.locationInfo.landmarkTag,
-                aOriginalObject.locationInfo.positionTag, aOriginalObject.locationInfo.surfaceTag);
+            Set(aOther.locationID, aOther.mapID, aOther.locationInfo.locationInfo.Value().locationName,
+                aOther.locationInfo.locationInfo.Value().floorNumber, aOther.locationInfo.locationInfo.Value().areaType,
+                aOther.locationInfo.landmarkTag, aOther.locationInfo.positionTag, aOther.locationInfo.surfaceTag);
         }
 
         return *this;
@@ -202,6 +199,58 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     }
 
     /**
+     * @brief Checks if the given LocationStructureWrapper is equal to this one.
+     * @param aOther The location to compare with.
+     * @param aIgnoreLocationId If true, the location IDs are ignored when checking for equality.
+     * @param aIgnoreMapId If true, the map IDs are ignored when checking for equality.
+     * @return True if both locations are equal. False otherwise.
+     */
+    bool IsEqual(const LocationStructureWrapper & aOther, bool aIgnoreLocationId, bool aIgnoreMapId) const
+    {
+        if (!aIgnoreLocationId && (locationID != aOther.locationID)) {
+            return false;
+        }
+
+        if (!aIgnoreMapId && (mapID != aOther.mapID)) {
+            return false;
+        }
+
+        if (locationInfo.locationInfo.IsNull() != aOther.locationInfo.locationInfo.IsNull())
+        {
+            return false;
+        }
+
+        if (!locationInfo.locationInfo.IsNull()) {
+
+            if (!DoesNameMatch(aOther.locationInfo.locationInfo->locationName)) {
+                return false;
+            }
+
+            if (locationInfo.locationInfo->floorNumber != aOther.locationInfo.locationInfo->floorNumber) {
+                return false;
+            }
+
+            if (locationInfo.locationInfo->areaType != aOther.locationInfo.locationInfo->areaType) {
+                return false;
+            }
+        }
+
+        if (locationInfo.landmarkTag != aOther.locationInfo.landmarkTag) {
+            return false;
+        }
+
+        if (locationInfo.positionTag != aOther.locationInfo.positionTag) {
+            return false;
+        }
+
+        if (locationInfo.surfaceTag != aOther.locationInfo.surfaceTag) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @brief Get the location name (for logging).
      * @return The map name as a c style char string.
      * 
@@ -227,7 +276,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     /**
      * @brief This is a default constructor that initializes the map object with default values.
      */
-    MapStructureWrapper() : mMapNameBuffer()
+    MapStructureWrapper()
     {
         Set( 0, CharSpan());
     }
@@ -240,24 +289,24 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      * @note Requirements regarding what combinations of fields and values are 'valid' are not checked by this class.
      * @note If aMapName is larger than kMapNameMaxSize, it will be truncated.
      */
-    MapStructureWrapper (uint8_t aMapId, const CharSpan & aMapName) : mMapNameBuffer()
+    MapStructureWrapper (uint8_t aMapId, const CharSpan & aMapName)
     {
         Set(aMapId, aMapName);
     }
 
     /**
      * @brief This is a copy constructor that initializes the map object with the values from another map object. All values are deep copied.
-     * @param[in] originalMap The map object to copy.
+     * @param[in] aOther The map object to copy.
      */
-    MapStructureWrapper(const MapStructureWrapper & originalMap) { *this = originalMap; }
+    MapStructureWrapper(const MapStructureWrapper & aOther) { *this = aOther; }
 
     /**
      * @brief This is an assignment operator that initializes the map object with the values from another map object. All values are deep copied.
-     * @param[in] originalMap The map object to copy.
+     * @param[in] aOther The map object to copy.
      */
-    MapStructureWrapper & operator=(const MapStructureWrapper & originalMap)
+    MapStructureWrapper & operator=(const MapStructureWrapper & aOther)
     {
-        Set(originalMap.mapID, originalMap.name);
+        Set(aOther.mapID, aOther.name);
         return *this;
     }
 

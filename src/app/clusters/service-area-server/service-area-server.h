@@ -214,15 +214,14 @@ public:
     bool IsValidSupportedLocation(const LocationStructureWrapper & aLocation);
 
     /**
-     * @brief check if location contents are unique with regard to supported locations
-     * @param[in] aLocation id of the location
-     * @param[out] locationInSupportedList set to true if locationID already exists in supported locations attribute
-     * @return true if meets all checks
-     * 
-     * @note this can be used to check a new location, or a modified location that is already a member of supported locations 
-     *       (does not check uniqueness against location with same locationID, if one exists in the supported locations attribute)
+     * @brief check if aLocation is unique with regard to supported locations.
+     * @param[in] aLocation the location to check.
+     * @param[out] ignoreLocationId if true, we do not check if the location ID is unique.
+     * @return true if there isn't a location in supported locations that matches aLocation.
+     *
+     * @note This method may ignore checking the MapId uniqueness. This depends on whether the SupportedMaps attribute is null.
      */
-    bool IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool & locationInSupportedList);
+    bool IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreLocationId);
 
     /**
      * @brief helper function to deal with side-effects of updating the Supported Locations attribute
