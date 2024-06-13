@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import os
+import tempfile
 import unittest
 from os import path
-import tempfile
 from typing import List
 
 from metadata import Metadata, MetadataReader
