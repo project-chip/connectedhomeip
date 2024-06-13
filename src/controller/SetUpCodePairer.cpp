@@ -377,6 +377,9 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     case Dnssd::DiscoveryFilterType::kLongDiscriminator:
         discriminatorMatches = (nodeData.longDiscriminator == mCurrentFilter.code);
         break;
+    case Dnssd::DiscoveryFilterType::kNone:
+        ChipLogDetail(Controller, "Filter type none; all matches will fail");
+        return false;
     default:
         ChipLogError(Controller, "Unknown filter type; all matches will fail");
         return false;
