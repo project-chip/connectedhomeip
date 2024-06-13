@@ -442,7 +442,7 @@ void BluezEndpoint::SetupGattService()
 {
 
     static const char * const c1_flags[] = { "write", nullptr };
-    static const char * const c2_flags[] = { "read", "indicate", nullptr };
+    static const char * const c2_flags[] = { "indicate", nullptr };
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static const char * const c3_flags[] = { "read", nullptr };
 #endif
