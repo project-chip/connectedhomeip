@@ -520,9 +520,10 @@ private:
     class RollbackData
     {
     public:
-        void Checkpoint(CommandSender& aCommandSender);
-        CHIP_ERROR Rollback(CommandSender& aCommandSender);
+        void Checkpoint(CommandSender & aCommandSender);
+        CHIP_ERROR Rollback(CommandSender & aCommandSender);
         bool RollbackIsValid() { return mRollbackIsValid; }
+
     private:
         TLV::TLVWriter mBackupWriter;
         State mBackupState;

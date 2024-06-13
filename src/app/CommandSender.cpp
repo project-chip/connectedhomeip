@@ -688,14 +688,16 @@ void CommandSender::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
 }
 
-void CommandSender::RollbackData::Checkpoint(CommandSender& aCommandSender) {
-    //InvokeRequestMessage::Builder& aInvokeRequestBuilder, const State& aState) {
+void CommandSender::RollbackData::Checkpoint(CommandSender & aCommandSender)
+{
+    // InvokeRequestMessage::Builder& aInvokeRequestBuilder, const State& aState) {
     aCommandSender.mInvokeRequestBuilder.Checkpoint(mBackupWriter);
-    mBackupState = aCommandSender.mState;
+    mBackupState     = aCommandSender.mState;
     mRollbackIsValid = true;
 }
 
-CHIP_ERROR CommandSender::RollbackData::Rollback(CommandSender& aCommandSender) {
+CHIP_ERROR CommandSender::RollbackData::Rollback(CommandSender & aCommandSender)
+{
     // TODO(#30453): Rollback of mInvokeRequestBuilder should handle resetting
     // InvokeResponses.
     VerifyOrReturnError(mRollbackIsValid, CHIP_ERROR_INCORRECT_STATE);

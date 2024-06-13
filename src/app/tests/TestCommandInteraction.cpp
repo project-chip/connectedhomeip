@@ -129,8 +129,7 @@ public:
 
         TLV::TLVType outerContainerType;
         ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outerContainerType));
-        ReturnErrorOnFailure(
-            app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer.Get(), mBuffer.AllocatedSize())));
+        ReturnErrorOnFailure(app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer.Get(), mBuffer.AllocatedSize())));
         return aWriter.EndContainer(outerContainerType);
     }
 
