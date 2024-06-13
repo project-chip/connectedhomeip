@@ -222,6 +222,11 @@ CHIP_ERROR ChipDeviceEventHandler::SetUdcStatus(bool udcInProgress)
     return CHIP_NO_ERROR;
 }
 
+bool ChipDeviceEventHandler::isUdcInProgress()
+{
+    return sUdcInProgress;
+}
+
 }; // namespace support
 }; // namespace casting
 }; // namespace matter

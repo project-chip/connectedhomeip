@@ -82,9 +82,14 @@ void ModelCommand::Shutdown()
     mOnDeviceConnectionFailureCallback.Cancel();
 }
 
-void ModelCommand::ClearICDEntry(const chip::ScopedNodeId & nodeId)
+void ModelCommand::ClearICDEntry(const ScopedNodeId & nodeId)
 {
     ChipLogError(chipTool, "ClearICDEntry is not implemented in tv-casting-app");
+}
+
+void ModelCommand::StoreICDEntryWithKey(app::ICDClientInfo & clientinfo, ByteSpan key)
+{
+    ChipLogError(chipTool, "StoreICDEntryWithKey is not implemented in tv-casting-app");
 }
 
 bool ModelCommand::IsPeerLIT()

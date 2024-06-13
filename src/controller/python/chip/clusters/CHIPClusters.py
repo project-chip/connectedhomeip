@@ -11591,6 +11591,107 @@ class ChipClusters:
             },
         },
     }
+    _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "ThreadBorderRouterManagement",
+        "clusterId": 0x00000452,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "GetActiveDatasetRequest",
+                "args": {
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "GetPendingDatasetRequest",
+                "args": {
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "SetActiveDatasetRequest",
+                "args": {
+                    "activeDataset": "bytes",
+                    "breadcrumb": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "SetPendingDatasetRequest",
+                "args": {
+                    "pendingDataset": "bytes",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "BorderRouterName",
+                "attributeId": 0x00000000,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "BorderAgentID",
+                "attributeId": 0x00000001,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "ThreadVersion",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "InterfaceEnabled",
+                "attributeId": 0x00000003,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "ActiveDatasetTimestamp",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO = {
         "clusterName": "ThreadNetworkDirectory",
         "clusterId": 0x00000453,
@@ -14779,6 +14880,7 @@ class ChipClusters:
         0x0000042E: _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000042F: _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x00000451: _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
+        0x00000452: _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         0x00000453: _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,
         0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
         0x00000504: _CHANNEL_CLUSTER_INFO,
@@ -14902,6 +15004,7 @@ class ChipClusters:
         "TotalVolatileOrganicCompoundsConcentrationMeasurement": _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "RadonConcentrationMeasurement": _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "WiFiNetworkManagement": _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
+        "ThreadBorderRouterManagement": _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         "ThreadNetworkDirectory": _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "Channel": _CHANNEL_CLUSTER_INFO,

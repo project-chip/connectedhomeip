@@ -7804,6 +7804,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ThreadBorderRouterManagement::Commands::DatasetResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("dataset", indent + 1, value.dataset));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const ThreadNetworkDirectory::Commands::OperationalDatasetResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -16222,6 +16230,67 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case ThreadBorderRouterManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case ThreadBorderRouterManagement::Attributes::BorderRouterName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BorderRouterName", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::BorderAgentID::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BorderAgentID", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ThreadVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThreadVersion", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InterfaceEnabled", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveDatasetTimestamp", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case ThreadNetworkDirectory::Id: {
         switch (path.mAttributeId)
         {
@@ -18631,6 +18700,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NetworkPassphraseResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case ThreadBorderRouterManagement::Id: {
+        switch (path.mCommandId)
+        {
+        case ThreadBorderRouterManagement::Commands::DatasetResponse::Id: {
+            ThreadBorderRouterManagement::Commands::DatasetResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DatasetResponse", 1, value);
         }
         }
         break;

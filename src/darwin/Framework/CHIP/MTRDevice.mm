@@ -35,6 +35,8 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
+#import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
@@ -60,35 +62,80 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
-// This class is for storing weak references in a container
-@interface MTRWeakReference<ObjectType> : NSObject
-+ (instancetype)weakReferenceWithObject:(ObjectType)object;
-- (instancetype)initWithObject:(ObjectType)object;
-- (ObjectType)strongObject; // returns strong object or NULL
-@end
 
-@interface MTRWeakReference () {
+// container of MTRDevice delegate weak reference, its queue, and its interested paths for attribute reports
+MTR_DIRECT_MEMBERS
+@interface MTRDeviceDelegateInfo : NSObject {
 @private
-    __weak id _object;
+    void * _delegatePointerValue;
+    __weak id _delegate;
+    dispatch_queue_t _queue;
+    NSArray * _Nullable _interestedPathsForAttributes;
+    NSArray * _Nullable _interestedPathsForEvents;
 }
+
+// Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
+@property (readonly, nullable) NSArray * interestedPathsForAttributes;
+
+// Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
+@property (readonly, nullable) NSArray * interestedPathsForEvents;
+
+// Expose delegate
+@property (readonly) id delegate;
+
+// Pointer value for logging purpose only
+@property (readonly) void * delegatePointerValue;
+
+- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
+
+// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
+- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
+
+#ifdef DEBUG
+// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
+- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
+#endif
 @end
 
-@implementation MTRWeakReference
-- (instancetype)initWithObject:(id)object
+@implementation MTRDeviceDelegateInfo
+- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
     if (self = [super init]) {
-        _object = object;
+        _delegate = delegate;
+        _delegatePointerValue = (__bridge void *) delegate;
+        _queue = queue;
+        _interestedPathsForAttributes = [interestedPathsForAttributes copy];
+        _interestedPathsForEvents = [interestedPathsForEvents copy];
     }
     return self;
 }
-+ (instancetype)weakReferenceWithObject:(id)object
+
+- (NSString *)description
 {
-    return [[self alloc] initWithObject:object];
+    return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested attribute paths count %lu event paths count %lu>", self, _delegatePointerValue, static_cast<unsigned long>(_interestedPathsForAttributes.count), static_cast<unsigned long>(_interestedPathsForEvents.count)];
 }
-- (id)strongObject
+
+- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
 {
-    return _object;
+    id<MTRDeviceDelegate> strongDelegate = _delegate;
+    VerifyOrReturnValue(strongDelegate, NO);
+    dispatch_async(_queue, ^{
+        block(strongDelegate);
+    });
+    return YES;
 }
+
+#ifdef DEBUG
+- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block
+{
+    id<MTRDeviceDelegate> strongDelegate = _delegate;
+    VerifyOrReturnValue(strongDelegate, NO);
+
+    block(strongDelegate);
+
+    return YES;
+}
+#endif
 @end
 
 NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
@@ -306,14 +353,19 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 // happen more often than once every 10 minutes.
 #define MTRDEVICE_MIN_RESUBSCRIBE_DUE_TO_READ_INTERVAL_SECONDS (10 * 60)
 
+// Weight of new data in determining subscription latencies.  To avoid random
+// outliers causing too much noise in the value, treat an existing value (if
+// any) as having 2/3 weight and the new value as having 1/3 weight.  These
+// weights are subject to change, if it's determined that different ones give
+// better behavior.
+#define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
+
 @interface MTRDevice ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
 // and protects device calls to setUTCTime and setDSTOffset
 @property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 @property (nonatomic) chip::FabricIndex fabricIndex;
-@property (nonatomic) MTRWeakReference<id<MTRDeviceDelegate>> * weakDelegate;
-@property (nonatomic) dispatch_queue_t delegateQueue;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 @property (nonatomic) BOOL receivingReport;
 @property (nonatomic) BOOL receivingPrimingReport;
@@ -374,6 +426,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
 - (void)unitTestClusterDataPersisted:(MTRDevice *)device;
+- (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
 @end
 #endif
 
@@ -435,6 +488,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     // System time change observer reference
     id _systemTimeChangeObserverToken;
+
+    NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -459,7 +514,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         _clusterDataToPersist = nil;
         _persistedClusters = [NSMutableSet set];
 
-        // If there is a data store, make sure we have an observer to
+        // If there is a data store, make sure we have an observer to monitor system clock changes, so
+        // NSDate-based write coalescing could be reset and not get into a bad state.
         if (_persistedClusterData) {
             mtr_weakify(self);
             _systemTimeChangeObserverToken = [[NSNotificationCenter defaultCenter] addObserverForName:NSSystemClockDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull notification) {
@@ -468,6 +524,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                 [self _resetStorageBehaviorState];
             }];
         }
+
+        _delegates = [NSMutableSet set];
 
         MTR_LOG_DEBUG("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
@@ -550,12 +608,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (void)_scheduleNextUpdate:(UInt64)nextUpdateInSeconds
 {
-    MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
+    mtr_weakify(self);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (nextUpdateInSeconds * NSEC_PER_SEC)), self.queue, ^{
         MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
-        MTRDevice * strongSelf = weakSelf.strongObject;
-        if (strongSelf) {
-            [strongSelf _performScheduledTimeUpdate];
+        mtr_strongify(self);
+        if (self) {
+            [self _performScheduledTimeUpdate];
         } else {
             MTR_LOG_DEBUG("%@ MTRDevice no longer valid. No Timer Scheduled will be scheduled for a Device Time Update.", self);
             return;
@@ -728,25 +786,64 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     MTR_LOG("%@ setDelegate %@", self, delegate);
+    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil interestedPathsForEvents:nil];
+}
 
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    MTR_LOG("%@ addDelegate %@", self, delegate);
+    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:nil interestedPathsForEvents:nil];
+}
+
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents MTR_NEWLY_AVAILABLE;
+{
+    MTR_LOG("%@ addDelegate %@ with interested attribute paths %@ event paths %@", self, delegate, interestedPathsForAttributes, interestedPathsForEvents);
+    [self _addDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
+}
+
+- (void)_addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
+{
     std::lock_guard lock(_lock);
 
-    BOOL setUpSubscription = [self _subscriptionsAllowed];
+    // Replace delegate info with the same delegate object, and opportunistically remove defunct delegate references
+    NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
+    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
+        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
+        if (!strongDelegate) {
+            [delegatesToRemove addObject:delegateInfo];
+            MTR_LOG("%@ removing delegate info for nil delegate %p", self, delegateInfo.delegatePointerValue);
+        } else if (strongDelegate == delegate) {
+            [delegatesToRemove addObject:delegateInfo];
+            MTR_LOG("%@ replacing delegate info for %p", self, delegate);
+        }
+    }
+    if (delegatesToRemove.count) {
+        NSUInteger oldDelegatesCount = _delegates.count;
+        [_delegates minusSet:delegatesToRemove];
+        MTR_LOG("%@ addDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
+    }
+
+    MTRDeviceDelegateInfo * newDelegateInfo = [[MTRDeviceDelegateInfo alloc] initWithDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
+    [_delegates addObject:newDelegateInfo];
+    MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
+
+    __block BOOL shouldSetUpSubscription = [self _subscriptionsAllowed];
 
     // For unit testing only. If this ever changes to not being for unit testing purposes,
     // we would need to move the code outside of where we acquire the lock above.
 #ifdef DEBUG
-    id testDelegate = delegate;
-    if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
-        setUpSubscription = [testDelegate unitTestShouldSetUpSubscriptionForDevice:self];
-    }
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
+            shouldSetUpSubscription = [testDelegate unitTestShouldSetUpSubscriptionForDevice:self];
+        }
+    }];
 #endif
 
-    _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
-    _delegateQueue = queue;
-
-    if (setUpSubscription) {
-        _initialSubscribeStart = [NSDate now];
+    if (shouldSetUpSubscription) {
+        // Record the time of first addDelegate call that triggers initial subscribe, and do not reset this value on subsequent addDelegate calls
+        if (!_initialSubscribeStart) {
+            _initialSubscribeStart = [NSDate now];
+        }
         if ([self _deviceUsesThread]) {
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
@@ -755,6 +852,27 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         } else {
             [self _setupSubscriptionWithReason:@"delegate is set and subscription is needed"];
         }
+    }
+}
+
+- (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
+{
+    MTR_LOG("%@ removeDelegate %@", self, delegate);
+
+    std::lock_guard lock(_lock);
+
+    NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
+    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
+        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
+        if (strongDelegate == delegate) {
+            [delegatesToRemove addObject:delegateInfo];
+            MTR_LOG("%@ removing delegate info %@ for %p", self, delegateInfo, delegate);
+        }
+    }];
+    if (delegatesToRemove.count) {
+        NSUInteger oldDelegatesCount = _delegates.count;
+        [_delegates minusSet:delegatesToRemove];
+        MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
     }
 }
 
@@ -772,15 +890,24 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     _state = MTRDeviceStateUnknown;
 
-    _weakDelegate = nil;
+    [_delegates removeAllObjects];
 
     // Make sure we don't try to resubscribe if we have a pending resubscribe
     // attempt, since we now have no delegate.
     _reattemptingSubscription = NO;
 
-    // We do not change _internalDeviceState here, because we might still have a
-    // subscription.  In that case, _internalDeviceState will update when the
-    // subscription is actually terminated.
+    [_deviceController asyncDispatchToMatterQueue:^{
+        // Destroy the read client and callback (has to happen on the Matter
+        // queue, to avoid deleting objects that are being referenced), to
+        // tear down the subscription.  We will get no more callbacks from
+        // the subscrption after this point.
+        std::lock_guard lock(self->_lock);
+        self->_currentReadClient = nullptr;
+        self->_currentSubscriptionCallback = nullptr;
+
+        [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
+    }
+                                     errorHandler:nil];
 
     [self _stopConnectivityMonitoring];
 
@@ -843,20 +970,25 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (BOOL)_subscriptionAbleToReport
 {
     std::lock_guard lock(_lock);
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate == nil) {
+    if (![self _delegateExists]) {
         // No delegate definitely means no subscription.
         return NO;
     }
 
     // For unit testing only, matching logic in setDelegate
 #ifdef DEBUG
-    id testDelegate = delegate;
-    if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
-        if (![testDelegate unitTestShouldSetUpSubscriptionForDevice:self]) {
-            return NO;
+    __block BOOL useTestDelegateOverride = NO;
+    __block BOOL testDelegateShouldSetUpSubscriptionForDevice = NO;
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
+            useTestDelegateOverride = YES;
+            testDelegateShouldSetUpSubscriptionForDevice = [testDelegate unitTestShouldSetUpSubscriptionForDevice:self];
         }
+    }];
+    if (useTestDelegateOverride && !testDelegateShouldSetUpSubscriptionForDevice) {
+        return NO;
     }
+
 #endif
 
     // Subscriptions are not able to report if they are not allowed.
@@ -903,23 +1035,83 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                                      errorHandler:nil];
 }
 
-- (BOOL)_callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
+- (BOOL)_delegateExists
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            block(delegate);
-        });
-        return YES;
-    }
-    return NO;
+    return [self _iterateDelegatesWithBlock:nil];
 }
+
+// Returns YES if any non-null delegates were found
+- (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^)(MTRDeviceDelegateInfo * delegateInfo)_Nullable)block
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (!_delegates.count) {
+        MTR_LOG_DEBUG("%@ no delegates to iterate", self);
+        return NO;
+    }
+
+    // Opportunistically remove defunct delegate references on every iteration
+    NSMutableSet * delegatesToRemove = nil;
+    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
+        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
+        if (strongDelegate) {
+            if (block) {
+                @autoreleasepool {
+                    block(delegateInfo);
+                }
+            }
+            (void) strongDelegate; // ensure it stays alive
+        } else {
+            if (!delegatesToRemove) {
+                delegatesToRemove = [NSMutableSet set];
+            }
+            [delegatesToRemove addObject:delegateInfo];
+        }
+    }
+
+    if (delegatesToRemove.count) {
+        [_delegates minusSet:delegatesToRemove];
+        MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", self, static_cast<unsigned long>(delegatesToRemove.count), (unsigned long) static_cast<unsigned long>(_delegates.count));
+    }
+
+    return (_delegates.count > 0);
+}
+
+- (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    __block NSUInteger delegatesCalled = 0;
+    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
+        if ([delegateInfo callDelegateWithBlock:block]) {
+            delegatesCalled++;
+        }
+    }];
+
+    return (delegatesCalled > 0);
+}
+
+#ifdef DEBUG
+// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
+// Returns YES if a delegate is called
+- (void)_callFirstDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
+        if ([delegateInfo callDelegateSynchronouslyWithBlock:block]) {
+            MTR_LOG("%@ _callFirstDelegateSynchronouslyWithBlock: successfully called %@", self, delegateInfo);
+            return;
+        }
+    }
+}
+#endif
 
 - (void)_callDelegateDeviceCachePrimed
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    [self _callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
             [delegate deviceCachePrimed:self];
         }
@@ -942,12 +1134,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             MTR_LOG(
                 "%@ reachability state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
         }
-        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-        if (delegate) {
-            dispatch_async(_delegateQueue, ^{
-                [delegate device:self stateChanged:state];
-            });
-        }
+        [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            [delegate device:self stateChanged:state];
+        }];
     } else {
         MTR_LOG(
             "%@ Not reporting reachability state change, since no change in state %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
@@ -964,12 +1153,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
         /* BEGIN DRAGONS: This is a huge hack for a specific use case, do not rename, remove or modify behavior here */
         // TODO: This should only be called for thread devices
-        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-        if ([delegate respondsToSelector:@selector(_deviceInternalStateChanged:)]) {
-            dispatch_async(_delegateQueue, ^{
-                [(id) delegate _deviceInternalStateChanged:self];
-            });
-        }
+        [self _callDelegatesWithBlock:^(id delegate) {
+            if ([delegate respondsToSelector:@selector(_deviceInternalStateChanged:)]) {
+                [delegate _deviceInternalStateChanged:self];
+            }
+        }];
         /* END DRAGONS */
     }
 }
@@ -1012,7 +1200,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // We want time interval from initialSubscribeStart to now, not the other
         // way around.
         NSTimeInterval subscriptionLatency = -[initialSubscribeStart timeIntervalSinceNow];
-        _estimatedSubscriptionLatency = @(subscriptionLatency);
+        if (_estimatedSubscriptionLatency == nil) {
+            _estimatedSubscriptionLatency = @(subscriptionLatency);
+        } else {
+            NSTimeInterval newSubscriptionLatencyEstimate = MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT * subscriptionLatency + (1 - MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT) * _estimatedSubscriptionLatency.doubleValue;
+            _estimatedSubscriptionLatency = @(newSubscriptionLatencyEstimate);
+        }
         [self _storePersistedDeviceData];
     }
 
@@ -1046,14 +1239,15 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     os_unfair_lock_assert_owner(&self->_lock);
 
 #ifdef DEBUG
-    id testDelegate = _weakDelegate.strongObject;
-    if (testDelegate) {
-        // Note: This is a hack to allow our unit tests to test the subscription pooling behavior we have implemented for thread, so we mock devices to be a thread device
+    // Note: This is a hack to allow our unit tests to test the subscription pooling behavior we have implemented for thread, so we mock devices to be a thread device
+    __block BOOL pretendThreadEnabled = NO;
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
         if ([testDelegate respondsToSelector:@selector(unitTestPretendThreadEnabled:)]) {
-            if ([testDelegate unitTestPretendThreadEnabled:self]) {
-                return YES;
-            }
+            pretendThreadEnabled = [testDelegate unitTestPretendThreadEnabled:self];
         }
+    }];
+    if (pretendThreadEnabled) {
+        return YES;
     }
 #endif
 
@@ -1079,14 +1273,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     MTRAsyncWorkCompletionBlock completion = self->_subscriptionPoolWorkCompletionBlock;
     if (completion) {
 #ifdef DEBUG
-        id delegate = self->_weakDelegate.strongObject;
-        if (delegate) {
-            dispatch_async(self->_delegateQueue, ^{
-                if ([delegate respondsToSelector:@selector(unitTestSubscriptionPoolWorkComplete:)]) {
-                    [delegate unitTestSubscriptionPoolWorkComplete:self];
-                }
-            });
-        }
+        [self _callDelegatesWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionPoolWorkComplete:)]) {
+                [testDelegate unitTestSubscriptionPoolWorkComplete:self];
+            }
+        }];
 #endif
         self->_subscriptionPoolWorkCompletionBlock = nil;
         completion(MTRAsyncWorkComplete);
@@ -1110,14 +1301,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
             os_unfair_lock_lock(&self->_lock);
 #ifdef DEBUG
-            id delegate = self->_weakDelegate.strongObject;
-            if (delegate) {
-                dispatch_async(self->_delegateQueue, ^{
-                    if ([delegate respondsToSelector:@selector(unitTestSubscriptionPoolDequeue:)]) {
-                        [delegate unitTestSubscriptionPoolDequeue:self];
-                    }
-                });
-            }
+            [self _callDelegatesWithBlock:^(id testDelegate) {
+                if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionPoolDequeue:)]) {
+                    [testDelegate unitTestSubscriptionPoolDequeue:self];
+                }
+            }];
 #endif
             if (self->_subscriptionPoolWorkCompletionBlock) {
                 // This means a resubscription triggering event happened and is now in-progress
@@ -1200,8 +1388,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _lastSubscriptionFailureTime = [NSDate now];
 
     // if there is no delegate then also do not retry
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (!delegate) {
+    if (![self _delegateExists]) {
         // NOTE: Do not log anything here: we have been invalidated, and the
         // Matter stack might already be torn down.
         return;
@@ -1209,7 +1396,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     // don't schedule multiple retries
     if (self.reattemptingSubscription) {
-        MTR_LOG("%@ already reattempting subscription", self);
         return;
     }
 
@@ -1244,9 +1430,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // Call _reattemptSubscriptionNowIfNeededWithReason when timer fires - if subscription is
     // in a better state at that time this will be a no-op.
     auto resubscriptionBlock = ^{
-        os_unfair_lock_lock(&self->_lock);
+        std::lock_guard lock(self->_lock);
         [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
-        os_unfair_lock_unlock(&self->_lock);
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
@@ -1277,14 +1462,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     [self _changeState:MTRDeviceStateReachable];
 
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
-                [delegate deviceBecameActive:self];
-            }
-        });
-    }
+    [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
+            [delegate deviceBecameActive:self];
+        }
+    }];
 
     // in case this is called during exponential back off of subscription
     // reestablishment, this starts the attempt right away
@@ -1351,6 +1533,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    // Sanity check
+    if (![self _dataStoreExists]) {
+        MTR_LOG_ERROR("%@ storage behavior: no data store in _persistClusterData!", self);
+        return;
+    }
+
     // Nothing to persist
     if (!_clusterDataToPersist.count) {
         return;
@@ -1379,14 +1567,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _clusterDataToPersist = nil;
 
 #ifdef DEBUG
-    id delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            if ([delegate respondsToSelector:@selector(unitTestClusterDataPersisted:)]) {
-                [delegate unitTestClusterDataPersisted:self];
-            }
-        });
-    }
+    [self _callDelegatesWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestClusterDataPersisted:)]) {
+            [testDelegate unitTestClusterDataPersisted:self];
+        }
+    }];
 #endif
 }
 
@@ -1571,7 +1756,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _deviceReportingExcessivelyStartTime = nil;
     _reportToPersistenceDelayCurrentMultiplier = 1;
 
-    if (_persistedClusters) {
+    // Sanity check that there is a data
+    if ([self _dataStoreExists]) {
         [self _persistClusterData];
     }
 }
@@ -1598,13 +1784,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     // After the handling of the report, if we detected a device configuration change, notify the delegate
     // of the same.
     if (_deviceConfigurationChanged) {
-        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-        if (delegate) {
-            dispatch_async(_delegateQueue, ^{
-                if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)])
-                    [delegate deviceConfigurationChanged:self];
-            });
-        }
+        [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)]) {
+                [delegate deviceConfigurationChanged:self];
+            }
+        }];
         _deviceConfigurationChanged = NO;
     }
 
@@ -1623,15 +1807,66 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 // For unit testing only
 #ifdef DEBUG
-    id delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            if ([delegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
-                [delegate unitTestReportEndForDevice:self];
-            }
-        });
-    }
+    [self _callDelegatesWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
+            [testDelegate unitTestReportEndForDevice:self];
+        }
+    }];
 #endif
+}
+
+- (BOOL)_interestedPaths:(NSArray * _Nullable)interestedPaths includesAttributePath:(MTRAttributePath *)attributePath
+{
+    for (id interestedPath in interestedPaths) {
+        if ([interestedPath isKindOfClass:[NSNumber class]]) {
+            NSNumber * interestedEndpointIDNumber = interestedPath;
+            if ([interestedEndpointIDNumber isEqualToNumber:attributePath.endpoint]) {
+                return YES;
+            }
+        } else if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
+            MTRClusterPath * interestedClusterPath = interestedPath;
+            if ([interestedClusterPath.cluster isEqualToNumber:attributePath.cluster]) {
+                return YES;
+            }
+        } else if ([interestedPath isKindOfClass:[MTRAttributePath class]]) {
+            MTRAttributePath * interestedAttributePath = interestedPath;
+            if (([interestedAttributePath.cluster isEqualToNumber:attributePath.cluster]) && ([interestedAttributePath.attribute isEqualToNumber:attributePath.attribute])) {
+                return YES;
+            }
+        }
+    }
+
+    return NO;
+}
+
+// Returns filtered set of attributes using an interestedPaths array.
+// Returns nil if no attribute report has a path that matches the paths in the interestedPaths array.
+- (NSArray<NSDictionary<NSString *, id> *> *)_filteredAttributes:(NSArray<NSDictionary<NSString *, id> *> *)attributes forInterestedPaths:(NSArray * _Nullable)interestedPaths
+{
+    if (!interestedPaths) {
+        return attributes;
+    }
+
+    if (!interestedPaths.count) {
+        return nil;
+    }
+
+    NSMutableArray * filteredAttributes = nil;
+    for (NSDictionary<NSString *, id> * responseValue in attributes) {
+        MTRAttributePath * attributePath = responseValue[MTRAttributePathKey];
+        if ([self _interestedPaths:interestedPaths includesAttributePath:attributePath]) {
+            if (!filteredAttributes) {
+                filteredAttributes = [NSMutableArray array];
+            }
+            [filteredAttributes addObject:responseValue];
+        }
+    }
+
+    if (filteredAttributes.count && (filteredAttributes.count != attributes.count)) {
+        MTR_LOG("%@ filtered attribute report %lu => %lu", self, static_cast<unsigned long>(attributes.count), static_cast<unsigned long>(filteredAttributes.count));
+    }
+
+    return filteredAttributes;
 }
 
 // assume lock is held
@@ -1639,12 +1874,15 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     os_unfair_lock_assert_owner(&self->_lock);
     if (attributes.count) {
-        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-        if (delegate) {
-            dispatch_async(_delegateQueue, ^{
-                [delegate device:self receivedAttributeReport:attributes];
-            });
-        }
+        [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
+            // _iterateDelegatesWithBlock calls this with an autorelease pool, and so temporary filtered attributes reports don't bloat memory
+            NSArray<NSDictionary<NSString *, id> *> * filteredAttributes = [self _filteredAttributes:attributes forInterestedPaths:delegateInfo.interestedPathsForAttributes];
+            if (filteredAttributes.count) {
+                [delegateInfo callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
+                    [delegate device:self receivedAttributeReport:filteredAttributes];
+                }];
+            }
+        }];
     }
 }
 
@@ -1673,6 +1911,60 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     });
 }
 #endif
+
+- (BOOL)_interestedPaths:(NSArray * _Nullable)interestedPaths includesEventPath:(MTREventPath *)eventPath
+{
+    for (id interestedPath in interestedPaths) {
+        if ([interestedPath isKindOfClass:[NSNumber class]]) {
+            NSNumber * interestedEndpointIDNumber = interestedPath;
+            if ([interestedEndpointIDNumber isEqualToNumber:eventPath.endpoint]) {
+                return YES;
+            }
+        } else if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
+            MTRClusterPath * interestedClusterPath = interestedPath;
+            if ([interestedClusterPath.cluster isEqualToNumber:eventPath.cluster]) {
+                return YES;
+            }
+        } else if ([interestedPath isKindOfClass:[MTREventPath class]]) {
+            MTREventPath * interestedEventPath = interestedPath;
+            if (([interestedEventPath.cluster isEqualToNumber:eventPath.cluster]) && ([interestedEventPath.event isEqualToNumber:eventPath.event])) {
+                return YES;
+            }
+        }
+    }
+
+    return NO;
+}
+
+// Returns filtered set of events using an interestedPaths array.
+// Returns nil if no event report has a path that matches the paths in the interestedPaths array.
+- (NSArray<NSDictionary<NSString *, id> *> *)_filteredEvents:(NSArray<NSDictionary<NSString *, id> *> *)events forInterestedPaths:(NSArray * _Nullable)interestedPaths
+{
+    if (!interestedPaths) {
+        return events;
+    }
+
+    if (!interestedPaths.count) {
+        return nil;
+    }
+
+    NSMutableArray * filteredEvents = nil;
+    for (NSDictionary<NSString *, id> * responseValue in events) {
+        MTREventPath * eventPath = responseValue[MTREventPathKey];
+        if ([self _interestedPaths:interestedPaths includesEventPath:eventPath]) {
+            if (!filteredEvents) {
+                filteredEvents = [NSMutableArray array];
+            }
+            [filteredEvents addObject:responseValue];
+        }
+    }
+
+    if (filteredEvents.count && (filteredEvents.count != events.count)) {
+        MTR_LOG("%@ filtered event report %lu => %lu", self, static_cast<unsigned long>(events.count), static_cast<unsigned long>(filteredEvents.count));
+    }
+
+    return filteredEvents;
+}
 
 - (void)_handleEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
@@ -1760,12 +2052,19 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         MTR_LOG("%@ updated estimated start time to %@", self, _estimatedStartTime);
     }
 
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate) {
+    __block BOOL delegatesCalled = NO;
+    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
+        // _iterateDelegatesWithBlock calls this with an autorelease pool, and so temporary filtered event reports don't bloat memory
+        NSArray<NSDictionary<NSString *, id> *> * filteredEvents = [self _filteredEvents:reportToReturn forInterestedPaths:delegateInfo.interestedPathsForEvents];
+        if (filteredEvents.count) {
+            [delegateInfo callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
+                [delegate device:self receivedEventReport:filteredEvents];
+            }];
+            delegatesCalled = YES;
+        }
+    }];
+    if (delegatesCalled) {
         _unreportedEvents = nil;
-        dispatch_async(_delegateQueue, ^{
-            [delegate device:self receivedEventReport:reportToReturn];
-        });
     } else {
         // save unreported events
         _unreportedEvents = reportToReturn;
@@ -1886,9 +2185,16 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         && isFromSubscription
         && !_receivingPrimingReport
         && AttributeHasChangesOmittedQuality(path)) {
-        // Do not persist new values for Changes Omitted Quality attributes unless
-        // they're part of a Priming Report or from a read response.
+        // Do not persist new values for Changes Omitted Quality (aka C Quality)
+        // attributes unless they're part of a Priming Report or from a read response.
         // (removals are OK)
+
+        // log when a device violates expectations for Changes Omitted Quality attributes.
+        using namespace chip::Tracing::DarwinFramework;
+        MATTER_LOG_METRIC_BEGIN(kMetricUnexpectedCQualityUpdate);
+        [self _addInformationalAttributesToCurrentMetricScope];
+        MATTER_LOG_METRIC_END(kMetricUnexpectedCQualityUpdate);
+
         return;
     }
 
@@ -1986,13 +2292,15 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     }
 
 #ifdef DEBUG
-    id delegate = _weakDelegate.strongObject;
+    __block NSNumber * delegateMin = nil;
     Optional<System::Clock::Seconds32> maxIntervalOverride;
-    if (delegate) {
-        if ([delegate respondsToSelector:@selector(unitTestMaxIntervalOverrideForSubscription:)]) {
-            NSNumber * delegateMin = [delegate unitTestMaxIntervalOverrideForSubscription:self];
-            maxIntervalOverride.Emplace(delegateMin.unsignedIntValue);
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestMaxIntervalOverrideForSubscription:)]) {
+            delegateMin = [testDelegate unitTestMaxIntervalOverrideForSubscription:self];
         }
+    }];
+    if (delegateMin) {
+        maxIntervalOverride.Emplace(delegateMin.unsignedIntValue);
     }
 #endif
 
@@ -2005,15 +2313,26 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
 
-    // Set up a timer to mark as not reachable if it takes too long to set up a subscription
-    MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
-        MTRDevice * strongSelf = weakSelf.strongObject;
-        if (strongSelf != nil) {
-            std::lock_guard lock(strongSelf->_lock);
-            [strongSelf _markDeviceAsUnreachableIfNeverSubscribed];
+    __block bool markUnreachableAfterWait = true;
+#ifdef DEBUG
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestSuppressTimeBasedReachabilityChanges:)]) {
+            markUnreachableAfterWait = ![testDelegate unitTestSuppressTimeBasedReachabilityChanges:self];
         }
-    });
+    }];
+#endif
+
+    if (markUnreachableAfterWait) {
+        // Set up a timer to mark as not reachable if it takes too long to set up a subscription
+        mtr_weakify(self);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
+            mtr_strongify(self);
+            if (self != nil) {
+                std::lock_guard lock(self->_lock);
+                [self _markDeviceAsUnreachableIfNeverSubscribed];
+            }
+        });
+    }
 
     [_deviceController
         getSessionForNode:_nodeID.unsignedLongLongValue
@@ -2214,6 +2533,20 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     NSUInteger attributesReportedSinceLastCheck = _unitTestAttributesReportedSinceLastCheck;
     _unitTestAttributesReportedSinceLastCheck = 0;
     return attributesReportedSinceLastCheck;
+}
+
+- (NSUInteger)unitTestNonnullDelegateCount
+{
+    std::lock_guard lock(self->_lock);
+
+    NSUInteger nonnullDelegateCount = 0;
+    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
+        if (delegateInfo.delegate) {
+            nonnullDelegateCount++;
+        }
+    }
+
+    return nonnullDelegateCount;
 }
 #endif
 
@@ -2509,14 +2842,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
                                                                          attributeID:attributeID];
 
-    BOOL useValueAsExpectedValue = YES;
+    __block BOOL useValueAsExpectedValue = YES;
 #ifdef DEBUG
     os_unfair_lock_lock(&self->_lock);
-    id delegate = _weakDelegate.strongObject;
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id delegate) {
+        if ([delegate respondsToSelector:@selector(unitTestShouldSkipExpectedValuesForWrite:)]) {
+            useValueAsExpectedValue = ![delegate unitTestShouldSkipExpectedValuesForWrite:self];
+        }
+    }];
     os_unfair_lock_unlock(&self->_lock);
-    if ([delegate respondsToSelector:@selector(unitTestShouldSkipExpectedValuesForWrite:)]) {
-        useValueAsExpectedValue = ![delegate unitTestShouldSkipExpectedValuesForWrite:self];
-    }
 #endif
 
     uint64_t expectedValueID = 0;
@@ -2909,10 +3243,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         if (waitTime < MTR_DEVICE_EXPIRATION_CHECK_TIMER_MINIMUM_WAIT_TIME) {
             waitTime = MTR_DEVICE_EXPIRATION_CHECK_TIMER_MINIMUM_WAIT_TIME;
         }
-        MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
+        mtr_weakify(self);
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (waitTime * NSEC_PER_SEC)), self.queue, ^{
-            MTRDevice * strongSelf = weakSelf.strongObject;
-            [strongSelf _performScheduledExpirationCheck];
+            mtr_strongify(self);
+            [self _performScheduledExpirationCheck];
         });
     }
 }
@@ -3192,7 +3526,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
 
             previousValue = [self _cachedAttributeValueForPath:attributePath];
+#ifdef DEBUG
+            __block BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:previousValue];
+#else
             BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:previousValue];
+#endif
             // Now that we have grabbed previousValue, update our cache with the attribute value.
             if (readCacheValueChanged) {
                 if (dataVersion) {
@@ -3214,12 +3552,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 #ifdef DEBUG
             // Unit test only code.
             if (!readCacheValueChanged) {
-                id delegate = _weakDelegate.strongObject;
-                if (delegate) {
+                [self _callFirstDelegateSynchronouslyWithBlock:^(id delegate) {
                     if ([delegate respondsToSelector:@selector(unitTestForceAttributeReportsIfMatchingCache:)]) {
                         readCacheValueChanged = [delegate unitTestForceAttributeReportsIfMatchingCache:self];
                     }
-                }
+                }];
             }
 #endif // DEBUG
 
@@ -3640,6 +3977,48 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return;
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+}
+
+#pragma mark Log Help
+
+- (nullable NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath
+{
+    auto * cachedData = [self _cachedAttributeValueForPath:attributePath];
+
+    auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
+        MTRAttributePathKey : attributePath,
+        MTRDataKey : cachedData,
+    }
+                                                                    error:nil];
+
+    return attrReport.value;
+}
+
+- (nullable NSNumber *)_informationalVendorID
+{
+    auto * vendorIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                              clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                            attributeID:@(MTRClusterBasicAttributeVendorIDID)];
+
+    return [self _informationalNumberAtAttributePath:vendorIDPath];
+}
+
+- (nullable NSNumber *)_informationalProductID
+{
+    auto * productIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                               clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                             attributeID:@(MTRClusterBasicAttributeProductIDID)];
+
+    return [self _informationalNumberAtAttributePath:productIDPath];
+}
+
+- (void)_addInformationalAttributesToCurrentMetricScope
+{
+    using namespace chip::Tracing::DarwinFramework;
+    MATTER_LOG_METRIC(kMetricDeviceVendorID, [self _informationalVendorID].unsignedShortValue);
+    MATTER_LOG_METRIC(kMetricDeviceProductID, [self _informationalProductID].unsignedShortValue);
+    BOOL usesThread = [self _deviceUsesThread];
+    MATTER_LOG_METRIC(kMetricDeviceUsesThread, usesThread);
 }
 
 @end

@@ -1385,9 +1385,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2987,15 +2987,15 @@ cluster DoorLock = 257 {
   attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
   attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
   attribute access(write: administer) optional int16u expiringUserTimeout = 53;
-  readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
-  readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
-  readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
-  readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
-  readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
-  readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
-  readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
-  readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
-  readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
+  provisional readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
+  provisional readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
+  provisional readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
+  provisional readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
+  provisional readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
+  provisional readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
+  provisional readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
+  provisional readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
+  provisional readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4472,7 +4472,7 @@ cluster WakeOnLan = 1283 {
   revision 1;
 
   readonly attribute optional char_string<12> MACAddress = 0;
-  readonly attribute optional octet_string<16> linkLocalAddress = 1;
+  provisional readonly attribute optional octet_string<16> linkLocalAddress = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6920,7 +6920,7 @@ endpoint 2 {
   }
 }
 endpoint 65534 {
-  device type ma_secondary_network_commissioning = 4293984258, version 1;
+  device type ma_secondary_network_interface = 25, version 1;
 
 
   server cluster Descriptor {

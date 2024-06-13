@@ -84,7 +84,7 @@ limitations under the License.
             <include cluster="Diagnostic Logs" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Software Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Ethernet Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="WiFi Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Wi-Fi Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thread Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="ICD Management" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
@@ -2429,6 +2429,21 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-thread-border-router</name>
+        <domain>HRAP</domain>
+        <typeName>Matter Thread Border Router</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0091</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Thread Network Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+
+    <deviceType>
         <name>MA-all-clusters-app</name>
         <domain>CHIP</domain>
         <typeName>Matter All-clusters-app Server Example</typeName>
@@ -2590,11 +2605,13 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-secondary-network-commissioning</name>
+        <name>MA-secondary-network-interface</name>
         <domain>CHIP</domain>
-        <typeName>Matter Secondary Network Commissioning Device Type</typeName>
+        <typeName>Matter Secondary Network Interface Device Type</typeName>
         <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0xFFF10002</deviceId>
+        <deviceId editable="false">0x0019</deviceId>
+        <class>Utility</class>
+        <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -2603,6 +2620,9 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
+            <include cluster="Ethernet Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Wi-Fi Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Thread Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>

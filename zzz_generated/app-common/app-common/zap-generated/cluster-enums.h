@@ -4324,6 +4324,15 @@ enum class Feature : uint32_t
 
 namespace WiFiNetworkManagement {} // namespace WiFiNetworkManagement
 
+namespace ThreadBorderRouterManagement {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPANChange = 0x1,
+};
+} // namespace ThreadBorderRouterManagement
+
 namespace ThreadNetworkDirectory {} // namespace ThreadNetworkDirectory
 
 namespace WakeOnLan {} // namespace WakeOnLan

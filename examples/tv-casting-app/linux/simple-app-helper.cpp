@@ -344,7 +344,7 @@ void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source
     {
         ChipLogProgress(AppServer, "---- Awaiting user input ----");
         ChipLogProgress(AppServer, "Input the Commissioner-Generated passcode displayed on the CastingPlayer UX.");
-        ChipLogProgress(AppServer, "Input 1245678 to use the default passcode.");
+        ChipLogProgress(AppServer, "Input 12345678 to use the default passcode.");
         ChipLogProgress(AppServer, "Example:     cast setcommissionerpasscode 12345678");
         ChipLogProgress(AppServer, "---- Awaiting user input ----");
         gAwaitingCommissionerPasscodeInput = true;
@@ -458,7 +458,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         uint32_t passcode = (uint32_t) strtol(argv[1], &eptr, 10);
         if (gAwaitingCommissionerPasscodeInput)
         {
-            ChipLogProgress(AppServer, "CommandHandler() setcommissionerpasscode user enterd passcode: %d", passcode);
+            ChipLogProgress(AppServer, "CommandHandler() setcommissionerpasscode user entered passcode: %d", passcode);
             gAwaitingCommissionerPasscodeInput = false;
 
             // Per connectedhomeip/examples/platform/linux/LinuxCommissionableDataProvider.h: We don't support overriding the
@@ -486,13 +486,27 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             }
 
             // Continue Connecting to the target CastingPlayer with the user entered Commissioner-generated Passcode.
-            targetCastingPlayer->ContinueConnecting();
+            err = targetCastingPlayer->ContinueConnecting();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "CommandHandler() setcommissionerpasscode ContinueConnecting() err %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
         }
         else
         {
             ChipLogError(
                 AppServer,
                 "CommandHandler() setcommissionerpasscode, no Commissioner-Generated passcode input expected at this time.");
+        }
+    }
+    if (strcmp(argv[0], "stop-connecting") == 0)
+    {
+        ChipLogProgress(AppServer, "CommandHandler() stop-connecting");
+        CHIP_ERROR err = targetCastingPlayer->StopConnecting();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CommandHandler() stop-connecting, err %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     if (strcmp(argv[0], "print-bindings") == 0)
@@ -536,6 +550,9 @@ CHIP_ERROR PrintAllCommands()
                     "  setcommissionerpasscode <passcode>               Set the commissioning session's passcode to the "
                     "Commissioner-Generated passcode. Used for the the Commissioner-Generated passcode commissioning flow. Usage: "
                     "cast setcommissionerpasscode 12345678\r\n");
+    streamer_printf(sout,
+                    "  stop-connecting                                  Stop connecting to Casting Player upon "
+                    "Commissioner-Generated passcode commissioning flow passcode input request. Usage: cast stop-connecting\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
