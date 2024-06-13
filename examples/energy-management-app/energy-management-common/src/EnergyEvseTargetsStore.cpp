@@ -409,7 +409,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
 
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
 
-    size_t len = writer.GetLengthWritten();
+    uint64_t len = static_cast<uint64_t>(writer.GetLengthWritten());
     ChipLogProgress(AppServer, "SaveTargets: length written 0x" ChipLogFormatX64, ChipLogValueX64(len));
 
     writer.Finalize(backingBuffer);
