@@ -337,6 +337,33 @@ class BitmapHandler(BaseHandler):
         self.context.AddIdlPostProcessor(self)
 
 
+class FeaturesHandler(BaseHandler):
+    """Handles .../features 
+
+       Attaches a "Feature" bitmap to the given structure
+    """
+
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context)
+        self._features = Bitmap(name='Feature', base_type="bitmap32", entries=[])
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name, attrs):
+        if name.lower() == 'feature':
+            self._features.entries.append(ConstantEntry(
+                name=attrs['name'],
+                code=1 << ParseInt(attrs['bit']),
+            ))
+
+            # Sub-elements are conformance which is not representable in IDL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        return BaseHandler(self.context)
+
+    def EndProcessing(self):
+        if self._features.entries:
+            self._cluster.bitmaps.append(self._features)
+
+
 class DescriptionHandler(BaseHandler):
     """Handles .../description text elements
 
@@ -511,6 +538,8 @@ class ClusterHandler(BaseHandler):
             return CommandHandler(self.context, self._cluster, attrs)
         elif name.lower() == 'description':
             return DescriptionHandler(self.context, self._cluster)
+        elif name.lower() == 'features':
+            return FeaturesHandler(self.context, self._cluster)
         elif name.lower() in ['define', 'domain', 'tag', 'client', 'server']:
             # NOTE: we COULD use client and server to create separate definitions
             #       of each, but the usefulness of this is unclear as the definitions are
