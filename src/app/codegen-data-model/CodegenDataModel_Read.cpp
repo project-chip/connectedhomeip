@@ -95,8 +95,7 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
 
 /// Attempts to read via an attribute access interface (AAI)
 ///
-/// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success):
-///    - in particular, CHIP_ERROR_ACCESS_DENIED will be used for UnsupportedRead AII returns
+/// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success).
 ///
 /// If it returns std::nullopt, then there is no AAI to handle the given path
 /// and processing should figure out the value otherwise (generally from other ember data)
@@ -110,11 +109,6 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
     }
 
     CHIP_ERROR err = aai->Read(path, encoder);
-
-    // explict translate UnsupportedRead to Access denied. This is to allow callers to determine a
-    // translation for this: usually wildcard subscriptions MAY just ignore these where as direct reads
-    // MUST translate them to UnsupportedAccess
-    ReturnErrorCodeIf(err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead), CHIP_ERROR_ACCESS_DENIED);
 
     if (err != CHIP_NO_ERROR)
     {
