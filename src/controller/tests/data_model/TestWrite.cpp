@@ -562,7 +562,8 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
         WriteClient writeClient(&mpContext->GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
         AttributePathParams attributePath{ kTestEndpointId, Clusters::UnitTesting::Id,
                                            Clusters::UnitTesting::Attributes::Int8u::Id };
-        ASSERT_EQ(writeClient.EncodeAttribute(attributePath, 1u), CHIP_NO_ERROR);
+        constexpr uint8_t attributeValue = 1u;
+        ASSERT_EQ(writeClient.EncodeAttribute(attributePath, attributeValue), CHIP_NO_ERROR);
         ASSERT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
 
         mpContext->DrainAndServiceIO();
@@ -593,7 +594,9 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
         WriteClient writeClient(&mpContext->GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
         AttributePathParams attributePath{ kTestEndpointId, Clusters::UnitTesting::Id,
                                            Clusters::UnitTesting::Attributes::Int8u::Id };
-        ASSERT_EQ(writeClient.EncodeAttribute(attributePath, 2u), CHIP_NO_ERROR);
+
+        constexpr uint8_t attributeValue = 2u;
+        ASSERT_EQ(writeClient.EncodeAttribute(attributePath, attributeValue), CHIP_NO_ERROR);
         ASSERT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
 
         mpContext->DrainAndServiceIO();
