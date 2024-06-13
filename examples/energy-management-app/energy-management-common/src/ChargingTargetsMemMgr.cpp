@@ -152,4 +152,3 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<St
 
     return err;
 }
-

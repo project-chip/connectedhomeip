@@ -449,4 +449,3 @@ void EvseTargetsDelegate::PrintTargets(const DataModel::List<const Structs::Char
         chargingTargetScheduleIdx++;
     }
 }
-
