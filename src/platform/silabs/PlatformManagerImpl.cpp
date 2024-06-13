@@ -75,7 +75,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
     return 0;
 }
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // !SLI_SI91X_MCU_INTERFACE
 #endif // TINYCRYPT_PRIMITIVES
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
@@ -96,7 +96,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #if defined(TINYCRYPT_PRIMITIVES)
 #if !(SLI_SI91X_MCU_INTERFACE)
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16 /*Threshold value*/));
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
     VerifyOrExit(sys_mutex_new(&rngMutexHandle) == ERR_OK, err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
