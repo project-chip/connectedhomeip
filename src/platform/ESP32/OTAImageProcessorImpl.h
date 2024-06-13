@@ -27,6 +27,12 @@
 #include <esp_encrypted_img.h>
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
+#ifdef CONFIG_ENABLE_DELTA_OTA
+#include "esp_app_format.h"
+#include <esp_delta_ota.h>
+#define IMG_HEADER_LEN sizeof(esp_image_header_t)
+#endif // CONFIG_ENABLE_DELTA_OTA
+
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
@@ -48,6 +54,11 @@ public:
     // @return CHIP_NO_ERROR on success, appropriate error code otherwise
     CHIP_ERROR InitEncryptedOTA(const CharSpan & key);
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_DELTA_OTA
+    esp_err_t DeltaOTAWriteHeader(OTAImageProcessorImpl * imageProcessor, const uint8_t * buf_p, size_t size, int index);
+    static esp_err_t DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset);
+    static esp_err_t DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg);
+#endif // CONFIG_ENABLE_DELTA_OTA
 
 private:
     static void HandlePrepareDownload(intptr_t context);
@@ -64,6 +75,10 @@ private:
     MutableByteSpan mBlock;
     const esp_partition_t * mOTAUpdatePartition = nullptr;
     esp_ota_handle_t mOTAUpdateHandle;
+#ifdef CONFIG_ENABLE_DELTA_OTA
+    esp_delta_ota_handle_t mDeltaOTAUpdateHandle;
+    esp_delta_ota_cfg_t delta_ota_cfg;
+#endif // CONFIG_ENABLE_DELTA_OTA
     OTAImageHeaderParser mHeaderParser;
 
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA

@@ -21,6 +21,7 @@
 #include <platform/ESP32/ESP32Utils.h>
 
 #include "OTAImageProcessorImpl.h"
+#include "esp_app_format.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_ota_ops.h"
@@ -31,7 +32,12 @@
 #include <esp_encrypted_img.h>
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
+#ifdef CONFIG_ENABLE_DELTA_OTA
+#include <esp_delta_ota.h>
+#endif // CONFIG_ENABLE_DELTA_OTA
+
 #define TAG "OTAImageProcessor"
+
 using namespace chip::System;
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -123,6 +129,96 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
+#ifdef CONFIG_ENABLE_DELTA_OTA
+esp_err_t OTAImageProcessorImpl::DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset)
+{
+    if (size <= 0 || buf_p == NULL)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    const esp_partition_t * current_partition = esp_ota_get_running_partition();
+    if (current_partition == NULL)
+    {
+        return ESP_FAIL;
+    }
+
+    esp_err_t err = esp_partition_read(current_partition, src_offset, buf_p, size);
+
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_partition_read failed (%s)!", esp_err_to_name(err));
+    }
+
+    return err;
+}
+
+esp_err_t OTAImageProcessorImpl::DeltaOTAWriteHeader(OTAImageProcessorImpl * imageProcessor, const uint8_t * buf_p, size_t size,
+                                                     int index)
+{
+    if (size <= 0 || buf_p == NULL)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    static char header_data[IMG_HEADER_LEN];
+    static bool chip_id_verified = false;
+    static int header_data_read  = 0;
+
+    if (!chip_id_verified)
+    {
+        if (header_data_read + size <= IMG_HEADER_LEN)
+        {
+            memcpy(header_data + header_data_read, buf_p, size);
+            header_data_read += size;
+            return ESP_OK;
+        }
+        else
+        {
+            index = IMG_HEADER_LEN - header_data_read;
+            memcpy(header_data + header_data_read, buf_p, index);
+
+            chip_id_verified = true;
+
+            // Write data in header_data buffer.
+            esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, header_data, IMG_HEADER_LEN);
+            if (err != ESP_OK)
+            {
+                ESP_LOGE(TAG, "esp_ota_write failed (%s)!", esp_err_to_name(err));
+                return err;
+            }
+        }
+    }
+    return ESP_OK;
+}
+
+esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg)
+{
+    static int index      = 0;
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(arg);
+    if (size <= 0 || buf_p == NULL)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    esp_err_t err = imageProcessor->DeltaOTAWriteHeader(imageProcessor, buf_p, size, index);
+
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "DeltaOTAWriteHeader failed (%s)!", esp_err_to_name(err));
+        return err;
+    }
+
+    err = esp_ota_write(imageProcessor->mOTAUpdateHandle, buf_p + index, size - index);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_ota_write failed (%s)!", esp_err_to_name(err));
+    }
+
+    return err;
+}
+#endif // CONFIG_ENABLE_DELTA_OTA
+
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
@@ -142,13 +238,31 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         ChipLogError(SoftwareUpdate, "OTA partition not found");
         return;
     }
+#ifdef CONFIG_ENABLE_DELTA_OTA
+    // New image size is unknown for delta OTA, so we use OTA_SIZE_UNKNOWN flag.
+    esp_err_t err = esp_ota_begin(imageProcessor->mOTAUpdatePartition, OTA_SIZE_UNKNOWN, &(imageProcessor->mOTAUpdateHandle));
+#else
     esp_err_t err =
         esp_ota_begin(imageProcessor->mOTAUpdatePartition, OTA_WITH_SEQUENTIAL_WRITES, &(imageProcessor->mOTAUpdateHandle));
+#endif // CONFIG_ENABLE_DELTA_OTA
+
     if (err != ESP_OK)
     {
         imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
         return;
     }
+#ifdef CONFIG_ENABLE_DELTA_OTA
+    imageProcessor->delta_ota_cfg.user_data               = imageProcessor,
+    imageProcessor->delta_ota_cfg.read_cb                 = &(imageProcessor->DeltaOTAReadCallback),
+    imageProcessor->delta_ota_cfg.write_cb_with_user_data = &(imageProcessor->DeltaOTAWriteCallback),
+
+    imageProcessor->mDeltaOTAUpdateHandle = esp_delta_ota_init(&imageProcessor->delta_ota_cfg);
+    if (imageProcessor->mDeltaOTAUpdateHandle == NULL)
+    {
+        ChipLogError(SoftwareUpdate, "esp_delta_ota_init failed");
+	return;
+    }
+#endif // CONFIG_ENABLE_DELTA_OTA
 
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     CHIP_ERROR chipError = imageProcessor->DecryptStart();
@@ -182,7 +296,29 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     }
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
+#ifdef CONFIG_ENABLE_DELTA_OTA
+    esp_err_t err = esp_delta_ota_finalize(imageProcessor->mDeltaOTAUpdateHandle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_delta_ota_finalize() failed (%s)!", esp_err_to_name(err));
+        esp_ota_abort(imageProcessor->mOTAUpdateHandle);
+        imageProcessor->ReleaseBlock();
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+    }
+
+    err = esp_delta_ota_deinit(imageProcessor->mDeltaOTAUpdateHandle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_delta_ota_deinit() failed (%s)!", esp_err_to_name(err));
+        esp_ota_abort(imageProcessor->mOTAUpdateHandle);
+        imageProcessor->ReleaseBlock();
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+    }
+
+    err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
+#else
     esp_err_t err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
+#endif // CONFIG_ENABLE_DELTA_OTA
     if (err != ESP_OK)
     {
         if (err == ESP_ERR_OTA_VALIDATE_FAILED)
@@ -264,7 +400,11 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
-    err = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
+#ifdef CONFIG_ENABLE_DELTA_OTA
+    err = esp_delta_ota_feed_patch(imageProcessor->mDeltaOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
+#else
+    err           = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
+#endif // CONFIG_ENABLE_DELTA_OTA
 
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     free((void *) (blockToWrite.data()));
