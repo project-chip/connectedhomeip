@@ -361,7 +361,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if sys.platform == 'linux':
         chiptest.linux.PrepareNamespacesForTestExecution(
             context.obj.in_unshare)
-        if (ble_wifi):
+        if ble_wifi:
             dbus = chiptest.linux.DbusTest()
             dbus.start()
 
@@ -369,9 +369,13 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 "/usr/sbin/hostapd",
                 "/usr/sbin/dnsmasq",
                 "/usr/sbin/wpa_supplicant",
+                dry_run=context.obj.dry_run,
             )
             virt_ble = chiptest.linux.VirtualBle(
-                "/usr/bin/btvirt", "/usr/bin/bluetoothctl")
+                "/usr/bin/btvirt",
+                "/usr/bin/bluetoothctl",
+                dry_run=context.obj.dry_run,
+            )
             virt_wifi.start()
             virt_ble.start()
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
@@ -384,14 +388,14 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     def cleanup():
         apps_register.uninit()
         if sys.platform == 'linux':
-            if (ble_wifi):
+            if ble_wifi:
                 virt_wifi.stop()
                 virt_ble.stop()
                 dbus.stop()
             chiptest.linux.ShutdownNamespaceForTestExecution()
 
     for i in range(iterations):
-        logging.info("Starting iteration %d" % (i+1))
+        logging.info("Starting iteration %d" % (i + 1))
         observed_failures = 0
         for test in context.obj.tests:
             if context.obj.include_tags:
@@ -409,23 +413,35 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 if context.obj.dry_run:
                     logging.info("Would run test: %s" % test.name)
                 else:
-                    logging.info('%-20s - Starting test' % (test.name))
+                    logging.info("%-20s - Starting test" % (test.name))
                 if ble_wifi:
                     test.Run(
-                        runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
-                        test_runtime=context.obj.runtime, app_hci_number=virt_ble.ble_app.index, tool_hci_number=virt_ble.ble_tool.index)
+                        runner,
+                        apps_register,
+                        paths,
+                        pics_file,
+                        test_timeout_seconds,
+                        context.obj.dry_run,
+                        test_runtime=context.obj.runtime,
+                        app_hci_number=virt_ble.ble_app.index,
+                        tool_hci_number=virt_ble.ble_tool.index,
+                    )
                 else:
                     test.Run(
-                        runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
-                        test_runtime=context.obj.runtime)
+                        runner,
+                        apps_register,
+                        paths,
+                        pics_file,
+                        test_timeout_seconds,
+                        context.obj.dry_run,
+                        test_runtime=context.obj.runtime,
+                    )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()
-                    logging.info('%-30s - Completed in %0.2f seconds' %
-                                 (test.name, (test_end - test_start)))
+                    logging.info("%-30s - Completed in %0.2f seconds" % (test.name, (test_end - test_start)))
             except Exception:
                 test_end = time.monotonic()
-                logging.exception('%-30s - FAILED in %0.2f seconds' %
-                                  (test.name, (test_end - test_start)))
+                logging.exception("%-30s - FAILED in %0.2f seconds" % (test.name, (test_end - test_start)))
                 observed_failures += 1
                 if not keep_going:
                     cleanup()
@@ -440,17 +456,14 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
 
 # On linux, allow an execution shell to be prepared
-if sys.platform == 'linux':
-    @main.command(
-        'shell',
-        help=('Execute a bash shell in the environment (useful to test '
-              'network namespaces)'))
+if sys.platform == "linux":
+
+    @main.command("shell", help=("Execute a bash shell in the environment (useful to test " "network namespaces)"))
     @click.pass_context
     def cmd_shell(context):
-        chiptest.linux.PrepareNamespacesForTestExecution(
-            context.obj.in_unshare)
+        chiptest.linux.PrepareNamespacesForTestExecution(context.obj.in_unshare)
         os.execvpe("bash", ["bash"], os.environ.copy())
 
 
-if __name__ == '__main__':
-    main(auto_envvar_prefix='CHIP')
+if __name__ == "__main__":
+    main(auto_envvar_prefix="CHIP")
