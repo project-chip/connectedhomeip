@@ -134,22 +134,15 @@ void CommandSender::CreateBackupForRequestRollback(RollbackData & aRollbackData)
     VerifyOrReturn(mState == State::Idle || mState == State::AddedCommand);
     VerifyOrReturn(mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
     VerifyOrReturn(mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
-    mInvokeRequestBuilder.Checkpoint(aRollbackData.backupWriter);
-    aRollbackData.backupState     = mState;
-    aRollbackData.rollbackIsValid = true;
+    aRollbackData.Checkpoint(*this);
 }
 
 void CommandSender::RollbackRequest(RollbackData & aRollbackData)
 {
-    VerifyOrReturn(aRollbackData.rollbackIsValid);
+    VerifyOrReturn(aRollbackData.RollbackIsValid());
     VerifyOrReturn(mState == State::AddingCommand);
     ChipLogDetail(DataManagement, "Rolling back response");
-    // TODO(#30453): Rollback of mInvokeRequestBuilder should handle resetting
-    // InvokeResponses.
-    mInvokeRequestBuilder.GetInvokeRequests().ResetError();
-    mInvokeRequestBuilder.Rollback(aRollbackData.backupWriter);
-    MoveToState(aRollbackData.backupState);
-    aRollbackData.rollbackIsValid = false;
+    LogErrorOnFailure(aRollbackData.Rollback(*this));
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -693,6 +686,24 @@ void CommandSender::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
+}
+
+void CommandSender::RollbackData::Checkpoint(CommandSender& aCommandSender) {
+    //InvokeRequestMessage::Builder& aInvokeRequestBuilder, const State& aState) {
+    aCommandSender.mInvokeRequestBuilder.Checkpoint(mBackupWriter);
+    mBackupState = aCommandSender.mState;
+    mRollbackIsValid = true;
+}
+
+CHIP_ERROR CommandSender::RollbackData::Rollback(CommandSender& aCommandSender) {
+    // TODO(#30453): Rollback of mInvokeRequestBuilder should handle resetting
+    // InvokeResponses.
+    VerifyOrReturnError(mRollbackIsValid, CHIP_ERROR_INCORRECT_STATE);
+    aCommandSender.mInvokeRequestBuilder.GetInvokeRequests().ResetError();
+    aCommandSender.mInvokeRequestBuilder.Rollback(mBackupWriter);
+    aCommandSender.MoveToState(mBackupState);
+    mRollbackIsValid = false;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace app

@@ -114,10 +114,10 @@ class ForcedSizeBuffer : public app::DataModel::EncodableToTLV
 public:
     ForcedSizeBuffer(uint32_t size)
     {
-        if (mBuffer_.Alloc(size))
+        if (mBuffer.Alloc(size))
         {
             // No significance with using 0x12, just using a value.
-            memset(mBuffer_.Get(), 0x12, size);
+            memset(mBuffer.Get(), 0x12, size);
         }
     }
 
@@ -125,17 +125,17 @@ public:
     static constexpr chip::CommandId GetCommandId() { return 0x12; }
     CHIP_ERROR EncodeTo(TLV::TLVWriter & aWriter, TLV::Tag aTag) const override
     {
-        VerifyOrReturnError(mBuffer_, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(mBuffer, CHIP_ERROR_NO_MEMORY);
 
         TLV::TLVType outerContainerType;
         ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outerContainerType));
         ReturnErrorOnFailure(
-            app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer_.Get(), mBuffer_.AllocatedSize())));
+            app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer.Get(), mBuffer.AllocatedSize())));
         return aWriter.EndContainer(outerContainerType);
     }
 
 private:
-    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer_;
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
 };
 
 struct Fields

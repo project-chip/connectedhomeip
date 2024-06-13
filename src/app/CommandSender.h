@@ -517,11 +517,16 @@ private:
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
-    struct RollbackData
+    class RollbackData
     {
-        TLV::TLVWriter backupWriter;
-        State backupState;
-        bool rollbackIsValid = false;
+    public:
+        void Checkpoint(CommandSender& aCommandSender);
+        CHIP_ERROR Rollback(CommandSender& aCommandSender);
+        bool RollbackIsValid() { return mRollbackIsValid; }
+    private:
+        TLV::TLVWriter mBackupWriter;
+        State mBackupState;
+        bool mRollbackIsValid = false;
     };
 
     union CallbackHandle
