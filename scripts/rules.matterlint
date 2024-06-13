@@ -106,6 +106,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.x
 load "../src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/energy-calendar-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml";

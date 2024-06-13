@@ -109,6 +109,7 @@
    <xi:include href="chip/temperature-control-cluster.xml" />
    <xi:include href="chip/refrigerator-alarm.xml" />
    <xi:include href="chip/matter-devices.xml" />
+   <xi:include href="chip/energy-calendar-cluster.xml" />
    <xi:include href="draft/barrier-control.xml" />
    <xi:include href="draft/electrical-measurement-cluster.xml" />
    <xi:include href="draft/input-output-value-clusters.xml" />

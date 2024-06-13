@@ -196,6 +196,9 @@ void EnergyCalendarServer::UpdateCurrentAttrs(void)
 
     // todo start matter
     UnlockThreadTask();
+
+    MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, CurrentDay::Id);
+    MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, NextDay::Id);
 }
 
 void EnergyCalendarServer::CalendarChangingHandler(void)
@@ -206,12 +209,17 @@ void EnergyCalendarServer::CalendarChangingHandler(void)
     if (content[endpointIndex].CalendarID.IsNull()) 
     {
         mProvider->GetCommonAttributes(content[0].endpoint,
-        content[0].CalendarID, content[0].Name, content[0].ProviderID, content[0].EventID);
+            content[0].CalendarID, content[0].Name, content[0].ProviderID, content[0].EventID);
+    
+        MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, CalendarID::Id);
+        MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, Name::Id);
+        MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, ProviderID::Id);
+        MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, EventID::Id);
     }
 
     DataModel::Nullable<uint32_t> startDate;
     DataModel::DecodableList<Structs::CalendarPeriod::Type> calendarPeriods;
-    DataModel::DecodableList<Structs::DayStruct::Type> s`pecialDays;
+    DataModel::DecodableList<Structs::DayStruct::Type> specialDays;
 
     mProvider->GetCalendarPeriod(content[0].endpoint, startDate, calendarPeriods);
     mProvider->GetSpecialDays(content[0].endpoint, specialDays);
@@ -225,6 +233,10 @@ void EnergyCalendarServer::CalendarChangingHandler(void)
 
     // todo start matter
     UnlockThreadTask();
+
+    MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, StartDate::Id);
+    MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, CalendarPeriods::Id);
+    MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, SpecialDays::Id);
 
     UpdateCurrentAttrs();
 }
@@ -247,6 +259,9 @@ void EnergyCalendarServer::PeakPeriodsChangingHandler(void)
     
     // todo start matter
     UnlockThreadTask();
+
+    MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, CurrentPeakPeriod::Id);
+    MatterReportingAttributeChangeCallback(content[0].endpoint, EnergyCalendar::Id, NextPeakPeriod::Id);
 }
 
 void EnergyCalendarServer::MidnightTimerCallback(chip::System::Layer *, void * callbackContext)

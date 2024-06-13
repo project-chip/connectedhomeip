@@ -44,21 +44,121 @@ static TransitionDayOfWeekBitmap GetWeekDate(uint32_t date)
     return (TransitionDayOfWeekBitmap)(calendarTime.tm_wday);
 }
 
-EnergyCalendarContent::EnergyCalendarContent()
-{
-    endpoint = 0;
-    currentDate = 0;
+void CalendarProviderInstance::Init(void)
+{    
+    cluster = new EnergyCalendarServer(content.EndpointId, 0xff, this);
 }
 
-EnergyCalendarContent::EnergyCalendarContent(EndpointId endpoint)
+void CalendarProviderInstance::SetDefault(void)
 {
-    this->endpoint = endpoint;
-    currentDate = 0;
+    uint32_t date = get_current_utc();
+    uint32_t time = date % kOneDay;
+    date -= time;
+
+    Structs::DayStruct::Type day = { .Date = {}, 
+        .Transitions = {
+            { .TransitionTime = 0, .PriceTier = 10}
+            { .TransitionTime = 1000, .PriceTier = 20}
+        },
+        .CalendarID = 123 };
+
+    Structs::PeakPeriodStruct::Type peak = { .Severity = 3, .PeakPeriod = 100, .StartTime = 2000, .EndTime = 2200 };
+
+    content.CalendarID.Value() = 1;
+    content.Name.Value() = "Test";
+    content.ProviderID.Value() = 123;
+    content.EventID.Value() = 1;
+    content.StartDate.Value() = date;
+    //content.CalendarPeriods.Value() = ;
+    //content.SpecialDays.Value() = ;
+    content.CurrentDay.Value() = day;
+    content.NextDay.Value() = day;
+    context.CurrentTransition.Value() = day.Transitions[0];
+    context.CurrentPeakPeriod.Value() = peak;
+    context.NextPeakPeriod.Value() = peak;
 }
 
-DataModel::Nullable<Structs::DayStruct::Type> EnergyCalendarContent::GetDay(uint32_t date)
+CHIP_ERROR CalendarProviderInstance::LoadJson(char *name)
 {
-    auto days_iterator = SpecialDays.begin();
+    return CHIP_IM_GLOBAL_STATUS(NotImplemented);  
+}
+
+void CalendarProviderInstance::UpdateDays(uint32_t time)
+{
+
+}
+
+void CalendarProviderInstance::MoveToNextDay(void)
+{
+
+}
+
+void CalendarProviderInstance::UpdatePeak(uint32_t time)
+{
+
+}
+
+void CalendarProviderInstance::MoveToNextPeak(void)
+{
+
+}
+
+CHIP_ERROR CalendarProviderInstance::GetCommonAttributes(EndpointId endpoint, 
+        DataModel::Nullable<uint32_t> &CalendarID,
+        DataModel::Nullable<std::string> &Name,
+        DataModel::Nullable<uint32_t> ProviderID,
+        DataModel::Nullable<uint32_t> EventID)
+{
+    CalendarID = content.CalendarID;
+    Name = content.Name;
+    ProviderID = content.ProviderID;
+    EventID = content.EventID;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CalendarProviderInstance::GetCalendarPeriod(EndpointId endpoint, 
+        DataModel::Nullable<uint32_t> &StartDate,
+        DataModel::DecodableList<Structs::CalendarPeriod::Type> &CalendarPeriods)
+{
+    StartDate = content.StartDate;
+    CalendarPeriods = content.CalendarPeriods;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CalendarProviderInstance::GetSpecialDays(EndpointId endpoint, 
+        DataModel::DecodableList<Structs::DayStruct::Type> &SpecialDays)
+{
+    SpecialDays = content.SpecialDays;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CalendarProviderInstance::GetCurrentAndNextDays(EndpointId endpoint, 
+        DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
+        DataModel::Nullable<Structs::DayStruct::Type> &NextDay)
+{
+    CurrentDay = content.currentDay;
+    NextDay = content.NextDay;
+
+    return CHIP_NO_ERROR;
+}
+    
+CHIP_ERROR CalendarProviderInstance::GetPeakPeriods(EndpointId endpoint, 
+        DataModel::Nullable<Structs::PeakPeriodStruct::Type> &CurrentPeakPeriod,
+        DataModel::Nullable<Structs::PeakPeriodStruct::Type> &NextPeakPeriod)
+{
+    CurrentPeakPeriod = content.CurrentPeakPeriod;
+    NextPeakPeriod = content.NextPeakPeriod;
+
+    return CHIP_NO_ERROR;
+}
+
+
+DataModel::Nullable<Structs::DayStruct::Type> CalendarProviderInstance::GetDay(uint32_t date)
+{
+    auto days_iterator = context.SpecialDays.begin();
     while (days_iterator.Next())
     {
         auto & day = days_iterator.GetValue();
@@ -70,7 +170,7 @@ DataModel::Nullable<Structs::DayStruct::Type> EnergyCalendarContent::GetDay(uint
 
     TransitionDayOfWeekBitmap week_day = GetWeekDate(date);
 
-    auto period_iterator = CalendarPeriods.begin();
+    auto period_iterator = context.CalendarPeriods.begin();
     while (period_iterator.Next())
     {
         auto & period = period_iterator.GetValue();
@@ -90,6 +190,7 @@ DataModel::Nullable<Structs::DayStruct::Type> EnergyCalendarContent::GetDay(uint
     return DataModel::Nullable<Structs::DayStruct::Type>();
 }
 
+#if 0
 CHIP_ERROR EnergyCalendarContent::UpdateDateRelativeAttributes()
 {
     uint32_t date = get_current_utc();
@@ -142,7 +243,9 @@ CHIP_ERROR EnergyCalendarContent::UpdateDateRelativeAttributes()
     return CHIP_NO_ERROR;
 }
 
-bool EnergyCalendarContent::CheckPeriods(DataModel::DecodableList<Structs::CalendarPeriod::Type> periods)
+#endif
+
+bool CalendarProviderInstance::CheckPeriods(DataModel::DecodableList<Structs::CalendarPeriod::Type> periods)
 {
     uint32_t date = 0;
     auto period_iterator = periods.begin();
@@ -172,7 +275,7 @@ bool EnergyCalendarContent::CheckPeriods(DataModel::DecodableList<Structs::Calen
     return true;
 }
 
-bool EnergyCalendarContent::CheckSpecialDays(DataModel::DecodableList<Structs::DayStruct::Type> days)
+bool CalendarProviderInstance::CheckSpecialDays(DataModel::DecodableList<Structs::DayStruct::Type> days)
 {
     uint32_t date = 0;
     while (days_iterator.Next())
@@ -189,7 +292,7 @@ bool EnergyCalendarContent::CheckSpecialDays(DataModel::DecodableList<Structs::D
     return true;
 }
 
-bool EnergyCalendarContent::CheckDay(const Structs::DayStruct::Type &day)
+bool CalendarProviderInstance::CheckDay(const Structs::DayStruct::Type &day)
 {
     if (day.DaysOfWeek && day.Date) || (!day.DaysOfWeek && !day.Date))
     {
@@ -216,102 +319,3 @@ bool EnergyCalendarContent::CheckDay(const Structs::DayStruct::Type &day)
 
     return true;
 }
-
-bool EnergyCalendarServer::HasFeature(Feature aFeature) const
-{
-    return mFeature.Has(aFeature);
-}
-
-DataModel::Nullable<Structs::PeakPeriodStruct::Type> EnergyCalendarServer::DayToPeak(DataModel::Nullable<Structs::DayStruct::Type> &day)
-{
-    if (GetPeakPeriod == nullptr || day.IsNull) {
-        return DataModel::Nullable<Structs::PeakPeriodStruct::Type>();
-    }
-    return (*GetPeakPeriod)(day.Value().Date);
-}
-
-// AttributeAccessInterface
-CHIP_ERROR EnergyCalendarServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    case CalendarID::Id:
-        return aEncoder.Encode(content[endpointIndex].CalendarID);
-    case Name::Id:
-        return aEncoder.Encode(content[endpointIndex].Name);
-    case ProviderID::Id:
-        return aEncoder.Encode(content[endpointIndex].ProviderID);
-    case EventID::Id:
-        return aEncoder.Encode(content[endpointIndex].EventID);
-    case StartDate::Id:
-        return aEncoder.Encode(content[endpointIndex].StartDate);
-    case TimeReference::Id:
-        return aEncoder.Encode(content[endpointIndex].TimeReference);
-    case CalendarPeriods::Id:
-        return aEncoder.Encode(content[endpointIndex].CalendarPeriods);
-    case SpecialDays::Id:
-        return aEncoder.Encode(content[endpointIndex].SpecialDays);
-    /* Date relative attributes */
-    case CurrentDay::Id:
-        UpdateDateRelativeAttributes();
-        return aEncoder.Encode(content[endpointIndex].CurrentDay);
-    case NextDay::Id:
-        UpdateDateRelativeAttributes();
-        return aEncoder.Encode(content[endpointIndex].NextDay);
-    case CurrentTransition::Id:
-        UpdateDateRelativeAttributes();
-        return aEncoder.Encode(content[endpointIndex].CurrentTransition);
-    case CurrentPeakPeriod::Id:
-    {
-        UpdateDateRelativeAttributes();
-        DataModel::Nullable<Structs::PeakPeriodStruct::Type> peak = DayToPeak(content[endpointIndex].CurrentDay);
-        return aEncoder.Encode(peak);
-        //return aEncoder.Encode(content[endpointIndex].CurrentPeakPeriod);
-    }
-    case NextPeakPeriod::Id:
-    {
-        UpdateDateRelativeAttributes();
-        DataModel::Nullable<Structs::PeakPeriodStruct::Type> peak = DayToPeak(content[endpointIndex].NextDay);
-        return aEncoder.Encode(peak);
-        //return aEncoder.Encode(content[endpointIndex].NextPeakPeriod);
-    }
-    /* FeatureMap - is held locally */
-    case FeatureMap::Id:
-        return aEncoder.Encode(mFeature);
-    }
-
-    /* Allow all other unhandled attributes to fall through to Ember */
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR EnergyCalendarServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    default:
-        // Unknown attribute; return error.  None of the other attributes for
-        // this cluster are writable, so should not be ending up in this code to         
-        // start with.
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-}
-
-void EnergyCalendarServer::InvokeCommand(HandlerContext & handlerContext)
-{
-    using namespace Commands;
-
-    //switch (handlerContext.mRequestPath.mCommandId)
-    //{
-    //}
-    return;
-}
-
-} // namespace EnergyCalendar
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-// -----------------------------------------------------------------------------
-// Plugin initialization
-
-void MatterEnergyCalendarPluginServerInitCallback() {}

@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x009A" name="Energy Calendar"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="SECA" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="ECAL" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PTIER" name="PricingTier" summary="Supports information about pricing tiers">
       <optionalConform choice="a" more="true"/>

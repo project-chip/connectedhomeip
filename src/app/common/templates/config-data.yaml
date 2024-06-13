@@ -36,6 +36,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Microwave Oven Control
     - Energy EVSE
     - Energy EVSE Mode
+    - Energy Calendar
     - Device Energy Management
     - Device Energy Management Mode
     - Electrical Power Measurement

@@ -37,56 +37,55 @@ namespace EnergyCalendar {
 /** @brief
  * CalendarProvider is interface of the Calendar Provider
  */
-class CalendarProvider
+class CalendarProviderInstance : public CalendarProvider
 {
 public:
-   CalendarProvider() : CalendarChanging_cb(null), PeakPeriodsChanging_cb(null) {}
+   CalendarProviderInstance() : CalendarProvider(), content(1), cluster(nullptr) {}
+   ~CalendarProviderInstance() { if (cluster) delete cluster; }
 
-    /* Get methods */
+   void Init(void);
 
-    virtual CHIP_ERROR GetCommonAttributes(EndpointId endpoint, 
+   void SetDefault(void);
+
+   CHIP_ERROR LoadJson(char *name);
+
+   void UpdateDays(uint32_t time);
+   void MoveToNextDay(void);
+   void UpdatePeak(uint32_t time);
+   void MoveToNextPeak(void);
+
+    /* owerride */
+    CHIP_ERROR GetCommonAttributes(EndpointId endpoint, 
         DataModel::Nullable<uint32_t> &CalendarID,
         DataModel::Nullable<std::string> &Name,
         DataModel::Nullable<uint32_t> ProviderID,
-        DataModel::Nullable<uint32_t> EventID) = 0;
+        DataModel::Nullable<uint32_t> EventID) override;
 
-    virtual CHIP_ERROR GetCalendarPeriod(EndpointId endpoint, 
+    CHIP_ERROR GetCalendarPeriod(EndpointId endpoint, 
         DataModel::Nullable<uint32_t> &StartDate,
-        DataModel::DecodableList<Structs::CalendarPeriod::Type> &CalendarPeriods) = 0;
+        DataModel::DecodableList<Structs::CalendarPeriod::Type> &CalendarPeriods) override;
 
-    virtual CHIP_ERROR GetSpecialDays(EndpointId endpoint, 
-        DataModel::DecodableList<Structs::DayStruct::Type> &SpecialDays) = 0;
+    CHIP_ERROR GetSpecialDays(EndpointId endpoint, 
+        DataModel::DecodableList<Structs::DayStruct::Type> &SpecialDays) override;
 
-    virtual CHIP_ERROR GetCurrentAndNextDays(EndpointId endpoint, 
+    CHIP_ERROR GetCurrentAndNextDays(EndpointId endpoint, 
         DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
-        DataModel::Nullable<Structs::DayStruct::Type> &NextDay) = 0;
+        DataModel::Nullable<Structs::DayStruct::Type> &NextDay) override;
     
-    virtual CHIP_ERROR GetPeakPeriods(EndpointId endpoint, 
+    CHIP_ERROR GetPeakPeriods(EndpointId endpoint, 
         DataModel::Nullable<Structs::PeakPeriodStruct::Type> &CurrentPeakPeriod,
-        DataModel::Nullable<Structs::PeakPeriodStruct::Type> &NextPeakPeriod) = 0;
-
-    /* Signals */
-    void CalendarChanging(void)
-    {
-        if (CalendarChanging_cb)
-            (*CalendarChanging_cb)();
-    }
-
-    void PeakPeriodsChanging(void)
-    {
-        if (PeakPeriodsChanging_cb)
-            (*PeakPeriodsChanging_cb)();
-    }
-
-    virtual void SignalsHandlerSet(void (*cal_cb)(void), void (*pp_cb)(void))
-    {
-        CalendarChanging_cb = cal_cb;
-        PeakPeriodsChanging_cb = pp_cb;
-    };
+        DataModel::Nullable<Structs::PeakPeriodStruct::Type> &NextPeakPeriod) override;
 
 private:
-    void (*CalendarChanging_cb)(void);
-    void (*PeakPeriodsChanging_cb)(void);
+    uint32_t date;
+    uint32_t time;
+    EnergyCalendarContent content;
+    EnergyCalendarServer *cluster;
+
+    DataModel::Nullable<Structs::DayStruct::Type> GetDay(uint32_t date);
+    bool CheckPeriods(DataModel::DecodableList<Structs::CalendarPeriod::Type> periods);
+    bool CheckSpecialDays(DataModel::DecodableList<Structs::DayStruct::Type> days);
+    bool CheckDay(const Structs::DayStruct::Type &day);
 };
 
 } // namespace EnergyCalendar
