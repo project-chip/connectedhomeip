@@ -151,7 +151,6 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
     <features>
-      </feature>
       <feature bit="0" code="TEMPO" name="TemperatureOffset" summary="Supports temperature offsets">
         <optionalConform choice="a" more="true"/>
       </feature>
