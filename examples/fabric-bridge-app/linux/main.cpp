@@ -36,6 +36,10 @@
 
 using namespace chip;
 
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::AdministratorCommissioning;
+
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
@@ -97,10 +101,57 @@ void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
 }
 #endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 
+class AdministratorCommissioningCommandHandler : public CommandHandlerInterface
+{
+public:
+    // Register for the AdministratorCommissioning cluster on all endpoints.
+    AdministratorCommissioningCommandHandler() :
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), AdministratorCommissioning::Id)
+    {}
+
+    void InvokeCommand(HandlerContext & handlerContext) override;
+};
+
+void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & handlerContext)
+{
+    using Protocols::InteractionModel::Status;
+
+    EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
+    ChipLogProgress(NotSpecified, "Received command to open commissioning window on Endpoind: %d", endpointId);
+
+    if (handlerContext.mRequestPath.mCommandId != Commands::OpenCommissioningWindow::Id || endpointId == kRootEndpointId)
+    {
+        // Proceed with default handling in Administrator Commissioning Server
+        return;
+    }
+
+    handlerContext.SetCommandHandled();
+    Status status = Status::Success;
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+    Device * device = DeviceMgr().GetDevice(endpointId);
+    if (device != nullptr && OpenCommissioningWindow(device->GetNodeId()) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(NotSpecified, "Commissioning window is now open");
+    }
+    else
+    {
+        status = Status::Failure;
+        ChipLogProgress(NotSpecified, "Commissioning window is failed to open");
+    }
+#endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
+
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
+}
+
+AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
+
 } // namespace
 
 void ApplicationInit()
 {
+    InteractionModelEngine::GetInstance()->RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
+
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     InitRpcServer(kFabricBridgeServerPort);
     AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
