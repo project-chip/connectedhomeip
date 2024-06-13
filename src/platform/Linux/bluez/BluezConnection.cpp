@@ -84,17 +84,15 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
     for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
     {
-        BluezGattService1 * service = bluez_object_get_gatt_service1(&object);
-        if (service != nullptr)
+        GAutoPtr<BluezGattService1> service(bluez_object_get_gatt_service1(&object));
+        if (service && BluezIsServiceOnDevice(service.get(), mDevice.get()))
         {
-            if (BluezIsServiceOnDevice(service, mDevice.get()) &&
-                (strcmp(bluez_gatt_service1_get_uuid(service), Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0))
+            if (strcmp(bluez_gatt_service1_get_uuid(service.get()), Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0)
             {
-                ChipLogDetail(DeviceLayer, "CHIP service found on %s", GetPeerAddress());
-                mService.reset(service);
+                ChipLogDetail(DeviceLayer, "CHIP service found");
+                mService.reset(service.release());
                 break;
             }
-            g_object_unref(service);
         }
     }
 
@@ -104,33 +102,26 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
     for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
     {
-        BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(&object);
-        if (char1 != nullptr)
+        GAutoPtr<BluezGattCharacteristic1> chr(bluez_object_get_gatt_characteristic1(&object));
+        if (chr && BluezIsCharOnService(chr.get(), mService.get()))
         {
-            if (BluezIsCharOnService(char1, mService.get()) &&
-                (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0))
+            if (strcmp(bluez_gatt_characteristic1_get_uuid(chr.get()), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0)
             {
-                ChipLogDetail(DeviceLayer, "C1 found on %s", GetPeerAddress());
-                mC1.reset(char1);
+                ChipLogDetail(DeviceLayer, "C1 characteristic found");
+                mC1.reset(chr.release());
             }
-            else if (BluezIsCharOnService(char1, mService.get()) &&
-                     (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0))
+            else if (strcmp(bluez_gatt_characteristic1_get_uuid(chr.get()), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0)
             {
-                ChipLogDetail(DeviceLayer, "C2 found on %s", GetPeerAddress());
-                mC2.reset(char1);
+                ChipLogDetail(DeviceLayer, "C2 characteristic found");
+                mC2.reset(chr.release());
             }
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-            else if (BluezIsCharOnService(char1, mService.get()) &&
-                     (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_3_UUID_STR) == 0))
+            else if (strcmp(bluez_gatt_characteristic1_get_uuid(chr.get()), Ble::CHIP_BLE_CHAR_3_UUID_STR) == 0)
             {
-                ChipLogDetail(DeviceLayer, "C3 found on %s", GetPeerAddress());
-                mC3.reset(char1);
+                ChipLogDetail(DeviceLayer, "C3 characteristic found");
+                mC3.reset(chr.release());
             }
 #endif
-            else
-            {
-                g_object_unref(char1);
-            }
         }
     }
 
