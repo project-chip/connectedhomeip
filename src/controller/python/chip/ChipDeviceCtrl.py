@@ -732,7 +732,7 @@ class ChipDeviceControllerBase():
 
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes(
-                self.devCtrl, int(filterType), str(filter).encode("utf-8") + b"\x00")).raise_on_error()
+                self.devCtrl, int(filterType), str(filter).encode("utf-8"))).raise_on_error()
 
         if timeoutSecond != 0:
             if stopOnFirst:
@@ -2019,7 +2019,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             self._enablePairingCompeleteCallback(True)
             self._ChipStack.Call(
                 lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
-                    self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None, discoveryTimeoutMsec)
+                    self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
             ).raise_on_error()
 
             return self._commissioning_complete_future.result()
@@ -2032,15 +2032,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         self.CheckIsActive()
 
-        setupPayload = setupPayload.encode() + b'\0'
-
         self._commissioning_complete_future = concurrent.futures.Future()
 
         try:
             self._enablePairingCompeleteCallback(True)
             self._ChipStack.Call(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
-                    self.devCtrl, setupPayload, nodeid, discoveryType.value)
+                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
             ).raise_on_error()
 
             return self._commissioning_complete_future.result()
