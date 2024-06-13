@@ -635,7 +635,7 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(const Con
     // AddResponseData. In order to have this accounted for in overhead calculation we set the length to be 256.
     uint32_t sizeOfForcedSizeBuffer = aBufferSizeHint == ForcedSizeBufferLengthHint::kSizeGreaterThan255 ? 256 : 0;
     ForcedSizeBuffer responseData(sizeOfForcedSizeBuffer);
-    EXPECT_EQ(commandHandler.AddResponseData(aRequestCommandPath, responseData, CHIP_NO_ERROR);
+    EXPECT_EQ(commandHandler.AddResponseData(aRequestCommandPath, responseData.GetCommandId(), responseData), CHIP_NO_ERROR);
     uint32_t remainingSizeAfter = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     uint32_t delta              = remainingSizeBefore - remainingSizeAfter - sizeOfForcedSizeBuffer;
 
@@ -661,7 +661,7 @@ void TestCommandInteraction::FillCurrentInvokeResponseBuffer(CommandHandlerImpl 
     EXPECT_GE(sizeToFill, 256u);
 
     ForcedSizeBuffer responseData(sizeToFill);
-    EXPECT_EQ(apCommandHandler->AddResponseData(aRequestCommandPath, responseData), CHIP_NO_ERROR);
+    EXPECT_EQ(apCommandHandler->AddResponseData(aRequestCommandPath, responseData.GetCommandId(), responseData), CHIP_NO_ERROR);
 }
 
 void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(bool aNeedStatusCode)
@@ -1193,7 +1193,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_WithoutResponderC
 
     uint32_t sizeToFill = 50; // This is an arbitrary number, we need to select a non-zero value.
     ForcedSizeBuffer responseData(sizeToFill);
-    EXPECT_EQ(commandHandler.AddResponseData(requestCommandPath, responseData, CHIP_NO_ERROR);
+    EXPECT_EQ(commandHandler.AddResponseData(requestCommandPath, responseData.GetCommandId(), responseData), CHIP_NO_ERROR);
 
     // Since calling AddResponseData is supposed to be a no-operation when there is no responder, it is
     // hard to validate. Best way is to check that we are still in an Idle state afterwards
@@ -1868,7 +1868,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_FillUpInvokeRespo
 
     uint32_t sizeToFill = 50;
     ForcedSizeBuffer responseData(sizeToFill);
-    EXPECT_EQ(commandHandler.AddResponseData(requestCommandPath2, responseData, CHIP_NO_ERROR);
+    EXPECT_EQ(commandHandler.AddResponseData(requestCommandPath2, responseData.GetCommandId(), responseData), CHIP_NO_ERROR);
 
     remainingSize = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     EXPECT_GT(remainingSize, sizeToLeave);
