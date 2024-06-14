@@ -543,11 +543,9 @@ CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath,
     ReturnErrorOnFailure(AllocateBuffer());
 
     RollbackInvokeRequest rollback(*this);
-    //rollback.Checkpoint(*this);
     PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
     ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
-    TLV::TLVWriter * writer = nullptr;
-    writer = GetCommandDataIBTLVWriter();
+    TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
     FinishCommandParameters finishCommandParams(aAddRequestDataParams);

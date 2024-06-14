@@ -519,7 +519,7 @@ private:
 
     /**
      * Class to help backup CommandSender's buffer containing InvokeRequestMessage when adding InvokeRequest
-     * in case there is a failure to add InvokeRequest. Intended usages is as follows:
+     * in case there is a failure to add InvokeRequest. Intended usage is as follows:
      *  - Allocate RollbackInvokeRequest on the stack.
      *  - Attempt adding InvokeRequest into InvokeRequestMessage buffer.
      *  - If modification is added successfully, call DisableAutomaticRollback() to prevent destructor from
