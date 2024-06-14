@@ -193,11 +193,11 @@ CHIP_ERROR Instance::ReadSupportedLocations(chip::app::AttributeValueEncoder & a
         return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR 
         {
             uint8_t                   locationIndex = 0;
-            LocationStructureWrapper  suppportedLocation;
+            LocationStructureWrapper supportedLocation;
 
-            while (mDelegate->GetSupportedLocationByIndex(locationIndex++, suppportedLocation))
+            while (mDelegate->GetSupportedLocationByIndex(locationIndex++, supportedLocation))
             {
-                ReturnErrorOnFailure(encoder.Encode(suppportedLocation));
+                ReturnErrorOnFailure(encoder.Encode(supportedLocation));
             }
             return CHIP_NO_ERROR; 
         });
@@ -215,11 +215,11 @@ CHIP_ERROR Instance::ReadSupportedMaps(chip::app::AttributeValueEncoder & aEncod
         return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR 
         {
             uint32_t              mapIndex = 0;
-            MapStructureWrapper   suppportedMap;
+            MapStructureWrapper supportedMap;
 
-            while (mDelegate->GetSupportedMapByIndex(mapIndex++, suppportedMap))
+            while (mDelegate->GetSupportedMapByIndex(mapIndex++, supportedMap))
             {
-                ReturnErrorOnFailure(encoder.Encode(suppportedMap));
+                ReturnErrorOnFailure(encoder.Encode(supportedMap));
             }
             return CHIP_NO_ERROR; 
         });
@@ -637,7 +637,6 @@ bool Instance::AddSupportedLocation( uint32_t                                   
 
     // success!
     ret_value = true;
-    mDelegate->HandleSupportedLocationsUpdated();
     NotifySupportedLocationsChanged();
 
 exit:
