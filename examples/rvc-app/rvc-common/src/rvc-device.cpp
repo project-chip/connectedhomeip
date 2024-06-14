@@ -6,7 +6,7 @@ using namespace chip::app::Clusters;
 
 void RvcDevice::Init()
 {
-//    mServiceAreaInstance.Init();
+    mServiceAreaInstance.Init();
     mRunModeInstance.Init();
     mCleanModeInstance.Init();
     mOperationalStateInstance.Init();

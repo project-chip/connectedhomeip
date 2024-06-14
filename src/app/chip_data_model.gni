@@ -390,6 +390,14 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/thread-network-diagnostics-provider.cpp",
           "${_app_root}/clusters/${cluster}/thread-network-diagnostics-provider.h",
         ]
+      } else if (cluster == "service-area-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/service-area-delegate.cpp",
+          "${_app_root}/clusters/${cluster}/service-area-delegate.h",
+          "${_app_root}/clusters/${cluster}/service-area-cluster-objects.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }

@@ -38,9 +38,6 @@ namespace app {
 namespace Clusters {
 namespace ServiceArea {
 
-class Delegate;
-
-
 /**
  * Instance is a class that represents an instance of the generic Service Area cluster.
  * It implements AttributeAccessInterface and CommandHandlerInterface so it can
@@ -218,18 +215,6 @@ private:
      */
     bool IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreLocationId);
 
-    /**
-     * @brief helper function to deal with side-effects of updating the Supported Locations attribute
-     * 
-     * @note When updating the SupportedLocations attribute list (adding or deleting entries, changing their MapID fields, changing the LocationID fields, or nulling the entire list):
-     *
-     *       - the SelectedLocations attribute SHALL be set to null.
-     *       - the CurrentLocation attribute SHALL be set to null.
-     *       - the Progress attribute SHALL be set to null.
-     * 
-     * @note MATTER change notifications are made for the attributes that change
-     */
-    void HandleSupportedLocationsUpdated();
 
 public:
 
@@ -395,12 +380,12 @@ public:
     DataModel::Nullable<uint32_t> GetEstimatedEndTime();
 
     /**
-     * @brief Set the estimated end time
+     * @brief Set the estimated end time.
      * @param[in] aEstimatedEndTime The estimated epoch time in seconds when operation at the location indicated by the CurrentLocation attribute will be completed, in seconds.
-     * @return true if attribute is set
+     * @return true if attribute is set.
      * 
      * @note MATTER change notification is made if the change meets the requirements for EstimatedEndTime notification (depends on old and new values).
-     */ 
+     */
     bool SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
 
 

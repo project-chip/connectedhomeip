@@ -64,7 +64,7 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<Service
     mFeature(aFeature)
 {
     ChipLogProgress(Zcl, "Service Area: Instance constructor");
-//    mDelegate->SetInstance(this);
+    mDelegate->SetInstance(this);
 }
 
 Instance::~Instance()
@@ -596,22 +596,6 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
     return true;
 }
 
-
-void Instance::HandleSupportedLocationsUpdated()
-{
-    // When updating the SupportedLocations attribute list 
-
-    // - the SelectedLocations attribute SHALL be set to null.
-    ClearSelectedLocations();
-
-    // - the CurrentLocation attribute SHALL be set to null.
-    SetCurrentLocation(DataModel::Nullable<uint32_t>());
-
-    // - the Progress attribute SHALL be set to null.
-    ClearProgress();
-}
-
-
 bool Instance::AddSupportedLocation( uint32_t                                     aLocationId,
                                      const DataModel::Nullable<uint8_t>         & aMapId,
                                      const CharSpan                             & aLocationName,
@@ -653,7 +637,7 @@ bool Instance::AddSupportedLocation( uint32_t                                   
 
     // success!
     ret_value = true;
-    HandleSupportedLocationsUpdated();
+    mDelegate->HandleSupportedLocationsUpdated();
     NotifySupportedLocationsChanged();
 
 exit:
@@ -717,7 +701,7 @@ bool Instance::ModifySupportedLocation( uint32_t                                
     ret_value = true;
     if (mapIDChanged)
     {
-        HandleSupportedLocationsUpdated();
+        mDelegate->HandleSupportedLocationsUpdated();
     }
 
     NotifySupportedLocationsChanged();
@@ -737,7 +721,7 @@ bool Instance::ClearSupportedLocations()
 
     if (mDelegate->ClearSupportedLocations())
     {
-        HandleSupportedLocationsUpdated();
+        mDelegate->HandleSupportedLocationsUpdated();
         NotifySupportedLocationsChanged();
 
         ret_value = true;

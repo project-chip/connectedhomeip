@@ -27,6 +27,8 @@ namespace app {
 namespace Clusters {
 namespace ServiceArea {
 
+class Instance;
+
 // *****************************************************************************
 // cluster constraints
 
@@ -64,10 +66,9 @@ public:
     Delegate() = default;
     virtual ~Delegate() = default;
 
-protected:
-
     friend class Instance;
 
+protected:
     //*************************************************************************
     // Command handling support
 
@@ -236,6 +237,16 @@ protected:
      */
     virtual bool ClearSupportedLocations() = 0;
 
+    /**
+     * @brief Ensure that when the Supported locations is modified, the required restrictions for the SelectedLocations,
+     * CurrentLocation, and Progress attributes are maintained.
+     *
+     * This method will be called by the SDK whenever the adherence to the restrictions for these attributes cannot be guaranteed.
+     * For example, if there are deletions in the SupportedMops or SupportedLocations attributes, or if there are changes to their IDs.
+     * This method will no be called if the changes made to the SupportedMops or SupportedLocations attributes, ensure that the restrictions are adhered.
+     * For example, if there are additions or the modifications do not involve changing IDs in the SupportedMops or SupportedLocations attributes.
+     */
+    virtual void HandleSupportedLocationsUpdated();
 
     //*************************************************************************
     // Supported Maps accessors
@@ -474,6 +485,14 @@ protected:
      * @note no notifications or other side effects
      */
     virtual bool ClearProgress() = 0;
+
+private:
+    Instance * mInstance = nullptr;
+
+    void SetInstance(Instance *aInstance)
+    {
+        mInstance = aInstance;
+    }
 };
 
 
