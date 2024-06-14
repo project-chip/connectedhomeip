@@ -528,7 +528,8 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
 
     // Use FabricTable directly to avoid situation of dangling index from stale FabricInfo
     // until we factor-out any FabricInfo direct usage.
-    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex,
+                                CHIP_ERROR_INVALID_ARGUMENT);
     const auto * fabricInfo = fabricTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
     ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1036,7 +1037,6 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     // ParseSigma1 ensures that:
     // mRemotePubKey.Length() == initiatorPubKey.size() == kP256_PublicKey_Length.
     memcpy(mRemotePubKey.Bytes(), initiatorPubKey.data(), mRemotePubKey.Length());
-
 
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma2);
     err = SendSigma2();
@@ -2382,7 +2382,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
         {
             // Need to capture before invoking status report since 'this' might be deallocated on successful completion of sigma3
             auto key = (mState == State::kSentSigma3) ? kMetricDeviceCASESessionSigma3 : kMetricDeviceCASESessionSigma2Resume;
-            err = HandleStatusReport(std::move(msg), /* successExpected*/ true);
+            err      = HandleStatusReport(std::move(msg), /* successExpected*/ true);
             MATTER_LOG_METRIC_END(key, err);
         }
         break;

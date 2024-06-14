@@ -1104,7 +1104,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(const ReadPrepareParams & aReadPrepa
     VerifyOrReturnError(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
                         CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto err =  SendSubscribeRequestImpl(aReadPrepareParams);
+    auto err = SendSubscribeRequestImpl(aReadPrepareParams);
     if (CHIP_NO_ERROR != err)
     {
         MATTER_LOG_METRIC_END(Tracing::kMetricDeviceSubscriptionSetup, err);
