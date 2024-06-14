@@ -662,15 +662,14 @@ void CommandSender::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
 }
 
-CommandSender::RollbackInvokeRequest::RollbackInvokeRequest(CommandSender& aCommandSender) :
-  mCommandSender(aCommandSender)
+CommandSender::RollbackInvokeRequest::RollbackInvokeRequest(CommandSender& aCommandSender) : mCommandSender(aCommandSender)
 {
     VerifyOrReturn(mCommandSender.mBufferAllocated);
     VerifyOrReturn(mCommandSender.mState == State::Idle || mCommandSender.mState == State::AddedCommand);
     VerifyOrReturn(mCommandSender.mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
     VerifyOrReturn(mCommandSender.mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
     mCommandSender.mInvokeRequestBuilder.Checkpoint(mBackupWriter);
-    mBackupState     = mCommandSender.mState;
+    mBackupState          = mCommandSender.mState;
     mRollbackInDestructor = true;
 }
 

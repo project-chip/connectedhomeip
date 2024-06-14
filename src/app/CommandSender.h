@@ -530,7 +530,7 @@ private:
     class RollbackInvokeRequest
     {
     public:
-        explicit RollbackInvokeRequest(CommandSender& aCommandSender);
+        explicit RollbackInvokeRequest(CommandSender & aCommandSender);
         ~RollbackInvokeRequest();
 
         /**
@@ -539,7 +539,7 @@ private:
         void DisableAutomaticRollback();
 
     private:
-        CommandSender& mCommandSender;
+        CommandSender & mCommandSender;
         TLV::TLVWriter mBackupWriter;
         State mBackupState;
         bool mRollbackInDestructor = false;
