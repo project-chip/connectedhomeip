@@ -62,6 +62,10 @@ public:
     // discriminators.
     bool HasDiscriminator() const { return mHasDiscriminator; }
 
+    // Obtains the long version of the discriminator, or 0 if short.
+    // WARNING: This is lossy and a bad idea to use. The correct method to use
+    //          is GetSetupDiscriminator(). This method exists for public
+    //          API backwards compatibility.
     uint16_t GetDiscriminator() const
     {
         if (mSetupDiscriminator.IsShortDiscriminator())
