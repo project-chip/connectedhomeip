@@ -186,26 +186,7 @@ protected:
      * 
      * @note may be overloaded in device implementation for optimization, if desired
     */
-    virtual bool GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex, LocationStructureWrapper & aSupportedLocation)
-    {
-        bool ret_value = false;
-
-        listIndex = 0;
-
-        // simple linear iteration to find the location with the desired locationID.
-        while (GetSupportedLocationByIndex(listIndex, aSupportedLocation))
-        {
-            if (aSupportedLocation.locationID == aLocationId)
-            {
-                ret_value = true;
-                break;
-            }
-
-            ++listIndex;
-        }
-
-        return ret_value;
-    };
+    virtual bool GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex, LocationStructureWrapper & aSupportedLocation);
 
     /**
      * @brief Add a location to the supported locations list.
@@ -290,25 +271,7 @@ protected:
      * 
      * @note may be overloaded in device implementation for optimization, if desired
     */
-    virtual bool GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
-    {
-        bool ret_value = false;
-
-        listIndex = 0;
-
-        while (GetSupportedMapByIndex(listIndex, aSupportedMap))
-        {
-            if (aSupportedMap.mapID == aMapId)
-            {
-                ret_value = true;
-                break;
-            }
-
-            ++listIndex;
-        }
-
-        return ret_value;
-    };
+    virtual bool GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap);
 
     /**
      * @brief Add a map to the supported maps list.
@@ -367,26 +330,7 @@ protected:
      * 
      * @note may be overloaded in device implementation for optimization, if desired
     */
-    virtual bool IsSelectedLocation(uint32_t aLocationId)
-    {
-        bool ret_value = false;
-
-        uint32_t listIndex = 0;
-        uint32_t selectedLocation;
-
-        while (GetSelectedLocationByIndex(listIndex, selectedLocation))
-        {
-            if (selectedLocation == aLocationId)
-            {
-                ret_value = true;
-                break;
-            }
-
-            ++listIndex;
-        }
-
-        return ret_value;
-    };
+    virtual bool IsSelectedLocation(uint32_t aLocationId);
 
     /**
      * @brief Add a locationID to the selected locations list.
@@ -436,26 +380,7 @@ protected:
      * 
      * @note may be overloaded in device implementation for optimization, if desired
     */
-    virtual bool GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
-    {
-        bool ret_value = false;
-
-        listIndex = 0;
-
-        // simple linear iteration to find the progress element with the desired locationID.
-        while (GetProgressElementByIndex(listIndex, aProgressElement))
-        {
-            if (aProgressElement.locationID == aLocationId)
-            {
-                ret_value = true;
-                break;
-            }
-
-            ++listIndex;
-        }
-
-        return ret_value;
-    };
+    virtual bool GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement);
 
     /**
      * @brief Add a progress element to the progress list.
