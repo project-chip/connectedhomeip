@@ -1030,6 +1030,12 @@ void DeviceCommissioner::CancelCommissioningInteractions()
         mInvokeCancelFn();
         mInvokeCancelFn = nullptr;
     }
+    if (mWriteCancelFn)
+    {
+        ChipLogDetail(Controller, "Cancelling write request for step '%s'", StageToString(mCommissioningStage));
+        mWriteCancelFn();
+        mWriteCancelFn = nullptr;
+    }
     if (mOnDeviceConnectedCallback.IsRegistered())
     {
         ChipLogDetail(Controller, "Cancelling CASE setup for step '%s'", StageToString(mCommissioningStage));
@@ -1979,6 +1985,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     DeviceProxy * proxy      = mDeviceBeingCommissioned;
     mDeviceBeingCommissioned = nullptr;
     mInvokeCancelFn          = nullptr;
+    mWriteCancelFn           = nullptr;
 
     if (mPairingDelegate != nullptr)
     {
@@ -2753,10 +2760,12 @@ CHIP_ERROR DeviceCommissioner::SendCommissioningWriteRequest(DeviceProxy * devic
                                                              WriteResponseSuccessCallback successCb,
                                                              WriteResponseFailureCallback failureCb)
 {
+    VerifyOrDie(!mWriteCancelFn); // we don't make parallel (cancellable) calls
     auto onSuccessCb = [this, successCb](const app::ConcreteAttributePath & aPath) { successCb(this); };
     auto onFailureCb = [this, failureCb](const app::ConcreteAttributePath * aPath, CHIP_ERROR aError) { failureCb(this, aError); };
     return WriteAttribute(device->GetSecureSession().Value(), endpoint, cluster, attribute, requestData, onSuccessCb, onFailureCb,
-                          /* aTimedWriteTimeoutMs = */ NullOptional, /* onDoneCb = */ nullptr, /* aDataVersion = */ NullOptional);
+                          /* aTimedWriteTimeoutMs = */ NullOptional, /* onDoneCb = */ nullptr, /* aDataVersion = */ NullOptional,
+                          /* outCancelFn = */ &mWriteCancelFn);
 }
 
 void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,

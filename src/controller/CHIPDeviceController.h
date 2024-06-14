@@ -820,6 +820,7 @@ private:
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     bool mRunCommissioningAfterConnection  = false;
     Internal::InvokeCancelFn mInvokeCancelFn;
+    Internal::WriteCancelFn mWriteCancelFn;
 
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 

@@ -23,10 +23,16 @@
 #include <app/WriteClient.h>
 #include <controller/CommandSenderAllocator.h>
 #include <controller/TypedCommandCallback.h>
+#include <functional>
 #include <lib/core/Optional.h>
 
 namespace chip {
 namespace Controller {
+
+namespace Internal {
+// WriteCancelFn functions on WriteAttribute() are for internal use only.
+typedef std::function<void()> WriteCancelFn;
+} // namespace Internal
 
 /*
  * An adapter callback that permits applications to provide std::function callbacks for success, error and on done.
@@ -130,7 +136,8 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
                           AttributeId attributeId, const AttrType & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr,
-                          const Optional<DataVersion> & aDataVersion = NullOptional)
+                          const Optional<DataVersion> & aDataVersion = NullOptional,
+                          Internal::WriteCancelFn * outCancelFn      = nullptr)
 {
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb, sessionHandle->IsGroupSession());
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -150,6 +157,15 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
     }
 
     ReturnErrorOnFailure(client->SendWriteRequest(sessionHandle));
+
+    // If requested by the caller, provide a way to cancel the write interaction.
+    if (outCancelFn != nullptr)
+    {
+        *outCancelFn = [rawCallback = callback.get(), rawClient = client.get()]() {
+            chip::Platform::Delete(rawClient);
+            chip::Platform::Delete(rawCallback);
+        };
+    }
 
     // At this point the handle will ensure our callback's OnDone is always
     // called.
