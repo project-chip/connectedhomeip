@@ -13,7 +13,7 @@ RUN set -x \
 WORKDIR /opt/espressif/qemu
 # Setup QEMU emulator for ESP32 platform
 RUN set -x \
-    && git clone --depth 1 -b esp-develop-20210826 https://github.com/espressif/qemu.git ../qemu-src \
+    && git clone --depth 1 -b v9.0.0 https://github.com/espressif/qemu.git ../qemu-src \
     && ../qemu-src/configure --target-list=xtensa-softmmu --enable-debug --disable-strip --disable-user --disable-capstone --disable-vnc --disable-sdl --disable-gtk \
     && make -j$(nproc) \
     && : # last line
