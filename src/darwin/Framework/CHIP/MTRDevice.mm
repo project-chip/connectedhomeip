@@ -161,6 +161,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
 using namespace chip::Tracing::DarwinFramework;
+
 typedef void (^FirstReportHandler)(void);
 
 namespace {
