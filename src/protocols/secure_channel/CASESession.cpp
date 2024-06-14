@@ -1327,7 +1327,7 @@ exit:
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
-    auto err = HandleSigma2(std::move(msg));
+    CHIP_ERROR err = HandleSigma2(std::move(msg));
     MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
     ReturnErrorOnFailure(err);
 
