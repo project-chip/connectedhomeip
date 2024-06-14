@@ -65,7 +65,7 @@ function build_image() {
         DOCKER_PATH=$(dirname $dockerfile) # Drop the file name
         IMAGE_NAME="ghcr.io/project-chip/${DOCKER_PATH##*/}:${VERSION}"     # Drop directory prefix
 
-        if [ $SKIP_BUILT -ne 0 ] && docker images "${IMAGE_NAME}" | grep 'ghcr.io' >/dev/null; then
+        if [ $SKIP_BUILT -ne 0 ] && docker image inspect "${IMAGE_NAME}" >/dev/null 2>&1; then
           echo "Image ${IMAGE_NAME} already exists. Skipping build"
           continue
         fi
