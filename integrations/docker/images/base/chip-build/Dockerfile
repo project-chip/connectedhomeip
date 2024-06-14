@@ -83,6 +83,7 @@ RUN set -x \
     net-tools \
     ninja-build \
     nodejs \
+    patch \
     pkg-config \
     python3 \
     python3-click \
