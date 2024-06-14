@@ -25,10 +25,6 @@
 #include <lib/support/Span.h>
 #include <openthread/netdiag.h>
 
-using chip::MutableByteSpan;
-using chip::MutableCharSpan;
-using chip::Span;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -70,16 +66,13 @@ public:
 
     CHIP_ERROR GetInterfaceEnabled(bool & interfaceEnabled) override;
 
-    CHIP_ERROR GetActiveDataset(chip::Thread::OperationalDataset & activeDataset) override;
+    CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
 
-    CHIP_ERROR GetPendingDataset(chip::Thread::OperationalDataset & pendingDataset) override;
-
-    CHIP_ERROR SetActiveDataset(const chip::Thread::OperationalDataset & activeDataset,
-                                ActivateDatasetCallback * callback) override;
+    CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCallback * callback) override;
 
     CHIP_ERROR RevertActiveDataset() override;
 
-    CHIP_ERROR SetPendingDataset(const chip::Thread::OperationalDataset & pendingDataset) override;
+    CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
 
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 

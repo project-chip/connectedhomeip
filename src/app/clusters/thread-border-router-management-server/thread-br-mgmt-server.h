@@ -56,10 +56,17 @@ public:
 
 private:
     // Command Handlers
-    void HandleGetActiveDatasetRequest(HandlerContext & ctx, const Commands::GetActiveDatasetRequest::DecodableType & req);
-    void HandleGetPendingDatasetRequest(HandlerContext & ctx, const Commands::GetPendingDatasetRequest::DecodableType & req);
+    void HandleGetActiveDatasetRequest(HandlerContext & ctx, const Commands::GetActiveDatasetRequest::DecodableType & req)
+    {
+        HandleGetDatasetRequest(ctx, Delegate::DatasetType::kActive);
+    }
+    void HandleGetPendingDatasetRequest(HandlerContext & ctx, const Commands::GetPendingDatasetRequest::DecodableType & req)
+    {
+        HandleGetDatasetRequest(ctx, Delegate::DatasetType::kPending);
+    }
     void HandleSetActiveDatasetRequest(HandlerContext & ctx, const Commands::SetActiveDatasetRequest::DecodableType & req);
     void HandleSetPendingDatasetRequest(HandlerContext & ctx, const Commands::SetPendingDatasetRequest::DecodableType & req);
+    void HandleGetDatasetRequest(HandlerContext & ctx, Delegate::DatasetType type);
 
     // Attribute Read handler
     CHIP_ERROR ReadFeatureMap(AttributeValueEncoder & aEncoder);
