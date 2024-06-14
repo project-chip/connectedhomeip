@@ -48,13 +48,14 @@ struct StatusIB
         mStatus(imStatus), mClusterStatus(clusterStatus)
     {}
 
-    explicit StatusIB(const Protocols::InteractionModel::ClusterStatusCode& statusCode) : mStatus(statusCode.GetStatus())
+    explicit StatusIB(const Protocols::InteractionModel::ClusterStatusCode & statusCode) : mStatus(statusCode.GetStatus())
     {
         // NOTE: Cluster-specific codes are only valid on SUCCESS/FAILURE IM status (7.10.7. Status Codes)
         chip::Optional<ClusterStatus> clusterStatus = statusCode.GetClusterSpecificCode();
         if (clusterStatus.HasValue())
         {
-            mStatus = statusCode.IsSuccess() ? Protocols::InteractionModel::Status::Success : Protocols::InteractionModel::Status::Failure;
+            mStatus        = statusCode.IsSuccess() ? Protocols::InteractionModel::Status::Success
+                                                    : Protocols::InteractionModel::Status::Failure;
             mClusterStatus = clusterStatus;
         }
     }

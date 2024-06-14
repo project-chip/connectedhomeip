@@ -44,14 +44,14 @@ public:
     CHIP_ERROR Success()
     {
         CHIP_ERROR err = mCommandHandler->FallibleAddStatus(mCommandPath, Protocols::InteractionModel::Status::Success);
-        mSentResponse = (err == CHIP_NO_ERROR);
+        mSentResponse  = (err == CHIP_NO_ERROR);
         return err;
     }
 
     CHIP_ERROR Failure(Protocols::InteractionModel::Status aStatus)
     {
         CHIP_ERROR err = mCommandHandler->FallibleAddStatus(mCommandPath, aStatus);
-        mSentResponse = (err == CHIP_NO_ERROR);
+        mSentResponse  = (err == CHIP_NO_ERROR);
         return err;
     }
 

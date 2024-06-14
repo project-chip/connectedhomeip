@@ -492,9 +492,7 @@ TEST_F(TestCommands, TestSuccessNoDataResponseWithClusterStatus)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureWasCalled](CHIP_ERROR aError) {
-        onFailureWasCalled = true;
-    };
+    auto onFailureCb = [&onFailureWasCalled](CHIP_ERROR aError) { onFailureWasCalled = true; };
 
     responseDirective = kSendSuccessStatusCodeWithClusterStatus;
 

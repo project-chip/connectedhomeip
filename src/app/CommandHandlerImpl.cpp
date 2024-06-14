@@ -19,10 +19,10 @@
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/util/MatterCallbacks.h>
-#include <app/MessageDef/StatusIB.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVData.h>
@@ -626,16 +626,19 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
         if (status.HasClusterSpecificCode())
         {
             ChipLogError(DataManagement,
-                        "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus " ClusterSpecificCode=%u (%s)",
-                        path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                        ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(status.GetClusterSpecificCode().Value()), context);
+                         "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
+                         " ClusterSpecificCode=%u (%s)",
+                         path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
+                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(status.GetClusterSpecificCode().Value()),
+                         context);
         }
         else
         {
             ChipLogError(DataManagement,
-                        "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus " (%s)",
-                        path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                        ChipLogValueIMStatus(status.GetStatus()), context);
+                         "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
+                         " (%s)",
+                         path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
+                         ChipLogValueIMStatus(status.GetStatus()), context);
         }
     }
 
