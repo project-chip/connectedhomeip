@@ -20,6 +20,8 @@
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <lib/core/TLVReader.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/BufferWriter.h>
 #include <resource-monitoring/chef-resource-monitoring-delegates.h>
 #include <utility>
 
@@ -123,12 +125,17 @@ ChefResourceMonitorInstance::ExternalAttributeWrite(const EmberAfAttributeMetada
     }
     break;
     case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
+        // We already know the input is a buffer started with a uint16_t as the length
+        chip::Encoding::LittleEndian::Reader bufReader(buffer, sizeof(uint16_t));
+        uint16_t tlvLen;
+        VerifyOrReturnError( CHIP_NO_ERROR == bufReader.Read16(&tlvLen).StatusCode(), Protocols::InteractionModel::Status::UnsupportedWrite);
+
+        // Read from TLV
         uint32_t newValue = 0;
-        uint16_t tlvLen   = *(uint16_t *) buffer;
-        chip::TLV::TLVReader reader;
-        reader.Init(buffer + sizeof(uint16_t), tlvLen);
-        reader.Next();
-        reader.Get(newValue);
+        chip::TLV::TLVReader tlvReader;
+        tlvReader.Init(buffer + sizeof(uint16_t), tlvLen);
+        tlvReader.Next();
+        tlvReader.Get(newValue);
         DataModel::Nullable<uint32_t> newLastChangedTime = DataModel::MakeNullable(newValue);
         ret                                              = UpdateLastChangedTime(newLastChangedTime);
     }
@@ -163,7 +170,7 @@ chefResourceMonitoringExternalWriteCallback(chip::EndpointId endpoint, chip::Clu
 {
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
     AttributeId attributeId                 = attributeMetadata->attributeId;
-    ChipLogProgress(Zcl, "chefResourceMonitoringExternalWriteCallback EP: %d, Cluster: %d, Att: %d", static_cast<int>(endpoint),
+    ChipLogProgress(Zcl, "chefResourceMonitoringExternalWriteCallback EP: %d, Cluster: %04x, Att: %04x", static_cast<int>(endpoint),
                     static_cast<int>(clusterId), static_cast<int>(attributeId));
 
     switch (clusterId)
@@ -232,8 +239,11 @@ ChefResourceMonitorInstance::ExternalAttributeRead(const EmberAfAttributeMetadat
     }
     break;
     case HepaFilterMonitoring::Attributes::LastChangedTime::Id: {
+        // Only LastChangedTime needs to handle Endianness
         DataModel::Nullable<uint32_t> lastChangedTime = GetLastChangedTime();
-        *(uint32_t *) buffer                          = lastChangedTime.IsNull() ? 0 : lastChangedTime.Value();
+        chip::Encoding::LittleEndian::BufferWriter bufWriter(buffer, sizeof(uint16_t));
+
+        bufWriter.Put32(lastChangedTime.IsNull() ? 0 : lastChangedTime.Value());
     }
     break;
     case HepaFilterMonitoring::Attributes::DegradationDirection::Id:
