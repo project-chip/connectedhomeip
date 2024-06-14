@@ -21,6 +21,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
@@ -28,6 +29,7 @@
 #include <app/util/ember-compatibility-functions.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/TypeTraits.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -619,13 +621,7 @@ exit:
 CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath,
                                    const Protocols::InteractionModel::ClusterStatusCode & aStatus)
 {
-    if (aStatus.HasClusterSpecificCode())
-    {
-        return AddStatusInternal(
-            aPath, StatusIB{ (aStatus.IsSuccess() ? Status::Success : Status::Failure), aStatus.GetClusterSpecificCode().Value() });
-    }
-
-    return AddStatusInternal(aPath, StatusIB{ aStatus.GetStatus() });
+    return AddStatusInternal(aPath, StatusIB{ aStatus });
 }
 
 CHIP_ERROR WriteHandler::AddClusterSpecificSuccess(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)

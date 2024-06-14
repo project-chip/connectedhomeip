@@ -161,4 +161,24 @@ TEST_F(TestStatusIB, TestStatusIBEqualityOperator)
     EXPECT_NE(invalid_argument, StatusIB(CHIP_NO_ERROR));
 }
 
+TEST_F(TestStatusIB, ConversionsFromClusterStatusCodeWork)
+{
+    StatusIB successWithCode {ClusterStatusCode::ClusterSpecificSuccess(123u)};
+    EXPECT_EQ(successWithCode.mStatus, Status::Success);
+    EXPECT_TRUE(successWithCode.IsSuccess());
+    ASSERT_TRUE(successWithCode.mClusterStatus.HasValue());
+    EXPECT_EQ(successWithCode.mClusterStatus.Value(), 123u);
+
+    StatusIB failureWithCode {ClusterStatusCode::ClusterSpecificFailure(42u)};
+    EXPECT_EQ(failureWithCode.mStatus, Status::Failure);
+    EXPECT_FALSE(failureWithCode.IsSuccess());
+    ASSERT_TRUE(failureWithCode.mClusterStatus.HasValue());
+    EXPECT_EQ(failureWithCode.mClusterStatus.Value(), 42u);
+
+    StatusIB imStatusInClusterStatusCode{ClusterStatusCode{Status::ConstraintError}};
+    EXPECT_EQ(imStatusInClusterStatusCode.mStatus, Status::ConstraintError);
+    EXPECT_FALSE(imStatusInClusterStatusCode.IsSuccess());
+    EXPECT_FALSE(imStatusInClusterStatusCode.mClusterStatus.HasValue());
+}
+
 } // namespace

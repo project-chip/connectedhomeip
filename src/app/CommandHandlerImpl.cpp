@@ -22,6 +22,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/util/MatterCallbacks.h>
+#include <app/MessageDef/StatusIB.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVData.h>
@@ -622,19 +623,23 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
             context = "no additional context";
         }
 
-        ChipLogError(DataManagement,
-                     "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus " (%s)",
-                     path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                     ChipLogValueIMStatus(status.GetStatus()), context);
+        if (status.HasClusterSpecificCode())
+        {
+            ChipLogError(DataManagement,
+                        "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus " ClusterSpecificCode=%u (%s)",
+                        path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
+                        ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(status.GetClusterSpecificCode().Value()), context);
+        }
+        else
+        {
+            ChipLogError(DataManagement,
+                        "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus " (%s)",
+                        path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
+                        ChipLogValueIMStatus(status.GetStatus()), context);
+        }
     }
 
-    if (status.HasClusterSpecificCode())
-    {
-        return AddStatusInternal(
-            path, StatusIB{ (status.IsSuccess() ? Status::Success : Status::Failure), status.GetClusterSpecificCode().Value() });
-    }
-
-    return AddStatusInternal(path, StatusIB{ status.GetStatus() });
+    return AddStatusInternal(path, StatusIB{ status });
 }
 
 CHIP_ERROR CommandHandlerImpl::PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,

@@ -138,7 +138,7 @@ public:
     {
         if (mCompleteState != CompleteState::kComplete)
         {
-            mWriter->Complete(Protocols::InteractionModel::Status::Failure);
+            mWriter->Complete(StatusIB{Protocols::InteractionModel::Status::Failure});
         }
     }
 

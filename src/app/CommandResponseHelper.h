@@ -39,38 +39,19 @@ public:
         mCommandHandler->AddResponse(mCommandPath, aResponse);
         mSentResponse = true;
         return CHIP_NO_ERROR;
-    };
-
-    // WARNING: Do not use for basic response-payload-free success, as SUCCESS status
-    // code should be handled without a cluster-specific status.
-    CHIP_ERROR Success(ClusterStatus aClusterStatus)
-    {
-        CHIP_ERROR err = mCommandHandler->FallibleAddStatus(
-            mCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(aClusterStatus));
-        if (err == CHIP_NO_ERROR)
-        {
-            mSentResponse = true;
-        }
-        return err;
     }
 
     CHIP_ERROR Success()
     {
         CHIP_ERROR err = mCommandHandler->FallibleAddStatus(mCommandPath, Protocols::InteractionModel::Status::Success);
-        if (err == CHIP_NO_ERROR)
-        {
-            mSentResponse = true;
-        }
+        mSentResponse = (err == CHIP_NO_ERROR);
         return err;
     }
 
     CHIP_ERROR Failure(Protocols::InteractionModel::Status aStatus)
     {
         CHIP_ERROR err = mCommandHandler->FallibleAddStatus(mCommandPath, aStatus);
-        if (err == CHIP_NO_ERROR)
-        {
-            mSentResponse = true;
-        }
+        mSentResponse = (err == CHIP_NO_ERROR);
         return err;
     }
 
@@ -78,10 +59,7 @@ public:
     {
         CHIP_ERROR err = mCommandHandler->FallibleAddStatus(
             mCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
-        if (err == CHIP_NO_ERROR)
-        {
-            mSentResponse = true;
-        }
+        mSentResponse = (err == CHIP_NO_ERROR);
         return err;
     }
 

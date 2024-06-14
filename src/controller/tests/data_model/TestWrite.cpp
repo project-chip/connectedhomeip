@@ -57,7 +57,7 @@ enum ResponseDirective
     kSendClusterSpecificFailure,
 };
 
-ResponseDirective gResponseDirective;
+ResponseDirective gResponseDirective = kSendAttributeSuccess;
 
 } // namespace
 

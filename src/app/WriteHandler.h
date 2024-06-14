@@ -31,6 +31,7 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 

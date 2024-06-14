@@ -493,7 +493,6 @@ TEST_F(TestCommands, TestSuccessNoDataResponseWithClusterStatus)
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](CHIP_ERROR aError) {
-        printf("   ----> %" CHIP_ERROR_FORMAT "\n", aError.Format());
         onFailureWasCalled = true;
     };
 

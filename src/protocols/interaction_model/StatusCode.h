@@ -97,7 +97,7 @@ public:
      *             (e.g. chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen)
      * @return a ClusterStatusCode instance properly configured.
      */
-    template <typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
+    template <typename T, typename std::enable_if_t<std::is_enum<T>::value, bool> = true>
     static ClusterStatusCode ClusterSpecificFailure(T cluster_specific_code)
     {
         static_assert(std::numeric_limits<std::underlying_type_t<T>>::max() <= std::numeric_limits<ClusterStatus>::max(),
@@ -119,7 +119,7 @@ public:
      *             (e.g. chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kBasicWindowOpen)
      * @return a ClusterStatusCode instance properly configured.
      */
-    template <typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
+    template <typename T, typename std::enable_if_t<std::is_enum<T>::value, bool> = true>
     static ClusterStatusCode ClusterSpecificSuccess(T cluster_specific_code)
     {
         static_assert(std::numeric_limits<std::underlying_type_t<T>>::max() <= std::numeric_limits<ClusterStatus>::max(),
