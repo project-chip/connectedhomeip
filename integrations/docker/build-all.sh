@@ -32,7 +32,7 @@ for i in "$@"; do
     -h | --help)
        echo "Supported arguments:"
        echo "  -h/--help       This help text"
-       echo "  -p/--path       TODO: document this"
+       echo "  -p/--path       sub-path in integrations/docker/images to build (defaults to * for everything)"
        echo "  -skip-built     Do not rebuild images already found as built"
        exit 0
        ;;
