@@ -60,14 +60,19 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
 {
     for (auto & attr : GlobalAttributesNotInMetadata)
     {
+
         if (attr == aPath.mAttributeId)
         {
             const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-            ReturnErrorCodeIf(cluster == nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+            if (cluster == nullptr)
+            {
+                return (emberAfFindEndpointType(aPath.mEndpointId) == nullptr) ? CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)
+                                                                               : CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
+            }
+
             return cluster;
         }
     }
-
     const EmberAfAttributeMetadata * metadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
