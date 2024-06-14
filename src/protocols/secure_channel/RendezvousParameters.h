@@ -93,8 +93,9 @@ public:
     {
         if (!mSetupDiscriminator.has_value())
         {
-            ChipLogError(Discovery,
-                         "Get RendezvousParameters::GetSetupDiscriminator() called without discriminator in params (inconsistent).");
+            ChipLogError(
+                Discovery,
+                "Get RendezvousParameters::GetSetupDiscriminator() called without discriminator in params (inconsistent).");
         }
         return mSetupDiscriminator;
     }

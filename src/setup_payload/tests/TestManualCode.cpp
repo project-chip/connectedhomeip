@@ -26,8 +26,8 @@
 #include <stdio.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/support/verhoeff/Verhoeff.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/verhoeff/Verhoeff.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
