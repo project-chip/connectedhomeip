@@ -46,6 +46,12 @@ public:
         virtual void OnActivateDatasetComplete(CHIP_ERROR error) = 0;
     };
 
+    enum class DatasetType : uint8_t
+    {
+        kActive,
+        kPending,
+    };
+
     virtual CHIP_ERROR Init() = 0;
 
     virtual CHIP_ERROR GetPanChangeSupported(bool & panChangeSupported) = 0;
@@ -58,16 +64,15 @@ public:
 
     virtual CHIP_ERROR GetInterfaceEnabled(bool & interfaceEnabled) = 0;
 
-    virtual CHIP_ERROR GetActiveDataset(chip::Thread::OperationalDataset & activeDataset) = 0;
+    virtual CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) = 0;
 
-    virtual CHIP_ERROR GetPendingDataset(chip::Thread::OperationalDataset & pendingDataset) = 0;
+    virtual CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCallback * callback) = 0;
 
-    virtual CHIP_ERROR SetActiveDataset(const chip::Thread::OperationalDataset & activeDataset,
-                                        ActivateDatasetCallback * callback) = 0;
-
+    // The Thread BR should be able to revert the active dataset set by SetActiveDataset(), and restore
+    // the previous status of Thread BR.
     virtual CHIP_ERROR RevertActiveDataset() = 0;
 
-    virtual CHIP_ERROR SetPendingDataset(const chip::Thread::OperationalDataset & pendingDataset) = 0;
+    virtual CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) = 0;
 };
 
 } // namespace ThreadBorderRouterManagement

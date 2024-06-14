@@ -92,34 +92,27 @@ CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetInterfaceEnabled(bool & interface
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetActiveDataset(chip::Thread::OperationalDataset & activeDataset)
+CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetDataset(Thread::OperationalDataset & dataset, DatasetType type)
 {
     ScopedThreadLock threadLock;
+    otError otErr = OT_ERROR_NONE;
     otOperationalDatasetTlvs datasetTlvs;
-    if (GetThreadEnabled())
+    if (type == DatasetType::kActive)
     {
-        otError otErr = otDatasetGetActiveTlvs(esp_openthread_get_instance(), &datasetTlvs);
-        if (otErr == OT_ERROR_NONE)
-        {
-            return activeDataset.Init(ByteSpan(datasetTlvs.mTlvs, datasetTlvs.mLength));
-        }
+        otErr = otDatasetGetActiveTlvs(esp_openthread_get_instance(), &datasetTlvs);
     }
-    return CHIP_ERROR_NOT_FOUND;
-}
-
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetPendingDataset(chip::Thread::OperationalDataset & pendingDataset)
-{
-    ScopedThreadLock threadLock;
-    otOperationalDatasetTlvs datasetTlvs;
-    otError otErr = otDatasetGetPendingTlvs(esp_openthread_get_instance(), &datasetTlvs);
+    else
+    {
+        otErr = otDatasetGetPendingTlvs(esp_openthread_get_instance(), &datasetTlvs);
+    }
     if (otErr == OT_ERROR_NONE)
     {
-        return pendingDataset.Init(ByteSpan(datasetTlvs.mTlvs, datasetTlvs.mLength));
+        return dataset.Init(ByteSpan(datasetTlvs.mTlvs, datasetTlvs.mLength));
     }
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::SetActiveDataset(const chip::Thread::OperationalDataset & activeDataset,
+CHIP_ERROR ESP32ThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
                                                              ActivateDatasetCallback * callback)
 {
     VerifyOrReturnError(callback, CHIP_ERROR_INVALID_ARGUMENT);
@@ -202,7 +195,7 @@ CHIP_ERROR ESP32ThreadBorderRouterDelegate::RevertActiveDataset()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::SetPendingDataset(const chip::Thread::OperationalDataset & pendingDataset)
+CHIP_ERROR ESP32ThreadBorderRouterDelegate::SetPendingDataset(const Thread::OperationalDataset & pendingDataset)
 {
     ScopedThreadLock threadLock;
     otOperationalDatasetTlvs datasetTlvs;
