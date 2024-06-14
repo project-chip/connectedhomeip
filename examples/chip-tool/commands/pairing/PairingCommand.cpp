@@ -80,6 +80,11 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case PairingMode::WiFiPAF:
+        err = Pair(remoteId, PeerAddress::WiFiPAF());
+        break;
+#endif
     case PairingMode::AlreadyDiscovered:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
