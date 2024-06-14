@@ -57,6 +57,7 @@ RUN set -x \
     libdbus-glib-1-dev \
     libdmalloc-dev \
     libgif-dev \
+    libgirepository-1.0-1 \
     libglib2.0-dev \
     libical-dev \
     libjpeg-dev \
