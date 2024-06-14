@@ -1492,6 +1492,7 @@ enum class Feature : uint32_t
     kMomentarySwitchRelease    = 0x4,
     kMomentarySwitchLongPress  = 0x8,
     kMomentarySwitchMultiPress = 0x10,
+    kActionSwitch              = 0x20,
 };
 } // namespace Switch
 
