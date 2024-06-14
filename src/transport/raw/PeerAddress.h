@@ -53,6 +53,7 @@ enum class Type : uint8_t
     kUdp,
     kBle,
     kTcp,
+    kWiFiPAF,
 };
 
 /**
@@ -167,6 +168,9 @@ public:
 #endif
                 snprintf(buf, bufSize, "TCP:[%s%s]:%d", ip_addr, interface, mPort);
             break;
+        case Type::kWiFiPAF:
+            snprintf(buf, bufSize, "WiFiPAF");
+            break;
         case Type::kBle:
             // Note that BLE does not currently use any specific address.
             snprintf(buf, bufSize, "BLE");
@@ -208,6 +212,8 @@ public:
     {
         return TCP(addr).SetPort(port).SetInterface(interface);
     }
+
+    static PeerAddress WiFiPAF() { return PeerAddress(Type::kWiFiPAF); }
 
     static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
     {

@@ -106,6 +106,9 @@ enum
 #if CHIP_WITH_NLFAULTINJECTION
     kDeviceOption_FaultInjection,
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    kDeviceOption_WiFi_PAF = 0x1028,
+#endif
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -117,6 +120,9 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     { "wifi", kNoArgument, kDeviceOption_WiFi },
     { "wifi-supports-5g", kNoArgument, kDeviceOption_WiFiSupports5g },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    { "wifi-paf", kNoArgument, kDeviceOption_WiFi_PAF },
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_ENABLE_OPENTHREAD
     { "thread", kNoArgument, kDeviceOption_Thread },
@@ -189,6 +195,11 @@ const char * sDeviceOptionHelp =
     "  --wifi-supports-5g\n"
     "       Indicate that local Wi-Fi hardware should report 5GHz support.\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF)
+    "\n"
+    "  --wifi-paf\n"
+    "       Enable Wi-Fi PAF via wpa_supplicant.\n"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #if CHIP_ENABLE_OPENTHREAD
     "\n"
     "  --thread\n"
@@ -587,6 +598,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             PrintArgError("%s: Invalid fault injection specification\n", aProgram);
             retval = false;
         }
+        break;
+    }
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case kDeviceOption_WiFi_PAF: {
+        LinuxDeviceOptions::GetInstance().mWiFiPAF = true;
         break;
     }
 #endif

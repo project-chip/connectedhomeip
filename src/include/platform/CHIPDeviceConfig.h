@@ -425,6 +425,16 @@
 #define CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME "wlan0"
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+ *
+ * Name of the WiFi PAF/DNAN-USD
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
+#endif
+
+
 // -------------------- WiFi AP Configuration --------------------
 
 /**

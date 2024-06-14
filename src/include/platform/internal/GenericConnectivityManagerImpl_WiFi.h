@@ -77,6 +77,9 @@ public:
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool val);
+#endif
 // TODO ICD rework: ambiguous declaration of _SetPollingInterval when thread and wifi are both build together
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && !CHIP_DEVICE_CONFIG_ENABLE_THREAD
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);

@@ -845,6 +845,11 @@ private:
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
     RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverBle;
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    static void OnWiFiPAFSubscribeComplete(void * appState);
+    static void OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err);
+    RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
+#endif
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 

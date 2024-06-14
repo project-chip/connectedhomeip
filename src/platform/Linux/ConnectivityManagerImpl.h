@@ -48,6 +48,9 @@
 #include <system/SystemMutex.h>
 
 #include <mutex>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
 #endif
 
 #include <platform/Linux/NetworkCommissioningDriver.h>
@@ -137,6 +140,17 @@ public:
                                               const Crypto::P256Keypair & clientIdentityKeypair,
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+	CHIP_ERROR _WiFiPAFConnect(void * appState,
+										  OnConnectionCompleteFunct onSuccess,
+										  OnConnectionErrorFunct onError);
+    void OnDiscoveryResult(gboolean success, GVariant * obj);
+	void OnNanReceive(GVariant * obj);
+
+	CHIP_ERROR _WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
+	Transport::WiFiPAFBase * _GetWiFiPAF();
+	void _SetWiFiPAF(Transport::WiFiPAFBase * pWiFiPAF);
+#endif
 
     void PostNetworkConnect();
     CHIP_ERROR CommitConfig();
@@ -215,6 +229,26 @@ private:
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+	struct wpa_dbus_discov_info {
+		uint32_t subscribe_id;
+		uint32_t peer_publish_id;
+		uint8_t peer_addr[6];
+	};
+	struct wpa_dbus_discov_info mpaf_info;
+	struct wpa_dbus_nanrx_info {
+		uint32_t id;
+		uint32_t peer_id;
+		uint8_t peer_addr[6];
+		uint32_t ssi_len;
+	};
+	struct wpa_dbus_nanrx_info mpaf_nanrx_info;
+
+    OnConnectionCompleteFunct mOnPafSubscribeComplete;
+    Transport::WiFiPAFBase * pmWiFiPAF;
+	void * mAppState;
+    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool val);
+#endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 

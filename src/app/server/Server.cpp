@@ -56,6 +56,10 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
+
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
 #include <lib/support/PersistentStorageAudit.h>
 #endif // defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
@@ -210,6 +214,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                            TcpListenParameters(DeviceLayer::TCPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                           ,
+                           Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
 #endif
     );
 

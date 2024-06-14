@@ -65,6 +65,9 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/raw/BLE.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <transport/raw/UDP.h>
@@ -99,6 +102,10 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                               ,
                                               chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                                              ,
+                                              chip::Transport::WiFiPAFBase
 #endif
                                               >;
 

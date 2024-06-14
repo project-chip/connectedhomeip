@@ -52,10 +52,17 @@
 #include <ble/Ble.h>
 #include <transport/raw/BLE.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
 
 namespace chip {
 
 inline constexpr size_t kMaxDeviceTransportBlePendingPackets = 1;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+inline constexpr size_t kMaxDeviceTransportWiFiPAFPendingPackets = 1;
+#endif
+
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 inline constexpr size_t kMaxDeviceTransportTcpActiveConnectionCount = CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS;
@@ -77,6 +84,10 @@ using DeviceTransportMgr =
                  ,
                  Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                 ,
+                 Transport::WiFiPAF<kMaxDeviceTransportWiFiPAFPendingPackets> /* WiFiPAF */
+#endif
                  >;
 
 namespace Controller {
@@ -93,6 +104,9 @@ struct DeviceControllerSystemStateParams
     FabricTable * fabricTable                                     = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    Transport::WiFiPAFLayer	*wifipaf_layer = nullptr;
 #endif
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
     Crypto::SessionKeystore * sessionKeystore          = nullptr;

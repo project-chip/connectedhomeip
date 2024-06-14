@@ -173,6 +173,16 @@ public:
     {}
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+class PairWiFiPAF : public PairingCommand
+{
+public:
+    PairWiFiPAF(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("wifi-paf", PairingMode::WiFiPAF, PairingNetworkType::WiFi, credsIssuerConfig)
+    {}
+};
+#endif
+
 class PairAlreadyDiscovered : public PairingCommand
 {
 public:
@@ -234,6 +244,9 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        make_unique<PairWiFiPAF>(credsIssuerConfig),
+#endif
         make_unique<PairAlreadyDiscovered>(credsIssuerConfig),
         make_unique<PairAlreadyDiscoveredByIndex>(credsIssuerConfig),
         make_unique<PairAlreadyDiscoveredByIndexWithWiFi>(credsIssuerConfig),

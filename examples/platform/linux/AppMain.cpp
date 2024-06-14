@@ -360,6 +360,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
+#elif CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kWiFiPAF;
 #else  // CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -465,6 +467,17 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
+    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    {
+        if (EnsureWiFiIsStarted())
+        {
+            ChipLogProgress(NotSpecified, "Wi-Fi Management started");
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(LinuxDeviceOptions::GetInstance().mWiFiPAF);
+        }
+    }
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
     if (LinuxDeviceOptions::GetInstance().mThread)
