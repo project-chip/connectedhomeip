@@ -782,10 +782,8 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
 
     // map successfully added
     ret_value = true;
-    ClearSupportedLocations();
     NotifySupportedMapsChanged();
     
-
 exit:
     return ret_value;
 }
