@@ -315,7 +315,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     if (!req.newLocations.IsNull())
     {
         auto locationIter = req.newLocations.Value().begin();
-        while (locationIter.Next()) 
+        while (locationIter.Next())
         {
             uint32_t aSelectedLocation = locationIter.GetValue();
 
@@ -325,6 +325,9 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
                             locationStatus = SelectLocationsStatus::kInvalidSet;
                             useLocationStatusText = true;
                             ChipLogError(Zcl, "HandleSelectLocationsCmd - unsupported location %u", aSelectedLocation));
+
+            // todo Should we take the responsibility for checking that there are no duplicate locations
+            //  from the delegate's IsValidSelectLocationsSet method?
 
             // check to see if parameter list and attribute still match
             if (matchesCurrentSelectedLocations)
@@ -347,7 +350,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
 
     // If the NewLocations field is the same as the value of the SelectedLocations attribute
     // the SelectLocationsResponse command SHALL have the Status field set to Success and
-    // the StatusText field MAY be supplied with a human readable string or include an empty string.
+    // the StatusText field MAY be supplied with a human-readable string or include an empty string.
     VerifyOrExit(!matchesCurrentSelectedLocations, cmdStatus = Status::Success);
 
     // If the current state of the device doesn't allow for the locations to be selected,
@@ -362,7 +365,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
 
     // ask the device to handle SelectLocations Command
     // (note - locationStatusText to be filled out by delegated function for kInvalidInMode and InvalidSet)
-    VerifyOrExit(mDelegate->HandleSetSelectLocations(req, locationStatus, locationStatusText, useLocationStatusText), 
+    VerifyOrExit(mDelegate->IsValidSelectLocationsSet(req, locationStatus, locationStatusText, useLocationStatusText),
                                     cmdStatus = Status::Failure);
 
     {
@@ -783,7 +786,7 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
     // map successfully added
     ret_value = true;
     NotifySupportedMapsChanged();
-    
+
 exit:
     return ret_value;
 }

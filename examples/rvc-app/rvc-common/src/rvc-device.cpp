@@ -445,8 +445,8 @@ bool RvcDevice::IsSetSelectedLocationsAllowed(char* statusText)
     return true; // TODO IMPLEMENT
 };
 
-bool RvcDevice::HandleSetSelectLocations(const Commands::SelectLocations::DecodableType & req, 
-                        SelectLocationsStatus & locationStatus, char* statusText, bool & useStatusText) 
+bool RvcDevice::IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
+                        SelectLocationsStatus & locationStatus, char* statusText, bool & useStatusText)
 {
     bool ret_value = false;
 

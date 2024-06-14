@@ -83,31 +83,23 @@ protected:
     virtual bool IsSetSelectedLocationsAllowed(char* statusText) = 0;
 
     /**
-     * @brief New selected locations have been requested by the client.
+     * Given a set of locations to be set to the SelectedLocations attribute, this method should check that:
+     *  - There are no duplicates in the list. If there are duplicates, the locationStatus should be set to
+     *     DuplicatedLocations and the statusText should be an empty string.
+     *  - The set of locations as a whole is valid and reachable by the device. If the set of locations is invalid,
+     *     the locationStatus should be set to InvalidSet and the statusText SHALL include a vendor-defined error description.
+     *
+     * The caller of this method will ensure that all the locations in the set are valid supported locations.
+     *
      * @param[in] req List of new selected locations.
      * @param[out] locationStatus Success if all checks pass, error code if failure.
-     * @param[out] statusText text describing failure (see notes), size kMaxSizeStatusText + 1 byte for terminating character
-     * @param[out] useStatusText if true, the statusText value should be returned in the command response
+     * @param[out] statusText text describing failure (see description above), size kMaxSizeStatusText + 1 byte for terminating character.
+     * @param[out] useStatusText if true, the statusText value should be returned in the command response.
      * @return true if success
-     * 
-     * @note newSelectLocations pre-checked no unsupported locations before this function is called.
-     * @note IsSetSelectedLocationsAllowed() MUST be called with a return value of true before this function can be called. (InvalidInMode)
-     * @note Fail with DuplicatedLocations if the same value is selected more than once.
-     *       Fail with InvalidSet if newSelectLocations contains values the device cannot handle (e.g. locations on different floors), with failure description in locationStatusText
-     * 
-     * @note If select locations is allowed when the device is operating and selected locations change such that none are selected, the device must stop.
-     * @note The Selected Locations attribute should be updated only after this function returns true.
-     * 
-     * @note If the Status field is set to Success, the StatusText field is optional.
-     *       If the Status field is set to UnsupportedLocation, the StatusText field SHALL be an empty string.
-     *       If the Status field is set to DuplicatedLocations, the StatusText field SHALL be an empty string.
-     *       If the Status field is not set to Success, or UnsupportedLocation, or DuplicatedLocations, the StatusText field SHALL include a vendor-defined error description
-     *       which can be used to explain the error to the user. For example,
-     *       if the Status field is set to InvalidInMode, the StatusText field SHOULD indicate
-     *       why the request is not allowed, given the current mode
-     *       of the device, which may involve other clusters.
+     *
+     * @note If the SelectLocations command is allowed when the device is operating and the selected locations change to none, the device must stop.
     */
-    virtual bool HandleSetSelectLocations(const Commands::SelectLocations::DecodableType & req, 
+    virtual bool IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
                         SelectLocationsStatus & locationStatus, char* statusText, bool & useStatusText) = 0;
 
     /**

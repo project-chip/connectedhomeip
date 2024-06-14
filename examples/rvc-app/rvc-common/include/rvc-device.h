@@ -145,7 +145,7 @@ public:
 
     bool IsSetSelectedLocationsAllowed(char* statusText) override;
 
-    bool HandleSetSelectLocations(const ServiceArea::Commands::SelectLocations::DecodableType & req, 
+    bool IsValidSelectLocationsSet(const ServiceArea::Commands::SelectLocations::DecodableType & req,
                         ServiceArea::SelectLocationsStatus & locationStatus, char* statusText, bool & useStatusText) override;
 
     bool HandleSkipCurrentLocation(char* skipStatusText) override;

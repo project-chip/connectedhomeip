@@ -225,14 +225,13 @@ public:
      * @param[in] aLocationName human readable name for this location (empty string if not used)
      * @param[in] aFloorNumber represents floor level - negative values for below ground
      * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a home
-     * @param[in] aLandmarkTag common namespace Landmak tag - indicates an association of the location with a home landmark
+     * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark
      * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark
      * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type
      * @return true if the new location passed validation checks and was successfully added to the list
      * 
-     * @note if aLocationName is larger than kLocationtNameMaxSize, it will be truncated
-     * @note if location is successfully added, SelectedLocations, CurrentLocation, and Progress are cleared.
-     * @note MATTER change notifications are made for the attributes that change
+     * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
+     * @note MATTER change notifications are made for the attributes that change.
      */
     bool AddSupportedLocation( uint32_t                                     aLocationId, 
                                const DataModel::Nullable<uint8_t>         & aMapId, 
@@ -293,13 +292,12 @@ public:
     bool IsSupportedMap(uint8_t aMapId);
 
     /**
-     * @brief Add new map to the supported maps list
-     * @param[in] aMapId id of the new added map
-     * @param[in] aMapName name of the new added map (cannot be empty string)
-     * @return true if the new map passed validation checks and was successfully added to the list
+     * @brief Add new map to the supported maps list.
+     * @param[in] aMapId The ID of the new added map.
+     * @param[in] aMapName The name of the new added map (cannot be an empty string).
+     * @return true if the new map passed validation checks and was successfully added to the list.
      * 
-     * @note if map is added, SelectedLocations, CurrentLocation, and Progress are cleared.
-     * @note MATTER change notifications are made for the attributes that change
+     * @note MATTER change notifications are made for the attributes that change.
      */ 
     bool AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName);
 
