@@ -329,8 +329,7 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
     {
         // if we only got a cluster, this was for a global attribute. We cannot read ember attributes
         // at this point, so give up (although GlobalAttributeReader should have returned something here).
-        // Return a permanent failure...
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        chipDie();
     }
     const EmberAfAttributeMetadata * attributeMetadata = std::get<const EmberAfAttributeMetadata *>(metadata);
 
