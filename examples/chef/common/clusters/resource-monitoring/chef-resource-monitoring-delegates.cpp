@@ -128,7 +128,8 @@ ChefResourceMonitorInstance::ExternalAttributeWrite(const EmberAfAttributeMetada
         // We already know the input is a buffer started with a uint16_t as the length
         chip::Encoding::LittleEndian::Reader bufReader(buffer, sizeof(uint16_t));
         uint16_t tlvLen;
-        VerifyOrReturnError( CHIP_NO_ERROR == bufReader.Read16(&tlvLen).StatusCode(), Protocols::InteractionModel::Status::UnsupportedWrite);
+        VerifyOrReturnError(CHIP_NO_ERROR == bufReader.Read16(&tlvLen).StatusCode(),
+                            Protocols::InteractionModel::Status::UnsupportedWrite);
 
         // Read from TLV
         uint32_t newValue = 0;
