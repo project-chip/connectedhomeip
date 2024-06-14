@@ -71,7 +71,7 @@ tests:
       attribute: "StartDate"
       response:
           constraints:
-              type: date
+              type: epoch-s
 
     - label: "Step 7: TH reads the CalendarPeriods attribute from the DUT"
       PICS: ECAL.S.A0005
