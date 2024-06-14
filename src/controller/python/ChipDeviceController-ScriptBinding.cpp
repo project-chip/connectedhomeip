@@ -384,11 +384,11 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
 
     if (isShortDiscriminator)
     {
-      setupDiscriminator.SetShortValue(discriminator);
+        setupDiscriminator.SetShortValue(discriminator);
     }
     else
     {
-      setupDiscriminator.SetLongValue(discriminator);
+        setupDiscriminator.SetLongValue(discriminator);
     }
 
     return ToPyChipError(devCtrl->PairDevice(nodeid,

@@ -24,8 +24,8 @@
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/SetupDiscriminator.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/PASESession.h>
 
@@ -62,33 +62,42 @@ public:
     // discriminators.
     bool HasDiscriminator() const { return mHasDiscriminator; }
 
-    uint16_t GetDiscriminator() const {
-      if (mSetupDiscriminator.IsShortDiscriminator()) {
-        ChipLogError(Discovery, "Get RendezvousParameters::GetDiscriminator() called with SHORT discriminator (inconsistent). Using value 0 to avoid crash! Call GetSetupDiscriminator() to avoid loss.");
-        return 0;
-      }
+    uint16_t GetDiscriminator() const
+    {
+        if (mSetupDiscriminator.IsShortDiscriminator())
+        {
+            ChipLogError(Discovery,
+                         "Get RendezvousParameters::GetDiscriminator() called with SHORT discriminator (inconsistent). Using value "
+                         "0 to avoid crash! Call GetSetupDiscriminator() to avoid loss.");
+            return 0;
+        }
 
-      if (!mHasDiscriminator)
-      {
-        ChipLogError(Discovery, "Get RendezvousParameters::GetDiscriminator() called without discriminator in params (inconsistent). Using value 0 to avoid crash! Ensure discriminator is set!");
-        return 0;
-      }
+        if (!mHasDiscriminator)
+        {
+            ChipLogError(Discovery,
+                         "Get RendezvousParameters::GetDiscriminator() called without discriminator in params (inconsistent). "
+                         "Using value 0 to avoid crash! Ensure discriminator is set!");
+            return 0;
+        }
 
-      return mSetupDiscriminator.GetLongValue();
+        return mSetupDiscriminator.GetLongValue();
     }
 
-    SetupDiscriminator GetSetupDiscriminator() const {
-      if (!mHasDiscriminator)
-      {
-        ChipLogError(Discovery, "Get RendezvousParameters::GetSetupDiscriminator() called without discriminator in params (inconsistent). Returning last!");
-      }
-      return mSetupDiscriminator;
+    SetupDiscriminator GetSetupDiscriminator() const
+    {
+        if (!mHasDiscriminator)
+        {
+            ChipLogError(Discovery,
+                         "Get RendezvousParameters::GetSetupDiscriminator() called without discriminator in params (inconsistent). "
+                         "Returning last!");
+        }
+        return mSetupDiscriminator;
     }
 
     RendezvousParameters & SetSetupDiscriminator(SetupDiscriminator discriminator)
     {
         mSetupDiscriminator = discriminator;
-        mHasDiscriminator = true;
+        mHasDiscriminator   = true;
         return *this;
     }
 
@@ -160,8 +169,8 @@ public:
     }
 
 private:
-    Transport::PeerAddress mPeerAddress;  ///< the peer node address
-    uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
+    Transport::PeerAddress mPeerAddress; ///< the peer node address
+    uint32_t mSetupPINCode = 0;          ///< the target peripheral setup PIN Code
     bool mHasDiscriminator = false;
     SetupDiscriminator mSetupDiscriminator;
 
