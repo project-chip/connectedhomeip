@@ -97,18 +97,18 @@ class DLL_EXPORT ContentApp
 public:
     struct SupportedCluster
     {
-        chip::ClusterId mClusterIdentifier{ chip::kInvalidClusterId };
+        chip::ClusterId mClusterIdentifier{ kInvalidClusterId };
         uint32_t mFeatures{ 0 };
-        std::vector<chip::CommandId> mOptionalCommandIdentifiers;
-        std::vector<chip::AttributeId> mOptionalAttributesIdentifiers;
+        std::vector<CommandId> mOptionalCommandIdentifiers;
+        std::vector<AttributeId> mOptionalAttributesIdentifiers;
 
-        SupportedCluster(chip::ClusterId clusterId, uint32_t features, const std::vector<chip::CommandId> & commandIds,
-                         const std::vector<chip::AttributeId> & attributeIds) :
+        SupportedCluster(ClusterId clusterId, uint32_t features, const std::vector<CommandId> & commandIds,
+                         const std::vector<AttributeId> & attributeIds) :
             mClusterIdentifier{ clusterId },
             mFeatures{ features }, mOptionalCommandIdentifiers{ commandIds }, mOptionalAttributesIdentifiers{ attributeIds }
         {}
 
-        SupportedCluster(chip::ClusterId clusterId) : mClusterIdentifier{ clusterId } {}
+        SupportedCluster(ClusterId clusterId) : mClusterIdentifier{ clusterId } {}
     };
 
     ContentApp(std::vector<SupportedCluster> supportedClusters) : mSupportedClusters{ supportedClusters } {}
@@ -119,7 +119,7 @@ public:
     inline EndpointId GetEndpointId() { return mEndpointId; };
 
     const std::vector<SupportedCluster> & GetSupportedClusters() const { return mSupportedClusters; };
-    bool HasSupportedCluster(chip::ClusterId clusterId) const;
+    bool HasSupportedCluster(ClusterId clusterId) const;
 
     virtual AccountLoginDelegate * GetAccountLoginDelegate()               = 0;
     virtual ApplicationBasicDelegate * GetApplicationBasicDelegate()       = 0;
