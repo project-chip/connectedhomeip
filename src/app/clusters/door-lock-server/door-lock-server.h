@@ -29,6 +29,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -174,57 +175,60 @@ public:
 
     bool SendLockAlarmEvent(chip::EndpointId endpointId, AlarmCodeEnum alarmCode);
 
-    chip::BitFlags<Feature> GetFeatures(chip::EndpointId endpointId);
+    static chip::BitFlags<Feature> GetFeatures(chip::EndpointId endpointId);
 
-    inline bool SupportsPIN(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kPinCredential); }
+    static inline bool SupportsPIN(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kPinCredential); }
 
-    inline bool SupportsRFID(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kRfidCredential); }
+    static inline bool SupportsRFID(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kRfidCredential); }
 
-    inline bool SupportsFingers(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kFingerCredentials); }
+    static inline bool SupportsFingers(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(Feature::kFingerCredentials);
+    }
 
-    inline bool SupportsFace(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kFaceCredentials); }
+    static inline bool SupportsFace(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kFaceCredentials); }
 
-    inline bool SupportsWeekDaySchedules(chip::EndpointId endpointId)
+    static inline bool SupportsWeekDaySchedules(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kWeekDayAccessSchedules);
     }
 
-    inline bool SupportsYearDaySchedules(chip::EndpointId endpointId)
+    static inline bool SupportsYearDaySchedules(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kYearDayAccessSchedules);
     }
 
-    inline bool SupportsHolidaySchedules(chip::EndpointId endpointId)
+    static inline bool SupportsHolidaySchedules(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kHolidaySchedules);
     }
 
-    inline bool SupportsAnyCredential(chip::EndpointId endpointId)
+    static inline bool SupportsAnyCredential(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId)
             .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials,
                     Feature::kAliroProvisioning);
     }
 
-    inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
+    static inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kCredentialsOverTheAirAccess);
     }
 
-    inline bool SupportsUSR(chip::EndpointId endpointId)
+    static inline bool SupportsUSR(chip::EndpointId endpointId)
     {
         // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]
         return GetFeatures(endpointId).Has(Feature::kUser) && SupportsAnyCredential(endpointId);
     }
 
-    inline bool SupportsUnbolt(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kUnbolt); }
+    static bool SupportsUnbolt(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kUnbolt); }
 
     /**
      * @brief Checks if Aliro Provisioning feature is supported on the given endpoint
      *
      * @param endpointId endpointId ID of the endpoint which contains the lock.
      */
-    inline bool SupportsAliroProvisioning(chip::EndpointId endpointId)
+    static inline bool SupportsAliroProvisioning(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kAliroProvisioning);
     }
@@ -234,7 +238,10 @@ public:
      *
      * @param endpointId endpointId ID of the endpoint which contains the lock.
      */
-    inline bool SupportsAliroBLEUWB(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kAliroBLEUWB); }
+    static inline bool SupportsAliroBLEUWB(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(Feature::kAliroBLEUWB);
+    }
 
     /**
      * @brief Allows the application to register a custom callback which will be called after the default DoorLock
@@ -545,8 +552,8 @@ private:
      * @return false        if attribute reading failed (value is kept unchanged)
      */
     template <typename T>
-    bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      chip::Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
+    static bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
+                             chip::Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value);
 
     /**
      * @brief Set generic attribute value
@@ -1273,33 +1280,3 @@ bool emberAfPluginDoorLockGetFingerVeinCredentialLengthConstraints(chip::Endpoin
  * @return false on failure, true on success.
  */
 bool emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen);
-
-/**
- * @brief This callback is called when Door Lock cluster needs to communicate the Aliro reader configuration to the door lock.
- *
- * @note This function is used for communicating the Aliro signing key, verification key, group identifier and group resolving key
- *       to the lock.
- *
- * @param endpointId ID of the endpoint which contains the lock.
- * @param[in] signingKey Signing key component of the Reader's key pair.
- * @param[in] verificationKey Verification key component of the Reader's key pair.
- * @param[in] groupIdentifier Reader group identifier for the lock.
- * @param[in] groupResolvingKey Group resolving key for the lock if Aliro BLE UWB feature is supported
- *
- * @retval true, if the Aliro reader config was successfully communicated to the door lock.
- * @retval false, if error occurred while communicating the Aliro reader config.
- */
-bool emberAfPluginDoorLockSetAliroReaderConfig(chip::EndpointId endpointId, const chip::ByteSpan & signingKey,
-                                               const chip::ByteSpan & verificationKey, const chip::ByteSpan & groupIdentifier,
-                                               const Optional<chip::ByteSpan> & groupResolvingKey);
-
-/**
- * @brief This callback is called when Door Lock cluster needs to clear an existing Aliro reader configuration from the door lock.
- *
- *
- * @param endpointId ID of the endpoint which contains the lock.
- *
- * @retval true, if the Aliro reader config was successfully cleared from the door lock.
- * @retval false, if error occurred while clearing the Aliro reader config.
- */
-bool emberAfPluginDoorLockClearAliroReaderConfig(chip::EndpointId endpointId);
