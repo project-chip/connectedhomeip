@@ -533,7 +533,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         )
 
-    def ConnectBLE(self, discriminator: int, setupPinCode:int , nodeid:int, isShortDiscriminator: bool = False) -> PyChipError:
+    def ConnectBLE(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> PyChipError:
         self.CheckIsActive()
 
         self._commissioning_complete_future = concurrent.futures.Future()
