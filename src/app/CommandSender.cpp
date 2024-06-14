@@ -542,25 +542,18 @@ CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath,
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
-    RollbackData rollbackData;
-    rollbackData.Checkpoint(*this);
+    RollbackInvokeRequest rollback(*this);
+    //rollback.Checkpoint(*this);
     PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
+    ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
     TLV::TLVWriter * writer = nullptr;
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    SuccessOrExit(err = PrepareCommand(aCommandPath, prepareCommandParams));
     writer = GetCommandDataIBTLVWriter();
-    VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
-    {
-        FinishCommandParameters finishCommandParams(aAddRequestDataParams);
-        SuccessOrExit(err = FinishCommand(finishCommandParams));
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        LogErrorOnFailure(rollbackData.Rollback(*this));
-    }
-    return err;
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+    FinishCommandParameters finishCommandParams(aAddRequestDataParams);
+    ReturnErrorOnFailure(FinishCommand(finishCommandParams));
+    rollback.DisableAutomaticRollback();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinishCommandParams)
@@ -671,29 +664,34 @@ void CommandSender::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
 }
 
-void CommandSender::RollbackData::Checkpoint(CommandSender & aCommandSender)
+CommandSender::RollbackInvokeRequest::RollbackInvokeRequest(CommandSender& aCommandSender) :
+  mCommandSender(aCommandSender)
 {
-    VerifyOrReturn(aCommandSender.mBufferAllocated);
-    VerifyOrReturn(aCommandSender.mState == State::Idle || aCommandSender.mState == State::AddedCommand);
-    VerifyOrReturn(aCommandSender.mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
-    VerifyOrReturn(aCommandSender.mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
-    aCommandSender.mInvokeRequestBuilder.Checkpoint(mBackupWriter);
-    mBackupState     = aCommandSender.mState;
-    mRollbackIsValid = true;
+    VerifyOrReturn(mCommandSender.mBufferAllocated);
+    VerifyOrReturn(mCommandSender.mState == State::Idle || mCommandSender.mState == State::AddedCommand);
+    VerifyOrReturn(mCommandSender.mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
+    VerifyOrReturn(mCommandSender.mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    mCommandSender.mInvokeRequestBuilder.Checkpoint(mBackupWriter);
+    mBackupState     = mCommandSender.mState;
+    mRollbackInDestructor = true;
 }
 
-CHIP_ERROR CommandSender::RollbackData::Rollback(CommandSender & aCommandSender)
+CommandSender::RollbackInvokeRequest::~RollbackInvokeRequest()
 {
-    VerifyOrReturnError(mRollbackIsValid, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(aCommandSender.mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mRollbackInDestructor);
+    VerifyOrReturn(mCommandSender.mState == State::AddingCommand);
     ChipLogDetail(DataManagement, "Rolling back response");
     // TODO(#30453): Rollback of mInvokeRequestBuilder should handle resetting
-    // InvokeResponses.
-    aCommandSender.mInvokeRequestBuilder.GetInvokeRequests().ResetError();
-    aCommandSender.mInvokeRequestBuilder.Rollback(mBackupWriter);
-    aCommandSender.MoveToState(mBackupState);
-    mRollbackIsValid = false;
-    return CHIP_NO_ERROR;
+    // InvokeRequest.
+    mCommandSender.mInvokeRequestBuilder.GetInvokeRequests().ResetError();
+    mCommandSender.mInvokeRequestBuilder.Rollback(mBackupWriter);
+    mCommandSender.MoveToState(mBackupState);
+    mRollbackInDestructor = false;
+}
+
+void CommandSender::RollbackInvokeRequest::DisableAutomaticRollback()
+{
+    mRollbackInDestructor = false;
 }
 
 } // namespace app

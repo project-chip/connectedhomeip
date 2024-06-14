@@ -517,32 +517,32 @@ private:
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
-    class RollbackData
+    /**
+     * Class to help backup CommandSender's buffer containing InvokeRequestMessage when adding InvokeRequest
+     * in case there is a failure to add InvokeRequest. Intended usages is as follows:
+     *  - Allocate RollbackInvokeRequest on the stack.
+     *  - Attempt adding InvokeRequest into InvokeRequestMessage buffer.
+     *  - If modification is added successfully, call DisableAutomaticRollback() to prevent destructor from
+     *    rolling back InvokeReqestMessage.
+     *  - If there is an issue adding InvokeRequest, destructor will take care of rolling back
+     *    InvokeRequestMessage to previously saved state.
+     */
+    class RollbackInvokeRequest
     {
     public:
+        explicit RollbackInvokeRequest(CommandSender& aCommandSender);
+        ~RollbackInvokeRequest();
+
         /**
-         * Creates a backup to enable rolling back CommandSender's buffer containing
-         * InvokeRequestMessage in case subsequent calls to add request fail.
-         *
-         * A successful backup will only be created if the InvokeRequestMessage is
-         * in a known good state.
-         *
-         * @param [in] aCommandSender reference to CommandSender.
+         * Disables rolling back to previously saved state for InvokeRequestMessage.
          */
-        void Checkpoint(CommandSender & aCommandSender);
-        /**
-         * Rolls back CommandSender's buffer containing InvokeRequestMessage to a previously
-         * saved state. Must have previously called Checkpoint in a known good state.
-         *
-         * @param [in] aCommandSender reference to CommandSender.
-         */
-        CHIP_ERROR Rollback(CommandSender & aCommandSender);
-        bool RollbackIsValid() { return mRollbackIsValid; }
+        void DisableAutomaticRollback();
 
     private:
+        CommandSender& mCommandSender;
         TLV::TLVWriter mBackupWriter;
         State mBackupState;
-        bool mRollbackIsValid = false;
+        bool mRollbackInDestructor = false;
     };
 
     union CallbackHandle
