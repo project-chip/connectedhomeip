@@ -29,12 +29,12 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
-#include <lib/support/UnitTest.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/android/AndroidChipPlatform-JNI.h>
 
-#include <nlunit-test.h>
+#include "pw_unit_test/framework.h"
+#include "pw_unit_test/googletest_style_event_handler.h"
+#include "pw_unit_test/logging_event_handler.h"
 
 using namespace chip;
 
@@ -146,57 +146,97 @@ exit:
     VerifyOrReturn(err != CHIP_NO_ERROR, ReportError(env, err, __FUNCTION__));
 }
 
-static void jni_log_name(struct _nlTestSuite * inSuite)
-{
-    onLog("[ %s ]\n", inSuite->name);
-}
+namespace pw::unit_test {
 
-static void jni_log_initialize(struct _nlTestSuite * inSuite, int inResult, int inWidth)
+// This Class allows us to redirect
+class AndroidLoggingEventHandler : public pw::unit_test::LoggingEventHandler
 {
-    onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, "Initialize", inResult == FAILURE ? "FAILED" : "PASSED");
-}
-static void jni_log_terminate(struct _nlTestSuite * inSuite, int inResult, int inWidth)
-{
-    onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, "Terminate", inResult == FAILURE ? "FAILED" : "PASSED");
-}
+public:
+    void TestProgramStart(const ProgramSummary & program_summary) override
+    {
+        onLog(PW_UNIT_TEST_GOOGLETEST_TEST_PROGRAM_START, program_summary.tests_to_run, program_summary.test_suites,
+              program_summary.test_suites != 1 ? "s" : "");
+    }
 
-static void jni_log_setup(struct _nlTestSuite * inSuite, int inResult, int inWidth)
-{
-    onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, "Setup", inResult == FAILURE ? "FAILED" : "PASSED");
-}
+    void TestSuiteStart(const TestSuite & test_suite) override
+    {
+        onLog(PW_UNIT_TEST_GOOGLETEST_TEST_SUITE_START, test_suite.test_to_run_count, test_suite.name);
+    }
 
-static void jni_log_test(struct _nlTestSuite * inSuite, int inWidth, int inIndex)
-{
-    onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, inSuite->tests[inIndex].name, inSuite->flagError ? "FAILED" : "PASSED");
-}
+    void TestSuiteEnd(const TestSuite & test_suite) override
+    {
+        onLog(PW_UNIT_TEST_GOOGLETEST_TEST_SUITE_END, test_suite.test_to_run_count, test_suite.name);
+    }
 
-static void jni_log_teardown(struct _nlTestSuite * inSuite, int inResult, int inWidth)
-{
-    onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, "TearDown", inResult == FAILURE ? "FAILED" : "PASSED");
-}
+    void EnvironmentsTearDownEnd() override { onLog(PW_UNIT_TEST_GOOGLETEST_ENVIRONMENTS_TEAR_DOWN_END); }
 
-static void jni_log_statTest(struct _nlTestSuite * inSuite)
-{
-    onLog("Failed Tests:   %d / %d\n", inSuite->failedTests, inSuite->runTests);
-}
+    void TestProgramEnd(const ProgramSummary & program_summary) override
+    {
+        onLog(PW_UNIT_TEST_GOOGLETEST_TEST_PROGRAM_END,
+              program_summary.tests_to_run - program_summary.tests_summary.skipped_tests -
+                  program_summary.tests_summary.disabled_tests,
+              program_summary.tests_to_run, program_summary.test_suites, program_summary.test_suites != 1 ? "s" : "");
+        onLog(PW_UNIT_TEST_GOOGLETEST_PASSED_SUMMARY, program_summary.tests_summary.passed_tests);
+        if (program_summary.tests_summary.skipped_tests || program_summary.tests_summary.disabled_tests)
+        {
+            onLog(PW_UNIT_TEST_GOOGLETEST_DISABLED_SUMMARY,
+                  program_summary.tests_summary.skipped_tests + program_summary.tests_summary.disabled_tests);
+        }
+        if (program_summary.tests_summary.failed_tests)
+        {
+            onLog(PW_UNIT_TEST_GOOGLETEST_FAILED_SUMMARY, program_summary.tests_summary.failed_tests);
+        }
+    }
 
-static void jni_log_statAssert(struct _nlTestSuite * inSuite)
-{
-    onLog("Failed Asserts: %d / %d\n", inSuite->failedAssertions, inSuite->performedAssertions);
-}
+    void RunAllTestsStart() override { onLog(PW_UNIT_TEST_GOOGLETEST_RUN_ALL_TESTS_START); }
 
-static nl_test_output_logger_t jni_test_logger = {
-    jni_log_name, jni_log_initialize, jni_log_terminate, jni_log_setup,
-    jni_log_test, jni_log_teardown,   jni_log_statTest,  jni_log_statAssert,
+    void RunAllTestsEnd(const RunTestsSummary & run_tests_summary) override
+    {
+        onLog(PW_UNIT_TEST_GOOGLETEST_RUN_ALL_TESTS_END);
+        onLog(PW_UNIT_TEST_GOOGLETEST_PASSED_SUMMARY, run_tests_summary.passed_tests);
+        if (run_tests_summary.skipped_tests)
+        {
+            onLog(PW_UNIT_TEST_GOOGLETEST_DISABLED_SUMMARY, run_tests_summary.skipped_tests);
+        }
+        if (run_tests_summary.failed_tests)
+        {
+            onLog(PW_UNIT_TEST_GOOGLETEST_FAILED_SUMMARY, run_tests_summary.failed_tests);
+        }
+    }
+
+    void TestCaseStart(const TestCase & test_case) override
+    {
+        onLog(PW_UNIT_TEST_GOOGLETEST_CASE_START, test_case.suite_name, test_case.test_name);
+    }
+
+    void TestCaseEnd(const TestCase & test_case, TestResult result) override
+    {
+        // Use a switch with no default to detect changes in the test result enum.
+        switch (result)
+        {
+        case TestResult::kSuccess:
+            onLog(PW_UNIT_TEST_GOOGLETEST_CASE_OK, test_case.suite_name, test_case.test_name);
+            break;
+        case TestResult::kFailure:
+            onLog(PW_UNIT_TEST_GOOGLETEST_CASE_FAILED, test_case.suite_name, test_case.test_name);
+            break;
+        case TestResult::kSkipped:
+            onLog(PW_UNIT_TEST_GOOGLETEST_CASE_DISABLED, test_case.suite_name, test_case.test_name);
+            break;
+        }
+    }
 };
+}; // namespace pw::unit_test
 
 extern "C" JNIEXPORT jint Java_com_tcl_chip_chiptest_TestEngine_runTest(JNIEnv * env, jclass clazz)
 {
-    nlTestSetLogger(&jni_test_logger);
     chip::DeviceLayer::StackLock lock;
-    // TODO [PW_MIGRATION] Remove NLUnit tests call after migration
-    jint ret = RunRegisteredUnitTests();
-    ret += chip::test::RunAllTests();
+
+    // Running Pigweed Tests
+    testing::InitGoogleTest(nullptr, static_cast<char **>(nullptr));
+    pw::unit_test::AndroidLoggingEventHandler handler;
+    pw::unit_test::RegisterEventHandler(&handler);
+    jint ret = RUN_ALL_TESTS();
 
     return ret;
 }
