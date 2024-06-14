@@ -131,6 +131,7 @@
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
+        "METER_INDENTIFICATION_CLUSTER": [],
         "ZLL_COMMISSIONING_CLUSTER": []
     },
     "ServerDirectories": {
@@ -311,6 +312,7 @@
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
+        "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "ZLL_COMMISSIONING_CLUSTER": []
     }
 }

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="Energy Management"/>
+  <cluster apiMaturity="provisional">
+    <name>Meter Identification</name>
+    <domain>Energy Management</domain>
+    <code>0x0B01</code>
+    <define>METER_IDENTIFICATION_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides attributes for determining advanced information about utility metering device.</description>
+
+    <features>
+      <feature bit="0" code="PWRTHLD" name="PowerThreshold" summary="Supports information about power threshold">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute code="0x0000" side="server" define="METER_TYPE" type="MeterTypeEnum" isNullable="true" writable="false">MeterType</attribute>
+    <attribute code="0x0001" side="server" define="CUSTOMER_NAME" type="char_string" isNullable="true" writable="true" length="64">
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="operate"/>
+      <description>CustomerName</description>
+    </attribute>
+    <attribute code="0x0002" side="server" define="UTILITY_NAME" type="char_string" length="16" isNullable="true">UtilityName</attribute>
+    <attribute code="0x0003" side="server" define="POINT_OF_DELIVERY" type="char_string" length="16" isNullable="true">PointOfDelivery</attribute>
+    <attribute code="0x0004" side="server" define="POWER_THRESHOLD" type="power-mW" isNullable="true">PowerThreshold</attribute>
+    <attribute code="0x0005" side="server" define="POWER_THRESHOLD_SOURCE" type="PowerThresholdSourceEnum" isNullable="true">PowerThresholdSource</attribute>
+  </cluster>
+
+  <enum name="MeterTypeEnum" type="enum8">
+    <cluster code="0x0B01"/>
+    <item name="Utility" value="0x00"/>
+    <item name="Private" value="0x01"/>
+    <item name="Generic" value="0x02"/>
+  </enum>
+
+  <enum name="PowerThresholdSourceEnum" type="enum8">
+    <cluster code="0x0B01"/>
+    <item name="Contract" value="0x00"/>
+    <item name="Regulator" value="0x01"/>
+    <item name="Equipment" value="0x02"/>
+  </enum>
+
+</configurator>
