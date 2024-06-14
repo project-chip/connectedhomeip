@@ -889,7 +889,7 @@ class TestConformanceSupport(MatterBaseTest):
                 msg = f'Choice conformance string should cause exception, but did not: {xml}'
                 et = ElementTree.fromstring(xml)
                 try:
-                    xml_callable = parse_callable_from_xml(et, self.params)
+                    parse_callable_from_xml(et, self.params)
                     asserts.fail(msg)
                 except ConformanceException:
                     pass
