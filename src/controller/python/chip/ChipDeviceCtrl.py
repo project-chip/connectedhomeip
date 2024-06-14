@@ -533,7 +533,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         )
 
-    def ConnectBLE(self, discriminator, setupPinCode, nodeid) -> PyChipError:
+    def ConnectBLE(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> PyChipError:
         self.CheckIsActive()
 
         self._commissioning_complete_future = concurrent.futures.Future()
@@ -542,7 +542,7 @@ class ChipDeviceControllerBase():
             self._enablePairingCompeleteCallback(True)
             self._ChipStack.Call(
                 lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
-                    self.devCtrl, discriminator, setupPinCode, nodeid)
+                    self.devCtrl, discriminator, isShortDiscriminator, setupPinCode, nodeid)
             ).raise_on_error()
 
             # TODO: Change return None. Only returning on success is not useful.
@@ -1590,7 +1590,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [
-                c_void_p, c_uint16, c_uint32, c_uint64]
+                c_void_p, c_uint16, c_bool, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
@@ -1882,17 +1882,17 @@ class ChipDeviceController(ChipDeviceControllerBase):
         finally:
             self._commissioning_complete_future = None
 
-    def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes) -> PyChipError:
+    def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> PyChipError:
         ''' Commissions a Thread device over BLE
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
-        return self.ConnectBLE(discriminator, setupPinCode, nodeId)
+        return self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
-    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str) -> PyChipError:
+    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> PyChipError:
         ''' Commissions a Wi-Fi device over BLE.
         '''
         self.SetWiFiCredentials(ssid, credentials)
-        return self.ConnectBLE(discriminator, setupPinCode, nodeId)
+        return self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
     def SetWiFiCredentials(self, ssid: str, credentials: str):
         ''' Set the Wi-Fi credentials to set during commissioning.'''
