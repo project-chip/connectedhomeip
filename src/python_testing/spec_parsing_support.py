@@ -170,7 +170,6 @@ DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-
 
 
 def get_location_from_element(element: ElementTree.Element, cluster_id: int):
-    # Conformance is missing, so let's record the problem and treat it as optional for lack of a better choice
     if element.tag == 'feature':
         location = FeaturePathLocation(endpoint_id=0, cluster_id=cluster_id, feature_code=element.attrib['code'])
     elif element.tag == 'command':
