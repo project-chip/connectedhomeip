@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0003" name="Identify Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0003" name="Identify Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2808"/>
     <revision revision="3" summary="All Hubs changes"/>
     <revision revision="4" summary="New data model format and notation; add IdentifyType"/>
+    <revision revision="5" summary="Added Q quality for IdentifyTime attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0003" name="Identify"/>
@@ -74,7 +75,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="0x0B" name="ChannelChange" summary="e.g., Colored light turns orange for 8 seconds;
-                           non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.">
+                          non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.">
         <mandatoryConform/>
       </item>
       <item value="0x01" name="Breathe" summary="e.g., Light is turned on/off over 1 second and repeated 15 times.">
@@ -83,10 +84,8 @@ Davis, CA 95616, USA
       <item value="0x02" name="Okay" summary="e.g., Colored light turns green for 1 second; non-colored light flashes twice.">
         <mandatoryConform/>
       </item>
-      <item value="0xFE" name="FinishEffect" summary="Complete the current effect sequence before
-                           terminating. e.g., if in the middle of a breathe effect (as above),
-                           first complete the current 1s breathe effect and then terminate the
-                           effect.">
+      <item value="0xFE" name="FinishEffect" summary="Complete the current effect sequence before terminating. e.g., if in the middle of a breathe effect
+                          (as above), first complete the current 1s breathe effect and then terminate the effect.">
         <mandatoryConform/>
       </item>
       <item value="0xFF" name="StopEffect" summary="Terminate the effect as soon as possible.">
@@ -123,6 +122,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="IdentifyTime" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="IdentifyType" type="IdentifyTypeEnum" default="MS">

@@ -55,9 +55,10 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002D" name="Air Purifier" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002D" name="Air Purifier" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Matter release"/>
+    <revision revision="2" summary="Added On/Off cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -66,6 +67,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0004" name="Groups" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0006" name="On/Off" side="server">
       <optionalConform/>
     </cluster>
     <cluster id="0x0071" name="HEPA Filter Monitoring" side="server">

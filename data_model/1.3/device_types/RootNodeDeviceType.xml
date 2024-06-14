@@ -119,19 +119,16 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
     <cluster id="0x0035" name="Thread Network Diagnostics" side="server">
-      <quality singleton="true"/>
       <optionalConform>
         <condition name="Thread"/>
       </optionalConform>
     </cluster>
     <cluster id="0x0036" name="Wi" side="server">
-      <quality singleton="true"/>
       <optionalConform>
         <condition name="Wi-Fi"/>
       </optionalConform>
     </cluster>
     <cluster id="0x0037" name="Ethernet Network Diagnostics" side="server">
-      <quality singleton="true"/>
       <optionalConform>
         <condition name="Ethernet"/>
       </optionalConform>

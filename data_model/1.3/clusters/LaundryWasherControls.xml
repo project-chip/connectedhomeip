@@ -55,9 +55,10 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0053" name="Laundry Washer Controls Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0053" name="Laundry Washer Controls Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="Updated Feature Map Conformance"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0053" name="Laundry Washer Controls"/>
@@ -65,10 +66,10 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="WASHERCTRL" scope="Endpoint"/>
   <features>
     <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
-      <optionalConform/>
+      <optionalConform choice="a" more="true"/>
     </feature>
     <feature bit="1" code="RINSE" name="Rinse" summary="Multiple rinse cycles supported">
-      <optionalConform/>
+      <optionalConform choice="a" more="true"/>
     </feature>
   </features>
   <dataTypes>
@@ -112,7 +113,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SPIN"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="15"/>
+      <constraint type="max" value="15"/>
     </attribute>
     <attribute id="0x0002" name="NumberOfRinses" type="NumberOfRinsesEnum" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>

@@ -57,10 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0099" name="Energy EVSE Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0099" name="Energy EVSE Cluster" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
+    <revision revision="3" summary="Added Q quality for SessionDuration, SessionEnergyCharged and SessionEnergyDischarged"/>
+    <revision revision="4" summary="Updates to V2X and associated areas"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0099" name="Energy EVSE"/>
@@ -68,7 +70,10 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="EEVSE" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PREF" name="ChargingPreferences" summary="EVSE supports storing user charging preferences">
-      <provisionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
     </feature>
     <feature bit="1" code="SOC" name="SoCReporting" summary="EVSE supports reporting of vehicle State of Charge (SoC)">
       <provisionalConform/>
@@ -188,12 +193,17 @@ Davis, CA 95616, USA
         </optionalConform>
       </item>
       <item value="3" name="DisabledError" summary="The EV is not currently allowed to charge or discharge due to an error.
- The error must be cleared before operation can continue.">
+                                The error must be cleared before operation can continue.">
         <mandatoryConform/>
       </item>
       <item value="4" name="DisabledDiagnostics" summary="The EV is not currently allowed to charge or discharge due
- to Diagnostics Mode.">
+                                to self-diagnostics mode.">
         <mandatoryConform/>
+      </item>
+      <item value="5" name="Enabled" summary="The EV is currently allowed to charge and discharge">
+        <optionalConform>
+          <feature name="V2X"/>
+        </optionalConform>
       </item>
     </enum>
     <bitmap name="TargetDayOfWeekBitmap">
@@ -233,7 +243,7 @@ Davis, CA 95616, USA
     <struct name="ChargingTargetStruct">
       <field id="0" name="TargetTimeMinutesPastMidnight" type="uint16" default="0">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="1439"/>
+        <constraint type="max" value="1439"/>
       </field>
       <field id="1" name="TargetSoC" type="percent" default="0">
         <otherwiseConform>
@@ -311,7 +321,7 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="86400"/>
+      <constraint type="max" value="86400"/>
     </attribute>
     <attribute id="0x0023" name="NextChargeStartTime" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
@@ -515,6 +525,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="min" value="0"/>
       </field>
+      <field id="3" name="MaximumDischargingCurrent" type="amperage-mA">
+        <mandatoryConform>
+          <feature name="V2X"/>
+        </mandatoryConform>
+        <constraint type="min" value="0"/>
+      </field>
     </event>
     <event id="0x03" name="EnergyTransferStopped" priority="info">
       <access readPrivilege="view"/>
@@ -530,6 +546,12 @@ Davis, CA 95616, USA
       </field>
       <field id="4" name="EnergyTransferred" type="energy-mWh">
         <mandatoryConform/>
+        <constraint type="min" value="0"/>
+      </field>
+      <field id="5" name="EnergyDischarged" type="energy-mWh">
+        <mandatoryConform>
+          <feature name="V2X"/>
+        </mandatoryConform>
         <constraint type="min" value="0"/>
       </field>
     </event>

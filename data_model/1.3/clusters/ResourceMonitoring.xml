@@ -64,6 +64,7 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0071" name="HEPA Filter Monitoring"/>
     <clusterId id="0x0072" name="Activated Carbon Filter Monitoring"/>
+    <clusterId id="0x0079" name="Water Tank Level Monitoring"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="REPM" scope="Endpoint"/>
   <features>

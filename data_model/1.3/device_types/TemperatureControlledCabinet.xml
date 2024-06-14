@@ -55,10 +55,11 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0071" name="Temperature Controlled Cabinet" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0071" name="Temperature Controlled Cabinet" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
     <revision revision="2" summary="Extension to heating cabinets"/>
+    <revision revision="3" summary="Added exclusivity for conditions"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>

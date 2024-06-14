@@ -129,10 +129,10 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="2" name="Toggle" summary="If the previous value of the OnOff attribute is
-                    equal to FALSE, set the OnOff attribute to TRUE.
-                    If the previous value of the OnOff attribute is
-                    equal to TRUE, set the OnOff attribute to FALSE
-                    (toggle).">
+                   equal to FALSE, set the OnOff attribute to TRUE.
+                   If the previous value of the OnOff attribute is
+                   equal to TRUE, set the OnOff attribute to FALSE
+                   (toggle).">
         <mandatoryConform/>
       </item>
     </enum>

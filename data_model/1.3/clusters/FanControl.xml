@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: short
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
     <revision revision="2" summary="New data model format and notation; Percent, speed and motion settings; General cleanup"/>
     <revision revision="3" summary="Addition of AirflowDirection and Step command"/>
     <revision revision="4" summary="Change conformance for FanModeSequenceEnum"/>
+    <revision revision="5" summary="Added Q quality for PercentCurrent and SpeedCurrent"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0202" name="Fan Control"/>
@@ -189,7 +190,6 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="6"/>
     </attribute>
     <attribute id="0x0001" name="FanModeSequence" type="FanModeSequenceEnum" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="operate"/>
@@ -197,24 +197,23 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <condition name="Zigbee"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="5"/>
     </attribute>
     <attribute id="0x0001" name="FanModeSequence" type="FanModeSequenceEnum" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="5"/>
     </attribute>
     <attribute id="0x0002" name="PercentSetting" type="percent" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="100"/>
+      <constraint type="max" value="100"/>
     </attribute>
     <attribute id="0x0003" name="PercentCurrent" type="percent" default="desc">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="100"/>
+      <constraint type="max" value="100"/>
     </attribute>
     <attribute id="0x0004" name="SpeedMax" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -230,7 +229,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="SpeedMax"/>
+      <constraint type="max" value="SpeedMax"/>
     </attribute>
     <attribute id="0x0006" name="SpeedCurrent" type="uint8" default="desc">
       <access read="true" readPrivilege="view"/>
@@ -238,7 +237,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="SpeedMax"/>
+      <constraint type="max" value="SpeedMax"/>
     </attribute>
     <attribute id="0x0007" name="RockSupport" type="RockBitmap" default="0">
       <access read="true" readPrivilege="view"/>

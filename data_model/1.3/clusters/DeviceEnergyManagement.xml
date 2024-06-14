@@ -57,11 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0098" name="Device Energy Management Cluster" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0098" name="Device Energy Management Cluster" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
     <revision revision="3" summary="Updates to match cluster spec updates"/>
+    <revision revision="4" summary="Bug fixes found during PICS production"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0098" name="Device Energy Management"/>
@@ -69,68 +70,51 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="DEM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PA" name="PowerAdjustment" summary="Allows an EMS to make a temporary power
-                                                                             adjustment (within the limits offered by the ESA).">
-      <optionalConform choice="a" more="true"/>
+                                                                           adjustment (within the limits offered by the ESA).">
+      <optionalConform/>
     </feature>
     <feature bit="1" code="PFR" name="PowerForecastReporting" summary="Allows an ESA to advertise its indicative
-                                                                             future power consumption vs time.">
+                                                                           future power consumption vs time.">
       <otherwiseConform>
+        <optionalConform choice="a">
+          <notTerm>
+            <feature name="PA"/>
+          </notTerm>
+        </optionalConform>
         <mandatoryConform>
-          <andTerm>
-            <orTerm>
-              <feature name="STA"/>
-              <feature name="PAU"/>
-              <feature name="FA"/>
-              <feature name="CON"/>
-            </orTerm>
-            <notTerm>
-              <feature name="SFR"/>
-            </notTerm>
-          </andTerm>
+          <orTerm>
+            <feature name="STA"/>
+            <feature name="PAU"/>
+            <feature name="FA"/>
+            <feature name="CON"/>
+          </orTerm>
         </mandatoryConform>
-        <optionalConform choice="a" more="true"/>
+        <optionalConform/>
       </otherwiseConform>
     </feature>
     <feature bit="2" code="SFR" name="StateForecastReporting" summary="Allows an ESA to advertise its indicative
-                                                                             future state vs time.">
-      <otherwiseConform>
-        <mandatoryConform>
-          <andTerm>
-            <orTerm>
-              <feature name="STA"/>
-              <feature name="PAU"/>
-              <feature name="FA"/>
-              <feature name="CON"/>
-            </orTerm>
-            <notTerm>
-              <feature name="PFR"/>
-            </notTerm>
-          </andTerm>
-        </mandatoryConform>
-        <optionalConform choice="a" more="true"/>
-      </otherwiseConform>
+                                                                           future state vs time.">
+      <optionalConform choice="a">
+        <notTerm>
+          <feature name="PA"/>
+        </notTerm>
+      </optionalConform>
     </feature>
     <feature bit="3" code="STA" name="StartTimeAdjustment" summary="Allows an EMS to delay an ESA's
-                                                                             planned operation.">
-      <optionalConform choice="a" more="true"/>
+                                                                           planned operation.">
+      <optionalConform/>
     </feature>
     <feature bit="4" code="PAU" name="Pausable" summary="Allows an EMS to pause an ESA's
-                                                                             planned operation.">
-      <optionalConform choice="a" more="true"/>
+                                                                           planned operation.">
+      <optionalConform/>
     </feature>
     <feature bit="5" code="FA" name="ForecastAdjustment" summary="Allows an EMS to adjust an ESA's
-                                                                             planned operation.">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform choice="a" more="true"/>
-      </otherwiseConform>
+                                                                           planned operation.">
+      <optionalConform/>
     </feature>
     <feature bit="6" code="CON" name="ConstraintBasedAdjustment" summary="Allows an EMS to request constraints to an ESA's
-                                                                             planned operation.">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform choice="a" more="true"/>
-      </otherwiseConform>
+                                                                           planned operation.">
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -189,9 +173,9 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </item>
       <item value="4" name="Paused" summary="The ESA is currently paused by a client using the PauseRequest command">
-        <optionalConform>
-          <feature name="FA"/>
-        </optionalConform>
+        <mandatoryConform>
+          <feature name="PAU"/>
+        </mandatoryConform>
       </item>
     </enum>
     <enum name="ESATypeEnum">
@@ -266,6 +250,17 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="PowerAdjustReasonEnum">
+      <item value="0" name="NoAdjustment" summary="There is no Power Adjustment active">
+        <optionalConform/>
+      </item>
+      <item value="1" name="LocalOptimizationAdjustment" summary="There is PowerAdjustment active due to local EMS optimization">
+        <optionalConform/>
+      </item>
+      <item value="2" name="GridOptimizationAdjustment" summary="There is PowerAdjustment active due to local EMS optimization">
+        <optionalConform/>
+      </item>
+    </enum>
     <struct name="ConstraintsStruct">
       <field id="0" name="StartTime" type="epoch-s">
         <mandatoryConform/>
@@ -273,7 +268,7 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Duration" type="elapsed-s">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="86400"/>
+        <constraint type="max" value="86400"/>
       </field>
       <field id="2" name="NominalPower" type="power-mW">
         <mandatoryConform>
@@ -308,7 +303,7 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="ForecastStruct">
-      <field id="0" name="ForecastId" type="uint16" default="0">
+      <field id="0" name="ForecastID" type="uint32" default="0">
         <mandatoryConform/>
       </field>
       <field id="1" name="ActiveSlotNumber" type="uint16" default="0">
@@ -332,7 +327,7 @@ Davis, CA 95616, USA
           <feature name="STA"/>
         </mandatoryConform>
       </field>
-      <field id="6" name="IsPauseable" type="bool">
+      <field id="6" name="IsPausable" type="bool">
         <mandatoryConform/>
       </field>
       <field id="7" name="Slots" type="list">
@@ -341,6 +336,17 @@ Davis, CA 95616, USA
         <constraint type="maxCount" value="10"/>
       </field>
       <field id="8" name="ForecastUpdateReason" type="ForecastUpdateReasonEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="PowerAdjustCapabilityStruct">
+      <field id="0" name="PowerAdjustCapability" type="list" default="null">
+        <entry type="PowerAdjustStruct"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="maxCount" value="8"/>
+      </field>
+      <field id="1" name="Cause" type="PowerAdjustReasonEnum" default="0">
         <mandatoryConform/>
       </field>
     </struct>
@@ -364,7 +370,9 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
       <field id="1" name="NominalPower" type="power-mW">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <feature name="PFR"/>
+        </mandatoryConform>
         <constraint type="desc"/>
       </field>
       <field id="2" name="Duration" type="elapsed-s">
@@ -388,7 +396,7 @@ Davis, CA 95616, USA
       <field id="4" name="RemainingSlotTime" type="elapsed-s">
         <mandatoryConform/>
       </field>
-      <field id="5" name="SlotIsPauseable" type="bool">
+      <field id="5" name="SlotIsPausable" type="bool">
         <mandatoryConform>
           <feature name="PAU"/>
         </mandatoryConform>
@@ -451,28 +459,71 @@ Davis, CA 95616, USA
       </field>
       <field id="16" name="MinDurationAdjustment" type="elapsed-s">
         <mandatoryConform>
-          <andTerm>
-            <feature name="FA"/>
-            <orTerm>
-              <feature name="PFR"/>
-              <feature name="SFR"/>
-            </orTerm>
-          </andTerm>
+          <feature name="FA"/>
         </mandatoryConform>
       </field>
       <field id="17" name="MaxDurationAdjustment" type="elapsed-s">
         <mandatoryConform>
-          <andTerm>
-            <feature name="FA"/>
-            <orTerm>
-              <feature name="PFR"/>
-              <feature name="SFR"/>
-            </orTerm>
-          </andTerm>
+          <feature name="FA"/>
         </mandatoryConform>
       </field>
     </struct>
   </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="ESAType" type="ESATypeEnum" default="Other">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="ESACanGenerate" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="ESAState" type="ESAStateEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0003" name="AbsMinPower" type="power-mW" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="AbsMaxPower" type="power-mW" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="PowerAdjustmentCapability" type="PowerAdjustCapabilityStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="PA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0006" name="Forecast" type="ForecastStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PFR"/>
+          <feature name="SFR"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="OptOutState" type="OptOutStateEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PA"/>
+          <feature name="STA"/>
+          <feature name="PAU"/>
+          <feature name="FA"/>
+          <feature name="CON"/>
+        </orTerm>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+  </attributes>
   <commands>
     <command id="0x00" name="PowerAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
@@ -537,7 +588,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="FA"/>
       </mandatoryConform>
-      <field id="0" name="ForecastId" type="uint32">
+      <field id="0" name="ForecastID" type="uint32">
         <mandatoryConform/>
       </field>
       <field id="1" name="SlotAdjustments" type="list">

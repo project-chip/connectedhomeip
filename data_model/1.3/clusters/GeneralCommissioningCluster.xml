@@ -55,14 +55,20 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0030" name="General Commissioning Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0030" name="General Commissioning Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Add Enhanced Setup Flow"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0030" name="General Commissioning"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="CGEN" scope="Node"/>
+  <features>
+    <feature bit="0" code="TC" name="Terms &amp; Conditions" summary="Supports Terms &amp; Conditions acknowledgement">
+      <optionalConform/>
+    </feature>
+  </features>
   <dataTypes>
     <enum name="CommissioningErrorEnum">
       <item value="0" name="OK" summary="No error">
@@ -79,6 +85,21 @@ Davis, CA 95616, USA
       </item>
       <item value="4" name="BusyWithOtherAdmin" summary="[[ref_BusyWithOtherAdmin]] Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context.">
         <mandatoryConform/>
+      </item>
+      <item value="5" name="RequiredTCNotAccepted" summary="[[ref_RequiredTCNotAccepted]] One or more required TC features from the Enhanced Setup Flow were not accepted.">
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="TCAcknowledgementsNotReceived" summary="[[ref_TCAcknowledgementsNotReceived]] No acknowledgements from the user for the TC features were received.">
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="TCMinVersionNotMet" summary="[[ref_TCMinVersionNotMet]] The version of the TC features acknowledged by the user did not meet the minimum required version.">
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
       </item>
     </enum>
     <enum name="RegulatoryLocationTypeEnum">
@@ -126,6 +147,30 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="TCAcceptedVersion" type="uint16">
+      <access read="true" readPrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0006" name="TCMinRequiredVersion" type="uint16">
+      <access read="true" readPrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="TCAcknowledgements" type="map16">
+      <access read="true" readPrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0008" name="TCAcknowledgementsRequired" type="bool" default="true">
+      <access read="true" readPrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
   <commands>
@@ -182,6 +227,26 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="1" name="DebugText" type="String" default="&quot;">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="SetTCAcknowledgements" direction="commandToServer" response="SetTCAcknowledgementsResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+      <field id="0" name="TCVersion" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="TCUserResponse" type="map16">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x07" name="SetTCAcknowledgementsResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="OK">
         <mandatoryConform/>
       </field>
     </command>

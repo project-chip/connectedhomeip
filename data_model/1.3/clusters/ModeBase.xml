@@ -59,7 +59,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial version"/>
     <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status.
-Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
+             Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
   </revisionHistory>
   <clusterIds>
     <clusterId name="Mode Base"/>
@@ -134,7 +134,6 @@ Require at least one standard mode tag. Define reserved ranges for base/derived 
       </field>
     </command>
     <command id="0x01" name="ChangeToModeResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="enum8">
         <enum>

@@ -55,10 +55,11 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002B" name="Fan" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002B" name="Fan" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial release of this document"/>
     <revision revision="2" summary="Added ability to be composed with a Thermostat for fan heaters"/>
+    <revision revision="3" summary="Added On/Off cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -68,6 +69,9 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0004" name="Groups" side="server">
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0006" name="On/Off" side="server">
+      <optionalConform/>
     </cluster>
     <cluster id="0x0202" name="Fan Control" side="server">
       <mandatoryConform/>

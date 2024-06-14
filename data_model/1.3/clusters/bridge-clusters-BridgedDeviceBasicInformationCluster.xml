@@ -57,16 +57,22 @@ Davis, CA 95616, USA
 
 :sectnums:
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
     <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
+    <revision revision="4" summary="Updated conformance for UniqueID to mandatory and add the BridgedICDSupport feature. Added DeviceLocation."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0039" name="Bridged Device Basic Information"/>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="BIS" name="BridgedICDSupport" summary="A set of features that support Bridged ICD Devices.">
+      <optionalConform/>
+    </feature>
+  </features>
   <attributes>
     <attribute id="0x0000" name="DataModelRevision">
       <disallowConform/>
@@ -123,7 +129,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0012" name="UniqueID">
-      <optionalConform/>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0013" name="CapabilityMinima">
       <disallowConform/>
@@ -137,7 +143,21 @@ Davis, CA 95616, USA
     <attribute id="0x0016" name="MaxPathsPerInvoke">
       <disallowConform/>
     </attribute>
+    <attribute id="0x0017" name="DeviceLocation">
+      <optionalConform/>
+    </attribute>
   </attributes>
+  <commands>
+    <command id="0x00" name="KeepActive" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="BIS"/>
+      </mandatoryConform>
+      <field id="0" name="StayActiveDuration" type="uint32">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
   <events>
     <event id="0x00" name="StartUp">
       <access readPrivilege="view"/>
@@ -157,6 +177,12 @@ Davis, CA 95616, USA
     <event id="0x03" name="ReachableChanged">
       <access readPrivilege="view"/>
       <mandatoryConform/>
+    </event>
+    <event id="0x04" name="ActiveChanged">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BIS"/>
+      </mandatoryConform>
     </event>
   </events>
 </cluster>

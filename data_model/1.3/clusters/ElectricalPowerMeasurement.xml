@@ -129,7 +129,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="4" name="EndTimestamp" type="epoch-s">
-        <constraint type="min" value="StartTimestamp+1"/>
+        <constraint type="min" value="StartTimestamp + 1"/>
       </field>
       <field id="5" name="MinTimestamp" type="epoch-s">
         <mandatoryConform>
@@ -140,7 +140,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <attribute name="EndTimestamp"/>
         </mandatoryConform>
-        <constraint type="min" value="MinTimestamp+1"/>
+        <constraint type="min" value="MinTimestamp + 1"/>
       </field>
       <field id="7" name="StartSystime" type="systime-ms">
         <mandatoryConform>
@@ -148,7 +148,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="8" name="EndSystime" type="systime-ms">
-        <constraint type="min" value="StartSystime+1"/>
+        <constraint type="min" value="StartSystime + 1"/>
       </field>
       <field id="9" name="MinSystime" type="systime-ms">
         <mandatoryConform>
@@ -159,7 +159,7 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <attribute name="EndSystime"/>
         </mandatoryConform>
-        <constraint type="min" value="MinSystime+1"/>
+        <constraint type="min" value="MinSystime + 1"/>
       </field>
     </struct>
   </dataTypes>

@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
     <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change)
@@ -65,10 +65,10 @@ Davis, CA 95616, USA
     <revision revision="3" summary="CCB 2574 2616 2659 2702 2814 2818 2819 2898"/>
     <revision revision="4" summary="FeatureMap support with On/Off, Lighting and Frequency features"/>
     <revision revision="5" summary="New data model format and notation"/>
+    <revision revision="6" summary="Added Q quality for CurrentLevel, CurrentFrequency and RemainingTime attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0008" name="Level Control"/>
-    <clusterId id="0x001C" name="Pulse Width Modulation"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="LVL" scope="Endpoint"/>
   <features>
@@ -78,9 +78,7 @@ Davis, CA 95616, USA
     <feature bit="1" code="LT" name="Lighting" default="0" summary="Behavior that supports lighting applications">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="FQ" name="Frequency" default="0" summary="Supports frequency attributes and behavior.
-                                                    The Pulse Width Modulation cluster was created
-                                                    for frequency control.">
+    <feature bit="2" code="FQ" name="Frequency" default="0" summary="Supports frequency attributes and behavior.">
       <provisionalConform/>
     </feature>
   </features>
@@ -126,6 +124,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
@@ -144,7 +143,7 @@ Davis, CA 95616, USA
           <feature name="LT"/>
         </notTerm>
       </optionalConform>
-      <constraint type="between" from="0" to="MaxLevel"/>
+      <constraint type="max" value="MaxLevel"/>
     </attribute>
     <attribute id="0x0003" name="MaxLevel" type="uint8" default="254">
       <access read="true" readPrivilege="view"/>
@@ -164,7 +163,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="MaxFrequency"/>
+      <constraint type="max" value="MaxFrequency"/>
     </attribute>
     <attribute id="0x0006" name="MaxFrequency" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -218,7 +217,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="Level" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="254"/>
+        <constraint type="max" value="254"/>
       </field>
       <field id="1" name="TransitionTime" type="uint16">
         <quality nullable="true"/>

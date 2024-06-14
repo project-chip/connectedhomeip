@@ -78,18 +78,18 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="MaxMeasuredValue-1"/>
+      <constraint type="max" value="MaxMeasuredValue - 1"/>
     </attribute>
     <attribute id="0x0002" name="MaxMeasuredValue" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinMeasuredValue+1" to="65534"/>
+      <constraint type="between" from="MinMeasuredValue + 1" to="65534"/>
     </attribute>
     <attribute id="0x0003" name="Tolerance" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="2048"/>
+      <constraint type="max" value="2048"/>
     </attribute>
   </attributes>
 </cluster>

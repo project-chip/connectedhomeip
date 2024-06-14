@@ -54,17 +54,25 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0028" name="Basic Information Cluster" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0028" name="Basic Information Cluster" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
     <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
+    <revision revision="4" summary="Updated conformance for UniqueID to mandatory and add the BridgedICDSupport feature. Added DeviceLocation attribute."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0028" name="Basic Information"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="BINFO" scope="Node"/>
+  <features>
+    <feature bit="0" code="BIS" name="BridgedICDSupport" summary="A set of features that support Bridged ICD Devices.">
+      <optionalConform/>
+    </feature>
+  </features>
   <dataTypes>
     <enum name="ColorEnum">
       <item value="0" name="Black" summary="Approximately RGB #000000.">
@@ -277,7 +285,7 @@ Davis, CA 95616, USA
     <attribute id="0x0012" name="UniqueID" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <optionalConform/>
+      <mandatoryConform/>
       <constraint type="maxLength" value="32"/>
     </attribute>
     <attribute id="0x0013" name="CapabilityMinima" type="CapabilityMinimaStruct" default="MS">
@@ -302,7 +310,20 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="min" value="1"/>
     </attribute>
+    <attribute id="0x0017" name="DeviceLocation" type="homeloc" default="MS">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <optionalConform/>
+    </attribute>
   </attributes>
+  <commands>
+    <command id="0x00" name="KeepActive" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="BIS"/>
+      </mandatoryConform>
+    </command>
+  </commands>
   <events>
     <event id="0x00" name="StartUp" priority="critical">
       <access readPrivilege="view"/>
@@ -327,6 +348,16 @@ Davis, CA 95616, USA
       <access readPrivilege="view"/>
       <field id="0" name="ReachableNewValue" type="bool">
         <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x04" name="ActiveChanged" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BIS"/>
+      </mandatoryConform>
+      <field id="0" name="PromisedActiveDuration" type="uint32">
+        <mandatoryConform/>
+        <constraint type="desc"/>
       </field>
     </event>
   </events>

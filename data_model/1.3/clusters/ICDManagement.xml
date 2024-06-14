@@ -93,6 +93,7 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
+    <number name="ClientType Field" type=""/>
     <number name="UserActiveModeTriggerBitmap" type=""/>
     <enum name="OperatingModeEnum">
       <item value="0" name="SIT" summary="ICD is operating as a Short Idle Time ICD.">
@@ -113,6 +114,10 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="Key">
         <deprecateConform/>
+      </field>
+      <field id="4" name="ClientType" type="ClientTypeEnum Field" default="0">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -182,6 +187,14 @@ Davis, CA 95616, USA
           <feature name="LITS"/>
         </mandatoryConform>
       </otherwiseConform>
+    </attribute>
+    <attribute id="0x0009" name="MaximumCheckInBackoff" type="uint32" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+      <constraint type="between" from="IdleModeDuration" to="64800"/>
     </attribute>
   </attributes>
   <commands>

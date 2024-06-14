@@ -55,14 +55,20 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001F" name="Access Control Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001F" name="Access Control Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Added Managed feature"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x001F" name="AccessControl"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="ACL" scope="Node"/>
+  <features>
+    <feature bit="0" code="MNGD" name="Managed" summary="Device is managed">
+      <optionalConform/>
+    </feature>
+  </features>
   <dataTypes>
     <enum name="AccessControlEntryAuthModeEnum">
       <item value="1" name="PASE" summary="Passcode authenticated session">
@@ -73,6 +79,11 @@ Davis, CA 95616, USA
       </item>
       <item value="3" name="Group" summary="Group authenticated session">
         <mandatoryConform/>
+      </item>
+      <item value="4" name="ALL" summary="All modes">
+        <mandatoryConform>
+          <feature name="MNGD"/>
+        </mandatoryConform>
       </item>
     </enum>
     <enum name="AccessControlEntryPrivilegeEnum">
@@ -184,6 +195,14 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
       <constraint type="min" value="4"/>
+    </attribute>
+    <attribute id="0x0005" name="ManagedACL" type="list" default="desc">
+      <entry type="AccessControlEntryStruct"/>
+      <access read="true" readPrivilege="view" fabricScoped="true"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
     </attribute>
   </attributes>
   <events>

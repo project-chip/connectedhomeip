@@ -75,16 +75,16 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="EnergyPriorityEnum">
-      <item value="0" name="Comfort">
+      <item value="0" name="Comfort" summary="User comfort">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Speed">
+      <item value="1" name="Speed" summary="Speed of operation">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Efficiency">
+      <item value="2" name="Efficiency" summary="Amount of Energy consumed by the device">
         <mandatoryConform/>
       </item>
-      <item value="3" name="WaterConsumption">
+      <item value="3" name="WaterConsumption" summary="Amount of water consumed by the device">
         <mandatoryConform/>
       </item>
     </enum>

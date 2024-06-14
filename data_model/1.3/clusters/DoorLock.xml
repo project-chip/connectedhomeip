@@ -57,15 +57,17 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock Cluster" revision="7">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock Cluster" revision="8">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1811 1812 1821"/>
     <revision revision="2" summary="CCB 2430"/>
     <revision revision="3" summary="CCB 2629 2630"/>
     <revision revision="4" summary="All Hubs changes and added feature map"/>
-    <revision revision="5"/>
+    <revision revision="5" summary="CCB 3472 3474 3338"/>
     <revision revision="6" summary="New data model format and notation. Added User features. General cleanup of functionality"/>
     <revision revision="7" summary="Added support for European door locks (unbolt feature)"/>
+    <revision revision="8" summary="Removed LOG feature
+             and added support for Aliro credential provisioning"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0101" name="Door Lock"/>
@@ -84,9 +86,6 @@ Davis, CA 95616, USA
         <optionalConform/>
       </otherwiseConform>
     </feature>
-    <feature bit="3" code="LOG" name="Logging" summary="Lock supports local/on-lock logging when Events are not supported">
-      <optionalConform/>
-    </feature>
     <feature bit="4" code="WDSCH" name="WeekDayAccessSchedules" summary="Lock supports week day user access schedules">
       <optionalConform/>
     </feature>
@@ -103,14 +102,19 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="8" code="USR" name="User" summary="Lock supports the user commands and database">
-      <optionalConform>
-        <orTerm>
-          <feature name="PIN"/>
-          <feature name="RID"/>
-          <feature name="FGP"/>
-          <feature name="FACE"/>
-        </orTerm>
-      </optionalConform>
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+        <optionalConform>
+          <orTerm>
+            <feature name="PIN"/>
+            <feature name="RID"/>
+            <feature name="FGP"/>
+            <feature name="FACE"/>
+          </orTerm>
+        </optionalConform>
+      </otherwiseConform>
     </feature>
     <feature bit="9" code="NOT" name="Notification" summary="Operation and Programming Notifications">
       <optionalConform/>
@@ -123,6 +127,14 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="12" code="UBOLT" name="Unbolting" summary="Lock supports unbolting">
       <optionalConform/>
+    </feature>
+    <feature bit="13" code="ALIRO" name="AliroProvisioning" summary="Lock supports Aliro credential provisioning as defined in ref_Aliro">
+      <optionalConform/>
+    </feature>
+    <feature bit="14" code="ALBU" name="AliroBLEUWB" summary="Lock supports the Bluetooth LE + UWB Access Control Flow as defined in ref_Aliro">
+      <optionalConform>
+        <feature name="ALIRO"/>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>
@@ -204,6 +216,23 @@ Davis, CA 95616, USA
       <item value="5" name="Face" summary="Face identifier credential type">
         <mandatoryConform>
           <feature name="FACE"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="AliroCredentialIssuerKey" summary="A Credential Issuer public key as defined in ref_Aliro">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="AliroEvictableEndpointKey" summary="An Endpoint public key as defined in ref_Aliro which can
+                                         be evicted if space is needed for another endpoint key">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+      <item value="8" name="AliroNonEvictableEndpointKey" summary="An Endpoint public key as defined in ref_Aliro which cannot
+                                         be evicted if space is needed for another endpoint key">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
         </mandatoryConform>
       </item>
     </enum>
@@ -339,6 +368,21 @@ Davis, CA 95616, USA
           <feature name="FACE"/>
         </mandatoryConform>
       </item>
+      <item value="11" name="AliroCredentialIssuerKey" summary="An Aliro credential issuer key credential was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+      <item value="12" name="AliroEvictableEndpointKey" summary="An Aliro endpoint key credential which can be evicted credential was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+      <item value="13" name="AliroNonEvictableEndpointKey" summary="An Aliro endpoint key credential which cannot be evicted was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
     </enum>
     <enum name="LockOperationTypeEnum">
       <item value="0" name="Lock" summary="Lock operation">
@@ -450,6 +494,66 @@ Davis, CA 95616, USA
         <optionalConform/>
       </item>
     </enum>
+    <enum name="OperationEventCodeEnum">
+      <item value="0" name="UnknownOrMfgSpecific" summary="Event code is unknown">
+        <optionalConform/>
+      </item>
+      <item value="1" name="Lock" summary="Event code is lock">
+        <optionalConform/>
+      </item>
+      <item value="2" name="Unlock" summary="Event code is unlock">
+        <optionalConform/>
+      </item>
+      <item value="3" name="LockFailureInvalidPINorRFID" summary="Event code is lock failure due to invalid PIN or RFID">
+        <optionalConform/>
+      </item>
+      <item value="4" name="LockFailureInvalidSchedule" summary="Event code is lock failure due to invalid schedule">
+        <optionalConform/>
+      </item>
+      <item value="5" name="UnlockFailureInvalidPINorRFID" summary="Event code is unlock failure due to invalid PIN or RFID">
+        <optionalConform/>
+      </item>
+      <item value="6" name="UnlockFailureInvalidSchedule" summary="Event code is unlock failure due to invalid schedule">
+        <optionalConform/>
+      </item>
+      <item value="7" name="OneTouchLock" summary="Event code is one touch lock">
+        <optionalConform/>
+      </item>
+      <item value="8" name="KeyLock" summary="Event code is key lock">
+        <optionalConform/>
+      </item>
+      <item value="9" name="KeyUnlock" summary="Event code is key unlock">
+        <optionalConform/>
+      </item>
+      <item value="10" name="AutoLock" summary="Event code is auto lock">
+        <optionalConform/>
+      </item>
+      <item value="11" name="ScheduleLock" summary="Event code is schedule lock">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="WDSCH"/>
+            <feature name="YDSCH"/>
+          </orTerm>
+        </mandatoryConform>
+      </item>
+      <item value="12" name="ScheduleUnlock" summary="Event code is schedule unlock">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="WDSCH"/>
+            <feature name="YDSCH"/>
+          </orTerm>
+        </mandatoryConform>
+      </item>
+      <item value="13" name="ManualLock" summary="Event code is manual lock (Key or Thumbturn)">
+        <optionalConform/>
+      </item>
+      <item value="14" name="ManualUnlock" summary="Event code is manual unlock (Key or Thumbturn)">
+        <optionalConform/>
+      </item>
+      <item value="15" name="NonAccessUserOperationEvent" summary="Event code is non access user operation">
+        <optionalConform/>
+      </item>
+    </enum>
     <enum name="OperationSourceEnum">
       <item value="0" name="Unspecified" summary="Lock/unlock operation came from unspecified source">
         <optionalConform/>
@@ -486,6 +590,35 @@ Davis, CA 95616, USA
         <optionalConform>
           <feature name="USR"/>
         </optionalConform>
+      </item>
+      <item value="10" name="Aliro" summary="Lock/unlock operation came from an interaction defined in ref_Aliro, or
+                              user change operation was a step-up credential provisioning as defined in ref_Aliro">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="ProgrammingEventCodeEnum">
+      <item value="0" name="UnknownOrMfgSpecific" summary="Event code is unknown">
+        <optionalConform/>
+      </item>
+      <item value="1" name="ProgrammingCodeChanged" summary="Event code is code changed">
+        <optionalConform/>
+      </item>
+      <item value="2" name="PINCodeAdded" summary="Event code is PIN added">
+        <optionalConform/>
+      </item>
+      <item value="3" name="PINCodeCleared" summary="Event code is PIN cleared">
+        <optionalConform/>
+      </item>
+      <item value="4" name="PINCodeChanged" summary="Event code is PIN changed">
+        <optionalConform/>
+      </item>
+      <item value="5" name="RFIDCodeAdded" summary="Event code is RFID added">
+        <optionalConform/>
+      </item>
+      <item value="6" name="RFIDCodeCleared" summary="Event code is RFID cleared">
+        <optionalConform/>
       </item>
     </enum>
     <enum name="SoundVolumeEnum">
@@ -777,13 +910,6 @@ Davis, CA 95616, USA
         <feature name="DPS"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x0010" name="NumberOfLogRecordsSupported" type="uint16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="LOG"/>
-      </mandatoryConform>
-    </attribute>
     <attribute id="0x0011" name="NumberOfTotalUsersSupported" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
@@ -866,13 +992,6 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="USR"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0020" name="EnableLogging" type="bool" default="0">
-      <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
-      <mandatoryConform>
-        <feature name="LOG"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0021" name="Language" type="string" default="MS">
@@ -982,6 +1101,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
     </attribute>
     <attribute id="0x0034" name="SecurityLevel" default="0">
+      <access read="true" readPrivilege="view"/>
       <deprecateConform/>
     </attribute>
     <attribute id="0x0035" name="ExpiringUserTimeout" type="uint16" default="MS">
@@ -1058,6 +1178,81 @@ Davis, CA 95616, USA
         </andTerm>
       </optionalConform>
     </attribute>
+    <attribute id="0x0080" name="AliroReaderVerificationKey" type="octstr" default="null">
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <constraint type="maxLength" value="65"/>
+    </attribute>
+    <attribute id="0x0081" name="AliroReaderGroupIdentifier" type="octstr" default="null">
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <constraint type="maxLength" value="16"/>
+    </attribute>
+    <attribute id="0x0082" name="AliroReaderGroupSubIdentifier" type="octstr">
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <constraint type="maxLength" value="16"/>
+    </attribute>
+    <attribute id="0x0083" name="AliroExpeditedTransactionSupportedProtocolVersions" type="list" default="empty">
+      <entry type="octstr">
+        <constraint type="maxLength" value="2"/>
+      </entry>
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <constraint type="maxCount" value="16"/>
+    </attribute>
+    <attribute id="0x0084" name="AliroGroupResolvingKey" type="octstr" default="null">
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALBU"/>
+      </mandatoryConform>
+      <constraint type="maxLength" value="16"/>
+    </attribute>
+    <attribute id="0x0085" name="AliroSupportedBLEUWBProtocolVersions" type="list" default="empty">
+      <entry type="octstr">
+        <constraint type="maxLength" value="2"/>
+      </entry>
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALBU"/>
+      </mandatoryConform>
+      <constraint type="maxCount" value="16"/>
+    </attribute>
+    <attribute id="0x0086" name="AliroBLEAdvertisingVersion" type="uint8" default="0">
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALBU"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0087" name="NumberOfAliroCredentialIssuerKeysSupported" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0088" name="NumberOfAliroEndpointKeysSupported" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="LockDoor" direction="commandToServer" response="Y">
@@ -1101,45 +1296,6 @@ Davis, CA 95616, USA
             <feature name="PIN"/>
           </andTerm>
         </optionalConform>
-      </field>
-    </command>
-    <command id="0x04" name="GetLogRecord" direction="commandToServer" response="GetLogRecordResponse">
-      <access invokePrivilege="manage"/>
-      <mandatoryConform>
-        <feature name="LOG"/>
-      </mandatoryConform>
-      <field id="0" name="LogIndex" type="uint16">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-    </command>
-    <command id="0x04" name="GetLogRecordResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <feature name="LOG"/>
-      </mandatoryConform>
-      <field id="0" name="LogEntryID" type="uint16">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="1" name="Timestamp" type="epoch-s">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="EventType" type="EventTypeEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="Source" type="EventSourceEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="4" name="EventID" type="uint8">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="5" name="UserID" type="uint16">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="6" name="PIN" type="octstr">
-        <mandatoryConform/>
       </field>
     </command>
     <command id="0x05" name="SetPINCode" direction="commandToServer" response="Y">
@@ -1313,19 +1469,19 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="StartHour" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="23"/>
+        <constraint type="max" value="23"/>
       </field>
       <field id="4" name="StartMinute" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="59"/>
+        <constraint type="max" value="59"/>
       </field>
       <field id="5" name="EndHour" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="23"/>
+        <constraint type="max" value="23"/>
       </field>
       <field id="6" name="EndMinute" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="59"/>
+        <constraint type="max" value="59"/>
       </field>
     </command>
     <command id="0x0C" name="GetWeekDaySchedule" direction="commandToServer" response="GetWeekDayScheduleResponse">
@@ -1363,19 +1519,19 @@ Davis, CA 95616, USA
       </field>
       <field id="4" name="StartHour" type="uint8">
         <optionalConform/>
-        <constraint type="between" from="0" to="23"/>
+        <constraint type="max" value="23"/>
       </field>
       <field id="5" name="StartMinute" type="uint8">
         <optionalConform/>
-        <constraint type="between" from="0" to="59"/>
+        <constraint type="max" value="59"/>
       </field>
       <field id="6" name="EndHour" type="uint8">
         <optionalConform/>
-        <constraint type="between" from="0" to="23"/>
+        <constraint type="max" value="23"/>
       </field>
       <field id="7" name="EndMinute" type="uint8">
         <optionalConform/>
-        <constraint type="between" from="0" to="59"/>
+        <constraint type="max" value="59"/>
       </field>
     </command>
     <command id="0x0D" name="ClearWeekDaySchedule" direction="commandToServer" response="Y">
@@ -1716,12 +1872,18 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint type="allowed" value="UnrestrictedUser"/>
-        <constraint type="allowed" value="NonAccessUser"/>
-        <constraint type="allowed" value="ForcedUser"/>
-        <constraint type="allowed" value="DisposableUser"/>
-        <constraint type="allowed" value="ExpiringUser"/>
-        <constraint type="allowed" value="ScheduleRestrictedUser"/>
-        <constraint type="allowed" value="RemoteOnlyUser"/>
+        <constraint type="allowed" value="+
+                                                        NonAccessUser"/>
+        <constraint type="allowed" value="+
+                                                        ForcedUser"/>
+        <constraint type="allowed" value="+
+                                                        DisposableUser"/>
+        <constraint type="allowed" value="+
+                                                        ExpiringUser"/>
+        <constraint type="allowed" value="+
+                                                        ScheduleRestrictedUser"/>
+        <constraint type="allowed" value="+
+                                                        RemoteOnlyUser"/>
       </field>
       <field id="6" name="CredentialRule" type="CredentialRuleEnum" default="Single">
         <quality nullable="true"/>
@@ -1872,12 +2034,18 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint type="allowed" value="UnrestrictedUser"/>
-        <constraint type="allowed" value="ProgrammingUser"/>
-        <constraint type="allowed" value="NonAccessUser"/>
-        <constraint type="allowed" value="ForcedUser"/>
-        <constraint type="allowed" value="DisposableUser"/>
-        <constraint type="allowed" value="ExpiringUser"/>
-        <constraint type="allowed" value="RemoteOnlyUser"/>
+        <constraint type="allowed" value="+
+                                                        ProgrammingUser"/>
+        <constraint type="allowed" value="+
+                                                        NonAccessUser"/>
+        <constraint type="allowed" value="+
+                                                        ForcedUser"/>
+        <constraint type="allowed" value="+
+                                                        DisposableUser"/>
+        <constraint type="allowed" value="+
+                                                        ExpiringUser"/>
+        <constraint type="allowed" value="+
+                                                        RemoteOnlyUser"/>
       </field>
     </command>
     <command id="0x23" name="SetCredentialResponse" direction="responseFromServer">
@@ -1933,6 +2101,13 @@ Davis, CA 95616, USA
         <optionalConform/>
         <constraint type="desc"/>
       </field>
+      <field id="5" name="CredentialData" type="octstr">
+        <quality nullable="true"/>
+        <optionalConform>
+          <feature name="ALIRO"/>
+        </optionalConform>
+        <constraint type="desc"/>
+      </field>
     </command>
     <command id="0x26" name="ClearCredential" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
@@ -1958,6 +2133,36 @@ Davis, CA 95616, USA
           </andTerm>
         </optionalConform>
       </field>
+    </command>
+    <command id="0x28" name="SetAliroReaderConfig" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <field id="0" name="SigningKey" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="32"/>
+      </field>
+      <field id="1" name="VerificationKey" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="65"/>
+      </field>
+      <field id="2" name="GroupIdentifier" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="3" name="GroupResolvingKey" type="octstr">
+        <mandatoryConform>
+          <feature name="ALBU"/>
+        </mandatoryConform>
+        <constraint type="maxLength" value="16"/>
+      </field>
+    </command>
+    <command id="0x29" name="ClearAliroReaderConfig" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
     </command>
   </commands>
   <events>
@@ -2053,6 +2258,7 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="OperationSource" type="OperationSourceEnum">
         <mandatoryConform/>
+        <constraint type="allowed" value="Aliro"/>
         <constraint type="allowed" value="Unspecified"/>
         <constraint type="allowed" value="Keypad"/>
         <constraint type="allowed" value="Remote"/>

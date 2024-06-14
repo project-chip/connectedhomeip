@@ -57,13 +57,14 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0102" name="Window Covering Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0102" name="Window Covering Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1994 1995 1996 1997 2086 2094 2095 2096 2097"/>
     <revision revision="2" summary="CCB 2328"/>
     <revision revision="3" summary="CCB 2477 2555 2845 3028"/>
     <revision revision="4" summary="All Hubs changes with FeatureMap &amp; OperationalStatus attribute"/>
     <revision revision="5" summary="New data model format and notation. Created plus clarified PositionAware and AbsolutePosition features. General cleanup of functionality."/>
+    <revision revision="6" summary="Added Q quality for all CurrentPosition attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0102" name="Window Covering"/>

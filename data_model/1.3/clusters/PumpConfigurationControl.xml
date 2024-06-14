@@ -55,12 +55,13 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0200" name="Pump Configuration and Control Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0200" name="Pump Configuration and Control Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="All Hubs changes"/>
     <revision revision="3" summary="New data model format and notation, added additional events"/>
     <revision revision="4" summary="Added feature map"/>
+    <revision revision="5" summary="Added Q quality for Capacity, Speed and Power"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0200" name="Pump Configuration and Control"/>
