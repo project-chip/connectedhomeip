@@ -384,7 +384,7 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
 
     if (isShortDiscriminator)
     {
-        setupDiscriminator.SetShortValue(discriminator);
+        setupDiscriminator.SetShortValue(discriminator & 0xFu);
     }
     else
     {

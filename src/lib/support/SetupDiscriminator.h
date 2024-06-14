@@ -32,7 +32,7 @@ namespace chip {
 class SetupDiscriminator
 {
 public:
-    constexpr SetupDiscriminator() : mDiscriminator(0xFFFFu), mIsShortDiscriminator(false) {}
+    constexpr SetupDiscriminator() : mDiscriminator(0), mIsShortDiscriminator(false) {}
 
     // See section 5.1.2. QR Code in the Matter specification
     static constexpr int kLongBits = 12;
