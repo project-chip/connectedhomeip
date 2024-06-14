@@ -29,6 +29,10 @@ using namespace chip::app::Clusters::MeterIdentification;
 using namespace chip::app::Clusters::MeterIdentification::Attributes;
 using namespace chip::app::Clusters::MeterIdentification::Structs;
 
+using chip::app::Clusters::MeterIdentification::MeterTypeEnum;
+using chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum;
+
+
 CHIP_ERROR MeterIdentificationInstance::Init()
 {
     return Instance::Init();
@@ -78,20 +82,6 @@ CHIP_ERROR MeterIdentificationDelegate::SetUtilityName(CharSpan &newValue)
     {
         // We won't log raw values since these could change frequently
         MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, UtilityName::Id);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR MeterIdentificationDelegate::SetPointOfDelivery(CharSpan &newValue)
-{
-    CharSpan oldValue = mPointOfDelivery;
-
-    mPointOfDelivery = newValue;
-    if (oldValue != newValue)
-    {
-        // We won't log raw values since these could change frequently
-        MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PointOfDelivery::Id);
     }
 
     return CHIP_NO_ERROR;

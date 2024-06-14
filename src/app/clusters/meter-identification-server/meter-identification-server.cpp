@@ -35,7 +35,10 @@ using namespace chip::app::Clusters::MeterIdentification::Structs;
 
 using chip::Protocols::InteractionModel::Status;
 
-namespace chip::app::Clusters::MeterIdentification {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace MeterIdentification {
 
 CHIP_ERROR Instance::Init()
 {
@@ -112,4 +115,7 @@ CHIP_ERROR Instance::Write(const ConcreteReadAttributePath & aPath, AttributeVal
     return CHIP_NO_ERROR;
 }
 
-} // namespace chip::app::Clusters::MeterIdentification
+} // namespace MeterIdentification
+} // namespace Clusters
+} // namespace app
+} // namespace chip

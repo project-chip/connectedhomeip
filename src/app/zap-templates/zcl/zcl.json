@@ -129,6 +129,7 @@
         "window-covering.xml",
         "matter-devices.xml",
         "sample-mei-cluster.xml",
+        "meter-identification-cluster.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
         "types/thermostat-user-interface-configuration.xml"

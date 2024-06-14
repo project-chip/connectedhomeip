@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MeterIdentification;
+using Feature = chip::app::Clusters::MeterIdentification::Feature;
 
 static std::unique_ptr<MeterIdentificationDelegate> gMIDelegate;
 static std::unique_ptr<MeterIdentificationInstance> gMIInstance;
@@ -38,7 +39,5 @@ void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpointId)
             BitMask<Feature, uint32_t>(Feature::kPowerThreshold));
 
         gMIInstance->Init();
-
-        gMIDelegate->SetPowerMode(PowerModeEnum::kAc);
     }
 }

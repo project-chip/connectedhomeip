@@ -19,12 +19,21 @@
 
 #include <stddef.h>
 
+#include <lib/core/Optional.h>
+
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 
-namespace chip::app::Clusters::MeterIdentification {
+using chip::app::Clusters::MeterIdentification::MeterTypeEnum;
+using chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum;
+using Feature = chip::app::Clusters::MeterIdentification::Feature;
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace MeterIdentification {
 
 struct Delegate
 {
@@ -72,4 +81,7 @@ private:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 };
 
-} // namespace chip::app::Clusters::MeterIdentification
+} // namespace MeterIdentification
+} // namespace Clusters
+} // namespace app
+} // namespace chip
