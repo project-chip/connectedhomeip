@@ -54,6 +54,8 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
     // must be restored on the boot. If there's no backup, the below function is a no-op.
     RevertConfiguration();
 
+    CheckInterfaceEnabled();
+
     return CHIP_NO_ERROR;
 }
 
@@ -204,10 +206,9 @@ CHIP_ERROR GenericThreadDriver::SetEnabled(bool enabled)
 
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kInterfaceEnabled, &enabled, sizeof(enabled)));
 
-    if ((!enabled && DeviceLayer::ThreadStackMgrImpl().IsThreadEnabled()) ||
-        (enabled && DeviceLayer::ThreadStackMgrImpl().IsThreadProvisioned()))
+    if ((!enabled && ThreadStackMgrImpl().IsThreadEnabled()) || (enabled && ThreadStackMgrImpl().IsThreadProvisioned()))
     {
-        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().SetThreadEnabled(enabled));
+        ReturnErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(enabled));
     }
     return CHIP_NO_ERROR;
 }
@@ -258,6 +259,20 @@ CHIP_ERROR GenericThreadDriver::BackupConfiguration()
     ByteSpan dataset = mStagingNetwork.AsByteSpan();
 
     return KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), dataset.data(), dataset.size());
+}
+
+void GenericThreadDriver::CheckInterfaceEnabled()
+{
+    bool enabled = GetEnabled();
+    ChipLogProgress(DeviceLayer, "OpenThread InterfaceEnabled: %s", enabled ? "true" : "false");
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
+    // If the Thread interface is enabled and stack has been provisioned, but is not currently enabled, enable it now.
+    if (enabled && ThreadStackMgrImpl().IsThreadProvisioned() && !ThreadStackMgrImpl().IsThreadEnabled())
+    {
+        ReturnOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
+        ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
+    }
+#endif
 }
 
 size_t GenericThreadDriver::ThreadNetworkIterator::Count()

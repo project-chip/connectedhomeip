@@ -1094,9 +1094,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     CHIP_ERROR err = CHIP_NO_ERROR;
     otError otErr  = OT_ERROR_NONE;
 
-    // If InterfaceEnabled is false, do not start Thread
-    bool InterfaceEnabled = true;
-
     // Arrange for OpenThread errors to be translated to text.
     RegisterOpenThreadErrorFormatter();
 
@@ -1134,12 +1131,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     memset(&mSrpClient, 0, sizeof(mSrpClient));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
-    InterfaceEnabled = sGenericThreadDriver.GetEnabled();
-#endif
-
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
-    if (InterfaceEnabled && otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(otInst))
+    if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(otInst))
     {
         // Enable the Thread IPv6 interface.
         otErr = otIp6SetEnabled(otInst, true);
@@ -1150,6 +1144,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
     }
+#endif
 
     initNetworkCommissioningThreadDriver();
 
