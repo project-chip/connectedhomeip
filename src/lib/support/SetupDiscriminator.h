@@ -23,9 +23,9 @@
 
 #pragma once
 
-#include <lib/support/CodeUtils.h>
-
 #include <cstdint>
+
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 

@@ -793,7 +793,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
 
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator(), this,
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(), this,
                                                                                           OnDiscoveredDeviceOverBleSuccess,
                                                                                           OnDiscoveredDeviceOverBleError));
             ExitNow(CHIP_NO_ERROR);
