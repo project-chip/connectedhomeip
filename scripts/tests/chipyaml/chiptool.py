@@ -26,7 +26,7 @@ from runner import CONTEXT_SETTINGS, chiptool
 from tests_finder import TestsFinder
 from tests_tool import send_raw_command, send_yaml_command
 
-_DEFAULT_EXTENSIONS_DIR = 'scripts/tests/yaml/extensions'
+_DEFAULT_EXTENSIONS_DIR = 'scripts/tests/chipyaml/extensions'
 _DEFAULT_PICS_FILE = 'src/app/tests/suites/certification/ci-pics-values'
 _DEFAULT_SPECIFICATIONS_DIR = 'src/app/zap-templates/zcl/data-model/chip/*.xml'
 
