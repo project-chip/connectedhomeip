@@ -60,7 +60,7 @@ function build_image() {
     echo "PARSE_PATH: $PARSE_PATH"
     echo "ARGS_TO_PASS: $ARGS_TO_PASS"
 
-    find "$(git rev-parse --show-toplevel)"/integrations/docker/images/$PARSE_PATH -name Dockerfile ! -path "*chip-cert-bins/*" | while read -r dockerfile; do
+    find "$(git rev-parse --show-toplevel)"/integrations/docker/images/$PARSE_PATH -name Dockerfile ! -path "*chip-cert-bins/*" | sort | while read -r dockerfile; do
         # Images are of the form `ghcr.io/project-chip/{name}` and tagged as "${VERSION}"
         DOCKER_PATH=$(dirname $dockerfile) # Drop the file name
         IMAGE_NAME="ghcr.io/project-chip/${DOCKER_PATH##*/}:${VERSION}"     # Drop directory prefix
