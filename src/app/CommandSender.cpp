@@ -679,7 +679,7 @@ CommandSender::RollbackInvokeRequest::~RollbackInvokeRequest()
     VerifyOrReturn(mCommandSender.mState == State::AddingCommand);
     ChipLogDetail(DataManagement, "Rolling back response");
     // TODO(#30453): Rollback of mInvokeRequestBuilder should handle resetting
-    // InvokeRequest.
+    // InvokeRequests.
     mCommandSender.mInvokeRequestBuilder.GetInvokeRequests().ResetError();
     mCommandSender.mInvokeRequestBuilder.Rollback(mBackupWriter);
     mCommandSender.MoveToState(mBackupState);
