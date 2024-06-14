@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-interaction-model/CodegenDataModel.h>
+#include <app/codegen-data-model/CodegenDataModel.h>
 
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
