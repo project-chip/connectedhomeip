@@ -77,12 +77,12 @@ static_library("shell_common") {
       "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
       "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
       "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-   ]
+    ]
 
     include_dirs = [
       "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
       "${chip_root}/examples/energy-management-app/energy-management-common/include",
-      "${chip_root}/src/app/clusters/device-energy-management-server"
+      "${chip_root}/src/app/clusters/device-energy-management-server",
     ]
 
     public_deps +=
