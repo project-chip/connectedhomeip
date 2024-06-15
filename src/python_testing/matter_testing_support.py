@@ -275,6 +275,7 @@ class EventChangeCallback:
 
         asserts.fail(f"Event reported when not expected {res}")
 
+
 class InternalTestRunnerHooks(TestRunnerHooks):
 
     def start(self, count: int):

@@ -58,8 +58,8 @@ class DEMBaseTestHelper:
                                                    expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.CancelPowerAdjustRequest(),
-                endpoint=endpoint,
-                timedRequestTimeoutMs=timedRequestTimeoutMs)
+                                       endpoint=endpoint,
+                                       timedRequestTimeoutMs=timedRequestTimeoutMs)
 
             asserts.assert_equal(expected_status, Status.Success)
 
@@ -218,6 +218,3 @@ class DEMBaseTestHelper:
 
     async def send_test_event_trigger_forecast_clear(self):
         await self.send_test_event_triggers(eventTrigger=0x0098000000000010)
-
-
-

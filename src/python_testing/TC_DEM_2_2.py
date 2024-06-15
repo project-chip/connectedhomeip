@@ -54,7 +54,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
             TestStep("3a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
             TestStep("3b", "TH reads PowerAdjustmentCapability attribute. Value has to include Cause=NoAdjustment. Note value for later. Determine the OverallMaxPower and OverallMaxDuration as the largest MaxPower and MaxDuration of the PowerAdjustStructs returned, and similarly the OverallMinPower and OverallMinDuration as the smallest of the MinPower and MinDuration values."),
             TestStep("3c", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            TestStep("4", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization. Verify Command response is Success and Event DEM.S.E00(PowerAdjustStart) sent"),
+            TestStep(
+                "4", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization. Verify Command response is Success and Event DEM.S.E00(PowerAdjustStart) sent"),
             TestStep("4a", "TH reads ESAState attribute. Verify value is 0x04 (PowerAdjustActive)"),
             TestStep("4b", "TH reads PowerAdjustmentCapability attribute. Value has to include Cause=LocalOptimizationAdjustment."),
             TestStep("5", "TH sends CancelPowerAdjustRequest. Verify Command response is Success and Event DEM.S.E01(PowerAdjustEnd) sent with Cause=Cancelled"),
@@ -65,15 +66,18 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
             TestStep("8", "TH sends PowerAdjustRequest with Power=OverallMinPower Duration=OverallMaxDuration+1 Cause=LocalOptimization. Verify Command response is ConstraintError"),
             TestStep("9", "TH sends PowerAdjustRequest with Power=OverallMinPower-1 Duration=OverallMaxDuration Cause=LocalOptimization. Verify Command response is ConstraintError"),
             TestStep("10", "TH sends PowerAdjustRequest with Power=OverallMaxPower Duration=OverallMinDuration-1 Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("11", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization. Verify Command response is Success and event DEM.S.E00(PowerAdjustStart) sent"),
+            TestStep(
+                "11", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization. Verify Command response is Success and event DEM.S.E00(PowerAdjustStart) sent"),
             TestStep("11a", "TH reads PowerAdjustmentCapability attribute. Value has to include Cause=LocalOptimizationAdjustment."),
-            TestStep("12", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=GridOptimization. Verify Command response is Success and no event sent"),
+            TestStep(
+                "12", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=GridOptimization. Verify Command response is Success and no event sent"),
             TestStep("12a", "TH reads ESAState attribute. Verify value is 0x04 (PowerAdjustActive)"),
             TestStep("12b", "TH reads PowerAdjustmentCapability attribute. Value has to include Cause=GridOptimizationAdjustment."),
             TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event. No event sent"),
             TestStep("13a", "TH reads ESAState attribute. Verify value is 0x04 (PowerAdjustActive)"),
             TestStep("13b", "TH reads OptOutState attribute. Verify value is 0x02 (LocalOptOut)"),
-            TestStep("14", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "14", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization. Verify Command response is ConstraintError"),
             TestStep("15", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event. Event DEM.S.E01(PowerAdjustEnd) sent with Cause=UserOptOut, Duration= approx time from step 11 to step 15, EnergyUse= a valid value"),
             TestStep("15a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
             TestStep("15b", "TH reads OptOutState attribute. Verify value is 0x03 (OptOut)"),
@@ -81,7 +85,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
             TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear"),
             TestStep("16a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
             TestStep("16b", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            TestStep("17", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization. Verify Command response is Success and event DEM.S.E00(PowerAdjustStart) sent"),
+            TestStep(
+                "17", "TH sends PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization. Verify Command response is Success and event DEM.S.E00(PowerAdjustStart) sent"),
             TestStep("17a", "TH reads ESAState attribute. Verify value is 0x04 (PowerAdjustActive)"),
             TestStep("17b", "TH reads PowerAdjustmentCapability attribute. Value has to include Cause=LocalOptimizationAdjustment."),
             TestStep("18", "Wait 10 seconds. Event DEM.S.E01(PowerAdjustEnd) sent with Cause=NormalCompletion, Duration=10s, EnergyUse= a valid value"),
@@ -126,7 +131,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
         asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
         logging.info(powerAdjustCapabilityStruct)
-        asserts.assert_equal(powerAdjustCapabilityStruct.cause, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
+        asserts.assert_equal(powerAdjustCapabilityStruct.cause,
+                             Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
 
         # we should expect powerAdjustCapabilityStruct to have multiple entries with different max powers, min powers, max and min durations
         found_min_power = sys.maxsize
@@ -164,7 +170,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
         self.step("4b")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
         asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
-        asserts.assert_equal(powerAdjustCapabilityStruct.cause, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
+        asserts.assert_equal(powerAdjustCapabilityStruct.cause,
+                             Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
 
         self.step("5")
         await self.send_cancel_power_adjustment_command()
@@ -174,7 +181,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
         self.step("5a")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
         asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
-        asserts.assert_equal(powerAdjustCapabilityStruct.cause, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
+        asserts.assert_equal(powerAdjustCapabilityStruct.cause,
+                             Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
 
         self.step("5b")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
@@ -217,7 +225,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
         self.step("11a")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
         asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
-        asserts.assert_equal(powerAdjustCapabilityStruct.cause, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
+        asserts.assert_equal(powerAdjustCapabilityStruct.cause,
+                             Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
 
         self.step("12")
         await self.send_power_adjustment_command(power=max_power,
@@ -233,7 +242,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
         self.step("12b")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
         asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
-        asserts.assert_equal(powerAdjustCapabilityStruct.cause, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kGridOptimizationAdjustment)
+        asserts.assert_equal(powerAdjustCapabilityStruct.cause,
+                             Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kGridOptimizationAdjustment)
 
         self.step("13")
         await self.send_test_event_trigger_user_opt_out_local()
@@ -270,7 +280,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
 
         self.step("15c")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
-        asserts.assert_equal(powerAdjustCapabilityStruct.cause, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
+        asserts.assert_equal(powerAdjustCapabilityStruct.cause,
+                             Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
 
         self.step("16")
         await self.send_test_event_trigger_user_opt_out_clear_all()
@@ -292,7 +303,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
 
         self.step("17b")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
-        asserts.assert_equal(powerAdjustCapabilityStruct.cause, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
+        asserts.assert_equal(powerAdjustCapabilityStruct.cause,
+                             Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
 
         self.step("18")
         time.sleep(10)
@@ -302,7 +314,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
 
         self.step("18b")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
-        asserts.assert_equal(powerAdjustCapabilityStruct.cause, Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
+        asserts.assert_equal(powerAdjustCapabilityStruct.cause,
+                             Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
 
         self.step("19")
         await self.send_test_event_trigger_power_adjustment_clear()
