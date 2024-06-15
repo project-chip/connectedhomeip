@@ -23,6 +23,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 
@@ -42,14 +43,14 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    virtual DataModel::Nullable<MeterTypeEnum> GetMeterType() = 0;
-    virtual CharSpan GetCustomerName() = 0;
-    virtual CharSpan GetUtilityName() = 0;
-    virtual CharSpan GetPointOfDelivery() = 0;
-    virtual DataModel::Nullable<uint64_t> GetPowerThreshold() = 0;
+    virtual DataModel::Nullable<MeterTypeEnum> GetMeterType()                       = 0;
+    virtual CharSpan GetCustomerName()                                              = 0;
+    virtual CharSpan GetUtilityName()                                               = 0;
+    virtual CharSpan GetPointOfDelivery()                                           = 0;
+    virtual DataModel::Nullable<uint64_t> GetPowerThreshold()                       = 0;
     virtual DataModel::Nullable<PowerThresholdSourceEnum> GetPowerThresholdSource() = 0;
 
-    virtual CHIP_ERROR SetCustomerName(char *value) = 0;
+    virtual CHIP_ERROR SetCustomerName(char * value) = 0;
 
 protected:
     EndpointId mEndpointId = 0;
@@ -59,8 +60,7 @@ class Instance : public AttributeAccessInterface
 {
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mFeature(aFeature)
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);

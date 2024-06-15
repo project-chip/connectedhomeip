@@ -11,34 +11,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+
 <configurator>
   <domain name="Energy Management"/>
-  <cluster apiMaturity="provisional">
-    <name>Meter Identification</name>
-    <domain>Energy Management</domain>
-    <code>0x0B01</code>
-    <define>METER_IDENTIFICATION_CLUSTER</define>
-    <client init="false" tick="false">true</client>
-    <server init="false" tick="false">true</server>
-    <description>This cluster provides attributes for determining advanced information about utility metering device.</description>
-
-    <features>
-      <feature bit="0" code="PWRTHLD" name="PowerThreshold" summary="Supports information about power threshold">
-        <optionalConform/>
-      </feature>
-    </features>
-
-    <attribute code="0x0000" side="server" define="METER_TYPE" type="MeterTypeEnum" isNullable="true" writable="false">MeterType</attribute>
-    <attribute code="0x0001" side="server" define="CUSTOMER_NAME" type="char_string" isNullable="true" writable="true" length="64">
-      <access op="read" privilege="view"/>
-      <access op="write" privilege="operate"/>
-      <description>CustomerName</description>
-    </attribute>
-    <attribute code="0x0002" side="server" define="UTILITY_NAME" type="char_string" length="16" isNullable="true">UtilityName</attribute>
-    <attribute code="0x0003" side="server" define="POINT_OF_DELIVERY" type="char_string" length="16" isNullable="true">PointOfDelivery</attribute>
-    <attribute code="0x0004" side="server" define="POWER_THRESHOLD" type="power-mW" isNullable="true">PowerThreshold</attribute>
-    <attribute code="0x0005" side="server" define="POWER_THRESHOLD_SOURCE" type="PowerThresholdSourceEnum" isNullable="true">PowerThresholdSource</attribute>
-  </cluster>
 
   <enum name="MeterTypeEnum" type="enum8">
     <cluster code="0x0B01"/>
@@ -53,5 +28,32 @@ limitations under the License.
     <item name="Regulator" value="0x01"/>
     <item name="Equipment" value="0x02"/>
   </enum>
+
+  <cluster>
+    <name>Meter Identification</name>
+    <domain>Energy Management</domain>
+    <code>0x0B01</code>
+    <define>METER_IDENTIFICATION_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides attributes for determining advanced information about utility metering device.</description>
+
+    <features>
+      <feature bit="0" code="PWRTHLD" name="PowerThreshold" summary="Supports information about power threshold">
+        <provisionalConform/>
+      </feature>
+    </features>
+
+    <attribute code="0x0000" side="server" define="METER_TYPE" type="MeterTypeEnum" isNullable="true" writable="false">MeterType</attribute>
+    <attribute code="0x0001" side="server" define="CUSTOMER_NAME" type="char_string" isNullable="true" writable="true" length="64">
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="operate"/>
+      <description>CustomerName</description>
+    </attribute>
+    <attribute code="0x0002" side="server" define="UTILITY_NAME" type="char_string" length="16" isNullable="true">UtilityName</attribute>
+    <attribute code="0x0003" side="server" define="POINT_OF_DELIVERY" type="char_string" length="16" isNullable="true">PointOfDelivery</attribute>
+    <attribute code="0x0004" side="server" define="POWER_THRESHOLD" type="power_mw" isNullable="true">PowerThreshold</attribute>
+    <attribute code="0x0005" side="server" define="POWER_THRESHOLD_SOURCE" type="PowerThresholdSourceEnum" isNullable="true">PowerThresholdSource</attribute>
+  </cluster>
 
 </configurator>

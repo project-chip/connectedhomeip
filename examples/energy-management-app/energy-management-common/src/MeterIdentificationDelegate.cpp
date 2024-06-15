@@ -32,7 +32,6 @@ using namespace chip::app::Clusters::MeterIdentification::Structs;
 using chip::app::Clusters::MeterIdentification::MeterTypeEnum;
 using chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum;
 
-
 CHIP_ERROR MeterIdentificationInstance::Init()
 {
     return Instance::Init();
@@ -59,7 +58,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetMeterType(DataModel::Nullable<MeterTy
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MeterIdentificationDelegate::SetCustomerName(CharSpan &newValue)
+CHIP_ERROR MeterIdentificationDelegate::SetCustomerName(CharSpan & newValue)
 {
     CharSpan oldValue = mCustomerName;
 
@@ -73,7 +72,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetCustomerName(CharSpan &newValue)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MeterIdentificationDelegate::SetUtilityName(CharSpan &newValue)
+CHIP_ERROR MeterIdentificationDelegate::SetUtilityName(CharSpan & newValue)
 {
     CharSpan oldValue = mUtilityName;
 
@@ -87,7 +86,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetUtilityName(CharSpan &newValue)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MeterIdentificationDelegate::SetPointOfDelivery(CharSpan &newValue)
+CHIP_ERROR MeterIdentificationDelegate::SetPointOfDelivery(CharSpan & newValue)
 {
     CharSpan oldValue = mPointOfDelivery;
 

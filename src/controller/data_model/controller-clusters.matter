@@ -8810,6 +8810,40 @@ provisional cluster ContentAppObserver = 1296 {
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
 }
 
+/** This cluster provides attributes for determining advanced information about utility metering device. */
+cluster MeterIdentification = 2817 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum MeterTypeEnum : enum8 {
+    kUtility = 0;
+    kPrivate = 1;
+    kGeneric = 2;
+  }
+
+  enum PowerThresholdSourceEnum : enum8 {
+    kContract = 0;
+    kRegulator = 1;
+    kEquipment = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPowerThreshold = 0x1;
+  }
+
+  readonly attribute nullable MeterTypeEnum meterType = 0;
+  attribute nullable char_string<64> customerName = 1;
+  readonly attribute nullable char_string<16> utilityName = 2;
+  readonly attribute nullable char_string<16> pointOfDelivery = 3;
+  readonly attribute nullable power_mw powerThreshold = 4;
+  readonly attribute nullable PowerThresholdSourceEnum powerThresholdSource = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */
 deprecated cluster ElectricalMeasurement = 2820 {
   revision 3;

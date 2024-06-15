@@ -40,12 +40,12 @@ public:
     DataModel::Nullable<uint64_t> GetPowerThreshold() override { return mPowerThreshold; };
     DataModel::Nullable<PowerThresholdSourceEnum> GetPowerThresholdSource() override { return mPowerThresholdSource; };
 
-    CHIP_ERROR SetCustomerName(CharSpan &value) override;
+    CHIP_ERROR SetCustomerName(CharSpan & value) override;
 
     // Internal Application API to set attribute values
     CHIP_ERROR SetMeterType(DataModel::Nullable<MeterTypeEnum>);
-    CHIP_ERROR SetUtilityName(CharSpan &value);
-    CHIP_ERROR SetPointOfDelivery(CharSpan &value);
+    CHIP_ERROR SetUtilityName(CharSpan & value);
+    CHIP_ERROR SetPointOfDelivery(CharSpan & value);
     CHIP_ERROR GetPowerThreshold(DataModel::Nullable<uint64_t>);
     CHIP_ERROR GetPowerThresholdSource(DataModel::Nullable<PowerThresholdSourceEnum>);
 
