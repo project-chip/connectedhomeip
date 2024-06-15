@@ -22,4 +22,3 @@
 #include <lib/support/BitMask.h>
 
 chip::BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature> GetFeatureMap();
-

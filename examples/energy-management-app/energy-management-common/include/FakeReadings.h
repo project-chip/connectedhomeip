@@ -117,4 +117,3 @@ private:
     /* Periodic Energy Imported which is updated if mPower < 0 */
     int64_t mPeriodicEnergyExported = 0;
 };
-
