@@ -310,7 +310,6 @@ void SetTestEventTrigger_ConstraintBasedAdjustment()
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
 {
-    ChipLogError(Zcl,"HandleDeviceEnergyManagementTestEventTrigger");
     DeviceEnergyManagementTrigger trigger = static_cast<DeviceEnergyManagementTrigger>(eventTrigger);
 
     switch (trigger)

@@ -44,7 +44,7 @@ CHIP_ERROR UtilsGetEpochTS(uint32_t & chipEpoch);
  * @return  bitmap value for day of week
  * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
  */
-uint8_t UtilsGetDayOfWeekUnixEpoch(time_t unixEpoch);
+uint8_t UtilsGetLocalDayOfWeekFromUnixEpoch(time_t unixEpoch);
 
 /**
  * @brief   Helper function to get current timestamp and work out the day of week based on localtime
@@ -53,4 +53,4 @@ uint8_t UtilsGetDayOfWeekUnixEpoch(time_t unixEpoch);
  *
  * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
  */
-CHIP_ERROR UtilsGetDayOfWeekNow(uint8_t & dayOfWeekMap);
+CHIP_ERROR UtilsGetLocalDayOfWeekNow(uint8_t & dayOfWeekMap);

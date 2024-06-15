@@ -34,7 +34,7 @@ using chip::Protocols::InteractionModel::Status;
 /**
  * @brief   Helper function to get current timestamp in Epoch format
  *
- * @param   chipEpoch reference to hold return timestamp
+ * @param[out]   chipEpoch reference to hold return timestamp. Set to 0 if an error occurs.
  */
 CHIP_ERROR UtilsGetEpochTS(uint32_t & chipEpoch)
 {
@@ -59,7 +59,7 @@ CHIP_ERROR UtilsGetEpochTS(uint32_t & chipEpoch)
     auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
     if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
     {
-        ChipLogError(Zcl, "EVSE: unable to convert Unix Epoch time to Matter Epoch Time");
+        ChipLogError(Zcl, "Unable to convert Unix Epoch time to Matter Epoch Time");
         return err;
     }
 
@@ -78,7 +78,7 @@ CHIP_ERROR UtilsGetEpochTS(uint32_t & chipEpoch)
  * @return  bitmap value for day of week
  * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
  */
-uint8_t UtilsGetDayOfWeekUnixEpoch(time_t unixEpoch)
+uint8_t UtilsGetLocalDayOfWeekFromUnixEpoch(time_t unixEpoch)
 {
     // Define a timezone structure and initialize it to the local timezone
     // This will capture any daylight saving time changes
@@ -100,17 +100,17 @@ uint8_t UtilsGetDayOfWeekUnixEpoch(time_t unixEpoch)
  *
  * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
  */
-CHIP_ERROR UtilsGetDayOfWeekNow(uint8_t & dayOfWeekMap)
+CHIP_ERROR UtilsGetLocalDayOfWeekNow(uint8_t & dayOfWeekMap)
 {
     chip::System::Clock::Milliseconds64 cTMs;
     CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "EVSE: unable to get current time to check user schedules error=%" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Uable to get current time. error=%" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
     time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
-    dayOfWeekMap     = UtilsGetDayOfWeekUnixEpoch(unixEpoch);
+    dayOfWeekMap     = UtilsGetLocalDayOfWeekFromUnixEpoch(unixEpoch);
 
     return CHIP_NO_ERROR;
 }

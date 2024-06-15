@@ -266,8 +266,8 @@ class EventChangeCallback:
         return res.Data
 
     def wait_for_no_event_report(self, timeout: int = 10):
-        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
-           It returns the event data so that the values can be checked."""
+        """This function succceeds/returns if an event does not arrive within the timeout.
+           If an event does arrive, an assert is called."""
         try:
             res = self._q.get(block=True, timeout=timeout)
         except queue.Empty:

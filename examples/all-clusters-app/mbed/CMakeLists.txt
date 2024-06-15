@@ -72,13 +72,13 @@ target_sources(${APP_TARGET} PRIVATE
                ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-temperature-levels.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/ElectricalPowerMeasurementDelegate.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/DEMUtils.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/EVSEManufacturerImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/utils.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/ElectricalPowerMeasurementDelegate.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}
