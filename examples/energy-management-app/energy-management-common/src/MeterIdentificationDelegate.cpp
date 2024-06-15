@@ -27,7 +27,6 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MeterIdentification;
 using namespace chip::app::Clusters::MeterIdentification::Attributes;
-using namespace chip::app::Clusters::MeterIdentification::Structs;
 
 using chip::app::Clusters::MeterIdentification::MeterTypeEnum;
 using chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum;
@@ -63,7 +62,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetCustomerName(CharSpan & newValue)
     CharSpan oldValue = mCustomerName;
 
     mCustomerName = newValue;
-    if (oldValue != newValue)
+    if (!oldValue.data_equal(newValue))
     {
         // We won't log raw values since these could change frequently
         MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, CustomerName::Id);
@@ -77,7 +76,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetUtilityName(CharSpan & newValue)
     CharSpan oldValue = mUtilityName;
 
     mUtilityName = newValue;
-    if (oldValue != newValue)
+    if (!oldValue.data_equal(newValue))
     {
         // We won't log raw values since these could change frequently
         MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, UtilityName::Id);
@@ -91,7 +90,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetPointOfDelivery(CharSpan & newValue)
     CharSpan oldValue = mPointOfDelivery;
 
     mPointOfDelivery = newValue;
-    if (oldValue != newValue)
+    if (!oldValue.data_equal(newValue))
     {
         // We won't log raw values since these could change frequently
         MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PointOfDelivery::Id);

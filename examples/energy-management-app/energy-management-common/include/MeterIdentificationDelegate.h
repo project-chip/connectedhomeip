@@ -46,8 +46,8 @@ public:
     CHIP_ERROR SetMeterType(DataModel::Nullable<MeterTypeEnum>);
     CHIP_ERROR SetUtilityName(CharSpan & value);
     CHIP_ERROR SetPointOfDelivery(CharSpan & value);
-    CHIP_ERROR GetPowerThreshold(DataModel::Nullable<uint64_t>);
-    CHIP_ERROR GetPowerThresholdSource(DataModel::Nullable<PowerThresholdSourceEnum>);
+    CHIP_ERROR SetPowerThreshold(DataModel::Nullable<uint64_t>);
+    CHIP_ERROR SetPowerThresholdSource(DataModel::Nullable<PowerThresholdSourceEnum>);
 
 private:
     // Attribute storage
