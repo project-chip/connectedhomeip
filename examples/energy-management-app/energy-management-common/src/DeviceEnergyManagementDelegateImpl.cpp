@@ -30,20 +30,11 @@ using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 using chip::Optional;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
-DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate():
-    mpDEMManufacturerDelegate(nullptr),
-    mEsaType(ESATypeEnum::kEvse),
-    mEsaCanGenerate(false),
-    mEsaState(ESAStateEnum::kOffline),
-    mAbsMinPower(0),
-    mAbsMaxPower(0),
-    mOptOutState(OptOutStateEnum::kNoOptOut),
-    mPowerAdjustmentInProgress(false),
-    mPowerAdjustmentStartTime(0),
-    mPauseRequestInProgress(false),
-    mPauseRequestStartTime(0)
-{
-}
+DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() :
+    mpDEMManufacturerDelegate(nullptr), mEsaType(ESATypeEnum::kEvse), mEsaCanGenerate(false), mEsaState(ESAStateEnum::kOffline),
+    mAbsMinPower(0), mAbsMaxPower(0), mOptOutState(OptOutStateEnum::kNoOptOut), mPowerAdjustmentInProgress(false),
+    mPowerAdjustmentStartTime(0), mPauseRequestInProgress(false), mPauseRequestStartTime(0)
+{}
 
 void DeviceEnergyManagementDelegate::SetDeviceEnergyManagementInstance(DeviceEnergyManagement::Instance & instance)
 {
@@ -62,7 +53,8 @@ uint32_t DeviceEnergyManagementDelegate::HasFeature(Feature feature) const
     return hasFeature;
 }
 
-void DeviceEnergyManagementDelegate::SetDEMManufacturerDelegate(DEMManufacturerDelegate & deviceEnergyManagementManufacturerDelegate)
+void DeviceEnergyManagementDelegate::SetDEMManufacturerDelegate(
+    DEMManufacturerDelegate & deviceEnergyManagementManufacturerDelegate)
 {
     mpDEMManufacturerDelegate = &deviceEnergyManagementManufacturerDelegate;
 }
@@ -140,12 +132,12 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t power, c
 
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(duration), PowerAdjustTimerExpiry, this);
     if (err != CHIP_NO_ERROR)
-     {
-         // TODO: Note: should the PowerAdjust just initiated be cancelled because an Event could not be logged?
-         ChipLogError(AppServer, "Unable to start a PowerAdjustStart timer: %" CHIP_ERROR_FORMAT, err.Format());
-         HandlePowerAdjustRequestFailure();
-         return Status::Failure;
-     }
+    {
+        // TODO: Note: should the PowerAdjust just initiated be cancelled because an Event could not be logged?
+        ChipLogError(AppServer, "Unable to start a PowerAdjustStart timer: %" CHIP_ERROR_FORMAT, err.Format());
+        HandlePowerAdjustRequestFailure();
+        return Status::Failure;
+    }
 
     if (sendEvent)
     {
@@ -375,8 +367,8 @@ Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t req
         {
             // Reset state
             mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
-            mForecast.Value().startTime = savedStartTime;
-            mForecast.Value().endTime   = savedEndTime;
+            mForecast.Value().startTime            = savedStartTime;
+            mForecast.Value().endTime              = savedEndTime;
 
             return Status::Failure;
         }
@@ -529,7 +521,6 @@ void DeviceEnergyManagementDelegate::HandlePauseRequestTimerExpiry()
     }
 }
 
-
 /**
  * @brief Handles the cancelation of a pause operation
  *
@@ -548,7 +539,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPauseRequestAndSendEvent(CauseE
 
     DeviceLayer::SystemLayer().CancelTimer(PauseRequestTimerExpiry, this);
 
-    CHIP_ERROR err = SendResumedEvent(cause);
+    CHIP_ERROR err  = SendResumedEvent(cause);
     CHIP_ERROR err2 = CHIP_NO_ERROR;
 
     // Notify the appliance's that it can resume its intended power setting (or go idle)
@@ -895,7 +886,8 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMaxPower(int64_t newValue)
 }
 
 CHIP_ERROR
-DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & powerAdjustCapabilityStruct)
+DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
+    DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & powerAdjustCapabilityStruct)
 {
     if (powerAdjustCapabilityStruct.IsNull())
     {
@@ -943,15 +935,18 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
 
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mOptOutState updated to %d mPowerAdjustmentInProgress %d", static_cast<int>(mOptOutState), mPowerAdjustmentInProgress);
+        ChipLogDetail(AppServer, "mOptOutState updated to %d mPowerAdjustmentInProgress %d", static_cast<int>(mOptOutState),
+                      mPowerAdjustmentInProgress);
         MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, OptOutState::Id);
     }
 
     // Cancel any outstanding PowerAdjustment if necessary
     if (mPowerAdjustmentInProgress)
     {
-        if ((newValue == OptOutStateEnum::kLocalOptOut && mPowerAdjustCapabilityStruct.Value().cause == PowerAdjustReasonEnum::kLocalOptimizationAdjustment) ||
-            (newValue == OptOutStateEnum::kGridOptOut && mPowerAdjustCapabilityStruct.Value().cause == PowerAdjustReasonEnum::kGridOptimizationAdjustment) ||
+        if ((newValue == OptOutStateEnum::kLocalOptOut &&
+             mPowerAdjustCapabilityStruct.Value().cause == PowerAdjustReasonEnum::kLocalOptimizationAdjustment) ||
+            (newValue == OptOutStateEnum::kGridOptOut &&
+             mPowerAdjustCapabilityStruct.Value().cause == PowerAdjustReasonEnum::kGridOptimizationAdjustment) ||
             newValue == OptOutStateEnum::kOptOut)
         {
             err = CancelPowerAdjustRequestAndSendEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
@@ -962,8 +957,10 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
     if (mPauseRequestInProgress)
     {
         // Cancel any outstanding PauseRequest
-        if ((newValue == OptOutStateEnum::kLocalOptOut && mForecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kLocalOptimization) ||
-            (newValue == OptOutStateEnum::kGridOptOut && mForecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kGridOptimization) ||
+        if ((newValue == OptOutStateEnum::kLocalOptOut &&
+             mForecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kLocalOptimization) ||
+            (newValue == OptOutStateEnum::kGridOptOut &&
+             mForecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kGridOptimization) ||
             newValue == OptOutStateEnum::kOptOut)
         {
             err = CancelPauseRequestAndSendEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
@@ -994,7 +991,8 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
             }
             break;
         default:
-            ChipLogDetail(AppServer, "Bad ForecastUpdateReasonEnum value of %d", static_cast<int>(mForecast.Value().forecastUpdateReason));
+            ChipLogDetail(AppServer, "Bad ForecastUpdateReasonEnum value of %d",
+                          static_cast<int>(mForecast.Value().forecastUpdateReason));
             return CHIP_ERROR_BAD_REQUEST;
             break;
         }

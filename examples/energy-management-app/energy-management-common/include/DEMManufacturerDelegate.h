@@ -33,32 +33,24 @@ class DeviceEnergyManagementDelegate;
 class DEMManufacturerDelegate
 {
 public:
-    DEMManufacturerDelegate()
-    {
-    }
+    DEMManufacturerDelegate() {}
 
-    virtual ~DEMManufacturerDelegate()
-    {
-    }
+    virtual ~DEMManufacturerDelegate() {}
 
     virtual int64_t GetEnergyUse() = 0;
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause)
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration,
+                                                                      AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion()
-    {
-        return CHIP_NO_ERROR;
-    }
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion() { return CHIP_NO_ERROR; }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause)
-    {
-        return CHIP_NO_ERROR;
-    }
+    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause) { return CHIP_NO_ERROR; }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause)
+    virtual CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime,
+                                                                          AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }
@@ -68,30 +60,23 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion()
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion() { return CHIP_NO_ERROR; }
+
+    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause) { return CHIP_NO_ERROR; }
+
+    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelRequest() { return CHIP_NO_ERROR; }
+
+    virtual CHIP_ERROR
+    HandleModifyRequest(const uint32_t forecastID,
+                        const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+                        AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelRequest()
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    virtual CHIP_ERROR HandleModifyRequest(const uint32_t forecastID,
-                                           const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
-                                           AdjustmentCauseEnum cause)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    virtual CHIP_ERROR RequestConstraintBasedForecast(const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
-                                                      AdjustmentCauseEnum cause)
+    virtual CHIP_ERROR RequestConstraintBasedForecast(
+        const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
+        AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }

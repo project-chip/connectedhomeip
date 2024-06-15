@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
+#include <DEMUtils.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
-#include <DEMUtils.h>
 
 using namespace chip;
 using namespace chip::app;

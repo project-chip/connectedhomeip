@@ -18,14 +18,13 @@
 
 #pragma once
 
+#include <DeviceEnergyManagementDelegateImpl.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
-#include <DeviceEnergyManagementDelegateImpl.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-
 
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 

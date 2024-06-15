@@ -93,8 +93,7 @@ CHIP_ERROR DeviceEnergyManagementInit()
     BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMap();
 
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(
-        EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate, featureMap);
+    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate, featureMap);
 
     if (!gDEMInstance)
     {

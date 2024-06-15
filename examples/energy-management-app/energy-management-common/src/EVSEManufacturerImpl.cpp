@@ -16,18 +16,18 @@
  *    limitations under the License.
  */
 
+#include <DEMManufacturerDelegate.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <EVSEManufacturerImpl.h>
-#include <DEMManufacturerDelegate.h>
 #include <EnergyEvseManager.h>
 
+#include <DEMUtils.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #include <app/clusters/power-source-server/power-source-server.h>
 #include <app/server/Server.h>
-#include <DEMUtils.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -376,7 +376,8 @@ int64_t EVSEManufacturer::GetEnergyUse()
     return 300;
 }
 
-CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause)
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration,
+                                                                            AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }
@@ -391,7 +392,8 @@ CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementCancelPowerAdjustReques
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause)
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime,
+                                                                                AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }
@@ -416,15 +418,17 @@ CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementCancelRequest()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EVSEManufacturer::HandleModifyRequest(const uint32_t forecastID,
-                                                 const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
-                                                 AdjustmentCauseEnum cause)
+CHIP_ERROR EVSEManufacturer::HandleModifyRequest(
+    const uint32_t forecastID,
+    const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+    AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EVSEManufacturer::RequestConstraintBasedForecast(const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
-                                                            AdjustmentCauseEnum cause)
+CHIP_ERROR EVSEManufacturer::RequestConstraintBasedForecast(
+    const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
+    AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }

@@ -30,8 +30,7 @@ DeviceEnergyManagementManager::DeviceEnergyManagementManager(EndpointId aEndpoin
                                                              Feature aFeature) :
     DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature),
     mDelegate(&aDelegate)
-{
-}
+{}
 
 CHIP_ERROR DeviceEnergyManagementManager::Init()
 {

@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <EVSEManufacturerImpl.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
+#include <EVSEManufacturerImpl.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 
 #include <DEMUtils.h>
@@ -37,7 +37,8 @@ static chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagemen
 #define MAX_POWER_ADJUSTMENTS 5
 static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type sPowerAdjustments[MAX_POWER_ADJUSTMENTS];
 static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type sPowerAdjustCapabilityStruct;
-static chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> sPowerAdjustmentCapability;
+static chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>
+    sPowerAdjustmentCapability;
 
 DeviceEnergyManagementDelegate * GetDEMDelegate()
 {
@@ -77,10 +78,10 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     sForecastStruct.activeSlotNumber.SetNonNull<uint16_t>(0);
 
-    sSlots[0].minDuration = 10;
-    sSlots[0].maxDuration = 20;
-    sSlots[0].defaultDuration = 15;
-    sSlots[0].elapsedSlotTime = 0;
+    sSlots[0].minDuration       = 10;
+    sSlots[0].maxDuration       = 20;
+    sSlots[0].defaultDuration   = 15;
+    sSlots[0].elapsedSlotTime   = 0;
     sSlots[0].remainingSlotTime = 0;
 
     sSlots[0].slotIsPausable.SetValue(true);
@@ -103,10 +104,10 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     for (uint16_t slotNo = 1; slotNo < numSlots; slotNo++)
     {
-        sSlots[slotNo].minDuration = 2 * sSlots[slotNo - 1].minDuration;
-        sSlots[slotNo].maxDuration = 2 * sSlots[slotNo - 1].maxDuration;
-        sSlots[slotNo].defaultDuration = 2 * sSlots[slotNo - 1].defaultDuration;
-        sSlots[slotNo].elapsedSlotTime = 2 * sSlots[slotNo - 1].elapsedSlotTime;
+        sSlots[slotNo].minDuration       = 2 * sSlots[slotNo - 1].minDuration;
+        sSlots[slotNo].maxDuration       = 2 * sSlots[slotNo - 1].maxDuration;
+        sSlots[slotNo].defaultDuration   = 2 * sSlots[slotNo - 1].defaultDuration;
+        sSlots[slotNo].elapsedSlotTime   = 2 * sSlots[slotNo - 1].elapsedSlotTime;
         sSlots[slotNo].remainingSlotTime = 2 * sSlots[slotNo - 1].remainingSlotTime;
 
         // Need slotNo == 1 not to be pausible for test DEM 2.4 step 3b
@@ -142,21 +143,20 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
     return CHIP_NO_ERROR;
 }
 
-
-
 void SetTestEventTrigger_PowerAdjustment()
 {
-    sPowerAdjustments[0].minPower =  5000 * 1000; // 5kW
-    sPowerAdjustments[0].maxPower = 30000 * 1000; // 30kW
-    sPowerAdjustments[0].minDuration = 10;        // 30s
-    sPowerAdjustments[0].maxDuration = 60;        // 60s
+    sPowerAdjustments[0].minPower    = 5000 * 1000;  // 5kW
+    sPowerAdjustments[0].maxPower    = 30000 * 1000; // 30kW
+    sPowerAdjustments[0].minDuration = 10;           // 30s
+    sPowerAdjustments[0].maxDuration = 60;           // 60s
 
     DataModel::List<const DeviceEnergyManagement::Structs::PowerAdjustStruct::Type> powerAdjustmentList(sPowerAdjustments, 1);
 
     sPowerAdjustCapabilityStruct.cause = PowerAdjustReasonEnum::kNoAdjustment;
     sPowerAdjustCapabilityStruct.powerAdjustCapability.SetNonNull(powerAdjustmentList);
 
-    DataModel::Nullable<DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapability(sPowerAdjustCapabilityStruct);
+    DataModel::Nullable<DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapability(
+        sPowerAdjustCapabilityStruct);
     sPowerAdjustmentCapability.SetNonNull(sPowerAdjustCapabilityStruct);
 
     CHIP_ERROR err = GetDEMDelegate()->SetPowerAdjustmentCapability(sPowerAdjustmentCapability);
@@ -168,8 +168,8 @@ void SetTestEventTrigger_PowerAdjustment()
 
 void SetTestEventTrigger_ClearForecast()
 {
-    sPowerAdjustments[0].minPower = 0;
-    sPowerAdjustments[0].maxPower = 0;
+    sPowerAdjustments[0].minPower    = 0;
+    sPowerAdjustments[0].maxPower    = 0;
     sPowerAdjustments[0].minDuration = 0;
     sPowerAdjustments[0].maxDuration = 0;
 
@@ -178,7 +178,8 @@ void SetTestEventTrigger_ClearForecast()
     sPowerAdjustCapabilityStruct.powerAdjustCapability.SetNonNull(powerAdjustmentList);
     sPowerAdjustCapabilityStruct.cause = PowerAdjustReasonEnum::kNoAdjustment;
 
-    DataModel::Nullable<DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapabilityStruct(sPowerAdjustCapabilityStruct);
+    DataModel::Nullable<DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapabilityStruct(
+        sPowerAdjustCapabilityStruct);
 
     CHIP_ERROR err = GetDEMDelegate()->SetPowerAdjustmentCapability(powerAdjustmentCapabilityStruct);
     if (err != CHIP_NO_ERROR)
@@ -225,10 +226,10 @@ void SetTestEventTrigger_StartTimeAdjustmentClear()
     sForecastStruct = GetDEMDelegate()->GetForecast().Value();
 
     sForecastStruct.startTime = static_cast<uint32_t>(0);
-    sForecastStruct.endTime = static_cast<uint32_t>(0);
+    sForecastStruct.endTime   = static_cast<uint32_t>(0);
 
     sForecastStruct.earliestStartTime = Optional<DataModel::Nullable<uint32_t>>();
-    sForecastStruct.latestEndTime = Optional<uint32_t>();
+    sForecastStruct.latestEndTime     = Optional<uint32_t>();
 
     DataModel::Nullable<DeviceEnergyManagement::Structs::ForecastStruct::Type> forecast(sForecastStruct);
 
@@ -264,7 +265,7 @@ void SetTestEventTrigger_Forecast()
 void SetTestEventTrigger_ForecastClear()
 {
     sForecastStruct.startTime = 0;
-    sForecastStruct.endTime = 0;
+    sForecastStruct.endTime   = 0;
     sForecastStruct.earliestStartTime.ClearValue();
     sForecastStruct.latestEndTime.ClearValue();
     sForecastStruct.isPausable = false;
@@ -315,7 +316,9 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
     switch (trigger)
     {
     case DeviceEnergyManagementTrigger::kPowerAdjustment:
-        ChipLogProgress(Support, "[PowerAdjustment-Test-Event] => Simulate a fixed forecast power usage including one or more PowerAdjustmentStructs");
+        ChipLogProgress(
+            Support,
+            "[PowerAdjustment-Test-Event] => Simulate a fixed forecast power usage including one or more PowerAdjustmentStructs");
         SetTestEventTrigger_PowerAdjustment();
         break;
     case DeviceEnergyManagementTrigger::kPowerAdjustmentClear:
@@ -335,7 +338,9 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum::kNoOptOut);
         break;
     case DeviceEnergyManagementTrigger::kStartTimeAdjustment:
-        ChipLogProgress(Support, "[StartTimeAdjustment-Test-Event] => Simulate a fixed forecast with EarliestStartTime earlier than startTime, and LatestEndTime greater than EndTime");
+        ChipLogProgress(Support,
+                        "[StartTimeAdjustment-Test-Event] => Simulate a fixed forecast with EarliestStartTime earlier than "
+                        "startTime, and LatestEndTime greater than EndTime");
         SetTestEventTrigger_StartTimeAdjustment();
         break;
     case DeviceEnergyManagementTrigger::kStartTimeAdjustmentClear:
@@ -343,7 +348,9 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         SetTestEventTrigger_StartTimeAdjustmentClear();
         break;
     case DeviceEnergyManagementTrigger::kPausable:
-        ChipLogProgress(Support, "[Pausable-Test-Event] => Simulate a fixed forecast with one pausable slot with MinPauseDuration >1, MaxPauseDuration>1 and one non pausable slot");
+        ChipLogProgress(Support,
+                        "[Pausable-Test-Event] => Simulate a fixed forecast with one pausable slot with MinPauseDuration >1, "
+                        "MaxPauseDuration>1 and one non pausable slot");
         SetTestEventTrigger_Pausable();
         break;
     case DeviceEnergyManagementTrigger::kPausableNextSlot:
@@ -355,7 +362,8 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         SetTestEventTrigger_ClearForecast();
         break;
     case DeviceEnergyManagementTrigger::kForecastAdjustment:
-        ChipLogProgress(Support, "[ForecastAdjustment-Test-Event] => Simulate a forecast power usage with at least 2 and at most 4 slots");
+        ChipLogProgress(Support,
+                        "[ForecastAdjustment-Test-Event] => Simulate a forecast power usage with at least 2 and at most 4 slots");
         SetTestEventTrigger_ForecastAdjustment();
         break;
     case DeviceEnergyManagementTrigger::kForecastAdjustmentNextSlot:
@@ -367,7 +375,9 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         SetTestEventTrigger_ClearForecast();
         break;
     case DeviceEnergyManagementTrigger::kConstraintBasedAdjustment:
-        ChipLogProgress(Support, "[ConstraintBasedAdjustment-Test-Event] => Simulate a forecast power usage with at least 2 and at most 4 slots");
+        ChipLogProgress(
+            Support,
+            "[ConstraintBasedAdjustment-Test-Event] => Simulate a forecast power usage with at least 2 and at most 4 slots");
         SetTestEventTrigger_ConstraintBasedAdjustment();
         break;
     case DeviceEnergyManagementTrigger::kConstraintBasedAdjustmentClear:

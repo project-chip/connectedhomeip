@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <DeviceEnergyManagementManager.h>
 #include <DEMManufacturerDelegate.h>
+#include <DeviceEnergyManagementManager.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseManager.h>
 #include <PowerTopologyDelegate.h>
@@ -34,7 +34,7 @@ namespace EnergyEvse {
  * The EVSEManufacturer example class
  */
 
-class EVSEManufacturer: public DEMManufacturerDelegate
+class EVSEManufacturer : public DEMManufacturerDelegate
 {
 public:
     EVSEManufacturer(EnergyEvseManager * aEvseInstance,
@@ -47,19 +47,11 @@ public:
         mDEMInstance  = aDEMInstance;
     }
 
-    virtual ~EVSEManufacturer()
-    {
-    }
+    virtual ~EVSEManufacturer() {}
 
-    EnergyEvseManager * GetEvseInstance()
-    {
-        return mEvseInstance;
-    }
+    EnergyEvseManager * GetEvseInstance() { return mEvseInstance; }
 
-    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance()
-    {
-        return mEPMInstance;
-    }
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance() { return mEPMInstance; }
 
     EnergyEvseDelegate * GetEvseDelegate()
     {
@@ -103,19 +95,23 @@ public:
      *
      */
     int64_t GetEnergyUse() override;
-    CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration,
+                                                              AdjustmentCauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion() override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause) override;
-    CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime,
+                                                                  AdjustmentCauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementPauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion() override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelRequest() override;
-    CHIP_ERROR HandleModifyRequest(const uint32_t forecastID,
-                                   const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
-                                   AdjustmentCauseEnum cause) override;
-    CHIP_ERROR RequestConstraintBasedForecast(const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
-                                              AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleModifyRequest(
+        const uint32_t forecastID,
+        const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+        AdjustmentCauseEnum cause) override;
+    CHIP_ERROR RequestConstraintBasedForecast(
+        const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
+        AdjustmentCauseEnum cause) override;
 
     /**
      * @brief   Called at start up to apply hardware settings

@@ -18,12 +18,11 @@
 
 #pragma once
 
-#include <system/SystemLayer.h>
-#include <lib/core/DataModelTypes.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/core/DataModelTypes.h>
+#include <system/SystemLayer.h>
 
 #define MAX_SLOTS 10
-
 
 class FakeReadings
 {
@@ -48,9 +47,9 @@ public:
      * @param[in]   aInterval_s  - the callback interval in seconds
      * @param[in]   bReset       - boolean: true will reset the energy values to 0
      */
-    void StartFakeReadings(chip::EndpointId aEndpointId, int64_t aPower_mW, uint32_t aPowerRandomness_mW,
-                           int64_t aVoltage_mV, uint32_t aVoltageRandomness_mV, int64_t aCurrent_mA,
-                           uint32_t aCurrentRandomness_mA, uint8_t aInterval_s, bool bReset);
+    void StartFakeReadings(chip::EndpointId aEndpointId, int64_t aPower_mW, uint32_t aPowerRandomness_mW, int64_t aVoltage_mV,
+                           uint32_t aVoltageRandomness_mV, int64_t aCurrent_mA, uint32_t aCurrentRandomness_mA, uint8_t aInterval_s,
+                           bool bReset);
 
     /**
      * @brief   Stops any active updates to the fake load data callbacks
@@ -106,10 +105,10 @@ private:
      */
 
     /* Cumulative Energy Imported which is updated if mPower > 0 */
-    int64_t mTotalEnergyImported    = 0;
+    int64_t mTotalEnergyImported = 0;
 
     /* Cumulative Energy Imported which is updated if mPower < 0 */
-    int64_t mTotalEnergyExported    = 0;
+    int64_t mTotalEnergyExported = 0;
 
     /* Periodic Energy Imported which is updated if mPower > 0 */
     int64_t mPeriodicEnergyImported = 0;

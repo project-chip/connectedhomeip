@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <protocols/interaction_model/StatusCode.h>
-#include <protocols/Protocols.h>
 #include <app/util/config.h>
 #include <cstring>
+#include <protocols/Protocols.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using chip::Protocols::InteractionModel::Status;
 

@@ -18,9 +18,8 @@
 
 #pragma once
 
-#include <app/util/config.h>
 #include <app/clusters/device-energy-management-server/device-energy-management-server.h>
-
+#include <app/util/config.h>
 
 using chip::Protocols::InteractionModel::Status;
 namespace chip {
@@ -225,11 +224,11 @@ private:
 
 private:
     // Have a pointer to partner instance object
-    DeviceEnergyManagement::Instance *mpDEMInstance;
+    DeviceEnergyManagement::Instance * mpDEMInstance;
 
     // The DEMManufacturerDelegate object knows how to handle
     // manufacturer/product specific operations
-    DEMManufacturerDelegate *mpDEMManufacturerDelegate;
+    DEMManufacturerDelegate * mpDEMManufacturerDelegate;
 
     // Various attributes
     ESATypeEnum mEsaType;

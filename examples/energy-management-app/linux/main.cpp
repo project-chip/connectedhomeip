@@ -28,23 +28,21 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 
 // Parse a hex (prefixed by 0x) or decimal (no-prefix) string
-static uint32_t ParseNumber(const char *pString);
+static uint32_t ParseNumber(const char * pString);
 
 // Parses the --featureMap option
-static bool FeatureMapOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
+static bool FeatureMapOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
+                                    const char * aName, const char * aValue);
 
 constexpr uint16_t kOptionFeatureMap = 'f';
 
 // Define the chip::ArgParser command line structures for extending the command line to support the
 // -f/--featureMap option
-static chip::ArgParser::OptionDef sFeatureMapOptionDefs[] =
-{
-    {  "featureSet", chip::ArgParser::kArgumentRequired, kOptionFeatureMap},
-    {  NULL }
+static chip::ArgParser::OptionDef sFeatureMapOptionDefs[] = {
+    { "featureSet", chip::ArgParser::kArgumentRequired, kOptionFeatureMap }, { NULL }
 };
 
-static chip::ArgParser::OptionSet sCmdLineOptions =
-{
+static chip::ArgParser::OptionSet sCmdLineOptions = {
     FeatureMapOptionHandler,   // handler function
     sFeatureMapOptionDefs,     // array of option definitions
     "GENERAL OPTIONS",         // help group
@@ -52,13 +50,11 @@ static chip::ArgParser::OptionSet sCmdLineOptions =
 };
 
 // Keep track of the parsed featureMap option
-static chip::BitMask<DeviceEnergyManagement::Feature> sFeatureMap(DeviceEnergyManagement::Feature::kPowerAdjustment,
-                                                                  DeviceEnergyManagement::Feature::kPowerForecastReporting,
-                                                                  DeviceEnergyManagement::Feature::kStateForecastReporting,
-                                                                  DeviceEnergyManagement::Feature::kStartTimeAdjustment,
-                                                                  DeviceEnergyManagement::Feature::kPausable,
-                                                                  DeviceEnergyManagement::Feature::kForecastAdjustment,
-                                                                  DeviceEnergyManagement::Feature::kConstraintBasedAdjustment);
+static chip::BitMask<DeviceEnergyManagement::Feature>
+    sFeatureMap(DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
+                DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
+                DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
+                DeviceEnergyManagement::Feature::kConstraintBasedAdjustment);
 
 void ApplicationInit()
 {
@@ -77,7 +73,7 @@ chip::BitMask<DeviceEnergyManagement::Feature> GetFeatureMap()
     return sFeatureMap;
 }
 
-static uint32_t ParseNumber(const char *pString)
+static uint32_t ParseNumber(const char * pString)
 {
     uint32_t num = 0;
     if (strlen(pString) > 2 && pString[0] == '0' && pString[1] == 'x')
@@ -92,7 +88,8 @@ static uint32_t ParseNumber(const char *pString)
     return num;
 }
 
-static bool FeatureMapOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
+static bool FeatureMapOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
+                                    const char * aName, const char * aValue)
 {
     bool retval = true;
 
@@ -110,7 +107,6 @@ static bool FeatureMapOptionHandler(const char * aProgram, chip::ArgParser::Opti
 
     return (retval);
 }
-
 
 int main(int argc, char * argv[])
 {

@@ -35,8 +35,8 @@ void SetTestEventTrigger_FakeReadingsLoadStart()
     uint32_t aCurrentRandomness_mA = 500;       // randomness 500mA
     uint8_t aInterval_s            = 2;         // 2s updates
     bool bReset                    = true;
-    FakeReadings::GetInstance().StartFakeReadings(EndpointId(1), aPower_mW, aPowerRandomness_mW, aVoltage_mV, aVoltageRandomness_mV, aCurrent_mA,
-                                                  aCurrentRandomness_mA, aInterval_s, bReset);
+    FakeReadings::GetInstance().StartFakeReadings(EndpointId(1), aPower_mW, aPowerRandomness_mW, aVoltage_mV, aVoltageRandomness_mV,
+                                                  aCurrent_mA, aCurrentRandomness_mA, aInterval_s, bReset);
 }
 
 void SetTestEventTrigger_FakeReadingsGeneratorStart()
@@ -49,8 +49,8 @@ void SetTestEventTrigger_FakeReadingsGeneratorStart()
     uint32_t aCurrentRandomness_mA = 500;        // randomness 500mA
     uint8_t aInterval_s            = 5;          // 5s updates
     bool bReset                    = true;
-    FakeReadings::GetInstance().StartFakeReadings(EndpointId(1), aPower_mW, aPowerRandomness_mW, aVoltage_mV, aVoltageRandomness_mV, aCurrent_mA,
-                                                  aCurrentRandomness_mA, aInterval_s, bReset);
+    FakeReadings::GetInstance().StartFakeReadings(EndpointId(1), aPower_mW, aPowerRandomness_mW, aVoltage_mV, aVoltageRandomness_mV,
+                                                  aCurrent_mA, aCurrentRandomness_mA, aInterval_s, bReset);
 }
 
 void SetTestEventTrigger_FakeReadingsStop()
