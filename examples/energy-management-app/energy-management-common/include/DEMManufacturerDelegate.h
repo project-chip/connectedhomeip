@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <lib/core/DataModelTypes.h>
+
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
