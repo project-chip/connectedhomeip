@@ -308,18 +308,19 @@ public:
      * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
     CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false) :
-        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false) :
+        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {}
     CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
     // TODO(#32138): After there is a macro that is always defined for all unit tests, the constructor with
     // TestOnlyMarker should only be compiled if that macro is defined.
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
-                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
-        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false,
+                  bool aAllowLargePayload = false) :
+        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {
         mpPendingResponseTracker = apPendingResponseTracker;
     }
@@ -636,6 +637,7 @@ private:
     bool mBufferAllocated       = false;
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
+    bool mAllowLargePayload     = false;
 };
 
 } // namespace app

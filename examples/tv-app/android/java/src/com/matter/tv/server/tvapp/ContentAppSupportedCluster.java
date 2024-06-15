@@ -15,20 +15,25 @@
  *   limitations under the License.
  *
  */
+package com.matter.tv.server.tvapp;
 
-package matter.controller
-
-object MatterICDClientImpl {
-  fun isPeerICDClient(fabricIndex: Int, deviceId: Long): Boolean {
-    val clientInfo = getICDClientInfo(fabricIndex) ?: return false
-    return clientInfo.firstOrNull { it.peerNodeId == deviceId } != null
+/*
+ * Mirrors com.matter.tv.app.api.SupportedCluster.aidl
+ */
+public class ContentAppSupportedCluster {
+  public ContentAppSupportedCluster(
+      int clusterIdentifier,
+      int features,
+      int[] optionalCommandIdentifiers,
+      int[] optionalAttributesIdentifiers) {
+    this.clusterIdentifier = clusterIdentifier;
+    this.features = features;
+    this.optionalCommandIdentifiers = optionalCommandIdentifiers;
+    this.optionalAttributesIdentifiers = optionalAttributesIdentifiers;
   }
 
-  external fun storeICDEntryWithKey(fabricIndex: Int, icdClientInfo: ICDClientInfo, key: ByteArray)
-
-  external fun removeICDEntryWithKey(fabricIndex: Int, icdClientInfo: ICDClientInfo)
-
-  external fun clearICDClientInfo(fabricIndex: Int, deviceId: Long)
-
-  external fun getICDClientInfo(fabricIndex: Int): List<ICDClientInfo>?
+  int clusterIdentifier;
+  int features;
+  int[] optionalCommandIdentifiers;
+  int[] optionalAttributesIdentifiers;
 }

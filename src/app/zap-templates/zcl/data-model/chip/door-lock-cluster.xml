@@ -190,7 +190,7 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="35" define="AUTO_RELOCK_TIME" type="int32u" reportable="true" writable="true">
+        <attribute side="server" code="35" define="AUTO_RELOCK_TIME" type="int32u" reportable="true" writable="true" optional="true">
             <description>AutoRelockTime</description>
             <access op="read" role="view" />
             <access op="write" role="manage" />

@@ -1230,6 +1230,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     [self _changeState:MTRDeviceStateUnreachable];
 }
 
+- (BOOL)deviceUsesThread
+{
+    std::lock_guard lock(_lock);
+    return [self _deviceUsesThread];
+}
+
 // This method is used for signaling whether to use the subscription pool. This functions as
 // a heuristic for whether to throttle subscriptions to the device via a pool of subscriptions.
 // If products appear that have both Thread and Wifi enabled but are primarily on wifi, this
@@ -2334,194 +2340,195 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         });
     }
 
+    // Call directlyGetSessionForNode because the subscription setup already goes through the subscription pool queue
     [_deviceController
-        getSessionForNode:_nodeID.unsignedLongLongValue
-               completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                   const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error,
-                   NSNumber * _Nullable retryDelay) {
-                   if (error != nil) {
-                       MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
-                       dispatch_async(self.queue, ^{
-                           [self _handleSubscriptionError:error];
-                           [self _handleSubscriptionReset:retryDelay];
-                       });
-                       return;
-                   }
+        directlyGetSessionForNode:_nodeID.unsignedLongLongValue
+                       completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                           const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error,
+                           NSNumber * _Nullable retryDelay) {
+                           if (error != nil) {
+                               MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
+                               dispatch_async(self.queue, ^{
+                                   [self _handleSubscriptionError:error];
+                                   [self _handleSubscriptionReset:retryDelay];
+                               });
+                               return;
+                           }
 
-                   auto callback = std::make_unique<SubscriptionCallback>(
-                       ^(NSArray * value) {
-                           MTR_LOG("%@ got attribute report %@", self, value);
-                           dispatch_async(self.queue, ^{
-                               // OnAttributeData
-                               [self _handleAttributeReport:value fromSubscription:YES];
+                           auto callback = std::make_unique<SubscriptionCallback>(
+                               ^(NSArray * value) {
+                                   MTR_LOG("%@ got attribute report %@", self, value);
+                                   dispatch_async(self.queue, ^{
+                                       // OnAttributeData
+                                       [self _handleAttributeReport:value fromSubscription:YES];
 #ifdef DEBUG
-                               self->_unitTestAttributesReportedSinceLastCheck += value.count;
+                                       self->_unitTestAttributesReportedSinceLastCheck += value.count;
 #endif
-                           });
-                       },
-                       ^(NSArray * value) {
-                           MTR_LOG("%@ got event report %@", self, value);
-                           dispatch_async(self.queue, ^{
-                               // OnEventReport
-                               [self _handleEventReport:value];
-                           });
-                       },
-                       ^(NSError * error) {
-                           MTR_LOG_ERROR("%@ got subscription error %@", self, error);
-                           dispatch_async(self.queue, ^{
-                               // OnError
-                               [self _handleSubscriptionError:error];
-                           });
-                       },
-                       ^(NSError * error, NSNumber * resubscriptionDelayMs) {
-                           MTR_LOG_ERROR("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelayMs);
-                           dispatch_async(self.queue, ^{
-                               // OnResubscriptionNeeded
-                               [self _handleResubscriptionNeededWithDelay:resubscriptionDelayMs];
-                           });
-                       },
-                       ^(void) {
-                           MTR_LOG("%@ got subscription established", self);
-                           dispatch_async(self.queue, ^{
-                               // OnSubscriptionEstablished
-                               [self _handleSubscriptionEstablished];
-                           });
-                       },
-                       ^(void) {
-                           MTR_LOG("%@ got subscription done", self);
-                           // Drop our pointer to the ReadClient immediately, since
-                           // it's about to be destroyed and we don't want to be
-                           // holding a dangling pointer.
-                           std::lock_guard lock(self->_lock);
-                           self->_currentReadClient = nullptr;
-                           self->_currentSubscriptionCallback = nullptr;
+                                   });
+                               },
+                               ^(NSArray * value) {
+                                   MTR_LOG("%@ got event report %@", self, value);
+                                   dispatch_async(self.queue, ^{
+                                       // OnEventReport
+                                       [self _handleEventReport:value];
+                                   });
+                               },
+                               ^(NSError * error) {
+                                   MTR_LOG_ERROR("%@ got subscription error %@", self, error);
+                                   dispatch_async(self.queue, ^{
+                                       // OnError
+                                       [self _handleSubscriptionError:error];
+                                   });
+                               },
+                               ^(NSError * error, NSNumber * resubscriptionDelayMs) {
+                                   MTR_LOG_ERROR("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelayMs);
+                                   dispatch_async(self.queue, ^{
+                                       // OnResubscriptionNeeded
+                                       [self _handleResubscriptionNeededWithDelay:resubscriptionDelayMs];
+                                   });
+                               },
+                               ^(void) {
+                                   MTR_LOG("%@ got subscription established", self);
+                                   dispatch_async(self.queue, ^{
+                                       // OnSubscriptionEstablished
+                                       [self _handleSubscriptionEstablished];
+                                   });
+                               },
+                               ^(void) {
+                                   MTR_LOG("%@ got subscription done", self);
+                                   // Drop our pointer to the ReadClient immediately, since
+                                   // it's about to be destroyed and we don't want to be
+                                   // holding a dangling pointer.
+                                   std::lock_guard lock(self->_lock);
+                                   self->_currentReadClient = nullptr;
+                                   self->_currentSubscriptionCallback = nullptr;
 
-                           dispatch_async(self.queue, ^{
-                               // OnDone
-                               [self _handleSubscriptionReset:nil];
-                           });
-                       },
-                       ^(void) {
-                           MTR_LOG("%@ got unsolicited message from publisher", self);
-                           dispatch_async(self.queue, ^{
-                               // OnUnsolicitedMessageFromPublisher
-                               [self _handleUnsolicitedMessageFromPublisher];
-                           });
-                       },
-                       ^(void) {
-                           MTR_LOG("%@ got report begin", self);
-                           dispatch_async(self.queue, ^{
-                               [self _handleReportBegin];
-                           });
-                       },
-                       ^(void) {
-                           MTR_LOG("%@ got report end", self);
-                           dispatch_async(self.queue, ^{
-                               [self _handleReportEnd];
-                           });
-                       });
+                                   dispatch_async(self.queue, ^{
+                                       // OnDone
+                                       [self _handleSubscriptionReset:nil];
+                                   });
+                               },
+                               ^(void) {
+                                   MTR_LOG("%@ got unsolicited message from publisher", self);
+                                   dispatch_async(self.queue, ^{
+                                       // OnUnsolicitedMessageFromPublisher
+                                       [self _handleUnsolicitedMessageFromPublisher];
+                                   });
+                               },
+                               ^(void) {
+                                   MTR_LOG("%@ got report begin", self);
+                                   dispatch_async(self.queue, ^{
+                                       [self _handleReportBegin];
+                                   });
+                               },
+                               ^(void) {
+                                   MTR_LOG("%@ got report end", self);
+                                   dispatch_async(self.queue, ^{
+                                       [self _handleReportEnd];
+                                   });
+                               });
 
-                   // Set up a cluster state cache.  We just want this for the logic it has for
-                   // tracking data versions and event numbers so we minimize the amount of data we
-                   // request on resubscribes, so tell it not to store data.
-                   auto clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get(),
-                       /* highestReceivedEventNumber = */ NullOptional,
-                       /* cacheData = */ false);
-                   auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                       clusterStateCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+                           // Set up a cluster state cache.  We just want this for the logic it has for
+                           // tracking data versions and event numbers so we minimize the amount of data we
+                           // request on resubscribes, so tell it not to store data.
+                           auto clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get(),
+                               /* highestReceivedEventNumber = */ NullOptional,
+                               /* cacheData = */ false);
+                           auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                               clusterStateCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
-                   // Subscribe with data version filter list and retry with smaller list if out of packet space
-                   CHIP_ERROR err;
-                   NSDictionary<MTRClusterPath *, NSNumber *> * dataVersions = [self _getCachedDataVersions];
-                   size_t dataVersionFilterListSizeReduction = 0;
-                   for (;;) {
-                       // Wildcard endpoint, cluster, attribute, event.
-                       auto attributePath = std::make_unique<AttributePathParams>();
-                       auto eventPath = std::make_unique<EventPathParams>();
-                       // We want to get event reports at the minInterval, not the maxInterval.
-                       eventPath->mIsUrgentEvent = true;
-                       ReadPrepareParams readParams(session.Value());
+                           // Subscribe with data version filter list and retry with smaller list if out of packet space
+                           CHIP_ERROR err;
+                           NSDictionary<MTRClusterPath *, NSNumber *> * dataVersions = [self _getCachedDataVersions];
+                           size_t dataVersionFilterListSizeReduction = 0;
+                           for (;;) {
+                               // Wildcard endpoint, cluster, attribute, event.
+                               auto attributePath = std::make_unique<AttributePathParams>();
+                               auto eventPath = std::make_unique<EventPathParams>();
+                               // We want to get event reports at the minInterval, not the maxInterval.
+                               eventPath->mIsUrgentEvent = true;
+                               ReadPrepareParams readParams(session.Value());
 
-                       readParams.mMinIntervalFloorSeconds = 0;
-                       // Select a max interval based on the device's claimed idle sleep interval.
-                       auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
-                           session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
+                               readParams.mMinIntervalFloorSeconds = 0;
+                               // Select a max interval based on the device's claimed idle sleep interval.
+                               auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
+                                   session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
 
-                       auto maxIntervalCeilingMin = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
-                       if (idleSleepInterval < maxIntervalCeilingMin) {
-                           idleSleepInterval = maxIntervalCeilingMin;
-                       }
+                               auto maxIntervalCeilingMin = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+                               if (idleSleepInterval < maxIntervalCeilingMin) {
+                                   idleSleepInterval = maxIntervalCeilingMin;
+                               }
 
-                       auto maxIntervalCeilingMax = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
-                       if (idleSleepInterval > maxIntervalCeilingMax) {
-                           idleSleepInterval = maxIntervalCeilingMax;
-                       }
+                               auto maxIntervalCeilingMax = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+                               if (idleSleepInterval > maxIntervalCeilingMax) {
+                                   idleSleepInterval = maxIntervalCeilingMax;
+                               }
 #ifdef DEBUG
-                       if (maxIntervalOverride.HasValue()) {
-                           idleSleepInterval = maxIntervalOverride.Value();
-                       }
+                               if (maxIntervalOverride.HasValue()) {
+                                   idleSleepInterval = maxIntervalOverride.Value();
+                               }
 #endif
-                       readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
+                               readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
 
-                       readParams.mpAttributePathParamsList = attributePath.get();
-                       readParams.mAttributePathParamsListSize = 1;
-                       readParams.mpEventPathParamsList = eventPath.get();
-                       readParams.mEventPathParamsListSize = 1;
-                       readParams.mKeepSubscriptions = true;
-                       readParams.mIsFabricFiltered = false;
-                       size_t dataVersionFilterListSize = 0;
-                       DataVersionFilter * dataVersionFilterList;
-                       [self _createDataVersionFilterListFromDictionary:dataVersions dataVersionFilterList:&dataVersionFilterList count:&dataVersionFilterListSize sizeReduction:dataVersionFilterListSizeReduction];
-                       readParams.mDataVersionFilterListSize = dataVersionFilterListSize;
-                       readParams.mpDataVersionFilterList = dataVersionFilterList;
-                       attributePath.release();
-                       eventPath.release();
+                               readParams.mpAttributePathParamsList = attributePath.get();
+                               readParams.mAttributePathParamsListSize = 1;
+                               readParams.mpEventPathParamsList = eventPath.get();
+                               readParams.mEventPathParamsListSize = 1;
+                               readParams.mKeepSubscriptions = true;
+                               readParams.mIsFabricFiltered = false;
+                               size_t dataVersionFilterListSize = 0;
+                               DataVersionFilter * dataVersionFilterList;
+                               [self _createDataVersionFilterListFromDictionary:dataVersions dataVersionFilterList:&dataVersionFilterList count:&dataVersionFilterListSize sizeReduction:dataVersionFilterListSizeReduction];
+                               readParams.mDataVersionFilterListSize = dataVersionFilterListSize;
+                               readParams.mpDataVersionFilterList = dataVersionFilterList;
+                               attributePath.release();
+                               eventPath.release();
 
-                       // TODO: Change from local filter list generation to rehydrating ClusterStateCache ot take advantage of existing filter list sorting algorithm
+                               // TODO: Change from local filter list generation to rehydrating ClusterStateCache ot take advantage of existing filter list sorting algorithm
 
-                       // SendAutoResubscribeRequest cleans up the params, even on failure.
-                       err = readClient->SendAutoResubscribeRequest(std::move(readParams));
-                       if (err == CHIP_NO_ERROR) {
-                           break;
-                       }
+                               // SendAutoResubscribeRequest cleans up the params, even on failure.
+                               err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+                               if (err == CHIP_NO_ERROR) {
+                                   break;
+                               }
 
-                       // If error is not a "no memory" issue, then break and go through regular resubscribe logic
-                       if (err != CHIP_ERROR_NO_MEMORY) {
-                           break;
-                       }
+                               // If error is not a "no memory" issue, then break and go through regular resubscribe logic
+                               if (err != CHIP_ERROR_NO_MEMORY) {
+                                   break;
+                               }
 
-                       // If "no memory" error is not caused by data version filter list, break as well
-                       if (!dataVersionFilterListSize) {
-                           break;
-                       }
+                               // If "no memory" error is not caused by data version filter list, break as well
+                               if (!dataVersionFilterListSize) {
+                                   break;
+                               }
 
-                       // Now "no memory" could mean subscribe request packet space ran out. Reduce size and try again immediately
-                       dataVersionFilterListSizeReduction++;
-                   }
+                               // Now "no memory" could mean subscribe request packet space ran out. Reduce size and try again immediately
+                               dataVersionFilterListSizeReduction++;
+                           }
 
-                   if (err != CHIP_NO_ERROR) {
-                       NSError * error = [MTRError errorForCHIPErrorCode:err logContext:self];
-                       MTR_LOG_ERROR("%@ SendAutoResubscribeRequest error %@", self, error);
-                       dispatch_async(self.queue, ^{
-                           [self _handleSubscriptionError:error];
-                           [self _handleSubscriptionReset:nil];
-                       });
+                           if (err != CHIP_NO_ERROR) {
+                               NSError * error = [MTRError errorForCHIPErrorCode:err logContext:self];
+                               MTR_LOG_ERROR("%@ SendAutoResubscribeRequest error %@", self, error);
+                               dispatch_async(self.queue, ^{
+                                   [self _handleSubscriptionError:error];
+                                   [self _handleSubscriptionReset:nil];
+                               });
 
-                       return;
-                   }
+                               return;
+                           }
 
-                   MTR_LOG("%@ Subscribe with data version list size %lu, reduced by %lu", self, static_cast<unsigned long>(dataVersions.count), static_cast<unsigned long>(dataVersionFilterListSizeReduction));
+                           MTR_LOG("%@ Subscribe with data version list size %lu, reduced by %lu", self, static_cast<unsigned long>(dataVersions.count), static_cast<unsigned long>(dataVersionFilterListSizeReduction));
 
-                   // Callback and ClusterStateCache and ReadClient will be deleted
-                   // when OnDone is called.
-                   os_unfair_lock_lock(&self->_lock);
-                   self->_currentReadClient = readClient.get();
-                   self->_currentSubscriptionCallback = callback.get();
-                   os_unfair_lock_unlock(&self->_lock);
-                   callback->AdoptReadClient(std::move(readClient));
-                   callback->AdoptClusterStateCache(std::move(clusterStateCache));
-                   callback.release();
-               }];
+                           // Callback and ClusterStateCache and ReadClient will be deleted
+                           // when OnDone is called.
+                           os_unfair_lock_lock(&self->_lock);
+                           self->_currentReadClient = readClient.get();
+                           self->_currentSubscriptionCallback = callback.get();
+                           os_unfair_lock_unlock(&self->_lock);
+                           callback->AdoptReadClient(std::move(readClient));
+                           callback->AdoptClusterStateCache(std::move(clusterStateCache));
+                           callback.release();
+                       }];
 
     // Set up connectivity monitoring in case network becomes routable after any part of the subscription process goes into backoff retries.
     [self _setupConnectivityMonitoring];

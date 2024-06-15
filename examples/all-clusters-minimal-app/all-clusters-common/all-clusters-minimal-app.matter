@@ -1989,6 +1989,7 @@ cluster Switch = 59 {
     kMomentarySwitchRelease = 0x4;
     kMomentarySwitchLongPress = 0x8;
     kMomentarySwitchMultiPress = 0x10;
+    kActionSwitch = 0x20;
   }
 
   info event SwitchLatched = 0 {
@@ -2972,7 +2973,7 @@ cluster DoorLock = 257 {
   readonly attribute optional int8u numberOfCredentialsSupportedPerUser = 28;
   attribute access(write: manage) optional char_string<3> language = 33;
   attribute access(write: manage) optional int8u LEDSettings = 34;
-  attribute access(write: manage) int32u autoRelockTime = 35;
+  attribute access(write: manage) optional int32u autoRelockTime = 35;
   attribute access(write: manage) optional int8u soundVolume = 36;
   attribute access(write: manage) OperatingModeEnum operatingMode = 37;
   readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
