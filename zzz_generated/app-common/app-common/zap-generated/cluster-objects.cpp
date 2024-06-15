@@ -27303,6 +27303,48 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace ContentAppObserver
+namespace MeterIdentification {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeterType::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, meterType);
+    case Attributes::CustomerName::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, customerName);
+    case Attributes::UtilityName::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, utilityName);
+    case Attributes::PointOfDelivery::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, pointOfDelivery);
+    case Attributes::PowerThreshold::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, powerThreshold);
+    case Attributes::PowerThresholdSource::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, powerThresholdSource);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace MeterIdentification
 namespace ElectricalMeasurement {
 
 namespace Commands {

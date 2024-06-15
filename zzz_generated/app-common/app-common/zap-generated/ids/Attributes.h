@@ -7297,6 +7297,60 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ContentAppObserver
 
+namespace MeterIdentification {
+namespace Attributes {
+
+namespace MeterType {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeterType
+
+namespace CustomerName {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CustomerName
+
+namespace UtilityName {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace UtilityName
+
+namespace PointOfDelivery {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PointOfDelivery
+
+namespace PowerThreshold {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PowerThreshold
+
+namespace PowerThresholdSource {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace PowerThresholdSource
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MeterIdentification
+
 namespace ElectricalMeasurement {
 namespace Attributes {
 

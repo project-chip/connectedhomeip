@@ -376,6 +376,9 @@ static constexpr ClusterId Id = 0x0000050F;
 namespace ContentAppObserver {
 static constexpr ClusterId Id = 0x00000510;
 } // namespace ContentAppObserver
+namespace MeterIdentification {
+static constexpr ClusterId Id = 0x00000B01;
+} // namespace MeterIdentification
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
