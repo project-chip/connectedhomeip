@@ -40,7 +40,7 @@ public:
 
     void SetDeviceEnergyManagementInstance(DeviceEnergyManagement::Instance & instance);
 
-    void SetDemManufacturerDelegate(DEMManufacturerDelegate & deviceEnergyManagementManufacturerDelegate);
+    void SetDEMManufacturerDelegate(DEMManufacturerDelegate & deviceEnergyManagementManufacturerDelegate);
 
     /**
      *

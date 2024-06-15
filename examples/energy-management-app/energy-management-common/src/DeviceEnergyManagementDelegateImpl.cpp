@@ -62,7 +62,7 @@ uint32_t DeviceEnergyManagementDelegate::HasFeature(Feature feature) const
     return hasFeature;
 }
 
-void DeviceEnergyManagementDelegate::SetDemManufacturerDelegate(DEMManufacturerDelegate & deviceEnergyManagementManufacturerDelegate)
+void DeviceEnergyManagementDelegate::SetDEMManufacturerDelegate(DEMManufacturerDelegate & deviceEnergyManagementManufacturerDelegate)
 {
     mpDEMManufacturerDelegate = &deviceEnergyManagementManufacturerDelegate;
 }

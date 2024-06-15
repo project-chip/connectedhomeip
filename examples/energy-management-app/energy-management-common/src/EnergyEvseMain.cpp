@@ -387,7 +387,7 @@ CHIP_ERROR EVSEManufacturerInit()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    gDEMDelegate.get()->SetDemManufacturerDelegate(*gEvseManufacturer.get());
+    gDEMDelegate.get()->SetDEMManufacturerDelegate(*gEvseManufacturer.get());
 
     /* Call Manufacturer specific init */
     err = gEvseManufacturer->Init();

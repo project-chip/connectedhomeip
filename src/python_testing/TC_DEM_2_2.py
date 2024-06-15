@@ -225,7 +225,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
                                                  cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization)
 
         # Wait 5 seconds for an event not to be reported
-        events_callback.wait_for_no_event_report(5)
+        events_callback.wait_for_event_expect_no_report(5)
 
         self.step("12a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPowerAdjustActive)
