@@ -375,7 +375,7 @@ public:
      * @param[in] noc                                NOC in CHIP certificate format.
      * @param[in] icac                               ICAC in CHIP certificate format. If no icac is present, an empty
      *                                               ByteSpan should be passed.
-     * @param[in] externalOperationalKeypair         External operational keypair. If null, use keypair in OperationalKeystore.
+     * @param[in] operationalKeypair                 External operational keypair. If null, use keypair in OperationalKeystore.
      * @param[in] operationalKeypairExternalOwned    If true, external operational keypair must outlive the fabric.
      *                                               If false, the keypair is copied and owned in heap of a FabricInfo.
      *
