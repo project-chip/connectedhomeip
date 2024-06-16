@@ -3692,6 +3692,30 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("contentControl", writeContentControlInteractionInfo);
     Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
+    Map<String, InteractionInfo> writeMeterIdentificationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeMeterIdentificationCustomerNameCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo meterIdentificationcustomerNameCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            String.class, 
+            String.class 
+        );
+    writeMeterIdentificationCustomerNameCommandParams.put(
+        "value",
+        meterIdentificationcustomerNameCommandParameterInfo
+    );
+    InteractionInfo writeMeterIdentificationCustomerNameAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MeterIdentificationCluster) cluster).writeCustomerNameAttribute(
+          (DefaultClusterCallback) callback,
+          (String) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeMeterIdentificationCustomerNameCommandParams
+    );
+    writeMeterIdentificationInteractionInfo.put("writeCustomerNameAttribute", writeMeterIdentificationCustomerNameAttributeInteractionInfo);
+    writeAttributeMap.put("meterIdentification", writeMeterIdentificationInteractionInfo);
     Map<String, InteractionInfo> writeElectricalMeasurementInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo electricalMeasurementaverageRmsVoltageMeasurementPeriodCommandParameterInfo =

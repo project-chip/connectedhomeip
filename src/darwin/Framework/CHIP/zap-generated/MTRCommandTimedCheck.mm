@@ -1127,6 +1127,15 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInMeterIdentificationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MeterIdentification;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInElectricalMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalMeasurement;
@@ -1505,6 +1514,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::MeterIdentification::Id: {
+        return CommandNeedsTimedInvokeInMeterIdentificationCluster(commandID);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return CommandNeedsTimedInvokeInElectricalMeasurementCluster(commandID);

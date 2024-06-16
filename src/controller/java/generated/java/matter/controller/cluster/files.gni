@@ -289,6 +289,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/MediaInputCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/MediaPlaybackCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/MessagesCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/MeterIdentificationCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/MicrowaveOvenControlCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/MicrowaveOvenModeCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ModeSelectCluster.kt",

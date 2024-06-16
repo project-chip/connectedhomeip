@@ -5900,6 +5900,51 @@ static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInMeterIdentificationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MeterIdentification;
+    switch (aAttributeId) {
+    case Attributes::MeterType::Id: {
+        return YES;
+    }
+    case Attributes::CustomerName::Id: {
+        return YES;
+    }
+    case Attributes::UtilityName::Id: {
+        return YES;
+    }
+    case Attributes::PointOfDelivery::Id: {
+        return YES;
+    }
+    case Attributes::PowerThreshold::Id: {
+        return YES;
+    }
+    case Attributes::PowerThresholdSource::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInElectricalMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalMeasurement;
@@ -6962,6 +7007,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ContentAppObserver::Id: {
         return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
+    }
+    case Clusters::MeterIdentification::Id: {
+        return AttributeIsSpecifiedInMeterIdentificationCluster(aAttributeId);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return AttributeIsSpecifiedInElectricalMeasurementCluster(aAttributeId);

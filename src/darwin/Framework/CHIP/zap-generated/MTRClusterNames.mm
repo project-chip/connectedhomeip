@@ -369,6 +369,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
         break;
+    case MTRClusterIDTypeMeterIdentificationID:
+        result = @"MeterIdentification";
+        break;
     case MTRClusterIDTypeElectricalMeasurementID:
         result = @"ElectricalMeasurement";
         break;
@@ -7995,6 +7998,64 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeMeterIdentificationID:
+
+        switch (attributeID) {
+
+            // Cluster MeterIdentification attributes
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterTypeID:
+            result = @"MeterType";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeCustomerNameID:
+            result = @"CustomerName";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeUtilityNameID:
+            result = @"UtilityName";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributePointOfDeliveryID:
+            result = @"PointOfDelivery";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributePowerThresholdID:
+            result = @"PowerThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributePowerThresholdSourceID:
+            result = @"PowerThresholdSource";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 

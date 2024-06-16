@@ -129,6 +129,7 @@ Generally regenerate using one of:
 |       1294 |      0x50E | AccountLogin                                            |
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
+|       2817 |      0xB01 | MeterIdentification                                     |
 |       2820 |      0xB04 | ElectricalMeasurement                                   |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
