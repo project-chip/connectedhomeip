@@ -288,7 +288,7 @@ class VirtualWifi:
             "-u",
             "-s",
             "-i",
-            "wlan0",
+            self._wlan_app,
             "-c",
             self._wpa_supplicant_conf,
         ]
