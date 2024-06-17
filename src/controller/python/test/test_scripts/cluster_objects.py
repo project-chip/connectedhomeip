@@ -164,7 +164,7 @@ class ClusterObjectTests:
             ]
         )
         expectedRes = [
-            AttributeStatus(Path=AttributePath(
+            AttributeStatus(Path=AttributePath.from_attribute(
                 EndpointId=1,
                 Attribute=Clusters.UnitTesting.Attributes.ListLongOctetString), Status=chip.interaction_model.Status.Success),
         ]

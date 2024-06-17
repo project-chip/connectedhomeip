@@ -47,21 +47,26 @@
 
 #pragma once
 
-#include <stdint.h>
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
 
-#include <ble/BleConfig.h>
+#include <cstddef>
+#include <cstdint>
 
+#include <lib/core/CHIPError.h>
+#include <lib/support/DLLUtil.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include <ble/BleApplicationDelegate.h>
-#include <ble/BleConnectionDelegate.h>
-#include <ble/BleError.h>
-#include <ble/BleLayerDelegate.h>
-#include <ble/BlePlatformDelegate.h>
-#include <ble/BleRole.h>
-#include <ble/BleUUID.h>
+#include "BleApplicationDelegate.h"
+#include "BleConfig.h"
+#include "BleConnectionDelegate.h"
+#include "BleLayerDelegate.h"
+#include "BlePlatformDelegate.h"
+#include "BleRole.h"
+#include "BleUUID.h"
 
 namespace chip {
 namespace Ble {
@@ -77,10 +82,6 @@ namespace Ble {
 /// Version(s) of the CHIP BLE Transport Protocol that this stack supports.
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
-
-/// Forward declarations.
-class BleLayer;
-class BLEEndPoint;
 
 /// Enum defining versions of CHIP over BLE transport protocol.
 typedef enum
@@ -228,9 +229,6 @@ public:
     void * mAppState                 = nullptr;
     BleLayerDelegate * mBleTransport = nullptr;
 
-    typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
-    BleConnectionReceivedFunct OnChipBleConnectReceived;
-
     // Public functions:
     BleLayer();
 
@@ -301,10 +299,6 @@ public:
     /// Call when an outstanding GATT indication receives a positive receipt confirmation.
     bool HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
-    /// Call when a GATT read request is received.
-    bool HandleReadReceived(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                            const ChipBleUUID * charId);
-
     /**< Platform must call this function when any previous operation undertaken by the BleLayer via BleAdapter
      *   fails, such as a characteristic write request or subscribe attempt, or when a BLE connection is closed.
      *
@@ -319,13 +313,6 @@ public:
 private:
     // Private data members:
 
-    // UUID of CHIP service characteristic used for central writes.
-    static const ChipBleUUID CHIP_BLE_CHAR_1_ID;
-    // UUID of CHIP service characteristic used for peripheral indications.
-    static const ChipBleUUID CHIP_BLE_CHAR_2_ID;
-    // UUID of CHIP service characteristic used for additional data
-    static const ChipBleUUID CHIP_BLE_CHAR_3_ID;
-
     BleConnectionDelegate * mConnectionDelegate;
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;
@@ -333,7 +320,6 @@ private:
 
     // Private functions:
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
-    void DriveSending();
     CHIP_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle && pBuf);
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);
@@ -344,5 +330,3 @@ private:
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#include "BLEEndPoint.h"

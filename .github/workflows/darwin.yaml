@@ -17,13 +17,16 @@ name: Darwin
 on:
     push:
         branches-ignore:
-            - 'dependabot/**'
+            - "dependabot/**"
     pull_request:
     merge_group:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+        'pull_request' && github.event.number) || (github.event_name ==
+        'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
@@ -51,16 +54,17 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: darwin
-                bootstrap-log-name: bootstrap-logs-framework-${{ matrix.options.flavor }}
+                  platform: darwin
+                  bootstrap-log-name:
+                      bootstrap-logs-framework-${{ matrix.options.flavor }}
             - name: Block zap-cli from being used
               env:
-                PW_ENVSETUP_NO_BANNER: 1
+                  PW_ENVSETUP_NO_BANNER: 1
               run: |
-                # Framework builds are NOT expected to require zap-cli
-                scripts/run_in_build_env.sh 'rm -- "$(which zap-cli)"'
-                # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
-                scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
+                  # Framework builds are NOT expected to require zap-cli
+                  scripts/run_in_build_env.sh 'rm -- "$(which zap-cli)"'
+                  # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
+                  scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
             - name: Build
               working-directory: src/darwin/Framework
               run: xcodebuild -target "Matter" ${{ matrix.options.arguments }}
@@ -68,32 +72,35 @@ jobs:
     tests:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
-        needs: [ framework ] # serialize to avoid running to many parallel macos runners
+        needs: [framework] # serialize to avoid running to many parallel macos runners
         runs-on: macos-13
         strategy:
             matrix:
                 options: # We don't need a full matrix
                     - flavor: asan
-                      arguments: -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES
-                    - flavor: asan-global-storage
-                      arguments: -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES
-                      defines: MTR_PER_CONTROLLER_STORAGE_ENABLED=0
+                      arguments:
+                          -enableAddressSanitizer YES
+                          -enableUndefinedBehaviorSanitizer YES
                     - flavor: tsan
                       arguments: -enableThreadSanitizer YES
+                    # "leaks" does not seem to be very compatible with asan or tsan
+                    - flavor: leaks
+                      defines: ENABLE_LEAK_DETECTION=1
         steps:
             - name: Checkout
               uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: darwin
-                bootstrap-log-name: bootstrap-logs-framework-${{ matrix.options.flavor }}
+                  platform: darwin
+                  bootstrap-log-name:
+                      bootstrap-logs-framework-${{ matrix.options.flavor }}
             - name: Build example All Clusters Server
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/all-clusters-app chip_config_network_layer_ble=false
             - name: Build example OTA Provider
               run: |
-                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
+                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug/ota-provider-app chip_config_network_layer_ble=false
             - name: Build example OTA Requestor
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0
@@ -106,8 +113,8 @@ jobs:
               run: |
                   mkdir -p /tmp/darwin/framework-tests
                   echo "This is a simple log" > /tmp/darwin/framework-tests/end_user_support_log.txt
-                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --end_user_support_log /tmp/darwin/framework-tests/end_user_support_log.txt > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
-                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --dac_provider ../../../credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json --product-id 32768 --discriminator 3839 --secured-device-port 5539 --KVS /tmp/chip-all-clusters-app-kvs2 > >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid-err.log >&2) &
+                  ../../../out/debug/all-clusters-app/chip-all-clusters-app --interface-id -1 --end_user_support_log /tmp/darwin/framework-tests/end_user_support_log.txt > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
+                  ../../../out/debug/all-clusters-app/chip-all-clusters-app --interface-id -1 --dac_provider ../../../credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json --product-id 32768 --discriminator 3839 --secured-device-port 5539 --KVS /tmp/chip-all-clusters-app-kvs2 > >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid-err.log >&2) &
 
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
 
@@ -127,19 +134,3 @@ jobs:
                   name: darwin-framework-test-logs-${{ matrix.options.flavor }}
                   path: /tmp/darwin/framework-tests
                   retention-days: 5
-
-    tv-casting-bridge:
-        name: Build TV Casting Bridge example
-        if: github.actor != 'restyled-io[bot]'
-        needs: [ framework ] # serialize to avoid running to many parallel macos runners
-        runs-on: macos-13
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: darwin
-            - name: Build
-              working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
-              run: xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos

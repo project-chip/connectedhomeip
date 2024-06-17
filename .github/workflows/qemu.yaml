@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32-qemu:47
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:54
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -60,8 +60,6 @@ jobs:
                       build                             \
                   "
             - name: Run all tests
-              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/32587
-              if: false
               run: |
                   src/test_driver/esp32/run_qemu_image.py \
                     --verbose                             \
@@ -80,7 +78,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen-qemu:47
+            image: ghcr.io/project-chip/chip-build-tizen-qemu:54
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 

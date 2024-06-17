@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
     <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change)
@@ -79,8 +79,8 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="2" code="FQ" name="Frequency" default="0" summary="Supports frequency attributes and behavior.
-                                      The Pulse Width Modulation cluster was created
-                                      for frequency control.">
+                                                    The Pulse Width Modulation cluster was created
+                                                    for frequency control.">
       <provisionalConform/>
     </feature>
   </features>
@@ -126,7 +126,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>

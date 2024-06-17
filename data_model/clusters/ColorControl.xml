@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0300" name="Color Control" revision="6">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0300" name="Color Control Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="mandatory global ClusterRevision attribute added; CCB 2028"/>
     <revision revision="2" summary="added Options attribute, CCB 2085 2104 2124 2230; ZLO 1.0"/>
@@ -107,7 +107,6 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
       <constraint type="between" from="0" to="65534"/>
     </attribute>

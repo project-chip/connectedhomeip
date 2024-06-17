@@ -18,6 +18,7 @@ source_set("data-model") {
     "BasicTypes.h",
     "DecodableList.h",
     "Decode.h",
+    "EncodableToTLV.h",
     "Encode.h",
     "FabricScoped.h",
     "FabricScopedPreEncodedValue.cpp",
@@ -27,7 +28,6 @@ source_set("data-model") {
     "Nullable.h",
     "PreEncodedValue.cpp",
     "PreEncodedValue.h",
-    "TagBoundEncoder.h",
     "WrappedStructEncoder.h",
   ]
 

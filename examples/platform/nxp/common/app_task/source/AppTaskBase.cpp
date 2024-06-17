@@ -62,6 +62,10 @@
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #endif
 
+#ifdef ENABLE_CHIP_SHELL
+#include <lib/shell/commands/WiFi.h>
+#endif
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -202,8 +206,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
 
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     sNetworkCommissioningInstance.Init();
+#ifdef ENABLE_CHIP_SHELL
+    Shell::SetWiFiDriver(chip::NXP::App::GetAppTask().GetWifiDriverInstance());
 #endif
-#if CONFIG_CHIP_OTA_REQUESTOR
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (err == CHIP_NO_ERROR)
     {
         /* If an update is under test make it permanent */

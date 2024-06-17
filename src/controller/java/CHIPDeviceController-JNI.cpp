@@ -37,7 +37,7 @@
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
 #include <atomic>
-#include <ble/BleUUID.h>
+#include <ble/Ble.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/java/GroupDeviceProxy.h>
@@ -1726,45 +1726,6 @@ JNI_METHOD(jint, getFabricIndex)(JNIEnv * env, jobject self, jlong handle)
     return wrapper->Controller()->GetFabricIndex();
 }
 
-JNI_METHOD(void, shutdownSubscriptions)
-(JNIEnv * env, jobject self, jobject handle, jobject fabricIndex, jobject peerNodeId, jobject subscriptionId)
-{
-    chip::DeviceLayer::StackLock lock;
-    if (fabricIndex == nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
-    {
-        app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
-        return;
-    }
-
-    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId == nullptr)
-    {
-        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
-        jlong jPeerNodeId = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
-        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex),
-                                                                          static_cast<chip::NodeId>(jPeerNodeId));
-        return;
-    }
-
-    if (fabricIndex != nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
-    {
-        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
-        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex));
-        return;
-    }
-
-    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId != nullptr)
-    {
-        jint jFabricIndex     = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
-        jlong jPeerNodeId     = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
-        jlong jSubscriptionId = chip::JniReferences::GetInstance().LongToPrimitive(subscriptionId);
-        app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
-            chip::ScopedNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex)),
-            static_cast<chip::SubscriptionId>(jSubscriptionId));
-        return;
-    }
-    ChipLogError(Controller, "Failed to shutdown subscriptions with correct input paramemeter");
-}
-
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -1878,7 +1839,7 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     chip::DeviceLayer::StackLock lock;
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    const Dnssd::DiscoveredNodeData * data   = wrapper->Controller()->GetDiscoveredDevice(idx);
+    const Dnssd::CommissionNodeData * data   = wrapper->Controller()->GetDiscoveredDevice(idx);
 
     if (data == nullptr)
     {
@@ -1905,21 +1866,21 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
 
     jobject discoveredObj = env->NewObject(discoveredDeviceCls, constructor);
 
-    env->SetLongField(discoveredObj, discrminatorID, data->nodeData.longDiscriminator);
+    env->SetLongField(discoveredObj, discrminatorID, data->longDiscriminator);
 
     char ipAddress[100];
-    data->resolutionData.ipAddress[0].ToString(ipAddress, 100);
+    data->ipAddress[0].ToString(ipAddress, 100);
     jstring jniipAdress = env->NewStringUTF(ipAddress);
 
     env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
-    env->SetIntField(discoveredObj, portID, static_cast<jint>(data->resolutionData.port));
-    env->SetLongField(discoveredObj, deviceTypeID, static_cast<jlong>(data->nodeData.deviceType));
-    env->SetIntField(discoveredObj, vendorIdID, static_cast<jint>(data->nodeData.vendorId));
-    env->SetIntField(discoveredObj, productIdID, static_cast<jint>(data->nodeData.productId));
+    env->SetIntField(discoveredObj, portID, static_cast<jint>(data->port));
+    env->SetLongField(discoveredObj, deviceTypeID, static_cast<jlong>(data->deviceType));
+    env->SetIntField(discoveredObj, vendorIdID, static_cast<jint>(data->vendorId));
+    env->SetIntField(discoveredObj, productIdID, static_cast<jint>(data->productId));
 
     jbyteArray jRotatingId;
-    CHIP_ERROR err = JniReferences::GetInstance().N2J_ByteArray(env, data->nodeData.rotatingId,
-                                                                static_cast<jsize>(data->nodeData.rotatingIdLen), jRotatingId);
+    CHIP_ERROR err =
+        JniReferences::GetInstance().N2J_ByteArray(env, data->rotatingId, static_cast<jsize>(data->rotatingIdLen), jRotatingId);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1927,12 +1888,12 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
         return nullptr;
     }
     env->SetObjectField(discoveredObj, rotatingIdID, static_cast<jobject>(jRotatingId));
-    env->SetObjectField(discoveredObj, instanceNameID, env->NewStringUTF(data->nodeData.instanceName));
-    env->SetObjectField(discoveredObj, deviceNameID, env->NewStringUTF(data->nodeData.deviceName));
-    env->SetObjectField(discoveredObj, pairingInstructionID, env->NewStringUTF(data->nodeData.pairingInstruction));
+    env->SetObjectField(discoveredObj, instanceNameID, env->NewStringUTF(data->instanceName));
+    env->SetObjectField(discoveredObj, deviceNameID, env->NewStringUTF(data->deviceName));
+    env->SetObjectField(discoveredObj, pairingInstructionID, env->NewStringUTF(data->pairingInstruction));
 
-    env->CallVoidMethod(discoveredObj, setCommissioningModeID, static_cast<jint>(data->nodeData.commissioningMode));
-    env->CallVoidMethod(discoveredObj, setPairingHintID, static_cast<jint>(data->nodeData.pairingHint));
+    env->CallVoidMethod(discoveredObj, setCommissioningModeID, static_cast<jint>(data->commissioningMode));
+    env->CallVoidMethod(discoveredObj, setPairingHintID, static_cast<jint>(data->pairingHint));
 
     return discoveredObj;
 }
@@ -2193,130 +2154,26 @@ JNI_METHOD(jbyteArray, validateAndExtractCSR)(JNIEnv * env, jclass clazz, jbyteA
     return javaCsr;
 }
 
-JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, jint jFabricIndex)
+JNI_METHOD(void, startDnssd)(JNIEnv * env, jobject self, jlong handle)
 {
+    ChipLogProgress(Controller, "startDnssd() called");
     chip::DeviceLayer::StackLock lock;
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    jobject jInfo = nullptr;
-    chip::app::ICDClientInfo info;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(jFabricIndex);
-
-    ChipLogProgress(Controller, "getICDClientInfo(%u) called", fabricIndex);
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
-
-    err = JniReferences::GetInstance().CreateArrayList(jInfo);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
-                        ChipLogError(Controller, "CreateArrayList failed!: %" CHIP_ERROR_FORMAT, err.Format()));
-
-    auto iter = wrapper->getICDClientStorage()->IterateICDClientInfo();
-    VerifyOrReturnValue(iter != nullptr, nullptr, ChipLogError(Controller, "IterateICDClientInfo failed!"));
-    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
-
-    jmethodID constructor;
-    jclass infoClass;
-    JniLocalReferenceScope scope(env);
-
-    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDClientInfo", infoClass);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
-                        ChipLogError(Controller, "Find ICDClientInfo class: %" CHIP_ERROR_FORMAT, err.Format()));
-
-    env->ExceptionClear();
-    constructor = env->GetMethodID(infoClass, "<init>", "(JJJJ[B[B)V");
-    VerifyOrReturnValue(constructor != nullptr, nullptr, ChipLogError(Controller, "Find GetMethodID error!"));
-
-    while (iter->Next(info))
-    {
-        jbyteArray jIcdAesKey  = nullptr;
-        jbyteArray jIcdHmacKey = nullptr;
-        jobject jICDClientInfo = nullptr;
-
-        if (info.peer_node.GetFabricIndex() != fabricIndex)
-        {
-            continue;
-        }
-
-        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                                                               CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdAesKey);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
-                            ChipLogError(Controller, "ICD AES KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
-
-        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                                                               CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdHmacKey);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
-                            ChipLogError(Controller, "ICD HMAC KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
-
-        jICDClientInfo = (jobject) env->NewObject(infoClass, constructor, static_cast<jlong>(info.peer_node.GetNodeId()),
-                                                  static_cast<jlong>(info.start_icd_counter), static_cast<jlong>(info.offset),
-                                                  static_cast<jlong>(info.monitored_subject), jIcdAesKey, jIcdHmacKey);
-
-        err = JniReferences::GetInstance().AddToList(jInfo, jICDClientInfo);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
-                            ChipLogError(Controller, "AddToList error!: %" CHIP_ERROR_FORMAT, err.Format()));
-    }
-
-    return jInfo;
+    VerifyOrReturn(wrapper != nullptr,
+                   ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in startDnssd fails!"));
+    wrapper->StartDnssd();
 }
 
-JNI_METHOD(void, subscribe)
-(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered,
- jint imTimeoutMs, jobject eventMin)
+JNI_METHOD(void, stopDnssd)(JNIEnv * env, jobject self, jlong handle)
 {
-    CHIP_ERROR err = subscribe(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList,
-                               minInterval, maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, eventMin);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
+    ChipLogProgress(Controller, "stopDnssd() called");
+    chip::DeviceLayer::StackLock lock;
 
-JNI_METHOD(void, read)
-(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
-{
-    CHIP_ERROR err = read(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList,
-                          isFabricFiltered, imTimeoutMs, eventMin);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "JNI IM Read Error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
-
-JNI_METHOD(void, write)
-(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
- jint imTimeoutMs)
-{
-    CHIP_ERROR err = write(env, handle, callbackHandle, devicePtr, attributeList, timedRequestTimeoutMs, imTimeoutMs);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "JNI IM Write Error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
-
-JNI_METHOD(void, invoke)
-(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
- jint imTimeoutMs)
-{
-    CHIP_ERROR err = invoke(env, handle, callbackHandle, devicePtr, invokeElement, timedRequestTimeoutMs, imTimeoutMs);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "JNI IM Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
-
-JNI_METHOD(void, extendableInvoke)
-(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElementList,
- jint timedRequestTimeoutMs, jint imTimeoutMs)
-{
-    CHIP_ERROR err =
-        extendableInvoke(env, handle, callbackHandle, devicePtr, invokeElementList, timedRequestTimeoutMs, imTimeoutMs);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "JNI IM Batch Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrReturn(wrapper != nullptr,
+                   ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in stopDnssd fails!"));
+    wrapper->StopDnssd();
 }
 
 void * IOThreadMain(void * arg)

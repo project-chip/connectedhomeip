@@ -20,7 +20,6 @@
 #include <memory>
 #include <vector>
 
-#include <app/AttributeAccessInterface.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/NetworkCommissioning.h>

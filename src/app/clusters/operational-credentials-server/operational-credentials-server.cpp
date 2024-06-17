@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -702,7 +703,11 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     needRevert = false;
 
     // We might have a new operational identity, so we should start advertising it right away.
-    app::DnssdServer::Instance().AdvertiseOperational();
+    err = app::DnssdServer::Instance().AdvertiseOperational();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     // Notify the attributes containing fabric metadata can be read with new data
     MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,

@@ -70,13 +70,18 @@ extern "C" {
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "wfx_host_events.h"
-#if SLI_SI91X_MCU_INTERFACE
+#if TINYCRYPT_PRIMITIVES
 #include "sl_si91x_trng.h"
 #define TRNGKEY_SIZE 4
-#endif // SLI_SI91X_MCU_INTERFACE
-} // extern "C" {
+#endif // TINYCRYPT_PRIMITIVES
+}
 
 WfxRsi_t wfx_rsi;
+
+// TODO: remove this. Added only to monitor how many watch dog reset have happened during testing.
+#ifdef SLI_SI91X_MCU_INTERFACE
+volatile uint32_t watchdog_reset = 0;
+#endif // SLI_SI91X_MCU_INTERFACE
 
 /* Declare a variable to hold the data associated with the created event group. */
 StaticEventGroup_t rsiDriverEventGroup;
@@ -274,42 +279,52 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 
 #if SL_ICD_ENABLED
 
-#if SLI_SI91X_MCU_INTERFACE
-/******************************************************************
- * @fn   sl_wfx_host_si91x_sleep_wakeup()
- * @brief
- *       M4 going to sleep
- *
- * @param[in] None
- * @return
- *        None
- *********************************************************************/
-void sl_wfx_host_si91x_sleep_wakeup()
+#if SI917_M4_SLEEP_ENABLED
+// Required to invoke button press event during sleep as falling edge is not detected
+void invoke_btn_press_event()
 {
-    if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY)
+    // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
+    if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
     {
-        // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
-        if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
-        {
-            sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
-            btn0_pressed = true;
-        }
-        if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
-        {
-#ifdef DISPLAY_ENABLED
-            // if LCD is enabled, power down the lcd before setting the M4 to sleep
-            sl_si91x_hardware_setup();
-#endif
-            btn0_pressed = false;
-            /* Configure RAM Usage and Retention Size */
-            sl_si91x_m4_sleep_wakeup();
-#if SILABS_LOG_ENABLED
-            silabsInitLog();
-#endif
-        }
+        sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
+        btn0_pressed = true;
+    }
+    if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
+    {
+        btn0_pressed = false;
     }
 }
-#endif // SLI_SI91X_MCU_INTERFACE
+
+/**
+ * @brief Checks if the Wi-Fi module is ready for sleep.
+ *
+ * This function checks if the Wi-Fi module is ready to enter sleep mode.
+ *
+ * @return true if the Wi-Fi module is ready for sleep, false otherwise.
+ */
+bool wfx_is_sleep_ready()
+{
+    // BRD4002A board BTN_PRESS is 0 when pressed, release is 1
+    // sli_si91x_is_sleep_ready requires OS Scheduler to be active
+    return ((RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) != 0) && (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY) &&
+            sli_si91x_is_sleep_ready());
+}
+
+/**
+ * @brief Sleeps for a specified duration and then wakes up.
+ *
+ * This function puts the SI91x host into sleep mode for the specified duration
+ * in milliseconds and then wakes it up.
+ *
+ * @param sleep_time_ms The duration in milliseconds to sleep.
+ */
+void sl_wfx_host_si91x_sleep(uint16_t * sleep_time_ms)
+{
+    SL_ASSERT(sleep_time_ms != NULL);
+    sl_si91x_m4_sleep_wakeup(sleep_time_ms);
+}
+
+#endif // SI917_M4_SLEEP_ENABLED
 
 /******************************************************************
  * @fn   wfx_rsi_power_save()
@@ -363,6 +378,13 @@ int32_t wfx_wifi_rsi_init(void)
     SILABS_LOG("wfx_wifi_rsi_init started");
     sl_status_t status;
     status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
+#ifdef SLI_SI91X_MCU_INTERFACE
+    // TODO: remove this. Added only to monitor how many watch dog reset have happened during testing.
+    if ((MCU_FSM->MCU_FSM_WAKEUP_STATUS_REG) & BIT(5))
+    {
+        watchdog_reset++;
+    }
+#endif // SLI_SI91X_MCU_INTERFACE
     if (status != SL_STATUS_OK)
     {
         return status;
@@ -455,7 +477,7 @@ static sl_status_t wfx_rsi_init(void)
         return status;
     }
 
-#ifdef SLI_SI91X_MCU_INTERFACE
+#ifdef TINYCRYPT_PRIMITIVES
     const uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
 
     // To check the Entropy of TRNG and verify TRNG functioning.
@@ -473,7 +495,7 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("TRNG Key Programming Failed");
         return status;
     }
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // TINYCRYPT_PRIMITIVES
 
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;

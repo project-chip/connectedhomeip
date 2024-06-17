@@ -60,4 +60,65 @@
     }
 }
 
+- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device
+{
+    return self.skipExpectedValuesForWrite;
+}
+
+- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device
+{
+    return self.forceAttributeReportsIfMatchingCache;
+}
+
+- (void)deviceConfigurationChanged:(MTRDevice *)device
+{
+    if (self.onDeviceConfigurationChanged != nil) {
+        self.onDeviceConfigurationChanged();
+    }
+}
+
+- (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device
+{
+    return self.pretendThreadEnabled;
+}
+
+- (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device
+{
+    if (self.onSubscriptionPoolDequeue != nil) {
+        self.onSubscriptionPoolDequeue();
+    }
+}
+
+- (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device
+{
+    if (self.onSubscriptionPoolWorkComplete != nil) {
+        self.onSubscriptionPoolWorkComplete();
+    }
+}
+
+- (void)unitTestClusterDataPersisted:(MTRDevice *)device
+{
+    if (self.onClusterDataPersisted != nil) {
+        self.onClusterDataPersisted();
+    }
+}
+
+- (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device
+{
+    // Allowing time-based reachability changes just makes the tests
+    // non-deterministic and can lead to random failures.  Suppress them
+    // unconditionally for now.  If we ever add tests that try to exercise that
+    // codepath, we can make this configurable.
+    return YES;
+}
+
+@end
+
+@implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride
+
+- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device
+{
+    return !_skipSetupSubscription;
+}
+
 @end

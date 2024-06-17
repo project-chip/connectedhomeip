@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <ble/BlePlatformDelegate.h>
+#include <ble/Ble.h>
 #include <system/SystemPacketBuffer.h>
 
 using ::chip::Ble::ChipBleUUID;
@@ -38,10 +38,6 @@ public:
                                 PacketBufferHandle pBuf);
     virtual bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                   PacketBufferHandle pBuf);
-    virtual bool SendReadRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                 PacketBufferHandle pBuf);
-    virtual bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext,
-                                  const Ble::ChipBleUUID * svcId, const ChipBleUUID * charId);
 };
 
 } // namespace Internal

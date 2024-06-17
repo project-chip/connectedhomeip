@@ -41,6 +41,10 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 {
     switch (event->Type)
     {
+    case DeviceEventType::kBLEDeinitialized:
+        ESP_LOGI(TAG, "BLE is deinitialized");
+        break;
+
     case DeviceEventType::kInternetConnectivityChange:
         OnInternetConnectivityChange(event);
         break;
@@ -51,7 +55,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 
     case DeviceEventType::kCHIPoBLEConnectionClosed:
         ESP_LOGI(TAG, "CHIPoBLE disconnected");
-        Esp32AppServer::DeInitBLEIfCommissioned();
         break;
 
     case DeviceEventType::kDnssdInitialized:
@@ -67,6 +70,7 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
+        Esp32AppServer::DeInitBLEIfCommissioned();
     }
     break;
 

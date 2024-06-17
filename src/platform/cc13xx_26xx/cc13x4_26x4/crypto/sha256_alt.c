@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include <ti/drivers/SHA2.h>
+#include <ti/drivers/dpl/HwiP.h>
 #include <ti/drivers/sha2/SHA2CC26X2.h>
 
 /*!
@@ -142,8 +143,11 @@ void mbedtls_sha256_clone(mbedtls_sha256_context * dst, const mbedtls_sha256_con
 int mbedtls_sha256_finish_ret(mbedtls_sha256_context * ctx, unsigned char output[32])
 {
     int_fast16_t result;
+    uint32_t key;
 
+    key    = HwiP_disable();
     result = SHA2_finalize(ctx->hndl, output);
+    HwiP_restore(key);
 
     if (SHA2_STATUS_SUCCESS != result)
     {
@@ -158,9 +162,12 @@ int mbedtls_sha256_finish_ret(mbedtls_sha256_context * ctx, unsigned char output
 int mbedtls_sha256_update_ret(mbedtls_sha256_context * ctx, const unsigned char * input, size_t ilen)
 {
     int_fast16_t result;
+    uint32_t key;
 
+    key = HwiP_disable();
     // Process data in chunks. The driver buffers incomplete blocks internally.
     result = SHA2_addData(ctx->hndl, input, ilen);
+    HwiP_restore(key);
 
     if (SHA2_STATUS_SUCCESS != result)
     {
@@ -175,9 +182,13 @@ int mbedtls_sha256_update_ret(mbedtls_sha256_context * ctx, const unsigned char 
 int mbedtls_internal_sha256_process(mbedtls_sha256_context * ctx, const unsigned char data[64])
 {
     int_fast16_t result;
+    uint32_t key;
+
+    key = HwiP_disable();
 
     // Process data in chunks. The driver buffers incomplete blocks internally.
     result = SHA2_addData(ctx->hndl, data, SHA2_BLOCK_SIZE_BYTES_256);
+    HwiP_restore(key);
 
     if (SHA2_STATUS_SUCCESS != result)
     {

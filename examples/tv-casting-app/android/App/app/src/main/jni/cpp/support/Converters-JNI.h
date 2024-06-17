@@ -19,7 +19,10 @@
 #include "core/BaseCluster.h"
 #include "core/CastingPlayer.h"
 #include "core/Command.h"
+#include "core/CommissionerDeclarationHandler.h"
+#include "core/ConnectionCallbacks.h"
 #include "core/Endpoint.h"
+#include "core/IdentificationDeclarationOptions.h"
 
 #include <lib/core/CHIPError.h>
 
@@ -28,6 +31,8 @@
 namespace matter {
 namespace casting {
 namespace support {
+
+jobject convertLongFromCppToJava(jlong value);
 
 jobject convertMatterErrorFromCppToJava(CHIP_ERROR inErr);
 
@@ -71,6 +76,28 @@ jobject convertCommandFromCppToJava(void * command, const char * className);
 void * convertCommandFromJavaToCpp(jobject jCommandObject);
 
 jobject convertLongFromCppToJava(uint64_t responseData);
+
+/**
+ * @brief Converts a Java TargetAppInfo into a native MatterTargetAppInfo.
+ *
+ * @return pointer to the TargetAppInfo jobject if created successfully, nullptr otherwise.
+ */
+chip::Protocols::UserDirectedCommissioning::TargetAppInfo * convertTargetAppInfoFromJavaToCpp(jobject jTargetAppInfo);
+
+/**
+ * @brief Converts a Java IdentificationDeclarationOptions into a native IdentificationDeclarationOptions
+ *
+ * @return pointer to the IdentificationDeclarationOptions if created successfully, nullptr otherwise.
+ */
+matter::casting::core::IdentificationDeclarationOptions * convertIdentificationDeclarationOptionsFromJavaToCpp(jobject jIdOptions);
+
+/**
+ * @brief Converts a native CommissioningDeclaration into a MatterCommissioningDeclaration jobject
+ *
+ * @return pointer to the CommissioningDeclaration jobject if created successfully, nullptr otherwise.
+ */
+jobject
+convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration & cppCd);
 
 }; // namespace support
 }; // namespace casting

@@ -47,6 +47,7 @@
 #include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
+#include <app/data-model/List.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
@@ -90,12 +91,18 @@ NSString * const MTREventTimestampDateKey = @"eventTimestampDate";
 NSString * const MTREventIsHistoricalKey = @"eventIsHistorical";
 
 class MTRDataValueDictionaryCallbackBridge;
+class MTRDataValueDictionaryDecodableType;
+template <typename DecodableValueType>
+class BufferedReadClientCallback;
 
 @interface MTRReadClientContainer : NSObject
 @property (nonatomic, readwrite) app::ReadClient * readClientPtr;
+@property (nonatomic, readwrite) BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback;
 @property (nonatomic, readwrite) app::AttributePathParams * pathParams;
 @property (nonatomic, readwrite) app::EventPathParams * eventPathParams;
 @property (nonatomic, readwrite) uint64_t deviceID;
+
+- (void)cleanup;
 - (void)onDone;
 @end
 
@@ -156,22 +163,7 @@ static void PurgeReadClientContainers(
     [controller
         asyncDispatchToMatterQueue:^() {
             for (MTRReadClientContainer * container in listToDelete) {
-                if (container.readClientPtr) {
-                    Platform::Delete(container.readClientPtr);
-                    container.readClientPtr = nullptr;
-                }
-                if (container.pathParams) {
-                    static_assert(std::is_trivially_destructible<AttributePathParams>::value,
-                        "AttributePathParams destructors won't get run");
-                    Platform::MemoryFree(container.pathParams);
-                    container.pathParams = nullptr;
-                }
-                if (container.eventPathParams) {
-                    static_assert(
-                        std::is_trivially_destructible<EventPathParams>::value, "EventPathParams destructors won't get run");
-                    Platform::MemoryFree(container.eventPathParams);
-                    container.eventPathParams = nullptr;
-                }
+                [container cleanup];
             }
             [listToDelete removeAllObjects];
             if (completion) {
@@ -203,47 +195,13 @@ static void PurgeCompletedReadClientContainers(uint64_t deviceId)
     [readClientContainersLock unlock];
 }
 
-#ifdef DEBUG
-// This function is for unit testing only. This function closes all read clients.
-static void CauseReadClientFailure(
-    MTRDeviceController * controller, uint64_t deviceId, dispatch_queue_t queue, void (^_Nullable completion)(void))
-{
-    InitializeReadClientContainers();
-
-    NSMutableArray<MTRReadClientContainer *> * listToFail;
-    NSNumber * key = [NSNumber numberWithUnsignedLongLong:deviceId];
-    [readClientContainersLock lock];
-    listToFail = readClientContainers[key];
-    [readClientContainers removeObjectForKey:key];
-    [readClientContainersLock unlock];
-
-    [controller
-        asyncDispatchToMatterQueue:^() {
-            for (MTRReadClientContainer * container in listToFail) {
-                // Send auto resubscribe request again by read clients, which must fail.
-                chip::app::ReadPrepareParams readParams;
-                if (container.readClientPtr) {
-                    container.readClientPtr->SendAutoResubscribeRequest(std::move(readParams));
-                }
-            }
-            if (completion) {
-                dispatch_async(queue, completion);
-            }
-        }
-        errorHandler:^(NSError * error) {
-            // Can't fail things. Just put them back.
-            ReinstateReadClientList(listToFail, key, queue, completion);
-        }];
-}
-#endif
-
 static bool CheckMemberOfType(NSDictionary<NSString *, id> * responseValue, NSString * memberName, Class expectedClass,
     NSString * errorMessage, NSError * __autoreleasing * error);
 static void LogStringAndReturnError(NSString * errorStr, CHIP_ERROR errorCode, NSError * __autoreleasing * error);
 static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode, NSError * __autoreleasing * error);
 
 @implementation MTRReadClientContainer
-- (void)onDone
+- (void)cleanup
 {
     if (_readClientPtr) {
         Platform::Delete(_readClientPtr);
@@ -259,26 +217,19 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
         Platform::MemoryFree(_eventPathParams);
         _eventPathParams = nullptr;
     }
+    if (_callback) {
+        Platform::Delete(_callback);
+        _callback = nullptr;
+    }
+}
+
+- (void)onDone
+{
+    [self cleanup];
+
     PurgeCompletedReadClientContainers(_deviceID);
 }
 
-- (void)dealloc
-{
-    if (_readClientPtr) {
-        Platform::Delete(_readClientPtr);
-        _readClientPtr = nullptr;
-    }
-    if (_pathParams) {
-        static_assert(std::is_trivially_destructible<AttributePathParams>::value, "AttributePathParams destructors won't get run");
-        Platform::MemoryFree(_pathParams);
-        _pathParams = nullptr;
-    }
-    if (_eventPathParams) {
-        static_assert(std::is_trivially_destructible<EventPathParams>::value, "EventPathParams destructors won't get run");
-        Platform::MemoryFree(_eventPathParams);
-        _eventPathParams = nullptr;
-    }
-}
 @end
 
 @implementation MTRBaseDevice
@@ -620,7 +571,7 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
         return _MakeDataValueDictionary(typeName, array, dataVersion);
     }
     default:
-        MTR_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", (unsigned) data->GetType());
+        MTR_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", static_cast<unsigned>(data->GetType()));
         return nil;
     }
 }
@@ -633,10 +584,11 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVW
     }
     NSString * typeName = ((NSDictionary *) object)[MTRTypeKey];
     id value = ((NSDictionary *) object)[MTRValueKey];
-    if (!typeName) {
+    if (![typeName isKindOfClass:[NSString class]]) {
         MTR_LOG_ERROR("Error: Object to encode is corrupt");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
     if ([typeName isEqualToString:MTRSignedIntegerValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             MTR_LOG_ERROR("Error: Object to encode has corrupt signed integer type: %@", [value class]);
@@ -1219,10 +1171,53 @@ private:
             auto onFailureCb = [failureCb, bridge](
                                    const app::ConcreteAttributePath * attribPath, CHIP_ERROR aError) { failureCb(bridge, aError); };
 
-            return chip::Controller::WriteAttribute<MTRDataValueDictionaryDecodableType>(session,
+            // To handle list chunking properly, we have to convert lists into
+            // DataModel::List here, because that's special-cased in
+            // WriteClient.
+            if (![value isKindOfClass:NSDictionary.class]) {
+                MTR_LOG_ERROR("Error: Unsupported object to write as attribute value: %@", value);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            NSDictionary<NSString *, id> * dataValue = value;
+            NSString * typeName = dataValue[MTRTypeKey];
+            if (![typeName isKindOfClass:NSString.class]) {
+                MTR_LOG_ERROR("Error: Object to encode is corrupt: %@", dataValue);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            if (![typeName isEqualToString:MTRArrayValueType]) {
+                return chip::Controller::WriteAttribute<MTRDataValueDictionaryDecodableType>(session,
+                    static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+                    static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
+                    static_cast<chip::AttributeId>([attributeID unsignedLongValue]), MTRDataValueDictionaryDecodableType(value),
+                    onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]));
+            }
+
+            // Now we are dealing with a list.
+            NSArray<NSDictionary<NSString *, id> *> * arrayValue = value[MTRValueKey];
+            if (![arrayValue isKindOfClass:NSArray.class]) {
+                MTR_LOG_ERROR("Error: Object to encode claims to be a list but isn't: %@", arrayValue);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            std::vector<MTRDataValueDictionaryDecodableType> encodableVector;
+            encodableVector.reserve(arrayValue.count);
+
+            for (NSDictionary<NSString *, id> * arrayItem in arrayValue) {
+                if (![arrayItem isKindOfClass:NSDictionary.class]) {
+                    MTR_LOG_ERROR("Error: Can't encode corrupt list: %@", arrayValue);
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+
+                encodableVector.push_back(MTRDataValueDictionaryDecodableType(arrayItem[MTRDataKey]));
+            }
+
+            DataModel::List<MTRDataValueDictionaryDecodableType> encodableList(encodableVector.data(), encodableVector.size());
+            return chip::Controller::WriteAttribute<DataModel::List<MTRDataValueDictionaryDecodableType>>(session,
                 static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
                 static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
-                static_cast<chip::AttributeId>([attributeID unsignedLongValue]), MTRDataValueDictionaryDecodableType(value),
+                static_cast<chip::AttributeId>([attributeID unsignedLongValue]), encodableList,
                 onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]));
         });
     std::move(*bridge).DispatchAction(self);
@@ -1685,6 +1680,7 @@ exit:
                            dispatch_async(queue, ^{
                                reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
                            });
+                           [container cleanup];
                            return;
                        }
                        for (MTRAttributeRequestPath * attribute in attributes) {
@@ -1699,6 +1695,7 @@ exit:
                            dispatch_async(queue, ^{
                                reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
                            });
+                           [container cleanup];
                            return;
                        }
                        for (MTREventRequestPath * event in events) {
@@ -1718,9 +1715,6 @@ exit:
 
                    auto onDone = [container](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
                        [container onDone];
-                       // Make sure we delete callback last, because doing that actually destroys our
-                       // lambda, so we can't access captured values after that.
-                       chip::Platform::Delete(callback);
                    };
 
                    auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
@@ -1729,6 +1723,9 @@ exit:
 
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
+
+                   container.readClientPtr = readClient;
+                   container.callback = callback.release();
 
                    if (!params.resubscribeAutomatically) {
                        err = readClient->SendRequest(readParams);
@@ -1740,23 +1737,12 @@ exit:
                        dispatch_async(queue, ^{
                            reportHandler(nil, [MTRError errorForCHIPErrorCode:err]);
                        });
-                       Platform::Delete(readClient);
-                       if (container.pathParams != nullptr) {
-                           Platform::MemoryFree(container.pathParams);
-                       }
-
-                       if (container.eventPathParams != nullptr) {
-                           Platform::MemoryFree(container.eventPathParams);
-                       }
-                       container.pathParams = nullptr;
-                       container.eventPathParams = nullptr;
+                       [container cleanup];
                        return;
                    }
 
                    // Read clients will be purged when deregistered.
-                   container.readClientPtr = readClient;
                    AddReadClientContainer(container.deviceID, container);
-                   callback.release();
                }];
 }
 
@@ -1795,11 +1781,7 @@ OpenCommissioningWindowHelper::OpenCommissioningWindowHelper(Controller::DeviceC
 CHIP_ERROR OpenCommissioningWindowHelper::OpenCommissioningWindow(Controller::DeviceController * controller, NodeId nodeID,
     System::Clock::Seconds16 timeout, uint16_t discriminator, const Optional<uint32_t> & setupPIN, ResultCallback callback)
 {
-    auto * self = new (std::nothrow) OpenCommissioningWindowHelper(controller, callback);
-    if (self == nullptr) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
+    auto * self = new OpenCommissioningWindowHelper(controller, callback);
     SetupPayload unused;
     CHIP_ERROR err = self->mOpener.OpenCommissioningWindow(nodeID, timeout, Crypto::kSpake2p_Min_PBKDF_Iterations, discriminator,
         setupPIN, NullOptional, &self->mOnOpenCommissioningWindowCallback, unused);
@@ -1983,13 +1965,6 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 }
 
 #ifdef DEBUG
-// This method is for unit testing only
-- (void)failSubscribers:(dispatch_queue_t)queue completion:(void (^)(void))completion
-{
-    MTR_LOG_DEBUG("Causing failure in subscribers on purpose");
-    CauseReadClientFailure(self.deviceController, self.nodeID, queue, completion);
-}
-
 // The following method is for unit testing purpose only
 + (id)CHIPEncodeAndDecodeNSObject:(id)object
 {

@@ -31,7 +31,7 @@
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
-#include <app/CommandHandler.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
@@ -87,11 +87,12 @@ namespace app {
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandResponseSender::Callback,
-                               public CommandHandler::Callback,
+                               public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
-                               public TimedHandlerDelegate
+                               public TimedHandlerDelegate,
+                               public WriteHandlerDelegate
 {
 public:
     /**
@@ -192,11 +193,6 @@ public:
      */
     WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
 
-    /**
-     * The Magic number of this InteractionModelEngine, the magic number is set during Init()
-     */
-    uint32_t GetMagicNumber() const { return mMagic; }
-
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
     reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
@@ -239,6 +235,9 @@ public:
                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+
+    // WriteHandlerDelegate implementation
+    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & apath) override;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
@@ -283,12 +282,6 @@ public:
      * Returns the number of dirty subscriptions. Including the subscriptions that are generating reports.
      */
     size_t GetNumDirtySubscriptions() const;
-
-    /**
-     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
-     * transaction is in the middle of processing the chunked value of the given path.)
-     */
-    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
     /**
      * Select the oldest (and the one that exceeds the per subscription resource minimum if there are any) read handler on the
@@ -426,7 +419,7 @@ private:
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandResponseSender & apResponderObj) override;
-    void OnDone(CommandHandler & apCommandObj) override;
+    void OnDone(CommandHandlerImpl & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
     void TryToResumeSubscriptions();
@@ -506,7 +499,7 @@ private:
     Status OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                    System::PacketBufferHandle && aPayload);
 
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
@@ -706,21 +699,7 @@ private:
     CASESessionManager * mpCASESessionMgr = nullptr;
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
-
-    // A magic number for tracking values between stack Shutdown()-s and Init()-s.
-    // An ObjectHandle is valid iff. its magic equals to this one.
-    uint32_t mMagic = 0;
 };
-
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj);
-
-/**
- *  Get the registered attribute access override. nullptr when attribute access override is not found.
- *
- * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
- */
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
 
 } // namespace app
 } // namespace chip

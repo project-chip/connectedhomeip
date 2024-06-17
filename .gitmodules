@@ -76,8 +76,8 @@
 [submodule "ot-stm32"]
 	path = third_party/openthread/ot-stm32
 	url = https://github.com/openthread/openthread
-        branch = eb6377f
-        platforms = stm32
+	branch = eb6377f
+	platforms = stm32
 [submodule "third_party/openthread/ot-ifx"]
 	path = third_party/openthread/ot-ifx
 	url = https://github.com/Infineon/ot-ifx-release.git
@@ -189,22 +189,6 @@
 [submodule "third_party/jsoncpp/repo"]
 	path = third_party/jsoncpp/repo
 	url = https://github.com/open-source-parsers/jsoncpp.git
-[submodule "cyw30739_sdk/30739A0"]
-	path = third_party/infineon/cyw30739_sdk/repos/30739A0
-	url = https://github.com/Infineon/OT-Matter-30739A0.git
-	platforms = infineon
-[submodule "cyw30739_sdk/include"]
-	path = third_party/infineon/cyw30739_sdk/repos/btsdk-include
-	url = https://github.com/Infineon/btsdk-include.git
-	platforms = infineon
-[submodule "cyw30739_sdk/target"]
-	path = third_party/infineon/cyw30739_sdk/repos/CYW930739M2EVB-01
-	url = https://github.com/Infineon/OT-Matter-TARGET_CYW930739M2EVB-01.git
-	platforms = infineon
-[submodule "cyw30739_sdk/tools"]
-	path = third_party/infineon/cyw30739_sdk/repos/btsdk-tools
-	url = https://github.com/Infineon/btsdk-tools.git
-	platforms = infineon
 [submodule "third_party/p6/p6_sdk/libs/anycloud-ota"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/anycloud-ota
 	url = https://github.com/Infineon/anycloud-ota
@@ -217,6 +201,12 @@
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/serial-flash
 	url = https://github.com/Infineon/serial-flash
 	platforms = infineon
+[submodule "infineon/matter-wpan-sdk"]
+	path = third_party/infineon/repos/matter-wpan-sdk
+	url = https://github.com/Infineon/matter-wpan-sdk.git
+	branch = main
+	platforms = infineon
+	recursive = true
 [submodule "ti_simplelink_sdk"]
 	path = third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx
 	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
@@ -244,7 +234,7 @@
 [submodule "third_party/silabs/gecko_sdk"]
 	path = third_party/silabs/gecko_sdk
 	url = https://github.com/SiliconLabs/gecko_sdk.git
-	branch = v4.4.1
+	branch = v4.4.2
 	platforms = silabs
 [submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
@@ -254,7 +244,7 @@
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect.git
-	branch = v3.1.3
+	branch = v3.1.3-matter-hotfix.4
 	platforms = silabs
 [submodule "editline"]
 	path = third_party/editline/repo
@@ -323,7 +313,7 @@
 [submodule "third_party/st/STM32CubeWB"]
 	path = third_party/st/STM32CubeWB
 	url = https://github.com/STMicroelectronics/STM32CubeWB.git
-	branch = v1.17.0
+	branch = v1.18.0
 	platforms = stm32
 [submodule "p6/lwip-network-interface-integration"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip-network-interface-integration
@@ -334,4 +324,3 @@
 	url = https://github.com/Infineon/optiga-trust-m.git
 	branch = matter_support
 	platforms = infineon
-

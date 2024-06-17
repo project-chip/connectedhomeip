@@ -72,13 +72,16 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="DF">
+        <feature code="" name="DeadFrontBehavior">
           <mandatoryConform/>
         </feature>
       </features>
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="server">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>

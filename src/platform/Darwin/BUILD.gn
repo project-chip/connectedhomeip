@@ -76,6 +76,8 @@ static_library("Darwin") {
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
+    "UserDefaults.h",
+    "UserDefaults.mm",
   ]
 
   if (chip_enable_wifi) {
@@ -128,8 +130,8 @@ static_library("Darwin") {
       "BleConnectionDelegateImpl.mm",
       "BlePlatformDelegate.h",
       "BlePlatformDelegateImpl.mm",
-      "UUIDHelper.h",
-      "UUIDHelperImpl.mm",
+      "MTRUUIDHelper.h",
+      "MTRUUIDHelperImpl.mm",
     ]
   }
 }

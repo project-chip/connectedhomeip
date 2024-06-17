@@ -1223,7 +1223,8 @@ class TestStep:
             # But some other tests were relying on the fact that the expression was put 'as if' in
             # the generated code and was resolved before being sent over the wire. For such
             # expressions (e.g 'myVar + 1') we need to compute it before sending it over the wire.
-            tokens = value.split()
+            delimiter_regex = "(\ |\(|\)|\+|\-|\*|\/|\%)"
+            tokens = re.split(delimiter_regex, value)
             if len(tokens) == 0:
                 return value
 
@@ -1240,7 +1241,7 @@ class TestStep:
                 return tokens[0]
 
             tokens = [str(token) for token in tokens]
-            value = ' '.join(tokens)
+            value = ''.join(tokens)
             # TODO we should move away from eval. That will mean that we will need to do extra
             # parsing, but it would be safer then just blindly running eval.
             return value if not substitution_occured else eval(value)

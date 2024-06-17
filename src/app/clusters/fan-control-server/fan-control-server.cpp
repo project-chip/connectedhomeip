@@ -20,14 +20,10 @@
  * @brief Implementation for the Fan Control Server Cluster
  ***************************************************************************/
 
-#include <assert.h>
-#include <math.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>

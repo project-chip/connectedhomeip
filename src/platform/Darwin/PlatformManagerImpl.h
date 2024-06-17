@@ -24,6 +24,7 @@
 #pragma once
 
 #include <lib/core/Global.h>
+#include <platform/Darwin/BleScannerDelegate.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <atomic>
@@ -49,9 +50,8 @@ public:
     dispatch_queue_t GetWorkQueue() { return mWorkQueue; }
     bool IsWorkQueueCurrentQueue() const;
 
-    CHIP_ERROR StartBleScan(BleScannerDelegate * delegate = nullptr);
+    CHIP_ERROR StartBleScan(BleScannerDelegate * delegate, BleScanMode mode = BleScanMode::kDefault);
     CHIP_ERROR StopBleScan();
-    CHIP_ERROR PrepareCommissioning();
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 

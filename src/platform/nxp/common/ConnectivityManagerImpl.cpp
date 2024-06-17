@@ -67,7 +67,6 @@ extern "C" {
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::DeviceLayer::DeviceEventType;
 
@@ -590,6 +589,34 @@ void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer *
                                               ConnectNetworkTimerHandler, context);
         PlatformMgr().UnlockChipStack();
     }
+}
+
+/* Can be used to disconnect from WiFi network.
+ */
+CHIP_ERROR ConnectivityManagerImpl::_DisconnectNetwork(void)
+{
+    int ret        = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (ConnectivityMgrImpl().IsWiFiStationConnected())
+    {
+        ChipLogProgress(NetworkProvisioning, "Disconnecting from WiFi network.");
+
+        ret = wlan_disconnect();
+
+        if (ret != WM_SUCCESS)
+        {
+            ChipLogError(NetworkProvisioning, "Failed to disconnect from network with error: %u", (uint8_t) ret);
+            err = CHIP_ERROR_UNEXPECTED_EVENT;
+        }
+    }
+    else
+    {
+        ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return err;
 }
 #endif
 

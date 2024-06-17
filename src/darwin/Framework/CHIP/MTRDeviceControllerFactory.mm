@@ -19,13 +19,8 @@
 
 #import <Matter/MTRDefines.h>
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-#import <Matter/MTRDeviceControllerParameters.h>
-#else
-#import "MTRDeviceControllerParameters_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 #import <Matter/MTRClusterConstants.h>
+#import <Matter/MTRDeviceControllerParameters.h>
 #import <Matter/MTRServerCluster.h>
 
 #import "MTRCertificates.h"
@@ -39,6 +34,7 @@
 #import "MTRFabricInfo_Internal.h"
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTROTAProviderDelegateBridge.h"
 #import "MTROperationalBrowser.h"
@@ -71,93 +67,14 @@
 
 using namespace chip;
 using namespace chip::Controller;
-
-static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
-static NSString * const kErrorSessionResumptionStorageInit = @"Init failure while creating a session resumption storage delegate";
-static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
-static NSString * const kErrorControllersInit = @"Init controllers array failure";
-static NSString * const kErrorCertificateValidityPolicyInit = @"Init certificate validity policy failure";
-static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
-static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
-static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
-static NSString * const kErrorSessionKeystoreInit = @"Init failure while initializing session keystore";
+using namespace chip::Tracing::DarwinFramework;
 
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit()
 {
-    MTR_LOG_INFO("ShutdownOnExit invoked on exit");
+    MTR_LOG("ShutdownOnExit invoked on exit");
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
-
-@interface MTRDeviceControllerFactory () {
-    MTRServerEndpoint * _otaProviderEndpoint;
-    std::unique_ptr<MTROTAProviderDelegateBridge> _otaProviderDelegateBridge;
-}
-
-@property (atomic, readonly) dispatch_queue_t chipWorkQueue;
-@property (readonly) DeviceControllerFactory * controllerFactory;
-@property (readonly) PersistentStorageDelegate * persistentStorageDelegate;
-@property (readonly) Crypto::RawKeySessionKeystore * sessionKeystore;
-// We use TestPersistentStorageDelegate just to get an in-memory store to back
-// our group data provider impl.  We initialize this store correctly on every
-// controller startup, so don't need to actually persist it.
-@property (readonly) TestPersistentStorageDelegate * groupStorageDelegate;
-@property (readonly) Credentials::GroupDataProviderImpl * groupDataProvider;
-@property (readonly) NSMutableArray<MTRDeviceController *> * controllers;
-@property (readonly) PersistentStorageOperationalKeystore * keystore;
-@property (readonly) Credentials::PersistentStorageOpCertStore * opCertStore;
-@property (readonly) MTROperationalBrowser * operationalBrowser;
-
-// productAttestationAuthorityCertificates and certificationDeclarationCertificates are just copied
-// from MTRDeviceControllerFactoryParams.
-@property (readonly, nullable) NSArray<MTRCertificateDERBytes> * productAttestationAuthorityCertificates;
-@property (readonly, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
-
-@property (readonly) BOOL advertiseOperational;
-@property (nonatomic, readonly) Credentials::IgnoreCertificateValidityPeriodPolicy * certificateValidityPolicy;
-@property (readonly) MTRSessionResumptionStorageBridge * sessionResumptionStorage;
-// Lock used to serialize access to the "controllers" array and the
-// "_controllerBeingStarted" and "_controllerBeingShutDown" ivars, since those
-// need to be touched from both whatever queue is starting controllers and from
-// the Matter queue.  The way this lock is used assumes that:
-//
-// 1) The only mutating accesses to the controllers array and the ivars happen
-//    when the current queue is not the Matter queue or in a block that was
-//    sync-dispatched to the Matter queue.  This is a good assumption, because
-//    the implementations of the functions that mutate these do sync dispatch to
-//    the Matter queue, which would deadlock if they were called when that queue
-//    was the current queue.
-//
-// 2) It's our API consumer's responsibility to serialize access to us from
-//    outside.
-//
-// These assumptions mean that if we are in a block that was sync-dispatched to
-// the Matter queue, that block cannot race with either the Matter queue nor the
-// non-Matter queue.  Similarly, if we are in a situation where the Matter queue
-// has been shut down, any accesses to the variables cannot race anything else.
-//
-// This means that:
-//
-// A. In a sync-dispatched block, or if the Matter queue has been shut down, we
-//    do not need to lock and can do read or write access.
-// B. Apart from item A, mutations of the array and ivars must happen outside the
-//    Matter queue and must lock.
-// C. Apart from item A, accesses on the Matter queue must be reads only and
-//    must lock.
-// D. Locking around reads not from the Matter queue is OK but not required.
-@property (nonatomic, readonly) os_unfair_lock controllersLock;
-
-@property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
-@property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
-
-@property (nonatomic, readonly) MTRDiagnosticLogsDownloader * diagnosticLogsDownloader;
-
-- (BOOL)findMatchingFabric:(FabricTable &)fabricTable
-                    params:(MTRDeviceControllerStartupParams *)params
-                    fabric:(const FabricInfo * _Nullable * _Nonnull)fabric;
-
-- (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller;
-@end
 
 @interface MTRDeviceControllerFactoryParams ()
 
@@ -167,18 +84,73 @@ static void ShutdownOnExit()
 
 @end
 
+MTR_DIRECT_MEMBERS
+@interface MTRDeviceControllerFactory ()
+- (void)preWarmCommissioningSessionDone;
+@end
+
+MTR_DIRECT_MEMBERS
 @implementation MTRDeviceControllerFactory {
+    dispatch_queue_t _chipWorkQueue;
+    DeviceControllerFactory * _controllerFactory;
+
+    Credentials::IgnoreCertificateValidityPeriodPolicy _certificateValidityPolicy;
+    Crypto::RawKeySessionKeystore _sessionKeystore;
+    // We use TestPersistentStorageDelegate just to get an in-memory store to back
+    // our group data provider impl.  We initialize this store correctly on every
+    // controller startup, so don't need to actually persist it.
+    TestPersistentStorageDelegate _groupStorageDelegate;
+    Credentials::GroupDataProviderImpl _groupDataProvider;
+
     // _usingPerControllerStorage is only written once, during controller
     // factory start.  After that it is only read, and can be read from
     // arbitrary threads.
     BOOL _usingPerControllerStorage;
+    PersistentStorageDelegate * _persistentStorageDelegate;
+    MTRSessionResumptionStorageBridge * _sessionResumptionStorage;
+    PersistentStorageOperationalKeystore * _keystore;
+    Credentials::PersistentStorageOpCertStore * _opCertStore;
+    MTROperationalBrowser * _operationalBrowser;
 
-    // See documentation for controllersLock above for the rules for accessing
-    // _controllerBeingStarted.
+    // productAttestationAuthorityCertificates and certificationDeclarationCertificates are just copied
+    // from MTRDeviceControllerFactoryParams.
+    NSArray<MTRCertificateDERBytes> * _Nullable _productAttestationAuthorityCertificates;
+    NSArray<MTRCertificateDERBytes> * _Nullable _certificationDeclarationCertificates;
+
+    BOOL _advertiseOperational;
+
+    // Lock used to serialize access to the "controllers" array and the
+    // "_controllerBeingStarted" and "_controllerBeingShutDown" ivars, since those
+    // need to be touched from both whatever queue is starting controllers and from
+    // the Matter queue.  The way this lock is used assumes that:
+    //
+    // 1) The only mutating accesses to the controllers array and the ivars happen
+    //    when the current queue is not the Matter queue or in a block that was
+    //    sync-dispatched to the Matter queue.  This is a good assumption, because
+    //    the implementations of the functions that mutate these do sync dispatch to
+    //    the Matter queue, which would deadlock if they were called when that queue
+    //    was the current queue.
+    //
+    // 2) It's our API consumer's responsibility to serialize access to us from
+    //    outside.
+    //
+    // These assumptions mean that if we are in a block that was sync-dispatched to
+    // the Matter queue, that block cannot race with either the Matter queue nor the
+    // non-Matter queue.  Similarly, if we are in a situation where the Matter queue
+    // has been shut down, any accesses to the variables cannot race anything else.
+    //
+    // This means that:
+    //
+    // A. In a sync-dispatched block, or if the Matter queue has been shut down, we
+    //    do not need to lock and can do read or write access.
+    // B. Apart from item A, mutations of the array and ivars must happen outside the
+    //    Matter queue and must lock.
+    // C. Apart from item A, accesses on the Matter queue must be reads only and
+    //    must lock.
+    // D. Locking around reads not from the Matter queue is OK but not required.
+    os_unfair_lock _controllersLock;
+    NSMutableArray<MTRDeviceController *> * _controllers;
     MTRDeviceController * _controllerBeingStarted;
-
-    // See documentation for controllersLock above for the rules for access
-    // _controllerBeingShutDown.
     MTRDeviceController * _controllerBeingShutDown;
 
     // Next available fabric index.  Only valid when _controllerBeingStarted is
@@ -187,10 +159,24 @@ static void ShutdownOnExit()
     // down.
     FabricIndex _nextAvailableFabricIndex;
 
+    id<MTROTAProviderDelegate> _Nullable _otaProviderDelegate;
+    dispatch_queue_t _Nullable _otaProviderDelegateQueue;
+    MTRServerEndpoint * _otaProviderEndpoint;
+    std::unique_ptr<MTROTAProviderDelegateBridge> _otaProviderDelegateBridge;
+
+    MTRDiagnosticLogsDownloader * _Nullable _diagnosticLogsDownloader;
+
     // Array of all server endpoints across all controllers, used to ensure
     // in an atomic way that endpoint IDs are unique.
     NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
     os_unfair_lock _serverEndpointsLock; // Protects access to _serverEndpoints.
+
+    class final : public DeviceLayer::BleScannerDelegate {
+        void OnBleScanStopped() override
+        {
+            [MTRDeviceControllerFactory.sharedInstance preWarmCommissioningSessionDone];
+        }
+    } _preWarmingDelegate;
 }
 
 + (void)initialize
@@ -219,46 +205,22 @@ static void ShutdownOnExit()
     // cost to having an idle dispatch queue, and it simplifies our logic.
     DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
-    _running = NO;
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
-    _controllersLock = OS_UNFAIR_LOCK_INIT;
 
-    _sessionKeystore = new chip::Crypto::RawKeySessionKeystore();
-    if ([self checkForInitError:(_sessionKeystore != nullptr) logMsg:kErrorSessionKeystoreInit]) {
-        return nil;
-    }
-
-    _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
-    if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {
-        return nil;
-    }
-
+    // Initialize our default-constructed GroupDataProviderImpl.
     // For now default args are fine, since we are just using this for the IPK.
-    _groupDataProvider = new chip::Credentials::GroupDataProviderImpl();
-    if ([self checkForInitError:(_groupDataProvider != nullptr) logMsg:kErrorGroupProviderInit]) {
-        return nil;
-    }
+    _groupDataProvider.SetStorageDelegate(&_groupStorageDelegate);
+    _groupDataProvider.SetSessionKeystore(&_sessionKeystore);
+    CHIP_ERROR err = _groupDataProvider.Init();
+    VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified,
+        "GroupDataProviderImpl::Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
 
-    _groupDataProvider->SetStorageDelegate(_groupStorageDelegate);
-    _groupDataProvider->SetSessionKeystore(_sessionKeystore);
-    CHIP_ERROR errorCode = _groupDataProvider->Init();
-    if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGroupProviderInit]) {
-        return nil;
-    }
-
+    _controllersLock = OS_UNFAIR_LOCK_INIT;
     _controllers = [[NSMutableArray alloc] init];
-    if ([self checkForInitError:(_controllers != nil) logMsg:kErrorControllersInit]) {
-        return nil;
-    }
 
-    _certificateValidityPolicy = new Credentials::IgnoreCertificateValidityPeriodPolicy();
-    if ([self checkForInitError:(_certificateValidityPolicy != nil) logMsg:kErrorCertificateValidityPolicyInit]) {
-        return nil;
-    }
-
-    _serverEndpoints = [[NSMutableArray alloc] init];
     _serverEndpointsLock = OS_UNFAIR_LOCK_INIT;
+    _serverEndpoints = [[NSMutableArray alloc] init];
 
     return self;
 }
@@ -266,7 +228,7 @@ static void ShutdownOnExit()
 - (void)dealloc
 {
     [self stopControllerFactory];
-    [self cleanupInitObjects];
+    _groupDataProvider.Finish();
 }
 
 - (void)_assertCurrentQueueIsNotMatterQueue
@@ -274,64 +236,10 @@ static void ShutdownOnExit()
     VerifyOrDie(!DeviceLayer::PlatformMgrImpl().IsWorkQueueCurrentQueue());
 }
 
-- (BOOL)checkIsRunning:(NSError * __autoreleasing *)error
-{
-    [self _assertCurrentQueueIsNotMatterQueue];
-
-    if ([self isRunning]) {
-        return YES;
-    }
-
-    if (error != nil) {
-        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-    }
-
-    return NO;
-}
-
-- (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
-{
-    if (condition) {
-        return NO;
-    }
-
-    MTR_LOG_ERROR("Error: %@", logMsg);
-
-    [self cleanupInitObjects];
-
-    return YES;
-}
-
-- (void)cleanupInitObjects
-{
-    _controllers = nil;
-
-    if (_groupDataProvider) {
-        _groupDataProvider->Finish();
-        delete _groupDataProvider;
-        _groupDataProvider = nullptr;
-    }
-
-    if (_groupStorageDelegate) {
-        delete _groupStorageDelegate;
-        _groupStorageDelegate = nullptr;
-    }
-
-    if (_sessionKeystore) {
-        delete _sessionKeystore;
-        _sessionKeystore = nullptr;
-    }
-
-    if (_certificateValidityPolicy) {
-        delete _certificateValidityPolicy;
-        _certificateValidityPolicy = nullptr;
-    }
-}
-
 - (void)cleanupStartupObjects
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_INFO("Cleaning startup objects in controller factory");
+    MTR_LOG("Cleaning startup objects in controller factory");
 
     // Make sure the deinit order here is the reverse of the init order in
     // startControllerFactory:
@@ -378,7 +286,7 @@ static void ShutdownOnExit()
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    if (!self.isRunning) {
+    if (!_running) { // Note: reading _running from outside of the Matter work queue
         return nil;
     }
 
@@ -424,40 +332,25 @@ static void ShutdownOnExit()
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    if ([self isRunning]) {
-        MTR_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
-        return YES;
-    }
-
-    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+    __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            return;
+        if (_running) {
+            // TODO: When treating a duplicate call as success we should validate parameters match
+            MTR_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
+            ExitNow(err = CHIP_NO_ERROR);
         }
 
         StartupMetricsCollection();
         InitializeServerAccessControl();
 
         if (startupParams.hasStorage) {
-            _persistentStorageDelegate = new (std::nothrow) MTRPersistentStorageDelegateBridge(startupParams.storage);
+            _persistentStorageDelegate = new MTRPersistentStorageDelegateBridge(startupParams.storage);
             _sessionResumptionStorage = nullptr;
             _usingPerControllerStorage = NO;
         } else {
-            _persistentStorageDelegate = new (std::nothrow) MTRDemuxingStorage(self);
-            _sessionResumptionStorage = new (std::nothrow) MTRSessionResumptionStorageBridge(self);
+            _persistentStorageDelegate = new MTRDemuxingStorage(self);
+            _sessionResumptionStorage = new MTRSessionResumptionStorageBridge(self);
             _usingPerControllerStorage = YES;
-
-            if (_sessionResumptionStorage == nil) {
-                MTR_LOG_ERROR("Error: %@", kErrorSessionResumptionStorageInit);
-                errorCode = CHIP_ERROR_NO_MEMORY;
-                return;
-            }
-        }
-
-        if (_persistentStorageDelegate == nil) {
-            MTR_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
-            errorCode = CHIP_ERROR_NO_MEMORY;
-            return;
         }
 
         _otaProviderDelegate = startupParams.otaProviderDelegate;
@@ -468,63 +361,42 @@ static void ShutdownOnExit()
 
         // TODO: Allow passing a different keystore implementation via startupParams.
         _keystore = new PersistentStorageOperationalKeystore();
-        if (_keystore == nullptr) {
-            MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
-            errorCode = CHIP_ERROR_NO_MEMORY;
-            return;
-        }
-
-        errorCode = _keystore->Init(_persistentStorageDelegate);
-        if (errorCode != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
-            return;
-        }
+        SuccessOrExit(err = _keystore->Init(_persistentStorageDelegate));
 
         // TODO Allow passing a different opcert store implementation via startupParams.
         _opCertStore = new Credentials::PersistentStorageOpCertStore();
-        if (_opCertStore == nullptr) {
-            MTR_LOG_ERROR("Error: %@", kErrorCertStoreInit);
-            errorCode = CHIP_ERROR_NO_MEMORY;
-            return;
-        }
-
-        errorCode = _opCertStore->Init(_persistentStorageDelegate);
-        if (errorCode != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Error: %@", kErrorCertStoreInit);
-            return;
-        }
+        SuccessOrExit(err = _opCertStore->Init(_persistentStorageDelegate));
 
         _productAttestationAuthorityCertificates = [startupParams.productAttestationAuthorityCertificates copy];
         _certificationDeclarationCertificates = [startupParams.certificationDeclarationCertificates copy];
 
-        chip::Controller::FactoryInitParams params;
-        if (startupParams.port != nil) {
-            params.listenPort = [startupParams.port unsignedShortValue];
-        }
-        params.enableServerInteractions = startupParams.shouldStartServer;
+        {
+            chip::Controller::FactoryInitParams params;
+            if (startupParams.port != nil) {
+                params.listenPort = [startupParams.port unsignedShortValue];
+            }
+            params.enableServerInteractions = startupParams.shouldStartServer;
 
-        params.groupDataProvider = _groupDataProvider;
-        params.sessionKeystore = _sessionKeystore;
-        params.fabricIndependentStorage = _persistentStorageDelegate;
-        params.operationalKeystore = _keystore;
-        params.opCertStore = _opCertStore;
-        params.certificateValidityPolicy = _certificateValidityPolicy;
-        params.sessionResumptionStorage = _sessionResumptionStorage;
-        errorCode = _controllerFactory->Init(params);
-        if (errorCode != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
-            return;
+            params.groupDataProvider = &_groupDataProvider;
+            params.sessionKeystore = &_sessionKeystore;
+            params.fabricIndependentStorage = _persistentStorageDelegate;
+            params.operationalKeystore = _keystore;
+            params.opCertStore = _opCertStore;
+            params.certificateValidityPolicy = &_certificateValidityPolicy;
+            params.sessionResumptionStorage = _sessionResumptionStorage;
+            SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
         // This needs to happen after DeviceControllerFactory::Init,
         // because that creates (lazily, by calling functions with
         // static variables in them) some static-lifetime objects.
         if (!sExitHandlerRegistered) {
-            int ret = atexit(ShutdownOnExit);
-            if (ret != 0) {
-                MTR_LOG_ERROR("Error registering exit handler: %d", ret);
-                return;
+            if (atexit(ShutdownOnExit) != 0) {
+                char error[128];
+                strerror_r(errno, error, sizeof(error));
+                MTR_LOG_ERROR("Warning: Failed to register atexit handler: %s", error);
             }
+            sExitHandlerRegistered = true;
         }
         HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
 
@@ -537,20 +409,24 @@ static void ShutdownOnExit()
         _controllerFactory->RetainSystemState();
         _controllerFactory->ReleaseSystemState();
 
-        self->_advertiseOperational = startupParams.shouldStartServer;
-        self->_running = YES;
-    });
+        _advertiseOperational = startupParams.shouldStartServer;
+        _running = YES;
+        err = CHIP_NO_ERROR;
 
-    if (![self isRunning]) {
-        dispatch_sync(_chipWorkQueue, ^{
+    exit:
+        if (err != CHIP_NO_ERROR) {
+            // Note: Since we have failed no later than _controllerFactory->Init(),
+            // there is no need to call _controllerFactory->Shutdown() here.
             [self cleanupStartupObjects];
-        });
+        }
+    });
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Failed to start Matter controller factory: %" CHIP_ERROR_FORMAT, err.Format());
         if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:errorCode];
+            *error = [MTRError errorForCHIPErrorCode:err];
         }
         return NO;
     }
-
     return YES;
 }
 
@@ -558,26 +434,19 @@ static void ShutdownOnExit()
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    if (![self isRunning]) {
-        return;
-    }
-
     while ([_controllers count] != 0) {
         [_controllers[0] shutdown];
     }
 
     dispatch_sync(_chipWorkQueue, ^{
-        MTR_LOG_INFO("Shutting down the Matter controller factory");
+        VerifyOrReturn(_running);
+
+        MTR_LOG("Shutting down the Matter controller factory");
         _controllerFactory->Shutdown();
-
         [self cleanupStartupObjects];
+        _running = NO;
+        _advertiseOperational = NO;
     });
-
-    // NOTE: we do not call cleanupInitObjects because we can be restarted, and
-    // that does not re-create the objects that we create inside init.
-    // Maybe we should be creating them in startup?
-
-    _running = NO;
 }
 
 /**
@@ -603,6 +472,8 @@ static void ShutdownOnExit()
     NSUUID * uniqueIdentifier;
     id<MTROTAProviderDelegate> _Nullable otaProviderDelegate;
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
+    NSUInteger concurrentSubscriptionPoolSize = 0;
+    MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
     if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
         MTRDeviceControllerParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
@@ -610,6 +481,8 @@ static void ShutdownOnExit()
         uniqueIdentifier = params.uniqueIdentifier;
         otaProviderDelegate = params.otaProviderDelegate;
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
+        concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
+        storageBehaviorConfiguration = params.storageBehaviorConfiguration;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
@@ -625,9 +498,9 @@ static void ShutdownOnExit()
         return nil;
     }
 
-    if (![self isRunning]) {
+    if (!_running) { // Note: reading _running from outside of the Matter work queue
         if (storageDelegate != nil) {
-            MTR_LOG_DEFAULT("Auto-starting Matter controller factory in per-controller storage mode");
+            MTR_LOG("Auto-starting Matter controller factory in per-controller storage mode");
             auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
             if (![self _startControllerFactory:params startingController:YES error:error]) {
                 return nil;
@@ -660,8 +533,8 @@ static void ShutdownOnExit()
     // Fall back to the factory-wide OTA provider delegate if one is not
     // provided in the startup params.
     if (otaProviderDelegate == nil) {
-        otaProviderDelegate = self.otaProviderDelegate;
-        otaProviderDelegateQueue = self.otaProviderDelegateQueue;
+        otaProviderDelegate = _otaProviderDelegate;
+        otaProviderDelegateQueue = _otaProviderDelegateQueue;
     }
 
     controller = [controller initWithFactory:self
@@ -670,7 +543,9 @@ static void ShutdownOnExit()
                         storageDelegateQueue:storageDelegateQueue
                          otaProviderDelegate:otaProviderDelegate
                     otaProviderDelegateQueue:otaProviderDelegateQueue
-                            uniqueIdentifier:uniqueIdentifier];
+                            uniqueIdentifier:uniqueIdentifier
+              concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
+                storageBehaviorConfiguration:storageBehaviorConfiguration];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
@@ -827,15 +702,10 @@ static void ShutdownOnExit()
                                   [[MTRDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabricTable
                                                                                               fabricIndex:fabric->GetFabricIndex()
                                                                                                  keystore:self->_keystore
-                                                                                     advertiseOperational:self.advertiseOperational
+                                                                                     advertiseOperational:self->_advertiseOperational
                                                                                                    params:startupParams];
-                              if (params == nil) {
-                                  fabricError = CHIP_ERROR_NO_MEMORY;
-                              } else {
-                                  params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
-                                  params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
-                              }
-
+                              params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
+                              params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
                               return params;
                           }
                                   error:error];
@@ -883,17 +753,39 @@ static void ShutdownOnExit()
                               auto * params =
                                   [[MTRDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
                                                                                             keystore:self->_keystore
-                                                                                advertiseOperational:self.advertiseOperational
+                                                                                advertiseOperational:self->_advertiseOperational
                                                                                               params:startupParams];
-                              if (params == nil) {
-                                  fabricError = CHIP_ERROR_NO_MEMORY;
-                              } else {
-                                  params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
-                                  params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
-                              }
+                              params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
+                              params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
                               return params;
                           }
                                   error:error];
+}
+
+- (void)preWarmCommissioningSession
+{
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
+        if (!self->_running) {
+            MTR_LOG_ERROR("Can't pre-warm, Matter controller factory is not running");
+        } else {
+            MTR_LOG("Pre-warming commissioning session");
+            self->_controllerFactory->EnsureAndRetainSystemState();
+            err = DeviceLayer::PlatformMgrImpl().StartBleScan(&self->_preWarmingDelegate, DeviceLayer::BleScanMode::kPreWarm);
+            if (err != CHIP_NO_ERROR) {
+                MTR_LOG_ERROR("Pre-warming failed: %" CHIP_ERROR_FORMAT, err.Format());
+                self->_controllerFactory->ReleaseSystemState();
+            }
+        }
+        MATTER_LOG_METRIC(kMetricPreWarmCommissioning, err);
+    });
+}
+
+- (void)preWarmCommissioningSessionDone
+{
+    assertChipStackLockedByCurrentThread();
+    MTR_LOG("Pre-warming done");
+    self->_controllerFactory->ReleaseSystemState();
 }
 
 // Finds a fabric that matches the given params, if one exists.
@@ -992,34 +884,22 @@ static void ShutdownOnExit()
 
 - (void)resetOperationalAdvertising
 {
-    if (![self checkIsRunning:nil]) {
-        // No need to reset anything; we are not running, so not
-        // advertising.
-        return;
+    assertChipStackLockedByCurrentThread();
+
+    // If we're not advertising, then there's no need to reset anything.
+    VerifyOrReturn(_advertiseOperational);
+
+    // If there are no running controllers there will be no advertisements to reset.
+    {
+        std::lock_guard lock(_controllersLock);
+        VerifyOrReturn(_controllers.count > 0);
     }
 
-    if (!self.advertiseOperational) {
-        // No need to reset anything; we are not advertising the things that
-        // would need to get reset.
-        return;
-    }
-
-    std::lock_guard lock(_controllersLock);
-    if (_controllers.count != 0) {
-        // We have a running controller.  That means we likely need to reset
-        // operational advertising for that controller.
-        dispatch_async(_chipWorkQueue, ^{
-            // StartServer() is the only API we have for resetting DNS-SD
-            // advertising.  It sure would be nice if there were a "restart"
-            // that was a no-op if the DNS-SD server was not already
-            // running.
-            app::DnssdServer::Instance().StartServer();
-        });
-    }
+    // StartServer() is the only API we have for resetting DNS-SD advertising.
+    // It sure would be nice if there were a "restart" that was a no-op if the
+    // DNS-SD server was not already running.
+    app::DnssdServer::Instance().StartServer();
 }
-@end
-
-@implementation MTRDeviceControllerFactory (InternalMethods)
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller
 {
@@ -1046,7 +926,7 @@ static void ShutdownOnExit()
             // Clear out out group keys for this fabric index, in case fabric
             // indices get reused later.  If a new controller is started on the
             // same fabric it will be handed the IPK at that point.
-            self->_groupDataProvider->RemoveGroupKeys(fabricIndex);
+            self->_groupDataProvider.RemoveGroupKeys(fabricIndex);
         }
 
         // If there are no other controllers left, we can shut down some things.
@@ -1264,7 +1144,7 @@ static void ShutdownOnExit()
                           startupParams:parameters
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
-                              auto advertiseOperational = self.advertiseOperational && parameters.shouldAdvertiseOperational;
+                              auto advertiseOperational = self->_advertiseOperational && parameters.shouldAdvertiseOperational;
                               auto * params =
                                   [[MTRDeviceControllerStartupParamsInternal alloc] initForNewController:controller
                                                                                              fabricTable:fabricTable
@@ -1274,10 +1154,10 @@ static void ShutdownOnExit()
                                                                                                    error:fabricError];
                               if (params != nil) {
                                   if (params.productAttestationAuthorityCertificates == nil) {
-                                      params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
+                                      params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
                                   }
                                   if (params.certificationDeclarationCertificates == nil) {
-                                      params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
+                                      params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
                                   }
                               }
                               return params;
@@ -1285,14 +1165,53 @@ static void ShutdownOnExit()
                                   error:error];
 }
 
+- (void)setMessageReliabilityProtocolIdleRetransmitMs:(nullable NSNumber *)idleRetransmitMs
+                                   activeRetransmitMs:(nullable NSNumber *)activeRetransmitMs
+                                    activeThresholdMs:(nullable NSNumber *)activeThresholdMs
+                          additionalRetransmitDelayMs:(nullable NSNumber *)additionalRetransmitDelayMs
+{
+    [self _assertCurrentQueueIsNotMatterQueue];
+    dispatch_async(_chipWorkQueue, ^{
+        bool resetAdvertising;
+        if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {
+            Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
+            resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(NullOptional);
+        } else {
+            if (additionalRetransmitDelayMs != nil) {
+                System::Clock::Timeout additionalBackoff(additionalRetransmitDelayMs.unsignedLongValue);
+                Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalBackoff));
+            }
+
+            // Get current MRP parameters, then override the things we were asked to
+            // override.
+            ReliableMessageProtocolConfig mrpConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+            if (idleRetransmitMs != nil) {
+                mrpConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(idleRetransmitMs.unsignedLongValue);
+            }
+            if (activeRetransmitMs != nil) {
+                mrpConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(activeRetransmitMs.unsignedLongValue);
+            }
+            if (activeThresholdMs != nil) {
+                mrpConfig.mActiveThresholdTime = System::Clock::Milliseconds32(activeThresholdMs.unsignedLongValue);
+            }
+
+            resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(MakeOptional(mrpConfig));
+        }
+
+        if (resetAdvertising) {
+            [self resetOperationalAdvertising];
+        }
+    });
+}
+
 - (PersistentStorageDelegate *)storageDelegate
 {
     return _persistentStorageDelegate;
 }
 
-- (Credentials::GroupDataProvider *)groupData
+- (Credentials::GroupDataProvider *)groupDataProvider
 {
-    return _groupDataProvider;
+    return &_groupDataProvider;
 }
 
 @end
@@ -1447,33 +1366,8 @@ void MTRSetMessageReliabilityParameters(NSNumber * _Nullable idleRetransmitMs,
     NSNumber * _Nullable activeThresholdMs,
     NSNumber * _Nullable additionalRetransmitDelayMs)
 {
-    bool resetAdvertising = false;
-    if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {
-        Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
-        resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(NullOptional);
-    } else {
-        if (additionalRetransmitDelayMs != nil) {
-            System::Clock::Milliseconds64 additionalBackoff(additionalRetransmitDelayMs.unsignedLongLongValue);
-            Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalBackoff));
-        }
-
-        // Get current MRP parameters, then override the things we were asked to
-        // override.
-        ReliableMessageProtocolConfig mrpConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
-        if (idleRetransmitMs != nil) {
-            mrpConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(idleRetransmitMs.unsignedLongValue);
-        }
-        if (activeRetransmitMs != nil) {
-            mrpConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(activeRetransmitMs.unsignedLongValue);
-        }
-        if (activeThresholdMs != nil) {
-            mrpConfig.mActiveThresholdTime = System::Clock::Milliseconds32(activeThresholdMs.unsignedLongValue);
-        }
-
-        resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(MakeOptional(mrpConfig));
-    }
-
-    if (resetAdvertising) {
-        [[MTRDeviceControllerFactory sharedInstance] resetOperationalAdvertising];
-    }
+    [MTRDeviceControllerFactory.sharedInstance setMessageReliabilityProtocolIdleRetransmitMs:idleRetransmitMs
+                                                                          activeRetransmitMs:activeThresholdMs
+                                                                           activeThresholdMs:activeThresholdMs
+                                                                 additionalRetransmitDelayMs:additionalRetransmitDelayMs];
 }

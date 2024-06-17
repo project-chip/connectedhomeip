@@ -21,6 +21,7 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,16 +31,38 @@ typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
 
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
-// Whether to store attributes by cluster instead of as individual entries for each attribute
-#define MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER 1
+typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
+    // Unsubscribed means we do not have a subscription and are not trying to set one up.
+    MTRInternalDeviceStateUnsubscribed = 0,
+    // Subscribing means we are actively trying to establish our initial subscription (e.g. doing
+    // DNS-SD discovery, trying to establish CASE to the peer, getting priming reports, etc).
+    MTRInternalDeviceStateSubscribing = 1,
+    // InitialSubscriptionEstablished means we have at some point finished setting up a
+    // subscription.  That subscription may have dropped since then, but if so it's the ReadClient's
+    // responsibility to re-establish it.
+    MTRInternalDeviceStateInitialSubscriptionEstablished = 2,
+    // Resubscribing means we had established a subscription, but then
+    // detected a subscription drop due to not receiving a report on time. This
+    // covers all the actions that happen when re-subscribing (discovery, CASE,
+    // getting priming reports, etc).
+    MTRInternalDeviceStateResubscribing = 3,
+    // LaterSubscriptionEstablished meant that we had a subscription drop and
+    // then re-created a subscription.
+    MTRInternalDeviceStateLaterSubscriptionEstablished = 4,
+};
 
 /**
- * Information about a cluster, currently is just data version
+ * Information about a cluster: data version and known attribute values.
  */
 MTR_TESTABLE
 @interface MTRDeviceClusterData : NSObject <NSSecureCoding, NSCopying>
-@property (nonatomic) NSNumber * dataVersion;
-@property (nonatomic) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
+@property (nonatomic, nullable) NSNumber * dataVersion;
+@property (nonatomic, readonly) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
+
+- (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute;
+- (void)removeValueForAttribute:(NSNumber *)attribute;
+
+- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes;
 @end
 
 @interface MTRDevice ()
@@ -81,14 +104,21 @@ MTR_TESTABLE
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 
-// Method to insert attribute values
-//   attributeValues : array of response-value dictionaries with non-null MTRAttributePathKey value
-//   reportChanges : if set to YES, attribute reports will also sent to the delegate if new values are different
-- (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges;
+// Method to insert persisted cluster data
+//   Contains data version information and attribute values.
+- (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
 
-// Method to insert cluster data
-//   Currently contains data version information
-- (void)setClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
+// Method to insert persisted data that pertains to the whole device.
+- (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data;
+
+#ifdef DEBUG
+- (NSUInteger)unitTestAttributeCount;
+#endif
+
+- (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+
+// Returns whether this MTRDevice uses Thread for communication
+- (BOOL)deviceUsesThread;
 
 @end
 
@@ -96,5 +126,13 @@ MTR_TESTABLE
 // Returns a NSNumber object that is aNumber if it falls within the range [min, max].
 // Returns min or max, if it is below or above, respectively.
 NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
+
+#pragma mark - Constants
+
+static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
+static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
+
+// Declared inside platform, but noting here for reference
+// static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
 
 NS_ASSUME_NONNULL_END

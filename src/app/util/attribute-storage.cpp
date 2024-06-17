@@ -19,7 +19,7 @@
 
 #include <app/util/attribute-storage-detail.h>
 
-#include <app/AttributeAccessInterfaceCache.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
@@ -139,43 +139,6 @@ constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVI
 // Not const, because these need to mutate.
 DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 #endif // FIXED_ENDPOINT_COUNT > 0
-
-AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
-AttributeAccessInterfaceCache gAttributeAccessInterfaceCache;
-
-// shouldUnregister returns true if the given AttributeAccessInterface should be
-// unregistered.
-template <typename F>
-void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
-{
-    AttributeAccessInterface * prev = nullptr;
-    AttributeAccessInterface * cur  = gAttributeAccessOverrides;
-    while (cur)
-    {
-        AttributeAccessInterface * next = cur->GetNext();
-        if (shouldUnregister(cur))
-        {
-            // Remove it from the list
-            if (prev)
-            {
-                prev->SetNext(next);
-            }
-            else
-            {
-                gAttributeAccessOverrides = next;
-            }
-
-            cur->SetNext(nullptr);
-
-            // Do not change prev in this case.
-        }
-        else
-        {
-            prev = cur;
-        }
-        cur = next;
-    }
-}
 
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
 {
@@ -462,10 +425,7 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     // endpoint.
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(definedEndpoint->endpoint);
 
-    // Clear out any attribute access overrides registered for this
-    // endpoint.
-    UnregisterMatchingAttributeAccessInterfaces(
-        [endpoint = definedEndpoint->endpoint](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpoint); });
+    unregisterAllAttributeAccessOverridesForEndpoint(definedEndpoint);
 }
 
 // Calls the init functions.
@@ -1382,61 +1342,8 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * 
     return cluster->functions[functionIndex];
 }
 
-bool registerAttributeAccessOverride(AttributeAccessInterface * attrOverride)
-{
-    gAttributeAccessInterfaceCache.Invalidate();
-    for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
-    {
-        if (cur->Matches(*attrOverride))
-        {
-            ChipLogError(Zcl, "Duplicate attribute override registration failed");
-            return false;
-        }
-    }
-    attrOverride->SetNext(gAttributeAccessOverrides);
-    gAttributeAccessOverrides = attrOverride;
-    return true;
-}
-
-void unregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
-{
-    gAttributeAccessInterfaceCache.Invalidate();
-    UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; });
-}
-
 namespace chip {
 namespace app {
-
-app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
-{
-    using CacheResult = AttributeAccessInterfaceCache::CacheResult;
-
-    AttributeAccessInterface * cached = nullptr;
-    CacheResult result                = gAttributeAccessInterfaceCache.Get(endpointId, clusterId, &cached);
-    switch (result)
-    {
-    case CacheResult::kDefinitelyUnused:
-        return nullptr;
-    case CacheResult::kDefinitelyUsed:
-        return cached;
-    case CacheResult::kCacheMiss:
-    default:
-        // Did not cache yet, search set of AAI registered, and cache if found.
-        for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
-        {
-            if (cur->Matches(endpointId, clusterId))
-            {
-                gAttributeAccessInterfaceCache.MarkUsed(endpointId, clusterId, cur);
-                return cur;
-            }
-        }
-
-        // Did not find AAI registered: mark as definitely not using.
-        gAttributeAccessInterfaceCache.MarkUnused(endpointId, clusterId);
-    }
-
-    return nullptr;
-}
 
 CHIP_ERROR SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint)
 {

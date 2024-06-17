@@ -29,7 +29,7 @@
 #include "AppEvent.h"
 #include "BaseApplication.h"
 #include "LockManager.h"
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -118,6 +118,13 @@ private:
      * @param context current context
      */
     static void UpdateClusterState(intptr_t context);
+
+    /**
+     * @brief Update Cluster State After Unlatch
+     *
+     * @param context current context
+     */
+    static void UpdateClusterStateAfterUnlatch(intptr_t context);
 
     /**
      * @brief Handle lock update event

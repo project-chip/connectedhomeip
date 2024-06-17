@@ -49,7 +49,7 @@
 #endif
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <transport/raw/BLE.h>
 #endif
 
@@ -57,16 +57,27 @@ namespace chip {
 
 inline constexpr size_t kMaxDeviceTransportBlePendingPackets = 1;
 
-using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+inline constexpr size_t kMaxDeviceTransportTcpActiveConnectionCount = CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS;
+
+inline constexpr size_t kMaxDeviceTransportTcpPendingPackets = CHIP_CONFIG_MAX_TCP_PENDING_PACKETS;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+using DeviceTransportMgr =
+    TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
-                                        ,
-                                        Transport::UDP /* IPv4 */
+                 ,
+                 Transport::UDP /* IPv4 */
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                                        ,
-                                        Transport::BLE<kMaxDeviceTransportBlePendingPackets> /* BLE */
+                 ,
+                 Transport::BLE<kMaxDeviceTransportBlePendingPackets> /* BLE */
 #endif
-                                        >;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                 ,
+                 Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets>
+#endif
+                 >;
 
 namespace Controller {
 
@@ -169,7 +180,7 @@ public:
     {
         auto count = mRefCount++;
         VerifyOrDie(count < std::numeric_limits<decltype(count)>::max()); // overflow
-        VerifyOrDie(!IsShutdown());                                       // avoid zombie
+        VerifyOrDie(!IsShutDown());                                       // avoid zombie
         return this;
     };
 
@@ -197,7 +208,7 @@ public:
             mGroupDataProvider != nullptr && mReportScheduler != nullptr && mTimerDelegate != nullptr &&
             mSessionKeystore != nullptr && mSessionResumptionStorage != nullptr && mBDXTransferServer != nullptr;
     };
-    bool IsShutdown() { return mHaveShutDown; }
+    bool IsShutDown() { return mHaveShutDown; }
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
     Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() const { return mTCPEndPointManager; };

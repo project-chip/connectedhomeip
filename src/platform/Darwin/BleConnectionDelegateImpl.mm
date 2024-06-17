@@ -25,10 +25,7 @@
 #error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
 
-#include <ble/BleConfig.h>
-#include <ble/BleError.h>
-#include <ble/BleLayer.h>
-#include <ble/BleUUID.h>
+#include <ble/Ble.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
@@ -37,22 +34,23 @@
 #include <setup_payload/SetupPayload.h>
 #include <tracing/metric_event.h>
 
+#import "MTRUUIDHelper.h"
 #import "PlatformMetricKeys.h"
-#import "UUIDHelper.h"
 
 using namespace chip::Ble;
+using namespace chip::DeviceLayer;
 using namespace chip::Tracing::DarwinPlatform;
 
 constexpr uint64_t kScanningWithDiscriminatorTimeoutInSeconds = 60;
-constexpr uint64_t kScanningWithoutDelegateTimeoutInSeconds = 120;
+constexpr uint64_t kPreWarmScanTimeoutInSeconds = 120;
 constexpr uint64_t kCachePeripheralTimeoutInSeconds
     = static_cast<uint64_t>(CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX / 1000.0 * 8.0 * 0.625);
 constexpr char kBleWorkQueueName[] = "org.csa-iot.matter.framework.ble.workqueue";
 
 typedef NS_ENUM(uint8_t, BleConnectionMode) {
     kUndefined = 0,
-    kScanningWithoutDelegate,
     kScanning,
+    kScanningWithTimeout,
     kConnecting,
 };
 
@@ -75,16 +73,14 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 @property (unsafe_unretained, nonatomic) chip::Ble::BleLayer * mBleLayer;
 
 - (id)initWithQueue:(dispatch_queue_t)queue;
-- (id)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate queue:(dispatch_queue_t)queue;
+- (id)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm queue:(dispatch_queue_t)queue;
 - (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator queue:(dispatch_queue_t)queue;
 - (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer;
 - (void)start;
 - (void)stop;
-- (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate;
+- (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
 - (void)updateWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
 - (void)updateWithPeripheral:(CBPeripheral *)peripheral;
-- (BOOL)isScanningWithoutDelegate;
-- (BOOL)isScanning;
 - (BOOL)isConnecting;
 - (void)addPeripheralToCache:(CBPeripheral *)peripheral data:(NSData *)data;
 - (void)removePeripheralFromCache:(CBPeripheral *)peripheral;
@@ -165,26 +161,40 @@ namespace DeviceLayer {
             });
         }
 
-        void BleConnectionDelegateImpl::StartScan(BleScannerDelegate * delegate)
+        void BleConnectionDelegateImpl::StartScan(BleScannerDelegate * delegate, BleScanMode mode)
         {
             assertChipStackLockedByCurrentThread();
 
-            ChipLogProgress(Ble, "ConnectionDelegate StartScan%s", (delegate ? " with delegate" : ""));
+            bool prewarm = (mode == BleScanMode::kPreWarm);
+            ChipLogProgress(Ble, "ConnectionDelegate StartScan (%s)", (prewarm ? "pre-warm" : "default"));
 
             if (!bleWorkQueue) {
                 bleWorkQueue = dispatch_queue_create(kBleWorkQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
             }
 
             dispatch_async(bleWorkQueue, ^{
+                // Pre-warming is best-effort, don't cancel an ongoing scan or connection attempt
+                if (prewarm && ble) {
+                    // TODO: Once we get rid of the separate BLE queue we can just return CHIP_ERROR_BUSY.
+                    // That will also allow these cases to be distinguished in our metric.
+                    ChipLogProgress(Ble, "Not starting pre-warm scan, an operation is already in progress");
+                    if (delegate) {
+                        dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
+                            delegate->OnBleScanStopped();
+                        });
+                    }
+                    return;
+                }
+
                 // If the previous connection delegate was not a try to connect to something, just reuse it instead of
                 // creating a brand new connection but update the discriminator and the ble layer members.
                 if (ble and ![ble isConnecting]) {
-                    [ble updateWithDelegate:delegate];
+                    [ble updateWithDelegate:delegate prewarm:prewarm];
                     return;
                 }
 
                 [ble stop];
-                ble = [[BleConnection alloc] initWithDelegate:delegate queue:bleWorkQueue];
+                ble = [[BleConnection alloc] initWithDelegate:delegate prewarm:prewarm queue:bleWorkQueue];
                 // Do _not_ set onConnectionComplete and onConnectionError
                 // here.  The connection callbacks we have expect an appState
                 // that we do not have here, and in any case connection
@@ -235,7 +245,7 @@ namespace DeviceLayer {
 {
     self = [super init];
     if (self) {
-        self.shortServiceUUID = [UUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
+        self.shortServiceUUID = [MTRUUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
         _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
         _workQueue = queue;
         _centralManager = [CBCentralManager alloc];
@@ -248,14 +258,16 @@ namespace DeviceLayer {
     return self;
 }
 
-- (id)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate queue:(dispatch_queue_t)queue
+- (id)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm queue:(dispatch_queue_t)queue
 {
     self = [self initWithQueue:queue];
     if (self) {
         _scannerDelegate = delegate;
-        _currentMode = (delegate == nullptr) ? kScanningWithoutDelegate : kScanning;
-        if (_currentMode == kScanningWithoutDelegate) {
-            [self setupTimer:kScanningWithoutDelegateTimeoutInSeconds];
+        if (prewarm) {
+            _currentMode = kScanningWithTimeout;
+            [self setupTimer:kPreWarmScanTimeoutInSeconds];
+        } else {
+            _currentMode = kScanning;
         }
     }
 
@@ -272,16 +284,6 @@ namespace DeviceLayer {
     }
 
     return self;
-}
-
-- (BOOL)isScanningWithoutDelegate
-{
-    return _currentMode == kScanningWithoutDelegate;
-}
-
-- (BOOL)isScanning
-{
-    return _currentMode == kScanning;
 }
 
 - (BOOL)isConnecting
@@ -595,7 +597,7 @@ namespace DeviceLayer {
 
 - (void)stop
 {
-    _scannerDelegate = nil;
+    [self detachScannerDelegate];
     _found = false;
     [self stopScanning];
     [self removePeripheralsFromCache];
@@ -672,31 +674,46 @@ namespace DeviceLayer {
     [_centralManager connectPeripheral:peripheral options:nil];
 }
 
-- (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate
+- (void)detachScannerDelegate
 {
-    _scannerDelegate = delegate;
-    _currentMode = (delegate == nullptr) ? kScanningWithoutDelegate : kScanning;
+    auto * existingDelegate = _scannerDelegate;
+    if (existingDelegate) {
+        _scannerDelegate = nullptr;
+        dispatch_async(_chipWorkQueue, ^{
+            existingDelegate->OnBleScanStopped();
+        });
+    }
+}
 
-    if (_currentMode == kScanning) {
-        [self clearTimer];
+- (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm
+{
+    [self detachScannerDelegate];
 
+    if (delegate) {
         for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
             NSData * serviceData = _cachedPeripherals[cachedPeripheral][@"data"];
             dispatch_async(_chipWorkQueue, ^{
                 ChipBLEDeviceIdentificationInfo info;
                 memcpy(&info, [serviceData bytes], sizeof(info));
-                _scannerDelegate->OnBleScanAdd((__bridge void *) cachedPeripheral, info);
+                delegate->OnBleScanAdd((__bridge void *) cachedPeripheral, info);
             });
         }
+        _scannerDelegate = delegate;
+    }
+
+    if (prewarm) {
+        _currentMode = kScanningWithTimeout;
+        [self setupTimer:kPreWarmScanTimeoutInSeconds];
     } else {
-        [self setupTimer:kScanningWithoutDelegateTimeoutInSeconds];
+        _currentMode = kScanning;
+        [self clearTimer];
     }
 }
 
 - (void)updateWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
 {
+    [self detachScannerDelegate];
     _deviceDiscriminator = deviceDiscriminator;
-    _scannerDelegate = nil;
     _currentMode = kConnecting;
 
     CBPeripheral * peripheral = nil;
@@ -725,7 +742,7 @@ namespace DeviceLayer {
 
 - (void)updateWithPeripheral:(CBPeripheral *)peripheral
 {
-    _scannerDelegate = nil;
+    [self detachScannerDelegate];
     _currentMode = kConnecting;
 
     MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);

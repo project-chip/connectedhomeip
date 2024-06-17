@@ -41,6 +41,9 @@
 #include <microwave-oven-device.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
+#if CONFIG_ENABLE_AMEBA_CRYPTO
+#include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
+#endif
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -152,6 +155,13 @@ static void InitServer(intptr_t context)
     initParams.appDelegate = &sAmebaObserver;
 
     initParams.InitializeStaticResourcesBeforeServerInit();
+
+#if CONFIG_ENABLE_AMEBA_CRYPTO
+    ChipLogProgress(DeviceLayer, "platform crypto enabled!");
+    static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;
+    VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
+    initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
+#endif
 
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());

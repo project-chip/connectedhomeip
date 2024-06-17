@@ -369,6 +369,7 @@ DelayedActionTime
 delayedApplyActionTimeSec
 delayedQueryActionTimeSec
 delayQuery
+deliverables
 demangle
 deployable
 depottools
@@ -585,6 +586,8 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
+getter
+getters
 GetInDevelopmentTests
 GetIP
 getManualTests
@@ -727,6 +730,7 @@ JLink
 JLinkExe
 JLinkRTTClient
 JN
+jni
 jpg
 jre
 js
@@ -901,12 +905,14 @@ MoveWithOnOff
 MPSL
 MRP
 MTD
+MTR
 MTU
 Multiband
 Multicast
 multilib
 Multiprotocol
 multithreaded
+mutex
 mutexes
 mv
 MX
@@ -936,6 +942,7 @@ nfds
 NitricOxideConcentrationMeasurement
 NitrogenDioxideConcentrationMeasurement
 nl
+nltest
 NLUnitTest
 NLUnitTests
 nmcli
@@ -958,6 +965,7 @@ NTP
 nullable
 nullptr
 NUM
+NuttX
 NVM
 NVS
 nwdiag
@@ -1499,6 +1507,7 @@ utils
 UUID
 ux
 validator
+valgrind
 vcom
 VCP
 Vectorcall

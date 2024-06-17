@@ -18,7 +18,6 @@
 import argparse
 import asyncio
 import builtins
-import glob
 import inspect
 import json
 import logging
@@ -30,7 +29,6 @@ import re
 import sys
 import typing
 import uuid
-import xml.etree.ElementTree as ET
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -64,6 +62,7 @@ from global_attribute_ids import GlobalAttributeIds
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+from pics_support import read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -140,50 +139,6 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
     else:
         # On not having found a PAA dir, just return current dir to avoid blow-ups
         return pathlib.Path.cwd()
-
-
-def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
-    pics = {}
-    for raw in lines:
-        line, _, _ = raw.partition("#")
-        line = line.strip()
-
-        if not line:
-            continue
-
-        key, _, val = line.partition("=")
-        val = val.strip()
-        if val not in ["1", "0"]:
-            raise ValueError('PICS {} must have a value of 0 or 1'.format(key))
-
-        pics[key.strip()] = (val == "1")
-    return pics
-
-
-def parse_pics_xml(contents: str) -> dict[str, bool]:
-    pics = {}
-    mytree = ET.fromstring(contents)
-    for pi in mytree.iter('picsItem'):
-        name = pi.find('itemNumber').text
-        support = pi.find('support').text
-        pics[name] = int(json.loads(support.lower())) == 1
-    return pics
-
-
-def read_pics_from_file(path: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
-    if os.path.isdir(os.path.abspath(path)):
-        pics_dict = {}
-        for filename in glob.glob(f'{path}/*.xml'):
-            with open(filename, 'r') as f:
-                contents = f.read()
-                pics_dict.update(parse_pics_xml(contents))
-        return pics_dict
-
-    else:
-        with open(path, 'r') as f:
-            lines = f.readlines()
-            return parse_pics(lines)
 
 
 def type_matches(received_value, desired_type):
@@ -684,10 +639,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             in order using self.step(number), where number is the test_plan_number
             from each TestStep.
         '''
-        steps = self._get_defined_test_steps(test)
+        steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def _get_defined_test_steps(self, test: str) -> list[TestStep]:
+    def get_defined_test_steps(self, test: str) -> list[TestStep]:
         steps_name = 'steps_' + test[5:]
         try:
             fn = getattr(self, steps_name)
@@ -781,7 +736,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
-            steps = self._get_defined_test_steps(test_name)
+            steps = self.get_defined_test_steps(test_name)
             num_steps = 1 if steps is None else len(steps)
             filename = inspect.getfile(self.__class__)
             desc = self.get_test_desc(test_name)
@@ -977,7 +932,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
-        steps = self._get_defined_test_steps(record.test_name)
+        steps = self.get_defined_test_steps(record.test_name)
         if steps is None:
             # if we don't have a list of steps, assume they were all run
             all_steps_run = True
@@ -1599,14 +1554,16 @@ class CommissionDeviceTest(MatterBaseTest):
                 info.passcode,
                 conf.dut_node_ids[i],
                 conf.wifi_ssid,
-                conf.wifi_passphrase
+                conf.wifi_passphrase,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
             )
         elif conf.commissioning_method == "ble-thread":
             return dev_ctrl.CommissionThread(
                 info.filter_value,
                 info.passcode,
                 conf.dut_node_ids[i],
-                conf.thread_operational_dataset
+                conf.thread_operational_dataset,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
             )
         elif conf.commissioning_method == "on-network-ip":
             logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
@@ -1656,7 +1613,7 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
     return info
 
 
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks) -> None:
+def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> bool:
 
     get_test_info(test_class, matter_test_config)
 
@@ -1668,7 +1625,10 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
 
-    stack = MatterStackState(matter_test_config)
+    if external_stack:
+        stack = external_stack
+    else:
+        stack = MatterStackState(matter_test_config)
 
     with TracingContext() as tracing_ctx:
         for destination in matter_test_config.trace_to:
@@ -1678,12 +1638,12 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
 
         # TODO: Steer to right FabricAdmin!
         # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
-
-        default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-            nodeId=matter_test_config.controller_node_id,
-            paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-            catTags=matter_test_config.controller_cat_tags
-        )
+        if not default_controller:
+            default_controller = stack.certificate_authorities[0].adminList[0].NewController(
+                nodeId=matter_test_config.controller_node_id,
+                paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+                catTags=matter_test_config.controller_cat_tags
+            )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 
         test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
@@ -1732,10 +1692,16 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
         hooks.stop(duration=duration)
 
     # Shutdown the stack when all done
-    stack.Shutdown()
+    if not external_stack:
+        stack.Shutdown()
 
     if ok:
         logging.info("Final result: PASS !")
     else:
         logging.error("Final result: FAIL !")
+    return ok
+
+
+def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
+    if not run_tests_no_exit(test_class, matter_test_config, hooks, default_controller, external_stack):
         sys.exit(1)

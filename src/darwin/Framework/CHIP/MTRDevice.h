@@ -73,7 +73,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * if a subscription has ever been established at any point in the past.
  *
  */
-@property (readonly) BOOL deviceCachePrimed MTR_NEWLY_AVAILABLE;
+@property (readonly) BOOL deviceCachePrimed MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * The estimated device system start time.
@@ -102,11 +102,48 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, readonly, copy) NSNumber * nodeID NS_REFINED_FOR_SWIFT MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 /**
+ * An estimate of how much time is likely to elapse between setDelegate being
+ * called and the current device state (attributes, stored events) being known.
+ *
+ * nil if no such estimate is available.  Otherwise, the NSNumber stores an NSTimeInterval.
+ */
+@property (nonatomic, readonly, nullable, copy) NSNumber * estimatedSubscriptionLatency MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
  * Set the delegate to receive asynchronous callbacks about the device.
  *
  * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.
  */
-- (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use addDelegate:queue:interestedPaths:");
+
+/**
+ * Adds a delegate to receive asynchronous callbacks about the device.
+ *
+ * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.
+ *
+ * MTRDevice holds a weak reference to the delegate object.
+ */
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
+
+/**
+ * Adds a delegate to receive asynchronous callbacks about the device, and limit attribute and/or event reports to a specific set of paths.
+ *
+ * interestedPathsForAttributes may contain either MTRClusterPath or MTRAttributePath to specify interested clusters and attributes, or NSNumber for endpoints.
+ *
+ * interestedPathsForAttributes may contain either MTRClusterPath or MTREventPath to specify interested clusters and events, or NSNumber for endpoints.
+ *
+ * For both interested paths arguments, if nil is specified, then no filter will be applied.
+ *
+ * Calling addDelegate: again with the same delegate object will update the interested paths for attributes and events for this delegate.
+ *
+ * MTRDevice holds a weak reference to the delegate object.
+ */
+- (void)addDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents MTR_NEWLY_AVAILABLE;
+
+/**
+ * Removes the delegate from receiving callbacks about the device.
+ */
+- (void)removeDelegate:(id<MTRDeviceDelegate>)delegate MTR_NEWLY_AVAILABLE;
 
 /**
  * Read attribute in a designated attribute path.  If there is no value available
@@ -357,11 +394,11 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                   timeout:(NSTimeInterval)timeout
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
-    MTR_NEWLY_AVAILABLE;
+    MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 @end
 
-MTR_EXTERN NSString * const MTRPreviousDataKey MTR_NEWLY_AVAILABLE;
-MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRPreviousDataKey MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+MTR_EXTERN NSString * const MTRDataVersionKey MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 @protocol MTRDeviceDelegate <NSObject>
 @required
@@ -381,7 +418,7 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
  *
  *                The data-value dictionary also contains this key:
  *
- *                MTRDataVersionKey : NSNumber-wrapped uin32_t. Monotonically increaseing data version for the cluster.
+ *                MTRDataVersionKey : NSNumber-wrapped uin32_t.
  */
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 
@@ -421,7 +458,15 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
  *
  * The intention is that after this is called, the client should be able to call read for mandatory attributes and likely expect non-nil values.
  */
-- (void)deviceCachePrimed:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
+- (void)deviceCachePrimed:(MTRDevice *)device MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+/**
+ * This is called when the MTRDevice object detects a change in the device configuration.
+ *
+ * Device configuration is the set of functionality implemented by the device.
+ *
+ */
+- (void)deviceConfigurationChanged:(MTRDevice *)device MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 @end
 

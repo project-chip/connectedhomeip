@@ -27,7 +27,7 @@
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -50,6 +50,7 @@ public:
     void UpdateClusterState();
 
     static void ButtonEventHandler(uint8_t btnIdx, bool btnPressed);
+    static void OpenCommissioning(intptr_t arg);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -68,6 +69,7 @@ private:
     static void LockActionEventHandler(AppEvent * aEvent);
     static void JammedLockEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
+    static void TotalHoursTimerHandler(chip::System::Layer * aLayer, void * aAppState);
 
     static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void UpdateLEDs(void);

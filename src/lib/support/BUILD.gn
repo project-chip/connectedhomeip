@@ -350,6 +350,7 @@ pw_static_library("pw_tests_wrapper") {
   public_deps = [
     "$dir_pw_log:impl",
     "$dir_pw_unit_test",
+    "$dir_pw_unit_test:logging",
   ]
   sources = [
     "UnitTest.cpp",

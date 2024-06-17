@@ -826,9 +826,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2114,6 +2114,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
+  device type ma_powersource = 17, version 1;
   device type ma_contactsensor = 21, version 1;
 
 
@@ -2122,11 +2123,13 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
 
     handle command Identify;
+    handle command TriggerEffect;
   }
 
   server cluster Descriptor {
@@ -2142,15 +2145,25 @@ endpoint 1 {
   }
 
   server cluster PowerSource {
-    ram      attribute status;
-    ram      attribute order;
-    ram      attribute description;
+    ram      attribute status default = 1;
+    ram      attribute order default = 1;
+    ram      attribute description default = "Primary Battery";
+    ram      attribute batVoltage default = 4100;
+    ram      attribute batPercentRemaining default = 95;
+    ram      attribute batTimeRemaining default = 5184000;
+    ram      attribute batChargeLevel default = 0;
+    ram      attribute batReplacementNeeded default = 0;
+    ram      attribute batReplaceability default = 1;
+    ram      attribute batPresent default = 1;
+    ram      attribute batCapacity default = 350;
+    ram      attribute batChargeState default = 4;
+    ram      attribute batFunctionalWhileCharging default = 1;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x06;
     ram      attribute clusterRevision default = 1;
   }
 

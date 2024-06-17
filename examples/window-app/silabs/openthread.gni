@@ -21,15 +21,16 @@ silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 app_data_model = "${chip_root}/examples/window-app/common:window-common"
 chip_enable_ota_requestor = true
 chip_enable_openthread = true
+sl_enable_test_event_trigger = true
 
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
 
 # ICD Default configurations
 chip_enable_icd_server = true
-enable_synchronized_sed = true
+enable_synchronized_sed = false
 chip_subscription_timeout_resumption = false
-sl_use_subscription_synching = true
+sl_use_subscription_syncing = true
 
 # Openthread Configuration flags
 sl_ot_idle_interval_ms = 1000  # 1s Idle Intervals

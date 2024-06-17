@@ -21,13 +21,16 @@
 
 #include <cinttypes>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 
 namespace {
-constexpr char kLocalDot[] = "local.";
+constexpr const char * kBrowseDomains[] = {
+    "default.service.arpa.", // SRP
+    "local.",
+};
 constexpr char kOperationalType[] = "_matter._tcp";
-constexpr DNSServiceFlags kBrowseFlags = 0;
 }
 
 MTROperationalBrowser::MTROperationalBrowser(MTRDeviceControllerFactory * aFactory, dispatch_queue_t aQueue)
@@ -43,23 +46,30 @@ void MTROperationalBrowser::TryToStartBrowse()
 {
     assertChipStackLockedByCurrentThread();
 
-    ChipLogProgress(Controller, "Trying to start operational browse");
+    ChipLogProgress(Controller, "Trying to start persistent operational browse");
 
-    auto err
-        = DNSServiceBrowse(&mBrowseRef, kBrowseFlags, kDNSServiceInterfaceIndexAny, kOperationalType, kLocalDot, OnBrowse, this);
+    auto err = DNSServiceCreateConnection(&mBrowseRef);
     if (err != kDNSServiceErr_NoError) {
-        ChipLogError(Controller, "Failed to start operational browse: %" PRId32, err);
+        ChipLogError(Controller, "Failed to create connection for persistent operational browse: %" PRId32, err);
         return;
     }
 
     err = DNSServiceSetDispatchQueue(mBrowseRef, mQueue);
     if (err != kDNSServiceErr_NoError) {
-        ChipLogError(Controller, "Failed to set up dispatch queue properly");
+        ChipLogError(Controller, "Failed to set up dispatch queue properly for persistent operational browse: %" PRId32, err);
         DNSServiceRefDeallocate(mBrowseRef);
         return;
     }
 
     mInitialized = true;
+
+    for (auto domain : kBrowseDomains) {
+        auto browseRef = mBrowseRef; // Mandatory copy because of kDNSServiceFlagsShareConnection.
+        err = DNSServiceBrowse(&browseRef, kDNSServiceFlagsShareConnection, kDNSServiceInterfaceIndexAny, kOperationalType, domain, OnBrowse, this);
+        if (err != kDNSServiceErr_NoError) {
+            ChipLogError(Controller, "Failed to start persistent operational browse for \"%s\" domain: %" PRId32, StringOrNullMarker(domain), err);
+        }
+    }
 }
 
 void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t aInterfaceId,

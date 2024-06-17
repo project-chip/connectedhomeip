@@ -169,6 +169,7 @@ struct BrowseContext : public BrowseHandler
 {
     DnssdBrowseCallback callback;
     std::vector<std::pair<DnssdService, std::string>> services;
+    bool dispatchedSuccessOnce = false;
 
     BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol);
 
@@ -262,8 +263,8 @@ struct ResolveContext : public GenericContext
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
 
-    // Indicates whether the timer for 250 msecs should be started
-    // to give the resolve on SRP domain some extra time to complete.
+    // Indicates whether the timer should be started to give the resolve
+    // on SRP domain some extra time to complete.
     bool shouldStartSRPTimerForResolve = false;
     bool isSRPTimerRunning             = false;
 
@@ -297,6 +298,12 @@ struct ResolveContext : public GenericContext
      */
     static void SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext);
 
+    /**
+     * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
+     *
+     */
+    void CancelSRPTimerIfRunning();
+
 private:
     /**
      * Try reporting the results we got on the provided interface index.
@@ -306,12 +313,6 @@ private:
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult);
 
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
-
-    /**
-     * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
-     *
-     */
-    void CancelSRPTimer();
 };
 
 } // namespace Dnssd

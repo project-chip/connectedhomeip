@@ -16,17 +16,6 @@ limitations under the License.
 -->
 <configurator>
   <domain name="Energy Management"/>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0098"/>
-    <field name="PowerAdjustment" mask="0x01"/>
-    <field name="PowerForecastReporting" mask="0x02"/>
-    <field name="StateForecastReporting" mask="0x04"/>
-    <field name="StartTimeAdjustment" mask="0x08"/>
-    <field name="Pausable" mask="0x10"/>
-    <field name="ForecastAdjustment" mask="0x20"/>
-    <field name="ConstraintBasedAdjustment" mask="0x40"/>
-  </bitmap>
-
   <cluster apiMaturity="provisional">
     <name>Device Energy Management</name>
     <domain>Energy Management</domain>
@@ -35,72 +24,133 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA).</description>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
-
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+    <features>
+      <feature bit="0" code="PA" name="PowerAdjustment" summary="Allows an EMS to make a temporary power
+adjustment (within the limits offered by the ESA).">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="PFR" name="PowerForecastReporting" summary="Allows an ESA to advertise its indicative
+future power consumption vs time.">
+        <otherwiseConform>
+          <optionalConform choice="a">
+            <notTerm>
+              <feature name="PA"/>
+            </notTerm>
+          </optionalConform>
+          <mandatoryConform>
+            <orTerm>
+              <feature name="STA"/>
+              <feature name="PAU"/>
+              <feature name="FA"/>
+              <feature name="CON"/>
+            </orTerm>
+          </mandatoryConform>
+          <optionalConform/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="2" code="SFR" name="StateForecastReporting" summary="Allows an ESA to advertise its indicative
+future state vs time.">
+        <optionalConform choice="a">
+          <notTerm>
+            <feature name="PA"/>
+          </notTerm>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="STA" name="StartTimeAdjustment" summary="Allows an EMS to delay an ESA&apos;s
+planned operation.">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="PAU" name="Pausable" summary="Allows an EMS to pause an ESA&apos;s
+planned operation.">
+        <optionalConform/>
+      </feature>
+      <feature bit="5" code="FA" name="ForecastAdjustment" summary="Allows an EMS to adjust an ESA&apos;s
+planned operation.">
+        <optionalConform/>
+      </feature>
+      <feature bit="6" code="CON" name="ConstraintBasedAdjustment" summary="Allows an EMS to request constraints to an ESA&apos;s
+planned operation.">
+        <optionalConform/>
+      </feature>
+    </features>
     <!--Attributes-->
-    <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" writable="false" optional="false" min="0x00" max="0xFF" default="0xFF">ESAType</attribute>
-    <attribute code="0x0001" side="server" type="boolean" define="ESA_CAN_GENERATE" writable="false" optional="false" default="0">ESACanGenerate</attribute>
-    <attribute code="0x0002" side="server" type="ESAStateEnum" define="ESA_STATE" default="0x00" writable="false" optional="false" min="0x00" max="0x04">ESAState</attribute>
-    <attribute code="0x0003" side="server" type="power_mw" define="ABS_MIN_POWER" default="0" writable="false" optional="false">AbsMinPower</attribute>
-    <attribute code="0x0004" side="server" type="power_mw" define="ABS_MAX_POWER" default="0" writable="false" optional="false">AbsMaxPower</attribute>
+    <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" min="0x00" max="0xFF" default="0xFF">ESAType</attribute>
+    <attribute code="0x0001" side="server" type="boolean" define="ESA_CAN_GENERATE" default="0">ESACanGenerate</attribute>
+    <attribute code="0x0002" side="server" type="ESAStateEnum" define="ESA_STATE" default="0x00" min="0x00" max="0x04">ESAState</attribute>
+    <attribute code="0x0003" side="server" type="power_mw" define="ABS_MIN_POWER" default="0">AbsMinPower</attribute>
+    <attribute code="0x0004" side="server" type="power_mw" define="ABS_MAX_POWER" default="0">AbsMaxPower</attribute>
     <!--Conformance feature PA - for now optional-->
-    <attribute code="0x0005" side="server" type="array" entryType="PowerAdjustStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" writable="false" optional="true" length="8">PowerAdjustmentCapability</attribute>
+    <attribute code="0x0005" side="server" type="PowerAdjustCapabilityStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" optional="true">PowerAdjustmentCapability</attribute>
     <!--Conformance feature PFR \| SFR - for now optional-->
-    <attribute code="0x0006" side="server" type="ForecastStruct" define="FORECAST" isNullable="true" writable="false" optional="true">Forecast</attribute>
-    <attribute code="0x0007" side="server" type="OptOutStateEnum" define="OPT_OUT_STATE" min="0x00" max="0x03" default="0x00" writable="false" optional="true">OptOutState</attribute>
+    <attribute code="0x0006" side="server" type="ForecastStruct" define="FORECAST" isNullable="true" optional="true">Forecast</attribute>
+    <attribute code="0x0007" side="server" type="OptOutStateEnum" define="OPT_OUT_STATE" min="0x00" max="0x03" default="0x00" optional="true">OptOutState</attribute>
     <command source="client" code="0x00" name="PowerAdjustRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to request an adjustment in the power consumption of an ESA for a specified duration.</description>
-      <arg name="Power" type="power_mw"/>
-      <arg name="Duration" type="elapsed_s"/>
-      <arg name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <arg id="0" name="Power" type="power_mw"/>
+      <arg id="1" name="Duration" type="elapsed_s"/>
+      <arg id="2" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
     </command>
+
     <command source="client" code="0x01" name="CancelPowerAdjustRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to cancel an ongoing PowerAdjustmentRequest operation.</description>
     </command>
+
     <command source="client" code="0x02" name="StartTimeAdjustRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to adjust the start time of a Forecast sequence that has not yet started operation (i.e. where the current Forecast StartTime is in the future).</description>
-      <arg name="RequestedStartTime" type="epoch_s"/>
-      <arg name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <arg id="0" name="RequestedStartTime" type="epoch_s"/>
+      <arg id="1" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
     </command>
+
     <command source="client" code="0x03" name="PauseRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to temporarily pause an operation and reduce the ESAs energy demand.</description>
-      <arg name="Duration" type="elapsed_s"/>
-      <arg name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <arg id="0" name="Duration" type="elapsed_s"/>
+      <arg id="1" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
     </command>
+
     <command source="client" code="0x04" name="ResumeRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to cancel the PauseRequest command and enable earlier resumption of operation.</description>
     </command>
+
     <command source="client" code="0x05" name="ModifyForecastRequest" optional="true" apiMaturity="provisional">
       <description>Allows a client to modify a Forecast within the limits allowed by the ESA.</description>
-      <arg name="ForecastId" type="int32u"/>
-      <arg name="SlotAdjustments" array="true" type="SlotAdjustmentStruct" length="10"/>
-      <arg name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <arg id="0" name="ForecastID" type="int32u"/>
+      <arg id="1" name="SlotAdjustments" array="true" type="SlotAdjustmentStruct" length="10"/>
+      <arg id="2" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
     </command>
+
     <command source="client" code="0x06" name="RequestConstraintBasedForecast" optional="true" apiMaturity="provisional">
       <description>Allows a client to ask the ESA to recompute its Forecast based on power and time constraints.</description>
-      <arg name="Constraints" array="true" type="ConstraintsStruct" length="10"/>
-      <arg name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
+      <arg id="0" name="Constraints" array="true" type="ConstraintsStruct" length="10"/>
+      <arg id="1" name="Cause" type="AdjustmentCauseEnum" min="0x00" max="0x01"/>
     </command>
+
     <command source="client" code="0x07" name="CancelRequest" optional="true">
       <description>Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command</description>
     </command>
+
     <event code="0x00" name="PowerAdjustStart" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>PowerAdjustStart</description>
     </event>
+
     <event code="0x01" name="PowerAdjustEnd" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>PowerAdjustEnd</description>
       <field id="0" name="Cause" type="CauseEnum" apiMaturity="provisional" default="0x00" min="0x00" max="0x04"/>
       <field id="1" name="Duration" type="elapsed_s" apiMaturity="provisional"/>
       <field id="2" name="EnergyUse" type="energy_mwh" apiMaturity="provisional"/>
     </event>
+
     <event code="0x02" name="Paused" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>Paused</description>
     </event>
+
     <event code="0x03" name="Resumed" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>Resumed</description>
       <field id="0" name="Cause" type="CauseEnum" apiMaturity="provisional" default="0x00" min="0x00" max="0x04"/>
     </event>
+
   </cluster>
+
   <enum name="CostTypeEnum" type="enum8" apiMaturity="provisional">
     <cluster code="0x0098"/>
     <item name="Financial" value="0x00"/>
@@ -167,12 +217,25 @@ limitations under the License.
     <item name="OptOut" value="0x03"/>
   </enum>
 
+  <enum name="PowerAdjustReasonEnum" type="enum8">
+    <cluster code="0x0098"/>
+    <item name="NoAdjustment" value="0x00"/>
+    <item name="LocalOptimizationAdjustment" value="0x01"/>
+    <item name="GridOptimizationAdjustment" value="0x02"/>
+  </enum>
+
   <struct name="CostStruct" apiMaturity="provisional">
     <cluster code="0x0098"/>
     <item fieldId="0" name="CostType" type="CostTypeEnum" default="0x00" min="0x00" max="0x03"/>
     <item fieldId="1" name="Value" type="int32s" default="0"/>
     <item fieldId="2" name="DecimalPoints" type="int8u" default="0"/>
     <item fieldId="3" name="Currency" type="int16u" max="999" optional="true" default="0"/>
+  </struct>
+
+  <struct name="PowerAdjustCapabilityStruct" apiMaturity="provisional">
+    <cluster code="0x0098"/>
+    <item fieldId="0" name="PowerAdjustCapability" array="true" type="PowerAdjustStruct" isNullable="true" length="8"/>
+    <item fieldId="1" name="Cause" type="PowerAdjustReasonEnum" default="0x00" min="0x00" max="0x02"/>
   </struct>
 
   <struct name="PowerAdjustStruct" apiMaturity="provisional">
@@ -185,13 +248,13 @@ limitations under the License.
 
   <struct name="ForecastStruct" apiMaturity="provisional">
     <cluster code="0x0098"/>
-    <item fieldId="0" name="ForecastId" type="int16u" default="0"/>
+    <item fieldId="0" name="ForecastID" type="int32u" default="0"/>
     <item fieldId="1" name="ActiveSlotNumber" type="int16u" isNullable="true" default="0"/>
     <item fieldId="2" name="StartTime" type="epoch_s"/>
     <item fieldId="3" name="EndTime" type="epoch_s"/>
     <item fieldId="4" name="EarliestStartTime" type="epoch_s" isNullable="true" optional="true"/>
     <item fieldId="5" name="LatestEndTime" type="epoch_s" optional="true"/>
-    <item fieldId="6" name="IsPauseable" type="boolean"/>
+    <item fieldId="6" name="IsPausable" type="boolean"/>
     <item fieldId="7" name="Slots" array="true" type="SlotStruct" length="10"/>
     <item fieldId="8" name="ForecastUpdateReason" type="ForecastUpdateReasonEnum" min="0x00" max="0x02"/>
   </struct>
@@ -203,7 +266,7 @@ limitations under the License.
     <item fieldId="2" name="DefaultDuration" type="elapsed_s"/>
     <item fieldId="3" name="ElapsedSlotTime" type="elapsed_s"/>
     <item fieldId="4" name="RemainingSlotTime" type="elapsed_s"/>
-    <item fieldId="5" name="SlotIsPauseable" type="boolean" optional="true"/>
+    <item fieldId="5" name="SlotIsPausable" type="boolean" optional="true"/>
     <item fieldId="6" name="MinPauseDuration" type="elapsed_s" optional="true"/>
     <item fieldId="7" name="MaxPauseDuration" type="elapsed_s" optional="true"/>
     <item fieldId="8" name="ManufacturerESAState" type="int16u" optional="true"/>
@@ -221,17 +284,16 @@ limitations under the License.
   <struct name="SlotAdjustmentStruct" apiMaturity="provisional">
     <cluster code="0x0098"/>
     <item fieldId="0" name="SlotIndex" type="int8u"/>
-    <item fieldId="1" name="NominalPower" type="power_mw"/>
+    <item fieldId="1" name="NominalPower" type="power_mw" optional="true"/>
     <item fieldId="2" name="Duration" type="elapsed_s"/>
   </struct>
 
   <struct name="ConstraintsStruct" apiMaturity="provisional">
     <cluster code="0x0098"/>
     <item fieldId="0" name="StartTime" type="epoch_s"/>
-    <item fieldId="1" name="Duration" type="elapsed_s" min="0" max="86400"/>
+    <item fieldId="1" name="Duration" type="elapsed_s" max="86400"/>
     <item fieldId="2" name="NominalPower" type="power_mw" optional="true"/>
     <item fieldId="3" name="MaximumEnergy" type="energy_mwh" optional="true"/>
     <item fieldId="4" name="LoadControl" type="int8s" optional="true"/>
   </struct>
-
 </configurator>

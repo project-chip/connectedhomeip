@@ -55,7 +55,7 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0060" name="Operational State" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0060" name="Operational State Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
     <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Define reserved ranges for base/derived clusters."/>
@@ -203,7 +203,10 @@ Davis, CA 95616, USA
     </event>
     <event id="0x01" name="OperationCompletion" priority="info">
       <access readPrivilege="view"/>
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
       <field id="0" name="CompletionErrorCode" type="enum8">
         <mandatoryConform/>
       </field>

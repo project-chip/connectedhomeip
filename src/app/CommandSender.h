@@ -33,6 +33,7 @@
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/PendingResponseTrackerImpl.h>
+#include <app/data-model/EncodableToTLV.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Optional.h>
@@ -307,18 +308,19 @@ public:
      * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
     CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false) :
-        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false) :
+        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {}
     CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
     // TODO(#32138): After there is a macro that is always defined for all unit tests, the constructor with
     // TestOnlyMarker should only be compiled if that macro is defined.
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
-                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
-        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false,
+                  bool aAllowLargePayload = false) :
+        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {
         mpPendingResponseTracker = apPendingResponseTracker;
     }
@@ -376,6 +378,22 @@ public:
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
 
     /**
+     * API for adding request data using DataModel::EncodableToTLV.
+     *
+     * @param [in] aCommandPath The path of the command being requested.
+     * @param [in] aEncodable The request data to encode into the
+     *             `CommandFields` member of `CommandDataIB`.
+     * @param [in] aAddRequestDataParams parameters associated with building the
+     *             InvokeRequestMessage that are associated with this request.
+     *
+     * This API will not fail if this is an untimed invoke but the command provided requires a timed
+     * invoke interaction. If the caller wants that to fail before sending the command, they should call
+     * the templated version of AddRequestData.
+     */
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
+                              AddRequestDataParameters & aAddRequestDataParams);
+
+    /**
      * API for adding a data request.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
      * object that can be encoded using the DataModel::Encode machinery and
@@ -391,15 +409,18 @@ public:
         return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
-    template <typename CommandDataT>
+    template <typename CommandDataT,
+              typename std::enable_if_t<!std::is_base_of_v<DataModel::EncodableToTLV, CommandDataT>, int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               AddRequestDataParameters & aAddRequestDataParams)
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aAddRequestDataParams.timedInvokeTimeoutMs.HasValue(),
                             CHIP_ERROR_INVALID_ARGUMENT);
 
-        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
+        DataModel::EncodableType<CommandDataT> encodable(aData);
+        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
     }
+
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs)
@@ -426,7 +447,8 @@ public:
     CHIP_ERROR TestOnlyAddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                                   AddRequestDataParameters & aAddRequestDataParams)
     {
-        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
+        DataModel::EncodableType<CommandDataT> encodable(aData);
+        return AddRequestData(aCommandPath, encodable, aAddRequestDataParams);
     }
 
     CHIP_ERROR TestOnlyFinishCommand(FinishCommandParameters & aFinishCommandParams)
@@ -448,19 +470,6 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
-    template <typename CommandDataT>
-    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      AddRequestDataParameters & aAddRequestDataParams)
-    {
-        PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
-        ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
-        TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
-        FinishCommandParameters finishCommandParams(aAddRequestDataParams);
-        return FinishCommand(finishCommandParams);
-    }
-
     CHIP_ERROR FinishCommandInternal(FinishCommandParameters & aFinishCommandParams);
 
 public:
@@ -628,6 +637,7 @@ private:
     bool mBufferAllocated       = false;
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
+    bool mAllowLargePayload     = false;
 };
 
 } // namespace app

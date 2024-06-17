@@ -19,6 +19,7 @@
 #pragma once
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
+#include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
@@ -30,11 +31,27 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {
+
+class WriteHandler;
+
+class WriteHandlerDelegate
+{
+public:
+    virtual ~WriteHandlerDelegate() = default;
+
+    /**
+     * Returns whether the write operation to the given path is in conflict with another write operation.
+     * (i.e. another write transaction is in the middle of processing a chunked write to the given path.)
+     */
+    virtual bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath) = 0;
+};
+
 /**
  *  @brief The write handler is responsible for processing a write request and sending a write reply.
  */
@@ -49,11 +66,13 @@ public:
      *  construction until a call to Close is made to terminate the
      *  instance.
      *
+     *  @param[in] apWriteHandlerDelegate  A Valid pointer to the WriteHandlerDelegate.
+     *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(WriteHandlerDelegate * apWriteHandlerDelegate);
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
@@ -82,11 +101,14 @@ public:
     CHIP_ERROR ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
 
-    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus);
+    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus);
+    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)
+    {
+        return AddStatus(aPath, Protocols::InteractionModel::ClusterStatusCode{ aStatus });
+    }
 
-    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteDataAttributePath & aAttributePathParams, uint8_t aClusterStatus);
-
-    CHIP_ERROR AddClusterSpecificFailure(const ConcreteDataAttributePath & aAttributePathParams, uint8_t aClusterStatus);
+    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteDataAttributePath & aAttributePathParams, ClusterStatus aClusterStatus);
+    CHIP_ERROR AddClusterSpecificFailure(const ConcreteDataAttributePath & aAttributePathParams, ClusterStatus aClusterStatus);
 
     FabricIndex GetAccessingFabricIndex() const;
 
@@ -148,7 +170,7 @@ private:
     // ProcessGroupAttributeDataIBs.
     CHIP_ERROR DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful);
 
-    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus);
+    CHIP_ERROR AddStatusInternal(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus);
 
 private:
     // ExchangeDelegate
@@ -175,6 +197,14 @@ private:
     //  Where (1)-(3) will be consistent among the whole list write request, while (4) and (5) are not appliable to group writes.
     bool mAttributeWriteSuccessful                = false;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
+
+    // This may be a "fake" pointer or a real delegate pointer, depending
+    // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.
+    //
+    // When this is not a real pointer, it checks that the value is always
+    // set to the global InteractionModelEngine and the size of this
+    // member is 1 byte.
+    InteractionModelDelegatePointer<WriteHandlerDelegate> mDelegate;
 };
 } // namespace app
 } // namespace chip

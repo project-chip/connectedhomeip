@@ -24,6 +24,7 @@
  *
  */
 
+#define _CHIP_BLE_BLE_H
 #include <ble/BleUUID.h>
 
 #include <gtest/gtest.h>
@@ -33,49 +34,48 @@ using namespace chip::Ble;
 
 namespace {
 
+constexpr ChipBleUUID expectedUUID = { { 0x00, 0x00, 0xFF, 0xF6, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34,
+                                         0xFB } };
+
+TEST(TestBleUUID, CheckUUIDsMatch_NULL)
+{
+    // Test that NULL pointer UUIDs are not equal
+    EXPECT_FALSE(UUIDsMatch(nullptr, nullptr));
+}
+
 TEST(TestBleUUID, CheckStringToUUID_ChipUUID)
 {
     // Test positive scenario - CHIP Service UUID
-    ChipBleUUID uuid;
-    EXPECT_TRUE(StringToUUID("0000FFF6-0000-1000-8000-00805F9B34FB", uuid));
-    EXPECT_TRUE(UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID));
+    ChipBleUUID uuid = StringToUUIDConstexpr("0000FFF6-0000-1000-8000-00805F9B34FB");
+    EXPECT_TRUE(UUIDsMatch(&uuid, &expectedUUID));
 }
 
 TEST(TestBleUUID, CheckStringToUUID_ChipUUID_RandomCase)
 {
     // Test that letter case doesn't matter
-    ChipBleUUID uuid;
-    EXPECT_TRUE(StringToUUID("0000FfF6-0000-1000-8000-00805f9B34Fb", uuid));
-    EXPECT_TRUE(UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID));
+    ChipBleUUID uuid = StringToUUIDConstexpr("0000FfF6-0000-1000-8000-00805f9B34Fb");
+    EXPECT_TRUE(UUIDsMatch(&uuid, &expectedUUID));
 }
 
 TEST(TestBleUUID, CheckStringToUUID_ChipUUID_NoSeparators)
 {
     // Test that separators don't matter
-    ChipBleUUID uuid;
-    EXPECT_TRUE(StringToUUID("0000FFF600001000800000805F9B34FB", uuid));
-    EXPECT_TRUE(UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID));
+    ChipBleUUID uuid = StringToUUIDConstexpr("0000FFF600001000800000805F9B34FB");
+    EXPECT_TRUE(UUIDsMatch(&uuid, &expectedUUID));
 }
 
 TEST(TestBleUUID, CheckStringToUUID_TooLong)
 {
     // Test that even one more digit is too much
-    ChipBleUUID uuid;
-    EXPECT_FALSE(StringToUUID("0000FFF600001000800000805F9B34FB0", uuid));
-}
-
-TEST(TestBleUUID, CheckStringToUUID_TooShort)
-{
-    // Test that even one less digit is too little
-    ChipBleUUID uuid;
-    EXPECT_FALSE(StringToUUID("0000FFF600001000800000805F9B34F", uuid));
+    auto result = StringToUUID("0000FFF600001000800000805F9B34FB0");
+    EXPECT_FALSE(result.first);
 }
 
 TEST(TestBleUUID, CheckStringToUUID_InvalidChar)
 {
     // Test that non-hex digits don't pass
-    ChipBleUUID uuid;
-    EXPECT_FALSE(StringToUUID("0000GFF6-0000-1000-8000-00805F9B34FB0", uuid));
+    auto result = StringToUUID("0000GFF6-0000-1000-8000-00805F9B34FB");
+    EXPECT_FALSE(result.first);
 }
 
 } // namespace

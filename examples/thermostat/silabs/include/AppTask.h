@@ -34,7 +34,7 @@
 #include "BaseApplication.h"
 #include "SensorManager.h"
 #include "TemperatureManager.h"
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>

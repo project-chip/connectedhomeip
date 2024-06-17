@@ -20,10 +20,12 @@
 #include <cstdint>
 #include <numeric>
 
-#include <ble/BleLayer.h>
-#include <ble/BtpEngine.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+#define _CHIP_BLE_BLE_H
+#include <ble/BleLayer.h>
+#include <ble/BtpEngine.h>
 
 #include <gtest/gtest.h>
 
@@ -65,7 +67,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedOnePacket)
     };
 
     auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
-    EXPECT_EQ(packet0->DataLength(), 5);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(5));
 
     SequenceNumber_t receivedAck;
     bool didReceiveAck;
@@ -79,7 +81,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedTwoPacket)
     constexpr uint8_t packetData1[] = { to_underlying(BtpEngine::HeaderFlags::kEndMessage), 0x02, 0xff };
 
     auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
-    EXPECT_EQ(packet0->DataLength(), 5);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(5));
 
     SequenceNumber_t receivedAck;
     bool didReceiveAck;
@@ -87,7 +89,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedTwoPacket)
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_InProgress);
 
     auto packet1 = System::PacketBufferHandle::NewWithData(packetData1, sizeof(packetData1));
-    EXPECT_EQ(packet1->DataLength(), 3);
+    EXPECT_EQ(packet1->DataLength(), static_cast<size_t>(3));
 
     EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet1), receivedAck, didReceiveAck), CHIP_NO_ERROR);
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Complete);
@@ -100,7 +102,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedThreePacket)
     constexpr uint8_t packetData2[] = { to_underlying(BtpEngine::HeaderFlags::kEndMessage), 0x03, 0xff };
 
     auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
-    EXPECT_EQ(packet0->DataLength(), 5);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(5));
 
     SequenceNumber_t receivedAck;
     bool didReceiveAck;
@@ -108,13 +110,13 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedThreePacket)
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_InProgress);
 
     auto packet1 = System::PacketBufferHandle::NewWithData(packetData1, sizeof(packetData1));
-    EXPECT_EQ(packet1->DataLength(), 3);
+    EXPECT_EQ(packet1->DataLength(), static_cast<size_t>(3));
 
     EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet1), receivedAck, didReceiveAck), CHIP_NO_ERROR);
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_InProgress);
 
     auto packet2 = System::PacketBufferHandle::NewWithData(packetData2, sizeof(packetData2));
-    EXPECT_EQ(packet2->DataLength(), 3);
+    EXPECT_EQ(packet2->DataLength(), static_cast<size_t>(3));
 
     EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet2), receivedAck, didReceiveAck), CHIP_NO_ERROR);
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Complete);
@@ -131,7 +133,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendOnePacket)
 
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
-    EXPECT_EQ(packet0->DataLength(), 5);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(5));
 }
 
 TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacket)
@@ -145,11 +147,11 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacket)
 
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
-    EXPECT_EQ(packet0->DataLength(), 20);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
 
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
-    EXPECT_EQ(packet0->DataLength(), 16);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(16));
 }
 
 // Send 40-byte payload.
@@ -167,15 +169,15 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendThreePacket)
 
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
-    EXPECT_EQ(packet0->DataLength(), 20);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
 
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
-    EXPECT_EQ(packet0->DataLength(), 20);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
 
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
-    EXPECT_EQ(packet0->DataLength(), 8);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(8));
 }
 
 } // namespace

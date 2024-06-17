@@ -47,17 +47,23 @@ limitations under the License.
     <item name="Connected" value="0x00"/>
     <item name="NotConnected" value="0x01"/>
   </enum>  
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0036"/>
-    <field name="PacketCounts" mask="0x1"/>
-    <field name="ErrorCounts" mask="0x2"/>
-  </bitmap>  
+
   <cluster>
     <domain>General</domain>
-    <name>WiFi Network Diagnostics</name>
+    <name>Wi-Fi Network Diagnostics</name>
     <code>0x0036</code>
     <define>WIFI_NETWORK_DIAGNOSTICS_CLUSTER</define>
     <description>The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
+
+    <features>
+      <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Node makes available the counts for the number of received and transmitted packets on the ethernet interface.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Node makes available the counts for the number of errors that have occurred during the reception and transmission of packets on the ethernet interface.">
+        <optionalConform/>
+      </feature>
+    </features>
+  
     <attribute side="server" code="0x00" define="BSSID" type="octet_string" length="6" writable="false" isNullable="true" optional="false">BSSID</attribute>
     <attribute side="server" code="0x01" define="SECURITY_TYPE" type="SecurityTypeEnum" writable="false" isNullable="true" optional="false">SecurityType</attribute>
     <attribute side="server" code="0x02" define="WIFI_VERSION" type="WiFiVersionEnum" writable="false" isNullable="true" optional="false">WiFiVersion</attribute>

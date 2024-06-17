@@ -118,7 +118,7 @@ public:
         const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
     void OnScanNetworksFailure(CHIP_ERROR error) override;
     void OnICDRegistrationInfoRequired() override;
-    void OnICDRegistrationComplete(chip::NodeId icdNodeId, uint32_t icdCounter) override;
+    void OnICDRegistrationComplete(chip::ScopedNodeId icdNodeId, uint32_t icdCounter) override;
 
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
@@ -212,9 +212,11 @@ public:
 
     CHIP_ERROR FinishOTAProvider();
 
-    chip::app::DefaultICDClientStorage * getICDClientStorage() { return &mICDClientStorage; }
-
     CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
+
+    void StartDnssd();
+
+    void StopDnssd();
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
@@ -228,7 +230,6 @@ private:
     // TODO: This may need to be injected as a SessionKeystore*
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
-    chip::app::DefaultICDClientStorage mICDClientStorage;
     chip::app::AndroidCheckInDelegate mCheckInDelegate;
     chip::app::CheckInHandler mCheckInHandler;
 

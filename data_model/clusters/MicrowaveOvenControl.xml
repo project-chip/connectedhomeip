@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005F" name="Microwave Oven Control" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005F" name="Microwave Oven Control Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -70,7 +70,10 @@ Davis, CA 95616, USA
       <optionalConform choice="a"/>
     </feature>
     <feature bit="1" code="WATTS" name="PowerInWatts" summary="Power is specified in Watts">
-      <optionalConform choice="a"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform choice="a"/>
+      </otherwiseConform>
     </feature>
     <feature bit="2" code="PWRLMTS" name="PowerNumberLimits" summary="Supports the limit attributes used with the PWRNUM feature">
       <optionalConform>
@@ -125,16 +128,22 @@ Davis, CA 95616, USA
       <entry type="uint16"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="WATTS"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="WATTS"/>
+        </mandatoryConform>
+      </otherwiseConform>
       <constraint type="countBetween" from="1" to="10"/>
     </attribute>
     <attribute id="0x0007" name="SelectedWattIndex" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="WATTS"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="WATTS"/>
+        </mandatoryConform>
+      </otherwiseConform>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0008" name="WattRating" type="uint16" default="MS">
@@ -165,7 +174,7 @@ Davis, CA 95616, USA
         <optionalConform choice="a" more="true">
           <feature name="WATTS"/>
         </optionalConform>
-        <constraint type="between" from="0" to="len(SupportedWatts)-1"/>
+        <constraint type="desc"/>
       </field>
       <field id="4" name="StartAfterSetting" type="bool" default="false">
         <optionalConform/>

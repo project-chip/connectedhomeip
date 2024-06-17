@@ -32,7 +32,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 
 #include "board.h"
 #include "gatt_db_app_interface.h"
@@ -125,11 +125,7 @@ EventGroupHandle_t sEventGroup;
 
 TimerHandle_t connectionTimeout;
 
-const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xF6, 0xFF };
-const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x11 } };
-const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x12 } };
+const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
 #if defined(chip_with_low_power) && (chip_with_low_power == 1)
 static bool bleAppStopInProgress;
@@ -319,17 +315,17 @@ void BLEManagerCommon::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kCHIPoBLESubscribe:
         ChipDeviceEvent connEstEvent;
 
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
         PlatformMgr().PostEventOrDie(&connEstEvent);
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
-        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
@@ -338,7 +334,7 @@ void BLEManagerCommon::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     default:
@@ -378,20 +374,6 @@ bool BLEManagerCommon::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipB
     return false;
 }
 
-bool BLEManagerCommon::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                       PacketBufferHandle pBuf)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendReadRequest() not supported");
-    return false;
-}
-
-bool BLEManagerCommon::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                        const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendReadResponse() not supported");
-    return false;
-}
-
 void BLEManagerCommon::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     BLEMgrImpl().CloseConnection(conId);
@@ -401,7 +383,7 @@ bool BLEManagerCommon::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBle
                                       PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t cId   = (UUIDsMatch(&ChipUUID_CHIPoBLEChar_TX, charId) ? value_chipoble_tx : 0);
+    uint16_t cId   = (UUIDsMatch(&Ble::CHIP_BLE_CHAR_2_UUID, charId) ? value_chipoble_tx : 0);
     ChipDeviceEvent event;
 
     if (cId != 0)
@@ -1075,6 +1057,10 @@ void BLEManagerCommon::HandleForceDisconnect()
     {
         ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
     }
+
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+    PWR_AllowDeviceToSleep();
+#endif
 }
 
 /*******************************************************************************

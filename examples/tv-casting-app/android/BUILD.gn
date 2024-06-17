@@ -55,6 +55,7 @@ shared_library("jni") {
     "${chip_root}/examples/tv-casting-app/tv-casting-common",
     "${chip_root}/src/app/data-model:heap",
     "${chip_root}/src/app/server/java:jni",
+    "${chip_root}/src/controller/java:android_chip_im_jni",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
   ]
@@ -72,6 +73,7 @@ android_library("java") {
   deps = [
     ":android",
     "${chip_root}/src/app/server/java",
+    "${chip_root}/src/controller/java:android_chip_im",
     "${chip_root}/src/platform/android:java",
     "${chip_root}/third_party/android_deps:annotation",
   ]
@@ -112,12 +114,16 @@ android_library("java") {
     "App/app/src/main/jni/com/matter/casting/core/MatterCastingPlayerDiscovery.java",
     "App/app/src/main/jni/com/matter/casting/support/AppParameters.java",
     "App/app/src/main/jni/com/matter/casting/support/CommissionableData.java",
+    "App/app/src/main/jni/com/matter/casting/support/CommissionerDeclaration.java",
+    "App/app/src/main/jni/com/matter/casting/support/ConnectionCallbacks.java",
     "App/app/src/main/jni/com/matter/casting/support/DACProvider.java",
     "App/app/src/main/jni/com/matter/casting/support/DataProvider.java",
     "App/app/src/main/jni/com/matter/casting/support/DeviceTypeStruct.java",
     "App/app/src/main/jni/com/matter/casting/support/EndpointFilter.java",
+    "App/app/src/main/jni/com/matter/casting/support/IdentificationDeclarationOptions.java",
     "App/app/src/main/jni/com/matter/casting/support/MatterCallback.java",
     "App/app/src/main/jni/com/matter/casting/support/MatterError.java",
+    "App/app/src/main/jni/com/matter/casting/support/TargetAppInfo.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
@@ -136,6 +142,7 @@ group("default") {
     ":java",
     ":jni",
     "${chip_root}/src/app/server/java",
+    "${chip_root}/src/controller/java:android_chip_im",
     "${chip_root}/src/platform/android:java",
   ]
 }

@@ -87,7 +87,10 @@ tests:
       command: "readAttribute"
       attribute: "ICDCounter"
       response:
-          value: beforeRebootICDCounter + 101
+          constraints:
+              # It is possible ICD hasn't had time to send a Check-In message after reboot
+              minValue: beforeRebootICDCounter + 100
+              maxValue: beforeRebootICDCounter + 101
 
     - label: "Verify the ICD is operating as a LIT ICD"
       command: "readAttribute"
@@ -138,7 +141,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-          value: 0x110D
+          value: 0x111D
 
     - label: "Read UserActiveModeTriggerInstruction"
       command: "readAttribute"

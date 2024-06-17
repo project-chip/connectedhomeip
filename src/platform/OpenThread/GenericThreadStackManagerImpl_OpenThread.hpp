@@ -52,6 +52,7 @@
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
@@ -73,14 +74,15 @@ static_assert(OPENTHREAD_API_VERSION >= 219, "OpenThread version too old");
 
 // Network commissioning
 namespace {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
 NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
-app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
+app::Clusters::NetworkCommissioning::Instance
+    sThreadNetworkCommissioningInstance(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */, &sGenericThreadDriver);
 #endif
 
 void initNetworkCommissioningThreadDriver(void)
 {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
     sThreadNetworkCommissioningInstance.Init();
 #endif
 }
@@ -122,13 +124,14 @@ NetworkCommissioning::otScanResponseIterator<NetworkCommissioning::ThreadScanRes
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChange(uint32_t flags, void * context)
 {
-    ChipDeviceEvent event;
-    event.Type                                = DeviceEventType::kThreadStateChange;
-    event.ThreadStateChange.RoleChanged       = (flags & OT_CHANGED_THREAD_ROLE) != 0;
-    event.ThreadStateChange.AddressChanged    = (flags & (OT_CHANGED_IP6_ADDRESS_ADDED | OT_CHANGED_IP6_ADDRESS_REMOVED)) != 0;
-    event.ThreadStateChange.NetDataChanged    = (flags & OT_CHANGED_THREAD_NETDATA) != 0;
-    event.ThreadStateChange.ChildNodesChanged = (flags & (OT_CHANGED_THREAD_CHILD_ADDED | OT_CHANGED_THREAD_CHILD_REMOVED)) != 0;
-    event.ThreadStateChange.OpenThread.Flags  = flags;
+    ChipDeviceEvent event{ .Type              = DeviceEventType::kThreadStateChange,
+                           .ThreadStateChange = {
+                               .RoleChanged    = (flags & OT_CHANGED_THREAD_ROLE) != 0,
+                               .AddressChanged = (flags & (OT_CHANGED_IP6_ADDRESS_ADDED | OT_CHANGED_IP6_ADDRESS_REMOVED)) != 0,
+                               .NetDataChanged = (flags & OT_CHANGED_THREAD_NETDATA) != 0,
+                               .ChildNodesChanged =
+                                   (flags & (OT_CHANGED_THREAD_CHILD_ADDED | OT_CHANGED_THREAD_CHILD_REMOVED)) != 0,
+                               .OpenThread = { .Flags = flags } } };
 
     CHIP_ERROR status = PlatformMgr().PostEvent(&event);
     if (status != CHIP_NO_ERROR)
@@ -210,11 +213,10 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
         // Avoid sending muliple events if the attachement state didn't change (Child->router or disable->Detached)
         if (event->ThreadStateChange.RoleChanged && (isThreadAttached != mIsAttached))
         {
-            ChipDeviceEvent attachEvent;
-            attachEvent.Clear();
-            attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
-            attachEvent.ThreadConnectivityChange.Result = (isThreadAttached) ? kConnectivity_Established : kConnectivity_Lost;
-            CHIP_ERROR status                           = PlatformMgr().PostEvent(&attachEvent);
+            ChipDeviceEvent attachEvent{ .Type                     = DeviceEventType::kThreadConnectivityChange,
+                                         .ThreadConnectivityChange = { .Result = (isThreadAttached) ? kConnectivity_Established
+                                                                                                    : kConnectivity_Lost } };
+            CHIP_ERROR status = PlatformMgr().PostEvent(&attachEvent);
             if (status == CHIP_NO_ERROR)
             {
                 mIsAttached = isThreadAttached;
@@ -223,10 +225,32 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
             {
                 ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
             }
+
+            ThreadDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetThreadDiagnosticsDelegate();
+
+            if (delegate)
+            {
+                if (mIsAttached)
+                {
+                    delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
+                }
+                else
+                {
+                    delegate->OnConnectionStatusChanged(
+                        app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
+
+                    GeneralFaults<kMaxNetworkFaults> current;
+                    current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
+                    delegate->OnNetworkFaultChanged(mNetworkFaults, current);
+                    mNetworkFaults = current;
+                }
+            }
         }
 
 #if CHIP_DETAIL_LOGGING
+        Impl()->LockThreadStack();
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
+        Impl()->UnlockThreadStack();
 #endif // CHIP_DETAIL_LOGGING
     }
 }
@@ -300,9 +324,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
     }
 
     // post an event alerting other subsystems about change in provisioning state
-    ChipDeviceEvent event;
-    event.Type                                           = DeviceEventType::kServiceProvisioningChange;
-    event.ServiceProvisioningChange.IsServiceProvisioned = true;
+    ChipDeviceEvent event{ .Type                      = DeviceEventType::kServiceProvisioningChange,
+                           .ServiceProvisioningChange = { .IsServiceProvisioned = true } };
     return PlatformMgr().PostEvent(&event);
 }
 
@@ -356,6 +379,14 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(
     const Thread::OperationalDataset & dataset, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
+    Thread::OperationalDataset current_dataset;
+    // Validate the dataset change with the current state
+    ThreadStackMgrImpl().GetThreadProvision(current_dataset);
+    if (dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && callback == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
     mpConnectCallback = nullptr;
     ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
@@ -1195,6 +1226,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(v
     ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
     Impl()->LockThreadStack();
     otThreadSetEnabled(mOTInst, false);
+    otIp6SetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
     Impl()->UnlockThreadStack();
 }
@@ -1713,7 +1745,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     if (!otIp6IsAddressUnspecified(&serviceInfo.mHostAddress))
     {
         mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
-        mdnsService.mAddress     = MakeOptional(ToIPAddress(serviceInfo.mHostAddress));
+        mdnsService.mAddress     = std::make_optional(ToIPAddress(serviceInfo.mHostAddress));
     }
 
     // Check if TXT record was included in DNS response.
@@ -1787,9 +1819,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchResolve(intptr
     Dnssd::DnssdService & service = dnsResult->mMdnsService;
     Span<Inet::IPAddress> ipAddrs;
 
-    if (service.mAddress.HasValue())
+    if (service.mAddress.has_value())
     {
-        ipAddrs = Span<Inet::IPAddress>(&service.mAddress.Value(), 1);
+        ipAddrs = Span<Inet::IPAddress>(&*service.mAddress, 1);
     }
 
     ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &service, ipAddrs, dnsResult->error);
@@ -1939,7 +1971,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsAddressResolveRes
     error = MapOpenThreadError(otDnsAddressResponseGetAddress(aResponse, 0, &address, nullptr));
     if (error == CHIP_NO_ERROR)
     {
-        dnsResult->mMdnsService.mAddress = MakeOptional(ToIPAddress(address));
+        dnsResult->mMdnsService.mAddress = std::make_optional(ToIPAddress(address));
     }
 
     dnsResult->error = error;

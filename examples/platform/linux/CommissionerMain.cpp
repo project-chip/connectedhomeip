@@ -216,7 +216,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
 
     // advertise operational since we are an admin
-    app::DnssdServer::Instance().AdvertiseOperational();
+    ReturnLogErrorOnFailure(app::DnssdServer::Instance().AdvertiseOperational());
 
     ChipLogProgress(Support,
                     "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabric.fabricId=0x" ChipLogFormatX64 " fabricIndex=0x%x",
@@ -277,6 +277,13 @@ void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
         break;
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(AppServer, "Secure Pairing Failed");
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->CommissioningFailed(CHIP_ERROR_CONNECTION_ABORTED);
+        }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         break;
     }
 }
