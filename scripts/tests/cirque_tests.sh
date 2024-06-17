@@ -114,8 +114,6 @@ function cirquetest_bootstrap() {
     set -ex
 
     cd "$REPO_DIR"/third_party/cirque/repo
-    pip3 uninstall -y setuptools --break-system-packages
-    pip3 install --break-system-packages setuptools==65.7.0
     pip3 install --break-system-packages pycodestyle==2.5.0 wheel
 
     make NO_GRPC=1 install -j
