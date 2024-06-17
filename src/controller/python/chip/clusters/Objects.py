@@ -11900,6 +11900,7 @@ class Switch(Cluster):
             kMomentarySwitchRelease = 0x4
             kMomentarySwitchLongPress = 0x8
             kMomentarySwitchMultiPress = 0x10
+            kActionSwitch = 0x20
 
     class Attributes:
         @dataclass

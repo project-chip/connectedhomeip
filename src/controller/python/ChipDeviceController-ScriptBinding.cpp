@@ -76,6 +76,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/SetupDiscriminator.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <system/SystemClock.h>
@@ -140,7 +141,7 @@ PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommission
 
 // Rendezvous
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
-                                               uint32_t setupPINCode, chip::NodeId nodeid);
+                                               bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
@@ -377,13 +378,24 @@ const char * pychip_DeviceController_StatusReportToString(uint32_t profileId, ui
 }
 
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
-                                               uint32_t setupPINCode, chip::NodeId nodeid)
+                                               bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid)
 {
+    SetupDiscriminator setupDiscriminator;
+
+    if (isShortDiscriminator)
+    {
+        setupDiscriminator.SetShortValue(discriminator & 0xFu);
+    }
+    else
+    {
+        setupDiscriminator.SetLongValue(discriminator);
+    }
+
     return ToPyChipError(devCtrl->PairDevice(nodeid,
                                              chip::RendezvousParameters()
                                                  .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
                                                  .SetSetupPINCode(setupPINCode)
-                                                 .SetDiscriminator(discriminator),
+                                                 .SetSetupDiscriminator(setupDiscriminator),
                                              sCommissioningParameters));
 }
 

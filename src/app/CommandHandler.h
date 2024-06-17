@@ -25,6 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -116,21 +117,51 @@ public:
 
     /**
      * Adds the given command status and returns any failures in adding statuses (e.g. out
-     * of buffer space) to the caller
+     * of buffer space) to the caller. `context` is an optional (if not nullptr)
+     * debug string to include in logging.
      */
     virtual CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
-                                         const Protocols::InteractionModel::Status aStatus, const char * context = nullptr) = 0;
+                                         const Protocols::InteractionModel::ClusterStatusCode & aStatus,
+                                         const char * context = nullptr) = 0;
+    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::Status aStatus,
+                                 const char * context = nullptr)
+    {
+        return FallibleAddStatus(aRequestCommandPath, Protocols::InteractionModel::ClusterStatusCode{ aStatus }, context);
+    }
 
     /**
-     * Adds a status when the caller is unable to handle any failures. Logging is performed
-     * and failure to register the status is checked with VerifyOrDie.
+     * Adds an IM global or Cluster status when the caller is unable to handle any failures. Logging is performed
+     * and failure to register the status is checked with VerifyOrDie. `context` is an optional (if not nullptr)
+     * debug string to include in logging.
      */
-    virtual void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                           const char * context = nullptr) = 0;
+    virtual void AddStatus(const ConcreteCommandPath & aRequestCommandPath,
+                           const Protocols::InteractionModel::ClusterStatusCode & aStatus, const char * context = nullptr) = 0;
+    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::Status aStatus,
+                   const char * context = nullptr)
+    {
+        AddStatus(aRequestCommandPath, Protocols::InteractionModel::ClusterStatusCode{ aStatus }, context);
+    }
 
-    virtual CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) = 0;
+    /**
+     * Sets the response to indicate Success with a cluster-specific status code `aClusterStatus` included.
+     *
+     * NOTE: For regular success, what you want is AddStatus/FailibleAddStatus(aRequestCommandPath,
+     * InteractionModel::Status::Success).
+     */
+    virtual CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus)
+    {
+        return FallibleAddStatus(aRequestCommandPath,
+                                 Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(aClusterStatus));
+    }
 
-    virtual CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) = 0;
+    /**
+     * Sets the response to indicate Failure with a cluster-specific status code `aClusterStatus` included.
+     */
+    virtual CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus)
+    {
+        return FallibleAddStatus(aRequestCommandPath,
+                                 Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
+    }
 
     /**
      * GetAccessingFabricIndex() may only be called during synchronous command

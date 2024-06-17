@@ -1554,14 +1554,16 @@ class CommissionDeviceTest(MatterBaseTest):
                 info.passcode,
                 conf.dut_node_ids[i],
                 conf.wifi_ssid,
-                conf.wifi_passphrase
+                conf.wifi_passphrase,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
             )
         elif conf.commissioning_method == "ble-thread":
             return dev_ctrl.CommissionThread(
                 info.filter_value,
                 info.passcode,
                 conf.dut_node_ids[i],
-                conf.thread_operational_dataset
+                conf.thread_operational_dataset,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
             )
         elif conf.commissioning_method == "on-network-ip":
             logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")

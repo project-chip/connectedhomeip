@@ -17585,6 +17585,7 @@ typedef NS_OPTIONS(uint32_t, MTRSwitchFeature) {
     MTRSwitchFeatureMomentarySwitchRelease MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x4,
     MTRSwitchFeatureMomentarySwitchLongPress MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x8,
     MTRSwitchFeatureMomentarySwitchMultiPress MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x10,
+    MTRSwitchFeatureActionSwitch MTR_PROVISIONALLY_AVAILABLE = 0x20,
 } MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningCommissioningWindowStatus) {
