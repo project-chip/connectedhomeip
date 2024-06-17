@@ -30,6 +30,7 @@ from chip.interaction_model import InteractionModelError
 from matter_testing_support import MatterBaseTest, async_test_body, compare_time, default_matter_test_main, utc_time_in_matter_epoch
 from mobly import asserts
 
+
 class TC_TIMESYNC_2_2(MatterBaseTest):
     async def read_ts_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.TimeSynchronization
@@ -84,6 +85,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
         if utc_dut_initial is NullValue:
             asserts.assert_equal(source, Clusters.Objects.TimeSynchronization.Enums.TimeSourceEnum.kAdmin)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
