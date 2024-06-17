@@ -45,4 +45,4 @@ target_compile_options(${COMPONENT_LIB} PUBLIC
 )
 
 target_link_directories(${COMPONENT_LIB} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/../chip/lib)
-target_link_libraries(${COMPONENT_LIB} PUBLIC -lSupportTesting -lPWTestsWrapper)
+target_link_libraries(${COMPONENT_LIB} PUBLIC -lPWTestsWrapper)
