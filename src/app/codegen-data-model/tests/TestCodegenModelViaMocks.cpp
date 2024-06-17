@@ -373,6 +373,28 @@ CHIP_ERROR DecodeList(TLV::TLVReader & reader, std::vector<T> & out)
     }
 }
 
+class UnsupportedReadAccessInterface : public AttributeAccessInterface
+{
+public:
+    UnsupportedReadAccessInterface(ConcreteAttributePath path) :
+        AttributeAccessInterface(MakeOptional(path.mEndpointId), path.mClusterId), mPath(path)
+    {}
+    ~UnsupportedReadAccessInterface() = default;
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder) override
+    {
+        if (static_cast<const ConcreteAttributePath &>(path) != mPath)
+        {
+            // returning without trying to handle means "I do not handle this"
+            return CHIP_NO_ERROR;
+        }
+
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
+    }
+private:
+    ConcreteAttributePath mPath;
+};
+
 class StructAttributeAccessInterface : public AttributeAccessInterface
 {
 public:
@@ -1045,6 +1067,27 @@ TEST(TestCodegenModelViaMocks, EmberAttributePathExpansionAccessDeniedRead)
 
     // For expanded paths, access control failures succeed without encoding anything
     // This is temporary until ACL checks are moved inside the IM/ReportEngine
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+    ASSERT_FALSE(encoder->TriedEncode());
+}
+
+TEST(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead) {
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kTestPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor, kTestPath);
+    RegisteredAttributeAccessInterface<UnsupportedReadAccessInterface> aai(kTestPath);
+
+    testRequest.request.path.mExpanded = true;
+
+    // For expanded paths, unsupported read from AAI (i.e. reading write-only data)
+    // succeed without attempting to encode.
+    // This is temporary until ACL checks are moved inside the IM/ReportEngine
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
     ASSERT_FALSE(encoder->TriedEncode());
 }
