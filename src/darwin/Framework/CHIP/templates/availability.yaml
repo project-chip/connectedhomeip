@@ -7468,7 +7468,6 @@
           - LaundryWasherControls
           - DishwasherAlarm
           - SampleMEI
-            ServiceArea
       attributes:
           Scenes:
               # New scenes bits not stable yet.
