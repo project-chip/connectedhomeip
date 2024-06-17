@@ -491,7 +491,15 @@ bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, c
     EndpointId endpoint = commandPath.mEndpointId;
     Status status       = Status::Success;
 
-    if (shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
+    // StopMoveStep command has no effect on an active color loop.
+    // Fetch if it is supported and active.
+    uint8_t isColorLoopActive = 0;
+    if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorLoop))
+    {
+        Attributes::ColorLoopActive::Get(endpoint, &isColorLoopActive);
+    }
+
+    if (shouldExecuteIfOff(endpoint, optionsMask, optionsOverride) && !isColorLoopActive)
     {
         status = stopAllColorTransitions(endpoint);
 
@@ -1165,7 +1173,7 @@ bool ColorControlServer::computeNewHueValue(ColorControlServer::ColorHueTransiti
             return true;
         }
 
-        // Check if we are in a color loop. If not, we         are in a moveHue
+        // Check if we are in a color loop. If not, we are in a moveHue
         uint8_t isColorLoop = 0;
         Attributes::ColorLoopActive::Get(p->endpoint, &isColorLoop);
 
@@ -2265,12 +2273,6 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     VerifyOrExit(colorXTransitionState != nullptr, status = Status::UnsupportedEndpoint);
     VerifyOrExit(colorYTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
-    if (rateX == 0 && rateY == 0)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
-
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
         commandObj->AddStatus(commandPath, Status::Success);
@@ -2282,6 +2284,13 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
+
+    if (rateX == 0 && rateY == 0)
+    {
+        // any current transition has been stopped. We are done.
+        commandObj->AddStatus(commandPath, Status::Success);
+        return true;
+    }
 
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, ColorControl::EnhancedColorMode::kCurrentXAndCurrentY);
