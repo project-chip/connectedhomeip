@@ -573,14 +573,16 @@ void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
 void ContentAppFactoryImpl::AddUninstalledContentApp(uint16_t vendorId, uint16_t productId)
 {
     auto make_default_supported_clusters = []() {
-        return std::vector<ContentApp::SupportedCluster>{ { Descriptor::Id },      { ApplicationBasic::Id },
-                                                          { KeypadInput::Id },     { ApplicationLauncher::Id } };
+        return std::vector<ContentApp::SupportedCluster>{
+            { Descriptor::Id }, { ApplicationBasic::Id }, { KeypadInput::Id }, { ApplicationLauncher::Id }
+        };
     };
 
-    auto ptr = std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1",
-                                                                   "0", make_default_supported_clusters());
+    auto ptr = std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1", "0",
+                                                make_default_supported_clusters());
 
-    ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum::kNotInstalled);
+    ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(
+        app::Clusters::ApplicationBasic::ApplicationStatusEnum::kNotInstalled);
 
     mContentApps.emplace_back(std::move(ptr));
 }
@@ -597,46 +599,51 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: InstallContentApp vendorId=%d productId=%d ", vendorId, productId);
     if (vendorId == 1 && productId == 11)
     {
-        auto ptr = std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1",
-                                                                   "34567890", make_default_supported_clusters());
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1", "34567890",
+                                                    make_default_supported_clusters());
 
-        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
+        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(
+            app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
 
         mContentApps.emplace_back(std::move(ptr));
     }
     else if (vendorId == 65521 && productId == 32769)
     {
-        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2",
-                                                                   "20202021", make_default_supported_clusters());
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2", "20202021",
+                                                    make_default_supported_clusters());
 
-        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
+        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(
+            app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
 
         mContentApps.emplace_back(std::move(ptr));
     }
     else if (vendorId == 9050 && productId == 22)
     {
         auto ptr = std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021",
-                                                                   make_default_supported_clusters());
+                                                    make_default_supported_clusters());
 
-        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
+        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(
+            app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
 
         mContentApps.emplace_back(std::move(ptr));
     }
     else if (vendorId == 1111 && productId == 22)
     {
-        auto ptr = std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2",
-                                                                   "20202021", make_default_supported_clusters());
+        auto ptr = std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2", "20202021",
+                                                    make_default_supported_clusters());
 
-        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
+        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(
+            app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
 
         mContentApps.emplace_back(std::move(ptr));
     }
     else
     {
-        auto ptr = std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2",
-                                                                   "20202021", make_default_supported_clusters());
+        auto ptr = std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2", "20202021",
+                                                    make_default_supported_clusters());
 
-        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
+        ptr.get()->GetApplicationBasicDelegate()->SetApplicationStatus(
+            app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled);
 
         mContentApps.emplace_back(std::move(ptr));
     }
@@ -675,26 +682,26 @@ std::string ApplicationBasicStatusToString(app::Clusters::ApplicationBasic::Appl
 {
     switch (status)
     {
-        case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kStopped:
-            return "kStopped";
-        case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus:
-            return "kActiveVisibleFocus";
-        case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveHidden:
-            return "kActiveHidden";
-        case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus:
-            return "kActiveVisibleNotFocus";
-        case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kNotInstalled:
-            return "kNotInstalled";
-        case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalling:
-            return "kInstalling";
-        case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstallationFailed:
-            return "kInstallationFailed";
-        case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled:
-            return "kInstalled";
-        case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kUnknownEnumValue:
-            return "kUnknownEnumValue";
-        default:
-            return "UnknownEnumValue";
+    case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kStopped:
+        return "kStopped";
+    case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus:
+        return "kActiveVisibleFocus";
+    case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveHidden:
+        return "kActiveHidden";
+    case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus:
+        return "kActiveVisibleNotFocus";
+    case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kNotInstalled:
+        return "kNotInstalled";
+    case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalling:
+        return "kInstalling";
+    case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstallationFailed:
+        return "kInstallationFailed";
+    case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kInstalled:
+        return "kInstalled";
+    case app::Clusters::ApplicationBasic::ApplicationStatusEnum::kUnknownEnumValue:
+        return "kUnknownEnumValue";
+    default:
+        return "UnknownEnumValue";
     }
 }
 
@@ -704,7 +711,8 @@ void ContentAppFactoryImpl::PrintInstalledApps()
     {
         auto app = contentApp.get();
 
-        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d is on ep=%d with app's basic status=%s", app->GetApplicationBasicDelegate()->HandleGetVendorId(),
+        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d is on ep=%d with app's basic status=%s",
+                        app->GetApplicationBasicDelegate()->HandleGetVendorId(),
                         app->GetApplicationBasicDelegate()->HandleGetProductId(), app->GetEndpointId(),
                         ApplicationBasicStatusToString(app->GetApplicationBasicDelegate()->HandleGetStatus()).c_str());
     }
