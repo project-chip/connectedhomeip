@@ -65,6 +65,7 @@ int main()
     int status = 0;
     // Migration to pw_unit_tests was not done for mbed since the unit-testing FW used to run out of flash and was disabled from
     // GitHub Actions workflows: https://github.com/project-chip/connectedhomeip/pull/15966
+
     // status += RunRegisteredUnitTests();
     // ChipLogProgress(NotSpecified, "CHIP test status: %d", status);
 
