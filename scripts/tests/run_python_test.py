@@ -127,9 +127,6 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
         if retcode != 0:
             raise Exception("Failed to remove /tmp/chip* for factory reset.")
 
-        print("Contents of test directory: %s" % os.getcwd())
-        print(subprocess.check_output(["ls -l"], shell=True).decode('utf-8'))
-
         # Remove native app KVS if that was used
         kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
         if kvs_match:

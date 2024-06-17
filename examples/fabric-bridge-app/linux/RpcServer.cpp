@@ -20,12 +20,21 @@
 #include "pw_rpc_system_server/rpc_server.h"
 #include "pw_rpc_system_server/socket.h"
 
-#include <system/SystemClock.h>
+#include <lib/core/CHIPError.h>
+
+#include <string>
 #include <thread>
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 #include "pigweed/rpc_services/FabricBridge.h"
 #endif
+
+#include "Device.h"
+#include "DeviceManager.h"
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 
 namespace {
 
@@ -33,13 +42,27 @@ namespace {
 class FabricBridge final : public chip::rpc::FabricBridge
 {
 public:
-    pw::Status AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override
-    {
-        chip::NodeId nodeId = request.node_id;
-        ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
-        return pw::OkStatus();
-    }
+    pw::Status AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response) override;
 };
+
+pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response)
+{
+    NodeId nodeId = request.node_id;
+    ChipLogProgress(NotSpecified, "Received AddSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    Device * device = new Device(nodeId);
+    device->SetReachable(true);
+
+    int result = DeviceMgr().AddDeviceEndpoint(device, 1);
+    if (result == -1)
+    {
+        delete device;
+        ChipLogError(NotSpecified, "Failed to add device with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+        return pw::Status::Unknown();
+    }
+
+    return pw::OkStatus();
+}
 
 FabricBridge fabric_bridge_service;
 #endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE

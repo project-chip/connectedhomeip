@@ -333,6 +333,15 @@ private:
      */
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
 
+    /*
+     * Get the appropriate size of a packet buffer to allocate for encoding a Report message.
+     * This size might depend on the underlying session used by the ReadHandler.
+     *
+     * The size returned here is the size not including the various prepended headers
+     * (what System::PacketBuffer calls the "available size").
+     */
+    size_t GetReportBufferMaxSize();
+
     /**
      *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
      */
