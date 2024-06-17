@@ -130,6 +130,8 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     Device * device = DeviceMgr().GetDevice(endpointId);
+
+    // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
     if (device != nullptr && OpenCommissioningWindow(device->GetNodeId()) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Commissioning window is now open");
@@ -139,6 +141,9 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
         status = Status::Failure;
         ChipLogProgress(NotSpecified, "Commissioning window is failed to open");
     }
+#else
+    status = Status::Failure;
+    ChipLogProgress(NotSpecified, "Commissioning window failed to open: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
 #endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
