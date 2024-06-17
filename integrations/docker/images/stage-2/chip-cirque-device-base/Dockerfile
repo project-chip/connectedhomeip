@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:24.04
 
 ARG OT_BR_POSIX_CHECKOUT=main
 
@@ -56,7 +56,7 @@ RUN apt-get update \
   && echo "ctrl_interface=/run/wpa_supplicant" >> /etc/wpa_supplicant/wpa_supplicant.conf \
   && echo "update_config=1" >> /etc/wpa_supplicant/wpa_supplicant.conf \
   && rm -rf /var/lib/apt/lists/* \
-  && pip3 install --no-cache-dir click==8.0.3 paramiko \
+  && pip3 install --break-system-packages --no-cache-dir click==8.0.3 paramiko \
   && mkdir /var/run/sshd \
   && echo 'root:admin' | chpasswd \
   && sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config \

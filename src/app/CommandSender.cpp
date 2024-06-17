@@ -555,13 +555,18 @@ CHIP_ERROR CommandSender::FinishCommand(FinishCommandParameters & aFinishCommand
 CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
                                          AddRequestDataParameters & aAddRequestDataParams)
 {
+    ReturnErrorOnFailure(AllocateBuffer());
+
+    RollbackInvokeRequest rollback(*this);
     PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
     ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
     FinishCommandParameters finishCommandParams(aAddRequestDataParams);
-    return FinishCommand(finishCommandParams);
+    ReturnErrorOnFailure(FinishCommand(finishCommandParams));
+    rollback.DisableAutomaticRollback();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinishCommandParams)
@@ -670,6 +675,35 @@ void CommandSender::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
+}
+
+CommandSender::RollbackInvokeRequest::RollbackInvokeRequest(CommandSender & aCommandSender) : mCommandSender(aCommandSender)
+{
+    VerifyOrReturn(mCommandSender.mBufferAllocated);
+    VerifyOrReturn(mCommandSender.mState == State::Idle || mCommandSender.mState == State::AddedCommand);
+    VerifyOrReturn(mCommandSender.mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
+    VerifyOrReturn(mCommandSender.mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    mCommandSender.mInvokeRequestBuilder.Checkpoint(mBackupWriter);
+    mBackupState          = mCommandSender.mState;
+    mRollbackInDestructor = true;
+}
+
+CommandSender::RollbackInvokeRequest::~RollbackInvokeRequest()
+{
+    VerifyOrReturn(mRollbackInDestructor);
+    VerifyOrReturn(mCommandSender.mState == State::AddingCommand);
+    ChipLogDetail(DataManagement, "Rolling back response");
+    // TODO(#30453): Rollback of mInvokeRequestBuilder should handle resetting
+    // InvokeRequests.
+    mCommandSender.mInvokeRequestBuilder.GetInvokeRequests().ResetError();
+    mCommandSender.mInvokeRequestBuilder.Rollback(mBackupWriter);
+    mCommandSender.MoveToState(mBackupState);
+    mRollbackInDestructor = false;
+}
+
+void CommandSender::RollbackInvokeRequest::DisableAutomaticRollback()
+{
+    mRollbackInDestructor = false;
 }
 
 } // namespace app
