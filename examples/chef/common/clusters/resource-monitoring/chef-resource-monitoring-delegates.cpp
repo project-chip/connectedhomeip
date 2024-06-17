@@ -247,7 +247,12 @@ ChefResourceMonitorInstance::ExternalAttributeRead(const EmberAfAttributeMetadat
         bufWriter.Put32(lastChangedTime.IsNull() ? 0 : lastChangedTime.Value());
     }
     break;
-    case HepaFilterMonitoring::Attributes::DegradationDirection::Id:
+    case HepaFilterMonitoring::Attributes::DegradationDirection::Id: {
+        ResourceMonitoring::DegradationDirectionEnum degradationDirection = GetDegradationDirection();
+        // The underlying type of ResourceMonitoring::DegradationDirectionEnum is uint8_t
+        *buffer = to_underlying(degradationDirection);
+    }
+    break;
     default:
         ChipLogError(Zcl, "Unsupported External Attribute Read: %d", static_cast<int>(attributeId));
         ret = Protocols::InteractionModel::Status::UnsupportedRead;
