@@ -391,6 +391,7 @@ public:
 
         return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
     }
+
 private:
     ConcreteAttributePath mPath;
 };
@@ -1071,13 +1072,14 @@ TEST(TestCodegenModelViaMocks, EmberAttributePathExpansionAccessDeniedRead)
     ASSERT_FALSE(encoder->TriedEncode());
 }
 
-TEST(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead) {
+TEST(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)
+{
     UseMockNodeConfig config(gTestNodeConfig);
     chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kTestPath(kMockEndpoint3, MockClusterId(4),
-                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
+                                          MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
 
     TestReadRequest testRequest(kAdminSubjectDescriptor, kTestPath);
     RegisteredAttributeAccessInterface<UnsupportedReadAccessInterface> aai(kTestPath);
