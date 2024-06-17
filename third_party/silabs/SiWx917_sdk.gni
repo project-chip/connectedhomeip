@@ -387,6 +387,7 @@ template("siwx917_sdk") {
           "SLI_SHA_DEVICE_SI91X=1",
           "SLI_TRNG_DEVICE_SI91X=1",
           "SLI_SECURE_KEY_STORAGE_DEVICE_SI91X=1",
+          "SLI_MULTITHREAD_DEVICE_SI91X=1",
         ]
 
         include_dirs = [
@@ -403,6 +404,7 @@ template("siwx917_sdk") {
           "${sl_si91x_psa_crypto_path}/sha/inc",
           "${sl_si91x_psa_crypto_path}/trng/inc",
           "${sl_si91x_psa_crypto_path}/wrap/inc",
+          "${sl_si91x_psa_crypto_path}/multithread/inc",
 
           # mbedTLS
           "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config",
@@ -509,6 +511,7 @@ template("siwx917_sdk") {
           "${sl_si91x_psa_crypto_path}/gcm/src/sl_si91x_gcm.c",
           "${sl_si91x_psa_crypto_path}/hmac/src/sl_si91x_hmac.c",
           "${sl_si91x_psa_crypto_path}/mac/src/sl_si91x_psa_mac.c",
+          "${sl_si91x_psa_crypto_path}/multithread/src/sl_si91x_crypto_thread.c",
           "${sl_si91x_psa_crypto_path}/sha/src/sl_si91x_psa_sha.c",
           "${sl_si91x_psa_crypto_path}/sha/src/sl_si91x_sha.c",
           "${sl_si91x_psa_crypto_path}/src/sli_si91x_crypto_driver_functions.c",
