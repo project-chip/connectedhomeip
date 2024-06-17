@@ -31,9 +31,9 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 
-#if defined(TINYCRYPT_PRIMITIVES)
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
 #include "tinycrypt/ecc.h"
-#endif // TINYCRYPT_PRIMITIVES
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
