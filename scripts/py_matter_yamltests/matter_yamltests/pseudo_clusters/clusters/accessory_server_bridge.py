@@ -22,7 +22,7 @@ _IP = '127.0.0.1'
 _PORT = 9000
 
 if sys.platform == 'linux':
-    _IP = '10.10.10.5'
+    _IP = "10.10.12.5"
 
 
 def _make_url():

@@ -64,7 +64,7 @@ def EnsurePrivateState():
         sys.exit(1)
 
 
-def CreateNamespacesForAppTest():
+def CreateNamespacesForAppTest(wifi_ble_config: bool = False):
     """
     Creates appropriate namespaces for a tool and app binaries in a simulated
     isolated network.
@@ -95,22 +95,32 @@ def CreateNamespacesForAppTest():
         "ip netns exec app ip link set dev lo up",
         "ip link set dev eth-app-switch up",
 
-        "ip netns exec tool ip addr add 10.10.10.2/24 dev eth-tool",
+        "ip netns exec tool ip addr add 10.10.12.2/24 dev eth-tool",
         "ip netns exec tool ip link set dev eth-tool up",
         "ip netns exec tool ip link set dev lo up",
         "ip link set dev eth-tool-switch up",
 
-        # Force IPv6 to use ULAs that we control
-        "ip netns exec tool ip -6 addr flush eth-tool",
-        "ip netns exec app ip -6 addr flush eth-app",
-        "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool",
-        "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app",
-
-        # create link between virtual host 'tool' and the test runner
         "ip addr add 10.10.10.5/24 dev eth-ci",
+        "ip addr add 10.10.12.5/24 dev eth-ci",
         "ip link set dev eth-ci up",
         "ip link set dev eth-ci-switch up",
     ]
+
+    if not wifi_ble_config:
+        COMMANDS += [
+            "ip link add eth-app-direct type veth peer name eth-tool-direct",
+            "ip link set eth-app-direct netns app",
+            "ip link set eth-tool-direct netns tool",
+            "ip netns exec app ip addr add 10.10.15.1/24 dev eth-app-direct",
+            "ip netns exec app ip link set dev eth-app-direct up",
+            "ip netns exec tool ip addr add 10.10.15.2/24 dev eth-tool-direct",
+            "ip netns exec tool ip link set dev eth-tool-direct up",
+            # Force IPv6 to use ULAs that we control
+            "ip netns exec tool ip -6 addr flush eth-tool",
+            "ip netns exec app ip -6 addr flush eth-app",
+            "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool-direct",
+            "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app-direct",
+        ]
 
     for command in COMMANDS:
         logging.debug("Executing '%s'" % command)
@@ -134,7 +144,7 @@ def CreateNamespacesForAppTest():
         logging.warn("Some addresses look to still be tentative")
 
 
-def RemoveNamespaceForAppTest():
+def RemoveNamespaceForAppTest(wifi_ble_config: bool = False):
     """
     Removes namespaces for a tool and app binaries previously created to simulate an
     isolated network. This tears down what was created in CreateNamespacesForAppTest.
@@ -155,6 +165,14 @@ def RemoveNamespaceForAppTest():
         "ip netns del app",
     ]
 
+    if not wifi_ble_config:
+        COMMANDS += [
+            "ip link set dev eth-app-direct down",
+            "ip link set dev eth-tool-direct down",
+            "ip link delete eth-tool-direct",
+            "ip link delete eth-app-direct",
+        ]
+
     for command in COMMANDS:
         logging.debug("Executing '%s'" % command)
         if os.system(command) != 0:
@@ -163,17 +181,17 @@ def RemoveNamespaceForAppTest():
             sys.exit(1)
 
 
-def PrepareNamespacesForTestExecution(in_unshare: bool):
+def PrepareNamespacesForTestExecution(in_unshare: bool, wifi_ble_config: bool = False):
     if not in_unshare:
         EnsureNetworkNamespaceAvailability()
     elif in_unshare:
         EnsurePrivateState()
 
-    CreateNamespacesForAppTest()
+    CreateNamespacesForAppTest(wifi_ble_config)
 
 
-def ShutdownNamespaceForTestExecution():
-    RemoveNamespaceForAppTest()
+def ShutdownNamespaceForTestExecution(wifi_ble_config: bool = False):
+    RemoveNamespaceForAppTest(wifi_ble_config)
 
 
 class DbusTest:
@@ -279,6 +297,9 @@ class VirtualWifi:
             logging.info(f"Would run dnsmasq with {dnsmaq_cmd}")
             logging.info(f"Would run wpa_supplicant with {wpa_cmd}")
             return
+        # Write clean configuration for wifi to prevent auto wifi connection during next test
+        with open(self._wpa_supplicant_conf, "w") as f:
+            f.write("ctrl_interface=DIR=/run/wpa_supplicant\nctrl_interface_group=root\nupdate_config=1\n")
         self._move_phy_to_netns(self._get_phy(self._wlan_app), "app")
         self._move_phy_to_netns(self._get_phy(self._wlan_tool), "tool")
         self._set_interface_ip_in_netns("tool", self._wlan_tool, "192.168.200.1/24")
