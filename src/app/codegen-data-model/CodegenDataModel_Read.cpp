@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/CHIPError.h"
 #include <app/codegen-data-model/CodegenDataModel.h>
 
 #include <optional>
@@ -112,7 +113,13 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
 
     if (err != CHIP_NO_ERROR)
     {
-        return std::make_optional(err);
+        // Implementation of 8.4.3.2 of the spec for path expansion
+        if (path.mExpanded && (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead)))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        return err;
     }
 
     // If the encoder tried to encode, then a value should have been written.
@@ -293,8 +300,17 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
         ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
         Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId };
-        ReturnErrorOnFailure(Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
-                                                              RequiredPrivilege::ForReadAttribute(request.path)));
+        CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
+                                                          RequiredPrivilege::ForReadAttribute(request.path));
+        if (err != CHIP_NO_ERROR)
+        {
+            // Implementation of 8.4.3.2 of the spec for path expansion
+            if (request.path.mExpanded && (err == CHIP_ERROR_ACCESS_DENIED))
+            {
+                return CHIP_NO_ERROR;
+            }
+            return err;
+        }
     }
 
     auto metadata = FindAttributeMetadata(request.path);

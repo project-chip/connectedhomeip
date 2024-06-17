@@ -55,13 +55,18 @@ public:
     // event emitting, path marking and other operations
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
+    /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
+    ///   ReadAttribute is REQUIRED to perform:
+    ///     - ACL validation (see notes on OperationFlags::kInternal)
+    ///     - Validation of readability/writability
+    ///     - use request.path.mExpanded to skip encoding replies for data according
+    ///       to 8.4.3.2 of the spec:
+    ///         > If the path indicates attribute data that is not readable, then the path SHALL 
+    ///           be discarded.
+    ///         > Else if reading from the attribute in the path requires a privilege that is not
+    ///           granted to access the cluster in the path, then the path SHALL be discarded.
+    ///
     /// Return codes:
-    ///   CHIP_ERROR_ACCESS_DENIED:
-    ///      - May be ignored if reads use path expansion (e.g. to skip inaccessible attributes
-    ///        during subscription requests). This code MUST be used for ACL failures and only for ACL failures.
-    ///   CHIP_IM_GLOBAL_STATUS(UnsupportedRead):
-    ///      - May be ignored if reads use path expansion (e.g. to skip reading write-only attributes
-    ///        during subscription requests).
     ///   CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL:
     ///      - Indicates that list encoding had insufficient buffer space to encode elements.
     ///      - encoder::GetState().AllowPartialData() determines if these errors are permanent (no partial
