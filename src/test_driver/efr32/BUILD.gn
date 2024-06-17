@@ -59,7 +59,7 @@ efr32_sdk("sdk") {
     "PW_RPC_ENABLED",
 
     # Thread is built but test driver do not have the NETWORK_COMMISSIONING cluster or zap config.
-    "_NO_NETWORK_COMMISSIONING_DRIVER_",
+    "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_",
   ]
 }
 

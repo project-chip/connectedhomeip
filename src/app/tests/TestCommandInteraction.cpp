@@ -330,6 +330,8 @@ public:
     void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket) override { mChunks.AddToEnd(std::move(aPacket)); }
     void ResponseDropped() override { mResponseDropped = true; }
 
+    size_t GetCommandResponseMaxBufferSize() override { return kMaxSecureSduLengthBytes; }
+
     System::PacketBufferHandle mChunks;
     bool mResponseDropped = false;
 };

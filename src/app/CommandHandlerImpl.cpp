@@ -67,7 +67,9 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
     {
         mCommandMessageWriter.Reset();
 
-        System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+        const size_t commandBufferMaxSize = mpResponder->GetCommandResponseMaxBufferSize();
+        auto commandPacket                = System::PacketBufferHandle::New(commandBufferMaxSize);
+
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         mCommandMessageWriter.Init(std::move(commandPacket));
