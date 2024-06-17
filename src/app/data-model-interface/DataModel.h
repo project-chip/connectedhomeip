@@ -61,7 +61,7 @@ public:
     ///     - Validation of readability/writability
     ///     - use request.path.mExpanded to skip encoding replies for data according
     ///       to 8.4.3.2 of the spec:
-    ///         > If the path indicates attribute data that is not readable, then the path SHALL 
+    ///         > If the path indicates attribute data that is not readable, then the path SHALL
     ///           be discarded.
     ///         > Else if reading from the attribute in the path requires a privilege that is not
     ///           granted to access the cluster in the path, then the path SHALL be discarded.

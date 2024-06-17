@@ -1031,6 +1031,24 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
     }
 }
 
+TEST(TestCodegenModelViaMocks, EmberAttributePathExpansionAccessDeniedRead)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    TestReadRequest testRequest(kDenySubjectDescriptor,
+                                ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+
+    testRequest.request.path.mExpanded = true;
+
+    // For expanded paths, access control failures succeed without encoding anything
+    // This is temporary until ACL checks are moved inside the IM/ReportEngine
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+    ASSERT_FALSE(encoder->TriedEncode());
+}
+
 TEST(TestCodegenModelViaMocks, EmberAttributeReadInt32S)
 {
     TestEmberScalarTypeRead<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE>(-1234);
