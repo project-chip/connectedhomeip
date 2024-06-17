@@ -9520,6 +9520,534 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForEnergyCalendarCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::EnergyCalendar;
+    switch (aAttributeId) {
+    case Attributes::CalendarID::Id: {
+        using TypeInfo = Attributes::CalendarID::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::Name::Id: {
+        using TypeInfo = Attributes::Name::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = AsString(cppValue.Value());
+            if (value == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+        }
+        return value;
+    }
+    case Attributes::ProviderID::Id: {
+        using TypeInfo = Attributes::ProviderID::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::EventID::Id: {
+        using TypeInfo = Attributes::EventID::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::StartDate::Id: {
+        using TypeInfo = Attributes::StartDate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::CalendarPeriods::Id: {
+        using TypeInfo = Attributes::CalendarPeriods::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTREnergyCalendarClusterCalendarPeriod * newElement_0;
+                newElement_0 = [MTREnergyCalendarClusterCalendarPeriod new];
+                newElement_0.startDate = [NSNumber numberWithUnsignedInt:entry_0.startDate];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.days.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTREnergyCalendarClusterDayStruct * newElement_2;
+                        newElement_2 = [MTREnergyCalendarClusterDayStruct new];
+                        if (entry_2.date.HasValue()) {
+                            newElement_2.date = [MTREnergyCalendarClusterDate new];
+                            if (entry_2.date.Value().year.HasValue()) {
+                                newElement_2.date.year = [NSNumber numberWithUnsignedShort:entry_2.date.Value().year.Value()];
+                            } else {
+                                newElement_2.date.year = nil;
+                            }
+                            if (entry_2.date.Value().month.HasValue()) {
+                                newElement_2.date.month = [NSNumber numberWithUnsignedChar:entry_2.date.Value().month.Value()];
+                            } else {
+                                newElement_2.date.month = nil;
+                            }
+                            if (entry_2.date.Value().day.HasValue()) {
+                                newElement_2.date.day = [NSNumber numberWithUnsignedChar:entry_2.date.Value().day.Value()];
+                            } else {
+                                newElement_2.date.day = nil;
+                            }
+                            if (entry_2.date.Value().dayOfWeek.HasValue()) {
+                                newElement_2.date.dayOfWeek = [NSNumber numberWithUnsignedChar:entry_2.date.Value().dayOfWeek.Value()];
+                            } else {
+                                newElement_2.date.dayOfWeek = nil;
+                            }
+                        } else {
+                            newElement_2.date = nil;
+                        }
+                        if (entry_2.daysOfWeek.HasValue()) {
+                            newElement_2.daysOfWeek = [NSNumber numberWithUnsignedChar:entry_2.daysOfWeek.Value().Raw()];
+                        } else {
+                            newElement_2.daysOfWeek = nil;
+                        }
+                        { // Scope for our temporary variables
+                            auto * array_4 = [NSMutableArray new];
+                            auto iter_4 = entry_2.transitions.begin();
+                            while (iter_4.Next()) {
+                                auto & entry_4 = iter_4.GetValue();
+                                MTREnergyCalendarClusterTransitionStruct * newElement_4;
+                                newElement_4 = [MTREnergyCalendarClusterTransitionStruct new];
+                                newElement_4.transitionTime = [NSNumber numberWithUnsignedShort:entry_4.transitionTime];
+                                if (entry_4.priceTier.HasValue()) {
+                                    newElement_4.priceTier = [NSNumber numberWithUnsignedInt:entry_4.priceTier.Value()];
+                                } else {
+                                    newElement_4.priceTier = nil;
+                                }
+                                if (entry_4.friendlyCredit.HasValue()) {
+                                    newElement_4.friendlyCredit = [NSNumber numberWithBool:entry_4.friendlyCredit.Value()];
+                                } else {
+                                    newElement_4.friendlyCredit = nil;
+                                }
+                                if (entry_4.auxiliaryLoad.HasValue()) {
+                                    newElement_4.auxiliaryLoad = [NSNumber numberWithUnsignedChar:entry_4.auxiliaryLoad.Value().Raw()];
+                                } else {
+                                    newElement_4.auxiliaryLoad = nil;
+                                }
+                                [array_4 addObject:newElement_4];
+                            }
+                            CHIP_ERROR err = iter_4.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_2.transitions = array_4;
+                        }
+                        if (entry_2.calendarID.HasValue()) {
+                            newElement_2.calendarID = [NSNumber numberWithUnsignedInt:entry_2.calendarID.Value()];
+                        } else {
+                            newElement_2.calendarID = nil;
+                        }
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.days = array_2;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::SpecialDays::Id: {
+        using TypeInfo = Attributes::SpecialDays::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTREnergyCalendarClusterDayStruct * newElement_0;
+                newElement_0 = [MTREnergyCalendarClusterDayStruct new];
+                if (entry_0.date.HasValue()) {
+                    newElement_0.date = [MTREnergyCalendarClusterDate new];
+                    if (entry_0.date.Value().year.HasValue()) {
+                        newElement_0.date.year = [NSNumber numberWithUnsignedShort:entry_0.date.Value().year.Value()];
+                    } else {
+                        newElement_0.date.year = nil;
+                    }
+                    if (entry_0.date.Value().month.HasValue()) {
+                        newElement_0.date.month = [NSNumber numberWithUnsignedChar:entry_0.date.Value().month.Value()];
+                    } else {
+                        newElement_0.date.month = nil;
+                    }
+                    if (entry_0.date.Value().day.HasValue()) {
+                        newElement_0.date.day = [NSNumber numberWithUnsignedChar:entry_0.date.Value().day.Value()];
+                    } else {
+                        newElement_0.date.day = nil;
+                    }
+                    if (entry_0.date.Value().dayOfWeek.HasValue()) {
+                        newElement_0.date.dayOfWeek = [NSNumber numberWithUnsignedChar:entry_0.date.Value().dayOfWeek.Value()];
+                    } else {
+                        newElement_0.date.dayOfWeek = nil;
+                    }
+                } else {
+                    newElement_0.date = nil;
+                }
+                if (entry_0.daysOfWeek.HasValue()) {
+                    newElement_0.daysOfWeek = [NSNumber numberWithUnsignedChar:entry_0.daysOfWeek.Value().Raw()];
+                } else {
+                    newElement_0.daysOfWeek = nil;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.transitions.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTREnergyCalendarClusterTransitionStruct * newElement_2;
+                        newElement_2 = [MTREnergyCalendarClusterTransitionStruct new];
+                        newElement_2.transitionTime = [NSNumber numberWithUnsignedShort:entry_2.transitionTime];
+                        if (entry_2.priceTier.HasValue()) {
+                            newElement_2.priceTier = [NSNumber numberWithUnsignedInt:entry_2.priceTier.Value()];
+                        } else {
+                            newElement_2.priceTier = nil;
+                        }
+                        if (entry_2.friendlyCredit.HasValue()) {
+                            newElement_2.friendlyCredit = [NSNumber numberWithBool:entry_2.friendlyCredit.Value()];
+                        } else {
+                            newElement_2.friendlyCredit = nil;
+                        }
+                        if (entry_2.auxiliaryLoad.HasValue()) {
+                            newElement_2.auxiliaryLoad = [NSNumber numberWithUnsignedChar:entry_2.auxiliaryLoad.Value().Raw()];
+                        } else {
+                            newElement_2.auxiliaryLoad = nil;
+                        }
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.transitions = array_2;
+                }
+                if (entry_0.calendarID.HasValue()) {
+                    newElement_0.calendarID = [NSNumber numberWithUnsignedInt:entry_0.calendarID.Value()];
+                } else {
+                    newElement_0.calendarID = nil;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::CurrentDay::Id: {
+        using TypeInfo = Attributes::CurrentDay::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTREnergyCalendarClusterDayStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTREnergyCalendarClusterDayStruct new];
+            if (cppValue.Value().date.HasValue()) {
+                value.date = [MTREnergyCalendarClusterDate new];
+                if (cppValue.Value().date.Value().year.HasValue()) {
+                    value.date.year = [NSNumber numberWithUnsignedShort:cppValue.Value().date.Value().year.Value()];
+                } else {
+                    value.date.year = nil;
+                }
+                if (cppValue.Value().date.Value().month.HasValue()) {
+                    value.date.month = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().month.Value()];
+                } else {
+                    value.date.month = nil;
+                }
+                if (cppValue.Value().date.Value().day.HasValue()) {
+                    value.date.day = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().day.Value()];
+                } else {
+                    value.date.day = nil;
+                }
+                if (cppValue.Value().date.Value().dayOfWeek.HasValue()) {
+                    value.date.dayOfWeek = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().dayOfWeek.Value()];
+                } else {
+                    value.date.dayOfWeek = nil;
+                }
+            } else {
+                value.date = nil;
+            }
+            if (cppValue.Value().daysOfWeek.HasValue()) {
+                value.daysOfWeek = [NSNumber numberWithUnsignedChar:cppValue.Value().daysOfWeek.Value().Raw()];
+            } else {
+                value.daysOfWeek = nil;
+            }
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = cppValue.Value().transitions.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    MTREnergyCalendarClusterTransitionStruct * newElement_2;
+                    newElement_2 = [MTREnergyCalendarClusterTransitionStruct new];
+                    newElement_2.transitionTime = [NSNumber numberWithUnsignedShort:entry_2.transitionTime];
+                    if (entry_2.priceTier.HasValue()) {
+                        newElement_2.priceTier = [NSNumber numberWithUnsignedInt:entry_2.priceTier.Value()];
+                    } else {
+                        newElement_2.priceTier = nil;
+                    }
+                    if (entry_2.friendlyCredit.HasValue()) {
+                        newElement_2.friendlyCredit = [NSNumber numberWithBool:entry_2.friendlyCredit.Value()];
+                    } else {
+                        newElement_2.friendlyCredit = nil;
+                    }
+                    if (entry_2.auxiliaryLoad.HasValue()) {
+                        newElement_2.auxiliaryLoad = [NSNumber numberWithUnsignedChar:entry_2.auxiliaryLoad.Value().Raw()];
+                    } else {
+                        newElement_2.auxiliaryLoad = nil;
+                    }
+                    [array_2 addObject:newElement_2];
+                }
+                CHIP_ERROR err = iter_2.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value.transitions = array_2;
+            }
+            if (cppValue.Value().calendarID.HasValue()) {
+                value.calendarID = [NSNumber numberWithUnsignedInt:cppValue.Value().calendarID.Value()];
+            } else {
+                value.calendarID = nil;
+            }
+        }
+        return value;
+    }
+    case Attributes::NextDay::Id: {
+        using TypeInfo = Attributes::NextDay::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTREnergyCalendarClusterDayStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTREnergyCalendarClusterDayStruct new];
+            if (cppValue.Value().date.HasValue()) {
+                value.date = [MTREnergyCalendarClusterDate new];
+                if (cppValue.Value().date.Value().year.HasValue()) {
+                    value.date.year = [NSNumber numberWithUnsignedShort:cppValue.Value().date.Value().year.Value()];
+                } else {
+                    value.date.year = nil;
+                }
+                if (cppValue.Value().date.Value().month.HasValue()) {
+                    value.date.month = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().month.Value()];
+                } else {
+                    value.date.month = nil;
+                }
+                if (cppValue.Value().date.Value().day.HasValue()) {
+                    value.date.day = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().day.Value()];
+                } else {
+                    value.date.day = nil;
+                }
+                if (cppValue.Value().date.Value().dayOfWeek.HasValue()) {
+                    value.date.dayOfWeek = [NSNumber numberWithUnsignedChar:cppValue.Value().date.Value().dayOfWeek.Value()];
+                } else {
+                    value.date.dayOfWeek = nil;
+                }
+            } else {
+                value.date = nil;
+            }
+            if (cppValue.Value().daysOfWeek.HasValue()) {
+                value.daysOfWeek = [NSNumber numberWithUnsignedChar:cppValue.Value().daysOfWeek.Value().Raw()];
+            } else {
+                value.daysOfWeek = nil;
+            }
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = cppValue.Value().transitions.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    MTREnergyCalendarClusterTransitionStruct * newElement_2;
+                    newElement_2 = [MTREnergyCalendarClusterTransitionStruct new];
+                    newElement_2.transitionTime = [NSNumber numberWithUnsignedShort:entry_2.transitionTime];
+                    if (entry_2.priceTier.HasValue()) {
+                        newElement_2.priceTier = [NSNumber numberWithUnsignedInt:entry_2.priceTier.Value()];
+                    } else {
+                        newElement_2.priceTier = nil;
+                    }
+                    if (entry_2.friendlyCredit.HasValue()) {
+                        newElement_2.friendlyCredit = [NSNumber numberWithBool:entry_2.friendlyCredit.Value()];
+                    } else {
+                        newElement_2.friendlyCredit = nil;
+                    }
+                    if (entry_2.auxiliaryLoad.HasValue()) {
+                        newElement_2.auxiliaryLoad = [NSNumber numberWithUnsignedChar:entry_2.auxiliaryLoad.Value().Raw()];
+                    } else {
+                        newElement_2.auxiliaryLoad = nil;
+                    }
+                    [array_2 addObject:newElement_2];
+                }
+                CHIP_ERROR err = iter_2.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value.transitions = array_2;
+            }
+            if (cppValue.Value().calendarID.HasValue()) {
+                value.calendarID = [NSNumber numberWithUnsignedInt:cppValue.Value().calendarID.Value()];
+            } else {
+                value.calendarID = nil;
+            }
+        }
+        return value;
+    }
+    case Attributes::CurrentTransition::Id: {
+        using TypeInfo = Attributes::CurrentTransition::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTREnergyCalendarClusterTransitionStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTREnergyCalendarClusterTransitionStruct new];
+            value.transitionTime = [NSNumber numberWithUnsignedShort:cppValue.Value().transitionTime];
+            if (cppValue.Value().priceTier.HasValue()) {
+                value.priceTier = [NSNumber numberWithUnsignedInt:cppValue.Value().priceTier.Value()];
+            } else {
+                value.priceTier = nil;
+            }
+            if (cppValue.Value().friendlyCredit.HasValue()) {
+                value.friendlyCredit = [NSNumber numberWithBool:cppValue.Value().friendlyCredit.Value()];
+            } else {
+                value.friendlyCredit = nil;
+            }
+            if (cppValue.Value().auxiliaryLoad.HasValue()) {
+                value.auxiliaryLoad = [NSNumber numberWithUnsignedChar:cppValue.Value().auxiliaryLoad.Value().Raw()];
+            } else {
+                value.auxiliaryLoad = nil;
+            }
+        }
+        return value;
+    }
+    case Attributes::CurrentPeakPeriod::Id: {
+        using TypeInfo = Attributes::CurrentPeakPeriod::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTREnergyCalendarClusterPeakPeriodStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTREnergyCalendarClusterPeakPeriodStruct new];
+            value.severity = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().severity)];
+            value.peakPeriod = [NSNumber numberWithUnsignedShort:cppValue.Value().peakPeriod];
+            value.startTime = [NSNumber numberWithUnsignedInt:cppValue.Value().startTime];
+            value.endTime = [NSNumber numberWithUnsignedInt:cppValue.Value().endTime];
+        }
+        return value;
+    }
+    case Attributes::NextPeakPeriod::Id: {
+        using TypeInfo = Attributes::NextPeakPeriod::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTREnergyCalendarClusterPeakPeriodStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTREnergyCalendarClusterPeakPeriodStruct new];
+            value.severity = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().severity)];
+            value.peakPeriod = [NSNumber numberWithUnsignedShort:cppValue.Value().peakPeriod];
+            value.startTime = [NSNumber numberWithUnsignedInt:cppValue.Value().startTime];
+            value.endTime = [NSNumber numberWithUnsignedInt:cppValue.Value().endTime];
+        }
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForEnergyPreferenceCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::EnergyPreference;
@@ -18866,6 +19394,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::EnergyEvse::Id: {
         return DecodeAttributeValueForEnergyEVSECluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::EnergyCalendar::Id: {
+        return DecodeAttributeValueForEnergyCalendarCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::EnergyPreference::Id: {
         return DecodeAttributeValueForEnergyPreferenceCluster(aPath.mAttributeId, aReader, aError);

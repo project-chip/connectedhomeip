@@ -3367,6 +3367,18 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForEnergyCalendarCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::EnergyCalendar;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForEnergyPreferenceCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::EnergyPreference;
@@ -4991,6 +5003,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::EnergyEvse::Id: {
         return DecodeEventPayloadForEnergyEVSECluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::EnergyCalendar::Id: {
+        return DecodeEventPayloadForEnergyCalendarCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::EnergyPreference::Id: {
         return DecodeEventPayloadForEnergyPreferenceCluster(aPath.mEventId, aReader, aError);

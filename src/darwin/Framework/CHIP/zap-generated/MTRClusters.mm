@@ -10353,6 +10353,100 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterEnergyCalendar
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCalendarIDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeCalendarIDID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNameWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeNameID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeProviderIDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeProviderIDID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventIDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeEventIDID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeStartDateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeStartDateID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCalendarPeriodsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeCalendarPeriodsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSpecialDaysWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeSpecialDaysID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentDayWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeCurrentDayID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNextDayWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeNextDayID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentTransitionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeCurrentTransitionID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentPeakPeriodWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeCurrentPeakPeriodID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNextPeakPeriodWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeNextPeakPeriodID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyCalendarID) attributeID:@(MTRAttributeIDTypeClusterEnergyCalendarAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterEnergyPreference
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeEnergyBalancesWithParams:(MTRReadParams * _Nullable)params

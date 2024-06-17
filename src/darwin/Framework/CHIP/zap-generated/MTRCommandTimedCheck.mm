@@ -656,6 +656,15 @@ static BOOL CommandNeedsTimedInvokeInEnergyEVSECluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInEnergyCalendarCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyCalendar;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInEnergyPreferenceCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EnergyPreference;
@@ -1370,6 +1379,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::EnergyEvse::Id: {
         return CommandNeedsTimedInvokeInEnergyEVSECluster(commandID);
+    }
+    case Clusters::EnergyCalendar::Id: {
+        return CommandNeedsTimedInvokeInEnergyCalendarCluster(commandID);
     }
     case Clusters::EnergyPreference::Id: {
         return CommandNeedsTimedInvokeInEnergyPreferenceCluster(commandID);

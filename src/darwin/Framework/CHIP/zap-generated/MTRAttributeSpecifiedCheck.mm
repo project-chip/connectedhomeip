@@ -3266,6 +3266,69 @@ static BOOL AttributeIsSpecifiedInEnergyEVSECluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInEnergyCalendarCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyCalendar;
+    switch (aAttributeId) {
+    case Attributes::CalendarID::Id: {
+        return YES;
+    }
+    case Attributes::Name::Id: {
+        return YES;
+    }
+    case Attributes::ProviderID::Id: {
+        return YES;
+    }
+    case Attributes::EventID::Id: {
+        return YES;
+    }
+    case Attributes::StartDate::Id: {
+        return YES;
+    }
+    case Attributes::CalendarPeriods::Id: {
+        return YES;
+    }
+    case Attributes::SpecialDays::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDay::Id: {
+        return YES;
+    }
+    case Attributes::NextDay::Id: {
+        return YES;
+    }
+    case Attributes::CurrentTransition::Id: {
+        return YES;
+    }
+    case Attributes::CurrentPeakPeriod::Id: {
+        return YES;
+    }
+    case Attributes::NextPeakPeriod::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInEnergyPreferenceCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EnergyPreference;
@@ -6503,6 +6566,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::EnergyEvse::Id: {
         return AttributeIsSpecifiedInEnergyEVSECluster(aAttributeId);
+    }
+    case Clusters::EnergyCalendar::Id: {
+        return AttributeIsSpecifiedInEnergyCalendarCluster(aAttributeId);
     }
     case Clusters::EnergyPreference::Id: {
         return AttributeIsSpecifiedInEnergyPreferenceCluster(aAttributeId);

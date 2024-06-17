@@ -1156,6 +1156,8 @@ public class ClusterWriteMapping {
     );
     writeEnergyEvseInteractionInfo.put("writeApproximateEVEfficiencyAttribute", writeEnergyEvseApproximateEVEfficiencyAttributeInteractionInfo);
     writeAttributeMap.put("energyEvse", writeEnergyEvseInteractionInfo);
+    Map<String, InteractionInfo> writeEnergyCalendarInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("energyCalendar", writeEnergyCalendarInteractionInfo);
     Map<String, InteractionInfo> writeEnergyPreferenceInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeEnergyPreferenceCurrentEnergyBalanceCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo energyPreferencecurrentEnergyBalanceCommandParameterInfo =
