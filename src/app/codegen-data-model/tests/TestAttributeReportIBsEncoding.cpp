@@ -43,7 +43,7 @@ CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeD
     //     0x01 => Array (i.e. report data ib)
     //       ReportIB*
     //
-    // Overally this is VERY hard to process ...
+    // Generally this is VERY hard to process ...
     //
     TLV::TLVReader reportIBsReader;
     reportIBsReader.Init(data);

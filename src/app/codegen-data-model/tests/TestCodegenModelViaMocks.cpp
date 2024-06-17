@@ -976,6 +976,27 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_ERROR_ACCESS_DENIED);
 }
 
+TEST(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    {
+        TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                    ConcreteAttributePath(kEndpointIdThatIsMissing, MockClusterId(1), AttributeList::Id));
+        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+        ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    }
+
+    {
+        TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                    ConcreteAttributePath(kMockEndpoint1, kInvalidClusterId, AttributeList::Id));
+        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+        ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedCluster));
+    }
+}
+
 TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);

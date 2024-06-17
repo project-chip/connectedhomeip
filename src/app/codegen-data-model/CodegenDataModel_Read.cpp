@@ -61,14 +61,19 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
 {
     for (auto & attr : GlobalAttributesNotInMetadata)
     {
+
         if (attr == aPath.mAttributeId)
         {
             const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-            ReturnErrorCodeIf(cluster == nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+            if (cluster == nullptr)
+            {
+                return (emberAfFindEndpointType(aPath.mEndpointId) == nullptr) ? CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)
+                                                                               : CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
+            }
+
             return cluster;
         }
     }
-
     const EmberAfAttributeMetadata * metadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
@@ -123,7 +128,7 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
     }
 
     // If the encoder tried to encode, then a value should have been written.
-    //   - if encode, assueme DONE (i.e. FINAL CHIP_NO_ERROR)
+    //   - if encode, assume DONE (i.e. FINAL CHIP_NO_ERROR)
     //   - if no encode, say that processing must continue
     return encoder.TriedEncode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
 }
@@ -290,7 +295,7 @@ CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * meta
 CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     ChipLogDetail(DataManagement,
-                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
+                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
                   request.path.mExpanded);
 
@@ -340,8 +345,7 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
     {
         // if we only got a cluster, this was for a global attribute. We cannot read ember attributes
         // at this point, so give up (although GlobalAttributeReader should have returned something here).
-        // Return a permanent failure...
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        chipDie();
     }
     const EmberAfAttributeMetadata * attributeMetadata = std::get<const EmberAfAttributeMetadata *>(metadata);
 
