@@ -98,12 +98,6 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override { return; }
-
-    // tv should override this with a dialog prompt
-    inline void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
-    {
-        return;
-    }
 };
 
 MyUserPrompter gMyUserPrompter;
@@ -583,28 +577,33 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: InstallContentApp vendorId=%d productId=%d ", vendorId, productId);
     if (vendorId == 1 && productId == 11)
     {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1",
-                                                                   "34567890", make_default_supported_clusters()));
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1",
+                                                                   "34567890", make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
-    else if (vendorId == 65521 && productId == 32768)
+    else if (vendorId == 65521 && productId == 32769)
     {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2",
-                                                                   "20202021", make_default_supported_clusters()));
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2",
+                                                                   "20202021", make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
     else if (vendorId == 9050 && productId == 22)
-    {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021",
-                                                                   make_default_supported_clusters()));
+    {   
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021",
+                                                                   make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
     else if (vendorId == 1111 && productId == 22)
     {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2",
-                                                                   "20202021", make_default_supported_clusters()));
+        auto ptr = std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2",
+                                                                   "20202021", make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
     else
     {
-        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2",
-                                                                   "20202021", make_default_supported_clusters()));
+        auto ptr = std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2",
+                                                                   "20202021", make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
     }
 }
 
@@ -627,12 +626,24 @@ bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t prod
                             app->GetApplicationBasicDelegate()->HandleGetVendorId(),
                             app->GetApplicationBasicDelegate()->HandleGetProductId());
             mContentApps.erase(mContentApps.begin() + index);
+            // TODO: call ContentAppPlatform->RemoveContentApp(ids...)
             return true;
         }
 
         index++;
     }
     return false;
+}
+
+void ContentAppFactoryImpl::PrintInstalledApps()
+{
+    for (auto & contentApp : mContentApps)
+    {
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d is on ep=%d", app->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                        app->GetApplicationBasicDelegate()->HandleGetProductId(), app->GetEndpointId());
+    }
 }
 
 Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
@@ -689,12 +700,22 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
 CHIP_ERROR AppTvInit()
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    // test data for apps
+    constexpr uint16_t kApp1VendorId  = 1;
+    constexpr uint16_t kApp1ProductId = 11;
+    constexpr uint16_t kApp2VendorId  = 65521;
+    constexpr uint16_t kApp2ProductId = 32769;
+    constexpr uint16_t kApp3VendorId  = 9050;
+    constexpr uint16_t kApp3ProductId = 22;
+    constexpr uint16_t kApp4VendorId  = 1111;
+    constexpr uint16_t kApp4ProductId = 22;
+
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
-    gFactory.InstallContentApp((uint16_t) 1, (uint16_t) 11);
-    gFactory.InstallContentApp((uint16_t) 65521, (uint16_t) 32768);
-    gFactory.InstallContentApp((uint16_t) 9050, (uint16_t) 22);
-    gFactory.InstallContentApp((uint16_t) 1111, (uint16_t) 22);
+    gFactory.InstallContentApp(kApp1VendorId, kApp1ProductId);
+    gFactory.InstallContentApp(kApp2VendorId, kApp2ProductId);
+    gFactory.InstallContentApp(kApp3VendorId, kApp3ProductId);
+    gFactory.InstallContentApp(kApp4VendorId, kApp4ProductId);
     uint16_t value;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {
