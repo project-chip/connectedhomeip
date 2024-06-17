@@ -227,8 +227,7 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
 
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
-        !chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
+    if (!sIsNetworkProvisioned)
     {
         LOG_INF("Confirm image.");
         OtaConfirmNewImage();
@@ -521,8 +520,8 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
 {
     LOG_INF("StartBleAdvHandler");
 
-    // Don't allow on starting Matter service BLE advertising after device provisioning.
-    if (ConnectivityMgr().IsThreadProvisioned() || ConnectivityMgr().IsWiFiStationProvisioned())
+    // Disable manual Matter service BLE advertising after device provisioning.
+    if (sIsNetworkProvisioned)
     {
         LOG_INF("Device already commissioned");
         return;
@@ -607,7 +606,7 @@ void AppTaskCommon::StartThreadButtonEventHandler(void)
 void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
 {
     LOG_INF("StartThreadHandler");
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    if (!sIsNetworkProvisioned)
     {
         // Switch context from BLE to Thread
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -645,15 +644,9 @@ void AppTaskCommon::StartWiFiHandler(AppEvent * aEvent)
         LOG_ERR("default WiFi SSID/Password are not set");
     }
 
-    if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
+    if (!sIsNetworkProvisioned)
     {
-        // Switch context from BLE to WiFi
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-        Internal::BLEManagerImpl sInstance;
-        sInstance.SwitchToWiFi();
-#else
         net_if_up(InetUtils::GetWiFiInterface());
-#endif
         NetworkCommissioning::TelinkWiFiDriver().StartDefaultWiFiNetwork();
     }
     else

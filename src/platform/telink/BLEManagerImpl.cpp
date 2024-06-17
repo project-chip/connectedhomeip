@@ -45,11 +45,6 @@
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/Zephyr/InetUtils.h>
-#include <platform/telink/wifi/TelinkWiFiDriver.h>
-#endif
-
 // TODO: need common mac_init solution for B9X & W91
 #ifndef CONFIG_BOARD_TLSR9118BDK40D
 extern "C" {
@@ -295,25 +290,26 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest(void)
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    if (ConnectivityMgr().IsThreadProvisioned() || ConnectivityMgr().IsWiFiStationProvisioned())
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (ConnectivityMgr().IsThreadProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Device provisioned, can't StartAdvertising");
 
-        return CHIP_ERROR_INCORRECT_STATE;
+        err = CHIP_ERROR_INCORRECT_STATE;
     }
-// TODO: check if WiFi scanning required for Amazon ecosystem
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     else if (!mBLERadioInitialized)
     {
         ThreadStackMgrImpl().StartThreadScan(mInternalScanCallback);
     }
-#endif
     else
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     {
-        return StartAdvertisingProcess();
+        err = StartAdvertisingProcess();
     }
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
@@ -395,12 +391,14 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
-    if (ConnectivityMgr().IsThreadProvisioned() || ConnectivityMgr().IsWiFiStationProvisioned())
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (ConnectivityMgr().IsThreadProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Device provisioned, StopAdvertising done");
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     ReturnErrorOnFailure(System::MapErrorZephyr(bt_le_adv_stop()));
 
@@ -671,6 +669,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         err = HandleTXCharComplete(event);
         break;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kThreadStateChange:
         err = HandleThreadStateChange(event);
         break;
@@ -682,6 +681,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kOperationalNetworkEnabled:
         err = HandleOperationalNetworkEnabled(event);
         break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     default:
         break;
@@ -909,6 +909,7 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 }
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent * event)
 {
     ChipLogDetail(DeviceLayer, "HandleOperationalNetworkEnabled");
@@ -944,20 +945,14 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (ThreadStackMgrImpl().IsReadyToAttach())
     {
         SwitchToIeee802154();
     }
-#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    // TODO: Implement ReadyToAttach for WiFi if needed
-    SwitchToWiFi();
-#endif
 
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void BLEManagerImpl::SwitchToIeee802154(void)
 {
     ChipLogProgress(DeviceLayer, "Switch context from BLE to Thread");
@@ -974,20 +969,7 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     ThreadStackMgrImpl().SetRadioBlocked(false);
     ThreadStackMgrImpl().SetThreadEnabled(true);
 }
-
-#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-void BLEManagerImpl::SwitchToWiFi(void)
-{
-    ChipLogProgress(DeviceLayer, "Switch context from BLE to WiFi");
-
-    // Deinit BLE
-    bt_disable();
-    mBLERadioInitialized = false;
-
-    // Init WiFi
-    net_if_up(InetUtils::GetWiFiInterface());
-}
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 } // namespace Internal
 } // namespace DeviceLayer
