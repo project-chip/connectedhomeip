@@ -116,7 +116,7 @@ class PyChipError(ctypes.Structure):
 
     def to_exception(self) -> typing.Union[None, chip.exceptions.ChipStackError]:
         if not self.is_success:
-            return chip.exceptions.ChipStackError(self.code, str(self))
+            return chip.exceptions.ChipStackError.from_chip_error(self)
 
     def __str__(self):
         buf = ctypes.create_string_buffer(256)
