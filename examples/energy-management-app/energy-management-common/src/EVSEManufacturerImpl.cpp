@@ -219,87 +219,94 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     addedEnergy_mWh.SetNull();
     startTime_epoch_s.SetNull(); // If we FindNextTarget this will be computed below and set to a non null value
 
-    uint8_t searchDay = 0;
-    while (searchDay < 2)
+    /* We can only compute charging schedules if the EV is plugged in and the charging is enabled
+     * so we know the charging current - i.e. can get the max power, and therefore can calculate
+     * the charging duration and hence start time
+     */
+    if (dg->IsEvsePluggedIn() && dg->GetSupplyState() == SupplyStateEnum::kChargingEnabled)
     {
-        err = FindNextTarget(dayOfWeekMap, minutesPastMidnightNow_m, targetTimeMinutesPastMidnight_m, targetSoC, addedEnergy_mWh,
-                             (searchDay != 0));
-        if (err == CHIP_ERROR_NOT_FOUND)
+        uint8_t searchDay = 0;
+        while (searchDay < 2)
         {
-            // We didn't find one for today, try tomorrow
-            searchDay++;
-            dayOfWeekMap = (dayOfWeekMap << 1) & 0x7f;
-            if (dayOfWeekMap == 0x00)
+            err = FindNextTarget(dayOfWeekMap, minutesPastMidnightNow_m, targetTimeMinutesPastMidnight_m, targetSoC,
+                                 addedEnergy_mWh, (searchDay != 0));
+            if (err == CHIP_ERROR_NOT_FOUND)
             {
-                dayOfWeekMap = 0x01; // Must be Saturday and shifted off, so set it to Sunday
-            }
-        }
-        else
-        {
-            break; // We found a target or we error'd out for some other reason
-        }
-    }
-
-    if (err == CHIP_NO_ERROR && dg->IsEvsePluggedIn() && dg->GetSupplyState() == SupplyStateEnum::kChargingEnabled)
-    {
-        /* Set the target Time in epoch_s format*/
-        tempTargetTime_epoch_s =
-            ((now_epoch_s / 60) + targetTimeMinutesPastMidnight_m + (searchDay * 1440) - minutesPastMidnightNow_m) * 60;
-        targetTime_epoch_s.SetNonNull(tempTargetTime_epoch_s);
-
-        if (!targetSoC.IsNull())
-        {
-            if (targetSoC.Value() != 100)
-            {
-                ChipLogError(AppServer, "EVSE WARNING: TargetSoC is not 100%% and we don't know the EV SoC!");
-            }
-            // We don't know the Vehicle SoC so we must charge now
-            // TODO make this use the SoC featureMap to determine if this is an error
-            startTime_epoch_s.SetNonNull(now_epoch_s);
-        }
-        else
-        {
-            // We expect to use AddedEnergy to determine the charging start time
-            if (addedEnergy_mWh.IsNull())
-            {
-                ChipLogError(AppServer, "EVSE ERROR: Neither TargetSoC or AddedEnergy has been provided");
-                return CHIP_ERROR_INTERNAL;
-            }
-            // Simple optimizer - assume a flat tariff throughout the day
-            // Compute power from nominal voltage and maxChargingRate
-            // GetMaximumChargeCurrent returns mA, but to help avoid overflow
-            // We use V (not mV) and compute power to the nearest Watt
-            power_W = static_cast<uint32_t>((230 * dg->GetMaximumChargeCurrent()) /
-                                            1000); // TODO don't use 230V - not all markets will use that
-            if (power_W == 0)
-            {
-                ChipLogError(AppServer, "EVSE Error: MaxCurrent = 0Amp - Can't schedule charging");
-                return CHIP_ERROR_INTERNAL;
-            }
-
-            // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
-            // to avoid using floats we multiply by 36 and then divide by 10 (instead of x3600 and dividing by 1000)
-            chargingDuration_s = static_cast<uint32_t>(((addedEnergy_mWh.Value() / power_W) * 36) / 10);
-
-            // Add in 15 minutes leeway to account for slow starting vehicles
-            // that need to condition the battery or if it is cold etc
-            chargingDuration_s += (15 * 60);
-
-            // A price optimizer can look for cheapest time of day
-            // However for now we'll start charging as late as possible
-            tempStartTime_epoch_s = tempTargetTime_epoch_s - chargingDuration_s;
-
-            if (tempStartTime_epoch_s < now_epoch_s)
-            {
-                // we need to turn on the EVSE now - it won't have enough time to reach the target
-                startTime_epoch_s.SetNonNull(now_epoch_s);
-                // TODO call function to turn on the EV
+                // We didn't find one for today, try tomorrow
+                searchDay++;
+                dayOfWeekMap = (dayOfWeekMap << 1) & 0x7f;
+                if (dayOfWeekMap == 0x00)
+                {
+                    dayOfWeekMap = 0x01; // Must be Saturday and shifted off, so set it to Sunday
+                }
             }
             else
             {
-                // we turn off the EVSE for now
-                startTime_epoch_s.SetNonNull(tempStartTime_epoch_s);
-                // TODO have a periodic timer which checks if we should turn on the charger now
+                break; // We found a target or we error'd out for some other reason
+            }
+        }
+
+        if (err == CHIP_NO_ERROR)
+        {
+            /* Set the target Time in epoch_s format*/
+            tempTargetTime_epoch_s =
+                ((now_epoch_s / 60) + targetTimeMinutesPastMidnight_m + (searchDay * 1440) - minutesPastMidnightNow_m) * 60;
+            targetTime_epoch_s.SetNonNull(tempTargetTime_epoch_s);
+
+            if (!targetSoC.IsNull())
+            {
+                if (targetSoC.Value() != 100)
+                {
+                    ChipLogError(AppServer, "EVSE WARNING: TargetSoC is not 100%% and we don't know the EV SoC!");
+                }
+                // We don't know the Vehicle SoC so we must charge now
+                // TODO make this use the SoC featureMap to determine if this is an error
+                startTime_epoch_s.SetNonNull(now_epoch_s);
+            }
+            else
+            {
+                // We expect to use AddedEnergy to determine the charging start time
+                if (addedEnergy_mWh.IsNull())
+                {
+                    ChipLogError(AppServer, "EVSE ERROR: Neither TargetSoC or AddedEnergy has been provided");
+                    return CHIP_ERROR_INTERNAL;
+                }
+                // Simple optimizer - assume a flat tariff throughout the day
+                // Compute power from nominal voltage and maxChargingRate
+                // GetMaximumChargeCurrent returns mA, but to help avoid overflow
+                // We use V (not mV) and compute power to the nearest Watt
+                power_W = static_cast<uint32_t>((230 * dg->GetMaximumChargeCurrent()) /
+                                                1000); // TODO don't use 230V - not all markets will use that
+                if (power_W == 0)
+                {
+                    ChipLogError(AppServer, "EVSE Error: MaxCurrent = 0Amp - Can't schedule charging");
+                    return CHIP_ERROR_INTERNAL;
+                }
+
+                // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
+                // to avoid using floats we multiply by 36 and then divide by 10 (instead of x3600 and dividing by 1000)
+                chargingDuration_s = static_cast<uint32_t>(((addedEnergy_mWh.Value() / power_W) * 36) / 10);
+
+                // Add in 15 minutes leeway to account for slow starting vehicles
+                // that need to condition the battery or if it is cold etc
+                chargingDuration_s += (15 * 60);
+
+                // A price optimizer can look for cheapest time of day
+                // However for now we'll start charging as late as possible
+                tempStartTime_epoch_s = tempTargetTime_epoch_s - chargingDuration_s;
+
+                if (tempStartTime_epoch_s < now_epoch_s)
+                {
+                    // we need to turn on the EVSE now - it won't have enough time to reach the target
+                    startTime_epoch_s.SetNonNull(now_epoch_s);
+                    // TODO call function to turn on the EV
+                }
+                else
+                {
+                    // we turn off the EVSE for now
+                    startTime_epoch_s.SetNonNull(tempStartTime_epoch_s);
+                    // TODO have a periodic timer which checks if we should turn on the charger now
+                }
             }
         }
     }
