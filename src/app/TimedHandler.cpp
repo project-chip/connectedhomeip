@@ -66,10 +66,9 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
                       ChipLogValueX64(now.count()), this, ChipLogValueExchange(aExchangeContext));
         if (now > mTimeLimit)
         {
-            // Time is up.  Spec says to send UNSUPPORTED_ACCESS.
             ChipLogError(DataManagement, "Timeout expired: handler %p exchange " ChipLogFormatExchange, this,
                          ChipLogValueExchange(aExchangeContext));
-            return StatusResponse::Send(Status::UnsupportedAccess, aExchangeContext, /* aExpectResponse = */ false);
+            return StatusResponse::Send(Status::Timeout, aExchangeContext, /* aExpectResponse = */ false);
         }
 
         if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest))
