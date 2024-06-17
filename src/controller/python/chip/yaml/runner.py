@@ -664,10 +664,10 @@ class CommissionerCommandAction(BaseAction):
         if self._command == 'GetCommissionerNodeId':
             return _ActionResult(status=_ActionStatus.SUCCESS, response=_GetCommissionerNodeIdResult(dev_ctrl.nodeId))
 
-        resp = dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
-        if resp:
+        try:
+            dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
             return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
-        else:
+        except ChipStackError:
             return _ActionResult(status=_ActionStatus.ERROR, response=None)
 
 
