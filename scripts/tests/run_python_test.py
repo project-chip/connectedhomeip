@@ -111,7 +111,7 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
         ]
 
     for run in runs:
-        print(f"Executing run: {run.py_script_path}")
+        print(f"Executing {run.py_script_path.split('/')[-1]} {run.run}")
         main_impl(run.app, run.factoryreset, run.factoryreset_app_only, run.app_args,
                   run.py_script_path, run.script_args, run.script_gdb, run.quiet)
 
