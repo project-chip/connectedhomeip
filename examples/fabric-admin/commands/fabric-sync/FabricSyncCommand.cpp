@@ -31,8 +31,11 @@ using namespace ::chip;
 
 namespace {
 
-constexpr uint16_t kRetryIntervalS      = 3;
-constexpr uint16_t kMaxManaulCodeLength = 11;
+// Constants
+constexpr uint32_t kCommissionPrepareTimeMs = 500;
+constexpr uint16_t kMaxManaulCodeLength     = 11;
+constexpr uint16_t kSubscribeMinInterval    = 0;
+constexpr uint16_t kSubscribeMaxInterval    = 60;
 
 } // namespace
 
@@ -55,8 +58,23 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
         CHIP_ERROR error = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualCode);
         if (error == CHIP_NO_ERROR)
         {
-            char command[64];
-            snprintf(command, sizeof(command), "pairing code 3 %s", payloadBuffer);
+            char command[kMaxCommandSize];
+            NodeId nodeId = 2; // TODO: need to switch to dynamically assigned ID
+            snprintf(command, sizeof(command), "pairing code %ld %s", nodeId, payloadBuffer);
+
+            PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "code"));
+
+            if (pairingCommand == nullptr)
+            {
+                ChipLogError(NotSpecified, "Pairing code command is not available");
+                return;
+            }
+
+            pairingCommand->RegisterCommissioningDelegate(this);
+            mAssignedNodeId = nodeId;
+
+            usleep(kCommissionPrepareTimeMs * 1000);
+
             PushCommand(command);
         }
         else
@@ -64,12 +82,38 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
             ChipLogError(NotSpecified, "Unable to generate manual code for setup payload: %" CHIP_ERROR_FORMAT, error.Format());
         }
     }
+    else
+    {
+        ChipLogError(NotSpecified,
+                     "Failed to open synced device (0x:" ChipLogFormatX64 ") commissioning window: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(deviceId), err.Format());
+    }
+}
+
+void FabricSyncDeviceCommand::OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err)
+{
+    if (mAssignedNodeId != deviceId)
+    {
+        return;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        // TODO: AddSyncedDevice
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to pair synced device (0x:" ChipLogFormatX64 ") with error: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(deviceId), err.Format());
+    }
 }
 
 CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
 {
-    char command[64];
-    snprintf(command, sizeof(command), "pairing open-commissioning-window 1 %d 1 300 1000 3840", remoteId);
+    char command[kMaxCommandSize];
+    NodeId bridgeNodeId = 1; // TODO: need to switch to configured ID
+    snprintf(command, sizeof(command), "pairing open-commissioning-window %ld %d %d %d %d %d", bridgeNodeId, remoteId,
+             kEnhancedCommissioningMethod, kWindowTimeout, kIteration, kDiscriminator);
 
     OpenCommissioningWindowCommand * openCommand =
         static_cast<OpenCommissioningWindowCommand *>(CommandMgr().GetCommandByName("pairing", "open-commissioning-window"));
