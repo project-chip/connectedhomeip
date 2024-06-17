@@ -216,6 +216,12 @@ public:
 
         AddRequestDataParameters(const Optional<uint16_t> & aTimedInvokeTimeoutMs) : timedInvokeTimeoutMs(aTimedInvokeTimeoutMs) {}
 
+        AddRequestDataParameters & SetCommandRef(uint16_t aCommandRef)
+        {
+            commandRef.SetValue(aCommandRef);
+            return *this;
+        }
+
         // When a value is provided for timedInvokeTimeoutMs, this invoke becomes a timed
         // invoke. CommandSender will use the minimum of all provided timeouts for execution.
         const Optional<uint16_t> timedInvokeTimeoutMs;
@@ -510,6 +516,34 @@ private:
         AwaitingResponse,    ///< The command has been sent successfully, and we are awaiting invoke response.
         ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
+    };
+
+    /**
+     * Class to help backup CommandSender's buffer containing InvokeRequestMessage when adding InvokeRequest
+     * in case there is a failure to add InvokeRequest. Intended usage is as follows:
+     *  - Allocate RollbackInvokeRequest on the stack.
+     *  - Attempt adding InvokeRequest into InvokeRequestMessage buffer.
+     *  - If modification is added successfully, call DisableAutomaticRollback() to prevent destructor from
+     *    rolling back InvokeReqestMessage.
+     *  - If there is an issue adding InvokeRequest, destructor will take care of rolling back
+     *    InvokeRequestMessage to previously saved state.
+     */
+    class RollbackInvokeRequest
+    {
+    public:
+        explicit RollbackInvokeRequest(CommandSender & aCommandSender);
+        ~RollbackInvokeRequest();
+
+        /**
+         * Disables rolling back to previously saved state for InvokeRequestMessage.
+         */
+        void DisableAutomaticRollback();
+
+    private:
+        CommandSender & mCommandSender;
+        TLV::TLVWriter mBackupWriter;
+        State mBackupState;
+        bool mRollbackInDestructor = false;
     };
 
     union CallbackHandle
