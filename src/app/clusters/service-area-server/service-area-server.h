@@ -54,11 +54,10 @@ public:
      * @param[in] aDelegate A pointer to the delegate to be used by this server.
      * @param[in] aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param[in] aFeature The supported features of this Service Area Cluster
-     * @param[in] aClusterId The Id of the Service Area cluster to be instantiated.
-     * 
+     *
      * @note the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature, ClusterId aClusterId = Clusters::ServiceArea::Id);
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
 
     /**
      * @brief Destructor

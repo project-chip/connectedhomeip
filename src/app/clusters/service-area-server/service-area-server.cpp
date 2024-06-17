@@ -55,12 +55,12 @@ namespace ServiceArea {
 // ****************************************************************************
 // Service Area Server Instance
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature, ClusterId aClusterId) :
-    AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
-    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature) :
+    AttributeAccessInterface(MakeOptional(aEndpointId), Clusters::ServiceArea::Id),
+    CommandHandlerInterface(MakeOptional(aEndpointId), Clusters::ServiceArea::Id),
     mDelegate(aDelegate),
     mEndpointId(aEndpointId),
-    mClusterId(aClusterId),
+    mClusterId(Clusters::ServiceArea::Id),
     mFeature(aFeature)
 {
     ChipLogProgress(Zcl, "Service Area: Instance constructor");
