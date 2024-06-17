@@ -75,6 +75,10 @@
 #include "BluezConnection.h"
 #include "Types.h"
 
+#if !GLIB_CHECK_VERSION(2, 68, 0)
+#define g_memdup2(mem, size) g_memdup(mem, static_cast<unsigned int>(size))
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -413,7 +417,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
                                                                          additionalDataFields);
     SuccessOrExit(err);
 
-    data = g_memdup(bufferHandle->Start(), bufferHandle->DataLength());
+    data = g_memdup2(bufferHandle->Start(), bufferHandle->DataLength());
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), data, bufferHandle->DataLength(), TRUE, g_free, data);
     bluez_gatt_characteristic1_set_value(characteristic, cValue);
