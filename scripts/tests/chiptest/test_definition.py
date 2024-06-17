@@ -389,8 +389,8 @@ class TestDefinition:
                         "--ble-adapter", str(tool_hci_number)]
                 else:
                     pairing_cmd = paths.chip_tool_with_python_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]
-                    if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                        pairing_cmd += ['--icd-registration', 'true']
+                if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                    pairing_cmd += ['--icd-registration', 'true']
                 test_cmd = paths.chip_tool_with_python_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
                 server_args = ['--server_path', paths.chip_tool[-1]] + \
                     ['--server_arguments', 'interactive server' +
@@ -412,7 +412,6 @@ class TestDefinition:
                         test_cmd,
                         name='TEST', dependencies=[apps_register],
                         timeout_seconds=timeout_seconds)
-            runner.capture_delegate.LogContents()
 
         except Exception:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")

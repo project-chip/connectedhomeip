@@ -277,8 +277,7 @@ class VirtualWifi:
     def start(self):
         hostapd_cmd = ["ip", "netns", "exec", "tool", self._hostapd_path, self._hostapd_conf]
         dnsmaq_cmd = ["ip", "netns", "exec", "tool", self._dnsmasq_path, "-d", "-C", self._dnsmasq_conf]
-        # TODO: change wlan0 to the actual interface name
-        dhclient_cmd = ["ip", "netns", "exec", "app", "dhclient", "wlan0"]
+        dhclient_cmd = ["ip", "netns", "exec", "app", "dhclient", self._wlan_app]
         wpa_cmd = [
             "ip",
             "netns",
