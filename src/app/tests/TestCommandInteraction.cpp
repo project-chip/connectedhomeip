@@ -109,10 +109,9 @@ enum class ForcedSizeBufferLengthHint
     kSizeGreaterThan255,
 };
 
-struct ForcedSizeBuffer
+class ForcedSizeBuffer : public app::DataModel::EncodableToTLV
 {
-    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
-
+public:
     ForcedSizeBuffer(uint32_t size)
     {
         if (mBuffer.Alloc(size))
@@ -124,7 +123,7 @@ struct ForcedSizeBuffer
 
     // No significance with using 0x12 as the CommandId, just using a value.
     static constexpr chip::CommandId GetCommandId() { return 0x12; }
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & aWriter, TLV::Tag aTag) const override
     {
         VerifyOrReturnError(mBuffer, CHIP_ERROR_NO_MEMORY);
 
@@ -133,6 +132,9 @@ struct ForcedSizeBuffer
         ReturnErrorOnFailure(app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(mBuffer.Get(), mBuffer.AllocatedSize())));
         return aWriter.EndContainer(outerContainerType);
     }
+
+private:
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
 };
 
 struct Fields
@@ -387,6 +389,7 @@ public:
     void TestCommandSender_WithProcessReceivedMsg();
     void TestCommandSender_ExtendableApiWithProcessReceivedMsg();
     void TestCommandSender_ExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef();
+    void TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked();
     void TestCommandHandler_WithoutResponderCallingAddStatus();
     void TestCommandHandler_WithoutResponderCallingAddResponse();
     void TestCommandHandler_WithoutResponderCallingDirectPrepareFinishCommandApis();
@@ -632,7 +635,8 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(const Con
     // When ForcedSizeBuffer exceeds 255, an extra byte is needed for length, affecting the overhead size required by
     // AddResponseData. In order to have this accounted for in overhead calculation we set the length to be 256.
     uint32_t sizeOfForcedSizeBuffer = aBufferSizeHint == ForcedSizeBufferLengthHint::kSizeGreaterThan255 ? 256 : 0;
-    EXPECT_EQ(commandHandler.AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeOfForcedSizeBuffer)), CHIP_NO_ERROR);
+    ForcedSizeBuffer responseData(sizeOfForcedSizeBuffer);
+    EXPECT_EQ(commandHandler.AddResponseData(aRequestCommandPath, responseData.GetCommandId(), responseData), CHIP_NO_ERROR);
     uint32_t remainingSizeAfter = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     uint32_t delta              = remainingSizeBefore - remainingSizeAfter - sizeOfForcedSizeBuffer;
 
@@ -657,7 +661,8 @@ void TestCommandInteraction::FillCurrentInvokeResponseBuffer(CommandHandlerImpl 
     // Validating assumption. If this fails, it means overheadSizeNeededForAddingResponse is likely too large.
     EXPECT_GE(sizeToFill, 256u);
 
-    EXPECT_EQ(apCommandHandler->AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeToFill)), CHIP_NO_ERROR);
+    ForcedSizeBuffer responseData(sizeToFill);
+    EXPECT_EQ(apCommandHandler->AddResponseData(aRequestCommandPath, responseData.GetCommandId(), responseData), CHIP_NO_ERROR);
 }
 
 void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(bool aNeedStatusCode)
@@ -1087,6 +1092,47 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onErrorCalledTimes, 0);
 }
 
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ValidateSecondLargeAddRequestDataRollbacked)
+{
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
+                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+
+    app::CommandSender::AddRequestDataParameters addRequestDataParams;
+
+    CommandSender::ConfigParameters config;
+    config.SetRemoteMaxPathsPerInvoke(2);
+    EXPECT_EQ(commandSender.SetCommandSenderConfig(config), CHIP_NO_ERROR);
+
+    // The specific values chosen here are arbitrary.
+    uint16_t firstCommandRef  = 1;
+    uint16_t secondCommandRef = 2;
+    auto commandPathParams    = MakeTestCommandPath();
+    SimpleTLVPayload simplePayloadWriter;
+    addRequestDataParams.SetCommandRef(firstCommandRef);
+
+    EXPECT_EQ(commandSender.AddRequestData(commandPathParams, simplePayloadWriter, addRequestDataParams), CHIP_NO_ERROR);
+
+    uint32_t remainingSize = commandSender.mInvokeRequestBuilder.GetWriter()->GetRemainingFreeLength();
+    // Because request is made of both request data and request path (commandPathParams), using
+    // `remainingSize` is large enough fail.
+    ForcedSizeBuffer requestData(remainingSize);
+
+    addRequestDataParams.SetCommandRef(secondCommandRef);
+    EXPECT_EQ(commandSender.AddRequestData(commandPathParams, requestData, addRequestDataParams), CHIP_ERROR_NO_MEMORY);
+
+    // Confirm that we can still send out a request with the first command.
+    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
+
+    mpTestContext->DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onResponseCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onErrorCalledTimes, 0);
+}
+
 TEST_F(TestCommandInteraction, TestCommandHandlerEncodeSimpleCommandData)
 {
     // Send response which has simple command data and command path
@@ -1188,7 +1234,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_WithoutResponderC
     CommandHandlerImpl commandHandler(&mockCommandHandlerDelegate);
 
     uint32_t sizeToFill = 50; // This is an arbitrary number, we need to select a non-zero value.
-    EXPECT_EQ(commandHandler.AddResponseData(requestCommandPath, ForcedSizeBuffer(sizeToFill)), CHIP_NO_ERROR);
+    ForcedSizeBuffer responseData(sizeToFill);
+    EXPECT_EQ(commandHandler.AddResponseData(requestCommandPath, responseData.GetCommandId(), responseData), CHIP_NO_ERROR);
 
     // Since calling AddResponseData is supposed to be a no-operation when there is no responder, it is
     // hard to validate. Best way is to check that we are still in an Idle state afterwards
@@ -1813,7 +1860,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_FillUpInvokeRespo
     EXPECT_EQ(remainingSize, sizeToLeave);
 
     uint32_t sizeToFill = 50;
-    EXPECT_EQ(commandHandler.AddResponseData(requestCommandPath2, ForcedSizeBuffer(sizeToFill)), CHIP_NO_ERROR);
+    ForcedSizeBuffer responseData(sizeToFill);
+    EXPECT_EQ(commandHandler.AddResponseData(requestCommandPath2, responseData.GetCommandId(), responseData), CHIP_NO_ERROR);
 
     remainingSize = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     EXPECT_GT(remainingSize, sizeToLeave);
