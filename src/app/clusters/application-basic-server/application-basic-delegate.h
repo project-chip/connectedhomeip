@@ -91,7 +91,7 @@ public:
 
 protected:
     CatalogVendorApp mCatalogVendorApp;
-    ApplicationStatusEnum mApplicationStatus = ApplicationStatusEnum::kStopped;
+    ApplicationStatusEnum mApplicationStatus = ApplicationStatusEnum::kNotInstalled;
 };
 
 } // namespace ApplicationBasic

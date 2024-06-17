@@ -44246,11 +44246,15 @@ class ApplicationBasic(Cluster):
             kActiveVisibleFocus = 0x01
             kActiveHidden = 0x02
             kActiveVisibleNotFocus = 0x03
+            kNotInstalled = 0x04
+            kInstalling = 0x05
+            kInstallationFailed = 0x06
+            kInstalled = 0x07
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 8,
 
     class Structs:
         @dataclass

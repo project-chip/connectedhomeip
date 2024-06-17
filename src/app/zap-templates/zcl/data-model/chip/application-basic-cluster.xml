@@ -51,5 +51,9 @@ limitations under the License.
     <item name="ActiveVisibleFocus" value="0x01"/>
     <item name="ActiveHidden" value="0x02"/>
     <item name="ActiveVisibleNotFocus" value="0x03"/>
+    <item name="NotInstalled" value="0x04"/>
+    <item name="Installing" value="0x05"/>
+    <item name="InstallationFailed" value="0x06"/>
+    <item name="Installed" value="0x07"/>
   </enum>
 </configurator>

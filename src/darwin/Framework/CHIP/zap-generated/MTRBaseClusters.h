@@ -20194,6 +20194,10 @@ typedef NS_ENUM(uint8_t, MTRApplicationBasicApplicationStatus) {
     MTRApplicationBasicApplicationStatusActiveVisibleFocus MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRApplicationBasicApplicationStatusActiveHidden MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRApplicationBasicApplicationStatusActiveVisibleNotFocus MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
+    MTRApplicationBasicApplicationStatusNotInstalled MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRApplicationBasicApplicationStatusInstalling MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRApplicationBasicApplicationStatusInstallationFailed MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRApplicationBasicApplicationStatusInstalled MTR_PROVISIONALLY_AVAILABLE = 0x07,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRContentControlFeature) {

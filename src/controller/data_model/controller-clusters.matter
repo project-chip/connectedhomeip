@@ -8633,6 +8633,10 @@ cluster ApplicationBasic = 1293 {
     kActiveVisibleFocus = 1;
     kActiveHidden = 2;
     kActiveVisibleNotFocus = 3;
+    kNotInstalled = 4;
+    kInstalling = 5;
+    kInstallationFailed = 6;
+    kInstalled = 7;
   }
 
   struct ApplicationStruct {

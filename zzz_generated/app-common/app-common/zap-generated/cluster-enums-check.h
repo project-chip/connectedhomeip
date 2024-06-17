@@ -3088,6 +3088,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationBasic::Appli
     case EnumType::kActiveVisibleFocus:
     case EnumType::kActiveHidden:
     case EnumType::kActiveVisibleNotFocus:
+    case EnumType::kNotInstalled:
+    case EnumType::kInstalling:
+    case EnumType::kInstallationFailed:
+    case EnumType::kInstalled:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

@@ -150,21 +150,6 @@ public:
      */
     virtual void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) = 0;
 
-    /**
-     * @brief
-     *   Called to prompt the user for consent to allow the app commissioneeName/vendorId/productId to be installed.
-     * For example "[commissioneeName] is requesting permission to install app to this TV, approve?"
-     *
-     * If user responds with OK then implementor should call CommissionerRespondOk();
-     * If user responds with Cancel then implementor should call CommissionerRespondCancel();
-     *
-     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
-     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
-     *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
-     *
-     */
-    virtual void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) = 0;
-
     virtual ~UserPrompter() = default;
 };
 
@@ -227,13 +212,22 @@ public:
      *   Called to check if the given target app is available to the commissione with th given
      *   vendorId/productId
      *
-     * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
-     *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
      *
      */
     virtual bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) = 0;
+
+    /**
+     * @brief
+     *   Called to add uninstalled content app to the list of mContentApps
+     *   vendorId/productId
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual void AddUninstalledContentApp(uint16_t vendorId, uint16_t productId) = 0;
 
     virtual ~AppInstallationService() = default;
 };

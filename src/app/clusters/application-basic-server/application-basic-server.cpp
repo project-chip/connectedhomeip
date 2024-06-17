@@ -225,6 +225,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadApplicationAttribute(app::AttributeVa
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadStatusAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
+    ChipLogProgress(DeviceLayer, "Here 1");
     ApplicationStatusEnum status = delegate->HandleGetStatus();
     return aEncoder.Encode(status);
 }
