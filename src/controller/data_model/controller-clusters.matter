@@ -5437,6 +5437,98 @@ cluster EnergyEvse = 153 {
   timed command ClearTargets(): DefaultSuccess = 7;
 }
 
+/** The Energy Calendar Cluster provides a mechanism for communicating schedules associated with various forms of energy consumption. */
+cluster EnergyCalendar = 154 {
+  revision 2;
+
+  enum PeakPeriodSeverityEnum : enum8 {
+    kUnused = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+  }
+
+  bitmap AuxiliaryLoadBitmap : bitmap8 {
+    kAuxiliarySwitch1 = 0x1;
+    kAuxiliarySwitch2 = 0x2;
+    kAuxiliarySwitch3 = 0x4;
+    kAuxiliarySwitch4 = 0x8;
+    kAuxiliarySwitch5 = 0x10;
+    kAuxiliarySwitch6 = 0x20;
+    kAuxiliarySwitch7 = 0x40;
+    kAuxiliarySwitch8 = 0x80;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPricingTier = 0x1;
+    kFriendlyCredit = 0x2;
+    kAuxiliaryLoad = 0x4;
+    kPeakPeriod = 0x8;
+  }
+
+  bitmap TransitionDayOfWeekBitmap : bitmap8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
+  struct TransitionStruct {
+    int16u transitionTime = 0;
+    optional int32u priceTier = 1;
+    optional boolean friendlyCredit = 2;
+    optional AuxiliaryLoadBitmap auxiliaryLoad = 3;
+  }
+
+  struct Date {
+    optional int16u year = 0;
+    optional int8u month = 1;
+    optional int8u day = 2;
+    optional int8u dayOfWeek = 3;
+  }
+
+  struct DayStruct {
+    optional Date date = 0;
+    optional TransitionDayOfWeekBitmap daysOfWeek = 1;
+    TransitionStruct transitions[] = 2;
+    optional int32u calendarID = 3;
+  }
+
+  struct CalendarPeriod {
+    epoch_s startDate = 0;
+    DayStruct days[] = 1;
+  }
+
+  struct PeakPeriodStruct {
+    PeakPeriodSeverityEnum severity = 0;
+    int16u peakPeriod = 1;
+    epoch_s startTime = 2;
+    epoch_s endTime = 3;
+  }
+
+  readonly attribute nullable int32u calendarID = 0;
+  readonly attribute nullable char_string<12> name = 1;
+  readonly attribute nullable int32u providerID = 2;
+  readonly attribute nullable int32u eventID = 3;
+  readonly attribute nullable epoch_s startDate = 4;
+  readonly attribute CalendarPeriod calendarPeriods[] = 5;
+  readonly attribute DayStruct specialDays[] = 6;
+  readonly attribute nullable DayStruct currentDay = 7;
+  readonly attribute nullable DayStruct nextDay = 8;
+  readonly attribute nullable TransitionStruct currentTransition = 9;
+  readonly attribute nullable PeakPeriodStruct currentPeakPeriod = 10;
+  readonly attribute nullable PeakPeriodStruct nextPeakPeriod = 11;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster provides an interface to specify preferences for how devices should consume energy. */
 provisional cluster EnergyPreference = 155 {
   revision 1;

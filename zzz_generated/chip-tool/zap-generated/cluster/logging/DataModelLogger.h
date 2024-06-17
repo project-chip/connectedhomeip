@@ -285,6 +285,21 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::EnergyCalendar::Structs::Date::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,

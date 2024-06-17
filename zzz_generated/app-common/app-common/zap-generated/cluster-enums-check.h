@@ -2213,6 +2213,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyCalendar::PeakPeriodSeverityEnum val)
+{
+    using EnumType = EnergyCalendar::PeakPeriodSeverityEnum;
+    switch (val)
+    {
+    case EnumType::kUnused:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::EnergyPriorityEnum val)
 {
     using EnumType = EnergyPreference::EnergyPriorityEnum;

@@ -26570,6 +26570,463 @@ class EnergyEvse(Cluster):
 
 
 @dataclass
+class EnergyCalendar(Cluster):
+    id: typing.ClassVar[int] = 0x0000009A
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="calendarID", Tag=0x00000000, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="name", Tag=0x00000001, Type=typing.Union[Nullable, str]),
+                ClusterObjectFieldDescriptor(Label="providerID", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="eventID", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="startDate", Tag=0x00000004, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="calendarPeriods", Tag=0x00000005, Type=typing.List[EnergyCalendar.Structs.CalendarPeriod]),
+                ClusterObjectFieldDescriptor(Label="specialDays", Tag=0x00000006, Type=typing.List[EnergyCalendar.Structs.DayStruct]),
+                ClusterObjectFieldDescriptor(Label="currentDay", Tag=0x00000007, Type=typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]),
+                ClusterObjectFieldDescriptor(Label="nextDay", Tag=0x00000008, Type=typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]),
+                ClusterObjectFieldDescriptor(Label="currentTransition", Tag=0x00000009, Type=typing.Union[Nullable, EnergyCalendar.Structs.TransitionStruct]),
+                ClusterObjectFieldDescriptor(Label="currentPeakPeriod", Tag=0x0000000A, Type=typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]),
+                ClusterObjectFieldDescriptor(Label="nextPeakPeriod", Tag=0x0000000B, Type=typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    calendarID: 'typing.Union[Nullable, uint]' = None
+    name: 'typing.Union[Nullable, str]' = None
+    providerID: 'typing.Union[Nullable, uint]' = None
+    eventID: 'typing.Union[Nullable, uint]' = None
+    startDate: 'typing.Union[Nullable, uint]' = None
+    calendarPeriods: 'typing.List[EnergyCalendar.Structs.CalendarPeriod]' = None
+    specialDays: 'typing.List[EnergyCalendar.Structs.DayStruct]' = None
+    currentDay: 'typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]' = None
+    nextDay: 'typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]' = None
+    currentTransition: 'typing.Union[Nullable, EnergyCalendar.Structs.TransitionStruct]' = None
+    currentPeakPeriod: 'typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = None
+    nextPeakPeriod: 'typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Enums:
+        class PeakPeriodSeverityEnum(MatterIntEnum):
+            kUnused = 0x00
+            kLow = 0x01
+            kMedium = 0x02
+            kHigh = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
+
+    class Bitmaps:
+        class AuxiliaryLoadBitmap(IntFlag):
+            kAuxiliarySwitch1 = 0x1
+            kAuxiliarySwitch2 = 0x2
+            kAuxiliarySwitch3 = 0x4
+            kAuxiliarySwitch4 = 0x8
+            kAuxiliarySwitch5 = 0x10
+            kAuxiliarySwitch6 = 0x20
+            kAuxiliarySwitch7 = 0x40
+            kAuxiliarySwitch8 = 0x80
+
+        class Feature(IntFlag):
+            kPricingTier = 0x1
+            kFriendlyCredit = 0x2
+            kAuxiliaryLoad = 0x4
+            kPeakPeriod = 0x8
+
+        class TransitionDayOfWeekBitmap(IntFlag):
+            kSunday = 0x1
+            kMonday = 0x2
+            kTuesday = 0x4
+            kWednesday = 0x8
+            kThursday = 0x10
+            kFriday = 0x20
+            kSaturday = 0x40
+
+    class Structs:
+        @dataclass
+        class TransitionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="priceTier", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="friendlyCredit", Tag=2, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="auxiliaryLoad", Tag=3, Type=typing.Optional[uint]),
+                    ])
+
+            transitionTime: 'uint' = 0
+            priceTier: 'typing.Optional[uint]' = None
+            friendlyCredit: 'typing.Optional[bool]' = None
+            auxiliaryLoad: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class Date(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="year", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="month", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="day", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=3, Type=typing.Optional[uint]),
+                    ])
+
+            year: 'typing.Optional[uint]' = None
+            month: 'typing.Optional[uint]' = None
+            day: 'typing.Optional[uint]' = None
+            dayOfWeek: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class DayStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="date", Tag=0, Type=typing.Optional[EnergyCalendar.Structs.Date]),
+                        ClusterObjectFieldDescriptor(Label="daysOfWeek", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="transitions", Tag=2, Type=typing.List[EnergyCalendar.Structs.TransitionStruct]),
+                        ClusterObjectFieldDescriptor(Label="calendarID", Tag=3, Type=typing.Optional[uint]),
+                    ])
+
+            date: 'typing.Optional[EnergyCalendar.Structs.Date]' = None
+            daysOfWeek: 'typing.Optional[uint]' = None
+            transitions: 'typing.List[EnergyCalendar.Structs.TransitionStruct]' = field(default_factory=lambda: [])
+            calendarID: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class CalendarPeriod(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="startDate", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="days", Tag=1, Type=typing.List[EnergyCalendar.Structs.DayStruct]),
+                    ])
+
+            startDate: 'uint' = 0
+            days: 'typing.List[EnergyCalendar.Structs.DayStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class PeakPeriodStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="severity", Tag=0, Type=EnergyCalendar.Enums.PeakPeriodSeverityEnum),
+                        ClusterObjectFieldDescriptor(Label="peakPeriod", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="startTime", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="endTime", Tag=3, Type=uint),
+                    ])
+
+            severity: 'EnergyCalendar.Enums.PeakPeriodSeverityEnum' = 0
+            peakPeriod: 'uint' = 0
+            startTime: 'uint' = 0
+            endTime: 'uint' = 0
+
+    class Attributes:
+        @dataclass
+        class CalendarID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class Name(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, str])
+
+            value: 'typing.Union[Nullable, str]' = NullValue
+
+        @dataclass
+        class ProviderID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class EventID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class StartDate(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class CalendarPeriods(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[EnergyCalendar.Structs.CalendarPeriod])
+
+            value: 'typing.List[EnergyCalendar.Structs.CalendarPeriod]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class SpecialDays(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[EnergyCalendar.Structs.DayStruct])
+
+            value: 'typing.List[EnergyCalendar.Structs.DayStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class CurrentDay(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, EnergyCalendar.Structs.DayStruct])
+
+            value: 'typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]' = NullValue
+
+        @dataclass
+        class NextDay(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, EnergyCalendar.Structs.DayStruct])
+
+            value: 'typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]' = NullValue
+
+        @dataclass
+        class CurrentTransition(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, EnergyCalendar.Structs.TransitionStruct])
+
+            value: 'typing.Union[Nullable, EnergyCalendar.Structs.TransitionStruct]' = NullValue
+
+        @dataclass
+        class CurrentPeakPeriod(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct])
+
+            value: 'typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = NullValue
+
+        @dataclass
+        class NextPeakPeriod(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct])
+
+            value: 'typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = NullValue
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+
+@dataclass
 class EnergyPreference(Cluster):
     id: typing.ClassVar[int] = 0x0000009B
 

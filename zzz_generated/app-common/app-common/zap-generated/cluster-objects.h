@@ -24321,6 +24321,383 @@ public:
 } // namespace Rfid
 } // namespace Events
 } // namespace EnergyEvse
+namespace EnergyCalendar {
+namespace Structs {
+namespace TransitionStruct {
+enum class Fields : uint8_t
+{
+    kTransitionTime = 0,
+    kPriceTier      = 1,
+    kFriendlyCredit = 2,
+    kAuxiliaryLoad  = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t transitionTime = static_cast<uint16_t>(0);
+    Optional<uint32_t> priceTier;
+    Optional<bool> friendlyCredit;
+    Optional<chip::BitMask<AuxiliaryLoadBitmap>> auxiliaryLoad;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TransitionStruct
+namespace Date {
+enum class Fields : uint8_t
+{
+    kYear      = 0,
+    kMonth     = 1,
+    kDay       = 2,
+    kDayOfWeek = 3,
+};
+
+struct Type
+{
+public:
+    Optional<uint16_t> year;
+    Optional<uint8_t> month;
+    Optional<uint8_t> day;
+    Optional<uint8_t> dayOfWeek;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace Date
+namespace DayStruct {
+enum class Fields : uint8_t
+{
+    kDate        = 0,
+    kDaysOfWeek  = 1,
+    kTransitions = 2,
+    kCalendarID  = 3,
+};
+
+struct Type
+{
+public:
+    Optional<Structs::Date::Type> date;
+    Optional<chip::BitMask<TransitionDayOfWeekBitmap>> daysOfWeek;
+    DataModel::List<const Structs::TransitionStruct::Type> transitions;
+    Optional<uint32_t> calendarID;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    Optional<Structs::Date::DecodableType> date;
+    Optional<chip::BitMask<TransitionDayOfWeekBitmap>> daysOfWeek;
+    DataModel::DecodableList<Structs::TransitionStruct::DecodableType> transitions;
+    Optional<uint32_t> calendarID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace DayStruct
+namespace CalendarPeriod {
+enum class Fields : uint8_t
+{
+    kStartDate = 0,
+    kDays      = 1,
+};
+
+struct Type
+{
+public:
+    uint32_t startDate = static_cast<uint32_t>(0);
+    DataModel::List<const Structs::DayStruct::Type> days;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint32_t startDate = static_cast<uint32_t>(0);
+    DataModel::DecodableList<Structs::DayStruct::DecodableType> days;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace CalendarPeriod
+namespace PeakPeriodStruct {
+enum class Fields : uint8_t
+{
+    kSeverity   = 0,
+    kPeakPeriod = 1,
+    kStartTime  = 2,
+    kEndTime    = 3,
+};
+
+struct Type
+{
+public:
+    PeakPeriodSeverityEnum severity = static_cast<PeakPeriodSeverityEnum>(0);
+    uint16_t peakPeriod             = static_cast<uint16_t>(0);
+    uint32_t startTime              = static_cast<uint32_t>(0);
+    uint32_t endTime                = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PeakPeriodStruct
+} // namespace Structs
+
+namespace Attributes {
+
+namespace CalendarID {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CalendarID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CalendarID
+namespace Name {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Name::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 12; }
+};
+} // namespace Name
+namespace ProviderID {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProviderID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ProviderID
+namespace EventID {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EventID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EventID
+namespace StartDate {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StartDate
+namespace CalendarPeriods {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CalendarPeriods::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CalendarPeriods
+namespace SpecialDays {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SpecialDays::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SpecialDays
+namespace CurrentDay {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentDay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentDay
+namespace NextDay {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextDay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextDay
+namespace CurrentTransition {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTransition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentTransition
+namespace CurrentPeakPeriod {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPeakPeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentPeakPeriod
+namespace NextPeakPeriod {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextPeakPeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextPeakPeriod
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::CalendarID::TypeInfo::DecodableType calendarID;
+        Attributes::Name::TypeInfo::DecodableType name;
+        Attributes::ProviderID::TypeInfo::DecodableType providerID;
+        Attributes::EventID::TypeInfo::DecodableType eventID;
+        Attributes::StartDate::TypeInfo::DecodableType startDate;
+        Attributes::CalendarPeriods::TypeInfo::DecodableType calendarPeriods;
+        Attributes::SpecialDays::TypeInfo::DecodableType specialDays;
+        Attributes::CurrentDay::TypeInfo::DecodableType currentDay;
+        Attributes::NextDay::TypeInfo::DecodableType nextDay;
+        Attributes::CurrentTransition::TypeInfo::DecodableType currentTransition;
+        Attributes::CurrentPeakPeriod::TypeInfo::DecodableType currentPeakPeriod;
+        Attributes::NextPeakPeriod::TypeInfo::DecodableType nextPeakPeriod;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace EnergyCalendar
 namespace EnergyPreference {
 namespace Structs {
 namespace BalanceStruct {

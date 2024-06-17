@@ -3978,6 +3978,228 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyEvse::Structs::C
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransitionStruct.transitionTime", "transitionTime",
+                                                                  value.isMember("transitionTime")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitionTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTime, value["transitionTime"]));
+    valueCopy.removeMember("transitionTime");
+
+    if (value.isMember("priceTier"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "priceTier");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.priceTier, value["priceTier"]));
+    }
+    valueCopy.removeMember("priceTier");
+
+    if (value.isMember("friendlyCredit"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "friendlyCredit");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.friendlyCredit, value["friendlyCredit"]));
+    }
+    valueCopy.removeMember("friendlyCredit");
+
+    if (value.isMember("auxiliaryLoad"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "auxiliaryLoad");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.auxiliaryLoad, value["auxiliaryLoad"]));
+    }
+    valueCopy.removeMember("auxiliaryLoad");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.transitionTime);
+    ComplexArgumentParser::Finalize(request.priceTier);
+    ComplexArgumentParser::Finalize(request.friendlyCredit);
+    ComplexArgumentParser::Finalize(request.auxiliaryLoad);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::Date::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    char labelWithMember[kMaxLabelLength];
+    if (value.isMember("year"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "year");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.year, value["year"]));
+    }
+    valueCopy.removeMember("year");
+
+    if (value.isMember("month"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "month");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.month, value["month"]));
+    }
+    valueCopy.removeMember("month");
+
+    if (value.isMember("day"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "day");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.day, value["day"]));
+    }
+    valueCopy.removeMember("day");
+
+    if (value.isMember("dayOfWeek"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeek");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeek, value["dayOfWeek"]));
+    }
+    valueCopy.removeMember("dayOfWeek");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Structs::Date::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.year);
+    ComplexArgumentParser::Finalize(request.month);
+    ComplexArgumentParser::Finalize(request.day);
+    ComplexArgumentParser::Finalize(request.dayOfWeek);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("DayStruct.transitions", "transitions", value.isMember("transitions")));
+
+    char labelWithMember[kMaxLabelLength];
+    if (value.isMember("date"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "date");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.date, value["date"]));
+    }
+    valueCopy.removeMember("date");
+
+    if (value.isMember("daysOfWeek"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "daysOfWeek");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.daysOfWeek, value["daysOfWeek"]));
+    }
+    valueCopy.removeMember("daysOfWeek");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitions");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitions, value["transitions"]));
+    valueCopy.removeMember("transitions");
+
+    if (value.isMember("calendarID"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "calendarID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.calendarID, value["calendarID"]));
+    }
+    valueCopy.removeMember("calendarID");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.date);
+    ComplexArgumentParser::Finalize(request.daysOfWeek);
+    ComplexArgumentParser::Finalize(request.transitions);
+    ComplexArgumentParser::Finalize(request.calendarID);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CalendarPeriod.startDate", "startDate", value.isMember("startDate")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CalendarPeriod.days", "days", value.isMember("days")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "startDate");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.startDate, value["startDate"]));
+    valueCopy.removeMember("startDate");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "days");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.days, value["days"]));
+    valueCopy.removeMember("days");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.startDate);
+    ComplexArgumentParser::Finalize(request.days);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("PeakPeriodStruct.severity", "severity", value.isMember("severity")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("PeakPeriodStruct.peakPeriod", "peakPeriod", value.isMember("peakPeriod")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("PeakPeriodStruct.startTime", "startTime", value.isMember("startTime")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("PeakPeriodStruct.endTime", "endTime", value.isMember("endTime")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "severity");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.severity, value["severity"]));
+    valueCopy.removeMember("severity");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "peakPeriod");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.peakPeriod, value["peakPeriod"]));
+    valueCopy.removeMember("peakPeriod");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "startTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.startTime, value["startTime"]));
+    valueCopy.removeMember("startTime");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endTime, value["endTime"]));
+    valueCopy.removeMember("endTime");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.severity);
+    ComplexArgumentParser::Finalize(request.peakPeriod);
+    ComplexArgumentParser::Finalize(request.startTime);
+    ComplexArgumentParser::Finalize(request.endTime);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & request,
                                         Json::Value & value)
 {
