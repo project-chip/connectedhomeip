@@ -47,6 +47,7 @@ RUN set -x \
     git-lfs \
     gperf \
     iproute2 \
+    iwyu \
     jq \
     lcov \
     libavahi-client-dev \
@@ -133,32 +134,6 @@ RUN set -x \
     && make install \
     && cd ../.. \
     && rm -rf bloaty \
-    && : # last line
-
-# Need newer version of include-what-you-use
-RUN set -x \
-    && apt-get update \
-    # Install build and runtime requirements for IWYU
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing clang-18 libclang-18-dev llvm-18-dev \
-    # Build and install IWYU
-    && git clone --depth=1 --branch=clang_18 https://github.com/include-what-you-use/include-what-you-use.git \
-    && mkdir -p include-what-you-use/build \
-    && cd include-what-you-use/build \
-    && cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/lib/llvm-18 -DIWYU_LINK_CLANG_DYLIB=OFF .. \
-    && make -j$(nproc) \
-    && strip bin/include-what-you-use \
-    && make install \
-    # Save clang-18 files, so we can restore them after build dependencies cleanup
-    # AWK logic converts 'libLLVM.so.18.1 => /usr/lib/llvm-18/lib/libLLVM.so.18.1 (0x00007f781ede6000)' to '/usr/lib/llvm-18/lib/libLLVM.so.18.1'
-    && tar -cf clang-18-files.tar $(dpkg -L libclang-common-18-dev |grep /include) $(ldd bin/include-what-you-use | grep /usr/lib/llvm | awk '{print $3}') /usr/lib/llvm-18/lib/libLLVM.so.1 \
-    # Cleanup build dependencies
-    && apt autopurge -fy clang-18 libclang-18-dev llvm-18-dev \
-    && rm -rf /var/lib/apt/lists/ \
-    # Restore clang-18 files
-    && tar -xf clang-18-files.tar -C / \
-    # Cleanup
-    && cd ../.. \
-    && rm -rf include-what-you-use \
     && : # last line
 
 # Build glib-2.0 from source with enabled thread sanitizer. This is needed for
