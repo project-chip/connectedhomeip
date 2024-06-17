@@ -2697,7 +2697,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     {
         colorTemperatureMinimum = tempPhysicalMin;
     }
-    if (colorTemperatureMaximum > tempPhysicalMax)
+    if ((colorTemperatureMaximum == 0) || (colorTemperatureMaximum > tempPhysicalMax))
     {
         colorTemperatureMaximum = tempPhysicalMax;
     }
@@ -2808,7 +2808,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     {
         colorTemperatureMinimum = tempPhysicalMin;
     }
-    if (colorTemperatureMaximum > tempPhysicalMax)
+    if ((colorTemperatureMaximum == 0) || (colorTemperatureMaximum > tempPhysicalMax))
     {
         colorTemperatureMaximum = tempPhysicalMax;
     }
