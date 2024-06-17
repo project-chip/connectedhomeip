@@ -278,6 +278,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 }
                 if (err != CHIP_ERROR_ENDPOINT_EXISTS)
                 {
+                    gDevices[index] = nullptr;
                     return -1;
                 }
                 // Handle wrap condition
@@ -286,6 +287,8 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                     gCurrentEndpointId = gFirstDynamicEndpointId;
                 }
             }
+            // Clear gDevices[index] as all retries are exhausted
+            gDevices[index] = nullptr;
         }
         index++;
     }
