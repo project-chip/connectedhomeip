@@ -84,6 +84,7 @@ Generally regenerate using one of:
 |        151 |       0x97 | Messages                                                |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
 |        153 |       0x99 | EnergyEvse                                              |
+|        154 |       0x9A | EnergyCalendar                                          |
 |        155 |       0x9B | EnergyPreference                                        |
 |        156 |       0x9C | PowerTopology                                           |
 |        157 |       0x9D | EnergyEvseMode                                          |
