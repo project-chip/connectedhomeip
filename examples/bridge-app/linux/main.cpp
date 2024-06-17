@@ -287,8 +287,6 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                     gCurrentEndpointId = gFirstDynamicEndpointId;
                 }
             }
-            // Clear gDevices[index] as all retries are exhausted
-            gDevices[index] = nullptr;
         }
         index++;
     }
