@@ -614,7 +614,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
         mContentApps.emplace_back(std::move(ptr));
     }
     else if (vendorId == 9050 && productId == 22)
-    {   
+    {
         auto ptr = std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021",
                                                                    make_default_supported_clusters());
 
@@ -705,7 +705,7 @@ void ContentAppFactoryImpl::PrintInstalledApps()
         auto app = contentApp.get();
 
         ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d is on ep=%d with app's basic status=%s", app->GetApplicationBasicDelegate()->HandleGetVendorId(),
-                        app->GetApplicationBasicDelegate()->HandleGetProductId(), app->GetEndpointId(), 
+                        app->GetApplicationBasicDelegate()->HandleGetProductId(), app->GetEndpointId(),
                         ApplicationBasicStatusToString(app->GetApplicationBasicDelegate()->HandleGetStatus()).c_str());
     }
 }
