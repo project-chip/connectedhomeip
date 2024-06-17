@@ -1177,8 +1177,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     os_unfair_lock_lock(&self->_lock);
 
-    MATTER_LOG_METRIC_END(kMetricMTRDeviceSubscriptionSetup, CHIP_NO_ERROR);
-
     // We have completed the subscription work - remove from the subscription pool.
     [self _clearSubscriptionPoolWork];
 
@@ -1187,6 +1185,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     if (HadSubscriptionEstablishedOnce(_internalDeviceState)) {
         [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
     } else {
+        MATTER_LOG_METRIC_END(kMetricMTRDeviceInitialSubscriptionSetup, CHIP_NO_ERROR);
         [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
     }
 
@@ -1226,8 +1225,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)_handleSubscriptionError:(NSError *)error
 {
     std::lock_guard lock(_lock);
-
-    MATTER_LOG_METRIC_END(kMetricMTRDeviceSubscriptionSetup, [MTRError errorToCHIPErrorCode:error]);
 
     [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
     _unreportedEvents = nil;
@@ -2345,7 +2342,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         });
     }
 
-    MATTER_LOG_METRIC_BEGIN(kMetricMTRDeviceSubscriptionSetup);
+    // This marks begin of initial subscription to the device (before CASE is established). The end is only marked after successfully setting
+    // up the subscription since it is always retried as long as the MTRDevice is kept running.
+    MATTER_LOG_METRIC_BEGIN(kMetricMTRDeviceInitialSubscriptionSetup);
 
     // Call directlyGetSessionForNode because the subscription setup already goes through the subscription pool queue
     [_deviceController

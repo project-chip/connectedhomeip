@@ -88,8 +88,8 @@ constexpr Tracing::MetricKey kMetricBLEDevicesRemoved = "dwnfw_ble_devices_remov
 // Unexpected C quality attribute update outside of priming
 constexpr Tracing::MetricKey kMetricUnexpectedCQualityUpdate = "dwnpm_bad_c_attr_update";
 
-// Subscription setup from darwin MTRDevice
-constexpr Tracing::MetricKey kMetricMTRDeviceSubscriptionSetup = "dwnpm_dev_subscription_setup";
+// Setup from darwin MTRDevice for initial subscrption to a device
+constexpr Tracing::MetricKey kMetricMTRDeviceInitialSubscriptionSetup = "dwnpm_dev_initial_subscription_setup";
 
 } // namespace DarwinFramework
 } // namespace Tracing
