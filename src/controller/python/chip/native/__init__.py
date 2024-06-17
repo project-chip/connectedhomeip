@@ -199,7 +199,7 @@ class NativeLibraryHandleMethodArguments:
     def Set(self, methodName: str, resultType, argumentTypes: list):
         method = getattr(self.handle, methodName)
         method.restype = resultType
-        method.argtype = argumentTypes
+        method.argtypes = argumentTypes
 
 
 @dataclass
