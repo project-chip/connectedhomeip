@@ -59,7 +59,7 @@ void FabricSyncDeviceCommand::OnCommissioningWindowOpened(NodeId deviceId, CHIP_
         if (error == CHIP_NO_ERROR)
         {
             char command[kMaxCommandSize];
-            NodeId nodeId = 2; // TODO: need to switch to dynamically assigned ID
+            NodeId nodeId = 2; // TODO: (Issue #33947) need to switch to dynamically assigned ID
             snprintf(command, sizeof(command), "pairing code %ld %s", nodeId, payloadBuffer);
 
             PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "code"));
@@ -101,7 +101,7 @@ void FabricSyncDeviceCommand::OnCommissioningComplete(chip::NodeId deviceId, CHI
 
     if (err == CHIP_NO_ERROR)
     {
-        // TODO: AddSyncedDevice
+        // TODO: (Issue #33947) Add Synced Device to device manager
     }
     else
     {
@@ -113,7 +113,7 @@ void FabricSyncDeviceCommand::OnCommissioningComplete(chip::NodeId deviceId, CHI
 CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
 {
     char command[kMaxCommandSize];
-    NodeId bridgeNodeId = 1; // TODO: need to switch to configured ID
+    NodeId bridgeNodeId = 1; // TODO: (Issue #33947) need to switch to configured ID
     snprintf(command, sizeof(command), "pairing open-commissioning-window %ld %d %d %d %d %d", bridgeNodeId, remoteId,
              kEnhancedCommissioningMethod, kWindowTimeout, kIteration, kDiscriminator);
 
