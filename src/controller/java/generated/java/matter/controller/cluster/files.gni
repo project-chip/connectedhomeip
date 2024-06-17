@@ -47,6 +47,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DeviceEnergyManagementClusterConstraintsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DeviceEnergyManagementClusterCostStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DeviceEnergyManagementClusterForecastStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DeviceEnergyManagementClusterPowerAdjustCapabilityStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DeviceEnergyManagementClusterPowerAdjustStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DeviceEnergyManagementClusterSlotAdjustmentStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DeviceEnergyManagementClusterSlotStruct.kt",

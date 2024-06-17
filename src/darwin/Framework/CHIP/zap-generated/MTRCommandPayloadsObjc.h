@@ -5739,7 +5739,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRDeviceEnergyManagementClusterModifyForecastRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull forecastId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull forecastID MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSArray * _Nonnull slotAdjustments MTR_PROVISIONALLY_AVAILABLE;
 

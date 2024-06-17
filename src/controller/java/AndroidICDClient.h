@@ -29,4 +29,10 @@
 
 jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFabricIndex);
 
+CHIP_ERROR StoreICDEntryWithKey(JNIEnv * env, jint jFabricIndex, jobject jicdClientInfo, jbyteArray jKey);
+
+CHIP_ERROR RemoveICDEntryWithKey(JNIEnv * env, jint jFabricIndex, jobject jicdClientInfo);
+
+CHIP_ERROR ClearICDClientInfo(JNIEnv * env, jint jFabricIndex, jlong jNodeId);
+
 chip::app::DefaultICDClientStorage * getICDClientStorage();

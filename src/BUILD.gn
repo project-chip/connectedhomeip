@@ -104,7 +104,6 @@ if (chip_build_tests) {
     if (chip_device_platform != "efr32") {
       tests += [
         "${chip_root}/src/app/tests",
-        "${chip_root}/src/app/tests:tests_nltest",
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",

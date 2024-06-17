@@ -1202,7 +1202,7 @@
             { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) },    /* ESAState */       \
             { ZAP_EMPTY_DEFAULT(), 0x00000003, 8, ZAP_TYPE(POWER_MW), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* AbsMinPower */    \
             { ZAP_EMPTY_DEFAULT(), 0x00000004, 8, ZAP_TYPE(POWER_MW), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* AbsMaxPower */    \
-            { ZAP_EMPTY_DEFAULT(), 0x00000005, 0, ZAP_TYPE(ARRAY),                                                                 \
+            { ZAP_EMPTY_DEFAULT(), 0x00000005, 0, ZAP_TYPE(STRUCT),                                                                \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* PowerAdjustmentCapability */               \
             { ZAP_EMPTY_DEFAULT(), 0x00000006, 0, ZAP_TYPE(STRUCT),                                                                \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) },                          /* Forecast */       \
