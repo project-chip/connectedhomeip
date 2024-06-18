@@ -39,7 +39,7 @@ class TC_MWOCTRL_2_5(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-    async def send_add_more_time_command_expect_response(self, endpoint, value, expectedError = Status.Success):
+    async def send_add_more_time_command_expect_response(self, endpoint, value, expectedError=Status.Success):
         commands = Clusters.Objects.MicrowaveOvenControl.Commands
         try:
             await self.send_single_cmd(cmd=commands.AddMoreTime(timeToAdd=value), endpoint=endpoint)
@@ -116,8 +116,8 @@ class TC_MWOCTRL_2_5(MatterBaseTest):
             await self.send_add_more_time_command_expect_response(endpoint, 30, Status.InvalidInState)
         else:
             self.skip_step(7)
-            self.skip_step(8)            
-    
+            self.skip_step(8)
+
 
 if __name__ == "__main__":
     default_matter_test_main()

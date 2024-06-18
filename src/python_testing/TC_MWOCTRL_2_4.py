@@ -43,7 +43,8 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
             TestStep(3, "Read the SelectedWattIndex attribute"),
             TestStep(4, "Send the SetCookingParameters command", "Verify DUT responds w/ status SUCCESS(0x00)."),
             TestStep(5, "Read and verify the SelectedWattIndex attribute"),
-            TestStep(6, "Try to set SelectedWattIndex to an invalid value.", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+            TestStep(6, "Try to set SelectedWattIndex to an invalid value.",
+                     "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
         ]
         return steps
 

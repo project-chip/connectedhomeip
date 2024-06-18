@@ -97,7 +97,8 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
             TestStep(15, "Set the CookTime attribute to 60", "Verify DUT responds w/ INVALID_IN_STATE(0xCB)"),
 
             TestStep(16, "Manually set DUT into a state where it will respond with INVALID_COMMAND", ""),
-            TestStep(17, "Send the SetCookingParameters command with StartAfterSetting to True", "Verify DUT responds w/ INVALID_COMMAND(0x85)"),
+            TestStep(17, "Send the SetCookingParameters command with StartAfterSetting to True",
+                     "Verify DUT responds w/ INVALID_COMMAND(0x85)"),
         ]
         return steps
 
@@ -165,8 +166,8 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
             await self.set_bad_cook_time_value_expect_failure(endpoint, maxCookTime+1, Status.InvalidInState)
         else:
             self.skip_step(14)
-            self.skip_step(15)            
-    
+            self.skip_step(15)
+
         if self.check_pics("MWOCTRL.S.M.ManualSetInvalidCommand"):
             self.step(16)
             input("Press Enter when done.\n")
@@ -175,7 +176,8 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
             await self.send_bad_command_expect_failure(endpoint)
         else:
             self.skip_step(16)
-            self.skip_step(17)            
+            self.skip_step(17)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
