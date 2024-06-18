@@ -62,7 +62,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::Init()
 
 CHIP_ERROR GenericThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSpan & borderAgentIdSpan)
 {
-    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
     otBorderAgentId borderAgentId;
     if (borderAgentIdSpan.size() < sizeof(borderAgentId.mId))
@@ -88,7 +88,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::GetThreadVersion(uint16_t & thread
 
 CHIP_ERROR GenericThreadBorderRouterDelegate::GetInterfaceEnabled(bool & interfaceEnabled)
 {
-    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
     ScopedThreadLock threadLock;
     interfaceEnabled = otIp6IsEnabled(otInst);
@@ -97,7 +97,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::GetInterfaceEnabled(bool & interfa
 
 CHIP_ERROR GenericThreadBorderRouterDelegate::GetDataset(Thread::OperationalDataset & dataset, DatasetType type)
 {
-    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
 
     ScopedThreadLock threadLock;
@@ -119,9 +119,9 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::GetDataset(Thread::OperationalData
 }
 
 CHIP_ERROR GenericThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
-                                                             ActivateDatasetCallback * callback)
+                                                               ActivateDatasetCallback * callback)
 {
-    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(callback, CHIP_ERROR_INVALID_ARGUMENT);
@@ -136,8 +136,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::SetActiveDataset(const Thread::Ope
     if (threadIsEnabled)
     {
         otOperationalDatasetTlvs stagingDataset;
-        ReturnErrorCodeIf(otDatasetGetActiveTlvs(otInst, &stagingDataset) != OT_ERROR_NONE,
-                          CHIP_ERROR_INTERNAL);
+        ReturnErrorCodeIf(otDatasetGetActiveTlvs(otInst, &stagingDataset) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
         if (activeDataset.AsByteSpan().data_equal(ByteSpan(stagingDataset.mTlvs, stagingDataset.mLength)))
         {
             callback->OnActivateDatasetComplete(CHIP_NO_ERROR);
@@ -172,7 +171,7 @@ void GenericThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer
 
 CHIP_ERROR GenericThreadBorderRouterDelegate::RevertActiveDataset()
 {
-    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
 
     bool threadIsEnabled = false;
@@ -197,8 +196,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::RevertActiveDataset()
         ReturnErrorOnFailure(err);
         stagingDataset.mLength = datasetTlvslen;
         ReturnErrorOnFailure(SetThreadEnabled(false));
-        ReturnErrorCodeIf(otDatasetSetActiveTlvs(otInst, &stagingDataset) != OT_ERROR_NONE,
-                          CHIP_ERROR_INTERNAL);
+        ReturnErrorCodeIf(otDatasetSetActiveTlvs(otInst, &stagingDataset) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
     }
     ReturnErrorOnFailure(SetThreadEnabled(threadIsEnabled));
     // Delete Failsafe Keys after reverting.
@@ -209,7 +207,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::RevertActiveDataset()
 
 CHIP_ERROR GenericThreadBorderRouterDelegate::SetPendingDataset(const Thread::OperationalDataset & pendingDataset)
 {
-    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
 
     ScopedThreadLock threadLock;
@@ -222,10 +220,10 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::SetPendingDataset(const Thread::Op
 
 CHIP_ERROR GenericThreadBorderRouterDelegate::SetThreadEnabled(bool enabled)
 {
-    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
-    bool isEnabled        = (otThreadGetDeviceRole(otInst) != OT_DEVICE_ROLE_DISABLED);
-    bool isIp6Enabled     = otIp6IsEnabled(otInst);
+    bool isEnabled    = (otThreadGetDeviceRole(otInst) != OT_DEVICE_ROLE_DISABLED);
+    bool isIp6Enabled = otIp6IsEnabled(otInst);
     if (enabled && !isIp6Enabled)
     {
         ReturnErrorCodeIf(otIp6SetEnabled(otInst, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
@@ -243,7 +241,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::SetThreadEnabled(bool enabled)
 
 bool GenericThreadBorderRouterDelegate::GetThreadEnabled()
 {
-    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     return otInst && otIp6IsEnabled(otInst) && (otThreadGetDeviceRole(otInst) != OT_DEVICE_ROLE_DISABLED);
 }
 
