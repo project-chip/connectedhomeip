@@ -216,7 +216,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                .SetListenPort(mOperationalServicePort)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                           ,
+                               ,
                            Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
 #endif
     );

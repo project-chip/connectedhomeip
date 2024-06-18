@@ -587,10 +587,10 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mCommissioneeDeviceProxy = proxy;
     mNeedsNetworkSetup =
         (mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
-        Transport::Type::kBle)
+         Transport::Type::kBle)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         || (mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
-        Transport::Type::kWiFiPAF)
+            Transport::Type::kWiFiPAF)
 #endif
         ;
     CHIP_ERROR err               = CHIP_NO_ERROR;

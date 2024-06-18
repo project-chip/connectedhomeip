@@ -63,7 +63,6 @@ inline constexpr size_t kMaxDeviceTransportBlePendingPackets = 1;
 inline constexpr size_t kMaxDeviceTransportWiFiPAFPendingPackets = 1;
 #endif
 
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 inline constexpr size_t kMaxDeviceTransportTcpActiveConnectionCount = CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS;
 
@@ -106,7 +105,7 @@ struct DeviceControllerSystemStateParams
     Ble::BleLayer * bleLayer = nullptr;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    Transport::WiFiPAFLayer	*wifipaf_layer = nullptr;
+    Transport::WiFiPAFLayer * wifipaf_layer = nullptr;
 #endif
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
     Crypto::SessionKeystore * sessionKeystore          = nullptr;

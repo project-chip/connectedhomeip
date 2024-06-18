@@ -37,10 +37,9 @@ namespace Transport {
 class WiFiPAFLayer
 {
 public:
-	WiFiPAFLayer() = default;
+    WiFiPAFLayer() = default;
 };
 class WiFiPAFListenParameters;
-
 
 /**
  * Implements a transport using Wi-Fi-PAF
@@ -58,7 +57,7 @@ public:
         kInitialized = 1, /**< State after class is connected and ready. */
         kConnected   = 2, /**< Endpoint connected. */
     };
-    WiFiPAFBase()=default;
+    WiFiPAFBase() = default;
     WiFiPAFBase(System::PacketBufferHandle * packetBuffers, size_t packetBuffersSize) :
         mPendingPackets(packetBuffers), mPendingPacketsSize(packetBuffersSize)
     {}
@@ -75,18 +74,18 @@ public:
     {
         return (mState != State::kNotReady) && (address.GetTransportType() == Type::kWiFiPAF);
     }
-	void OnWiFiPAFMessageReceived(System::PacketBufferHandle && buffer);
-	void SetWiFiPAFState(State state) { mState = state; };
-	State GetWiFiPAFState() { return mState; };
+    void OnWiFiPAFMessageReceived(System::PacketBufferHandle && buffer);
+    void SetWiFiPAFState(State state) { mState = state; };
+    State GetWiFiPAFState() { return mState; };
 
 private:
     void ClearState();
-   /**
+    /**
      * Sends the specified message once a connection has been established.
      * @param msg - what buffer to send once a connection has been established.
      */
     CHIP_ERROR SendAfterConnect(System::PacketBufferHandle && msg);
-    State mState                    = State::kNotReady;
+    State mState = State::kNotReady;
 
     System::PacketBufferHandle * mPendingPackets;
     size_t mPendingPacketsSize;
@@ -102,16 +101,15 @@ private:
     System::PacketBufferHandle mPendingPackets[kPendingPacketSize];
 };
 
-
 /** Defines parameters for setting up the Wi-Fi PAF transport */
 class WiFiPAFListenParameters
 {
 public:
-	WiFiPAFListenParameters() = default;
-	explicit WiFiPAFListenParameters(WiFiPAFBase * layer) : mWiFiPAF(layer) {}
-private:
-	WiFiPAFBase * mWiFiPAF;
+    WiFiPAFListenParameters() = default;
+    explicit WiFiPAFListenParameters(WiFiPAFBase * layer) : mWiFiPAF(layer) {}
 
+private:
+    WiFiPAFBase * mWiFiPAF;
 };
 
 } // namespace Transport

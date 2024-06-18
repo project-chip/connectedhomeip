@@ -69,7 +69,6 @@
 #include <transport/raw/WiFiPAF.h>
 #endif
 
-
 #include <errno.h>
 #include <inttypes.h>
 #include <memory>
@@ -817,7 +816,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
     {
-        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != Transport::WiFiPAFBase::State::kConnected) {
+        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != Transport::WiFiPAFBase::State::kConnected)
+        {
             ChipLogProgress(Controller, "WiFi-PAF: Subscribing the NAN-USD devices");
             static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
             static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
@@ -833,15 +833,12 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                     usleep(kWiFiStartCheckTimeUsec);
                 }
             }
-            if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted()) {
+            if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+            {
                 ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(
-                this,
-                OnWiFiPAFSubscribeComplete,
-                OnWiFiPAFSubscribeError
-                );
+            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(this, OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
         }
         ChipLogProgress(Controller, "WiFi-PAF: Request to subscrib the NAN-USD device complete");
@@ -924,7 +921,7 @@ void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
         auto remoteId = device->GetDeviceId();
-        auto params = self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
+        auto params   = self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
 
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         self->ReleaseCommissioneeDevice(device);
