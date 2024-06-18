@@ -2382,7 +2382,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
         {
             // Need to capture before invoking status report since 'this' might be deallocated on successful completion of sigma3
             MetricKey key = (mState == State::kSentSigma3) ? kMetricDeviceCASESessionSigma3 : kMetricDeviceCASESessionSigma2Resume;
-            err      = HandleStatusReport(std::move(msg), /* successExpected*/ true);
+            err           = HandleStatusReport(std::move(msg), /* successExpected*/ true);
             MATTER_LOG_METRIC_END(key, err);
             IgnoreUnusedVariable(key);
         }
