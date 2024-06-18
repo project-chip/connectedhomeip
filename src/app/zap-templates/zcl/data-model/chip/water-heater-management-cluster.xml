@@ -16,13 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="Energy Management"/>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0094"/>
-    <field name="EnergyManagement" mask="0x01"/>
-    <field name="TankPercent" mask="0x02"/>
-  </bitmap>
-
-  <bitmap name="WaterHeaterDemandBitmap" type="bitmap8">
+  <bitmap name="WaterHeaterDemandBitmap" type="bitmap8" apiMaturity="provisional">
     <cluster code="0x0094"/>
     <field name="ImmersionElement1" mask="0x01"/>
     <field name="ImmersionElement2" mask="0x02"/>
@@ -31,7 +25,7 @@ limitations under the License.
     <field name="Other" mask="0x10"/>
   </bitmap>
 
-  <bitmap name="WaterHeaterTypeBitmap" type="bitmap8">
+  <bitmap name="WaterHeaterTypeBitmap" type="bitmap8" apiMaturity="provisional">
     <cluster code="0x0094"/>
     <field name="ImmersionElement1" mask="0x01"/>
     <field name="ImmersionElement2" mask="0x02"/>
@@ -40,19 +34,27 @@ limitations under the License.
     <field name="Other" mask="0x10"/>
   </bitmap>
 
-  <enum name="BoostStateEnum" type="enum8">
+  <enum name="BoostStateEnum" type="enum8" apiMaturity="provisional">
     <cluster code="0x0094"/>
     <item name="Inactive" value="0x00"/>
     <item name="Active" value="0x01"/>
   </enum>
 
-  <cluster code="0x0094">
+  <cluster code="0x0094" apiMaturity="provisional">
     <domain>Energy Management</domain>
     <name>Water Heater Management</name>
     <code>0x0094</code>
     <define>WATER_HEATER_MANAGEMENT_CLUSTER</define>
     <description>This cluster is used to allow clients to control the operation of a hot water heating appliance so that it can be used with energy management.</description>
     <client init="false" tick="false">true</client>
+    <features>
+      <feature bit="0" code="EM" name="EnergyManagement" summary="Allows energy management control of the tank">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="TP" name="TankPercent" summary="Supports monitoring the percentage of the water in the tank which is hot">
+        <optionalConform/>
+      </feature>
+    </features>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <attribute code="0x0000" side="server" define="HEATER_TYPES" type="WaterHeaterTypeBitmap" min="0x00" max="0x1F" default="0x00">HeaterTypes</attribute>
@@ -61,7 +63,7 @@ limitations under the License.
     <attribute code="0x0003" side="server" define="ESTIMATED_HEAT_REQUIRED" type="energy_mwh" default="0" optional="true">EstimatedHeatRequired</attribute>
     <attribute code="0x0004" side="server" define="TANK_PERCENTAGE" type="percent" default="0" optional="true">TankPercentage</attribute>
     <attribute code="0x0005" side="server" define="BOOST_STATE" type="BoostStateEnum" default="0" min="0x00" max="0x01">BoostState</attribute>
-    <command code="0x00" source="client" name="Boost" optional="false">
+    <command code="0x00" source="client" name="Boost" optional="false" apiMaturity="provisional">
       <description>Allows a client to request that the water heater is put into a Boost state.</description>
       <arg id="0" name="Duration" type="elapsed_s"/>
       <arg id="1" name="OneShot" type="boolean" optional="true" default="0"/>
@@ -72,7 +74,7 @@ limitations under the License.
       <access op="invoke" privilege="manage"/>
     </command>
 
-    <command code="0x01" source="client" name="CancelBoost" optional="false">
+    <command code="0x01" source="client" name="CancelBoost" optional="false" apiMaturity="provisional">
       <description>Allows a client to cancel an ongoing Boost operation.</description>
       <access op="invoke" privilege="manage"/>
     </command>
