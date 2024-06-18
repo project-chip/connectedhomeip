@@ -15,10 +15,8 @@
 import os
 import tempfile
 import unittest
-from typing import List
 
 from metadata import Metadata, MetadataReader
-
 
 class TestMetadataReader(unittest.TestCase):
 
