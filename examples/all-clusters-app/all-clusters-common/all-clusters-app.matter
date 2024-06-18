@@ -4068,64 +4068,6 @@ cluster ElectricalEnergyMeasurement = 145 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster is used to allow clients to control the operation of a hot water heating appliance so that it can be used with energy management. */
-provisional cluster WaterHeaterManagement = 148 {
-  revision 1;
-
-  enum BoostStateEnum : enum8 {
-    kInactive = 0;
-    kActive = 1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kEnergyManagement = 0x1;
-    kTankPercent = 0x2;
-  }
-
-  bitmap WaterHeaterDemandBitmap : bitmap8 {
-    kImmersionElement1 = 0x1;
-    kImmersionElement2 = 0x2;
-    kHeatPump = 0x4;
-    kBoiler = 0x8;
-    kOther = 0x10;
-  }
-
-  bitmap WaterHeaterTypeBitmap : bitmap8 {
-    kImmersionElement1 = 0x1;
-    kImmersionElement2 = 0x2;
-    kHeatPump = 0x4;
-    kBoiler = 0x8;
-    kOther = 0x10;
-  }
-
-  readonly attribute WaterHeaterTypeBitmap heaterTypes = 0;
-  readonly attribute WaterHeaterDemandBitmap heatDemand = 1;
-  readonly attribute optional int16u tankVolume = 2;
-  readonly attribute optional energy_mwh estimatedHeatRequired = 3;
-  readonly attribute optional percent tankPercentage = 4;
-  readonly attribute BoostStateEnum boostState = 5;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct BoostRequest {
-    elapsed_s duration = 0;
-    optional boolean oneShot = 1;
-    optional boolean emergencyBoost = 2;
-    optional temperature temporarySetpoint = 3;
-    optional percent targetPercentage = 4;
-    optional percent targetReheat = 5;
-  }
-
-  /** Allows a client to request that the water heater is put into a Boost state. */
-  command access(invoke: manage) Boost(BoostRequest): DefaultSuccess = 0;
-  /** Allows a client to cancel an ongoing Boost operation. */
-  command access(invoke: manage) CancelBoost(): DefaultSuccess = 1;
-}
-
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional cluster DeviceEnergyManagement = 152 {
   revision 4;
@@ -8395,21 +8337,6 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster WaterHeaterManagement {
-    ram      attribute heaterTypes default = 0x00;
-    ram      attribute heatDemand default = 0x00;
-    ram      attribute boostState default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-
-    handle command Boost;
-    handle command CancelBoost;
   }
 
   server cluster DeviceEnergyManagement {
