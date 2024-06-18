@@ -1646,6 +1646,18 @@ MTR_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct", 
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThreadNetworkDirectoryClusterThreadNetworkStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull extendedPanID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull networkName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull channel MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThreadNetworkDirectoryClusterNetworkChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull extendedPanID MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRChannelClusterProgramCastStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nonnull role MTR_PROVISIONALLY_AVAILABLE;

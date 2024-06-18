@@ -6617,6 +6617,98 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace WiFiNetworkManagement
 
+namespace ThreadBorderRouterManagement {
+namespace Attributes {
+
+namespace BorderRouterName {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace BorderRouterName
+
+namespace BorderAgentID {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace BorderAgentID
+
+namespace ThreadVersion {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ThreadVersion
+
+namespace InterfaceEnabled {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InterfaceEnabled
+
+namespace ActiveDatasetTimestamp {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ActiveDatasetTimestamp
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ThreadBorderRouterManagement
+
+namespace ThreadNetworkDirectory {
+namespace Attributes {
+
+namespace PreferredExtendedPanID {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PreferredExtendedPanID
+
+namespace ThreadNetworks {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ThreadNetworks
+
+namespace ThreadNetworkTableSize {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ThreadNetworkTableSize
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ThreadNetworkDirectory
+
 namespace WakeOnLan {
 namespace Attributes {
 

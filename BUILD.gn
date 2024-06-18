@@ -16,7 +16,6 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/nlassert.gni")
-import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
 
 import("//src/lwip/lwip.gni")
@@ -135,7 +134,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${chip_root}/src/system",
       "${chip_root}/src/transport",
       "${nlassert_root}:nlassert",
-      "${nlunit_test_root}:nlunit-test",
     ]
 
     if (enable_fuzz_test_targets) {

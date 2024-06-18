@@ -22,10 +22,18 @@ import("${chip_root}/src/lib/core/core.gni")
 
 assert(chip_build_tools)
 
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
 config("config") {
   include_dirs = [
     ".",
     "${chip_root}/examples/common",
+    "${chip_root}/examples/platform/linux",
     "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
@@ -39,6 +47,10 @@ config("config") {
   }
 
   cflags = [ "-Wconversion" ]
+
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
+  }
 }
 
 static_library("fabric-admin-utils") {
@@ -49,6 +61,8 @@ static_library("fabric-admin-utils") {
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
     "commands/clusters/ModelCommand.cpp",
     "commands/clusters/ModelCommand.h",
+    "commands/clusters/ReportCommand.cpp",
+    "commands/clusters/ReportCommand.h",
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
@@ -59,6 +73,7 @@ static_library("fabric-admin-utils") {
     "commands/common/HexConversion.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
+    "commands/fabric-sync/FabricSyncCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
@@ -94,6 +109,40 @@ static_library("fabric-admin-utils") {
   ]
 
   public_configs = [ ":config" ]
+
+  if (chip_enable_pw_rpc) {
+    defines = [
+      "PW_RPC_FABRIC_ADMIN_SERVICE=1",
+      "PW_RPC_FABRIC_BRIDGE_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/platform/linux/RpcClientProcessor.cpp",
+      "${chip_root}/examples/platform/linux/RpcClientProcessor.h",
+      "${chip_root}/examples/platform/linux/system_rpc_server.cc",
+      "rpc/RpcClient.cpp",
+      "rpc/RpcClient.h",
+      "rpc/RpcServer.cpp",
+      "rpc/RpcServer.h",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:default_addresses",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_log",
+      "$dir_pw_rpc:server",
+      "$dir_pw_rpc/system_server:facade",
+      "$dir_pw_rpc/system_server:socket",
+      "$dir_pw_stream:socket_stream",
+      "$dir_pw_sync:mutex",
+      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:fabric_admin_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:fabric_bridge_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:rpc_services",
+    ]
+
+    deps += pw_build_LINK_DEPS
+  }
 
   if (chip_enable_transport_trace) {
     public_deps +=

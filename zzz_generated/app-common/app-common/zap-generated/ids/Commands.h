@@ -1395,6 +1395,54 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace WiFiNetworkManagement
 
+namespace ThreadBorderRouterManagement {
+namespace Commands {
+
+namespace GetActiveDatasetRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetActiveDatasetRequest
+
+namespace GetPendingDatasetRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetPendingDatasetRequest
+
+namespace DatasetResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace DatasetResponse
+
+namespace SetActiveDatasetRequest {
+static constexpr CommandId Id = 0x00000004;
+} // namespace SetActiveDatasetRequest
+
+namespace SetPendingDatasetRequest {
+static constexpr CommandId Id = 0x00000005;
+} // namespace SetPendingDatasetRequest
+
+} // namespace Commands
+} // namespace ThreadBorderRouterManagement
+
+namespace ThreadNetworkDirectory {
+namespace Commands {
+
+namespace AddNetwork {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AddNetwork
+
+namespace RemoveNetwork {
+static constexpr CommandId Id = 0x00000001;
+} // namespace RemoveNetwork
+
+namespace GetOperationalDataset {
+static constexpr CommandId Id = 0x00000002;
+} // namespace GetOperationalDataset
+
+namespace OperationalDatasetResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace OperationalDatasetResponse
+
+} // namespace Commands
+} // namespace ThreadNetworkDirectory
+
 namespace Channel {
 namespace Commands {
 

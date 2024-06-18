@@ -34,6 +34,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -41,10 +42,24 @@ namespace app {
 struct StatusIB
 {
     StatusIB() = default;
-    StatusIB(Protocols::InteractionModel::Status imStatus) : mStatus(imStatus) {}
-    StatusIB(Protocols::InteractionModel::Status imStatus, ClusterStatus clusterStatus) :
+    explicit StatusIB(Protocols::InteractionModel::Status imStatus) : mStatus(imStatus) {}
+
+    explicit StatusIB(Protocols::InteractionModel::Status imStatus, ClusterStatus clusterStatus) :
         mStatus(imStatus), mClusterStatus(clusterStatus)
     {}
+
+    explicit StatusIB(const Protocols::InteractionModel::ClusterStatusCode & statusCode) : mStatus(statusCode.GetStatus())
+    {
+        // NOTE: Cluster-specific codes are only valid on SUCCESS/FAILURE IM status (7.10.7. Status Codes)
+        chip::Optional<ClusterStatus> clusterStatus = statusCode.GetClusterSpecificCode();
+        if (clusterStatus.HasValue())
+        {
+            mStatus        = statusCode.IsSuccess() ? Protocols::InteractionModel::Status::Success
+                                                    : Protocols::InteractionModel::Status::Failure;
+            mClusterStatus = clusterStatus;
+        }
+    }
+
     explicit StatusIB(CHIP_ERROR error) { InitFromChipError(error); }
 
     enum class Tag : uint8_t

@@ -347,12 +347,12 @@ Compile chip-tool:
 
 NOTE: use the target appropriate to your system
 
-[chiptool.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/yaml/chiptool.py)
+[chiptool.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/chipyaml/chiptool.py)
 can be used to run tests against a commissioned DUT (commissioned by chip-tool).
 This will start an interactive instance of chip-tool automatically.
 
 ```
-./scripts/tests/yaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool
+./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool
 
 ```
 
@@ -361,14 +361,14 @@ NOTE: substitute the appropriate test name and chip-tool path as appropriate.
 A list of available tests can be generated using:
 
 ```
-./scripts/tests/yaml/chiptool.py list
+./scripts/tests/chipyaml/chiptool.py list
 ```
 
 Config variables can be passed to chiptool.py after the script by separating
 with --
 
 ```
-./scripts/tests/yaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool -- nodeId 0x12344321
+./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool -- nodeId 0x12344321
 
 ```
 

@@ -461,6 +461,12 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ProgramCastStruct::Type & request,
                         Json::Value & value);
 

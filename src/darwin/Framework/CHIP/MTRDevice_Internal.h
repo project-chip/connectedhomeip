@@ -60,6 +60,7 @@ MTR_TESTABLE
 @property (nonatomic, readonly) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
 
 - (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute;
+- (void)removeValueForAttribute:(NSNumber *)attribute;
 
 - (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes;
 @end
@@ -115,6 +116,9 @@ MTR_TESTABLE
 #endif
 
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+
+// Returns whether this MTRDevice uses Thread for communication
+- (BOOL)deviceUsesThread;
 
 @end
 

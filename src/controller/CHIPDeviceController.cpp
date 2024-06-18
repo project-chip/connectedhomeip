@@ -793,10 +793,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
 
-            SetupDiscriminator discriminator;
-            discriminator.SetLongValue(params.GetDiscriminator());
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
-                              discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(),
+                                                                                          this, OnDiscoveredDeviceOverBleSuccess,
+                                                                                          OnDiscoveredDeviceOverBleError));
             ExitNow(CHIP_NO_ERROR);
         }
         else
@@ -1326,8 +1325,8 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
 
     if (commissioner->mPairingDelegate != nullptr)
     {
-        commissioner->mPairingDelegate->OnICDRegistrationComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
-                                                                  data.ICDCounter);
+        commissioner->mPairingDelegate->OnICDRegistrationComplete(
+            ScopedNodeId(commissioner->mDeviceBeingCommissioned->GetDeviceId(), commissioner->GetFabricIndex()), data.ICDCounter);
     }
 
 exit:
@@ -1346,8 +1345,10 @@ void DeviceCommissioner::OnICDManagementStayActiveResponse(
 
     if (commissioner->mPairingDelegate != nullptr)
     {
-        commissioner->mPairingDelegate->OnICDStayActiveComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
-                                                                data.promisedActiveDuration);
+        commissioner->mPairingDelegate->OnICDStayActiveComplete(
+
+            ScopedNodeId(commissioner->mDeviceBeingCommissioned->GetDeviceId(), commissioner->GetFabricIndex()),
+            data.promisedActiveDuration);
     }
 
 exit:

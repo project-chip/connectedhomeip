@@ -1,1 +1,1 @@
-53 : [Tizen] Add libatomic.so to QEMU Docker image
+55 : Update to Ubuntu 24.04 as the base build image

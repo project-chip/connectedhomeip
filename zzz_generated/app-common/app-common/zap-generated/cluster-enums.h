@@ -1492,6 +1492,7 @@ enum class Feature : uint32_t
     kMomentarySwitchRelease    = 0x4,
     kMomentarySwitchLongPress  = 0x8,
     kMomentarySwitchMultiPress = 0x10,
+    kActionSwitch              = 0x20,
 };
 } // namespace Switch
 
@@ -4324,6 +4325,17 @@ enum class Feature : uint32_t
 } // namespace RadonConcentrationMeasurement
 
 namespace WiFiNetworkManagement {} // namespace WiFiNetworkManagement
+
+namespace ThreadBorderRouterManagement {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPANChange = 0x1,
+};
+} // namespace ThreadBorderRouterManagement
+
+namespace ThreadNetworkDirectory {} // namespace ThreadNetworkDirectory
 
 namespace WakeOnLan {} // namespace WakeOnLan
 
