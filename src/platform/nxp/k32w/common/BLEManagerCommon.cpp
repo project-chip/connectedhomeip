@@ -374,20 +374,6 @@ bool BLEManagerCommon::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipB
     return false;
 }
 
-bool BLEManagerCommon::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                       PacketBufferHandle pBuf)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendReadRequest() not supported");
-    return false;
-}
-
-bool BLEManagerCommon::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                        const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerCommon::SendReadResponse() not supported");
-    return false;
-}
-
 void BLEManagerCommon::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     BLEMgrImpl().CloseConnection(conId);

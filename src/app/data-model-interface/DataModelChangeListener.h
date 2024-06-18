@@ -22,7 +22,8 @@ namespace chip {
 namespace app {
 namespace InteractionModel {
 
-/// Notification listener for attribute changes.
+/// Notification listener for changes of the underlying data in a
+/// data model.
 ///
 /// Used to notify that a specific attribute path (or several attributes
 /// via wildcards) have changed their underlying content.
@@ -30,10 +31,10 @@ namespace InteractionModel {
 /// Methods on this class MUST be called from within the matter
 /// main loop as they will likely trigger interaction model
 /// internal updates and subscription data reporting.
-class Paths
+class DataModelChangeListener
 {
 public:
-    virtual ~Paths() = 0;
+    virtual ~DataModelChangeListener() = 0;
 
     /// Mark all attributes matching the given path (which may be a wildcard) dirty.
     ///

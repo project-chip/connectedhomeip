@@ -28,4 +28,7 @@ chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 matter_enable_tracing_support = true
 
+chip_enable_additional_data_advertising = true
+chip_enable_rotating_device_id = true
+
 chip_enable_read_client = false

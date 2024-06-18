@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#include <app/interaction-model/ActionContext.h>
-#include <app/interaction-model/Events.h>
-#include <app/interaction-model/Paths.h>
+#include <app/data-model-interface/ActionContext.h>
+#include <app/data-model-interface/DataModelChangeListener.h>
+#include <app/data-model-interface/EventsGenerator.h>
 
 namespace chip {
 namespace app {
@@ -31,8 +31,8 @@ namespace InteractionModel {
 /// as well as fetching current state (via actionContext)
 struct InteractionModelContext
 {
-    Events * events;
-    Paths * paths;
+    EventsGenerator * eventsGenerator;
+    DataModelChangeListener * dataModelChangeListener;
     ActionContext * actionContext;
 };
 

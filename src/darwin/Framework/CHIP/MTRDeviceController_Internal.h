@@ -268,6 +268,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSNumber * _Nullable)syncGetCompressedFabricID;
 
+/**
+ * Since getSessionForNode now enqueues by the subscription pool for Thread
+ * devices, MTRDevice needs a direct non-queued access because it already
+ * makes use of the subscription pool.
+ */
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+
 @end
 
 NS_ASSUME_NONNULL_END

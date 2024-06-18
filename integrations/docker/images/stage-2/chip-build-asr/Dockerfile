@@ -5,6 +5,8 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    bzip2 \
+    tar \
     wget \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \

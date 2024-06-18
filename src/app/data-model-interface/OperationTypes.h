@@ -85,7 +85,6 @@ enum class InvokeFlags : uint32_t
 struct InvokeRequest : OperationRequest
 {
     ConcreteCommandPath path;
-    std::optional<GroupId> groupRequestId; // set if and only if this was a group request
     BitFlags<InvokeFlags> invokeFlags;
 };
 
