@@ -30,6 +30,16 @@
 - (dispatch_queue_t _Nonnull)clientQueue;
 
 /**
+ * @brief Updates the MCCommissionableData object stored inside MCAppParametersDataSource, which was used to
+ * initialize the MCCastingApp. This function needs to be implemented by the client in use cases where the
+ * MCCommissionableData needs to be updated post-initialization. For example, when the Commissioner-Generated
+ * Passcode feature is used.
+ *
+ * @param newCommissionableData The new MCCommissionableData object to be used for the next commissioning session.
+ */
+- (void)update:(MCCommissionableData * _Nonnull)newCommissionableData;
+
+/**
  * @brief Provide UniqueId used to generate the RotatingDeviceId advertised during commissioning by the MCCastingApp
  * Must be at least 16 bytes (i.e. ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength)
  */

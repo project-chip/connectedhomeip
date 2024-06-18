@@ -30,69 +30,83 @@ class MCMediaPlaybackSubscribeToCurrentStateExampleViewModel: ObservableObject {
 
     func subscribe(castingPlayer: MCCastingPlayer)
     {
-        // select the MCEndpoint on the MCCastingPlayer to invoke the command on
-        if let endpoint: MCEndpoint = castingPlayer.endpoints().filter({ $0.vendorId().intValue == sampleEndpointVid}).first
-        {
-            // validate that the selected endpoint supports the MediaPlayback cluster
-            if(!endpoint.hasCluster(MCEndpointClusterTypeMediaPlayback))
-            {
-                self.Log.error("No MediaPlayback cluster supporting endpoint found")
-                DispatchQueue.main.async
-                {
-                    self.status = "No MediaPlayback cluster supporting endpoint found"
-                }
-                return
-            }
-            
-            // get MediaPlayback cluster from the endpoint
-            let mediaPlaybackCluster: MCMediaPlaybackCluster = endpoint.cluster(for: MCEndpointClusterTypeMediaPlayback) as! MCMediaPlaybackCluster
+        self.Log.info("MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.subscribe()")
+        castingPlayer.logAllEndpoints()
+        var selectedEndpoint: MCEndpoint?
 
-            // get the currentStateAttribute from the mediaPlaybackCluster
-            let currentStateAttribute: MCMediaPlaybackClusterCurrentStateAttribute? = mediaPlaybackCluster.currentStateAttribute()
-            if(currentStateAttribute == nil)
-            {
-                self.Log.error("CurrentState attribute not supported on cluster")
-                DispatchQueue.main.async
-                {
-                    self.status = "CurrentState attribute not supported on cluster"
-                }
-                return
-            }
-                
-                    
-            // call read on currentStateAttribute and pass in a completion block
-            currentStateAttribute!.subscribe(nil, completion: { context, before, after, err in
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "HH:mm:ss"
-                let currentTime = dateFormatter.string(from: Date())
-                DispatchQueue.main.async
-                {
-                    if(err != nil)
-                    {
-                        self.Log.error("Error when reading CurrentState value \(String(describing: err)) at \(currentTime)")
-                        self.status = "Error when reading CurrentState value \(String(describing: err)) at \(currentTime)"
-                        return
-                    }
-                    if(before != nil)
-                    {
-                        self.Log.info("Read CurrentState value: \(String(describing: after)) Before: \(String(describing: before)) at \(currentTime)")
-                        self.status = "Read CurrentState value: \(String(describing: after)) Before: \(String(describing: before)) at \(currentTime)"
-                    }
-                    else
-                    {
-                        self.Log.info("Read CurrentState value: \(String(describing: after)) at \(currentTime)")
-                        self.status = "Read CurrentState value: \(String(describing: after)) at \(currentTime)"
-                    }
-                }
-            }, minInterval: 0, maxInterval: 1)
+        // select the MCEndpoint on the MCCastingPlayer to invoke the command on
+        if let endpoint = castingPlayer.endpoints().filter({ $0.vendorId().intValue == sampleEndpointVid }).first {
+            selectedEndpoint = endpoint
+        // For the example Commissioner-Generated passcode commissioning flow, run demo interactions with the Endpoint with
+        // ID 1. For this flow, we commissioned with the Target Content Application with Vendor ID 1111. Since this target
+        // content application does not report its Endpoint's Vendor IDs, we find the desired endpoint based on the Endpoint
+        // ID. See connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
+        } else if let endpoint = castingPlayer.endpoints().filter({ $0.identifier().intValue == 1 }).first {
+            self.Log.info("MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.subscribe() No endpoint matching the sampleEndpointVid: \(String(describing: self.sampleEndpointVid)), but found endpoint with identifier: 1")
+            selectedEndpoint = endpoint
         }
-        else
+
+        guard let endpoint = selectedEndpoint else {
+            self.Log.error("No endpoint matching the example VID or identifier 1 found")
+            DispatchQueue.main.async {
+                self.status = "No endpoint matching the example VID or identifier 1 found"
+            }
+            return
+        }
+
+        self.Log.info("MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.subscribe() selected endpoint: \(endpoint.description)")
+
+        // validate that the selected endpoint supports the MediaPlayback cluster
+        if(!endpoint.hasCluster(MCEndpointClusterTypeMediaPlayback))
         {
-            self.Log.error("No endpoint matching the example VID found")
+            self.Log.error("No MediaPlayback cluster supporting endpoint found")
             DispatchQueue.main.async
             {
-                self.status = "No endpoint matching the example VID found"
+                self.status = "No MediaPlayback cluster supporting endpoint found"
             }
+            return
         }
+        
+        // get MediaPlayback cluster from the endpoint
+        let mediaPlaybackCluster: MCMediaPlaybackCluster = endpoint.cluster(for: MCEndpointClusterTypeMediaPlayback) as! MCMediaPlaybackCluster
+
+        // get the currentStateAttribute from the mediaPlaybackCluster
+        let currentStateAttribute: MCMediaPlaybackClusterCurrentStateAttribute? = mediaPlaybackCluster.currentStateAttribute()
+        if(currentStateAttribute == nil)
+        {
+            self.Log.error("CurrentState attribute not supported on cluster")
+            DispatchQueue.main.async
+            {
+                self.status = "CurrentState attribute not supported on cluster"
+            }
+            return
+        }
+            
+                
+        // call read on currentStateAttribute and pass in a completion block
+        currentStateAttribute!.subscribe(nil, completion: { context, before, after, err in
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "HH:mm:ss"
+            let currentTime = dateFormatter.string(from: Date())
+            DispatchQueue.main.async
+            {
+                if(err != nil)
+                {
+                    self.Log.error("Error when reading CurrentState value \(String(describing: err)) at \(currentTime)")
+                    self.status = "Error when reading CurrentState value \(String(describing: err)) at \(currentTime)"
+                    return
+                }
+                if(before != nil)
+                {
+                    self.Log.info("Read CurrentState value: \(String(describing: after)) Before: \(String(describing: before)) at \(currentTime)")
+                    self.status = "Read CurrentState value: \(String(describing: after)) Before: \(String(describing: before)) at \(currentTime)"
+                }
+                else
+                {
+                    self.Log.info("Read CurrentState value: \(String(describing: after)) at \(currentTime)")
+                    self.status = "Read CurrentState value: \(String(describing: after)) at \(currentTime)"
+                }
+            }
+        }, minInterval: 0, maxInterval: 1)
     }
 }

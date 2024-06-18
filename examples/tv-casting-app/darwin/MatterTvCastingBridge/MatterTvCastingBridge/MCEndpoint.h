@@ -41,6 +41,9 @@
 - (BOOL)hasCluster:(MCEndpointClusterType)type;
 - (MCCluster * _Nullable)clusterForType:(MCEndpointClusterType)type;
 
+- (NSString * _Nonnull)description;
+- (void)logDetail;
+
 @end
 
 #endif /* MCEndpoint_h */

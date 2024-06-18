@@ -43,6 +43,16 @@
 - (NSError * _Nullable)initializeWithDataSource:(id<MCDataSource> _Nonnull)dataSource;
 
 /**
+ * @brief Updates the MCCommissionableDataProvider stored in this CastingApp with the new CommissionableData
+ * to be used for the next commissioning session. Calling this function is mandatory for the
+ * Casting Player/Commissioner-Generated passcode commissioning flow, since the commissioning session's PAKE
+ * verifier needs to be updated with the user entered passcode.
+ *
+ * @param newCommissionableData the new MCCommissionableData to be used for the next commissioning session.
+ */
+- (NSError * _Nullable)updateCommissionableDataProvider:(MCCommissionableData * _Nonnull)newCommissionableData;
+
+/**
  * @brief (async) Starts the Matter server that the MCCastingApp runs on and registers all the necessary delegates
  */
 - (void)startWithCompletionBlock:(void (^_Nonnull __strong)(NSError * _Nullable __strong))completion;

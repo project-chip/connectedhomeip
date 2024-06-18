@@ -7,8 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		393039D52C1CF3C500DE8681 /* MCIdentificationDeclarationOptions_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 393039D42C1CF3C500DE8681 /* MCIdentificationDeclarationOptions_Internal.h */; };
+		3938C1ED2C1A1C8D009B2B35 /* MCCommissionerDeclaration_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 3938C1EC2C1A1C8D009B2B35 /* MCCommissionerDeclaration_Internal.h */; };
 		39589F162B91556B00BE040C /* MCInteractionModelStructs.h in Headers */ = {isa = PBXBuildFile; fileRef = 39589F152B91556B00BE040C /* MCInteractionModelStructs.h */; };
 		39589F182B91557700BE040C /* MCInteractionModelStructs.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39589F172B91557700BE040C /* MCInteractionModelStructs.mm */; };
+		395BF6AF2C18EC7C00C73CE2 /* MCTargetAppInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 395BF6AE2C18EC7C00C73CE2 /* MCTargetAppInfo.mm */; };
+		399BCE1E2C13CBAD0075AA85 /* MCTargetAppInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 399BCE1D2C13CBAD0075AA85 /* MCTargetAppInfo.h */; };
 		39BF57C52B8CFF790081653C /* MCAttributeObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 39BF57C42B8CFF790081653C /* MCAttributeObjects.h */; };
 		39BF57C72B8CFFB90081653C /* MCAttributeObjects.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39BF57C62B8CFFB90081653C /* MCAttributeObjects.mm */; };
 		39BF57C92B8D66540081653C /* NSStringSpanConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 39BF57C82B8D66540081653C /* NSStringSpanConversion.h */; };
@@ -19,6 +23,12 @@
 		39D4D2522B97943D00BF3CFE /* MCCommandObjects.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39D4D2512B97943D00BF3CFE /* MCCommandObjects.mm */; };
 		39DB29E92B9A3B1D0071334A /* MCCommandPayloads.h in Headers */ = {isa = PBXBuildFile; fileRef = 39DB29E82B9A3B1D0071334A /* MCCommandPayloads.h */; };
 		39DB29EB2B9A3B2D0071334A /* MCCommandPayloads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39DB29EA2B9A3B2D0071334A /* MCCommandPayloads.mm */; };
+		39F589DA2C176EA4000AAADD /* MCIdentificationDeclarationOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 39F589D92C176EA4000AAADD /* MCIdentificationDeclarationOptions.h */; };
+		39F589DC2C176EC0000AAADD /* MCIdentificationDeclarationOptions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39F589DB2C176EC0000AAADD /* MCIdentificationDeclarationOptions.mm */; };
+		39F589DE2C1781C8000AAADD /* MCCommissionerDeclaration.h in Headers */ = {isa = PBXBuildFile; fileRef = 39F589DD2C1781C8000AAADD /* MCCommissionerDeclaration.h */; };
+		39F589E02C1781E4000AAADD /* MCCommissionerDeclaration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39F589DF2C1781E4000AAADD /* MCCommissionerDeclaration.mm */; };
+		39F589E22C179A09000AAADD /* MCConnectionCallbacks.h in Headers */ = {isa = PBXBuildFile; fileRef = 39F589E12C179A09000AAADD /* MCConnectionCallbacks.h */; };
+		39F589E42C179A18000AAADD /* MCConnectionCallbacks.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39F589E32C179A18000AAADD /* MCConnectionCallbacks.mm */; };
 		3C0474062B3F7E5F0012AE95 /* MCEndpointFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C0474052B3F7E5F0012AE95 /* MCEndpointFilter.h */; };
 		3C04740C2B4604CF0012AE95 /* MCCryptoUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C04740B2B4604CF0012AE95 /* MCCryptoUtils.h */; };
 		3C04740E2B4605B40012AE95 /* MCCryptoUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C04740D2B4605B40012AE95 /* MCCryptoUtils.mm */; };
@@ -81,9 +91,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		393039D42C1CF3C500DE8681 /* MCIdentificationDeclarationOptions_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCIdentificationDeclarationOptions_Internal.h; sourceTree = "<group>"; };
+		3938C1EC2C1A1C8D009B2B35 /* MCCommissionerDeclaration_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommissionerDeclaration_Internal.h; sourceTree = "<group>"; };
 		39589F152B91556B00BE040C /* MCInteractionModelStructs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCInteractionModelStructs.h; sourceTree = "<group>"; };
 		39589F172B91557700BE040C /* MCInteractionModelStructs.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCInteractionModelStructs.mm; sourceTree = "<group>"; };
+		395BF6AE2C18EC7C00C73CE2 /* MCTargetAppInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCTargetAppInfo.mm; sourceTree = "<group>"; };
 		399049A62B9FC4ED000C91F0 /* MCCommandPayloads_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommandPayloads_Internal.h; sourceTree = "<group>"; };
+		399BCE1D2C13CBAD0075AA85 /* MCTargetAppInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCTargetAppInfo.h; sourceTree = "<group>"; };
 		39BF57C42B8CFF790081653C /* MCAttributeObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCAttributeObjects.h; sourceTree = "<group>"; };
 		39BF57C62B8CFFB90081653C /* MCAttributeObjects.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCAttributeObjects.mm; sourceTree = "<group>"; };
 		39BF57C82B8D66540081653C /* NSStringSpanConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSStringSpanConversion.h; sourceTree = "<group>"; };
@@ -94,6 +108,12 @@
 		39D4D2512B97943D00BF3CFE /* MCCommandObjects.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCommandObjects.mm; sourceTree = "<group>"; };
 		39DB29E82B9A3B1D0071334A /* MCCommandPayloads.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommandPayloads.h; sourceTree = "<group>"; };
 		39DB29EA2B9A3B2D0071334A /* MCCommandPayloads.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCommandPayloads.mm; sourceTree = "<group>"; };
+		39F589D92C176EA4000AAADD /* MCIdentificationDeclarationOptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCIdentificationDeclarationOptions.h; sourceTree = "<group>"; };
+		39F589DB2C176EC0000AAADD /* MCIdentificationDeclarationOptions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCIdentificationDeclarationOptions.mm; sourceTree = "<group>"; };
+		39F589DD2C1781C8000AAADD /* MCCommissionerDeclaration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommissionerDeclaration.h; sourceTree = "<group>"; };
+		39F589DF2C1781E4000AAADD /* MCCommissionerDeclaration.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCommissionerDeclaration.mm; sourceTree = "<group>"; };
+		39F589E12C179A09000AAADD /* MCConnectionCallbacks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCConnectionCallbacks.h; sourceTree = "<group>"; };
+		39F589E32C179A18000AAADD /* MCConnectionCallbacks.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCConnectionCallbacks.mm; sourceTree = "<group>"; };
 		3C0474052B3F7E5F0012AE95 /* MCEndpointFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCEndpointFilter.h; sourceTree = "<group>"; };
 		3C04740B2B4604CF0012AE95 /* MCCryptoUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCryptoUtils.h; sourceTree = "<group>"; };
 		3C04740D2B4605B40012AE95 /* MCCryptoUtils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCryptoUtils.mm; sourceTree = "<group>"; };
@@ -276,6 +296,16 @@
 				3C4F52132B4F31DC00BB8A10 /* MCDeviceTypeStruct.h */,
 				3C4F52152B4F31FA00BB8A10 /* MCDeviceTypeStruct.m */,
 				3C0474052B3F7E5F0012AE95 /* MCEndpointFilter.h */,
+				399BCE1D2C13CBAD0075AA85 /* MCTargetAppInfo.h */,
+				395BF6AE2C18EC7C00C73CE2 /* MCTargetAppInfo.mm */,
+				39F589E12C179A09000AAADD /* MCConnectionCallbacks.h */,
+				39F589E32C179A18000AAADD /* MCConnectionCallbacks.mm */,
+				39F589DD2C1781C8000AAADD /* MCCommissionerDeclaration.h */,
+				3938C1EC2C1A1C8D009B2B35 /* MCCommissionerDeclaration_Internal.h */,
+				39F589DF2C1781E4000AAADD /* MCCommissionerDeclaration.mm */,
+				39F589D92C176EA4000AAADD /* MCIdentificationDeclarationOptions.h */,
+				393039D42C1CF3C500DE8681 /* MCIdentificationDeclarationOptions_Internal.h */,
+				39F589DB2C176EC0000AAADD /* MCIdentificationDeclarationOptions.mm */,
 				3C2696FA2B4A5FC50026E771 /* MCEndpointFilter.m */,
 				3CF71C0D2A992DA2003A5CE5 /* MCDataSource.h */,
 				3CF71C0F2A99312D003A5CE5 /* MCCommissionableData.h */,
@@ -312,6 +342,7 @@
 				3C2346212B362B4F00FA276E /* MCCastingPlayer.h in Headers */,
 				3C2346232B362B9500FA276E /* MCCastingPlayerDiscovery.h in Headers */,
 				3CF71C0E2A992DA2003A5CE5 /* MCDataSource.h in Headers */,
+				3938C1ED2C1A1C8D009B2B35 /* MCCommissionerDeclaration_Internal.h in Headers */,
 				3C4F52142B4F31DC00BB8A10 /* MCDeviceTypeStruct.h in Headers */,
 				39BF57CD2B8FC0EF0081653C /* MCClusterObjects.h in Headers */,
 				39D4D2502B97942D00BF3CFE /* MCCommandObjects.h in Headers */,
@@ -319,12 +350,16 @@
 				3CD73F1C2A9E8396009D82D1 /* MCCommissionableDataProvider.h in Headers */,
 				3C4F521E2B4F4B3B00BB8A10 /* MCEndpoint_Internal.h in Headers */,
 				39BF57C92B8D66540081653C /* NSStringSpanConversion.h in Headers */,
+				399BCE1E2C13CBAD0075AA85 /* MCTargetAppInfo.h in Headers */,
 				39DB29E92B9A3B1D0071334A /* MCCommandPayloads.h in Headers */,
+				39F589DE2C1781C8000AAADD /* MCCommissionerDeclaration.h in Headers */,
 				3C4F52262B50899700BB8A10 /* MCCluster_Internal.h in Headers */,
+				39F589DA2C176EA4000AAADD /* MCIdentificationDeclarationOptions.h in Headers */,
 				3CF71C0A2A992D0D003A5CE5 /* MCCastingApp.h in Headers */,
 				3C4F521C2B4F4B1B00BB8A10 /* MCCastingPlayer_Internal.h in Headers */,
 				3CD73F172A9E6884009D82D1 /* MCRotatingDeviceIdUniqueIdProvider.h in Headers */,
 				3C4F52102B4E18C800BB8A10 /* MCEndpoint.h in Headers */,
+				393039D52C1CF3C500DE8681 /* MCIdentificationDeclarationOptions_Internal.h in Headers */,
 				3C4F52282B51DB3000BB8A10 /* MCCommand.h in Headers */,
 				39BF57CB2B8E54F80081653C /* NSDataSpanConversion.h in Headers */,
 				3C621CA92B605C52005CDBA3 /* MCAttribute_Internal.h in Headers */,
@@ -336,6 +371,7 @@
 				39589F162B91556B00BE040C /* MCInteractionModelStructs.h in Headers */,
 				3C9437922B3B478E0096E5F4 /* MCErrorUtils.h in Headers */,
 				3C4F52222B507C9300BB8A10 /* MCCluster.h in Headers */,
+				39F589E22C179A09000AAADD /* MCConnectionCallbacks.h in Headers */,
 				3CCB8741286A593700771BAD /* DiscoveredNodeData.h in Headers */,
 				3C0474062B3F7E5F0012AE95 /* MCEndpointFilter.h in Headers */,
 				3CCB87212869085400771BAD /* MatterTvCastingBridge.h in Headers */,
@@ -449,18 +485,22 @@
 				39BF57CF2B8FC1030081653C /* MCClusterObjects.mm in Sources */,
 				3CD73F192A9E68A7009D82D1 /* MCRotatingDeviceIdUniqueIdProvider.mm in Sources */,
 				39589F182B91557700BE040C /* MCInteractionModelStructs.mm in Sources */,
+				39F589DC2C176EC0000AAADD /* MCIdentificationDeclarationOptions.mm in Sources */,
 				39DB29EB2B9A3B2D0071334A /* MCCommandPayloads.mm in Sources */,
 				3CF8532728E37F1000F07B9F /* MatterError.mm in Sources */,
 				3C4F522C2B51E02800BB8A10 /* MCCommand.mm in Sources */,
+				395BF6AF2C18EC7C00C73CE2 /* MCTargetAppInfo.mm in Sources */,
 				3C4E53B628E5595A00F293E8 /* ContentLauncherTypes.mm in Sources */,
 				3C81C75028F7A7D3001CB9D1 /* VideoPlayer.m in Sources */,
 				3CF71C0C2A992D25003A5CE5 /* MCCastingApp.mm in Sources */,
 				3CC3979E2BE9857C00465462 /* MCCastingPlayer.mm in Sources */,
 				3C621CAB2B605C6E005CDBA3 /* MCAttribute.mm in Sources */,
+				39F589E42C179A18000AAADD /* MCConnectionCallbacks.mm in Sources */,
 				3C4F52122B4E18ED00BB8A10 /* MCEndpoint.mm in Sources */,
 				3C4E53B028E4F28100F293E8 /* MediaPlaybackTypes.mm in Sources */,
 				3C04740E2B4605B40012AE95 /* MCCryptoUtils.mm in Sources */,
 				3CD73F1E2A9E83C1009D82D1 /* MCCommissionableDataProvider.mm in Sources */,
+				39F589E02C1781E4000AAADD /* MCCommissionerDeclaration.mm in Sources */,
 				3CD73F222A9EA078009D82D1 /* MCDeviceAttestationCredentials.mm in Sources */,
 				39BF57C72B8CFFB90081653C /* MCAttributeObjects.mm in Sources */,
 				3C2346252B362BBB00FA276E /* MCCastingPlayerDiscovery.mm in Sources */,

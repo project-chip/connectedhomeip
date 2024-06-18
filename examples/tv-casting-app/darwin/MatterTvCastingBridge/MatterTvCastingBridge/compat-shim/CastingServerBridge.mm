@@ -24,8 +24,10 @@
 #import "MCCastingApp.h"
 #import "MCCastingPlayerDiscovery.h"
 #import "MCCastingPlayer_Internal.h"
+#import "MCConnectionCallbacks.h"
 #import "MCEndpoint.h"
 #import "MCErrorUtils.h"
+#import "MCIdentificationDeclarationOptions.h"
 
 #import "MatterCallbacks.h"
 #import "OnboardingPayload.h"
@@ -226,11 +228,20 @@ static const uint32_t kTargetPlayerDeviceType = 0x23;
 {
     ChipLogProgress(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() called with desiredContentAppVendorId: %d", desiredContentAppVendorId);
 
-    MCEndpointFilter * filter = [MCEndpointFilter new];
-    filter.vendorId = desiredContentAppVendorId;
+    MCIdentificationDeclarationOptions * identificationDeclarationOptions = [[MCIdentificationDeclarationOptions alloc] init];
+    MCTargetAppInfo * targetAppInfo = [[MCTargetAppInfo alloc] init];
+    targetAppInfo.vendorId = desiredContentAppVendorId;
+    BOOL success = [identificationDeclarationOptions addTargetAppInfo:targetAppInfo];
+    if (success) {
+        ChipLogProgress(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() Target app info added successfully");
+    } else {
+        ChipLogProgress(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() Failed to add target app info");
+    }
+    [identificationDeclarationOptions logDetail];
 
-    [commissioner.getCastingPlayer verifyOrEstablishConnectionWithCompletionBlock:^(NSError * _Nullable err) {
+    void (^connectionCompletionBlock)(NSError * _Nullable) = ^(NSError * _Nullable err) {
         dispatch_async(clientQueue, ^{
+            ChipLogError(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() connectionCompleteCallback() completed with error: %@", err.description);
             if (err == nil) {
                 if (self->_commissioningCallbackHandlers != nil && self->_commissioningCallbackHandlers.commissioningCompleteCallback != nil) {
                     self->_commissioningCallbackHandlers.commissioningCompleteCallback(MATTER_NO_ERROR);
@@ -249,7 +260,11 @@ static const uint32_t kTargetPlayerDeviceType = 0x23;
                 }
             }
         });
-    } desiredEndpointFilter:filter];
+    };
+
+    MCConnectionCallbacks * connectionCallbacks = [[MCConnectionCallbacks alloc] initWithCallbacks:connectionCompletionBlock commissionerDeclarationCallback:nil];
+
+    [commissioner.getCastingPlayer verifyOrEstablishConnectionWithCallbacks:connectionCallbacks identificationDeclarationOptions:identificationDeclarationOptions];
 
     dispatch_async(clientQueue, ^{
         udcRequestSentHandler(MATTER_NO_ERROR);

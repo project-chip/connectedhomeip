@@ -43,6 +43,10 @@
 // queue used to perform all work performed by the MatterTvCastingBridge
 @property (atomic) dispatch_queue_t workQueue;
 
+// used to update the commissionableDataProvider post initialization, this is necessary for the
+// Commissioner-Generated passcode commissioning feature.
+@property (nonatomic, strong) id<MCDataSource> dataSource;
+
 @end
 
 @implementation MCCastingApp
@@ -69,7 +73,8 @@
 
 - (NSError *)initializeWithDataSource:(id)dataSource
 {
-    ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource called");
+    ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() called");
+    _dataSource = dataSource;
 
     // get the clientQueue
     VerifyOrReturnValue([dataSource clientQueue] != nil, [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
@@ -78,6 +83,7 @@
     // Initialize cpp Providers
     VerifyOrReturnValue(_uniqueIdProvider.Initialize(dataSource) == CHIP_NO_ERROR, [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
 
+    ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() calling MCCommissionableDataProvider.Initialize()");
     _commissionableDataProvider = new matter::casting::support::MCCommissionableDataProvider();
     VerifyOrReturnValue(_commissionableDataProvider->Initialize(dataSource) == CHIP_NO_ERROR, [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
 
@@ -92,12 +98,33 @@
             == CHIP_NO_ERROR,
         [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
 
+    ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() calling cpp CastingApp::Initialize()");
     // Initialize cpp CastingApp
     VerifyOrReturnValue(matter::casting::core::CastingApp::GetInstance()->Initialize(_appParameters) == CHIP_NO_ERROR,
         [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
 
     // Get and store the CHIP Work queue
     _workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+
+    return [MCErrorUtils NSErrorFromChipError:CHIP_NO_ERROR];
+}
+
+- (NSError *)updateCommissionableDataProvider:(MCCommissionableData *)newCommissionableData
+{
+    ChipLogProgress(AppServer, "MCCastingApp.UpdateCommissionableDataProvider() called");
+
+    if (_dataSource) {
+        [_dataSource update:newCommissionableData];
+    }
+
+    _commissionableDataProvider = new matter::casting::support::MCCommissionableDataProvider();
+    VerifyOrReturnValue(_commissionableDataProvider->Initialize(_dataSource) == CHIP_NO_ERROR,
+        [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
+
+    ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() calling cpp CastingApp::UpdateCommissionableDataProvider()");
+    // Update cpp CastingApp CommissionableDataProvider
+    VerifyOrReturnValue(matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(_commissionableDataProvider) == CHIP_NO_ERROR,
+        [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
 
     return [MCErrorUtils NSErrorFromChipError:CHIP_NO_ERROR];
 }
