@@ -13,15 +13,14 @@ RUN set -x \
     && : # last line
 
 
-# Clone Gecko SDK 4.4.2 (e359ba4)
-RUN wget https://github.com/SiliconLabs/gecko_sdk/releases/download/v4.4.2/gecko-sdk.zip -O /tmp/gecko_sdk.zip \
-    && unzip /tmp/gecko_sdk.zip -d /tmp/gecko_sdk \
-    && rm -rf /tmp/gecko_sdk.zip \
+# Download Simplicity SDK v2024.6.0 (a1a37fa)
+RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2024.6.0/sisdk-sdk.zip -O /tmp/simplicity_sdk.zip \
+    && unzip /tmp/simplicity_sdk.zip -d /tmp/simplicity_sdk \
+    && rm -rf /tmp/simplicity_sdk.zip \
     # Deleting files that are not needed to save space
-    && rm -rf /tmp/gecko_sdk/protocol/flex /tmp/gecko_sdk/protocol/z-wave /tmp/gecko_sdk/protocol/zigbee /tmp/gecko_sdk/protocol/wisun \
-    && find /tmp/gecko_sdk/protocol/bluetooth /tmp/gecko_sdk/platform -name "*.a" -type f -delete \
-    && find /tmp/gecko_sdk/protocol/openthread -name "*efr32mg21*" -delete \
-    && find /tmp/gecko_sdk/protocol/openthread -name "*efr32mg13*" -delete \
+    && rm -rf /tmp/simplicity_sdk/protocol/flex /tmp/simplicity_sdk/protocol/z-wave /tmp/simplicity_sdk/protocol/zigbee /tmp/simplicity_sdk/protocol/wisun \
+    && find /tmp/simplicity_sdk/protocol/bluetooth /tmp/simplicity_sdk/platform -name "*.a" -type f -delete \
+    && find /tmp/simplicity_sdk/protocol/openthread -name "*efr32mg21*" -delete \
     && : # last line
 
 # Clone WiSeConnect Wi-Fi and Bluetooth Software 2.8.2 (4fa5c5f)
@@ -30,8 +29,8 @@ RUN git clone --depth=1 --single-branch --branch=2.8.2 https://github.com/Silico
     rm -rf .git \
     && : # last line
 
-# Clone WiSeConnect SDK 3.1.3-matter-hotfix.4 (aa514d4)
-RUN git clone --depth=1 --single-branch --branch=v3.1.3-matter-hotfix.4 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
+# Clone WiSeConnect SDK v3.3.0 (e97a0ed)
+RUN git clone --depth=1 --single-branch --branch=v3.3.0 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git \
     && : # last line
@@ -63,12 +62,14 @@ RUN set -x \
     && rm /tmp/requirements.txt \
     && : # last line
 
-ENV GSDK_ROOT=/opt/silabs/gecko_sdk/
+# Keep GSDK_ROOT name until rename transition to SISDK is completed
+ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
+ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk/
 ENV PATH="${PATH}:/opt/silabs/slc_cli/"
 
-COPY --from=build /tmp/gecko_sdk /opt/silabs/gecko_sdk
+COPY --from=build /tmp/simplicity_sdk /opt/silabs/simplicity_sdk
 COPY --from=build /tmp/wiseconnect-wifi-bt-sdk/ /opt/silabs/wiseconnect-wifi-bt-sdk/
 COPY --from=build /tmp/wifi_sdk /opt/silabs/wifi_sdk
 COPY --from=build /tmp/slc_cli /opt/silabs/slc_cli
