@@ -2467,6 +2467,67 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 } // namespace Attributes
 } // namespace ElectricalEnergyMeasurement
 
+namespace WaterHeaterManagement {
+namespace Attributes {
+
+namespace HeaterTypes {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap> * value); // WaterHeaterTypeBitmap
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap> value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap> value,
+                                        MarkAttributeDirty markDirty);
+} // namespace HeaterTypes
+
+namespace HeatDemand {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap> * value); // WaterHeaterDemandBitmap
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap> value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap> value,
+                                        MarkAttributeDirty markDirty);
+} // namespace HeatDemand
+
+namespace TankVolume {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace TankVolume
+
+namespace EstimatedHeatRequired {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, int64_t * value); // energy_mwh
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace EstimatedHeatRequired
+
+namespace TankPercentage {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Percent * value); // percent
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
+} // namespace TankPercentage
+
+namespace BoostState {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::app::Clusters::WaterHeaterManagement::BoostStateEnum * value); // BoostStateEnum
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::WaterHeaterManagement::BoostStateEnum value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::WaterHeaterManagement::BoostStateEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace BoostState
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 namespace Attributes {
 

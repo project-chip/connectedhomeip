@@ -3053,6 +3053,51 @@ static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId
     }
     }
 }
+static BOOL AttributeIsSpecifiedInWaterHeaterManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterHeaterManagement;
+    switch (aAttributeId) {
+    case Attributes::HeaterTypes::Id: {
+        return YES;
+    }
+    case Attributes::HeatDemand::Id: {
+        return YES;
+    }
+    case Attributes::TankVolume::Id: {
+        return YES;
+    }
+    case Attributes::EstimatedHeatRequired::Id: {
+        return YES;
+    }
+    case Attributes::TankPercentage::Id: {
+        return YES;
+    }
+    case Attributes::BoostState::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -6812,6 +6857,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(aAttributeId);
+    }
+    case Clusters::WaterHeaterManagement::Id: {
+        return AttributeIsSpecifiedInWaterHeaterManagementCluster(aAttributeId);
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);

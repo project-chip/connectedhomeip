@@ -929,6 +929,20 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
 
+namespace WaterHeaterManagement {
+namespace Commands {
+
+namespace Boost {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Boost
+
+namespace CancelBoost {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CancelBoost
+
+} // namespace Commands
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 namespace Commands {
 

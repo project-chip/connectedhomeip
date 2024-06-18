@@ -20817,6 +20817,239 @@ public:
 } // namespace PeriodicEnergyMeasured
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement
+namespace WaterHeaterManagement {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Boost {
+struct Type;
+struct DecodableType;
+} // namespace Boost
+
+namespace CancelBoost {
+struct Type;
+struct DecodableType;
+} // namespace CancelBoost
+
+} // namespace Commands
+
+namespace Commands {
+namespace Boost {
+enum class Fields : uint8_t
+{
+    kDuration          = 0,
+    kOneShot           = 1,
+    kEmergencyBoost    = 2,
+    kTemporarySetpoint = 3,
+    kTargetPercentage  = 4,
+    kTargetReheat      = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    uint32_t duration = static_cast<uint32_t>(0);
+    Optional<bool> oneShot;
+    Optional<bool> emergencyBoost;
+    Optional<int16_t> temporarySetpoint;
+    Optional<chip::Percent> targetPercentage;
+    Optional<chip::Percent> targetReheat;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Boost::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    uint32_t duration = static_cast<uint32_t>(0);
+    Optional<bool> oneShot;
+    Optional<bool> emergencyBoost;
+    Optional<int16_t> temporarySetpoint;
+    Optional<chip::Percent> targetPercentage;
+    Optional<chip::Percent> targetReheat;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Boost
+namespace CancelBoost {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CancelBoost::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CancelBoost::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CancelBoost
+} // namespace Commands
+
+namespace Attributes {
+
+namespace HeaterTypes {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HeaterTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HeaterTypes
+namespace HeatDemand {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HeatDemand::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HeatDemand
+namespace TankVolume {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TankVolume::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TankVolume
+namespace EstimatedHeatRequired {
+struct TypeInfo
+{
+    using Type             = int64_t;
+    using DecodableType    = int64_t;
+    using DecodableArgType = int64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EstimatedHeatRequired::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EstimatedHeatRequired
+namespace TankPercentage {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TankPercentage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TankPercentage
+namespace BoostState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::WaterHeaterManagement::BoostStateEnum;
+    using DecodableType    = chip::app::Clusters::WaterHeaterManagement::BoostStateEnum;
+    using DecodableArgType = chip::app::Clusters::WaterHeaterManagement::BoostStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BoostState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BoostState
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::WaterHeaterManagement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::HeaterTypes::TypeInfo::DecodableType heaterTypes =
+            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterTypeBitmap>>(0);
+        Attributes::HeatDemand::TypeInfo::DecodableType heatDemand =
+            static_cast<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterDemandBitmap>>(0);
+        Attributes::TankVolume::TypeInfo::DecodableType tankVolume                       = static_cast<uint16_t>(0);
+        Attributes::EstimatedHeatRequired::TypeInfo::DecodableType estimatedHeatRequired = static_cast<int64_t>(0);
+        Attributes::TankPercentage::TypeInfo::DecodableType tankPercentage               = static_cast<chip::Percent>(0);
+        Attributes::BoostState::TypeInfo::DecodableType boostState =
+            static_cast<chip::app::Clusters::WaterHeaterManagement::BoostStateEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace WaterHeaterManagement
 namespace DemandResponseLoadControl {
 namespace Structs {
 namespace HeatingSourceControlStruct {
