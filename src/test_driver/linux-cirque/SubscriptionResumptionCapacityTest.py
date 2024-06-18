@@ -125,11 +125,11 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
         self.reset_thread_devices(server_ids)
 
         for req_device_id in req_ids:
-            self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
+            self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
                 CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_clusters-0.0-py3-none-any.whl")))
-            self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
+            self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
                 CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl")))
-            self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
+            self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
                 CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
 
         command1 = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
