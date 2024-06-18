@@ -130,7 +130,6 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedLocations()
     return mSupportedLocations.size();
 }
 
-
 bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation) 
 {
     bool ret_value = false;
@@ -143,7 +142,6 @@ bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, Loc
 
     return ret_value;
 };
-
 
 bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex, LocationStructureWrapper & aSupportedLocation)
 {
@@ -170,14 +168,13 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint
     return ret_value;
 };
 
-
 bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper & newLocation, uint32_t & listIndex)
 {
     bool ret_value = false;
 
-    // server instance (caller)  is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded, etc.
 
-    // double check list size to ensure no memory issues
+    // Double-check list size to ensure there no memory issues.
     if (mSupportedLocations.size() < kMaxNumSupportedLocations)
     {
         // not sorting list, number of locations normally expected to be small, max 255
@@ -194,18 +191,16 @@ bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper
     return ret_value;
 }
 
-
 bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation)
 {
     bool ret_value = false;
 
-    // server instance (caller) is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded, etc.
 
-    // double check that locationID's match
+    // Double-check that locationID's match.
     VerifyOrExit((modifiedLocation.locationID == mSupportedLocations[listIndex].locationID), 
                  ChipLogError(Zcl,  "ModifySupportedLocation - new locationID %u does not match existing locationID %u", 
                               modifiedLocation.locationID, mSupportedLocations[listIndex].locationID));   
-
 
     // checks passed, update the attribute
     mSupportedLocations[listIndex] = modifiedLocation;
@@ -215,7 +210,6 @@ exit:
 
     return ret_value;
 }
-
 
 bool RvcServiceAreaDelegate::ClearSupportedLocations()
 {
@@ -257,12 +251,11 @@ bool RvcServiceAreaDelegate::GetSupportedMapByIndex(uint32_t listIndex, MapStruc
     return ret_value;
 };
 
-
 bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
 {
-    // optional optimization of base delegate function
-    // still using linear search, 
-    // but don't need to copy every map (because direct access to list is available)
+    // We do not need to reimplement this method as it's already done by the SDK.
+    // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
+    // since we have direct access to the list.
     bool ret_value = false;
 
     listIndex = 0;
@@ -283,14 +276,13 @@ bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & list
     return ret_value;
 };
 
-
 bool RvcServiceAreaDelegate::AddSupportedMap(const MapStructureWrapper & newMap, uint32_t & listIndex)
 {
     bool ret_value = false;
 
-    // server instance class is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded, etc.
 
-    // double check list size to ensure no memory issues
+    // Double-check list size to ensure there no memory issues.
     if (mSupportedMaps.size() < kMaxNumSupportedMaps)
     {
         // not sorting list, number of locations normally expected to be small, max 255
@@ -306,16 +298,15 @@ bool RvcServiceAreaDelegate::AddSupportedMap(const MapStructureWrapper & newMap,
     return ret_value;
 }
 
-
 bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper & modifiedMap)
 {
     bool ret_value = false;
 
-    // server instance (caller) is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded, etc.
 
-    // double check that mapID's match
+    // Double-check that mapID's match.
     VerifyOrExit((modifiedMap.mapID == mSupportedMaps[listIndex].mapID),
-                 ChipLogError(Zcl,  "ModifySupportedMap - mapID's do not match, new lmapID %u, existing mapID %u", 
+                 ChipLogError(Zcl,  "ModifySupportedMap - mapID's do not match, new mapID %u, existing mapID %u",
                               modifiedMap.mapID, mSupportedMaps[listIndex].mapID));   
 
     // save modified map
@@ -325,7 +316,6 @@ bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStr
 exit:
     return ret_value;
 }
-
 
 bool RvcServiceAreaDelegate::ClearSupportedMaps()
 {
@@ -349,7 +339,6 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfSelectedLocations()
     return mSelectedLocations.size();
 }
 
-
 bool RvcServiceAreaDelegate::GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & aSelectedLocation)
 {
     bool ret_value = false;
@@ -363,14 +352,13 @@ bool RvcServiceAreaDelegate::GetSelectedLocationByIndex(uint32_t listIndex, uint
     return ret_value;
 };
 
-
 bool RvcServiceAreaDelegate::AddSelectedLocation(uint32_t aLocationId, uint32_t & listIndex)
 {
     bool ret_value = false;
 
-    // server instance class is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded, etc.
 
-    // double check list size to ensure no memory issues
+    // Double-check list size to ensure there no memory issues.
     if (mSelectedLocations.size() < kMaxNumSelectedLocations)
     {
         // not sorting list, number of locations normally expected to be small, max 255
@@ -385,7 +373,6 @@ bool RvcServiceAreaDelegate::AddSelectedLocation(uint32_t aLocationId, uint32_t 
 
     return ret_value;
 }
-
 
 bool RvcServiceAreaDelegate::ClearSelectedLocations()
 {
@@ -409,7 +396,6 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfProgressElements()
     return mProgressList.size();
 }
 
-
 bool RvcServiceAreaDelegate::GetProgressElementByIndex(uint32_t listIndex,  Structs::ProgressStruct::Type & aProgressElement) 
 {
     bool ret_value = false;
@@ -423,12 +409,11 @@ bool RvcServiceAreaDelegate::GetProgressElementByIndex(uint32_t listIndex,  Stru
     return ret_value;
 };
 
-
 bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
-    // optional optimization of base delegate function
-    // still using linear search, 
-    // but don't need to copy every map (because direct access to list is available)
+    // We do not need to reimplement this method as it's already done by the SDK.
+    // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
+    // since we have direct access to the list.
     bool ret_value = false;
 
     listIndex = 0;
@@ -449,14 +434,13 @@ bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32
     return ret_value;
 };
 
-
 bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex)
 {
     bool ret_value = false;
 
-    // server instance class is responsible for ensuring no duplicate locationsIds, list size not exceeded, etc.
+    // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded, etc.
 
-    // double check list size to ensure no memory issues
+    // Double-check list size to ensure there no memory issues.
     if (mProgressList.size() < kMaxNumProgressElements)
     {
         // not sorting list, number of locations normally expected to be small, max 255
@@ -472,7 +456,6 @@ bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::T
     return ret_value;
 }
 
-
 bool RvcServiceAreaDelegate::ModifyProgressElement(uint32_t listIndex, const Structs::ProgressStruct::Type & modifiedProgressElement) 
 {
     bool ret_value = false;
@@ -481,7 +464,6 @@ bool RvcServiceAreaDelegate::ModifyProgressElement(uint32_t listIndex, const Str
 
     return ret_value; 
 }
-
 
 bool RvcServiceAreaDelegate::ClearProgress()
 {

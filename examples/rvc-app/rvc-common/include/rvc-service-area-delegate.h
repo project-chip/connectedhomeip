@@ -55,7 +55,7 @@ public:
     //*************************************************************************
     // Supported Locations accessors
 
-    bool IsSupportedLocationsChangeAllowed();
+    bool IsSupportedLocationsChangeAllowed() override;
 
     uint32_t GetNumberOfSupportedLocations() override;
 
@@ -72,7 +72,7 @@ public:
     //*************************************************************************
     // Supported Maps accessors
 
-    bool IsSupportedMapChangeAllowed();
+    bool IsSupportedMapChangeAllowed() override;
 
     uint32_t GetNumberOfSupportedMaps() override;
 
@@ -114,7 +114,6 @@ public:
 
     bool ClearProgress() override;
 };
-
 
 } // namespace ServiceArea
 
