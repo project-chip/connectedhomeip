@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import os
-import unittest
 import tempfile
+import unittest
 from typing import List
 
-from metadata import MetadataReader, Metadata
+from metadata import Metadata, MetadataReader
 
 
 class TestMetadataReader(unittest.TestCase):
