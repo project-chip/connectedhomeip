@@ -575,7 +575,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         )
 
-    def ConnectBLE(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> int:
+    async def ConnectBLE(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> int:
         """Connect to a BLE device using the given discriminator and setup pin code.
 
         Returns:
@@ -585,12 +585,13 @@ class ChipDeviceControllerBase():
 
         with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            self._ChipStack.Call(
+            res = await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                     self.devCtrl, discriminator, isShortDiscriminator, setupPinCode, nodeid)
-            ).raise_on_error()
+            )
+            res.raise_on_error()
 
-            return ctx.future.result()
+            return await asyncio.futures.wrap_future(ctx.future)
 
     def UnpairDevice(self, nodeid: int) -> None:
         self.CheckIsActive()
@@ -1869,7 +1870,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def fabricAdmin(self) -> FabricAdmin:
         return self._fabricAdmin
 
-    def Commission(self, nodeid) -> int:
+    async def Commission(self, nodeid) -> int:
         '''
         Start the auto-commissioning process on a node after establishing a PASE connection.
         This function is intended to be used in conjunction with `EstablishPASESessionBLE` or
@@ -1887,24 +1888,25 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(False)
-            self._ChipStack.Call(
+            res = await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_Commission(
                     self.devCtrl, nodeid)
-            ).raise_on_error()
+            )
+            res.raise_on_error()
 
-            return ctx.future.result()
+            return await asyncio.futures.wrap_future(ctx.future)
 
-    def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
+    async def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
         ''' Commissions a Thread device over BLE
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
-        return self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
+        return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
-    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
+    async def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
         ''' Commissions a Wi-Fi device over BLE.
         '''
         self.SetWiFiCredentials(ssid, credentials)
-        return self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
+        return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
     def SetWiFiCredentials(self, ssid: str, credentials: str):
         ''' Set the Wi-Fi credentials to set during commissioning.'''
@@ -2002,8 +2004,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ''' Returns the fabric check result if SetCheckMatchingFabric was used.'''
         return self._fabricCheckNodeId
 
-    def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
-                            filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None, discoveryTimeoutMsec: int = 30000) -> int:
+    async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
+                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,
+                                  discoveryTimeoutMsec: int = 30000) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
         Supported filters are:
@@ -2033,12 +2036,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            self._ChipStack.Call(
+            res = await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
-            ).raise_on_error()
+            )
+            res.raise_on_error()
 
-            return ctx.future.result()
+            return await asyncio.futures.wrap_future(ctx.future)
 
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.
@@ -2053,14 +2057,15 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            await self._ChipStack.CallAsync(
+            res = await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
                     self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
-            ).raise_on_error()
+            )
+            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
-    def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> int:
+    async def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> int:
         """ DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
 
         Raises a ChipStackError on failure.
@@ -2072,12 +2077,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            self._ChipStack.Call(
+            res = await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                     self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
-            ).raise_on_error()
+            )
+            res.raise_on_error()
 
-            return ctx.future.result()
+            return await asyncio.futures.wrap_future(ctx.future)
 
     def NOCChainCallback(self, nocChain):
         if self._issue_node_chain_context.future is None:
