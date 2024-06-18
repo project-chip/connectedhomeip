@@ -104,12 +104,9 @@ class TC_CGEN_2_4(MatterBaseTest):
         logging.info('Step 16 - TH2 fully commissions the DUT')
         self.th2.ResetTestCommissioner()
 
-        ctx = asserts.assert_raises(ChipStackError)
-        with ctx:
-            self.th2.CommissionOnNetwork(
-                nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-        asserts.assert_true(ctx.exception.chip_error.sdk_code == 0x02, 'Unexpected error code returned from CommissioningComplete')
+        self.th2.CommissionOnNetwork(
+            nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
         logging.info('Commissioning complete done.')
 
         logging.info('Step 17 - TH1 sends an arm failsafe')
