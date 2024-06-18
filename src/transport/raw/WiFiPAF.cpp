@@ -22,13 +22,13 @@
  *
  */
 
-//#include <transport/raw/BLE.h>
+// #include <transport/raw/BLE.h>
 #include <transport/raw/WiFiPAF.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <transport/raw/MessageHeader.h>
 #include <platform/ConnectivityManager.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
 

@@ -50,7 +50,7 @@ struct LinuxDeviceOptions
     bool mWiFi                 = false;
     bool mThread               = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    bool mWiFiPAF              = false;
+    bool mWiFiPAF = false;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     uint16_t securedDevicePort         = CHIP_PORT;

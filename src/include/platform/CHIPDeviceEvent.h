@@ -495,7 +495,7 @@ struct ChipDeviceEvent final
             BLE_CONNECTION_OBJECT ConId;
         } CHIPoBLENotifyConfirm;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-		struct
+        struct
         {
             chip::System::PacketBuffer * Data;
         } CHIPoWiFiPAFWriteReceived;

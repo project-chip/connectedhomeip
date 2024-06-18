@@ -434,7 +434,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
 #endif
 
-
 // -------------------- WiFi AP Configuration --------------------
 
 /**
