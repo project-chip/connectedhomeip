@@ -289,7 +289,8 @@ tests:
 
     - label:
           "Step 5a: TH sends StepColorTemperature command to DUT with StepMode =
-          0x01 (up), StepSize = ColorTempPhysicalMaxMireds and TransitionTime = 0 (instant)."
+          0x01 (up), StepSize = ColorTempPhysicalMaxMireds and TransitionTime =
+          0 (instant)."
       PICS: CC.S.F04 && CC.S.C4c.Rsp
       command: "StepColorTemperature"
       arguments:
@@ -297,8 +298,7 @@ tests:
               - name: "StepMode"
                 value: 1
               - name: "StepSize"
-                value:
-                    ColorTempPhysicalMaxMiredsValue
+                value: ColorTempPhysicalMaxMiredsValue
               - name: "ColorTemperatureMinimumMireds"
                 value: ColorTempPhysicalMinMiredsValue
               - name: "ColorTemperatureMaximumMireds"
@@ -331,7 +331,8 @@ tests:
 
     - label:
           "Step 6a: TH sends StepColorTemperature command to DUT with StepMode =
-          0x03 (down), StepSize = ColorTempPhysicalMaxMireds and TransitionTime = 0 (instant)."
+          0x03 (down), StepSize = ColorTempPhysicalMaxMireds and TransitionTime
+          = 0 (instant)."
       PICS: CC.S.F04 && CC.S.C4c.Rsp
       command: "StepColorTemperature"
       arguments:
@@ -339,8 +340,7 @@ tests:
               - name: "StepMode"
                 value: 3
               - name: "StepSize"
-                value:
-                    ColorTempPhysicalMaxMiredsValue
+                value: ColorTempPhysicalMaxMiredsValue
               - name: "ColorTemperatureMinimumMireds"
                 value: 0
               - name: "ColorTemperatureMaximumMireds"

@@ -366,7 +366,8 @@ tests:
               maxValue: 3
     - label:
           "Step 6a: TH sends MoveColorTemperature command to DUT with MoveMode =
-          0x03(down), Rate = 65535 (max value) with ColorTemperatureMinimumMireds of 0"
+          0x03(down), Rate = 65535 (max value) with
+          ColorTemperatureMinimumMireds of 0"
       PICS: CC.S.F04 && CC.S.C4b.Rsp
       command: MoveColorTemperature
       arguments:
@@ -405,7 +406,8 @@ tests:
 
     - label:
           "Step 7a: TH sends MoveColorTemperature command to DUT with MoveMode =
-          0x01(up), Rate = 65535 (max value) with ColorTemperatureMaximumMireds of 0"
+          0x01(up), Rate = 65535 (max value) with ColorTemperatureMaximumMireds
+          of 0"
       PICS: CC.S.F04 && CC.S.C4b.Rsp
       command: MoveColorTemperature
       arguments:
