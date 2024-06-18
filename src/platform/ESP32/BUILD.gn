@@ -33,7 +33,6 @@ declare_args() {
   chip_use_esp32_ecdsa_peripheral = false
   chip_enable_ethernet = false
   chip_enable_route_hook = false
-  chip_enable_thread_border_router = false
 }
 
 defines = [
@@ -173,10 +172,10 @@ static_library("ESP32") {
         "../OpenThread/OpenThreadDnssdImpl.h",
       ]
     }
-    if (chip_enable_thread_border_router) {
+    if (chip_openthread_border_router) {
       sources += [
-        "ESP32ThreadBorderRouterDelegate.cpp",
-        "ESP32ThreadBorderRouterDelegate.h",
+        "../OpenThread/GenericThreadBorderRouterDelegate.cpp",
+        "../OpenThread/GenericThreadBorderRouterDelegate.h",
       ]
     }
     configs -= [ "${chip_root}/build/config/compiler:warnings_default" ]

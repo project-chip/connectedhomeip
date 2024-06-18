@@ -235,9 +235,9 @@ else()
 endif()
 
 if (CONFIG_OPENTHREAD_BORDER_ROUTER)
-    chip_gn_arg_append("chip_enable_thread_border_router"       "true")
+    chip_gn_arg_append("chip_openthread_border_router"       "true")
 else()
-    chip_gn_arg_append("chip_enable_thread_border_router"       "false")
+    chip_gn_arg_append("chip_openthread_border_router"       "false")
 endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)

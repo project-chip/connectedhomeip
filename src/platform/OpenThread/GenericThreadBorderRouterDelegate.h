@@ -17,13 +17,11 @@
 
 #pragma once
 
-#include "openthread/dataset.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
-#include <openthread/netdiag.h>
 
 namespace chip {
 namespace app {
@@ -31,15 +29,15 @@ namespace Clusters {
 
 namespace ThreadBorderRouterManagement {
 
-class ESP32ThreadBorderRouterDelegate : public Delegate
+class GenericThreadBorderRouterDelegate : public Delegate
 {
 public:
     static constexpr char kThreadBorderRourterName[]      = "Espressif-ThreadBR";
     static constexpr char kFailsafeThreadDatasetTlvsKey[] = "g/fs/td";
     static constexpr char kFailsafeThreadEnabledKey[]     = "g/fs/te";
 
-    ESP32ThreadBorderRouterDelegate()  = default;
-    ~ESP32ThreadBorderRouterDelegate() = default;
+    GenericThreadBorderRouterDelegate()  = default;
+    ~GenericThreadBorderRouterDelegate() = default;
 
     CHIP_ERROR Init() override;
 

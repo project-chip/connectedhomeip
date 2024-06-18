@@ -15,9 +15,8 @@
  *    limitations under the License.
  */
 
-#include "ESP32ThreadBorderRouterDelegate.h"
+#include "GenericThreadBorderRouterDelegate.h"
 
-#include <esp_openthread.h>
 #include <openthread/border_agent.h>
 #include <openthread/dataset.h>
 #include <openthread/error.h>
@@ -53,7 +52,7 @@ public:
     ~ScopedThreadLock() { DeviceLayer::ThreadStackMgr().UnlockThreadStack(); }
 };
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::Init()
+CHIP_ERROR GenericThreadBorderRouterDelegate::Init()
 {
     mCallback = nullptr;
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
@@ -61,15 +60,17 @@ CHIP_ERROR ESP32ThreadBorderRouterDelegate::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSpan & borderAgentIdSpan)
+CHIP_ERROR GenericThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSpan & borderAgentIdSpan)
 {
+    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
     otBorderAgentId borderAgentId;
     if (borderAgentIdSpan.size() < sizeof(borderAgentId.mId))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     ScopedThreadLock threadLock;
-    otError err = otBorderAgentGetId(esp_openthread_get_instance(), &borderAgentId);
+    otError err = otBorderAgentGetId(otInst, &borderAgentId);
     if (err == OT_ERROR_NONE)
     {
         memcpy(borderAgentIdSpan.data(), borderAgentId.mId, sizeof(borderAgentId.mId));
@@ -79,31 +80,36 @@ CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSpan & b
     return CHIP_ERROR_INTERNAL;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetThreadVersion(uint16_t & threadVersion)
+CHIP_ERROR GenericThreadBorderRouterDelegate::GetThreadVersion(uint16_t & threadVersion)
 {
     threadVersion = otThreadGetVersion();
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetInterfaceEnabled(bool & interfaceEnabled)
+CHIP_ERROR GenericThreadBorderRouterDelegate::GetInterfaceEnabled(bool & interfaceEnabled)
 {
+    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
     ScopedThreadLock threadLock;
-    interfaceEnabled = otIp6IsEnabled(esp_openthread_get_instance());
+    interfaceEnabled = otIp6IsEnabled(otInst);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetDataset(Thread::OperationalDataset & dataset, DatasetType type)
+CHIP_ERROR GenericThreadBorderRouterDelegate::GetDataset(Thread::OperationalDataset & dataset, DatasetType type)
 {
+    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
+
     ScopedThreadLock threadLock;
     otError otErr = OT_ERROR_NONE;
     otOperationalDatasetTlvs datasetTlvs;
     if (type == DatasetType::kActive)
     {
-        otErr = otDatasetGetActiveTlvs(esp_openthread_get_instance(), &datasetTlvs);
+        otErr = otDatasetGetActiveTlvs(otInst, &datasetTlvs);
     }
     else
     {
-        otErr = otDatasetGetPendingTlvs(esp_openthread_get_instance(), &datasetTlvs);
+        otErr = otDatasetGetPendingTlvs(otInst, &datasetTlvs);
     }
     if (otErr == OT_ERROR_NONE)
     {
@@ -112,9 +118,12 @@ CHIP_ERROR ESP32ThreadBorderRouterDelegate::GetDataset(Thread::OperationalDatase
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
+CHIP_ERROR GenericThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
                                                              ActivateDatasetCallback * callback)
 {
+    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
+
     VerifyOrReturnError(callback, CHIP_ERROR_INVALID_ARGUMENT);
     otOperationalDatasetTlvs datasetTlvs;
     memcpy(datasetTlvs.mTlvs, activeDataset.AsByteSpan().data(), activeDataset.AsByteSpan().size());
@@ -127,7 +136,7 @@ CHIP_ERROR ESP32ThreadBorderRouterDelegate::SetActiveDataset(const Thread::Opera
     if (threadIsEnabled)
     {
         otOperationalDatasetTlvs stagingDataset;
-        ReturnErrorCodeIf(otDatasetGetActiveTlvs(esp_openthread_get_instance(), &stagingDataset) != OT_ERROR_NONE,
+        ReturnErrorCodeIf(otDatasetGetActiveTlvs(otInst, &stagingDataset) != OT_ERROR_NONE,
                           CHIP_ERROR_INTERNAL);
         if (activeDataset.AsByteSpan().data_equal(ByteSpan(stagingDataset.mTlvs, stagingDataset.mLength)))
         {
@@ -138,15 +147,15 @@ CHIP_ERROR ESP32ThreadBorderRouterDelegate::SetActiveDataset(const Thread::Opera
                                                                                    stagingDataset.mTlvs, stagingDataset.mLength));
     }
     SetThreadEnabled(false);
-    ReturnErrorCodeIf(otDatasetSetActiveTlvs(esp_openthread_get_instance(), &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(otDatasetSetActiveTlvs(otInst, &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
     SetThreadEnabled(true);
     mCallback = callback;
     return CHIP_NO_ERROR;
 }
 
-void ESP32ThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+void GenericThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    ESP32ThreadBorderRouterDelegate * delegate = reinterpret_cast<ESP32ThreadBorderRouterDelegate *>(arg);
+    GenericThreadBorderRouterDelegate * delegate = reinterpret_cast<GenericThreadBorderRouterDelegate *>(arg);
     if (delegate && delegate->mCallback)
     {
         if (event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange &&
@@ -161,8 +170,11 @@ void ESP32ThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer::
     }
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::RevertActiveDataset()
+CHIP_ERROR GenericThreadBorderRouterDelegate::RevertActiveDataset()
 {
+    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
+
     bool threadIsEnabled = false;
     CHIP_ERROR err       = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadEnabledKey, &threadIsEnabled);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -185,7 +197,7 @@ CHIP_ERROR ESP32ThreadBorderRouterDelegate::RevertActiveDataset()
         ReturnErrorOnFailure(err);
         stagingDataset.mLength = datasetTlvslen;
         ReturnErrorOnFailure(SetThreadEnabled(false));
-        ReturnErrorCodeIf(otDatasetSetActiveTlvs(esp_openthread_get_instance(), &stagingDataset) != OT_ERROR_NONE,
+        ReturnErrorCodeIf(otDatasetSetActiveTlvs(otInst, &stagingDataset) != OT_ERROR_NONE,
                           CHIP_ERROR_INTERNAL);
     }
     ReturnErrorOnFailure(SetThreadEnabled(threadIsEnabled));
@@ -195,40 +207,44 @@ CHIP_ERROR ESP32ThreadBorderRouterDelegate::RevertActiveDataset()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::SetPendingDataset(const Thread::OperationalDataset & pendingDataset)
+CHIP_ERROR GenericThreadBorderRouterDelegate::SetPendingDataset(const Thread::OperationalDataset & pendingDataset)
 {
+    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
+
     ScopedThreadLock threadLock;
     otOperationalDatasetTlvs datasetTlvs;
     memcpy(datasetTlvs.mTlvs, pendingDataset.AsByteSpan().data(), pendingDataset.AsByteSpan().size());
     datasetTlvs.mLength = pendingDataset.AsByteSpan().size();
-    ReturnErrorCodeIf(otDatasetSetPendingTlvs(esp_openthread_get_instance(), &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(otDatasetSetPendingTlvs(otInst, &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32ThreadBorderRouterDelegate::SetThreadEnabled(bool enabled)
+CHIP_ERROR GenericThreadBorderRouterDelegate::SetThreadEnabled(bool enabled)
 {
-    otInstance * instance = esp_openthread_get_instance();
-    bool isEnabled        = (otThreadGetDeviceRole(instance) != OT_DEVICE_ROLE_DISABLED);
-    bool isIp6Enabled     = otIp6IsEnabled(instance);
+    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
+    bool isEnabled        = (otThreadGetDeviceRole(otInst) != OT_DEVICE_ROLE_DISABLED);
+    bool isIp6Enabled     = otIp6IsEnabled(otInst);
     if (enabled && !isIp6Enabled)
     {
-        ReturnErrorCodeIf(otIp6SetEnabled(instance, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
+        ReturnErrorCodeIf(otIp6SetEnabled(otInst, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
     }
     if (enabled != isEnabled)
     {
-        ReturnErrorCodeIf(otThreadSetEnabled(instance, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
+        ReturnErrorCodeIf(otThreadSetEnabled(otInst, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
     }
     if (!enabled && isIp6Enabled)
     {
-        ReturnErrorCodeIf(otIp6SetEnabled(instance, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
+        ReturnErrorCodeIf(otIp6SetEnabled(otInst, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
     }
     return CHIP_NO_ERROR;
 }
 
-bool ESP32ThreadBorderRouterDelegate::GetThreadEnabled()
+bool GenericThreadBorderRouterDelegate::GetThreadEnabled()
 {
-    otInstance * instance = esp_openthread_get_instance();
-    return otIp6IsEnabled(instance) && (otThreadGetDeviceRole(instance) != OT_DEVICE_ROLE_DISABLED);
+    otInstance *otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    return otInst && otIp6IsEnabled(otInst) && (otThreadGetDeviceRole(otInst) != OT_DEVICE_ROLE_DISABLED);
 }
 
 } // namespace ThreadBorderRouterManagement
