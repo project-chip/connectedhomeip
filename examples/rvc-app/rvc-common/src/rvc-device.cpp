@@ -12,7 +12,6 @@ void RvcDevice::Init()
     mOperationalStateInstance.Init();
 }
 
-
 void RvcDevice::SetDeviceToIdleState()
 {
     if (mCharging)
@@ -162,12 +161,11 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
     }
 }
 
-
-bool RvcDevice::HandleIsSetSelectedLocationCallback(char* statusText)
+bool RvcDevice::HandleIsSetSelectedLocationCallback(char * statusText)
 {
     bool canSet;
 
-    switch(mRunModeInstance.GetCurrentMode())
+    switch (mRunModeInstance.GetCurrentMode())
     {
     case RvcRunMode::ModeIdle:
         canSet = true;

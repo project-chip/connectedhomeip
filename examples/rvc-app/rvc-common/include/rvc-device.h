@@ -5,8 +5,8 @@
 #include "rvc-service-area-delegate.h"
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/clusters/service-area-server/service-area-server.h>
 #include <app/clusters/service-area-server/service-area-delegate.h>
+#include <app/clusters/service-area-server/service-area-server.h>
 
 #include <string>
 
@@ -43,8 +43,7 @@ public:
     explicit RvcDevice(EndpointId aRvcClustersEndpoint) :
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
-        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint),
-        mServiceAreaDelegate(),
+        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint), mServiceAreaDelegate(),
         mServiceAreaInstance(&mServiceAreaDelegate, aRvcClustersEndpoint, BitMask<ServiceArea::Feature>(0))
     {
         // set the current-mode at start-up
@@ -102,8 +101,8 @@ public:
      * @param locationText if setting the selected location failed, a description of the mode or condition prohibiting the change
      *        size kMaxSizeStatusText + 1 for termination char
      * @return true if Selected Locations can be changed
-    */
-    bool HandleIsSetSelectedLocationCallback(char* locationText);
+     */
+    bool HandleIsSetSelectedLocationCallback(char * locationText);
 
     /**
      * Updates the state machine when the device becomes fully-charged.
@@ -131,8 +130,6 @@ public:
     void HandleClearErrorMessage();
 
     void HandleResetMessage();
-
-
 };
 
 } // namespace Clusters

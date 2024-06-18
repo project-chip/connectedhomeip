@@ -3,7 +3,6 @@
 
 using namespace chip::app::Clusters::ServiceArea;
 
-
 bool Delegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex, LocationStructureWrapper & aSupportedLocation)
 {
     bool ret_value = false;
@@ -32,7 +31,8 @@ bool Delegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listInd
  * The user is free the redefine this method as their device may have more information on what has changed and may be able to
  * maintain the restrictions on these attributes by selectively editing them.
  */
-void Delegate::HandleSupportedLocationsUpdated()  {
+void Delegate::HandleSupportedLocationsUpdated()
+{
     mInstance->ClearSelectedLocations();
     mInstance->SetCurrentLocation(DataModel::Nullable<uint32_t>());
     mInstance->ClearProgress();

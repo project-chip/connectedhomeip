@@ -1,20 +1,20 @@
 /*
-*
-*    Copyright (c) 2024 Project CHIP Authors
-*    All rights reserved.
-*
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*        http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
-*/
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #pragma once
 
@@ -35,22 +35,22 @@ class RvcServiceAreaDelegate : public Delegate
 {
 private:
     // containers for array attributes.
-    std::vector<ServiceArea::LocationStructureWrapper>       mSupportedLocations;
-    std::vector<ServiceArea::MapStructureWrapper>            mSupportedMaps;
-    std::vector<uint32_t>                                    mSelectedLocations;
-    std::vector<ServiceArea::Structs::ProgressStruct::Type>  mProgressList;
-
+    std::vector<ServiceArea::LocationStructureWrapper> mSupportedLocations;
+    std::vector<ServiceArea::MapStructureWrapper> mSupportedMaps;
+    std::vector<uint32_t> mSelectedLocations;
+    std::vector<ServiceArea::Structs::ProgressStruct::Type> mProgressList;
 
 public:
     CHIP_ERROR Init() override;
 
     // command support
-    bool IsSetSelectedLocationsAllowed(char* statusText) override;
+    bool IsSetSelectedLocationsAllowed(char * statusText) override;
 
     bool IsValidSelectLocationsSet(const ServiceArea::Commands::SelectLocations::DecodableType & req,
-                                   ServiceArea::SelectLocationsStatus & locationStatus, char* statusText, bool & useStatusText) override;
+                                   ServiceArea::SelectLocationsStatus & locationStatus, char * statusText,
+                                   bool & useStatusText) override;
 
-    bool HandleSkipCurrentLocation(char* skipStatusText) override;
+    bool HandleSkipCurrentLocation(char * skipStatusText) override;
 
     //*************************************************************************
     // Supported Locations accessors
@@ -61,7 +61,8 @@ public:
 
     bool GetSupportedLocationByIndex(uint32_t listIndex, ServiceArea::LocationStructureWrapper & supportedLocation) override;
 
-    bool GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex, ServiceArea::LocationStructureWrapper & supportedLocation) override;
+    bool GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex,
+                                  ServiceArea::LocationStructureWrapper & supportedLocation) override;
 
     bool AddSupportedLocation(const ServiceArea::LocationStructureWrapper & newLocation, uint32_t & listIndex) override;
 
@@ -106,11 +107,13 @@ public:
 
     bool GetProgressElementByIndex(uint32_t listIndex, ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
 
-    bool GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex, ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
+    bool GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex,
+                                ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
 
     bool AddProgressElement(const ServiceArea::Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) override;
 
-    bool ModifyProgressElement(uint32_t listIndex, const ServiceArea::Structs::ProgressStruct::Type & modifiedProgressElement) override;
+    bool ModifyProgressElement(uint32_t listIndex,
+                               const ServiceArea::Structs::ProgressStruct::Type & modifiedProgressElement) override;
 
     bool ClearProgress() override;
 };
