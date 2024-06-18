@@ -8851,20 +8851,20 @@ public static class EnergyCalendarClusterTransitionStruct {
   }
 }
 public static class EnergyCalendarClusterDate {
-  public Optional<Integer> year;
-  public Optional<Integer> month;
-  public Optional<Integer> day;
-  public Optional<Integer> dayOfWeek;
+  public @Nullable Optional<Integer> year;
+  public @Nullable Optional<Integer> month;
+  public @Nullable Optional<Integer> day;
+  public @Nullable Optional<Integer> dayOfWeek;
   private static final long YEAR_ID = 0L;
   private static final long MONTH_ID = 1L;
   private static final long DAY_ID = 2L;
   private static final long DAY_OF_WEEK_ID = 3L;
 
   public EnergyCalendarClusterDate(
-    Optional<Integer> year,
-    Optional<Integer> month,
-    Optional<Integer> day,
-    Optional<Integer> dayOfWeek
+    @Nullable Optional<Integer> year,
+    @Nullable Optional<Integer> month,
+    @Nullable Optional<Integer> day,
+    @Nullable Optional<Integer> dayOfWeek
   ) {
     this.year = year;
     this.month = month;
@@ -8874,10 +8874,10 @@ public static class EnergyCalendarClusterDate {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(YEAR_ID, year.<BaseTLVType>map((nonOptionalyear) -> new UIntType(nonOptionalyear)).orElse(new EmptyType())));
-    values.add(new StructElement(MONTH_ID, month.<BaseTLVType>map((nonOptionalmonth) -> new UIntType(nonOptionalmonth)).orElse(new EmptyType())));
-    values.add(new StructElement(DAY_ID, day.<BaseTLVType>map((nonOptionalday) -> new UIntType(nonOptionalday)).orElse(new EmptyType())));
-    values.add(new StructElement(DAY_OF_WEEK_ID, dayOfWeek.<BaseTLVType>map((nonOptionaldayOfWeek) -> new UIntType(nonOptionaldayOfWeek)).orElse(new EmptyType())));
+    values.add(new StructElement(YEAR_ID, year != null ? year.<BaseTLVType>map((nonOptionalyear) -> new UIntType(nonOptionalyear)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(MONTH_ID, month != null ? month.<BaseTLVType>map((nonOptionalmonth) -> new UIntType(nonOptionalmonth)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(DAY_ID, day != null ? day.<BaseTLVType>map((nonOptionalday) -> new UIntType(nonOptionalday)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(DAY_OF_WEEK_ID, dayOfWeek != null ? dayOfWeek.<BaseTLVType>map((nonOptionaldayOfWeek) -> new UIntType(nonOptionaldayOfWeek)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -8886,10 +8886,10 @@ public static class EnergyCalendarClusterDate {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Optional<Integer> year = Optional.empty();
-    Optional<Integer> month = Optional.empty();
-    Optional<Integer> day = Optional.empty();
-    Optional<Integer> dayOfWeek = Optional.empty();
+    @Nullable Optional<Integer> year = null;
+    @Nullable Optional<Integer> month = null;
+    @Nullable Optional<Integer> day = null;
+    @Nullable Optional<Integer> dayOfWeek = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == YEAR_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {

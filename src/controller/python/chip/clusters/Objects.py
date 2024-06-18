@@ -26587,8 +26587,8 @@ class EnergyCalendar(Cluster):
                 ClusterObjectFieldDescriptor(Label="currentDay", Tag=0x00000007, Type=typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]),
                 ClusterObjectFieldDescriptor(Label="nextDay", Tag=0x00000008, Type=typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]),
                 ClusterObjectFieldDescriptor(Label="currentTransition", Tag=0x00000009, Type=typing.Union[Nullable, EnergyCalendar.Structs.TransitionStruct]),
-                ClusterObjectFieldDescriptor(Label="currentPeakPeriod", Tag=0x0000000A, Type=typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]),
-                ClusterObjectFieldDescriptor(Label="nextPeakPeriod", Tag=0x0000000B, Type=typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]),
+                ClusterObjectFieldDescriptor(Label="currentPeakPeriod", Tag=0x0000000A, Type=typing.Union[None, Nullable, EnergyCalendar.Structs.PeakPeriodStruct]),
+                ClusterObjectFieldDescriptor(Label="nextPeakPeriod", Tag=0x0000000B, Type=typing.Union[None, Nullable, EnergyCalendar.Structs.PeakPeriodStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -26607,8 +26607,8 @@ class EnergyCalendar(Cluster):
     currentDay: 'typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]' = None
     nextDay: 'typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]' = None
     currentTransition: 'typing.Union[Nullable, EnergyCalendar.Structs.TransitionStruct]' = None
-    currentPeakPeriod: 'typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = None
-    nextPeakPeriod: 'typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = None
+    currentPeakPeriod: 'typing.Union[None, Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = None
+    nextPeakPeriod: 'typing.Union[None, Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -26678,16 +26678,16 @@ class EnergyCalendar(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="year", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="month", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="day", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="year", Tag=0, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="month", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="day", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=3, Type=typing.Union[None, Nullable, uint]),
                     ])
 
-            year: 'typing.Optional[uint]' = None
-            month: 'typing.Optional[uint]' = None
-            day: 'typing.Optional[uint]' = None
-            dayOfWeek: 'typing.Optional[uint]' = None
+            year: 'typing.Union[None, Nullable, uint]' = None
+            month: 'typing.Union[None, Nullable, uint]' = None
+            day: 'typing.Union[None, Nullable, uint]' = None
+            dayOfWeek: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class DayStruct(ClusterObject):
@@ -26909,9 +26909,9 @@ class EnergyCalendar(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, EnergyCalendar.Structs.PeakPeriodStruct])
 
-            value: 'typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = NullValue
+            value: 'typing.Union[None, Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = None
 
         @dataclass
         class NextPeakPeriod(ClusterAttributeDescriptor):
@@ -26925,9 +26925,9 @@ class EnergyCalendar(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, EnergyCalendar.Structs.PeakPeriodStruct])
 
-            value: 'typing.Union[Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = NullValue
+            value: 'typing.Union[None, Nullable, EnergyCalendar.Structs.PeakPeriodStruct]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

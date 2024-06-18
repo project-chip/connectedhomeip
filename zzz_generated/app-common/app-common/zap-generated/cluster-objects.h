@@ -24362,10 +24362,10 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<uint16_t> year;
-    Optional<uint8_t> month;
-    Optional<uint8_t> day;
-    Optional<uint8_t> dayOfWeek;
+    Optional<DataModel::Nullable<uint16_t>> year;
+    Optional<DataModel::Nullable<uint8_t>> month;
+    Optional<DataModel::Nullable<uint8_t>> day;
+    Optional<DataModel::Nullable<uint8_t>> dayOfWeek;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

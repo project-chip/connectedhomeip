@@ -5484,10 +5484,10 @@ cluster EnergyCalendar = 154 {
   }
 
   struct Date {
-    optional int16u year = 0;
-    optional int8u month = 1;
-    optional int8u day = 2;
-    optional int8u dayOfWeek = 3;
+    optional nullable int16u year = 0;
+    optional nullable int8u month = 1;
+    optional nullable int8u day = 2;
+    optional nullable int8u dayOfWeek = 3;
   }
 
   struct DayStruct {
@@ -5519,8 +5519,8 @@ cluster EnergyCalendar = 154 {
   readonly attribute nullable DayStruct currentDay = 7;
   readonly attribute nullable DayStruct nextDay = 8;
   readonly attribute nullable TransitionStruct currentTransition = 9;
-  readonly attribute nullable PeakPeriodStruct currentPeakPeriod = 10;
-  readonly attribute nullable PeakPeriodStruct nextPeakPeriod = 11;
+  readonly attribute optional nullable PeakPeriodStruct currentPeakPeriod = 10;
+  readonly attribute optional nullable PeakPeriodStruct nextPeakPeriod = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

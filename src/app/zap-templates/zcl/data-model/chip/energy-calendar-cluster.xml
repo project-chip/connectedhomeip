@@ -47,10 +47,10 @@ limitations under the License.
 
   <struct name="Date">
     <cluster code="0x009A"/>
-    <item fieldId="0" name="Year" type="int16u" default="0" optional="true"/>
-    <item fieldId="1" name="Month" type="int8u" min="1" max="12" default="1" optional="true"/>
-    <item fieldId="2" name="Day" type="int8u" min="1" max="31" default="1" optional="true"/>
-    <item fieldId="3" name="DayOfWeek" type="int8u" min="1" max="7" optional="true"/>
+    <item fieldId="0" name="Year" type="int16u" default="0" isNullable="true" optional="true"/>
+    <item fieldId="1" name="Month" type="int8u" min="1" max="12" default="1" isNullable="true" optional="true"/>
+    <item fieldId="2" name="Day" type="int8u" min="1" max="31" default="1" isNullable="true" optional="true"/>
+    <item fieldId="3" name="DayOfWeek" type="int8u" min="1" max="7" isNullable="true" optional="true"/>
   </struct>
 
   <struct name="CalendarPeriod">
@@ -119,8 +119,8 @@ limitations under the License.
     <attribute code="0x0007" side="server" type="DayStruct" define="CURRENT_DAY" isNullable="true" writable="false" optional="false">CurrentDay</attribute>
     <attribute code="0x0008" side="server" type="DayStruct" define="NEXT_DAY" isNullable="true" writable="false" optional="false">NextDay</attribute>
     <attribute code="0x0009" side="server" type="TransitionStruct" define="CURRENT_TRANSITION" isNullable="true" writable="false" optional="false">CurrentTransition</attribute>
-    <attribute code="0x000A" side="server" type="PeakPeriodStruct" define="CURRENT_PEAK_PERIOD" isNullable="true" writable="false" optional="false">CurrentPeakPeriod</attribute>
-    <attribute code="0x000B" side="server" type="PeakPeriodStruct" define="NEXT_PEAK_PERIOD" isNullable="true" writable="false" optional="false">NextPeakPeriod</attribute>
+    <attribute code="0x000A" side="server" type="PeakPeriodStruct" define="CURRENT_PEAK_PERIOD" isNullable="true" writable="false" optional="true">CurrentPeakPeriod</attribute>
+    <attribute code="0x000B" side="server" type="PeakPeriodStruct" define="NEXT_PEAK_PERIOD" isNullable="true" writable="false" optional="true">NextPeakPeriod</attribute>
   </cluster>
 
 </configurator>
