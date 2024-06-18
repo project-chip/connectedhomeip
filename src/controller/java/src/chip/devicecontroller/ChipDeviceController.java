@@ -404,8 +404,12 @@ public class ChipDeviceController {
    *     ICDRegistrationInfo value.
    */
   public void commissionDevice(
-      long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials, @Nullable ICDRegistrationInfo icdRegistrationInfo) {
-    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials, icdRegistrationInfo);
+      long deviceId,
+      @Nullable byte[] csrNonce,
+      @Nullable NetworkCredentials networkCredentials,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo) {
+    commissionDevice(
+        deviceControllerPtr, deviceId, csrNonce, networkCredentials, icdRegistrationInfo);
   }
 
   /**
