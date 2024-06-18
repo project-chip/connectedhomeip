@@ -25,7 +25,7 @@ followed by the same for the tv-casting-app. On the other hand, at the end of ea
 be stopped by providing the `STOP_APP` string as the `input_cmd`. As noted in the example below of `example_test_sequence`, the first
 four steps pertain to starting the apps while the last two are for signaling stopping the apps. 
 
-Note: `START_APP` and `STOP_APP` are reserved for signaling the starting and stopping of an apps.
+Note: `START_APP` and `STOP_APP` are reserved for signaling the starting and stopping of apps.
 
 Example:
      test_sequences = [
