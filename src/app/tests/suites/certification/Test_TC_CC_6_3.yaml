@@ -286,7 +286,7 @@ tests:
           constraints:
               minValue: 0
               maxValue: 3
-    
+
     - label:
           "Step 5a: TH sends StepColorTemperature command to DUT with StepMode =
           0x01 (up), StepSize = ColorTempPhysicalMaxMireds and TransitionTime = 0 (instant)."
@@ -328,7 +328,7 @@ tests:
           constraints:
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
-    
+
     - label:
           "Step 6a: TH sends StepColorTemperature command to DUT with StepMode =
           0x03 (down), StepSize = ColorTempPhysicalMaxMireds and TransitionTime = 0 (instant)."

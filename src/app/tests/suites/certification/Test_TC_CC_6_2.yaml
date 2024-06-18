@@ -402,7 +402,7 @@ tests:
           constraints:
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
-    
+
     - label:
           "Step 7a: TH sends MoveColorTemperature command to DUT with MoveMode =
           0x01(up), Rate = 65535 (max value) with ColorTemperatureMaximumMireds of 0"
