@@ -254,13 +254,18 @@ class DeviceProxyWrapper():
         that is not an issue that needs to be accounted for and it will become very apparent
         if that happens.
     '''
+    class DeviceProxyType(enum.Enum):
+        OPERATIONAL = enum.auto(),
+        COMMISSIONEE = enum.auto(),
 
-    def __init__(self, deviceProxy: ctypes.c_void_p, dmLib=None):
+    def __init__(self, deviceProxy: ctypes.c_void_p, proxyType, dmLib=None):
         self._deviceProxy = deviceProxy
         self._dmLib = dmLib
+        self._proxyType = proxyType
 
     def __del__(self):
-        if (self._dmLib is not None and hasattr(builtins, 'chipStack') and builtins.chipStack is not None):
+        # Commissionee device proxies are owned by the DeviceCommissioner. See #33031
+        if (self._proxyType == self.DeviceProxyType.OPERATIONAL and self.self._dmLib is not None and hasattr(builtins, 'chipStack') and builtins.chipStack is not None):
             # This destructor is called from any threading context, including on the Matter threading context.
             # So, we cannot call chipStack.Call or chipStack.CallAsyncWithCompleteCallback which waits for the posted work to
             # actually be executed. Instead, we just post/schedule the work and move on.
@@ -861,7 +866,23 @@ class ChipDeviceControllerBase():
 
         return self._Cluster
 
-    def GetConnectedDeviceSync(self, nodeid, allowPASE: bool = True, timeoutMs: int = None):
+    def FindOrEstablishPASESession(self, setupCode: str, nodeid: int, timeoutMs: int = None) -> typing.Optional[DeviceProxyWrapper]:
+        ''' Returns CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device'''
+        self.CheckIsActive()
+        returnDevice = c_void_p(None)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
+        if res.is_success:
+            return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+
+        self.EstablishPASESession(setupCode, nodeid)
+
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
+        if res.is_success:
+            return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+
+    def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: int = None):
         ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
         nodeId: Target's Node ID
@@ -882,7 +903,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
                 logging.info('Using PASE connection')
-                return DeviceProxyWrapper(returnDevice)
+                return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
         class DeviceAvailableClosure():
             def deviceAvailable(self, device, err):
@@ -916,7 +937,7 @@ class ChipDeviceControllerBase():
         if returnDevice.value is None:
             returnErr.raise_on_error()
 
-        return DeviceProxyWrapper(returnDevice, self._dmLib)
+        return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
     async def WaitForActive(self, nodeid, *, timeoutSeconds=30.0, stayActiveDurationMs=30000):
         ''' Waits a LIT ICD device to become active. Will send a StayActive command to the device on active to allow human operations.
@@ -948,7 +969,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
                 logging.info('Using PASE connection')
-                return DeviceProxyWrapper(returnDevice)
+                return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
@@ -987,7 +1008,7 @@ class ChipDeviceControllerBase():
         else:
             await future
 
-        return DeviceProxyWrapper(future.result(), self._dmLib)
+        return DeviceProxyWrapper(future.result(), DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
     def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
         ''' Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
@@ -1013,12 +1034,8 @@ class ChipDeviceControllerBase():
         sessionParametersStruct = SessionParametersStruct.parse(b'\x00' * SessionParametersStruct.sizeof())
         sessionParametersByteArray = SessionParametersStruct.build(sessionParametersStruct)
         device = self.GetConnectedDeviceSync(nodeid)
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters(
-            device.deviceProxy, ctypes.c_char_p(sessionParametersByteArray)))
-
-        # 0 is CHIP_NO_ERROR
-        if res != 0:
-            return None
+        self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters(
+            device.deviceProxy, ctypes.c_char_p(sessionParametersByteArray))).raise_on_error()
 
         sessionParametersStruct = SessionParametersStruct.parse(sessionParametersByteArray)
         return SessionParameters(
@@ -1029,8 +1046,6 @@ class ChipDeviceControllerBase():
             interactionModelRevision=sessionParametersStruct.InteractionModelRevision if sessionParametersStruct.InteractionModelRevision != 0 else None,
             specficiationVersion=sessionParametersStruct.SpecificationVersion if sessionParametersStruct.SpecificationVersion != 0 else None,
             maxPathsPerInvoke=sessionParametersStruct.MaxPathsPerInvoke)
-
-        return res
 
     async def TestOnlySendBatchCommands(self, nodeid: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
                                         timedRequestTimeoutMs: typing.Optional[int] = None,
@@ -1803,6 +1818,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback.argtypes = [_OnCheckInCompleteFunct]
 
             self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback(_OnCheckInComplete)
+
+            self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters.restype = PyChipError
+            self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters.argtypes = [c_void_p, c_char_p]
 
 
 class ChipDeviceController(ChipDeviceControllerBase):

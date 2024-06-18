@@ -37,6 +37,9 @@ PRODUCTION_NODE_URL = "https://on.dcl.csa-iot.org:26657"
 PRODUCTION_NODE_URL_REST = "https://on.dcl.csa-iot.org"
 TEST_NODE_URL_REST = "https://on.test-net.dcl.csa-iot.org"
 
+MATTER_CERT_CA_SUBJECT = "MFIxDDAKBgNVBAoMA0NTQTEsMCoGA1UEAwwjTWF0dGVyIENlcnRpZmljYXRpb24gYW5kIFRlc3RpbmcgQ0ExFDASBgorBgEEAYKifAIBDARDNUEw"
+MATTER_CERT_CA_SUBJECT_KEY_ID = "97:E4:69:D0:C5:04:14:C2:6F:C7:01:F7:7E:94:77:39:09:8D:F6:A5"
+
 
 def parse_paa_root_certs(cmdpipe, paa_list):
     """
@@ -73,13 +76,14 @@ def parse_paa_root_certs(cmdpipe, paa_list):
         else:
             if b': ' in line:
                 key, value = line.split(b': ')
-                result[key.strip(b' -').decode("utf-8")] = value.strip().decode("utf-8")
+                result[key.strip(b' -').decode("utf-8")
+                       ] = value.strip().decode("utf-8")
                 parse_paa_root_certs.counter += 1
                 if parse_paa_root_certs.counter % 2 == 0:
                     paa_list.append(copy.deepcopy(result))
 
 
-def write_paa_root_cert(certificate, subject):
+def write_cert(certificate, subject):
     filename = 'dcld_mirror_' + \
         re.sub('[^a-zA-Z0-9_-]', '', re.sub('[=, ]', '_', subject))
     with open(filename + '.pem', 'w+') as outfile:
@@ -93,7 +97,8 @@ def write_paa_root_cert(certificate, subject):
                 serialization.Encoding.DER)
             outfile.write(der_certificate)
     except (IOError, ValueError) as e:
-        print(f"ERROR: Failed to convert {filename + '.pem'}: {str(e)}. Skipping...")
+        print(
+            f"ERROR: Failed to convert {filename + '.pem'}: {str(e)}. Skipping...")
 
 
 def parse_paa_root_cert_from_dcld(cmdpipe):
@@ -133,7 +138,38 @@ def use_dcld(dcld, production, cmdlist):
 @optgroup.option('--paa-trust-store-path', default='paa-root-certs', type=str, metavar='PATH', help="PAA trust store path (default: paa-root-certs)")
 def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path):
     """DCL PAA mirroring tools"""
+    fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path)
 
+
+def get_cert_from_rest(rest_node_url, subject, subject_key_id):
+    response = requests.get(
+        f"{rest_node_url}/dcl/pki/certificates/{subject}/{subject_key_id}").json()["approvedCertificates"]["certs"][0]
+    certificate = response["pemCert"].rstrip("\n")
+    subject = response["subjectAsText"]
+    return certificate, subject
+
+
+def fetch_cd_signing_certs(store_path):
+    ''' Only supports using main net http currently.'''
+    rest_node_url = PRODUCTION_NODE_URL_REST
+    os.makedirs(store_path, exist_ok=True)
+    original_dir = os.getcwd()
+    os.chdir(store_path)
+
+    cd_signer_ids = requests.get(
+        f"{rest_node_url}/dcl/pki/child-certificates/{MATTER_CERT_CA_SUBJECT}/{MATTER_CERT_CA_SUBJECT_KEY_ID}").json()['childCertificates']['certIds']
+    for signer in cd_signer_ids:
+        subject = signer['subject']
+        subject_key_id = signer['subjectKeyId']
+        certificate, subject = get_cert_from_rest(rest_node_url, subject, subject_key_id)
+
+        print(f"Downloaded CD signing cert with subject: {subject}")
+        write_cert(certificate, subject)
+
+    os.chdir(original_dir)
+
+
+def fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path):
     production = False
     dcld = use_test_net_dcld
 
@@ -148,36 +184,43 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
     rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
 
     os.makedirs(paa_trust_store_path, exist_ok=True)
+    original_dir = os.getcwd()
     os.chdir(paa_trust_store_path)
 
     if use_rest:
-        paa_list = requests.get(f"{rest_node_url}/dcl/pki/root-certificates").json()["approvedRootCertificates"]["certs"]
+        paa_list = requests.get(
+            f"{rest_node_url}/dcl/pki/root-certificates").json()["approvedRootCertificates"]["certs"]
     else:
         cmdlist = ['query', 'pki', 'all-x509-root-certs']
 
-        cmdpipe = subprocess.Popen(use_dcld(dcld, production, cmdlist), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmdpipe = subprocess.Popen(use_dcld(
+            dcld, production, cmdlist), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         paa_list = []
         parse_paa_root_certs.counter = 0
         parse_paa_root_certs(cmdpipe, paa_list)
 
     for paa in paa_list:
+        if paa['subject'] == MATTER_CERT_CA_SUBJECT and paa['subjectKeyId'] == MATTER_CERT_CA_SUBJECT_KEY_ID:
+            # Don't include the CD signing cert as a PAA root.
+            continue
         if use_rest:
-            response = requests.get(
-                f"{rest_node_url}/dcl/pki/certificates/{paa['subject']}/{paa['subjectKeyId']}").json()["approvedCertificates"]["certs"][0]
-            certificate = response["pemCert"]
-            subject = response["subjectAsText"]
+            certificate, subject = get_cert_from_rest(rest_node_url, paa['subject'], paa['subjectKeyId'])
         else:
-            cmdlist = ['query', 'pki', 'x509-cert', '-u', paa['subject'], '-k', paa['subjectKeyId']]
+            cmdlist = ['query', 'pki', 'x509-cert', '-u',
+                       paa['subject'], '-k', paa['subjectKeyId']]
 
-            cmdpipe = subprocess.Popen(use_dcld(dcld, production, cmdlist), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            cmdpipe = subprocess.Popen(use_dcld(
+                dcld, production, cmdlist), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             (certificate, subject) = parse_paa_root_cert_from_dcld(cmdpipe)
 
         certificate = certificate.rstrip('\n')
 
-        print(f"Downloaded certificate with subject: {subject}")
-        write_paa_root_cert(certificate, subject)
+        print(f"Downloaded PAA certificate with subject: {subject}")
+        write_cert(certificate, subject)
+
+    os.chdir(original_dir)
 
 
 if __name__ == "__main__":
