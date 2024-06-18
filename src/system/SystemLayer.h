@@ -50,7 +50,6 @@
 #include <ev.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
-
 namespace chip {
 namespace System {
 
