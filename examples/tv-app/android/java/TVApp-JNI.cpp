@@ -240,7 +240,7 @@ class MyPincodeService : public PasscodeService
 };
 MyPincodeService gMyPincodeService;
 
-class MyAppInstallationService : public AppInstallationService
+class SampleTvAppInstallationService : public AppInstallationService
 {
     bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) override
     {
@@ -248,7 +248,7 @@ class MyAppInstallationService : public AppInstallationService
     }
 };
 
-MyAppInstallationService gMyAppInstallationService;
+SampleTvAppInstallationService gSampleTvAppInstallationService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
@@ -382,7 +382,7 @@ void TvAppJNI::InitializeCommissioner(JNIMyUserPrompter * userPrompter)
     if (cdc != nullptr && userPrompter != nullptr)
     {
         cdc->SetPasscodeService(&gMyPincodeService);
-        cdc->SetAppInstallationService(&gMyAppInstallationService);
+        cdc->SetAppInstallationService(&gSampleTvAppInstallationService);
         cdc->SetUserPrompter(userPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

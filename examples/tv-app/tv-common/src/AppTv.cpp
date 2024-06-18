@@ -635,7 +635,7 @@ bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t prod
     return false;
 }
 
-void ContentAppFactoryImpl::PrintInstalledApps()
+void ContentAppFactoryImpl::LogInstalledApps()
 {
     for (auto & contentApp : mContentApps)
     {

@@ -150,7 +150,8 @@ public:
     // Remove the app from the list of mContentApps
     bool UninstallContentApp(uint16_t vendorId, uint16_t productId);
     // Print mContentApps and endpoints
-    void PrintInstalledApps();
+    void LogInstalledApps();
+    // TODO: method to retireve list of mContentApps
 
 protected:
     std::vector<std::unique_ptr<ContentAppImpl>> mContentApps;

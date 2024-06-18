@@ -231,6 +231,7 @@ void CommissionerDiscoveryController::InternalOk()
         ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
 
         // TODO: Prepare app to be installed or add it to the mContentApps
+        // Draft PR: https://github.com/project-chip/connectedhomeip/pull/33982
     }
 
     if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
