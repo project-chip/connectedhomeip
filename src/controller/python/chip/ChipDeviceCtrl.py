@@ -2095,17 +2095,18 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._issue_node_chain_context.future.set_result(nocChain)
         return
 
-    def IssueNOCChain(self, csr: Clusters.OperationalCredentials.Commands.CSRResponse, nodeId: int):
+    async def IssueNOCChain(self, csr: Clusters.OperationalCredentials.Commands.CSRResponse, nodeId: int):
         """Issue an NOC chain using the associated OperationalCredentialsDelegate.
         The NOC chain will be provided in TLV cert format."""
         self.CheckIsActive()
 
         with self._issue_node_chain_context as ctx:
-            self._ChipStack.Call(
+            res = await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_IssueNOCChain(
                     self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
-            ).raise_on_error()
-            return ctx.future.result()
+            )
+            res.raise_on_error()
+            return await asyncio.futures.wrap_future(ctx.future)
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):
