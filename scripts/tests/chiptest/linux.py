@@ -64,7 +64,7 @@ def EnsurePrivateState():
         sys.exit(1)
 
 
-def CreateNamespacesForAppTest(wifi_ble_config: bool = False):
+def CreateNamespacesForAppTest(ble_wifi: bool = False):
     """
     Creates appropriate namespaces for a tool and app binaries in a simulated
     isolated network.
@@ -106,7 +106,7 @@ def CreateNamespacesForAppTest(wifi_ble_config: bool = False):
         "ip link set dev eth-ci-switch up",
     ]
 
-    if not wifi_ble_config:
+    if not ble_wifi:
         COMMANDS += [
             "ip link add eth-app-direct type veth peer name eth-tool-direct",
             "ip link set eth-app-direct netns app",
@@ -144,7 +144,7 @@ def CreateNamespacesForAppTest(wifi_ble_config: bool = False):
         logging.warn("Some addresses look to still be tentative")
 
 
-def RemoveNamespaceForAppTest(wifi_ble_config: bool = False):
+def RemoveNamespaceForAppTest(ble_wifi: bool = False):
     """
     Removes namespaces for a tool and app binaries previously created to simulate an
     isolated network. This tears down what was created in CreateNamespacesForAppTest.
@@ -165,12 +165,11 @@ def RemoveNamespaceForAppTest(wifi_ble_config: bool = False):
         "ip netns del app",
     ]
 
-    if not wifi_ble_config:
+    if not ble_wifi:
         COMMANDS += [
             "ip link set dev eth-app-direct down",
             "ip link set dev eth-tool-direct down",
             "ip link delete eth-tool-direct",
-            "ip link delete eth-app-direct",
         ]
 
     for command in COMMANDS:
@@ -181,17 +180,17 @@ def RemoveNamespaceForAppTest(wifi_ble_config: bool = False):
             sys.exit(1)
 
 
-def PrepareNamespacesForTestExecution(in_unshare: bool, wifi_ble_config: bool = False):
+def PrepareNamespacesForTestExecution(in_unshare: bool, ble_wifi: bool = False):
     if not in_unshare:
         EnsureNetworkNamespaceAvailability()
     elif in_unshare:
         EnsurePrivateState()
 
-    CreateNamespacesForAppTest(wifi_ble_config)
+    CreateNamespacesForAppTest(ble_wifi)
 
 
-def ShutdownNamespaceForTestExecution(wifi_ble_config: bool = False):
-    RemoveNamespaceForAppTest(wifi_ble_config)
+def ShutdownNamespaceForTestExecution(ble_wifi: bool = False):
+    RemoveNamespaceForAppTest(ble_wifi)
 
 
 class DbusTest:
