@@ -49,7 +49,7 @@ public class ICDRegistrationInfo {
   }
 
   public Short getClientType() {
-    reutnr clientType;
+    return clientType;
   }
 
   public static Builder newBuilder() {
