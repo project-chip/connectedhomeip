@@ -19,6 +19,14 @@
 #pragma once
 
 #include <commands/common/CHIPCommand.h>
+#include <commands/pairing/OpenCommissioningWindowCommand.h>
+#include <commands/pairing/PairingCommand.h>
+
+constexpr uint16_t kMaxCommandSize             = 64;
+constexpr uint16_t kDiscriminator              = 3840;
+constexpr uint16_t kWindowTimeout              = 300;
+constexpr uint16_t kIteration                  = 1000;
+constexpr uint8_t kEnhancedCommissioningMethod = 1;
 
 class FabricSyncAddDeviceCommand : public CHIPCommand
 {
@@ -37,4 +45,27 @@ private:
     chip::NodeId mNodeId;
 
     CHIP_ERROR RunCommand(NodeId remoteId);
+};
+
+class FabricSyncDeviceCommand : public CHIPCommand, public CommissioningWindowDelegate, public CommissioningDelegate
+{
+public:
+    FabricSyncDeviceCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("sync-device", credIssuerCommands)
+    {
+        AddArgument("endpointid", 0, UINT16_MAX, &mRemoteEndpointId);
+    }
+
+    void OnCommissioningWindowOpened(NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload) override;
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override;
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override { return RunCommand(mRemoteEndpointId); }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+
+private:
+    chip::EndpointId mRemoteEndpointId = chip::kInvalidEndpointId;
+    chip::NodeId mAssignedNodeId       = chip::kUndefinedNodeId;
+
+    CHIP_ERROR RunCommand(chip::EndpointId remoteId);
 };

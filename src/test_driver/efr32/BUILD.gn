@@ -27,7 +27,6 @@ import("${chip_root}/src/platform/device.gni")
 import("$dir_pw_build/python.gni")
 import("$dir_pw_protobuf_compiler/proto.gni")
 
-import("//build_overrides/nlunit_test.gni")
 assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/src/test_driver/efr32"
@@ -86,9 +85,7 @@ silabs_executable("efr32_device_tests") {
     "${chip_root}/src:tests",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:pw_tests_wrapper",
-    "${chip_root}/src/lib/support:testing_nlunit",
     "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
-    "${nlunit_test_root}:nlunit-test",
   ]
 
   # OpenThread Settings
