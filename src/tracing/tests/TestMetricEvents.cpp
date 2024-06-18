@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 #include <gtest/gtest.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <tracing/backend.h>
 #include <tracing/metric_event.h>
 
@@ -597,17 +596,17 @@ TEST(TestMetricEvents, TestVerifyOrDoWithMetric)
     MetricEventBackend backend;
     ScopedRegistration scope(backend);
 
-    VerifyOrDoWithMetric("event0", DoubleOf(2) == 5);
-    VerifyOrDoWithMetric("event1", DoubleOf(3) == 6);
-    VerifyOrDoWithMetric("event2", DoubleOf(4) == 7, MATTER_LOG_METRIC("event4", 10));
-    VerifyOrDoWithMetric("event3", DoubleOf(5) == 8);
-    VerifyOrDoWithMetric("event5", DoubleOf(6) == 12);
+    VerifyOrDoWithMetric("event0", DoubleOf(2) == 5, 11);
+    VerifyOrDoWithMetric("event1", DoubleOf(3) == 6, 12);
+    VerifyOrDoWithMetric("event2", DoubleOf(4) == 7, CHIP_ERROR_BAD_REQUEST, MATTER_LOG_METRIC("event4", 10));
+    VerifyOrDoWithMetric("event3", DoubleOf(5) == 8, 13);
+    VerifyOrDoWithMetric("event5", DoubleOf(6) == 12, 14);
 
     std::vector<MetricEvent> expected = {
-        MetricEvent(MetricEvent::Type::kInstantEvent, "event0", false),
-        MetricEvent(MetricEvent::Type::kInstantEvent, "event2", false),
+        MetricEvent(MetricEvent::Type::kInstantEvent, "event0", 11),
+        MetricEvent(MetricEvent::Type::kInstantEvent, "event2", CHIP_ERROR_BAD_REQUEST),
         MetricEvent(MetricEvent::Type::kInstantEvent, "event4", 10),
-        MetricEvent(MetricEvent::Type::kInstantEvent, "event3", false),
+        MetricEvent(MetricEvent::Type::kInstantEvent, "event3", 13),
     };
 
     EXPECT_EQ(backend.GetMetricEvents().size(), expected.size());

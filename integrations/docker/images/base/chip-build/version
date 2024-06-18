@@ -1,1 +1,1 @@
-51 : [NuttX] Update Docker image to support compile with external source
+55 : Update to Ubuntu 24.04 as the base build image

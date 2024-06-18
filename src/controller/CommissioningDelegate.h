@@ -24,6 +24,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Variant.h>
+#include <matter/tracing/build_config.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -88,6 +89,10 @@ enum class ICDRegistrationStrategy : uint8_t
 };
 
 const char * StageToString(CommissioningStage stage);
+
+#if MATTER_TRACING_ENABLED
+const char * MetricKeyForCommissioningStage(CommissioningStage stage);
+#endif
 
 struct WiFiCredentials
 {

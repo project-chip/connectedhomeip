@@ -4035,6 +4035,59 @@ static id _Nullable DecodeEventPayloadForRadonConcentrationMeasurementCluster(Ev
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForWiFiNetworkManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WiFiNetworkManagement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForThreadBorderRouterManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ThreadBorderRouterManagement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForThreadNetworkDirectoryCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ThreadNetworkDirectory;
+    switch (aEventId) {
+    case Events::NetworkChanged::Id: {
+        Events::NetworkChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThreadNetworkDirectoryClusterNetworkChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.extendedPanID];
+            value.extendedPanID = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForWakeOnLANCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WakeOnLan;
@@ -4835,6 +4888,15 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return DecodeEventPayloadForRadonConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::WiFiNetworkManagement::Id: {
+        return DecodeEventPayloadForWiFiNetworkManagementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        return DecodeEventPayloadForThreadBorderRouterManagementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ThreadNetworkDirectory::Id: {
+        return DecodeEventPayloadForThreadNetworkDirectoryCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WakeOnLan::Id: {
         return DecodeEventPayloadForWakeOnLANCluster(aPath.mEventId, aReader, aError);

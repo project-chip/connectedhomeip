@@ -46,12 +46,15 @@ from pw_hdlc import rpc
 
 # Protos
 # isort: off
+from actions_service import actions_service_pb2
 from attributes_service import attributes_service_pb2
 from boolean_state_service import boolean_state_service_pb2
 from button_service import button_service_pb2
 from descriptor_service import descriptor_service_pb2
 from device_service import device_service_pb2
 from echo_service import echo_pb2
+from fabric_admin_service import fabric_admin_service_pb2
+from fabric_bridge_service import fabric_bridge_service_pb2
 from lighting_service import lighting_service_pb2
 from locking_service import locking_service_pb2
 from ot_cli_service import ot_cli_service_pb2
@@ -128,12 +131,15 @@ def show_console(device: str, baudrate: int,
         # "set_wakeup_fd only works in main thread of the main interpreter"
         use_ipython=True,
         compiled_protos=[
+                actions_service_pb2,
                 attributes_service_pb2,
                 boolean_state_service_pb2,
                 button_service_pb2,
                 descriptor_service_pb2,
                 device_service_pb2,
                 echo_pb2,
+                fabric_admin_service_pb2,
+                fabric_bridge_service_pb2,
                 lighting_service_pb2,
                 locking_service_pb2,
                 ot_cli_service_pb2,

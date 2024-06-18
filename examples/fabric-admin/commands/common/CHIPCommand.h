@@ -67,6 +67,9 @@ public:
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds, const char * helpText = nullptr) :
         Command(commandName, helpText), mCredIssuerCmds(credIssuerCmds)
     {
+        AddArgument("log-file-path", &mLogFilePath,
+                    "Path to the log file where the output is redirected.  Can be absolute or relative to the current working "
+                    "directory.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
                     "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
                     "directory.");
@@ -156,6 +159,7 @@ protected:
     // identity without shutting it down or something in between...
     PersistentStorage mCommissionerStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE
+    chip::Optional<char *> mLogFilePath;
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
     static chip::Crypto::RawKeySessionKeystore sSessionKeystore;

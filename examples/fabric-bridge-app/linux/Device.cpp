@@ -25,12 +25,11 @@
 
 using namespace chip::app::Clusters::Actions;
 
-Device::Device(const char * szDeviceName, std::string szLocation)
+Device::Device(chip::NodeId nodeId)
 {
-    chip::Platform::CopyString(mName, szDeviceName);
-    mLocation   = szLocation;
     mReachable  = false;
-    mEndpointId = 0;
+    mNodeId     = nodeId;
+    mEndpointId = chip::kInvalidEndpointId;
 }
 
 bool Device::IsReachable()
@@ -38,37 +37,23 @@ bool Device::IsReachable()
     return mReachable;
 }
 
-void Device::SetReachable(bool aReachable)
+void Device::SetReachable(bool reachable)
 {
-    bool changed = (mReachable != aReachable);
+    mReachable = reachable;
 
-    mReachable = aReachable;
-
-    if (aReachable)
+    if (reachable)
     {
-        ChipLogProgress(DeviceLayer, "Device[%s]: ONLINE", mName);
+        ChipLogProgress(NotSpecified, "Device[%s]: ONLINE", mName);
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "Device[%s]: OFFLINE", mName);
-    }
-
-    if (changed)
-    {
-        HandleDeviceChange(this, kChanged_Reachable);
+        ChipLogProgress(NotSpecified, "Device[%s]: OFFLINE", mName);
     }
 }
 
-void Device::SetName(const char * szName)
+void Device::SetName(const char * name)
 {
-    bool changed = (strncmp(mName, szName, sizeof(mName)) != 0);
+    ChipLogProgress(NotSpecified, "Device[%s]: New Name=\"%s\"", mName, name);
 
-    ChipLogProgress(DeviceLayer, "Device[%s]: New Name=\"%s\"", mName, szName);
-
-    chip::Platform::CopyString(mName, szName);
-
-    if (changed)
-    {
-        HandleDeviceChange(this, kChanged_Name);
-    }
+    chip::Platform::CopyString(mName, name);
 }

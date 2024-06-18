@@ -2,6 +2,12 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} as build
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    xz-utils \
+    && : # last line
+
 # Setup toolchain
 WORKDIR /opt/telink
 RUN set -x \
@@ -12,10 +18,10 @@ RUN set -x \
     && : # last line
 
 # Setup Zephyr
-ARG ZEPHYR_REVISION=68deadeb5c20b82d68700e720d4580e8003bf1d8
+ARG ZEPHYR_REVISION=0e8032dfef7e02498f34ba0b5d5d2df71a62adb1
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
-    && python3 -m pip install -U --no-cache-dir west \
+    && python3 -m pip install --break-system-packages -U --no-cache-dir west \
     && git clone https://github.com/telink-semi/zephyr \
     && cd zephyr \
     && git reset ${ZEPHYR_REVISION} --hard \
@@ -35,7 +41,7 @@ RUN set -x \
     && apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
-    && pip3 install --no-cache-dir --user -r /opt/telink/zephyrproject/zephyr/scripts/requirements.txt \
+    && pip3 install --break-system-packages --no-cache-dir --user -r /opt/telink/zephyrproject/zephyr/scripts/requirements.txt \
     && : # last line
 
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr

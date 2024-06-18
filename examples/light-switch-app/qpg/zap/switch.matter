@@ -912,9 +912,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1397,6 +1397,7 @@ cluster Switch = 59 {
     kMomentarySwitchRelease = 0x4;
     kMomentarySwitchLongPress = 0x8;
     kMomentarySwitchMultiPress = 0x10;
+    kActionSwitch = 0x20;
   }
 
   info event SwitchLatched = 0 {
@@ -1778,9 +1779,9 @@ cluster IcdManagement = 70 {
   readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
   readonly attribute access(read: administer) optional int32u ICDCounter = 4;
   readonly attribute optional int16u clientsSupportedPerFabric = 5;
-  readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
-  readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
-  readonly attribute optional OperatingModeEnum operatingMode = 8;
+  provisional readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
+  provisional readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  provisional readonly attribute optional OperatingModeEnum operatingMode = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2404,6 +2405,8 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute supportedThreadFeatures;
+    callback attribute threadVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2441,19 +2444,21 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
+    callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
-    ram      attribute testEventTriggersEnabled default = 0;
+    callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command TestEventTrigger;
+    handle command TimeSnapshot;
+    handle command TimeSnapshotResponse;
   }
 
   server cluster SoftwareDiagnostics {
@@ -2729,13 +2734,15 @@ endpoint 2 {
   }
 
   server cluster Switch {
+    emits event InitialPress;
+    emits event ShortRelease;
     ram      attribute numberOfPositions default = 2;
     ram      attribute currentPosition default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 6;
     ram      attribute clusterRevision default = 1;
   }
 }

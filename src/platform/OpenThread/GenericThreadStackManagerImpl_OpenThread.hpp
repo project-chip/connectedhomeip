@@ -74,14 +74,15 @@ static_assert(OPENTHREAD_API_VERSION >= 219, "OpenThread version too old");
 
 // Network commissioning
 namespace {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
 NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
-app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
+app::Clusters::NetworkCommissioning::Instance
+    sThreadNetworkCommissioningInstance(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */, &sGenericThreadDriver);
 #endif
 
 void initNetworkCommissioningThreadDriver(void)
 {
-#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
     sThreadNetworkCommissioningInstance.Init();
 #endif
 }
@@ -247,7 +248,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
         }
 
 #if CHIP_DETAIL_LOGGING
+        Impl()->LockThreadStack();
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
+        Impl()->UnlockThreadStack();
 #endif // CHIP_DETAIL_LOGGING
     }
 }

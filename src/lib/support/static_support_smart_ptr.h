@@ -54,7 +54,7 @@ template <class T>
 class CheckedGlobalInstanceReference
 {
 public:
-    CheckedGlobalInstanceReference<T>() = default;
+    CheckedGlobalInstanceReference() = default;
     CheckedGlobalInstanceReference(T * e) { VerifyOrDie(e == GlobalInstanceProvider<T>::InstancePointer()); }
     CheckedGlobalInstanceReference & operator=(T * value)
     {
@@ -89,7 +89,7 @@ template <class T>
 class SimpleInstanceReference
 {
 public:
-    SimpleInstanceReference<T>() = default;
+    SimpleInstanceReference() = default;
     SimpleInstanceReference(T * e) : mValue(e) {}
     SimpleInstanceReference & operator=(T * value)
     {

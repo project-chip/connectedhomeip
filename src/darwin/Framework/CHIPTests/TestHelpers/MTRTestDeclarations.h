@@ -33,6 +33,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)_endpointIndexKeyForNodeID:(NSNumber *)nodeID;
 - (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (NSString *)_clusterDataKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+- (nullable NSArray<NSNumber *> *)_fetchEndpointIndexForNodeID:(NSNumber *)nodeID;
+- (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
+- (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 @end
 
 // Declare internal methods for testing
@@ -44,6 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice (Test)
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
+- (MTRDeviceClusterData *)_getClusterDataForPath:(MTRClusterPath *)path;
+- (BOOL)_clusterHasBeenPersisted:(MTRClusterPath *)path;
+- (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
@@ -60,9 +66,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice (TestDebug)
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
-- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
 - (void)unitTestClearClusterData;
+- (MTRInternalDeviceState)_getInternalState;
+- (void)unitTestSetReportToPersistenceDelayTime:(NSTimeInterval)reportToPersistenceDelayTime
+                reportToPersistenceDelayTimeMax:(NSTimeInterval)reportToPersistenceDelayTimeMax
+                      recentReportTimesMaxCount:(NSUInteger)recentReportTimesMaxCount
+            timeBetweenReportsTooShortThreshold:(NSTimeInterval)timeBetweenReportsTooShortThreshold
+         timeBetweenReportsTooShortMinThreshold:(NSTimeInterval)timeBetweenReportsTooShortMinThreshold
+          reportToPersistenceDelayMaxMultiplier:(double)reportToPersistenceDelayMaxMultiplier
+    deviceReportingExcessivelyIntervalThreshold:(NSTimeInterval)deviceReportingExcessivelyIntervalThreshold;
+- (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
+- (NSUInteger)unitTestNonnullDelegateCount;
 @end
 #endif
 

@@ -61,7 +61,7 @@ Now that the building is completed there is a `chip-app1` binary created. This
 binary can be executed on a linux os with test commands.
 
 ```
-./scripts/tests/yaml/runner.py [TEST NAME] app1
+./scripts/tests/chipyaml/runner.py [TEST NAME] app1
 ```
 
 ## Interacting with the simulated app
