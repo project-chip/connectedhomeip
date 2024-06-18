@@ -394,9 +394,9 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/service-area-cluster-objects.h",
           "${_app_root}/clusters/${cluster}/service-area-delegate.cpp",
           "${_app_root}/clusters/${cluster}/service-area-delegate.h",
-          "${_app_root}/clusters/${cluster}/service-area-cluster-objects.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
