@@ -78,6 +78,8 @@ static_library("fabric-admin-utils") {
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/ToTLVCert.cpp",
+    "device_manager/DeviceManager.cpp",
+    "device_manager/DeviceManager.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]
