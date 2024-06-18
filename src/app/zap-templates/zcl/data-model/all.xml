@@ -105,6 +105,7 @@
    <xi:include href="chip/valve-configuration-and-control-cluster.xml" />
    <xi:include href="chip/wake-on-lan-cluster.xml" />
    <xi:include href="chip/washer-controls-cluster.xml" />
+   <xi:include href="chip/water-heater-management-cluster.xml" />   
    <xi:include href="chip/wifi-network-diagnostics-cluster.xml" />
    <xi:include href="chip/wifi-network-management-cluster.xml" />
    <xi:include href="chip/window-covering.xml" />

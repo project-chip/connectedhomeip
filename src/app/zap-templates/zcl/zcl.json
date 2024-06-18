@@ -124,6 +124,7 @@
         "valve-configuration-and-control-cluster.xml",
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
+        "water-heater-management-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -635,6 +636,7 @@
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Water Heater Management": ["FeatureMap"],
         "Wi-Fi Network Management": ["SSID"]
     },
     "defaultReportingPolicy": "mandatory",
