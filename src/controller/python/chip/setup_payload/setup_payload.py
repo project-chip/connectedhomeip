@@ -14,11 +14,10 @@
 #    limitations under the License.
 #
 
-from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8, c_uint16, c_uint32
+from ctypes import CFUNCTYPE, c_char_p, c_uint8, c_uint16, c_uint32
 from typing import Optional
 
-from chip.exceptions import ChipStackError
-from chip.native import GetLibraryHandle, NativeLibraryHandleMethodArguments
+from chip.native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 
 
 class SetupPayload:
@@ -46,34 +45,25 @@ class SetupPayload:
 
     def ParseQrCode(self, qrCode: str):
         self.Clear()
-        err = self.chipLib.pychip_SetupPayload_ParseQrCode(qrCode.upper().encode(),
-                                                           self.attribute_visitor,
-                                                           self.vendor_attribute_visitor)
-
-        if err != 0:
-            raise ChipStackError(err)
+        self.chipLib.pychip_SetupPayload_ParseQrCode(qrCode.upper().encode(),
+                                                     self.attribute_visitor,
+                                                     self.vendor_attribute_visitor).raise_on_error()
 
         return self
 
     def ParseManualPairingCode(self, manualPairingCode: str):
         self.Clear()
-        err = self.chipLib.pychip_SetupPayload_ParseManualPairingCode(manualPairingCode.encode(),
-                                                                      self.attribute_visitor,
-                                                                      self.vendor_attribute_visitor)
-
-        if err != 0:
-            raise ChipStackError(err)
+        self.chipLib.pychip_SetupPayload_ParseManualPairingCode(manualPairingCode.encode(),
+                                                                self.attribute_visitor,
+                                                                self.vendor_attribute_visitor).raise_on_error()
 
         return self
 
     # DEPRECATED
     def PrintOnboardingCodes(self, passcode, vendorId, productId, discriminator, customFlow, capabilities, version):
         self.Clear()
-        err = self.chipLib.pychip_SetupPayload_PrintOnboardingCodes(
-            passcode, vendorId, productId, discriminator, customFlow, capabilities, version)
-
-        if err != 0:
-            raise ChipStackError(err)
+        self.chipLib.pychip_SetupPayload_PrintOnboardingCodes(
+            passcode, vendorId, productId, discriminator, customFlow, capabilities, version).raise_on_error()
 
     # DEPRECATED
     def Print(self):
@@ -106,17 +96,17 @@ class SetupPayload:
         return None
 
     def __InitNativeFunctions(self, chipLib):
-        if chipLib.pychip_SetupPayload_ParseQrCode is not None:
+        if chipLib.pychip_SetupPayload_ParseQrCode.argtypes is not None:
             return
         setter = NativeLibraryHandleMethodArguments(chipLib)
         setter.Set("pychip_SetupPayload_ParseQrCode",
-                   c_int32,
+                   PyChipError,
                    [c_char_p, SetupPayload.AttributeVisitor, SetupPayload.VendorAttributeVisitor])
         setter.Set("pychip_SetupPayload_ParseManualPairingCode",
-                   c_int32,
+                   PyChipError,
                    [c_char_p, SetupPayload.AttributeVisitor, SetupPayload.VendorAttributeVisitor])
         setter.Set("pychip_SetupPayload_PrintOnboardingCodes",
-                   c_int32,
+                   PyChipError,
                    [c_uint32, c_uint16, c_uint16, c_uint16, c_uint8, c_uint8, c_uint8])
 
     # Getters from parsed contents.

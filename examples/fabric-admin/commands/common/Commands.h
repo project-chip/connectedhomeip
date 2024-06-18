@@ -45,6 +45,8 @@ public:
     int Run(int argc, char ** argv);
     int RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory, bool advertiseOperational);
 
+    Command * GetCommandByName(std::string commandSetName, std::string commandName);
+
 private:
     struct CommandSet
     {
@@ -87,4 +89,18 @@ private:
 #ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE
+
+    friend Commands & CommandMgr();
+    static Commands sInstance;
 };
+
+/**
+ * Returns the public interface of the CommandManager singleton object.
+ *
+ * Applications should use this to access features of the CommandManager
+ * object.
+ */
+inline Commands & CommandMgr()
+{
+    return Commands::sInstance;
+}

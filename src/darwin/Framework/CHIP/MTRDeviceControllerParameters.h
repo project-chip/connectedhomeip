@@ -84,7 +84,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  *
  * If this value is 0, the maximum subscription establishments allowed at a time will be set to 1.
  */
-@property (nonatomic, assign) NSUInteger concurrentSubscriptionEstablishmentsAllowedOnThread MTR_NEWLY_AVAILABLE;
+@property (nonatomic, assign) NSUInteger concurrentSubscriptionEstablishmentsAllowedOnThread MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Sets the storage behavior configuration - see MTRDeviceStorageBehaviorConfiguration.h for details

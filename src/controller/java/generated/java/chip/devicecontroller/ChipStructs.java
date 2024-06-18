@@ -7352,13 +7352,165 @@ public static class DeviceEnergyManagementClusterCostStruct {
     return output.toString();
   }
 }
+public static class DeviceEnergyManagementClusterPowerAdjustStruct {
+  public Long minPower;
+  public Long maxPower;
+  public Long minDuration;
+  public Long maxDuration;
+  private static final long MIN_POWER_ID = 0L;
+  private static final long MAX_POWER_ID = 1L;
+  private static final long MIN_DURATION_ID = 2L;
+  private static final long MAX_DURATION_ID = 3L;
+
+  public DeviceEnergyManagementClusterPowerAdjustStruct(
+    Long minPower,
+    Long maxPower,
+    Long minDuration,
+    Long maxDuration
+  ) {
+    this.minPower = minPower;
+    this.maxPower = maxPower;
+    this.minDuration = minDuration;
+    this.maxDuration = maxDuration;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MIN_POWER_ID, new IntType(minPower)));
+    values.add(new StructElement(MAX_POWER_ID, new IntType(maxPower)));
+    values.add(new StructElement(MIN_DURATION_ID, new UIntType(minDuration)));
+    values.add(new StructElement(MAX_DURATION_ID, new UIntType(maxDuration)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerAdjustStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long minPower = null;
+    Long maxPower = null;
+    Long minDuration = null;
+    Long maxDuration = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MIN_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          minPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MIN_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minDuration = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxDuration = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerAdjustStruct(
+      minPower,
+      maxPower,
+      minDuration,
+      maxDuration
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerAdjustStruct {\n");
+    output.append("\tminPower: ");
+    output.append(minPower);
+    output.append("\n");
+    output.append("\tmaxPower: ");
+    output.append(maxPower);
+    output.append("\n");
+    output.append("\tminDuration: ");
+    output.append(minDuration);
+    output.append("\n");
+    output.append("\tmaxDuration: ");
+    output.append(maxDuration);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DeviceEnergyManagementClusterPowerAdjustCapabilityStruct {
+  public @Nullable ArrayList<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> powerAdjustCapability;
+  public Integer cause;
+  private static final long POWER_ADJUST_CAPABILITY_ID = 0L;
+  private static final long CAUSE_ID = 1L;
+
+  public DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(
+    @Nullable ArrayList<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> powerAdjustCapability,
+    Integer cause
+  ) {
+    this.powerAdjustCapability = powerAdjustCapability;
+    this.cause = cause;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(POWER_ADJUST_CAPABILITY_ID, powerAdjustCapability != null ? ArrayType.generateArrayType(powerAdjustCapability, (elementpowerAdjustCapability) -> elementpowerAdjustCapability.encodeTlv()) : new NullType()));
+    values.add(new StructElement(CAUSE_ID, new UIntType(cause)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerAdjustCapabilityStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable ArrayList<ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct> powerAdjustCapability = null;
+    Integer cause = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == POWER_ADJUST_CAPABILITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          powerAdjustCapability = castingValue.map((elementcastingValue) -> ChipStructs.DeviceEnergyManagementClusterPowerAdjustStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == CAUSE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cause = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerAdjustCapabilityStruct(
+      powerAdjustCapability,
+      cause
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerAdjustCapabilityStruct {\n");
+    output.append("\tpowerAdjustCapability: ");
+    output.append(powerAdjustCapability);
+    output.append("\n");
+    output.append("\tcause: ");
+    output.append(cause);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementClusterSlotStruct {
   public Long minDuration;
   public Long maxDuration;
   public Long defaultDuration;
   public Long elapsedSlotTime;
   public Long remainingSlotTime;
-  public Optional<Boolean> slotIsPauseable;
+  public Optional<Boolean> slotIsPausable;
   public Optional<Long> minPauseDuration;
   public Optional<Long> maxPauseDuration;
   public Optional<Integer> manufacturerESAState;
@@ -7376,7 +7528,7 @@ public static class DeviceEnergyManagementClusterSlotStruct {
   private static final long DEFAULT_DURATION_ID = 2L;
   private static final long ELAPSED_SLOT_TIME_ID = 3L;
   private static final long REMAINING_SLOT_TIME_ID = 4L;
-  private static final long SLOT_IS_PAUSEABLE_ID = 5L;
+  private static final long SLOT_IS_PAUSABLE_ID = 5L;
   private static final long MIN_PAUSE_DURATION_ID = 6L;
   private static final long MAX_PAUSE_DURATION_ID = 7L;
   private static final long MANUFACTURER_E_S_A_STATE_ID = 8L;
@@ -7396,7 +7548,7 @@ public static class DeviceEnergyManagementClusterSlotStruct {
     Long defaultDuration,
     Long elapsedSlotTime,
     Long remainingSlotTime,
-    Optional<Boolean> slotIsPauseable,
+    Optional<Boolean> slotIsPausable,
     Optional<Long> minPauseDuration,
     Optional<Long> maxPauseDuration,
     Optional<Integer> manufacturerESAState,
@@ -7415,7 +7567,7 @@ public static class DeviceEnergyManagementClusterSlotStruct {
     this.defaultDuration = defaultDuration;
     this.elapsedSlotTime = elapsedSlotTime;
     this.remainingSlotTime = remainingSlotTime;
-    this.slotIsPauseable = slotIsPauseable;
+    this.slotIsPausable = slotIsPausable;
     this.minPauseDuration = minPauseDuration;
     this.maxPauseDuration = maxPauseDuration;
     this.manufacturerESAState = manufacturerESAState;
@@ -7437,7 +7589,7 @@ public static class DeviceEnergyManagementClusterSlotStruct {
     values.add(new StructElement(DEFAULT_DURATION_ID, new UIntType(defaultDuration)));
     values.add(new StructElement(ELAPSED_SLOT_TIME_ID, new UIntType(elapsedSlotTime)));
     values.add(new StructElement(REMAINING_SLOT_TIME_ID, new UIntType(remainingSlotTime)));
-    values.add(new StructElement(SLOT_IS_PAUSEABLE_ID, slotIsPauseable.<BaseTLVType>map((nonOptionalslotIsPauseable) -> new BooleanType(nonOptionalslotIsPauseable)).orElse(new EmptyType())));
+    values.add(new StructElement(SLOT_IS_PAUSABLE_ID, slotIsPausable.<BaseTLVType>map((nonOptionalslotIsPausable) -> new BooleanType(nonOptionalslotIsPausable)).orElse(new EmptyType())));
     values.add(new StructElement(MIN_PAUSE_DURATION_ID, minPauseDuration.<BaseTLVType>map((nonOptionalminPauseDuration) -> new UIntType(nonOptionalminPauseDuration)).orElse(new EmptyType())));
     values.add(new StructElement(MAX_PAUSE_DURATION_ID, maxPauseDuration.<BaseTLVType>map((nonOptionalmaxPauseDuration) -> new UIntType(nonOptionalmaxPauseDuration)).orElse(new EmptyType())));
     values.add(new StructElement(MANUFACTURER_E_S_A_STATE_ID, manufacturerESAState.<BaseTLVType>map((nonOptionalmanufacturerESAState) -> new UIntType(nonOptionalmanufacturerESAState)).orElse(new EmptyType())));
@@ -7463,7 +7615,7 @@ public static class DeviceEnergyManagementClusterSlotStruct {
     Long defaultDuration = null;
     Long elapsedSlotTime = null;
     Long remainingSlotTime = null;
-    Optional<Boolean> slotIsPauseable = Optional.empty();
+    Optional<Boolean> slotIsPausable = Optional.empty();
     Optional<Long> minPauseDuration = Optional.empty();
     Optional<Long> maxPauseDuration = Optional.empty();
     Optional<Integer> manufacturerESAState = Optional.empty();
@@ -7502,10 +7654,10 @@ public static class DeviceEnergyManagementClusterSlotStruct {
           UIntType castingValue = element.value(UIntType.class);
           remainingSlotTime = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == SLOT_IS_PAUSEABLE_ID) {
+      } else if (element.contextTagNum() == SLOT_IS_PAUSABLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          slotIsPauseable = Optional.of(castingValue.value(Boolean.class));
+          slotIsPausable = Optional.of(castingValue.value(Boolean.class));
         }
       } else if (element.contextTagNum() == MIN_PAUSE_DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -7575,7 +7727,7 @@ public static class DeviceEnergyManagementClusterSlotStruct {
       defaultDuration,
       elapsedSlotTime,
       remainingSlotTime,
-      slotIsPauseable,
+      slotIsPausable,
       minPauseDuration,
       maxPauseDuration,
       manufacturerESAState,
@@ -7610,8 +7762,8 @@ public static class DeviceEnergyManagementClusterSlotStruct {
     output.append("\tremainingSlotTime: ");
     output.append(remainingSlotTime);
     output.append("\n");
-    output.append("\tslotIsPauseable: ");
-    output.append(slotIsPauseable);
+    output.append("\tslotIsPausable: ");
+    output.append(slotIsPausable);
     output.append("\n");
     output.append("\tminPauseDuration: ");
     output.append(minPauseDuration);
@@ -7654,56 +7806,56 @@ public static class DeviceEnergyManagementClusterSlotStruct {
   }
 }
 public static class DeviceEnergyManagementClusterForecastStruct {
-  public Integer forecastId;
+  public Long forecastID;
   public @Nullable Integer activeSlotNumber;
   public Long startTime;
   public Long endTime;
   public @Nullable Optional<Long> earliestStartTime;
   public Optional<Long> latestEndTime;
-  public Boolean isPauseable;
+  public Boolean isPausable;
   public ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotStruct> slots;
   public Integer forecastUpdateReason;
-  private static final long FORECAST_ID_ID = 0L;
+  private static final long FORECAST_I_D_ID = 0L;
   private static final long ACTIVE_SLOT_NUMBER_ID = 1L;
   private static final long START_TIME_ID = 2L;
   private static final long END_TIME_ID = 3L;
   private static final long EARLIEST_START_TIME_ID = 4L;
   private static final long LATEST_END_TIME_ID = 5L;
-  private static final long IS_PAUSEABLE_ID = 6L;
+  private static final long IS_PAUSABLE_ID = 6L;
   private static final long SLOTS_ID = 7L;
   private static final long FORECAST_UPDATE_REASON_ID = 8L;
 
   public DeviceEnergyManagementClusterForecastStruct(
-    Integer forecastId,
+    Long forecastID,
     @Nullable Integer activeSlotNumber,
     Long startTime,
     Long endTime,
     @Nullable Optional<Long> earliestStartTime,
     Optional<Long> latestEndTime,
-    Boolean isPauseable,
+    Boolean isPausable,
     ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotStruct> slots,
     Integer forecastUpdateReason
   ) {
-    this.forecastId = forecastId;
+    this.forecastID = forecastID;
     this.activeSlotNumber = activeSlotNumber;
     this.startTime = startTime;
     this.endTime = endTime;
     this.earliestStartTime = earliestStartTime;
     this.latestEndTime = latestEndTime;
-    this.isPauseable = isPauseable;
+    this.isPausable = isPausable;
     this.slots = slots;
     this.forecastUpdateReason = forecastUpdateReason;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(FORECAST_ID_ID, new UIntType(forecastId)));
+    values.add(new StructElement(FORECAST_I_D_ID, new UIntType(forecastID)));
     values.add(new StructElement(ACTIVE_SLOT_NUMBER_ID, activeSlotNumber != null ? new UIntType(activeSlotNumber) : new NullType()));
     values.add(new StructElement(START_TIME_ID, new UIntType(startTime)));
     values.add(new StructElement(END_TIME_ID, new UIntType(endTime)));
     values.add(new StructElement(EARLIEST_START_TIME_ID, earliestStartTime != null ? earliestStartTime.<BaseTLVType>map((nonOptionalearliestStartTime) -> new UIntType(nonOptionalearliestStartTime)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(LATEST_END_TIME_ID, latestEndTime.<BaseTLVType>map((nonOptionallatestEndTime) -> new UIntType(nonOptionallatestEndTime)).orElse(new EmptyType())));
-    values.add(new StructElement(IS_PAUSEABLE_ID, new BooleanType(isPauseable)));
+    values.add(new StructElement(IS_PAUSABLE_ID, new BooleanType(isPausable)));
     values.add(new StructElement(SLOTS_ID, ArrayType.generateArrayType(slots, (elementslots) -> elementslots.encodeTlv())));
     values.add(new StructElement(FORECAST_UPDATE_REASON_ID, new UIntType(forecastUpdateReason)));
 
@@ -7714,20 +7866,20 @@ public static class DeviceEnergyManagementClusterForecastStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer forecastId = null;
+    Long forecastID = null;
     @Nullable Integer activeSlotNumber = null;
     Long startTime = null;
     Long endTime = null;
     @Nullable Optional<Long> earliestStartTime = null;
     Optional<Long> latestEndTime = Optional.empty();
-    Boolean isPauseable = null;
+    Boolean isPausable = null;
     ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotStruct> slots = null;
     Integer forecastUpdateReason = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == FORECAST_ID_ID) {
+      if (element.contextTagNum() == FORECAST_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          forecastId = castingValue.value(Integer.class);
+          forecastID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == ACTIVE_SLOT_NUMBER_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -7754,10 +7906,10 @@ public static class DeviceEnergyManagementClusterForecastStruct {
           UIntType castingValue = element.value(UIntType.class);
           latestEndTime = Optional.of(castingValue.value(Long.class));
         }
-      } else if (element.contextTagNum() == IS_PAUSEABLE_ID) {
+      } else if (element.contextTagNum() == IS_PAUSABLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          isPauseable = castingValue.value(Boolean.class);
+          isPausable = castingValue.value(Boolean.class);
         }
       } else if (element.contextTagNum() == SLOTS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
@@ -7772,13 +7924,13 @@ public static class DeviceEnergyManagementClusterForecastStruct {
       }
     }
     return new DeviceEnergyManagementClusterForecastStruct(
-      forecastId,
+      forecastID,
       activeSlotNumber,
       startTime,
       endTime,
       earliestStartTime,
       latestEndTime,
-      isPauseable,
+      isPausable,
       slots,
       forecastUpdateReason
     );
@@ -7788,8 +7940,8 @@ public static class DeviceEnergyManagementClusterForecastStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("DeviceEnergyManagementClusterForecastStruct {\n");
-    output.append("\tforecastId: ");
-    output.append(forecastId);
+    output.append("\tforecastID: ");
+    output.append(forecastID);
     output.append("\n");
     output.append("\tactiveSlotNumber: ");
     output.append(activeSlotNumber);
@@ -7806,8 +7958,8 @@ public static class DeviceEnergyManagementClusterForecastStruct {
     output.append("\tlatestEndTime: ");
     output.append(latestEndTime);
     output.append("\n");
-    output.append("\tisPauseable: ");
-    output.append(isPauseable);
+    output.append("\tisPausable: ");
+    output.append(isPausable);
     output.append("\n");
     output.append("\tslots: ");
     output.append(slots);
@@ -7925,100 +8077,9 @@ public static class DeviceEnergyManagementClusterConstraintsStruct {
     return output.toString();
   }
 }
-public static class DeviceEnergyManagementClusterPowerAdjustStruct {
-  public Long minPower;
-  public Long maxPower;
-  public Long minDuration;
-  public Long maxDuration;
-  private static final long MIN_POWER_ID = 0L;
-  private static final long MAX_POWER_ID = 1L;
-  private static final long MIN_DURATION_ID = 2L;
-  private static final long MAX_DURATION_ID = 3L;
-
-  public DeviceEnergyManagementClusterPowerAdjustStruct(
-    Long minPower,
-    Long maxPower,
-    Long minDuration,
-    Long maxDuration
-  ) {
-    this.minPower = minPower;
-    this.maxPower = maxPower;
-    this.minDuration = minDuration;
-    this.maxDuration = maxDuration;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(MIN_POWER_ID, new IntType(minPower)));
-    values.add(new StructElement(MAX_POWER_ID, new IntType(maxPower)));
-    values.add(new StructElement(MIN_DURATION_ID, new UIntType(minDuration)));
-    values.add(new StructElement(MAX_DURATION_ID, new UIntType(maxDuration)));
-
-    return new StructType(values);
-  }
-
-  public static DeviceEnergyManagementClusterPowerAdjustStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long minPower = null;
-    Long maxPower = null;
-    Long minDuration = null;
-    Long maxDuration = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == MIN_POWER_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          minPower = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == MAX_POWER_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          maxPower = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == MIN_DURATION_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          minDuration = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == MAX_DURATION_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          maxDuration = castingValue.value(Long.class);
-        }
-      }
-    }
-    return new DeviceEnergyManagementClusterPowerAdjustStruct(
-      minPower,
-      maxPower,
-      minDuration,
-      maxDuration
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("DeviceEnergyManagementClusterPowerAdjustStruct {\n");
-    output.append("\tminPower: ");
-    output.append(minPower);
-    output.append("\n");
-    output.append("\tmaxPower: ");
-    output.append(maxPower);
-    output.append("\n");
-    output.append("\tminDuration: ");
-    output.append(minDuration);
-    output.append("\n");
-    output.append("\tmaxDuration: ");
-    output.append(maxDuration);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class DeviceEnergyManagementClusterSlotAdjustmentStruct {
   public Integer slotIndex;
-  public Long nominalPower;
+  public Optional<Long> nominalPower;
   public Long duration;
   private static final long SLOT_INDEX_ID = 0L;
   private static final long NOMINAL_POWER_ID = 1L;
@@ -8026,7 +8087,7 @@ public static class DeviceEnergyManagementClusterSlotAdjustmentStruct {
 
   public DeviceEnergyManagementClusterSlotAdjustmentStruct(
     Integer slotIndex,
-    Long nominalPower,
+    Optional<Long> nominalPower,
     Long duration
   ) {
     this.slotIndex = slotIndex;
@@ -8037,7 +8098,7 @@ public static class DeviceEnergyManagementClusterSlotAdjustmentStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(SLOT_INDEX_ID, new UIntType(slotIndex)));
-    values.add(new StructElement(NOMINAL_POWER_ID, new IntType(nominalPower)));
+    values.add(new StructElement(NOMINAL_POWER_ID, nominalPower.<BaseTLVType>map((nonOptionalnominalPower) -> new IntType(nonOptionalnominalPower)).orElse(new EmptyType())));
     values.add(new StructElement(DURATION_ID, new UIntType(duration)));
 
     return new StructType(values);
@@ -8048,7 +8109,7 @@ public static class DeviceEnergyManagementClusterSlotAdjustmentStruct {
       return null;
     }
     Integer slotIndex = null;
-    Long nominalPower = null;
+    Optional<Long> nominalPower = Optional.empty();
     Long duration = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SLOT_INDEX_ID) {
@@ -8059,7 +8120,7 @@ public static class DeviceEnergyManagementClusterSlotAdjustmentStruct {
       } else if (element.contextTagNum() == NOMINAL_POWER_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          nominalPower = castingValue.value(Long.class);
+          nominalPower = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
