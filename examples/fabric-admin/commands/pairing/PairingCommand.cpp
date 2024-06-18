@@ -30,6 +30,10 @@
 
 #include <string>
 
+#if defined(PW_RPC_ENABLED)
+#include <rpc/RpcClient.h>
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Controller;
 
@@ -389,7 +393,12 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Device commissioning completed with success");
+        // print to console
+        fprintf(stderr, "New device with Node ID: 0x%lx has been successfully added.\n", nodeId);
+
+#if defined(PW_RPC_ENABLED)
+        AddSynchronizedDevice(nodeId);
+#endif
     }
     else
     {
@@ -404,6 +413,12 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             }
         }
         ChipLogProgress(NotSpecified, "Device commissioning Failure: %s", ErrorStr(err));
+    }
+
+    if (mCommissioningDelegate)
+    {
+        mCommissioningDelegate->OnCommissioningComplete(nodeId, err);
+        this->UnregisterCommissioningDelegate();
     }
 
     SetCommandExitStatus(err);
@@ -520,11 +535,23 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
 
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Device unpair completed with success: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+        // print to console
+        fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
+
+#if defined(PW_RPC_ENABLED)
+        RemoveSynchronizedDevice(nodeId);
+#endif
     }
     else
     {
         ChipLogProgress(NotSpecified, "Device unpair Failure: " ChipLogFormatX64 " %s", ChipLogValueX64(nodeId), ErrorStr(err));
+    }
+
+    PairingDelegate * pairingDelegate = command->GetPairingDelegate();
+    if (pairingDelegate)
+    {
+        pairingDelegate->OnDeviceRemoved(nodeId, err);
+        command->UnregisterPairingDelegate();
     }
 
     command->SetCommandExitStatus(err);
