@@ -24,6 +24,7 @@ represent individual steps in a test sequence (Step), and a class to represent a
 Additionally, it provides helper functions to retrieve specific test sequences or all defined test sequences.
 """
 
+
 class App(Enum):
     """An enumeration of the supported applications."""
 
@@ -59,7 +60,8 @@ class Step:
     ):
         # Validate that either `output_msg` or `input_cmd` is provided, but not both.
         if output_msg is not None and input_cmd is not None:
-            raise ValueError('Step cannot contain both `output_msg` and `input_cmd`. Either `output_msg` or `input_cmd` should be provided.')
+            raise ValueError(
+                'Step cannot contain both `output_msg` and `input_cmd`. Either `output_msg` or `input_cmd` should be provided.')
         elif output_msg is None and input_cmd is None:
             raise ValueError('Step must contain either `output_msg` or `input_cmd`. Both are `None`.')
 
@@ -87,7 +89,6 @@ class Sequence:
         self.name = name
         self.steps = steps
 
-
     @staticmethod
     def get_test_sequence_by_name(test_sequences: List['Sequence'], test_sequence_name: str) -> Optional['Sequence']:
         """Retrieve a test sequence from a list of sequences by its name."""
@@ -97,11 +98,10 @@ class Sequence:
                 return sequence
         return None
 
-
     @staticmethod
     def get_test_sequences() -> List['Sequence']:
         """Retrieve all the test sequences to validate the casting experience between the Linux tv-casting-app and the Linux tv-app."""
 
         from linux.tv_casting_test_sequences import test_sequences
-        
+
         return test_sequences

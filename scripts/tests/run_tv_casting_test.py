@@ -21,11 +21,11 @@ import subprocess
 import sys
 import tempfile
 import time
-from linux.tv_casting_test_sequence_utils import App, Sequence, Step
-from linux.tv_casting_test_sequences import START_APP, STOP_APP
 from typing import List, TextIO, Tuple
 
 import click
+from linux.tv_casting_test_sequence_utils import App, Sequence, Step
+from linux.tv_casting_test_sequences import START_APP, STOP_APP
 
 """
 This script can be used to validate the casting experience between the Linux tv-casting-app and the Linux tv-app.
@@ -101,10 +101,11 @@ def stop_app(test_sequence_name: str, app_name: str, app: subprocess.Popen):
                 logging.info(f'{test_sequence_name}: {app_name} stopped by {signal_number} (SIGTERM) signal.')
                 return True
             else:
-                logging.error(f'{test_sequence_name}: {app_name} stopped by signal {signal_number} instead of {signal.SIGTERM.value} (SIGTERM).')
+                logging.error(
+                    f'{test_sequence_name}: {app_name} stopped by signal {signal_number} instead of {signal.SIGTERM.value} (SIGTERM).')
         else:
             logging.error(f'{test_sequence_name}: {app_name} exited with unexpected exit code {app_exit_code}.')
-    
+
     return False
 
 
@@ -116,7 +117,7 @@ def parse_output_msg_in_subprocess(
     test_sequence_step: Step
 ):
     """Parse the output of a given `app` subprocess and validate its output against the expected `output_msg` in the given `Step`."""
-    
+
     if not test_sequence_step.output_msg:
         logging.error(f'{test_sequence_name} - No output message provided in the test sequence step.')
         return False
@@ -191,23 +192,23 @@ def send_input_cmd_to_subprocess(
 
 
 def handle_output_msg(
-    tv_casting_app_info: Tuple[subprocess.Popen, TextIO], 
-    tv_app_info: Tuple[subprocess.Popen, TextIO], 
-    log_paths: List[str], 
-    test_sequence_name: str, 
+    tv_casting_app_info: Tuple[subprocess.Popen, TextIO],
+    tv_app_info: Tuple[subprocess.Popen, TextIO],
+    log_paths: List[str],
+    test_sequence_name: str,
     test_sequence_step: Step
 ):
     """Handle the output message (`output_msg`) from a test sequence step."""
-    
+
     if not parse_output_msg_in_subprocess(tv_casting_app_info, tv_app_info, log_paths, test_sequence_name, test_sequence_step):
         handle_casting_failure(test_sequence_name, log_paths)
 
 
 def handle_input_cmd(
-    tv_casting_app_info: Tuple[subprocess.Popen, TextIO], 
-    tv_app_info: Tuple[subprocess.Popen, TextIO], 
-    log_paths: List[str], 
-    test_sequence_name: str, 
+    tv_casting_app_info: Tuple[subprocess.Popen, TextIO],
+    tv_app_info: Tuple[subprocess.Popen, TextIO],
+    log_paths: List[str],
+    test_sequence_name: str,
     test_sequence_step: Step
 ):
     """Handle the input command (`input_cmd`) from a test sequence step."""
@@ -230,11 +231,11 @@ def handle_input_cmd(
 
 
 def run_test_sequence_steps(
-    current_index: int, 
-    test_sequence_name: str, 
-    test_sequence_steps: List[Step], 
-    tv_casting_app_info: Tuple[subprocess.Popen, TextIO], 
-    tv_app_info: Tuple[subprocess.Popen, TextIO], 
+    current_index: int,
+    test_sequence_name: str,
+    test_sequence_steps: List[Step],
+    tv_casting_app_info: Tuple[subprocess.Popen, TextIO],
+    tv_app_info: Tuple[subprocess.Popen, TextIO],
     log_paths: List[str]
 ):
     """Run through the test steps from a test sequence starting from the current index and perform actions based on the presence of `output_msg` or `input_cmd`."""
@@ -271,8 +272,6 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
         linux_tv_app_log_path = os.path.join(temp_dir, LINUX_TV_APP_LOGS)
         linux_tv_casting_app_log_path = os.path.join(temp_dir, LINUX_TV_CASTING_APP_LOGS)
 
-        print(temp_dir) # SHAO remove when done
-
         with open(linux_tv_app_log_path, 'w') as linux_tv_app_log_file, open(linux_tv_casting_app_log_path, 'w') as linux_tv_casting_app_log_file:
 
             # Get all the test sequences.
@@ -297,7 +296,8 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
 
             current_index = 0
             if test_sequence_steps[current_index].input_cmd != START_APP:
-                raise ValueError(f'{test_sequence_name}: The first step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-app.')
+                raise ValueError(
+                    f'{test_sequence_name}: The first step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-app.')
             elif test_sequence_steps[current_index].app != App.TV_APP:
                 raise ValueError(f'{test_sequence_name}: The first step in the test sequence must be to start up the tv-app.')
             current_index += 1
@@ -308,13 +308,16 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
                 tv_app_info = (tv_app_process, linux_tv_app_log_file)
 
                 # Verify that the tv-app is up and running.
-                handle_output_msg(None, tv_app_info, [linux_tv_app_log_path], test_sequence_name, test_sequence_steps[current_index])
+                handle_output_msg(None, tv_app_info, [linux_tv_app_log_path],
+                                  test_sequence_name, test_sequence_steps[current_index])
                 current_index += 1
 
                 if test_sequence_steps[current_index].input_cmd != START_APP:
-                    raise ValueError(f'{test_sequence_name}: The third step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-casting-app.')
+                    raise ValueError(
+                        f'{test_sequence_name}: The third step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-casting-app.')
                 elif test_sequence_steps[current_index].app != App.TV_CASTING_APP:
-                    raise ValueError(f'{test_sequence_name}: The third step in the test sequence must be to start up the tv-casting-app.')
+                    raise ValueError(
+                        f'{test_sequence_name}: The third step in the test sequence must be to start up the tv-casting-app.')
                 current_index += 1
 
                 tv_casting_app_abs_path = os.path.abspath(tv_casting_app_rel_path)
@@ -324,10 +327,12 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
                     tv_casting_app_info = (tv_casting_app_process, linux_tv_casting_app_log_file)
 
                     # Verify that the server initialization is completed in the tv-casting-app output.
-                    handle_output_msg(tv_casting_app_info, tv_app_info, log_paths, test_sequence_name, test_sequence_steps[current_index])
+                    handle_output_msg(tv_casting_app_info, tv_app_info, log_paths,
+                                      test_sequence_name, test_sequence_steps[current_index])
                     current_index += 1
 
-                    run_test_sequence_steps(current_index, test_sequence_name, test_sequence_steps, tv_casting_app_info, tv_app_info, log_paths)
+                    run_test_sequence_steps(current_index, test_sequence_name, test_sequence_steps,
+                                            tv_casting_app_info, tv_app_info, log_paths)
 
 
 if __name__ == '__main__':

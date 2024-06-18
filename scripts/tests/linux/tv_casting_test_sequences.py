@@ -78,75 +78,75 @@ CLUSTER_MEDIA_PLAYBACK = '0x506'  # Application Cluster Spec 6.10.3 Cluster ID: 
 ATTRIBUTE_CURRENT_PLAYBACK_STATE = '0x0000_0000'  # Application Cluster Spec 6.10.6 Attribute ID: Current State of Playback
 
 test_sequences = [
-     Sequence(
-          name='commissionee_generated_passcode_test',
-          steps=[
-               # Signal to start the tv-app.
-               Step(app=App.TV_APP, input_cmd=START_APP),
+    Sequence(
+        name='commissionee_generated_passcode_test',
+        steps=[
+             # Signal to start the tv-app.
+            Step(app=App.TV_APP, input_cmd=START_APP),
 
-               # Validate that the tv-app is up and running.
-               Step(app=App.TV_APP, timeout_sec=APP_MAX_START_WAIT_SEC, output_msg=['Started commissioner']),
+            # Validate that the tv-app is up and running.
+            Step(app=App.TV_APP, timeout_sec=APP_MAX_START_WAIT_SEC, output_msg=['Started commissioner']),
 
-               # Signal to start the tv-casting-app.
-               Step(app=App.TV_CASTING_APP, input_cmd=START_APP),
+            # Signal to start the tv-casting-app.
+            Step(app=App.TV_CASTING_APP, input_cmd=START_APP),
 
-               # Validate that the server is properly initialized in the tv-casting-app output.
-               Step(app=App.TV_CASTING_APP, timeout_sec=APP_MAX_START_WAIT_SEC, output_msg=['Server initialization complete']),
+            # Validate that the server is properly initialized in the tv-casting-app output.
+            Step(app=App.TV_CASTING_APP, timeout_sec=APP_MAX_START_WAIT_SEC, output_msg=['Server initialization complete']),
 
-               # Validate that there is a valid discovered commissioner with {VENDOR_ID}, {PRODUCT_ID}, and {DEVICE_TYPE_CASTING_VIDEO_PLAYER} in the tv-casting-app output.
-               Step(app=App.TV_CASTING_APP, output_msg=['Discovered Commissioner #0', f'Vendor ID: {VENDOR_ID}', f'Product ID: {PRODUCT_ID}',
-                                                       f'Device Type: {DEVICE_TYPE_CASTING_VIDEO_PLAYER}', 'Supports Commissioner Generated Passcode: true']),
+            # Validate that there is a valid discovered commissioner with {VENDOR_ID}, {PRODUCT_ID}, and {DEVICE_TYPE_CASTING_VIDEO_PLAYER} in the tv-casting-app output.
+            Step(app=App.TV_CASTING_APP, output_msg=['Discovered Commissioner #0', f'Vendor ID: {VENDOR_ID}', f'Product ID: {PRODUCT_ID}',
+                                                     f'Device Type: {DEVICE_TYPE_CASTING_VIDEO_PLAYER}', 'Supports Commissioner Generated Passcode: true']),
 
-               # Validate that we are ready to send `cast request` command to the tv-casting-app subprocess.
-               Step(app=App.TV_CASTING_APP, output_msg=['Example: cast request 0']),
+            # Validate that we are ready to send `cast request` command to the tv-casting-app subprocess.
+            Step(app=App.TV_CASTING_APP, output_msg=['Example: cast request 0']),
 
-               # Send `cast request {valid_discovered_commissioner_number}\n` command to the tv-casting-app subprocess.
-               Step(app=App.TV_CASTING_APP, input_cmd='cast request 0\n'),
+            # Send `cast request {valid_discovered_commissioner_number}\n` command to the tv-casting-app subprocess.
+            Step(app=App.TV_CASTING_APP, input_cmd='cast request 0\n'),
 
-               # Validate that the `Identification Declaration` message block in the tv-casting-app output has the expected values for `device Name`, `vendor id`, and `product id`.
-               Step(app=App.TV_CASTING_APP, output_msg=['Identification Declaration Start', f'device Name: {TEST_TV_CASTING_APP_DEVICE_NAME}',
-                                                       f'vendor id: {VENDOR_ID}', f'product id: {PRODUCT_ID}', 'Identification Declaration End']),
+            # Validate that the `Identification Declaration` message block in the tv-casting-app output has the expected values for `device Name`, `vendor id`, and `product id`.
+            Step(app=App.TV_CASTING_APP, output_msg=['Identification Declaration Start', f'device Name: {TEST_TV_CASTING_APP_DEVICE_NAME}',
+                                                     f'vendor id: {VENDOR_ID}', f'product id: {PRODUCT_ID}', 'Identification Declaration End']),
 
-               # Validate that the `Identification Declaration` message block in the tv-app output has the expected values for `device Name`, `vendor id`, and `product id`.
-               Step(app=App.TV_APP, output_msg=['Identification Declaration Start', f'device Name: {TEST_TV_CASTING_APP_DEVICE_NAME}',
+            # Validate that the `Identification Declaration` message block in the tv-app output has the expected values for `device Name`, `vendor id`, and `product id`.
+            Step(app=App.TV_APP, output_msg=['Identification Declaration Start', f'device Name: {TEST_TV_CASTING_APP_DEVICE_NAME}',
                                              f'vendor id: {VENDOR_ID}', f'product id: {PRODUCT_ID}', 'Identification Declaration End']),
 
-               # Validate that we received the cast request from the tv-casting-app on the tv-app output.
-               Step(app=App.TV_APP,
-                    output_msg=['PROMPT USER: Test TV casting app is requesting permission to cast to this TV, approve?']),
+            # Validate that we received the cast request from the tv-casting-app on the tv-app output.
+            Step(app=App.TV_APP,
+                 output_msg=['PROMPT USER: Test TV casting app is requesting permission to cast to this TV, approve?']),
 
-               # Validate that we received the instructions on the tv-app output for sending the `controller ux ok` command.
-               Step(app=App.TV_APP, output_msg=['Via Shell Enter: controller ux ok|cancel']),
+            # Validate that we received the instructions on the tv-app output for sending the `controller ux ok` command.
+            Step(app=App.TV_APP, output_msg=['Via Shell Enter: controller ux ok|cancel']),
 
-               # Send `controller ux ok` command to the tv-app subprocess.
-               Step(app=App.TV_APP, input_cmd='controller ux ok\n'),
+            # Send `controller ux ok` command to the tv-app subprocess.
+            Step(app=App.TV_APP, input_cmd='controller ux ok\n'),
 
-               # Validate that pairing succeeded between the tv-casting-app and the tv-app.
-               Step(app=App.TV_APP, output_msg=['Secure Pairing Success']),
+            # Validate that pairing succeeded between the tv-casting-app and the tv-app.
+            Step(app=App.TV_APP, output_msg=['Secure Pairing Success']),
 
-               # Validate that commissioning succeeded in the tv-casting-app output.
-               Step(app=App.TV_CASTING_APP, output_msg=['Commissioning completed successfully']),
+            # Validate that commissioning succeeded in the tv-casting-app output.
+            Step(app=App.TV_CASTING_APP, output_msg=['Commissioning completed successfully']),
 
-               # Validate that commissioning succeeded in the tv-app output.
-               Step(app=App.TV_APP, output_msg=['------PROMPT USER: commissioning success']),
+            # Validate that commissioning succeeded in the tv-app output.
+            Step(app=App.TV_APP, output_msg=['------PROMPT USER: commissioning success']),
 
-               # Validate the subscription state by looking at the `Cluster` and `Attribute` values in the `ReportDataMessage` block in the tv-casting-app output.
-               Step(app=App.TV_CASTING_APP, output_msg=[
-               'ReportDataMessage =', f'Cluster = {CLUSTER_MEDIA_PLAYBACK}', f'Attribute = {ATTRIBUTE_CURRENT_PLAYBACK_STATE}', 'InteractionModelRevision =', '}']),
+            # Validate the subscription state by looking at the `Cluster` and `Attribute` values in the `ReportDataMessage` block in the tv-casting-app output.
+            Step(app=App.TV_CASTING_APP, output_msg=[
+                'ReportDataMessage =', f'Cluster = {CLUSTER_MEDIA_PLAYBACK}', f'Attribute = {ATTRIBUTE_CURRENT_PLAYBACK_STATE}', 'InteractionModelRevision =', '}']),
 
-               # Validate the LaunchURL in the tv-app output.
-               Step(app=App.TV_APP,
-                    output_msg=['ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://www.test.com/videoid DisplayString=Test video']),
+            # Validate the LaunchURL in the tv-app output.
+            Step(app=App.TV_APP,
+                 output_msg=['ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://www.test.com/videoid DisplayString=Test video']),
 
-               # Validate the LaunchURL in the tv-casting-app output.
-               Step(app=App.TV_CASTING_APP, output_msg=['InvokeResponseMessage =',
-                                                       'exampleData', 'InteractionModelRevision =', '},']),
+            # Validate the LaunchURL in the tv-casting-app output.
+            Step(app=App.TV_CASTING_APP, output_msg=['InvokeResponseMessage =',
+                                                     'exampleData', 'InteractionModelRevision =', '},']),
 
-               # Signal to stop the tv-casting-app as we finished validation.
-               Step(app=App.TV_CASTING_APP, input_cmd=STOP_APP),
+            # Signal to stop the tv-casting-app as we finished validation.
+            Step(app=App.TV_CASTING_APP, input_cmd=STOP_APP),
 
-               # Signal to stop the tv-app as we finished validation.
-               Step(app=App.TV_APP, input_cmd=STOP_APP)
-          ]
-     )
+            # Signal to stop the tv-app as we finished validation.
+            Step(app=App.TV_APP, input_cmd=STOP_APP)
+        ]
+    )
 ]
