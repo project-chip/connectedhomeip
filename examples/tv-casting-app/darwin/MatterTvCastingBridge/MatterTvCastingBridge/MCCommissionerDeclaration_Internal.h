@@ -20,8 +20,8 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef  MCCommissionerDeclaration_Internal_h
-#define  MCCommissionerDeclaration_Internal_h
+#ifndef MCCommissionerDeclaration_Internal_h
+#define MCCommissionerDeclaration_Internal_h
 
 @interface MCCommissionerDeclaration ()
 

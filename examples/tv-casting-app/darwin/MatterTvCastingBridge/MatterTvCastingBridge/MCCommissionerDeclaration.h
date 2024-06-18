@@ -49,11 +49,11 @@ typedef NS_ENUM(NSInteger, CdError) {
 };
 
 - (instancetype)initWithOptions:(NSInteger)errorCode
-                    needsPasscode:(BOOL)needsPasscode
-                      noAppsFound:(BOOL)noAppsFound
-          passcodeDialogDisplayed:(BOOL)passcodeDialogDisplayed
-              commissionerPasscode:(BOOL)commissionerPasscode
-                    qRCodeDisplayed:(BOOL)qRCodeDisplayed;
+                  needsPasscode:(BOOL)needsPasscode
+                    noAppsFound:(BOOL)noAppsFound
+        passcodeDialogDisplayed:(BOOL)passcodeDialogDisplayed
+           commissionerPasscode:(BOOL)commissionerPasscode
+                qRCodeDisplayed:(BOOL)qRCodeDisplayed;
 
 - (CdError)getErrorCode;
 - (BOOL)getNeedsPasscode;

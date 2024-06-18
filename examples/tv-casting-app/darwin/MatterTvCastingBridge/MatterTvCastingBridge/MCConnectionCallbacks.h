@@ -25,30 +25,27 @@
 /** @brief A container class for User Directed Commissioning (UDC) callbacks. */
 @interface MCConnectionCallbacks : NSObject
 
-
 /**
-* @param connectionCompleteCallback is required.
-* @param commissionerDeclarationCallback is optional.
-*
-* @return A new instance of MCConnectionCallbacks.
+ * @param connectionCompleteCallback is required.
+ * @param commissionerDeclarationCallback is optional.
+ *
+ * @return A new instance of MCConnectionCallbacks.
  */
 - (instancetype _Nonnull)initWithCallbacks:(void (^_Nonnull)(NSError * _Nonnull))connectionCompleteCallback
            commissionerDeclarationCallback:(void (^_Nullable)(MCCommissionerDeclaration * _Nonnull))commissionerDeclarationCallback;
 
 /**
-  * (Required) The callback called when the connection process has ended, regardless of whether it was successful or not.
-  */
+ * (Required) The callback called when the connection process has ended, regardless of whether it was successful or not.
+ */
 @property void (^_Nullable connectionCompleteCallback)(NSError * _Nonnull);
 
-
-  /**
-   * (Optional) The callback called when the Client/Commissionee receives a CommissionerDeclaration
-   * message from the CastingPlayer/Commissioner. This callback is needed to support UDC features
-   * where a reply from the Commissioner is expected. It provides information indicating the
-   * Commissioner’s pre-commissioning state.
-   */
+/**
+ * (Optional) The callback called when the Client/Commissionee receives a CommissionerDeclaration
+ * message from the CastingPlayer/Commissioner. This callback is needed to support UDC features
+ * where a reply from the Commissioner is expected. It provides information indicating the
+ * Commissioner’s pre-commissioning state.
+ */
 @property void (^_Nullable commissionerDeclarationCallback)(MCCommissionerDeclaration * _Nonnull);
-
 
 @end
 

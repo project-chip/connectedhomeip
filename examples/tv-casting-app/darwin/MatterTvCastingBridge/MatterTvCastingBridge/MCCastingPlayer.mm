@@ -81,16 +81,16 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
         }
 
         void (^connectCallback)(CHIP_ERROR, matter::casting::core::CastingPlayer *) = ^(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
-                  ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() connectCallback() called");
-                  dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
-                  dispatch_async(clientQueue, ^{
-                      if (connectionCallbacks.connectionCompleteCallback) {
-                          connectionCallbacks.connectionCompleteCallback(err == CHIP_NO_ERROR ? nil : [MCErrorUtils NSErrorFromChipError:err]);
-                      } else {
-                          ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() connectCallback(), client failed to set the connectionCompleteCallback() callback");
-                      }
-                  });
-              };
+            ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() connectCallback() called");
+            dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
+            dispatch_async(clientQueue, ^{
+                if (connectionCallbacks.connectionCompleteCallback) {
+                    connectionCallbacks.connectionCompleteCallback(err == CHIP_NO_ERROR ? nil : [MCErrorUtils NSErrorFromChipError:err]);
+                } else {
+                    ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() connectCallback(), client failed to set the connectionCompleteCallback() callback");
+                }
+            });
+        };
         void (^commissionerDeclarationCallback)(const chip::Transport::PeerAddress & source, const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) = ^(const chip::Transport::PeerAddress & source, const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) {
             ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() commissionerDeclarationCallback() called with cpp CommissionerDeclaration");
             dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];

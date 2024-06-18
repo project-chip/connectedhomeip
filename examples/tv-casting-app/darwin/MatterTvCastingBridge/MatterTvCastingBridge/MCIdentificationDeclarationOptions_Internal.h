@@ -20,8 +20,8 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef  MCIdentificationDeclarationOptions_Internal_h
-#define  MCIdentificationDeclarationOptions_Internal_h
+#ifndef MCIdentificationDeclarationOptions_Internal_h
+#define MCIdentificationDeclarationOptions_Internal_h
 
 @interface MCIdentificationDeclarationOptions ()
 

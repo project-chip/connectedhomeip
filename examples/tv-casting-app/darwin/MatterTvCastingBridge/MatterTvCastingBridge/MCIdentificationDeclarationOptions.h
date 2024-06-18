@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#import <Foundation/Foundation.h>
 #import "MCTargetAppInfo.h"
+#import <Foundation/Foundation.h>
 
 #ifndef MCIdentificationDeclarationOptions_h
 #define MCIdentificationDeclarationOptions_h
@@ -38,10 +38,10 @@
 - (BOOL)getCommissionerPasscodeReady;
 - (BOOL)getCancelPasscode;
 
-  /**
-   * @brief Adds a TargetAppInfo to the IdentificationDeclarationOptions.java TargetAppInfos list,
-   *     up to a maximum of CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS.
-   */
+/**
+ * @brief Adds a TargetAppInfo to the IdentificationDeclarationOptions.java TargetAppInfos list,
+ *     up to a maximum of CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS.
+ */
 - (BOOL)addTargetAppInfo:(MCTargetAppInfo *)targetAppInfo NS_SWIFT_NAME(addTargetAppInfo(_:));
 - (NSArray<MCTargetAppInfo *> *)getTargetAppInfoList;
 
