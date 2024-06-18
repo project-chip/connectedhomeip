@@ -3640,6 +3640,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("radonConcentrationMeasurement", writeRadonConcentrationMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeWiFiNetworkManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wiFiNetworkManagement", writeWiFiNetworkManagementInteractionInfo);
+    Map<String, InteractionInfo> writeThreadBorderRouterManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("threadBorderRouterManagement", writeThreadBorderRouterManagementInteractionInfo);
     Map<String, InteractionInfo> writeThreadNetworkDirectoryInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeThreadNetworkDirectoryPreferredExtendedPanIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo threadNetworkDirectorypreferredExtendedPanIDCommandParameterInfo =

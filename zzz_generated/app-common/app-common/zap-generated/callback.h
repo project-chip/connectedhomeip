@@ -546,6 +546,11 @@ void emberAfWiFiNetworkManagementClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfThreadBorderRouterManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfThreadNetworkDirectoryClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -1604,7 +1609,7 @@ chip::Protocols::InteractionModel::Status MatterThreadNetworkDiagnosticsClusterS
 void emberAfThreadNetworkDiagnosticsClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// WiFi Network Diagnostics Cluster
+// Wi-Fi Network Diagnostics Cluster
 //
 
 /**
@@ -4581,6 +4586,45 @@ chip::Protocols::InteractionModel::Status MatterWiFiNetworkManagementClusterServ
 void emberAfWiFiNetworkManagementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Thread Border Router Management Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfThreadBorderRouterManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterThreadBorderRouterManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfThreadBorderRouterManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterThreadBorderRouterManagementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterThreadBorderRouterManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfThreadBorderRouterManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Thread Network Directory Cluster
 //
 
@@ -5611,7 +5655,7 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
- * @brief WiFi Network Diagnostics Cluster ResetCounts Command callback (from client)
+ * @brief Wi-Fi Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
 bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -6257,6 +6301,30 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(
 bool emberAfColorControlClusterStepColorTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
+/**
+ * @brief Thread Border Router Management Cluster GetActiveDatasetRequest Command callback (from client)
+ */
+bool emberAfThreadBorderRouterManagementClusterGetActiveDatasetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::DecodableType & commandData);
+/**
+ * @brief Thread Border Router Management Cluster GetPendingDatasetRequest Command callback (from client)
+ */
+bool emberAfThreadBorderRouterManagementClusterGetPendingDatasetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::DecodableType & commandData);
+/**
+ * @brief Thread Border Router Management Cluster SetActiveDatasetRequest Command callback (from client)
+ */
+bool emberAfThreadBorderRouterManagementClusterSetActiveDatasetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::DecodableType & commandData);
+/**
+ * @brief Thread Border Router Management Cluster SetPendingDatasetRequest Command callback (from client)
+ */
+bool emberAfThreadBorderRouterManagementClusterSetPendingDatasetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::DecodableType & commandData);
 /**
  * @brief Thread Network Directory Cluster AddNetwork Command callback (from client)
  */

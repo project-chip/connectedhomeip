@@ -2761,6 +2761,74 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("MinPower", indent + 1, value.minPower);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinPower'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxPower", indent + 1, value.maxPower);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxPower'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MinDuration", indent + 1, value.minDuration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinDuration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxDuration", indent + 1, value.maxDuration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxDuration'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PowerAdjustCapability", indent + 1, value.powerAdjustCapability);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerAdjustCapability'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Cause", indent + 1, value.cause);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Cause'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::DecodableType & value)
 {
@@ -2806,10 +2874,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("SlotIsPauseable", indent + 1, value.slotIsPauseable);
+        CHIP_ERROR err = LogValue("SlotIsPausable", indent + 1, value.slotIsPausable);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SlotIsPauseable'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SlotIsPausable'");
             return err;
         }
     }
@@ -2920,10 +2988,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("ForecastId", indent + 1, value.forecastId);
+        CHIP_ERROR err = LogValue("ForecastID", indent + 1, value.forecastID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ForecastId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ForecastID'");
             return err;
         }
     }
@@ -2968,10 +3036,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("IsPauseable", indent + 1, value.isPauseable);
+        CHIP_ERROR err = LogValue("IsPausable", indent + 1, value.isPausable);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IsPauseable'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IsPausable'");
             return err;
         }
     }
@@ -3038,48 +3106,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LoadControl'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("MinPower", indent + 1, value.minPower);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinPower'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxPower", indent + 1, value.maxPower);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxPower'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MinDuration", indent + 1, value.minDuration);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinDuration'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxDuration", indent + 1, value.maxDuration);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxDuration'");
             return err;
         }
     }
@@ -7965,6 +7991,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("passphrase", indent + 1, value.passphrase));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ThreadBorderRouterManagement::Commands::DatasetResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("dataset", indent + 1, value.dataset));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -13063,8 +13097,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AbsMaxPower", 1, value);
         }
         case DeviceEnergyManagement::Attributes::PowerAdjustmentCapability::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType>>
+            chip::app::DataModel::Nullable<
+                chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PowerAdjustmentCapability", 1, value);
@@ -16457,6 +16491,67 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case ThreadBorderRouterManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case ThreadBorderRouterManagement::Attributes::BorderRouterName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BorderRouterName", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::BorderAgentID::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BorderAgentID", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ThreadVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThreadVersion", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InterfaceEnabled", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveDatasetTimestamp", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case ThreadNetworkDirectory::Id: {
         switch (path.mAttributeId)
         {
@@ -18882,6 +18977,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NetworkPassphraseResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case ThreadBorderRouterManagement::Id: {
+        switch (path.mCommandId)
+        {
+        case ThreadBorderRouterManagement::Commands::DatasetResponse::Id: {
+            ThreadBorderRouterManagement::Commands::DatasetResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DatasetResponse", 1, value);
         }
         }
         break;

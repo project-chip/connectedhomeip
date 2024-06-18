@@ -1492,6 +1492,7 @@ enum class Feature : uint32_t
     kMomentarySwitchRelease    = 0x4,
     kMomentarySwitchLongPress  = 0x8,
     kMomentarySwitchMultiPress = 0x10,
+    kActionSwitch              = 0x20,
 };
 } // namespace Switch
 
@@ -2569,6 +2570,19 @@ enum class OptOutStateEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
+};
+
+// Enum for PowerAdjustReasonEnum
+enum class PowerAdjustReasonEnum : uint8_t
+{
+    kNoAdjustment                = 0x00,
+    kLocalOptimizationAdjustment = 0x01,
+    kGridOptimizationAdjustment  = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 
 // Bitmap for Feature
@@ -4586,6 +4600,15 @@ enum class Feature : uint32_t
 } // namespace RadonConcentrationMeasurement
 
 namespace WiFiNetworkManagement {} // namespace WiFiNetworkManagement
+
+namespace ThreadBorderRouterManagement {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPANChange = 0x1,
+};
+} // namespace ThreadBorderRouterManagement
 
 namespace ThreadNetworkDirectory {} // namespace ThreadNetworkDirectory
 

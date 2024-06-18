@@ -26,7 +26,7 @@ limitations under the License.
         <item name="Max" value="0x3" />
     </enum>
 
-    <cluster apiMaturity="provisional">
+    <cluster>
         <domain>Appliances</domain>
         <name>Laundry Dryer Controls</name>
         <code>0x004A</code>

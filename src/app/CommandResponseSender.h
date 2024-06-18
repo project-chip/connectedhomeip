@@ -124,6 +124,8 @@ public:
 
     void ResponseDropped() override { mReportResponseDropped = true; }
 
+    size_t GetCommandResponseMaxBufferSize() override;
+
     /*
      * Main entrypoint for this class to handle an invoke request.
      *

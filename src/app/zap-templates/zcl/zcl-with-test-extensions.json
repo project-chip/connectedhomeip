@@ -118,6 +118,7 @@
         "test-cluster.xml",
         "thermostat-cluster.xml",
         "thermostat-user-interface-configuration-cluster.xml",
+        "thread-border-router-management-cluster.xml",
         "thread-network-diagnostics-cluster.xml",
         "thread-network-directory-cluster.xml",
         "time-format-localization-cluster.xml",
@@ -356,7 +357,7 @@
             "ChannelPage0Mask",
             "OperationalDatasetComponents"
         ],
-        "WiFi Network Diagnostics": [
+        "Wi-Fi Network Diagnostics": [
             "BSSID",
             "SecurityType",
             "WiFiVersion",
@@ -648,5 +649,8 @@
         "indexFieldId": 254,
         "indexFieldName": "FabricIndex",
         "indexType": "fabric_idx"
+    },
+    "uiOptions": {
+        "showProfileId": false
     }
 }

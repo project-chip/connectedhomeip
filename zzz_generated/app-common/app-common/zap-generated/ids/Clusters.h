@@ -331,6 +331,9 @@ static constexpr ClusterId Id = 0x0000042F;
 namespace WiFiNetworkManagement {
 static constexpr ClusterId Id = 0x00000451;
 } // namespace WiFiNetworkManagement
+namespace ThreadBorderRouterManagement {
+static constexpr ClusterId Id = 0x00000452;
+} // namespace ThreadBorderRouterManagement
 namespace ThreadNetworkDirectory {
 static constexpr ClusterId Id = 0x00000453;
 } // namespace ThreadNetworkDirectory

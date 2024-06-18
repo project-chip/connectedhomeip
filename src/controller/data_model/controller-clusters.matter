@@ -1445,9 +1445,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2280,6 +2280,7 @@ cluster Switch = 59 {
     kMomentarySwitchRelease = 0x4;
     kMomentarySwitchLongPress = 0x8;
     kMomentarySwitchMultiPress = 0x10;
+    kActionSwitch = 0x20;
   }
 
   info event SwitchLatched = 0 {
@@ -2714,9 +2715,9 @@ cluster IcdManagement = 70 {
   readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
   readonly attribute access(read: administer) optional int32u ICDCounter = 4;
   readonly attribute optional int16u clientsSupportedPerFabric = 5;
-  readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
-  readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
-  readonly attribute optional OperatingModeEnum operatingMode = 8;
+  provisional readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
+  provisional readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  provisional readonly attribute optional OperatingModeEnum operatingMode = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2927,7 +2928,7 @@ cluster OvenMode = 73 {
 
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
-provisional cluster LaundryDryerControls = 74 {
+cluster LaundryDryerControls = 74 {
   revision 1;
 
   enum DrynessLevelEnum : enum8 {
@@ -3575,8 +3576,8 @@ cluster MicrowaveOvenControl = 95 {
   readonly attribute optional int8u minPower = 3;
   readonly attribute optional int8u maxPower = 4;
   readonly attribute optional int8u powerStep = 5;
-  readonly attribute optional int16u supportedWatts[] = 6;
-  readonly attribute optional int8u selectedWattIndex = 7;
+  provisional readonly attribute optional int16u supportedWatts[] = 6;
+  provisional readonly attribute optional int8u selectedWattIndex = 7;
   readonly attribute optional int16u wattRating = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4594,7 +4595,7 @@ provisional cluster Messages = 151 {
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional cluster DeviceEnergyManagement = 152 {
-  revision 3;
+  revision 4;
 
   enum AdjustmentCauseEnum : enum8 {
     kLocalOptimization = 0;
@@ -4655,6 +4656,12 @@ provisional cluster DeviceEnergyManagement = 152 {
     kOptOut = 3;
   }
 
+  enum PowerAdjustReasonEnum : enum8 {
+    kNoAdjustment = 0;
+    kLocalOptimizationAdjustment = 1;
+    kGridOptimizationAdjustment = 2;
+  }
+
   bitmap Feature : bitmap32 {
     kPowerAdjustment = 0x1;
     kPowerForecastReporting = 0x2;
@@ -4672,13 +4679,25 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional int16u currency = 3;
   }
 
+  struct PowerAdjustStruct {
+    power_mw minPower = 0;
+    power_mw maxPower = 1;
+    elapsed_s minDuration = 2;
+    elapsed_s maxDuration = 3;
+  }
+
+  struct PowerAdjustCapabilityStruct {
+    nullable PowerAdjustStruct powerAdjustCapability[] = 0;
+    PowerAdjustReasonEnum cause = 1;
+  }
+
   struct SlotStruct {
     elapsed_s minDuration = 0;
     elapsed_s maxDuration = 1;
     elapsed_s defaultDuration = 2;
     elapsed_s elapsedSlotTime = 3;
     elapsed_s remainingSlotTime = 4;
-    optional boolean slotIsPauseable = 5;
+    optional boolean slotIsPausable = 5;
     optional elapsed_s minPauseDuration = 6;
     optional elapsed_s maxPauseDuration = 7;
     optional int16u manufacturerESAState = 8;
@@ -4694,13 +4713,13 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   struct ForecastStruct {
-    int16u forecastId = 0;
+    int32u forecastID = 0;
     nullable int16u activeSlotNumber = 1;
     epoch_s startTime = 2;
     epoch_s endTime = 3;
     optional nullable epoch_s earliestStartTime = 4;
     optional epoch_s latestEndTime = 5;
-    boolean isPauseable = 6;
+    boolean isPausable = 6;
     SlotStruct slots[] = 7;
     ForecastUpdateReasonEnum forecastUpdateReason = 8;
   }
@@ -4713,16 +4732,9 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional int8s loadControl = 4;
   }
 
-  struct PowerAdjustStruct {
-    power_mw minPower = 0;
-    power_mw maxPower = 1;
-    elapsed_s minDuration = 2;
-    elapsed_s maxDuration = 3;
-  }
-
   struct SlotAdjustmentStruct {
     int8u slotIndex = 0;
-    power_mw nominalPower = 1;
+    optional power_mw nominalPower = 1;
     elapsed_s duration = 2;
   }
 
@@ -4747,7 +4759,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute ESAStateEnum ESAState = 2;
   readonly attribute power_mw absMinPower = 3;
   readonly attribute power_mw absMaxPower = 4;
-  readonly attribute optional nullable PowerAdjustStruct powerAdjustmentCapability[] = 5;
+  readonly attribute optional nullable PowerAdjustCapabilityStruct powerAdjustmentCapability = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
   readonly attribute optional OptOutStateEnum optOutState = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -4774,7 +4786,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   request struct ModifyForecastRequestRequest {
-    int32u forecastId = 0;
+    int32u forecastID = 0;
     SlotAdjustmentStruct slotAdjustments[] = 1;
     AdjustmentCauseEnum cause = 2;
   }
@@ -5547,7 +5559,7 @@ cluster DoorLock = 257 {
   readonly attribute optional int8u numberOfCredentialsSupportedPerUser = 28;
   attribute access(write: manage) optional char_string<3> language = 33;
   attribute access(write: manage) optional int8u LEDSettings = 34;
-  attribute access(write: manage) int32u autoRelockTime = 35;
+  attribute access(write: manage) optional int32u autoRelockTime = 35;
   attribute access(write: manage) optional int8u soundVolume = 36;
   attribute access(write: manage) OperatingModeEnum operatingMode = 37;
   readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
@@ -5562,15 +5574,15 @@ cluster DoorLock = 257 {
   attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
   attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
   attribute access(write: administer) optional int16u expiringUserTimeout = 53;
-  readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
-  readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
-  readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
-  readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
-  readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
-  readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
-  readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
-  readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
-  readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
+  provisional readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
+  provisional readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
+  provisional readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
+  provisional readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
+  provisional readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
+  provisional readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
+  provisional readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
+  provisional readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
+  provisional readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -7964,6 +7976,49 @@ cluster WiFiNetworkManagement = 1105 {
   command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
 }
 
+/** Manage the Thread network of Thread Border Router */
+cluster ThreadBorderRouterManagement = 1106 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kPANChange = 0x1;
+  }
+
+  readonly attribute char_string<63> borderRouterName = 0;
+  readonly attribute octet_string<254> borderAgentID = 1;
+  readonly attribute int16u threadVersion = 2;
+  readonly attribute boolean interfaceEnabled = 3;
+  readonly attribute nullable int64u activeDatasetTimestamp = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct DatasetResponse = 3 {
+    octet_string<254> dataset = 0;
+  }
+
+  request struct SetActiveDatasetRequestRequest {
+    octet_string<254> activeDataset = 0;
+    optional int64u breadcrumb = 1;
+  }
+
+  request struct SetPendingDatasetRequestRequest {
+    octet_string<254> pendingDataset = 0;
+  }
+
+  /** Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetActiveDatasetRequest(): DatasetResponse = 0;
+  /** Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  command access(invoke: manage) GetPendingDatasetRequest(): DatasetResponse = 1;
+  /** Command to set or update the active Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 4;
+  /** Command set or update the pending Dataset of the Thread network to which the Border Router is connected. */
+  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 5;
+}
+
 /** Manages the names and credentials of Thread networks visible to the user. */
 cluster ThreadNetworkDirectory = 1107 {
   revision 1;
@@ -8017,7 +8072,7 @@ cluster WakeOnLan = 1283 {
   revision 1;
 
   readonly attribute optional char_string<12> MACAddress = 0;
-  readonly attribute optional octet_string<16> linkLocalAddress = 1;
+  provisional readonly attribute optional octet_string<16> linkLocalAddress = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
