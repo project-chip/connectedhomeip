@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 100,
+  "featureLevel": 102,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -4340,7 +4340,7 @@
           ]
         },
         {
-          "name": "WiFi Network Diagnostics",
+          "name": "Wi-Fi Network Diagnostics",
           "code": 54,
           "mfgCode": null,
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
@@ -24779,27 +24779,27 @@
       "id": 4,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "code": 4293984258,
+        "code": 25,
         "profileId": 259,
-        "label": "MA-secondary-network-commissioning",
-        "name": "MA-secondary-network-commissioning"
+        "label": "MA-secondary-network-interface",
+        "name": "MA-secondary-network-interface"
       },
       "deviceTypes": [
         {
-          "code": 4293984258,
+          "code": 25,
           "profileId": 259,
-          "label": "MA-secondary-network-commissioning",
-          "name": "MA-secondary-network-commissioning"
+          "label": "MA-secondary-network-interface",
+          "name": "MA-secondary-network-interface"
         }
       ],
       "deviceVersions": [
         1
       ],
       "deviceIdentifiers": [
-        4293984258
+        25
       ],
-      "deviceTypeName": "MA-secondary-network-commissioning",
-      "deviceTypeCode": 4293984258,
+      "deviceTypeName": "MA-secondary-network-interface",
+      "deviceTypeCode": 25,
       "deviceTypeProfileId": 259,
       "clusters": [
         {

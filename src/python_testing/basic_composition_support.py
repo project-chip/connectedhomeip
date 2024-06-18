@@ -22,6 +22,7 @@ import json
 import logging
 import pathlib
 import sys
+import typing
 from pprint import pprint
 from typing import Any, Optional
 
@@ -102,6 +103,16 @@ class BasicCompositionTests:
         asserts.assert_true(setupCode, "Require either --qr-code or --manual-code.")
         dev_ctrl.FindOrEstablishPASESession(setupCode, self.dut_node_id)
 
+    def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]):
+        node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
+        logging.debug(f"Raw TLV contents of Node: {json.dumps(node_dump_dict, indent=2)}")
+
+        if dump_device_composition_path is not None:
+            with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "wt+") as outfile:
+                json.dump(node_dump_dict, outfile, indent=2)
+            with open(pathlib.Path(dump_device_composition_path).with_suffix(".txt"), "wt+") as outfile:
+                pprint(self.endpoints, outfile, indent=1, width=200, compact=True)
+
     async def setup_class_helper(self, default_to_pase: bool = True):
         dev_ctrl = self.default_controller
         self.problems = []
@@ -117,28 +128,19 @@ class BasicCompositionTests:
             node_id = self.dut_node_id
 
         wildcard_read = (await dev_ctrl.Read(node_id, [()]))
-        endpoints_tlv = wildcard_read.tlvAttributes
-
-        node_dump_dict = {endpoint_id: MatterTlvToJson(endpoints_tlv[endpoint_id]) for endpoint_id in endpoints_tlv}
-        logging.debug(f"Raw TLV contents of Node: {json.dumps(node_dump_dict, indent=2)}")
-
-        if dump_device_composition_path is not None:
-            with open(pathlib.Path(dump_device_composition_path).with_suffix(".json"), "wt+") as outfile:
-                json.dump(node_dump_dict, outfile, indent=2)
-            with open(pathlib.Path(dump_device_composition_path).with_suffix(".txt"), "wt+") as outfile:
-                pprint(wildcard_read.attributes, outfile, indent=1, width=200, compact=True)
-
-        logging.info("###########################################################")
-        logging.info("Start of actual tests")
-        logging.info("###########################################################")
 
         # ======= State kept for use by all tests =======
-
         # All endpoints in "full object" indexing format
         self.endpoints = wildcard_read.attributes
 
         # All endpoints in raw TLV format
         self.endpoints_tlv = wildcard_read.tlvAttributes
+
+        self.dump_wildcard(dump_device_composition_path)
+
+        logging.info("###########################################################")
+        logging.info("Start of actual tests")
+        logging.info("###########################################################")
 
     def get_test_name(self) -> str:
         """Return the function name of the caller. Used to create logging entries."""

@@ -59,7 +59,7 @@ RUN set -x \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     # Install Python Packages
-    && pip3 install -r /tmp/requirements.txt \
+    && pip3 install --break-system-packages -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt \
     && : # last line
 

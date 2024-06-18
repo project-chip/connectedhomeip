@@ -17,6 +17,7 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class DeviceEnergyManagementClusterSlotAdjustmentStruct(
   val slotIndex: UInt,
-  val nominalPower: Long,
+  val nominalPower: Optional<Long>,
   val duration: ULong
 ) {
   override fun toString(): String = buildString {
@@ -39,7 +40,10 @@ class DeviceEnergyManagementClusterSlotAdjustmentStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SLOT_INDEX), slotIndex)
-      put(ContextSpecificTag(TAG_NOMINAL_POWER), nominalPower)
+      if (nominalPower.isPresent) {
+        val optnominalPower = nominalPower.get()
+        put(ContextSpecificTag(TAG_NOMINAL_POWER), optnominalPower)
+      }
       put(ContextSpecificTag(TAG_DURATION), duration)
       endStructure()
     }
@@ -56,7 +60,12 @@ class DeviceEnergyManagementClusterSlotAdjustmentStruct(
     ): DeviceEnergyManagementClusterSlotAdjustmentStruct {
       tlvReader.enterStructure(tlvTag)
       val slotIndex = tlvReader.getUInt(ContextSpecificTag(TAG_SLOT_INDEX))
-      val nominalPower = tlvReader.getLong(ContextSpecificTag(TAG_NOMINAL_POWER))
+      val nominalPower =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NOMINAL_POWER))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NOMINAL_POWER)))
+        } else {
+          Optional.empty()
+        }
       val duration = tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
 
       tlvReader.exitContainer()

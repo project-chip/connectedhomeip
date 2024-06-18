@@ -65,12 +65,9 @@
 #define OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE 1
 #define OPENTHREAD_CONFIG_ECDSA_ENABLE 1
 
-// Temporary workaround till we can enable this via the gn
-#ifdef SPINEL_INTERFACE_RPMSG
-#define OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE 1
-#else
+#ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE
 #define OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE 0
-#endif /* SPINEL_INTERFACE_RPMSG */
+#endif /* OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE */
 
 /*
  * "ot-nxp/src/rw/rw612/platform/radio.c" has a dependency on

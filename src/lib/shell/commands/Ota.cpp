@@ -19,7 +19,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
+#include <lib/shell/SubShellCommand.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::DeviceLayer;
@@ -27,8 +27,6 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace Shell {
 namespace {
-
-Shell::Engine sSubShell;
 
 CHIP_ERROR QueryImageHandler(int argc, char ** argv)
 {
@@ -96,31 +94,15 @@ CHIP_ERROR ProgressHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OtaHandler(int argc, char ** argv)
-{
-    if (argc == 0)
-    {
-        sSubShell.ForEachCommand(PrintCommandHelp, nullptr);
-        return CHIP_NO_ERROR;
-    }
-
-    return sSubShell.ExecCommand(argc, argv);
-}
 } // namespace
 
 void RegisterOtaCommands()
 {
-    // Register subcommands of the `ota` commands.
-    static const shell_command_t subCommands[] = {
-        { &QueryImageHandler, "query", "Query for a new image. Usage: ota query" },
-        { &StateHandler, "state", "Gets state of a current image update process. Usage: ota state" },
-        { &ProgressHandler, "progress", "Gets progress of a current image update process. Usage: ota progress" }
-    };
+    static constexpr Command subCommands[] = { { &QueryImageHandler, "query", "Query for a new image" },
+                                               { &StateHandler, "state", "Get current image update state" },
+                                               { &ProgressHandler, "progress", "Get current image update progress" } };
 
-    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
-
-    // Register the root `ota` command in the top-level shell.
-    static const shell_command_t otaCommand = { &OtaHandler, "ota", "OTA commands" };
+    static constexpr Command otaCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "ota", "OTA commands" };
 
     Engine::Root().RegisterCommands(&otaCommand, 1);
 }

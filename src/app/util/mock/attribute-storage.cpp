@@ -47,7 +47,6 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <app/util/af-types.h>
@@ -150,6 +149,50 @@ uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpointId)
     auto endpoint = GetMockNodeConfig().endpointById(endpointId);
     VerifyOrReturnValue(endpoint != nullptr, 0);
     return static_cast<uint8_t>(endpoint->clusters.size());
+}
+
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
+{
+    auto ep = GetMockNodeConfig().endpointById(endpointId);
+    VerifyOrReturnValue(ep != nullptr, nullptr);
+
+    auto cluster = ep->clusterById(clusterId);
+    VerifyOrReturnValue(cluster != nullptr, nullptr);
+
+    auto attr = cluster->attributeById(attributeId);
+    VerifyOrReturnValue(attr != nullptr, nullptr);
+
+    return &attr->attributeMetaData;
+}
+
+const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,
+                                                EmberAfClusterMask mask, uint8_t * index)
+{
+    // This is a copy & paste implementation from ember attribute storage
+    // TODO: this hard-codes ember logic and is duplicated code.
+    uint8_t scopedIndex = 0;
+
+    for (uint8_t i = 0; i < endpointType->clusterCount; i++)
+    {
+        const EmberAfCluster * cluster = &(endpointType->cluster[i]);
+
+        if (mask == 0 || ((cluster->mask & mask) != 0))
+        {
+            if (cluster->clusterId == clusterId)
+            {
+                if (index)
+                {
+                    *index = scopedIndex;
+                }
+
+                return cluster;
+            }
+
+            scopedIndex++;
+        }
+    }
+
+    return nullptr;
 }
 
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
@@ -414,6 +457,7 @@ void SetMockNodeConfig(const MockNodeConfig & config)
     mockConfig = &config;
 }
 
+/// Resets the mock attribute storage to the default configuration.
 void ResetMockNodeConfig()
 {
     mockConfig = nullptr;

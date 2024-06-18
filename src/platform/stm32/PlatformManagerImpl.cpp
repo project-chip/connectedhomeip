@@ -34,6 +34,7 @@ namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
+
 extern "C" int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_t * olen);
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)

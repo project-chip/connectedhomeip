@@ -41,9 +41,13 @@ chip_with_lwip = false
 chip_system_config_locking = "none"
 chip_system_config_use_sockets = false
 
+chip_use_transitional_commissionable_data_provider = false
+
 optimize_debug_level = "s"
+is_debug = true
 lwip_debug = false
 default_configs_optimize = [ "$dir_pw_build:optimize_size" ]
+default_configs_specs = [ "${cyw30739_sdk_build_root}:specs-config" ]
 
 chip_build_tests = false
 
@@ -52,9 +56,6 @@ openthread_external_mbedtls = mbedtls_target
 
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_deps = [ "${chip_root}/examples/platform/infineon/cyw30739:openthread_core_config_ifx_chip_examples" ]
-
-openthread_external_platform =
-    "${chip_root}/third_party/openthread/platforms/ifx:libopenthread-ifx"
 
 openthread_enable_core_config_args = true
 openthread_config_dhcp6_client_enable = true
@@ -65,8 +66,4 @@ openthread_config_joiner_enable = true
 openthread_config_log_output = "platform_defined"
 openthread_config_srp_client_enable = true
 
-# TODO: this should be removed once sufficient flash for things
-#       like:
-#
-# ./scripts/build/build_examples.py --target cyw30739-cyw930739m2evb_01-ota-requestor build
-chip_detail_logging = false
+optiga_trust_m_dir = "${chip_root}/third_party/infineon/trustm/optiga-trust-m"

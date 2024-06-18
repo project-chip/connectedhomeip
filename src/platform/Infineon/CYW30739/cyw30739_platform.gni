@@ -1,0 +1,64 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/cyw30739_sdk.gni")
+
+import("${chip_root}/src/platform/Infineon/CYW30739/args.gni")
+
+cyw30739_platform_dir = "${chip_root}/src/platform/Infineon/CYW30739"
+
+template("cyw30739_platform") {
+  forward_variables_from(invoker, [ "board" ])
+
+  static_library(target_name) {
+    sources = [
+      "${cyw30739_platform_dir}/BLEManagerImpl.cpp",
+      "${cyw30739_platform_dir}/CYW30739Config.cpp",
+      "${cyw30739_platform_dir}/ConfigurationManagerImpl.cpp",
+      "${cyw30739_platform_dir}/DiagnosticDataProviderImpl.cpp",
+      "${cyw30739_platform_dir}/EventFlags.cpp",
+      "${cyw30739_platform_dir}/FactoryDataProvider.cpp",
+      "${cyw30739_platform_dir}/Logging.cpp",
+      "${cyw30739_platform_dir}/OTAImageProcessorImpl.cpp",
+      "${cyw30739_platform_dir}/PlatformManagerImpl.cpp",
+      "${cyw30739_platform_dir}/SystemTimeSupport.cpp",
+      "${cyw30739_platform_dir}/cycfg_gatt_db.c",
+    ]
+
+    if (chip_enable_openthread) {
+      sources += [ "${cyw30739_platform_dir}/ThreadStackManagerImpl.cpp" ]
+    }
+
+    if (invoker.board_use_optiga) {
+      sources += [
+        "${cyw30739_platform_dir}/OptigaFactoryDataProvider.cpp",
+        "${cyw30739_platform_dir}/UnprovisionedOptigaFactoryDataProvider.cpp",
+      ]
+    }
+
+    configs += [ "${matter_wpan_sdk_build_root}:${board}-config" ]
+
+    deps = [
+      "${chip_root}/src/platform:platform",
+      "${chip_root}/src/platform/logging:headers",
+    ]
+
+    if (chip_enable_openthread) {
+      deps += [
+        "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+      ]
+    }
+  }
+}

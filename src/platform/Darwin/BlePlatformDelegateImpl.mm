@@ -29,7 +29,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/BlePlatformDelegate.h>
 
-#import "UUIDHelper.h"
+#import "MTRUUIDHelper.h"
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -47,7 +47,7 @@ namespace DeviceLayer {
                 return found;
             }
 
-            CBUUID * serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
+            CBUUID * serviceId = [MTRUUIDHelper GetShortestServiceUUID:svcId];
             CBUUID * characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
             CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
 
@@ -74,7 +74,7 @@ namespace DeviceLayer {
                 return found;
             }
 
-            CBUUID * serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
+            CBUUID * serviceId = [MTRUUIDHelper GetShortestServiceUUID:svcId];
             CBUUID * characteristicId = characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes
                                                                                                length:sizeof(charId->bytes)]];
             CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
@@ -131,7 +131,7 @@ namespace DeviceLayer {
                 return found;
             }
 
-            CBUUID * serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
+            CBUUID * serviceId = [MTRUUIDHelper GetShortestServiceUUID:svcId];
             CBUUID * characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
             NSData * data = [NSData dataWithBytes:pBuf->Start() length:pBuf->DataLength()];
             CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
@@ -152,18 +152,6 @@ namespace DeviceLayer {
             // stack free their references to it. We release pBuf's reference here since its payload bytes were copied into a new
             // NSData object
             return found;
-        }
-
-        bool BlePlatformDelegateImpl::SendReadRequest(
-            BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBufferHandle pBuf)
-        {
-            return false;
-        }
-
-        bool BlePlatformDelegateImpl::SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext,
-            const ChipBleUUID * svcId, const ChipBleUUID * charId)
-        {
-            return false;
         }
 
     } // namespace Internal

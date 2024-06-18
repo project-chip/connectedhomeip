@@ -16,21 +16,16 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for CHIP Interaction Model Command Interaction
- *
- */
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
+
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 namespace {
 
@@ -38,35 +33,20 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-class TestDataModelSerialization
+class TestDataModelSerialization : public ::testing::Test
 {
 public:
-    static void TestDataModelSerialization_EncAndDecSimpleStruct(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_EncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_EncAndDecNestedStructList(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_EncAndDecDecodableNestedStructList(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList(nlTestSuite * apSuite, void * apContext);
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    void TearDown() override { System::PacketBufferHandle buf = mStore.Release(); }
 
-    static void TestDataModelSerialization_OptionalFields(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_ExtraField(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_InvalidSimpleFieldTypes(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_InvalidListType(nlTestSuite * apSuite, void * apContext);
-
-    static void NullablesOptionalsStruct(nlTestSuite * apSuite, void * apContext);
-    static void NullablesOptionalsCommand(nlTestSuite * apSuite, void * apContext);
-
-    void Shutdown();
-
-protected:
     // Helper functions
     template <typename Encodable, typename Decodable>
-    static void NullablesOptionalsEncodeDecodeCheck(nlTestSuite * apSuite, void * apContext, bool encodeNulls, bool encodeValues);
+    void NullablesOptionalsEncodeDecodeCheck(bool encodeNulls, bool encodeValues);
 
     template <typename Encodable, typename Decodable>
-    static void NullablesOptionalsEncodeDecodeCheck(nlTestSuite * apSuite, void * apContext);
+    void NullablesOptionalsEncodeDecodeCheck();
 
-private:
     void SetupBuf();
     void DumpBuf();
     void SetupReader();
@@ -74,12 +54,9 @@ private:
     System::TLVPacketBufferBackingStore mStore;
     TLV::TLVWriter mWriter;
     TLV::TLVReader mReader;
-    nlTestSuite * mpSuite;
 };
 
 using namespace TLV;
-
-TestDataModelSerialization gTestDataModelSerialization;
 
 void TestDataModelSerialization::SetupBuf()
 {
@@ -90,11 +67,6 @@ void TestDataModelSerialization::SetupBuf()
 
     mWriter.Init(mStore);
     mReader.Init(mStore);
-}
-
-void TestDataModelSerialization::Shutdown()
-{
-    System::PacketBufferHandle buf = mStore.Release();
 }
 
 void TestDataModelSerialization::DumpBuf()
@@ -112,12 +84,9 @@ void TestDataModelSerialization::DumpBuf()
 
 void TestDataModelSerialization::SetupReader()
 {
-    CHIP_ERROR err;
 
     mReader.Init(mStore);
-    err = mReader.Next();
-
-    NL_TEST_ASSERT(mpSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(mReader.Next(), CHIP_NO_ERROR);
 }
 
 template <typename T>
@@ -161,13 +130,9 @@ bool StringMatches(Span<const char> str1, const char * str2)
     return (strncmp(str1.data(), str2, str1.size()) == 0);
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruct(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestDataModelSerialization, EncAndDecSimpleStruct)
 {
-    CHIP_ERROR err;
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
-
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
+    SetupBuf();
 
     //
     // Encode
@@ -186,13 +151,11 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
 
         t.f.Set(Clusters::UnitTesting::SimpleBitmap::kValueC);
 
-        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), t), CHIP_NO_ERROR);
 
-        err = _this->mWriter.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
 
-        _this->DumpBuf();
+        DumpBuf();
     }
 
     //
@@ -201,35 +164,31 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
     {
         Clusters::UnitTesting::Structs::SimpleStruct::Type t;
 
-        _this->SetupReader();
+        SetupReader();
 
-        err = DataModel::Decode(_this->mReader, t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(apSuite, t.a == 20);
-        NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c == Clusters::UnitTesting::SimpleEnum::kValueA);
+        EXPECT_EQ(t.a, 20);
+        EXPECT_TRUE(t.b);
+        EXPECT_EQ(t.c, Clusters::UnitTesting::SimpleEnum::kValueA);
 
-        NL_TEST_ASSERT(apSuite, t.d.size() == 4);
+        EXPECT_EQ(t.d.size(), 4u);
 
         for (uint32_t i = 0; i < t.d.size(); i++)
         {
-            NL_TEST_ASSERT(apSuite, t.d.data()[i] == i);
+            EXPECT_EQ(t.d.data()[i], i);
         }
 
-        NL_TEST_ASSERT(apSuite, StringMatches(t.e, "chip"));
-        NL_TEST_ASSERT(apSuite, t.f.HasOnly(Clusters::UnitTesting::SimpleBitmap::kValueC));
+        EXPECT_TRUE(StringMatches(t.e, "chip"));
+        EXPECT_TRUE(t.f.HasOnly(Clusters::UnitTesting::SimpleBitmap::kValueC));
     }
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum(nlTestSuite * apSuite,
-                                                                                              void * apContext)
-{
-    CHIP_ERROR err;
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
+TEST_F(TestDataModelSerialization, EncAndDecSimpleStructNegativeEnum)
 
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
+{
+
+    SetupBuf();
 
     //
     // Encode
@@ -248,13 +207,11 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
 
         t.f.Set(Clusters::UnitTesting::SimpleBitmap::kValueC);
 
-        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), t), CHIP_NO_ERROR);
 
-        err = _this->mWriter.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
 
-        _this->DumpBuf();
+        DumpBuf();
     }
 
     //
@@ -263,21 +220,17 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
     {
         Clusters::UnitTesting::Structs::SimpleStruct::Type t;
 
-        _this->SetupReader();
+        SetupReader();
 
-        err = DataModel::Decode(_this->mReader, t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, to_underlying(t.c) == 4);
+        EXPECT_EQ(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
+        EXPECT_EQ(to_underlying(t.c), 4);
     }
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestDataModelSerialization, EncAndDecNestedStruct)
 {
-    CHIP_ERROR err;
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
+    SetupBuf();
 
     //
     // Encode
@@ -296,13 +249,10 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
 
         t.c.e = Span<char>{ strbuf, strlen(strbuf) };
 
-        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), t), CHIP_NO_ERROR);
+        EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
 
-        err = _this->mWriter.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        _this->DumpBuf();
+        DumpBuf();
     }
 
     //
@@ -311,36 +261,30 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
     {
         Clusters::UnitTesting::Structs::NestedStruct::DecodableType t;
 
-        _this->SetupReader();
+        SetupReader();
 
-        err = DataModel::Decode(_this->mReader, t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(apSuite, t.a == 20);
-        NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c.a == 11);
-        NL_TEST_ASSERT(apSuite, t.c.b == true);
-        NL_TEST_ASSERT(apSuite, t.c.c == Clusters::UnitTesting::SimpleEnum::kValueB);
+        EXPECT_EQ(t.a, 20);
+        EXPECT_TRUE(t.b);
+        EXPECT_EQ(t.c.a, 11);
+        EXPECT_TRUE(t.c.b);
+        EXPECT_EQ(t.c.c, Clusters::UnitTesting::SimpleEnum::kValueB);
 
-        NL_TEST_ASSERT(apSuite, t.c.d.size() == 4);
+        EXPECT_EQ(t.c.d.size(), 4u);
 
         for (uint32_t i = 0; i < t.c.d.size(); i++)
         {
-            NL_TEST_ASSERT(apSuite, t.c.d.data()[i] == i);
+            EXPECT_EQ(t.c.d.data()[i], i);
         }
 
-        NL_TEST_ASSERT(apSuite, StringMatches(t.c.e, "chip"));
+        EXPECT_TRUE(StringMatches(t.c.e, "chip"));
     }
 }
-
-void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNestedStructList(nlTestSuite * apSuite,
-                                                                                               void * apContext)
+TEST_F(TestDataModelSerialization, EncAndDecDecodableNestedStructList)
 {
-    CHIP_ERROR err;
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
+    SetupBuf();
 
     //
     // Encode
@@ -381,13 +325,10 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         t.c.e = Span<char>{ strbuf, strlen(strbuf) };
         t.d   = structList;
 
-        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), t), CHIP_NO_ERROR);
+        EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
 
-        err = _this->mWriter.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        _this->DumpBuf();
+        DumpBuf();
     }
 
     //
@@ -397,18 +338,17 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         Clusters::UnitTesting::Structs::NestedStructList::DecodableType t;
         int i;
 
-        _this->SetupReader();
+        SetupReader();
 
-        err = DataModel::Decode(_this->mReader, t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(apSuite, t.a == 20);
-        NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c.a == 11);
-        NL_TEST_ASSERT(apSuite, t.c.b == true);
-        NL_TEST_ASSERT(apSuite, t.c.c == Clusters::UnitTesting::SimpleEnum::kValueB);
+        EXPECT_EQ(t.a, 20);
+        EXPECT_TRUE(t.b);
+        EXPECT_EQ(t.c.a, 11);
+        EXPECT_TRUE(t.c.b);
+        EXPECT_EQ(t.c.c, Clusters::UnitTesting::SimpleEnum::kValueB);
 
-        NL_TEST_ASSERT(apSuite, StringMatches(t.c.e, "chip"));
+        EXPECT_TRUE(StringMatches(t.c.e, "chip"));
 
         {
             i         = 0;
@@ -416,13 +356,13 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
             while (iter.Next())
             {
                 auto & item = iter.GetValue();
-                NL_TEST_ASSERT(apSuite, item.a == static_cast<uint8_t>(i));
-                NL_TEST_ASSERT(apSuite, item.b == true);
+                EXPECT_EQ(item.a, static_cast<uint8_t>(i));
+                EXPECT_TRUE(item.b);
                 i++;
             }
 
-            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(apSuite, i == 4);
+            EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+            EXPECT_EQ(i, 4);
         }
 
         {
@@ -431,12 +371,12 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
             while (iter.Next())
             {
                 auto & item = iter.GetValue();
-                NL_TEST_ASSERT(apSuite, item == static_cast<uint32_t>(i + 10000));
+                EXPECT_EQ(item, static_cast<uint32_t>(i + 10000));
                 i++;
             }
 
-            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(apSuite, i == 4);
+            EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+            EXPECT_EQ(i, 4);
         }
 
         {
@@ -450,15 +390,15 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
                 unsigned int j = 0;
                 for (; j < item.size(); j++)
                 {
-                    NL_TEST_ASSERT(apSuite, item.data()[j] == j);
+                    EXPECT_EQ(item.data()[j], j);
                 }
 
-                NL_TEST_ASSERT(apSuite, j == 4);
+                EXPECT_EQ(j, 4u);
                 i++;
             }
 
-            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(apSuite, i == 4);
+            EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+            EXPECT_EQ(i, 4);
         }
 
         {
@@ -468,24 +408,19 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
             while (iter.Next())
             {
                 auto & item = iter.GetValue();
-                NL_TEST_ASSERT(apSuite, item == i);
+                EXPECT_EQ(item, i);
                 i++;
             }
 
-            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(apSuite, i == 4);
+            EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+            EXPECT_EQ(i, 4);
         }
     }
 }
-
-void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList(nlTestSuite * apSuite,
-                                                                                                     void * apContext)
+TEST_F(TestDataModelSerialization, EncAndDecDecodableDoubleNestedStructList)
 {
-    CHIP_ERROR err;
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
+    SetupBuf();
 
     //
     // Encode
@@ -510,13 +445,10 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
             item.d = structList;
         }
 
-        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), t), CHIP_NO_ERROR);
+        EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
 
-        err = _this->mWriter.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        _this->DumpBuf();
+        DumpBuf();
     }
 
     //
@@ -525,10 +457,9 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
     {
         Clusters::UnitTesting::Structs::DoubleNestedStructList::DecodableType t;
 
-        _this->SetupReader();
+        SetupReader();
 
-        err = DataModel::Decode(_this->mReader, t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
 
         uint8_t i = 0;
 
@@ -543,26 +474,23 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
             {
                 auto & nestedItem = nestedIter.GetValue();
 
-                NL_TEST_ASSERT(apSuite, nestedItem.a == (static_cast<uint8_t>(35) + j));
+                EXPECT_EQ(nestedItem.a, (static_cast<uint8_t>(35) + j));
                 j++;
             }
 
-            NL_TEST_ASSERT(apSuite, j == 4);
+            EXPECT_EQ(j, 4u);
             i++;
         }
 
-        NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, i == 4);
+        EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_EQ(i, 4u);
     }
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestDataModelSerialization, OptionalFields)
 {
-    CHIP_ERROR err;
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
+    SetupBuf();
 
     //
     // Encode
@@ -581,18 +509,18 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
 
         // Encode every field manually except a.
         {
-            err = EncodeStruct(_this->mWriter, TLV::AnonymousTag(),
-                               MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
-                               MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
-                               MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.d),
-                               MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e));
-            NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+            EXPECT_EQ(
+                EncodeStruct(mWriter, TLV::AnonymousTag(),
+                             MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
+                             MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
+                             MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.d),
+                             MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e)),
+                CHIP_NO_ERROR);
         }
 
-        err = _this->mWriter.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
 
-        _this->DumpBuf();
+        DumpBuf();
     }
 
     //
@@ -601,38 +529,33 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
     {
         Clusters::UnitTesting::Structs::SimpleStruct::DecodableType t;
 
-        _this->SetupReader();
+        SetupReader();
 
         // Set the value of a to a specific value, and ensure it is not over-written after decode.
         t.a = 150;
 
-        err = DataModel::Decode(_this->mReader, t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
 
         // Ensure that the decoder did not over-write the value set in the generated object
-        NL_TEST_ASSERT(apSuite, t.a == 150);
+        EXPECT_EQ(t.a, 150);
 
-        NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c == Clusters::UnitTesting::SimpleEnum::kValueA);
+        EXPECT_TRUE(t.b);
+        EXPECT_EQ(t.c, Clusters::UnitTesting::SimpleEnum::kValueA);
 
-        NL_TEST_ASSERT(apSuite, t.d.size() == 4);
+        EXPECT_EQ(t.d.size(), 4u);
 
         for (uint32_t i = 0; i < t.d.size(); i++)
         {
-            NL_TEST_ASSERT(apSuite, t.d.data()[i] == i);
+            EXPECT_EQ(t.d.data()[i], i);
         }
 
-        NL_TEST_ASSERT(apSuite, StringMatches(t.e, "chip"));
+        EXPECT_TRUE(StringMatches(t.e, "chip"));
     }
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestDataModelSerialization, ExtraField)
 {
-    CHIP_ERROR err;
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
-
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
+    SetupBuf();
 
     //
     // Encode
@@ -651,22 +574,21 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
 
         // Encode every field + an extra field.
         {
-            err = EncodeStruct(
-                _this->mWriter, TLV::AnonymousTag(),
-                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA), t.a),
-                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
-                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
-                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.d),
-                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE) + 1),
-                                 t.a));
-            NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+            EXPECT_EQ(EncodeStruct(
+                          mWriter, TLV::AnonymousTag(),
+                          MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA), t.a),
+                          MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
+                          MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
+                          MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.d),
+                          MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e),
+                          MakeTagValuePair(
+                              TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE) + 1), t.a)),
+                      CHIP_NO_ERROR);
         }
 
-        err = _this->mWriter.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
 
-        _this->DumpBuf();
+        DumpBuf();
     }
 
     //
@@ -675,35 +597,29 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
     {
         Clusters::UnitTesting::Structs::SimpleStruct::DecodableType t;
 
-        _this->SetupReader();
+        SetupReader();
 
         // Ensure successful decode despite the extra field.
-        err = DataModel::Decode(_this->mReader, t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(apSuite, t.a == 20);
-        NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c == Clusters::UnitTesting::SimpleEnum::kValueA);
+        EXPECT_EQ(t.a, 20);
+        EXPECT_TRUE(t.b);
+        EXPECT_EQ(t.c, Clusters::UnitTesting::SimpleEnum::kValueA);
 
-        NL_TEST_ASSERT(apSuite, t.d.size() == 4);
+        EXPECT_EQ(t.d.size(), 4u);
 
         for (uint32_t i = 0; i < t.d.size(); i++)
         {
-            NL_TEST_ASSERT(apSuite, t.d.data()[i] == i);
+            EXPECT_EQ(t.d.data()[i], i);
         }
 
-        NL_TEST_ASSERT(apSuite, StringMatches(t.e, "chip"));
+        EXPECT_TRUE(StringMatches(t.e, "chip"));
     }
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTypes(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestDataModelSerialization, InvalidSimpleFieldTypes)
 {
-    CHIP_ERROR err;
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
-
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
-
+    SetupBuf();
     //
     // Case #1: Swap out field a (an integer) with a boolean.
     //
@@ -725,37 +641,32 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
 
             // Encode every field manually except a.
             {
-                err =
-                    EncodeStruct(_this->mWriter, TLV::AnonymousTag(),
+                EXPECT_EQ(
+                    EncodeStruct(mWriter, TLV::AnonymousTag(),
                                  MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA), t.b),
                                  MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
                                  MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
                                  MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.d),
-                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e));
-                NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e)),
+                    CHIP_NO_ERROR);
             }
 
-            err = _this->mWriter.Finalize();
-            NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-            _this->DumpBuf();
+            EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
+            DumpBuf();
         }
-
         //
         // Decode
         //
         {
             Clusters::UnitTesting::Structs::SimpleStruct::DecodableType t;
 
-            _this->SetupReader();
+            SetupReader();
 
-            err = DataModel::Decode(_this->mReader, t);
-            NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
+            EXPECT_NE(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
         }
     }
 
-    _this->SetupBuf();
-
+    SetupBuf();
     //
     // Case #2: Swap out an octet string with a UTF-8 string.
     //
@@ -777,20 +688,19 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
 
             // Encode every field manually except a.
             {
-                err =
-                    EncodeStruct(_this->mWriter, TLV::AnonymousTag(),
+                EXPECT_EQ(
+                    EncodeStruct(mWriter, TLV::AnonymousTag(),
                                  MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA), t.a),
                                  MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
                                  MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
                                  MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.e),
-                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e));
-                NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e)),
+                    CHIP_NO_ERROR);
             }
 
-            err = _this->mWriter.Finalize();
-            NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+            EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
 
-            _this->DumpBuf();
+            DumpBuf();
         }
 
         //
@@ -799,21 +709,16 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
         {
             Clusters::UnitTesting::Structs::SimpleStruct::DecodableType t;
 
-            _this->SetupReader();
+            SetupReader();
 
-            err = DataModel::Decode(_this->mReader, t);
-            NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
+            EXPECT_NE(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
         }
     }
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestDataModelSerialization, InvalidListType)
 {
-    CHIP_ERROR err;
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
-
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
+    SetupBuf();
 
     //
     // Encode
@@ -826,16 +731,14 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
 
         // Encode a list of integers for field d instead of a list of structs.
         {
-            err =
-                EncodeStruct(_this->mWriter, TLV::AnonymousTag(),
-                             MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::NestedStructList::Fields::kD), t.e));
-            NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+            EXPECT_EQ(
+                EncodeStruct(mWriter, TLV::AnonymousTag(),
+                             MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::NestedStructList::Fields::kD), t.e)),
+                CHIP_NO_ERROR);
         }
 
-        err = _this->mWriter.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        _this->DumpBuf();
+        EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
+        DumpBuf();
     }
 
     //
@@ -844,10 +747,9 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
     {
         Clusters::UnitTesting::Structs::NestedStructList::DecodableType t;
 
-        _this->SetupReader();
+        SetupReader();
 
-        err = DataModel::Decode(_this->mReader, t);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Decode(mReader, t), CHIP_NO_ERROR);
 
         auto iter     = t.d.begin();
         bool hadItems = false;
@@ -857,8 +759,8 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
             hadItems = true;
         }
 
-        NL_TEST_ASSERT(apSuite, iter.GetStatus() != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, !hadItems);
+        EXPECT_NE(iter.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_FALSE(hadItems);
     }
 }
 
@@ -905,13 +807,10 @@ bool ListsEqual(const DataModel::DecodableList<T> & list1, const DataModel::List
 } // anonymous namespace
 
 template <typename Encodable, typename Decodable>
-void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite * apSuite, void * apContext, bool encodeNulls,
-                                                                     bool encodeValues)
+void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(bool encodeNulls, bool encodeValues)
 {
-    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
-    _this->mpSuite = apSuite;
-    _this->SetupBuf();
+    SetupBuf();
 
     static const char structStr[] = "something";
     const uint8_t structBytes[]   = { 1, 8, 17 };
@@ -974,161 +873,117 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite
             encodable.nullableList.SetNull();
         }
 
-        CHIP_ERROR err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), encodable);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-        err = _this->mWriter.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(mWriter, TLV::AnonymousTag(), encodable), CHIP_NO_ERROR);
+        EXPECT_EQ(mWriter.Finalize(), CHIP_NO_ERROR);
     }
 
     // Decode
     {
-        _this->SetupReader();
+        SetupReader();
 
         Decodable decodable;
-        CHIP_ERROR err = DataModel::Decode(_this->mReader, decodable);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Decode(mReader, decodable), CHIP_NO_ERROR);
 
         if (encodeNulls)
         {
-            NL_TEST_ASSERT(apSuite, decodable.nullableInt.IsNull());
-            NL_TEST_ASSERT(apSuite, !decodable.optionalInt.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalInt.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalInt.Value().IsNull());
+            EXPECT_TRUE(decodable.nullableInt.IsNull());
+            EXPECT_FALSE(decodable.optionalInt.HasValue());
+            EXPECT_TRUE(decodable.nullableOptionalInt.HasValue());
+            EXPECT_TRUE(decodable.nullableOptionalInt.Value().IsNull());
 
-            NL_TEST_ASSERT(apSuite, decodable.nullableString.IsNull());
-            NL_TEST_ASSERT(apSuite, !decodable.optionalString.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalString.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalString.Value().IsNull());
+            EXPECT_TRUE(decodable.nullableString.IsNull());
+            EXPECT_FALSE(decodable.optionalString.HasValue());
+            EXPECT_TRUE(decodable.nullableOptionalString.HasValue());
+            EXPECT_TRUE(decodable.nullableOptionalString.Value().IsNull());
 
-            NL_TEST_ASSERT(apSuite, decodable.nullableStruct.IsNull());
-            NL_TEST_ASSERT(apSuite, !decodable.optionalStruct.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalStruct.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalStruct.Value().IsNull());
+            EXPECT_TRUE(decodable.nullableStruct.IsNull());
+            EXPECT_FALSE(decodable.optionalStruct.HasValue());
+            EXPECT_TRUE(decodable.nullableOptionalStruct.HasValue());
+            EXPECT_TRUE(decodable.nullableOptionalStruct.Value().IsNull());
 
-            NL_TEST_ASSERT(apSuite, decodable.nullableList.IsNull());
-            NL_TEST_ASSERT(apSuite, !decodable.optionalList.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalList.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalList.Value().IsNull());
+            EXPECT_TRUE(decodable.nullableList.IsNull());
+            EXPECT_FALSE(decodable.optionalList.HasValue());
+            EXPECT_TRUE(decodable.nullableOptionalList.HasValue());
+            EXPECT_TRUE(decodable.nullableOptionalList.Value().IsNull());
         }
         else if (encodeValues)
         {
             static const char str[] = "abc";
             CharSpan strSpan        = CharSpan::fromCharString(str);
 
-            NL_TEST_ASSERT(apSuite, !decodable.nullableInt.IsNull());
-            NL_TEST_ASSERT(apSuite, decodable.nullableInt.Value() == 5);
-            NL_TEST_ASSERT(apSuite, decodable.optionalInt.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.optionalInt.Value() == 6);
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalInt.HasValue());
-            NL_TEST_ASSERT(apSuite, !decodable.nullableOptionalInt.Value().IsNull());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalInt.Value().Value() == 7);
+            EXPECT_FALSE(decodable.nullableInt.IsNull());
+            EXPECT_EQ(decodable.nullableInt.Value(), 5);
+            EXPECT_TRUE(decodable.optionalInt.HasValue());
+            EXPECT_EQ(decodable.optionalInt.Value(), 6);
+            EXPECT_TRUE(decodable.nullableOptionalInt.HasValue());
+            EXPECT_FALSE(decodable.nullableOptionalInt.Value().IsNull());
+            EXPECT_EQ(decodable.nullableOptionalInt.Value().Value(), 7);
 
-            NL_TEST_ASSERT(apSuite, !decodable.nullableString.IsNull());
-            NL_TEST_ASSERT(apSuite, decodable.nullableString.Value().data_equal(strSpan));
-            NL_TEST_ASSERT(apSuite, decodable.optionalString.HasValue());
-            NL_TEST_ASSERT(apSuite, decodable.optionalString.Value().data_equal(strSpan));
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalString.HasValue());
-            NL_TEST_ASSERT(apSuite, !decodable.nullableOptionalString.Value().IsNull());
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalString.Value().Value().data_equal(strSpan));
+            EXPECT_FALSE(decodable.nullableString.IsNull());
+            EXPECT_TRUE(decodable.nullableString.Value().data_equal(strSpan));
+            EXPECT_TRUE(decodable.optionalString.HasValue());
+            EXPECT_TRUE(decodable.optionalString.Value().data_equal(strSpan));
+            EXPECT_TRUE(decodable.nullableOptionalString.HasValue());
+            EXPECT_FALSE(decodable.nullableOptionalString.Value().IsNull());
+            EXPECT_TRUE(decodable.nullableOptionalString.Value().Value().data_equal(strSpan));
 
-            NL_TEST_ASSERT(apSuite, !decodable.nullableStruct.IsNull());
-            NL_TEST_ASSERT(apSuite, SimpleStructsEqual(decodable.nullableStruct.Value(), myStruct));
-            NL_TEST_ASSERT(apSuite, decodable.optionalStruct.HasValue());
-            NL_TEST_ASSERT(apSuite, SimpleStructsEqual(decodable.optionalStruct.Value(), myStruct));
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalStruct.HasValue());
-            NL_TEST_ASSERT(apSuite, !decodable.nullableOptionalStruct.Value().IsNull());
-            NL_TEST_ASSERT(apSuite, SimpleStructsEqual(decodable.nullableOptionalStruct.Value().Value(), myStruct));
+            EXPECT_FALSE(decodable.nullableStruct.IsNull());
+            EXPECT_TRUE(SimpleStructsEqual(decodable.nullableStruct.Value(), myStruct));
+            EXPECT_TRUE(decodable.optionalStruct.HasValue());
+            EXPECT_TRUE(SimpleStructsEqual(decodable.optionalStruct.Value(), myStruct));
+            EXPECT_TRUE(decodable.nullableOptionalStruct.HasValue());
+            EXPECT_FALSE(decodable.nullableOptionalStruct.Value().IsNull());
+            EXPECT_TRUE(SimpleStructsEqual(decodable.nullableOptionalStruct.Value().Value(), myStruct));
 
-            NL_TEST_ASSERT(apSuite, !decodable.nullableList.IsNull());
-            NL_TEST_ASSERT(apSuite, ListsEqual(decodable.nullableList.Value(), enumList));
-            NL_TEST_ASSERT(apSuite, decodable.optionalList.HasValue());
-            NL_TEST_ASSERT(apSuite, ListsEqual(decodable.optionalList.Value(), enumList));
-            NL_TEST_ASSERT(apSuite, decodable.nullableOptionalList.HasValue());
-            NL_TEST_ASSERT(apSuite, !decodable.nullableOptionalList.Value().IsNull());
-            NL_TEST_ASSERT(apSuite, ListsEqual(decodable.nullableOptionalList.Value().Value(), enumList));
+            EXPECT_FALSE(decodable.nullableList.IsNull());
+            EXPECT_TRUE(ListsEqual(decodable.nullableList.Value(), enumList));
+            EXPECT_TRUE(decodable.optionalList.HasValue());
+            EXPECT_TRUE(ListsEqual(decodable.optionalList.Value(), enumList));
+            EXPECT_TRUE(decodable.nullableOptionalList.HasValue());
+            EXPECT_FALSE(decodable.nullableOptionalList.Value().IsNull());
+            EXPECT_TRUE(ListsEqual(decodable.nullableOptionalList.Value().Value(), enumList));
         }
         else
         {
-            NL_TEST_ASSERT(apSuite, decodable.nullableInt.IsNull());
-            NL_TEST_ASSERT(apSuite, !decodable.optionalInt.HasValue());
-            NL_TEST_ASSERT(apSuite, !decodable.nullableOptionalInt.HasValue());
+            EXPECT_TRUE(decodable.nullableInt.IsNull());
+            EXPECT_FALSE(decodable.optionalInt.HasValue());
+            EXPECT_FALSE(decodable.nullableOptionalInt.HasValue());
 
-            NL_TEST_ASSERT(apSuite, decodable.nullableString.IsNull());
-            NL_TEST_ASSERT(apSuite, !decodable.optionalString.HasValue());
-            NL_TEST_ASSERT(apSuite, !decodable.nullableOptionalString.HasValue());
+            EXPECT_TRUE(decodable.nullableString.IsNull());
+            EXPECT_FALSE(decodable.optionalString.HasValue());
+            EXPECT_FALSE(decodable.nullableOptionalString.HasValue());
 
-            NL_TEST_ASSERT(apSuite, decodable.nullableStruct.IsNull());
-            NL_TEST_ASSERT(apSuite, !decodable.optionalStruct.HasValue());
-            NL_TEST_ASSERT(apSuite, !decodable.nullableOptionalStruct.HasValue());
+            EXPECT_TRUE(decodable.nullableStruct.IsNull());
+            EXPECT_FALSE(decodable.optionalStruct.HasValue());
+            EXPECT_FALSE(decodable.nullableOptionalStruct.HasValue());
 
-            NL_TEST_ASSERT(apSuite, decodable.nullableList.IsNull());
-            NL_TEST_ASSERT(apSuite, !decodable.optionalList.HasValue());
-            NL_TEST_ASSERT(apSuite, !decodable.nullableOptionalList.HasValue());
+            EXPECT_TRUE(decodable.nullableList.IsNull());
+            EXPECT_FALSE(decodable.optionalList.HasValue());
+            EXPECT_FALSE(decodable.nullableOptionalList.HasValue());
         }
     }
 }
 
 template <typename Encodable, typename Decodable>
-void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck()
 {
-    NullablesOptionalsEncodeDecodeCheck<Encodable, Decodable>(apSuite, apContext, false, false);
-    NullablesOptionalsEncodeDecodeCheck<Encodable, Decodable>(apSuite, apContext, true, false);
-    NullablesOptionalsEncodeDecodeCheck<Encodable, Decodable>(apSuite, apContext, false, true);
+    NullablesOptionalsEncodeDecodeCheck<Encodable, Decodable>(false, false);
+    NullablesOptionalsEncodeDecodeCheck<Encodable, Decodable>(true, false);
+    NullablesOptionalsEncodeDecodeCheck<Encodable, Decodable>(false, true);
 }
 
-void TestDataModelSerialization::NullablesOptionalsStruct(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestDataModelSerialization, NullablesOptionalsStruct)
 {
     using EncType = Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::Type;
     using DecType = Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType;
-    NullablesOptionalsEncodeDecodeCheck<EncType, DecType>(apSuite, apContext);
+    NullablesOptionalsEncodeDecodeCheck<EncType, DecType>();
 }
 
-void TestDataModelSerialization::NullablesOptionalsCommand(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestDataModelSerialization, NullablesOptionalsCommand)
 {
     using EncType = Clusters::UnitTesting::Commands::TestComplexNullableOptionalRequest::Type;
     using DecType = Clusters::UnitTesting::Commands::TestComplexNullableOptionalRequest::DecodableType;
-    NullablesOptionalsEncodeDecodeCheck<EncType, DecType>(apSuite, apContext);
-}
-
-int Initialize(void * apSuite)
-{
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    return SUCCESS;
-}
-
-int Finalize(void * aContext)
-{
-    gTestDataModelSerialization.Shutdown();
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
+    NullablesOptionalsEncodeDecodeCheck<EncType, DecType>();
 }
 
 } // namespace
-
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecSimple", TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruct),
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum", TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum),
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecNestedStruct", TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruct),
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableNestedStructList",  TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNestedStructList),
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList", TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList),
-    NL_TEST_DEF("TestDataModelSerialization_OptionalFields", TestDataModelSerialization::TestDataModelSerialization_OptionalFields),
-    NL_TEST_DEF("TestDataModelSerialization_ExtraField",  TestDataModelSerialization::TestDataModelSerialization_ExtraField),
-    NL_TEST_DEF("TestDataModelSerialization_InvalidSimpleFieldTypes", TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTypes),
-    NL_TEST_DEF("TestDataModelSerialization_InvalidListType", TestDataModelSerialization::TestDataModelSerialization_InvalidListType),
-    NL_TEST_DEF("TestDataModelSerialization_NullablesOptionalsStruct", TestDataModelSerialization::NullablesOptionalsStruct),
-    NL_TEST_DEF("TestDataModelSerialization_NullablesOptionalsCommand", TestDataModelSerialization::NullablesOptionalsCommand),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-nlTestSuite theSuite = { "TestDataModelSerialization", &sTests[0], Initialize, Finalize };
-
-int DataModelSerializationTest()
-{
-    nlTestRunner(&theSuite, &gTestDataModelSerialization);
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(DataModelSerializationTest)

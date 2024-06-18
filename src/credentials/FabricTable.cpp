@@ -2124,4 +2124,16 @@ CHIP_ERROR FabricTable::PeekFabricIndexForNextAddition(FabricIndex & outIndex)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR FabricTable::SetFabricIndexForNextAddition(FabricIndex fabricIndex)
+{
+    VerifyOrReturnError(!mStateFlags.Has(StateFlags::kIsPendingFabricDataPresent), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo == nullptr, CHIP_ERROR_FABRIC_EXISTS);
+
+    mNextAvailableFabricIndex.SetValue(fabricIndex);
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip

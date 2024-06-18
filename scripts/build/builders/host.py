@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 from platform import uname
+from typing import Optional
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -66,6 +68,8 @@ class HostApp(Enum):
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
+    FABRIC_ADMIN = auto()
+    FABRIC_BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
@@ -118,6 +122,10 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
+        elif self == HostApp.FABRIC_ADMIN:
+            return 'fabric-admin'
+        elif self == HostApp.FABRIC_BRIDGE:
+            return 'fabric-bridge-app/linux'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
         elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
@@ -215,6 +223,12 @@ class HostApp(Enum):
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
+        elif self == HostApp.FABRIC_ADMIN:
+            yield 'fabric-admin'
+            yield 'fabric-admin.map'
+        elif self == HostApp.FABRIC_BRIDGE:
+            yield 'fabric-bridge-app'
+            yield 'fabric-bridge-app.map'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
@@ -298,7 +312,9 @@ class HostBuilder(GnBuilder):
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
-                 enable_test_event_triggers=None):
+                 enable_test_event_triggers=None,
+                 enable_dnssd_tests: Optional[bool] = None
+                 ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -405,6 +421,12 @@ class HostBuilder(GnBuilder):
         if enable_test_event_triggers is not None:
             if 'EVSE' in enable_test_event_triggers:
                 self.extra_gn_options.append('chip_enable_energy_evse_trigger=true')
+
+        if enable_dnssd_tests is not None:
+            if enable_dnssd_tests:
+                self.extra_gn_options.append('chip_enable_dnssd_tests=true')
+            else:
+                self.extra_gn_options.append('chip_enable_dnssd_tests=false')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -543,19 +565,13 @@ class HostBuilder(GnBuilder):
             self.createJavaExecutable("kotlin-matter-controller")
 
     def build_outputs(self):
-        outputs = {}
-
         for name in self.app.OutputNames():
+            if not self.options.enable_link_map_file and name.endswith(".map"):
+                continue
             path = os.path.join(self.output_dir, name)
             if os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
                     for file in files:
-                        outputs.update({
-                            file: os.path.join(root, file)
-                        })
+                        yield BuilderOutput(os.path.join(root, file), file)
             else:
-                outputs.update({
-                    name: os.path.join(self.output_dir, name)
-                })
-
-        return outputs
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)

@@ -25,6 +25,7 @@ source_set("mock_ember") {
     "MockNodeConfig.cpp",
     "MockNodeConfig.h",
     "attribute-storage.cpp",
+    "privilege-storage.cpp",
   ]
 
   public_deps = [
@@ -32,7 +33,6 @@ source_set("mock_ember") {
     "${chip_root}/src/app/common:attribute-type",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:testing_nlunit",
   ]
 
   public_configs = [ ":mock_include" ]

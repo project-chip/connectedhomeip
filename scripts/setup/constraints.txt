@@ -49,7 +49,7 @@ colorama==0.4.6
     #   west
 coloredlogs==15.0.1
     # via -r requirements.all.txt
-construct==2.10.54
+construct==2.10.70
     # via
     #   -r requirements.esp32.txt
     #   esp-coredump
@@ -134,7 +134,7 @@ mypy-extensions==1.0.0
     # via mypy
 mypy-protobuf==3.5.0
     # via -r requirements.all.txt
-numpy==1.24.2
+numpy==1.26.4
     # via pandas
 packaging==23.0
     # via
@@ -143,7 +143,7 @@ packaging==23.0
     #   ghapi
     #   idf-component-manager
     #   west
-pandas==1.5.3 ; platform_machine != "aarch64" and platform_machine != "arm64"
+pandas==2.1.4 ; platform_machine != "aarch64" and platform_machine != "arm64"
     # via -r requirements.memory.txt
 parso==0.8.3
     # via jedi
@@ -208,7 +208,7 @@ python-socketio==4.6.1
     # via -r requirements.esp32.txt
 pytz==2022.7.1
     # via pandas
-pyyaml==6.0
+pyyaml==6.0.1
     # via
     #   esptool
     #   idf-component-manager
@@ -296,4 +296,3 @@ setuptools==68.0.0
 # Higher versions depend on proto-plus, which break
 # nanopb code generation (due to name conflict of the 'proto' module)
 google-api-core==2.17.0
-

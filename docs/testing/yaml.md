@@ -279,6 +279,17 @@ function can be use. See
 [TestEqualities](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/TestEqualities.yaml)
 for an example of how to use this pseudo-cluster.
 
+#### Setting step timeouts
+
+The timeout argument can be used for each individual test step to set the time
+the runner will wait for a test step to complete before reporting a failure.
+
+Note that this timeout is different than the subscription report timeout and the
+subscription report timeout is not currently adjustable in YAML.
+
+There several other options for configuring test steps as shown in the
+[YAML schema](./yaml_schema.md) document.
+
 ## Running YAML tests
 
 YAML scripts are parsed and run using a python-based runner program that parses
@@ -304,6 +315,24 @@ There are several options for running tests locally. Because the YAML runner
 uses python, it is necessary to compile and install the chip python package
 before using any YAML runner script.
 
+First activate the matter environment using either
+
+```
+. ./scripts/bootstrap.sh
+```
+
+or
+
+```
+. ./scripts/activate.sh
+```
+
+bootstrap.sh should be used for for the first setup, activate.sh may be used for
+subsequent setups as it is faster.
+
+Next build the python wheels and create a venv (called `py` here, but any name
+may be used)
+
 ```
 ./scripts/build_python.sh -i py
 source py/bin/activate
@@ -318,12 +347,12 @@ Compile chip-tool:
 
 NOTE: use the target appropriate to your system
 
-[chiptool.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/yaml/chiptool.py)
+[chiptool.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/chipyaml/chiptool.py)
 can be used to run tests against a commissioned DUT (commissioned by chip-tool).
 This will start an interactive instance of chip-tool automatically.
 
 ```
-./scripts/tests/yaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool
+./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool
 
 ```
 
@@ -332,14 +361,14 @@ NOTE: substitute the appropriate test name and chip-tool path as appropriate.
 A list of available tests can be generated using:
 
 ```
-./scripts/tests/yaml/chiptool.py list
+./scripts/tests/chipyaml/chiptool.py list
 ```
 
 Config variables can be passed to chiptool.py after the script by separating
 with --
 
 ```
-./scripts/tests/yaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool -- nodeId 0x12344321
+./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool -- nodeId 0x12344321
 
 ```
 

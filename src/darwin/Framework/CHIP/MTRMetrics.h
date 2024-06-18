@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Representation of metric data corresponding to a metric event.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRMetricData : NSObject
 
 /**
@@ -49,7 +49,7 @@ MTR_NEWLY_AVAILABLE
 /**
  * A representation of a collection of metrics data for an operation.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRMetrics : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;

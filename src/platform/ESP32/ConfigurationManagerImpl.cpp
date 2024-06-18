@@ -29,6 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
+#include <platform/ESP32/ESP32Utils.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
@@ -223,7 +224,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 
 CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 {
-#if CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
+#ifdef CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
     uint32_t value = 0;
     CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_LocationCapability, value);
 
@@ -237,7 +238,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 #else
     location       = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
     return CHIP_NO_ERROR;
-#endif
+#endif // CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t codeLen)
@@ -246,7 +247,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t 
     VerifyOrReturnError((code != nullptr) && (codeLen == 2), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Setting country is only possible on WiFi supported SoCs
-#if CONFIG_ESP32_WIFI_ENABLED
+#ifdef CONFIG_ESP32_WIFI_ENABLED
     // Write CountryCode to esp_phy layer
     ReturnErrorOnFailure(MapConfigError(esp_phy_update_country_info(code)));
 #endif
@@ -403,6 +404,22 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
+
+    // Unregistering the wifi and IP event handlers from the esp_default_event_loop()
+    err = ESP32Utils::MapError(esp_event_handler_unregister(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to unregister IP event handler");
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    err =
+        ESP32Utils::MapError(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to unregister wifi event handler");
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 

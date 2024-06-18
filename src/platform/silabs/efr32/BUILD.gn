@@ -55,6 +55,7 @@ static_library("efr32") {
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.h",
     "${silabs_platform_dir}/Logging.cpp",
     "${silabs_platform_dir}/MigrationManager.cpp",
+    "${silabs_platform_dir}/PlatformManagerImpl.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
@@ -64,7 +65,6 @@ static_library("efr32") {
     "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "PlatformManagerImpl.cpp",
   ]
 
   if (chip_enable_ble_rs911x) {

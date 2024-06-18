@@ -93,7 +93,9 @@
    <xi:include href="chip/test-cluster.xml" />
    <xi:include href="chip/thermostat-user-interface-configuration-cluster.xml" />
    <xi:include href="chip/thermostat-cluster.xml" />
+   <xi:include href="chip/thread-border-router-management-cluster.xml" />
    <xi:include href="chip/thread-network-diagnostics-cluster.xml" />
+   <xi:include href="chip/thread-network-directory-cluster.xml" />
    <xi:include href="chip/time-format-localization-cluster.xml" />
    <xi:include href="chip/time-synchronization-cluster.xml" />
    <xi:include href="chip/timer-cluster.xml" />
@@ -104,6 +106,7 @@
    <xi:include href="chip/wake-on-lan-cluster.xml" />
    <xi:include href="chip/washer-controls-cluster.xml" />
    <xi:include href="chip/wifi-network-diagnostics-cluster.xml" />
+   <xi:include href="chip/wifi-network-management-cluster.xml" />
    <xi:include href="chip/window-covering.xml" />
    <xi:include href="chip/temperature-control-cluster.xml" />
    <xi:include href="chip/refrigerator-alarm.xml" />

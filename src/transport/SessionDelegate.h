@@ -51,8 +51,6 @@ public:
      */
     virtual NewSessionHandlingPolicy GetNewSessionHandlingPolicy() { return NewSessionHandlingPolicy::kShiftToNewSession; }
 
-    using Event = void (SessionDelegate::*)();
-
     /**
      * @brief
      *   Called when a session is releasing. Callees SHALL NOT make synchronous calls into SessionManager to allocate a new session.

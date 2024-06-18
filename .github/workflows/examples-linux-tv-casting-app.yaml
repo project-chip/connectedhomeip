@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:41
+            image: ghcr.io/project-chip/chip-build:54
 
         steps:
             - name: Checkout
@@ -67,7 +67,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "python3 ./scripts/tests/run_tv_casting_test.py"
-              timeout-minutes: 1
+              timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

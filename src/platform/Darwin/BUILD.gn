@@ -130,8 +130,8 @@ static_library("Darwin") {
       "BleConnectionDelegateImpl.mm",
       "BlePlatformDelegate.h",
       "BlePlatformDelegateImpl.mm",
-      "UUIDHelper.h",
-      "UUIDHelperImpl.mm",
+      "MTRUUIDHelper.h",
+      "MTRUUIDHelperImpl.mm",
     ]
   }
 }

@@ -4,7 +4,6 @@ FROM ghcr.io/project-chip/chip-build-nrf-platform:${VERSION} AS nrf
 FROM ghcr.io/project-chip/chip-build-efr32:${VERSION} AS efr32
 FROM ghcr.io/project-chip/chip-build-android:${VERSION} AS android
 FROM ghcr.io/project-chip/chip-build-esp32-qemu:${VERSION} as esp32
-FROM ghcr.io/project-chip/chip-build-mbed-os:${VERSION} AS mbedos
 FROM ghcr.io/project-chip/chip-build-telink:${VERSION} AS telink
 FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS p6
 FROM ghcr.io/project-chip/chip-build-tizen:${VERSION} AS tizen
@@ -35,9 +34,6 @@ COPY --from=nrf /opt/NordicSemiconductor/nrfconnect /opt/NordicSemiconductor/nrf
 COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r23c /opt/android/android-ndk-r23c
 COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
-
-# FIXME: OpenOCD was removed during the move to infineon's repo
-# COPY --from=mbedos /opt/openocd/ /opt/openocd/
 
 COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 
@@ -78,6 +74,15 @@ RUN set -x \
     && chmod -R a+w /opt/android/sdk/licenses \
     && : # last line
 
+# mbedos requirements are generally just PIP packages
+RUN set -x \
+    && pip3 install --break-system-packages --no-cache-dir -U mbed-cli==1.10.5 mbed-tools==7.44.0 \
+    && : # last line
+RUN set -x \
+    && mbed config -G GCC_ARM_PATH /opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
+    && mbed toolchain -G -s GCC_ARM \
+    && : # last line
+
 # Required for the Tizen SDK:
 #   - zip
 # Required for the Open IoT SDK platform
@@ -100,7 +105,7 @@ RUN set -x \
 
 # Required for the Bouffalolab platform
 RUN set -x \
-    && pip3 install bflb-iot-tool==1.8.6 \
+    && pip3 install --break-system-packages bflb-iot-tool==1.8.6 \
     && : # last line
 
 ENV PATH $PATH:/usr/lib/kotlinc/bin

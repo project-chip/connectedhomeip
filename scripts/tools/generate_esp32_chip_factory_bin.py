@@ -30,7 +30,7 @@ CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('sc
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
 from spake2p import generate_verifier  # noqa: E402 isort:skip
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
-from generate_setup_payload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
+from SetupPayload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
 
 if os.getenv('IDF_PATH'):
     sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),

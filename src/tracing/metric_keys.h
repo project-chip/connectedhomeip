@@ -31,5 +31,28 @@ typedef const char * MetricKey;
  */
 constexpr MetricKey kMetricWiFiRSSI = "wifi_rssi";
 
+// Overall PASE session est in device commissioner
+constexpr MetricKey kMetricDeviceCommissionerPASESession = "core_dcm_pase_session";
+
+// Overall commissioning into a fabric
+constexpr MetricKey kMetricDeviceCommissionerCommission = "core_dcm_commission_device";
+
+constexpr MetricKey kMetricDeviceCommissionerCommissionStage = "core_dcm_commission_stage";
+
+// Setup Code Pairer
+constexpr MetricKey kMetricSetupCodePairerPairDevice = "core_setup_code_pairer_pair_dev";
+
+// Commissioning Operational Setup (Discovery + CASE)
+constexpr MetricKey kMetricDeviceCommissioningOperationalSetup = "core_dcm_operational_setup";
+
+// Operational Discovery
+constexpr MetricKey kMetricDeviceOperationalDiscovery = "core_dev_operational_discovery";
+
+// Operational Discovery Attempt Count
+constexpr MetricKey kMetricDeviceOperationalDiscoveryAttemptCount = "core_dev_operational_discovery_attempt_ctr";
+
+// CASE Session
+constexpr MetricKey kMetricDeviceCASESession = "core_dev_case_session";
+
 } // namespace Tracing
 } // namespace chip

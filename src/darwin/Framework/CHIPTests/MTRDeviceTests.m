@@ -26,6 +26,7 @@
 
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
@@ -35,6 +36,7 @@
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
+#import <os/lock.h>
 
 // system dependencies
 #import <XCTest/XCTest.h>
@@ -125,6 +127,17 @@ static MTRBaseDevice * GetConnectedDevice(void)
 @end
 
 @interface MTRDeviceTests : XCTestCase
+
++ (void)checkAttributeReportTriggersConfigurationChanged:(MTRAttributeIDType)attributeId
+                                               clusterId:(MTRClusterIDType)clusterId
+                                              endpointId:(NSNumber *)endpointId
+                                                  device:(MTRDevice *)device
+                                                delegate:(MTRDeviceTestDelegate *)delegate
+                                             dataVersion:(NSNumber *)dataVersion
+                                         attributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+                                                testcase:(XCTestCase *)testcase
+                              expectConfigurationChanged:(BOOL)expectConfigurationChanged;
+
 @end
 
 @implementation MTRDeviceTests
@@ -207,6 +220,56 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 {
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    // Ensure the test starts with clean slate in terms of stored data.
+    if (sController != nil) {
+        [sController.controllerDataStore clearAllStoredClusterData];
+        NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+        XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+    }
+}
+
+- (void)tearDown
+{
+    // Make sure our MTRDevice instances, which are stateful, do not keep that
+    // state between different tests.
+    if (sController != nil) {
+        __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+        [sController removeDevice:device];
+    }
+
+    // Try to make sure we don't have any outstanding subscriptions from
+    // previous tests, by sending a subscribe request that will get rid of
+    // existing subscriptions and then fail out due to requesting a subscribe to
+    // a nonexistent cluster.
+    if (mConnectedDevice != nil) {
+        dispatch_queue_t queue = dispatch_get_main_queue();
+
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
+        params.resubscribeAutomatically = NO;
+        params.replaceExistingSubscriptions = YES;
+
+        XCTestExpectation * errorExpectation = [self expectationWithDescription:@"Canceled all subscriptions"];
+
+        // There should be no Basic Information cluster on random endpoints.
+        [mConnectedDevice subscribeToAttributesWithEndpointID:@10000
+            clusterID:@(MTRClusterIDTypeBasicInformationID)
+            attributeID:@(0)
+            params:params
+            queue:queue
+            reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                XCTAssertNil(values);
+                XCTAssertNotNil(error);
+                [errorExpectation fulfill];
+            }
+            subscriptionEstablished:^() {
+                XCTFail("Did not expect subscription to Basic Information on random endpoint to succeed");
+            }];
+
+        [self waitForExpectations:@[ errorExpectation ] timeout:kTimeoutInSeconds];
+    }
+
+    [super tearDown];
 }
 
 - (void)test001_ReadAttribute
@@ -395,6 +458,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
         attributeID:@0
@@ -1071,8 +1135,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
         XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
         if ([result[@"data"][@"value"] boolValue] == YES) {
-            [reportExpectation fulfill];
             globalReportHandler = nil;
+            [reportExpectation fulfill];
         }
     };
 
@@ -1109,13 +1173,34 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
 
-    // Trigger reader failure
-    XCTestExpectation * failureExpectation = [self expectationWithDescription:@"failed on purpose"];
-    [device failSubscribers:queue
-                 completion:^{
-                     [failureExpectation fulfill];
-                 }];
-    [self waitForExpectations:@[ failureExpectation ] timeout:kTimeoutInSeconds];
+    XCTestExpectation * errorExpectation1 = [self expectationWithDescription:@"First subscription errored out"];
+    XCTestExpectation * errorExpectation2 = [self expectationWithDescription:@"Second subscription errored out"];
+
+    globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(values);
+        XCTAssertNotNil(error);
+        globalReportHandler = nil;
+        [errorExpectation1 fulfill];
+    };
+
+    // Try to create a second subscription, which will cancel the first
+    // subscription.  We can use a non-existent path here to cut down on the
+    // work that gets done.
+    params.replaceExistingSubscriptions = YES;
+    [device subscribeToAttributesWithEndpointID:@10000
+        clusterID:@6
+        attributeID:@0
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+            XCTAssertNil(values);
+            XCTAssertNotNil(error);
+            [errorExpectation2 fulfill];
+        }
+        subscriptionEstablished:^() {
+            XCTFail("Did not expect this subscription to succeed");
+        }];
+    [self waitForExpectations:@[ errorExpectation1, errorExpectation2 ] timeout:60];
 
     deregisterExpectation = [self expectationWithDescription:@"Report handler deregistered"];
     [device deregisterReportHandlersWithQueue:queue
@@ -1124,7 +1209,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                    }];
     [self waitForExpectations:@[ deregisterExpectation ] timeout:kTimeoutInSeconds];
 }
-#endif
+#endif // DEBUG
 
 - (void)test013_ReuseChipClusterObject
 {
@@ -1246,8 +1331,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type clusterStateCacheContainer = [[MTRAttributeCacheContainer alloc] init];
     __auto_type * params = [[MTRSubscribeParams alloc] init];
     params.resubscribeAutomatically = NO;
-    params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not
-    // affect this subscription erroring out correctly.
+    params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not affect this subscription erroring out correctly.
     [device subscribeWithQueue:queue
         minInterval:1
         maxInterval:2
@@ -1355,11 +1439,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test017_TestMTRDeviceBasics
 {
-    // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1574,6 +1653,13 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [resubscriptionGotReportsExpectation fulfill];
     };
 
+    // Make sure there are no device configuration changed notifications during this test.
+    // There is nothing changing about the server that would lead to those.
+    __block BOOL wasOnDeviceConfigurationChangedCallbackCalled = NO;
+    delegate.onDeviceConfigurationChanged = ^() {
+        wasOnDeviceConfigurationChangedCallbackCalled = YES;
+    };
+
     // reset the onAttributeDataReceived to validate the following resubscribe test
     attributeReportsReceived = 0;
     eventReportsReceived = 0;
@@ -1609,6 +1695,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertNil(device.estimatedStartTime);
 
     [self waitForExpectations:@[ resubscriptionReachableExpectation, resubscriptionGotReportsExpectation ] timeout:60];
+
+    XCTAssertFalse(wasOnDeviceConfigurationChangedCallbackCalled);
 
     // Now make sure we ignore later tests.  Ideally we would just unsubscribe
     // or remove the delegate, but there's no good way to do that.
@@ -2108,6 +2196,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
 
     NSNumber * failClusterId = @5678;
     NSNumber * failEndpointId = @1000;
@@ -2365,6 +2454,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe multiple events"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
 
     NSArray<MTREventRequestPath *> * eventPaths = @[
         // Startup event.
@@ -2374,7 +2464,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ];
 
     XCTestExpectation * startupEventExpectation = [self expectationWithDescription:@"report startup event"];
-    __auto_type reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+    __block __auto_type reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
 
@@ -2414,18 +2504,26 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     };
 
     [device subscribeToAttributePaths:nil
-                           eventPaths:eventPaths
-                               params:params
-                                queue:queue
-                        reportHandler:reportHandler
-              subscriptionEstablished:^{
-                  NSLog(@"subscribe complete");
-                  [expectation fulfill];
-              }
-              resubscriptionScheduled:nil];
+        eventPaths:eventPaths
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+            if (reportHandler != nil) {
+                reportHandler(values, error);
+            }
+        }
+        subscriptionEstablished:^{
+            NSLog(@"subscribe complete");
+            [expectation fulfill];
+        }
+        resubscriptionScheduled:nil];
 
     // Wait till establishment
     [self waitForExpectations:@[ startupEventExpectation, expectation ] timeout:kTimeoutInSeconds];
+
+    // Null out reportHandler, so we don't notify it when the
+    // subscription tears down.
+    reportHandler = nil;
 }
 
 - (void)test026_LocationAttribute
@@ -2593,11 +2691,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test029_MTRDeviceWriteCoalescing
 {
-    // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -2930,17 +3023,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
+    // Get the subscription primed
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
-    [sController removeDevice:device];
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
-    // Now recreate device and get subscription primed
-    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    NSTimeInterval baseTestDelayTime = 1;
+    MTRDeviceStorageBehaviorConfiguration * config = [MTRDeviceStorageBehaviorConfiguration
+        configurationWithReportToPersistenceDelayTime:baseTestDelayTime
+                      reportToPersistenceDelayTimeMax:baseTestDelayTime * 2
+                            recentReportTimesMaxCount:5
+                  timeBetweenReportsTooShortThreshold:baseTestDelayTime * 0.4
+               timeBetweenReportsTooShortMinThreshold:baseTestDelayTime * 0.2
+                reportToPersistenceDelayMaxMultiplier:baseTestDelayTime * 5
+          deviceReportingExcessivelyIntervalThreshold:baseTestDelayTime * 10];
+    [device setStorageBehaviorConfiguration:config];
+
     XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
     XCTestExpectation * gotDeviceCachePrimed = [self expectationWithDescription:@"Device cache primed for the first time"];
+    XCTestExpectation * gotClusterDataPersisted1 = [self expectationWithDescription:@"Cluster data persisted 1"];
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
     __weak __auto_type weakDelegate = delegate;
     delegate.onReportEnd = ^{
@@ -2951,9 +3050,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     delegate.onDeviceCachePrimed = ^{
         [gotDeviceCachePrimed fulfill];
     };
+    delegate.onClusterDataPersisted = ^{
+        [gotClusterDataPersisted1 fulfill];
+    };
     [device setDelegate:delegate queue:queue];
 
-    [self waitForExpectations:@[ gotReportsExpectation, gotDeviceCachePrimed ] timeout:60];
+    [self waitForExpectations:@[ gotReportsExpectation, gotDeviceCachePrimed, gotClusterDataPersisted1 ] timeout:60];
 
     NSUInteger attributesReportedWithFirstSubscription = [device unitTestAttributesReportedSinceLastCheck];
 
@@ -2965,6 +3067,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
 
     XCTestExpectation * resubGotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received for resubscription"];
+    XCTestExpectation * gotClusterDataPersisted2 = [self expectationWithDescription:@"Cluster data persisted 2"];
     delegate.onReportEnd = ^{
         [resubGotReportsExpectation fulfill];
         __strong __auto_type strongDelegate = weakDelegate;
@@ -2974,9 +3077,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     delegate.onDeviceCachePrimed = ^{
         onDeviceCachePrimedCalled = YES;
     };
+    delegate.onClusterDataPersisted = ^{
+        [gotClusterDataPersisted2 fulfill];
+    };
     [device setDelegate:delegate queue:queue];
 
-    [self waitForExpectations:@[ resubGotReportsExpectation ] timeout:60];
+    [self waitForExpectations:@[ resubGotReportsExpectation, gotClusterDataPersisted2 ] timeout:60];
 
     // Make sure that the new callback is only ever called once, the first time subscription was primed
     XCTAssertFalse(onDeviceCachePrimedCalled);
@@ -3041,6 +3147,1086 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     MTRCommandPath * decodedCommandPath = decodedValue;
     XCTAssertEqualObjects(originalCommandPath, decodedCommandPath);
+}
+
+// Helper API to test if changes in an attribute with a path specified by endpointId, clusterId and attributeId trigger
+// device configuration changed callbacks for a given MTRDevice. This API creates a fake attribute report for the given attribute path
+// and injects it into MTRDevice to exercise and test the delegate's device configuration changed callback.
++ (void)checkAttributeReportTriggersConfigurationChanged:(MTRAttributeIDType)attributeId
+                                               clusterId:(MTRClusterIDType)clusterId
+                                              endpointId:(NSNumber *)endpointId
+                                                  device:(MTRDevice *)device
+                                                delegate:(MTRDeviceTestDelegate *)delegate
+                                             dataVersion:(NSNumber *)dataVersion
+                                         attributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+                                                testcase:(XCTestCase *)testcase
+                              expectConfigurationChanged:(BOOL)expectConfigurationChanged
+{
+    XCTAssertNotNil(endpointId);
+    XCTAssertNotNil(device);
+    XCTAssertNotNil(delegate);
+    XCTAssertNotNil(dataVersion);
+    XCTAssertNotNil(attributeReport);
+    XCTAssertNotNil(testcase);
+
+    XCTestExpectation * gotAttributeReportExpectation = [testcase expectationWithDescription:@"Attribute report has been received"];
+    XCTestExpectation * gotAttributeReportEndExpectation = [testcase expectationWithDescription:@"Attribute report has ended"];
+    XCTestExpectation * deviceConfigurationChangedExpectation = [testcase expectationWithDescription:@"Device configuration changed was receieved"];
+    deviceConfigurationChangedExpectation.inverted = !expectConfigurationChanged;
+
+    __block unsigned attributeReportsReceived = 0;
+    __block id testDataValue = nil;
+
+    for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+        MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+        if (attributePath.attribute.unsignedLongLongValue == attributeId) {
+            NSDictionary * data = attributeDict[MTRDataKey];
+            XCTAssertNotNil(data);
+            testDataValue = data[MTRValueKey];
+        }
+    }
+
+    // Check if the received attribute report matches the injected attribute report.
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+        for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+            MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+            XCTAssertNotNil(attributePath);
+
+            XCTAssertEqualObjects(attributePath.cluster, @(clusterId));
+            XCTAssertEqualObjects(attributePath.attribute, @(attributeId));
+
+            NSDictionary * data = attributeDict[MTRDataKey];
+            XCTAssertNotNil(data);
+            XCTAssertEqualObjects(data[MTRDataVersionKey], dataVersion);
+
+            // This code assumes that none of the attributes in the report can have null values.
+            // Since we are injecting the attribute report for testing this with non-null values,
+            // we are fine for now. But if we plan to inject attribute reports with attributes having
+            // null values, we need to fix the code accordingly.
+            id dataValue = data[MTRValueKey];
+            XCTAssertNotNil(dataValue);
+            XCTAssertNotNil(testDataValue);
+            XCTAssertEqualObjects(dataValue, testDataValue);
+            [gotAttributeReportExpectation fulfill];
+        }
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotAttributeReportEndExpectation fulfill];
+    };
+
+    __block BOOL wasOnDeviceConfigurationChangedCallbackCalled = NO;
+
+    delegate.onDeviceConfigurationChanged = ^() {
+        [deviceConfigurationChangedExpectation fulfill];
+        wasOnDeviceConfigurationChangedCallbackCalled = YES;
+    };
+
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+
+    [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
+    if (!expectConfigurationChanged) {
+        XCTAssertFalse(wasOnDeviceConfigurationChangedCallbackCalled);
+    }
+}
+
+- (void)test033_TestMTRDeviceDeviceConfigurationChanged
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Check if subscription is set up and initial reports are received.
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    XCTestExpectation * gotInitialReportsExpectation = [self expectationWithDescription:@"Initial Attribute and Event reports have been received"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.onReachable = ^() {
+        [subscriptionExpectation fulfill];
+    };
+
+    __block unsigned attributeReportsReceived = 0;
+
+    // Get the data version for the following attributes that we will use for the tests - parts list, device types list and server list for descriptor cluster,
+    // attribute list and cluster revision for the Identify cluster, accepted commands list for oven cavity operational state ID cluster and
+    // feature map for groups ID cluster.
+    __block NSNumber * dataVersionForPartsList;
+    __block NSNumber * dataVersionForDeviceTypesList;
+    __block NSNumber * dataVersionForServerList;
+    __block NSNumber * dataVersionForAcceptedCommandList;
+    __block NSNumber * dataVersionForAttributeList;
+    __block NSNumber * dataVersionForClusterRevision;
+    __block NSNumber * dataVersionForFeatureMap;
+    __block NSNumber * dataVersionForPowerConfigurationSources;
+
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+
+        for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+            MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+            XCTAssertNotNil(attributePath);
+
+            if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                switch (attributePath.attribute.unsignedLongValue) {
+                case MTRAttributeIDTypeClusterDescriptorAttributePartsListID: {
+                    dataVersionForPartsList = data[MTRDataVersionKey];
+                    break;
+                }
+                case MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID: {
+                    dataVersionForDeviceTypesList = data[MTRDataVersionKey];
+                    break;
+                }
+                case MTRAttributeIDTypeClusterDescriptorAttributeServerListID: {
+                    dataVersionForServerList = data[MTRDataVersionKey];
+                    break;
+                }
+                }
+            } else if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeIdentifyID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                switch (attributePath.attribute.unsignedLongValue) {
+                case MTRAttributeIDTypeGlobalAttributeAttributeListID: {
+                    dataVersionForAttributeList = data[MTRDataVersionKey];
+                    break;
+                }
+                case MTRAttributeIDTypeGlobalAttributeClusterRevisionID: {
+                    dataVersionForClusterRevision = data[MTRDataVersionKey];
+                    break;
+                }
+                }
+            } else if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeOvenCavityOperationalStateID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                dataVersionForAcceptedCommandList = data[MTRDataVersionKey];
+            } else if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeGroupsID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                dataVersionForFeatureMap = data[MTRDataVersionKey];
+            } else if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypePowerSourceConfigurationID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                dataVersionForPowerConfigurationSources = data[MTRDataVersionKey];
+            }
+        }
+    };
+
+    delegate.onReportEnd = ^() {
+        XCTAssertNotNil(dataVersionForPartsList);
+        XCTAssertNotNil(dataVersionForDeviceTypesList);
+        XCTAssertNotNil(dataVersionForServerList);
+        XCTAssertNotNil(dataVersionForAttributeList);
+        XCTAssertNotNil(dataVersionForClusterRevision);
+        XCTAssertNotNil(dataVersionForAcceptedCommandList);
+        XCTAssertNotNil(dataVersionForFeatureMap);
+        XCTAssertNotNil(dataVersionForPowerConfigurationSources);
+        [gotInitialReportsExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    // Wait for subscription set up and initial reports received.
+    [self waitForExpectations:@[
+        subscriptionExpectation,
+        gotInitialReportsExpectation,
+    ]
+                      timeout:60];
+
+    // The multiple tests below do the following:
+    // 1. Set the test data version to the data version for the attribute path saved from the initial attribute report incremented by 1.
+    // 2. Create the fake data for the attribute report for the attribute.
+    // 3. Call the helper checkAttributeReportTriggersConfigurationChanged to test if the attribute report affects device configuration changes.
+
+    // Test attribute path - endpointId = 0, clusterId = descriptor, attributeId = parts list.
+    dataVersionForPartsList = [NSNumber numberWithUnsignedLongLong:(dataVersionForPartsList.unsignedLongLongValue + 1)];
+    NSArray<NSDictionary<NSString *, id> *> * unsignedIntegerArrayValue = @[
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @1,
+            }
+        },
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @2,
+            }
+        },
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @3,
+            }
+        },
+    ];
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForPartsList,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : unsignedIntegerArrayValue,
+        }
+    } ];
+
+    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributePartsListID clusterId:MTRClusterIDTypeDescriptorID endpointId:@(0) device:device delegate:delegate dataVersion:dataVersionForPartsList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+
+    // Test attribute path - endpointId = 0, clusterId = descriptor, attributeId = device types list.
+    dataVersionForDeviceTypesList = [NSNumber numberWithUnsignedLongLong:(dataVersionForDeviceTypesList.unsignedLongLongValue + 1)];
+    NSArray<NSDictionary<NSString *, id> *> * deviceTypesListValue = @[
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRStructureValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRContextTagKey : @0,
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @1
+                        },
+                    },
+                    @{
+                        MTRContextTagKey : @1,
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @2
+                        },
+                    },
+                ],
+            },
+        },
+    ];
+
+    attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForDeviceTypesList,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : deviceTypesListValue,
+        }
+    } ];
+
+    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID clusterId:MTRClusterIDTypeDescriptorID endpointId:@(0) device:device delegate:delegate dataVersion:dataVersionForDeviceTypesList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+
+    // Test attribute path - endpointId = 0, clusterId = descriptor, attributeId = server list.
+    dataVersionForServerList = [NSNumber numberWithUnsignedLongLong:(dataVersionForServerList.unsignedLongLongValue + 1)];
+    attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForServerList,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : unsignedIntegerArrayValue,
+        }
+    } ];
+
+    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributeServerListID clusterId:MTRClusterIDTypeDescriptorID endpointId:@(0) device:device delegate:delegate dataVersion:dataVersionForServerList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+
+    // Test attribute path - endpointId = 1, clusterId = ovencavityoperationalstateID, attributeId = accepted command list.
+    dataVersionForAcceptedCommandList = [NSNumber numberWithUnsignedLongLong:(dataVersionForAcceptedCommandList.unsignedLongLongValue + 1)];
+    attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOvenCavityOperationalStateID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForAcceptedCommandList,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : unsignedIntegerArrayValue,
+        }
+    } ];
+
+    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID clusterId:MTRClusterIDTypeOvenCavityOperationalStateID endpointId:@(1) device:device delegate:delegate dataVersion:dataVersionForAcceptedCommandList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+
+    // Test attribute path - endpointId = 0, clusterId = identify, attributeId = attribute list.
+    dataVersionForAttributeList = [NSNumber numberWithUnsignedLongLong:(dataVersionForAttributeList.unsignedLongLongValue + 1)];
+    attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForAttributeList,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : unsignedIntegerArrayValue,
+        }
+    } ];
+
+    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeAttributeListID clusterId:MTRClusterIDTypeIdentifyID endpointId:@(0) device:device delegate:delegate dataVersion:dataVersionForAttributeList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+
+    // Test attribute path - endpointId = 0, clusterId = identify, attributeId = cluster revision.
+    dataVersionForClusterRevision = [NSNumber numberWithUnsignedLongLong:(dataVersionForClusterRevision.unsignedLongLongValue + 1)];
+    attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeClusterRevisionID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForClusterRevision,
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @9999,
+        }
+    } ];
+
+    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeClusterRevisionID clusterId:MTRClusterIDTypeIdentifyID endpointId:@(0) device:device delegate:delegate dataVersion:dataVersionForClusterRevision attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+
+    // Test attribute path - endpointId = 0, clusterId = groupsID, attributeId = feature map.
+    dataVersionForFeatureMap = [NSNumber numberWithUnsignedLongLong:(dataVersionForFeatureMap.unsignedLongLongValue + 1)];
+    attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForFeatureMap,
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @2,
+        }
+    } ];
+
+    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeGlobalAttributeFeatureMapID clusterId:MTRClusterIDTypeGroupsID endpointId:@(0) device:device delegate:delegate dataVersion:dataVersionForFeatureMap attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
+
+    // Test attribute path that doesn't cause a device configuration changed - endpointId = 1, clusterId = power source configuration, attributeId = sources.
+    dataVersionForPowerConfigurationSources = [NSNumber numberWithUnsignedLongLong:(dataVersionForPowerConfigurationSources.unsignedLongLongValue + 1)];
+    attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForPowerConfigurationSources,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : unsignedIntegerArrayValue,
+        }
+    } ];
+
+    [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID clusterId:MTRClusterIDTypePowerSourceConfigurationID endpointId:@(0) device:device delegate:delegate dataVersion:dataVersionForPowerConfigurationSources attributeReport:attributeReport testcase:self expectConfigurationChanged:NO];
+
+    NSArray<NSDictionary<NSString *, id> *> * newUnsignedIntegerArrayValue = @[
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @1,
+            }
+        },
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @2,
+            }
+        }
+    ];
+
+    // Test an attribute report with multiple attributes at least one of which triggers device configuration changed.
+    dataVersionForAttributeList = [NSNumber numberWithUnsignedLongLong:(dataVersionForAttributeList.unsignedLongLongValue + 1)];
+    dataVersionForFeatureMap = [NSNumber numberWithUnsignedLongLong:(dataVersionForFeatureMap.unsignedLongLongValue + 1)];
+    dataVersionForPowerConfigurationSources = [NSNumber numberWithUnsignedLongLong:(dataVersionForPowerConfigurationSources.unsignedLongLongValue + 1)];
+    attributeReport = @[
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : dataVersionForAttributeList,
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : unsignedIntegerArrayValue,
+            }
+        },
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : dataVersionForFeatureMap,
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @3,
+            }
+        },
+        @{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : dataVersionForPowerConfigurationSources,
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : newUnsignedIntegerArrayValue,
+            }
+        }
+    ];
+
+    XCTestExpectation * gotAttributeReportWithMultipleAttributesExpectation = [self expectationWithDescription:@"Attribute report with multiple attributes has been received"];
+    XCTestExpectation * gotAttributeReportWithMultipleAttributesEndExpectation = [self expectationWithDescription:@"Attribute report with multiple attributes has ended"];
+    XCTestExpectation * deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes = [self expectationWithDescription:@"Device configuration changed was receieved due to an attribute report with multiple attributes "];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+        [gotAttributeReportWithMultipleAttributesExpectation fulfill];
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotAttributeReportWithMultipleAttributesEndExpectation fulfill];
+    };
+
+    delegate.onDeviceConfigurationChanged = ^() {
+        [deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes fulfill];
+    };
+
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [self waitForExpectations:@[ gotAttributeReportWithMultipleAttributesExpectation, gotAttributeReportWithMultipleAttributesEndExpectation, deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test034_TestMTRDeviceHistoricalEvents
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    // Set up a subscription via mConnectedDevice that will send us continuous
+    // reports.
+    XCTestExpectation * firstSubscriptionExpectation = [self expectationWithDescription:@"First subscription established"];
+
+    MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(0)];
+    params.resubscribeAutomatically = NO;
+
+    [mConnectedDevice subscribeToAttributesWithEndpointID:@(0)
+        clusterID:@(MTRClusterIDTypeBasicInformationID)
+        attributeID:@(0)
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+        }
+        subscriptionEstablished:^() {
+            [firstSubscriptionExpectation fulfill];
+        }];
+
+    [self waitForExpectations:@[ firstSubscriptionExpectation ] timeout:kTimeoutInSeconds];
+
+    // Now set up our MTRDevice and do a subscribe.  Make sure all the events we
+    // get are marked "historical".
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    XCTestExpectation * secondSubscriptionExpectation = [self expectationWithDescription:@"Second subscription established"];
+    XCTestExpectation * gotFirstReportsExpectation = [self expectationWithDescription:@"First Attribute and Event reports have been received"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.onReachable = ^() {
+        [secondSubscriptionExpectation fulfill];
+    };
+
+    __block unsigned eventReportsReceived = 0;
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
+        eventReportsReceived += eventReport.count;
+        for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+            NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+            XCTAssertTrue(reportIsHistorical.boolValue);
+        }
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotFirstReportsExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ secondSubscriptionExpectation, gotFirstReportsExpectation ] timeout:60];
+
+    // Must have gotten some events (at least StartUp!)
+    XCTAssertTrue(eventReportsReceived > 0);
+
+    // Remove the device, then try again, now with us having stored cluster
+    // data.  All the events should still be reported as historical.
+    [sController removeDevice:device];
+
+    eventReportsReceived = 0;
+
+    device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    XCTestExpectation * thirdSubscriptionExpectation = [self expectationWithDescription:@"Third subscription established"];
+    XCTestExpectation * gotSecondReportsExpectation = [self expectationWithDescription:@"Second Attribute and Event reports have been received"];
+
+    delegate.onReachable = ^() {
+        [thirdSubscriptionExpectation fulfill];
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotSecondReportsExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ thirdSubscriptionExpectation, gotSecondReportsExpectation ] timeout:60];
+
+    // Must have gotten some events (at least StartUp!)
+    XCTAssertTrue(eventReportsReceived > 0);
+}
+
+- (void)test035_TestMTRDeviceSubscriptionNotEstablishedOverXPC
+{
+    NSString * const MTRDeviceControllerId = @"MTRController";
+    __auto_type remoteController = [MTRDeviceController
+        sharedControllerWithID:MTRDeviceControllerId
+               xpcConnectBlock:^NSXPCConnection * _Nonnull {
+                   return nil;
+               }];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:remoteController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    subscriptionExpectation.inverted = YES;
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:5];
+
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)_testAttributeReportWithValue:(unsigned int)testValue
+{
+    return @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(testValue),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(testValue),
+        }
+    } ];
+}
+
+- (void)test036_TestStorageBehaviorConfiguration
+{
+    // Use separate queue for timing sensitive test
+    dispatch_queue_t queue = dispatch_queue_create("storage-behavior-queue", DISPATCH_QUEUE_SERIAL);
+
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    __block os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
+    __block NSDate * reportEndTime = nil;
+    __block NSDate * dataPersistedTime = nil;
+
+    XCTestExpectation * dataPersistedInitial = [self expectationWithDescription:@"data persisted initial"];
+    delegate.onReportEnd = ^() {
+        os_unfair_lock_lock(&lock);
+        if (!reportEndTime) {
+            reportEndTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+    };
+
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersistedInitial fulfill];
+    };
+
+    // Do not subscribe - only inject sequence of reports to control the timing
+    delegate.skipSetupSubscription = YES;
+
+    NSTimeInterval baseTestDelayTime = 3;
+
+    // Set up a config of relatively short timers so this test doesn't take too long
+    MTRDeviceStorageBehaviorConfiguration * config = [MTRDeviceStorageBehaviorConfiguration
+        configurationWithReportToPersistenceDelayTime:baseTestDelayTime
+                      reportToPersistenceDelayTimeMax:baseTestDelayTime * 2
+                            recentReportTimesMaxCount:5
+                  timeBetweenReportsTooShortThreshold:baseTestDelayTime * 0.4
+               timeBetweenReportsTooShortMinThreshold:baseTestDelayTime * 0.2
+                reportToPersistenceDelayMaxMultiplier:baseTestDelayTime * 5
+          deviceReportingExcessivelyIntervalThreshold:baseTestDelayTime * 7];
+    [device setStorageBehaviorConfiguration:config];
+
+    [device setDelegate:delegate queue:queue];
+
+    // Use a counter that will be incremented for each report as the value.
+    unsigned int currentTestValue = 1;
+
+    // Initial setup: Inject report and see that the attribute persisted.  No delay is
+    // expected for the first (priming) report.
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    [self waitForExpectations:@[ dataPersistedInitial ] timeout:60];
+
+    XCTestExpectation * dataPersisted1 = [self expectationWithDescription:@"data persisted 1"];
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersisted1 fulfill];
+    };
+
+    // Test 1: Inject report and see that the attribute persisted, with a delay
+    reportEndTime = nil;
+    dataPersistedTime = nil;
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    [self waitForExpectations:@[ dataPersisted1 ] timeout:60];
+
+    os_unfair_lock_lock(&lock);
+    NSTimeInterval reportToPersistenceDelay = [dataPersistedTime timeIntervalSinceDate:reportEndTime];
+    os_unfair_lock_unlock(&lock);
+    // Check delay exists
+    XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime / 2);
+    // Check delay is expectd - use base delay plus small fudge in case of CPU slowness with dispatch_after
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 1.3);
+
+    XCTestExpectation * dataPersisted2 = [self expectationWithDescription:@"data persisted 2"];
+
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersisted2 fulfill];
+    };
+
+    // Test 2: Inject multiple reports with delay and see that the attribute persisted eventually
+    reportEndTime = nil;
+    dataPersistedTime = nil;
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    double frequentReportMultiplier = 0.5;
+    usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    // At this point, the threshold for reportToPersistenceDelayTimeMax should have hit, and persistence
+    // should have happened with timer running down to persist again with the 5th report above. Need to
+    // wait for expectation and immediately clear the onClusterDataPersisted callback
+
+    [self waitForExpectations:@[ dataPersisted2 ] timeout:60];
+
+    os_unfair_lock_lock(&lock);
+    reportToPersistenceDelay = [dataPersistedTime timeIntervalSinceDate:reportEndTime];
+    os_unfair_lock_unlock(&lock);
+    // Check delay exists and approximately reportToPersistenceDelayTimeMax, which is base delay times 2
+    XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 0.9);
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 1.3); // larger upper limit in case machine is slow
+
+    delegate.onClusterDataPersisted = nil;
+
+    // sleep the base delay interval to allow the onClusterDataPersisted callback to happen.
+    usleep((useconds_t) (baseTestDelayTime * 1.1 * USEC_PER_SEC));
+
+    // Test 3: test reporting frequently, and see that the delay time increased
+    reportEndTime = nil;
+    dataPersistedTime = nil;
+    XCTestExpectation * dataPersisted3 = [self expectationWithDescription:@"data persisted 3"];
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersisted3 fulfill];
+    };
+
+    // Set report times with short delay and check that the multiplier is engaged
+    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.3 * 4)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.3 * 3)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.3 * 2)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.3)],
+    ]]];
+
+    // Inject final report that makes MTRDevice recalculate delay with multiplier
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    [self waitForExpectations:@[ dataPersisted3 ] timeout:60];
+
+    // 0.3 is between 0.4 and 0.2, which should get us at least 50% of the multiplier.
+    // The multiplier is 5, which is +400% of the base delay, and so 50% of the multiplier
+    // is +200% of the base delay, meaning 3x the base delay.
+
+    os_unfair_lock_lock(&lock);
+    reportToPersistenceDelay = [dataPersistedTime timeIntervalSinceDate:reportEndTime];
+    os_unfair_lock_unlock(&lock);
+    // Check delay exists and at least base delay times 3
+    XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime * 3 * 0.9);
+    // upper limit at most max delay times full multiplier + extra in case machine is slow
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 5 * 1.3);
+
+    // Test 4: test reporting excessively, and see that persistence does not happen until
+    // reporting frequency goes back above the threshold
+    reportEndTime = nil;
+    dataPersistedTime = nil;
+    XCTestExpectation * dataPersisted4 = [self expectationWithDescription:@"data persisted 4"];
+    delegate.onClusterDataPersisted = ^{
+        os_unfair_lock_lock(&lock);
+        if (!dataPersistedTime) {
+            dataPersistedTime = [NSDate now];
+        }
+        os_unfair_lock_unlock(&lock);
+        [dataPersisted4 fulfill];
+    };
+
+    // Set report times with short delay and check that the multiplier is engaged
+    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 4)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 3)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1 * 2)],
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 0.1)],
+    ]]];
+
+    // Inject report that makes MTRDevice detect the device is reporting excessively
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    // Now keep reporting excessively for base delay time max times max multiplier, plus a bit more
+    NSDate * excessiveStartTime = [NSDate now];
+    for (;;) {
+        usleep((useconds_t) (baseTestDelayTime * 0.1 * USEC_PER_SEC));
+        [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+        NSTimeInterval elapsed = -[excessiveStartTime timeIntervalSinceNow];
+        if (elapsed > (baseTestDelayTime * 2 * 5 * 1.2)) {
+            break;
+        }
+    }
+
+    // Check that persistence has not happened because it's now turned off
+    XCTAssertNil(dataPersistedTime);
+
+    // Now force report times to large number, to simulate time passage
+    [device unitTestSetMostRecentReportTimes:[NSMutableArray arrayWithArray:@[
+        [NSDate dateWithTimeIntervalSinceNow:-(baseTestDelayTime * 10)],
+    ]]];
+
+    // And inject a report to trigger MTRDevice to recalculate that this device is no longer
+    // reporting excessively
+    [device unitTestInjectAttributeReport:[self _testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
+
+    [self waitForExpectations:@[ dataPersisted4 ] timeout:60];
+
+    delegate.onReportEnd = nil;
+    delegate.onClusterDataPersisted = nil;
+}
+
+- (void)test037_MTRDeviceMultipleDelegatesGetReports
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    [sController removeDevice:device];
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    // Now recreate device and get subscription primed
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    XCTestExpectation * gotReportEnd1 = [self expectationWithDescription:@"Report end  for delegate 1"];
+    __auto_type * delegate1 = [[MTRDeviceTestDelegate alloc] init];
+    __weak __auto_type weakDelegate1 = delegate1;
+    delegate1.onReportEnd = ^{
+        [gotReportEnd1 fulfill];
+        __strong __auto_type strongDelegate = weakDelegate1;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    [device addDelegate:delegate1 queue:queue];
+
+    // Use autoreleasepool to dealloc a second delegate upon exiting the scope
+    @autoreleasepool {
+        // Test that a second delegate can also receive attribute reports
+        XCTestExpectation * gotAReport2 = [self expectationWithDescription:@"Report end  for delegate 2"];
+        __auto_type * delegate2 = [[MTRDeviceTestDelegate alloc] init];
+        __weak __auto_type weakDelegate2 = delegate2;
+        delegate2.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+            [gotAReport2 fulfill];
+            __strong __auto_type strongDelegate = weakDelegate2;
+            strongDelegate.onAttributeDataReceived = nil;
+        };
+
+        [device addDelegate:delegate2 queue:queue];
+
+        // Wait just long enough for 1 report
+        [self waitForExpectations:@[ gotAReport2 ] timeout:60];
+
+        // Verify that at this point MTRDevice is still seeing 2 delegates
+        XCTAssertEqual([device unitTestNonnullDelegateCount], 2);
+    }
+
+    [self waitForExpectations:@[ gotReportEnd1 ] timeout:60];
+
+    // Verify that once the entire report comes in from all-clusters, that delegate2 had been dealloced, and MTRDevice no longer sees it
+    XCTAssertEqual([device unitTestNonnullDelegateCount], 1);
+}
+
+- (NSDictionary<NSString *, id> *)_testAttributeResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(unsigned int)testValue
+{
+    return @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(testValue),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(testValue),
+        }
+    };
+}
+
+- (NSDictionary<NSString *, id> *)_testEventResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
+{
+    return @{
+        MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
+        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+        MTREventTimestampDateKey : [NSDate date],
+        // For unit test no real data is needed, but timestamp is required
+    };
+}
+- (void)test038_MTRDeviceMultipleDelegatesInterestedPaths
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    [sController removeDevice:device];
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    // Now recreate device and get subscription primed
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    XCTestExpectation * gotReportEnd1 = [self expectationWithDescription:@"Report end for delegate 1"];
+
+    __auto_type * delegate1 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate1.skipSetupSubscription = YES;
+    __weak __auto_type weakDelegate1 = delegate1;
+    __block NSUInteger attributesReceived1 = 0;
+    delegate1.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        attributesReceived1 += data.count;
+    };
+    __block NSUInteger eventsReceived1 = 0;
+    delegate1.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        eventsReceived1 += data.count;
+    };
+    delegate1.onReportEnd = ^{
+        [gotReportEnd1 fulfill];
+        __strong __auto_type strongDelegate = weakDelegate1;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    // All 9 attributes from endpoint 1, plus 3 from endpoint 2, plus endpoint 3 = total 21
+    NSArray * interestedAttributePaths1 = @[
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(111)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(112)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(113)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(12) attributeID:@(121)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(12) attributeID:@(122)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(12) attributeID:@(123)],
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(13)],
+        [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(21) attributeID:@(211)],
+        [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(21) attributeID:@(212)],
+        [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(21)],
+        @(3),
+    ];
+    // All 9 event from endpoint 1, plus 3 from endpoint 2, plus endpoint 3 = total 21
+    NSArray * interestedEventPaths1 = @[
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(11) eventID:@(111)],
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(11) eventID:@(112)],
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(11) eventID:@(113)],
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(12) eventID:@(121)],
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(12) eventID:@(122)],
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(12) eventID:@(123)],
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(13)],
+        [MTREventPath eventPathWithEndpointID:@(2) clusterID:@(21) eventID:@(211)],
+        [MTREventPath eventPathWithEndpointID:@(2) clusterID:@(21) eventID:@(212)],
+        [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(21)],
+        @(3),
+    ];
+    [device addDelegate:delegate1 queue:queue interestedPathsForAttributes:interestedAttributePaths1 interestedPathsForEvents:interestedEventPaths1];
+
+    // Delegate 2
+    XCTestExpectation * gotReportEnd2 = [self expectationWithDescription:@"Report end for delegate 2"];
+    __auto_type * delegate2 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate2.skipSetupSubscription = YES;
+    __weak __auto_type weakDelegate2 = delegate2;
+    __block NSUInteger attributesReceived2 = 0;
+    delegate2.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        attributesReceived2 += data.count;
+    };
+    __block NSUInteger eventsReceived2 = 0;
+    delegate2.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        eventsReceived2 += data.count;
+    };
+    delegate2.onReportEnd = ^{
+        [gotReportEnd2 fulfill];
+        __strong __auto_type strongDelegate = weakDelegate2;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    // All 9 attributes from endpoint 3
+    NSArray * interestedAttributePaths2 = @[
+        [MTRClusterPath clusterPathWithEndpointID:@(3) clusterID:@(31)],
+        [MTRClusterPath clusterPathWithEndpointID:@(3) clusterID:@(32)],
+        [MTRClusterPath clusterPathWithEndpointID:@(3) clusterID:@(33)],
+    ];
+    // Test empty events (all filtered)
+    [device addDelegate:delegate2 queue:queue interestedPathsForAttributes:interestedAttributePaths2 interestedPathsForEvents:@[]];
+
+    // Delegate 3
+    XCTestExpectation * gotReportEnd3 = [self expectationWithDescription:@"Report end for delegate 3"];
+    __auto_type * delegate3 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate3.skipSetupSubscription = YES;
+    __weak __auto_type weakDelegate3 = delegate3;
+    __block NSUInteger attributesReceived3 = 0;
+    delegate3.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        attributesReceived3 += data.count;
+    };
+    __block NSUInteger eventsReceived3 = 0;
+    delegate3.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        eventsReceived3 += data.count;
+    };
+    delegate3.onReportEnd = ^{
+        [gotReportEnd3 fulfill];
+        __strong __auto_type strongDelegate = weakDelegate3;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    // All 9 events from endpoint 4
+    NSArray * interestedEventPaths3 = @[
+        [MTRClusterPath clusterPathWithEndpointID:@(4) clusterID:@(41)],
+        [MTRClusterPath clusterPathWithEndpointID:@(4) clusterID:@(42)],
+        [MTRClusterPath clusterPathWithEndpointID:@(4) clusterID:@(43)],
+    ];
+    // Test empty attributes (all filtered)
+    [device addDelegate:delegate3 queue:queue interestedPathsForAttributes:@[] interestedPathsForEvents:interestedEventPaths3];
+
+    // Delegate 4
+    XCTestExpectation * gotReportEnd4 = [self expectationWithDescription:@"Report end for delegate 4"];
+    __auto_type * delegate4 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate3.skipSetupSubscription = YES;
+    __weak __auto_type weakDelegate4 = delegate4;
+    __block NSUInteger attributesReceived4 = 0;
+    delegate4.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        attributesReceived4 += data.count;
+    };
+    __block NSUInteger eventsReceived4 = 0;
+    delegate4.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        eventsReceived4 += data.count;
+    };
+    delegate4.onReportEnd = ^{
+        [gotReportEnd4 fulfill];
+        __strong __auto_type strongDelegate = weakDelegate4;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    // Test a fourth delegate that receives everything will get all the reports
+    [device addDelegate:delegate4 queue:queue];
+
+    // Inject events first
+    NSMutableArray * eventReport = [NSMutableArray array];
+    // Construct 36 events with endpoints 1~4, clusters 11 ~ 33, and events 111~333
+    for (int i = 1; i <= 4; i++) {
+        for (int j = 1; j <= 3; j++) {
+            for (int k = 1; k <= 3; k++) {
+                int endpointID = i;
+                int clusterID = i * 10 + j;
+                int eventID = i * 100 + j * 10 + k;
+                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+            }
+        }
+    }
+    [device unitTestInjectEventReport:eventReport];
+
+    // Now inject attributes and check that each delegate gets the right set of attributes
+    NSMutableArray * attributeReport = [NSMutableArray array];
+    // Construct 36 attributes with endpoints 1~4, clusters 11 ~ 33, and attributes 111~333
+    for (int i = 1; i <= 4; i++) {
+        for (int j = 1; j <= 3; j++) {
+            for (int k = 1; k <= 3; k++) {
+                int endpointID = i;
+                int clusterID = i * 10 + j;
+                int attributeID = i * 100 + j * 10 + k;
+                int value = attributeID + 10000;
+                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+            }
+        }
+    }
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+
+    [self waitForExpectations:@[ gotReportEnd1, gotReportEnd2, gotReportEnd3, gotReportEnd4 ] timeout:60];
+
+    XCTAssertEqual(attributesReceived1, 21);
+    XCTAssertEqual(eventsReceived1, 21);
+    XCTAssertEqual(attributesReceived2, 9);
+    XCTAssertEqual(eventsReceived2, 0);
+    XCTAssertEqual(attributesReceived3, 0);
+    XCTAssertEqual(eventsReceived3, 9);
+    XCTAssertEqual(attributesReceived4, 36);
+    XCTAssertEqual(eventsReceived4, 36);
+
+    // Now reset the counts, remove delegate1 and verify that only delegates 2~4 got reports
+    attributesReceived1 = 0;
+    eventsReceived1 = 0;
+    attributesReceived2 = 0;
+    eventsReceived2 = 0;
+    attributesReceived3 = 0;
+    eventsReceived3 = 0;
+    attributesReceived4 = 0;
+    eventsReceived4 = 0;
+    [device removeDelegate:delegate1];
+
+    XCTestExpectation * gotReportEnd2again = [self expectationWithDescription:@"Report end for delegate 2 again"];
+    delegate2.onReportEnd = ^{
+        [gotReportEnd2again fulfill];
+        __strong __auto_type strongDelegate = weakDelegate2;
+        strongDelegate.onReportEnd = nil;
+    };
+    XCTestExpectation * gotReportEnd3again = [self expectationWithDescription:@"Report end for delegate 3 again"];
+    delegate3.onReportEnd = ^{
+        [gotReportEnd3again fulfill];
+        __strong __auto_type strongDelegate = weakDelegate3;
+        strongDelegate.onReportEnd = nil;
+    };
+    XCTestExpectation * gotReportEnd4again = [self expectationWithDescription:@"Report end for delegate 4 again"];
+    delegate4.onReportEnd = ^{
+        [gotReportEnd4again fulfill];
+        __strong __auto_type strongDelegate = weakDelegate4;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    // Construct 36 new events with new timestamps
+    [eventReport removeAllObjects];
+    for (int i = 1; i <= 4; i++) {
+        for (int j = 1; j <= 3; j++) {
+            for (int k = 1; k <= 3; k++) {
+                int endpointID = i;
+                int clusterID = i * 10 + j;
+                int eventID = i * 100 + j * 10 + k;
+                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+            }
+        }
+    }
+    [device unitTestInjectEventReport:eventReport];
+
+    // Construct 36 new attributes with new values / data versions
+    [attributeReport removeAllObjects];
+    for (int i = 1; i <= 4; i++) {
+        for (int j = 1; j <= 3; j++) {
+            for (int k = 1; k <= 3; k++) {
+                int endpointID = i;
+                int clusterID = i * 10 + j;
+                int attributeID = i * 100 + j * 10 + k;
+                int value = attributeID + 20000;
+                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+            }
+        }
+    }
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [self waitForExpectations:@[ gotReportEnd2again, gotReportEnd3again, gotReportEnd4again ] timeout:60];
+
+    XCTAssertEqual(attributesReceived1, 0);
+    XCTAssertEqual(eventsReceived1, 0);
+    XCTAssertEqual(attributesReceived2, 9);
+    XCTAssertEqual(eventsReceived2, 0);
+    XCTAssertEqual(attributesReceived3, 0);
+    XCTAssertEqual(eventsReceived3, 9);
+    XCTAssertEqual(attributesReceived4, 36);
+    XCTAssertEqual(eventsReceived4, 36);
 }
 
 @end

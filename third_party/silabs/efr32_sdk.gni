@@ -201,8 +201,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/include/psa",
       "${efr32_sdk_root}/util/third_party/mbedtls/library",
       "${efr32_sdk_root}/platform/security/sl_component/sl_protocol_crypto/src",
-      "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
-      "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
       "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/inc",
@@ -213,6 +211,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/driver/debug/inc",
       "${silabs_gen_folder}/config",
       "${silabs_gen_folder}/autogen",
+
+      # Use directory in matter support until gsdk files are updated
+      "${sdk_support_root}/platform/security/sl_component/sl_mbedtls_support/inc",
 
       # Headers needed for Init no function will be called if OT is not used
       "${sl_ot_efr32_root}",
@@ -684,7 +685,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/sl_entropy_hardware.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/sl_mbedtls.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/sli_psa_crypto.c",
-      "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_common.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_init.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_psa_trng.c",
@@ -783,6 +783,9 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_device_init_clocks.c",
       "${silabs_gen_folder}/autogen/sl_event_handler.c",
       "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
+
+      # Used file in matter_support until fix is pushed to gsdk
+      "${sdk_support_root}/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
     ]
     if (enable_dic) {
       sources += [

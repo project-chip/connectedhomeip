@@ -47,9 +47,7 @@ using namespace chip::System::Clock::Literals;
 namespace chip {
 namespace Messaging {
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
-Optional<System::Clock::Milliseconds64> ReliableMessageMgr::sAdditionalMRPBackoffTime;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+System::Clock::Timeout ReliableMessageMgr::sAdditionalMRPBackoffTime = CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
 
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry(ReliableMessageContext * rc) :
     ec(*rc->GetExchangeContext()), nextRetransTime(0), sendCount(0)
@@ -158,7 +156,7 @@ void ReliableMessageMgr::ExecuteActions()
                 {
                     session->AsSecureSession()->MarkAsDefunct();
                 }
-                session->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+                session->NotifySessionHang();
             }
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
@@ -201,7 +199,7 @@ void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
 
 CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry)
 {
-    VerifyOrDie(!rc->IsWaitingForAck());
+    VerifyOrReturnError(!rc->IsWaitingForAck(), CHIP_ERROR_INCORRECT_STATE);
 
     *rEntry = mRetransTable.CreateObject(rc);
     if (*rEntry == nullptr)
@@ -269,11 +267,7 @@ System::Clock::Timeout ReliableMessageMgr::GetBackoff(System::Clock::Timeout bas
     mrpBackoffTime += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
-    mrpBackoffTime += sAdditionalMRPBackoffTime.ValueOr(CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST);
-#else
-    mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+    mrpBackoffTime += sAdditionalMRPBackoffTime;
 
     return std::chrono::duration_cast<System::Clock::Timeout>(mrpBackoffTime);
 }
@@ -461,6 +455,11 @@ CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeI
     }
 
     return error;
+}
+
+void ReliableMessageMgr::SetAdditionalMRPBackoffTime(const Optional<System::Clock::Timeout> & additionalTime)
+{
+    sAdditionalMRPBackoffTime = additionalTime.ValueOr(CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST);
 }
 
 void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)

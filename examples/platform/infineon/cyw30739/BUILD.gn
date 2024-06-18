@@ -13,6 +13,28 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/cyw30739_sdk.gni")
+
+import("${chip_root}/examples/platform/infineon/cyw30739/args.gni")
+import("${cyw30739_sdk_build_root}/cyw30739_sdk.gni")
+
+static_library("platform") {
+  sources = [
+    "EventManagementTestEventTriggerHandler.h",
+    "LEDWidget.h",
+    "OTAConfig.h",
+    "SoftwareDiagnostics.h",
+    "main.cpp",
+  ]
+
+  public_configs = [ ":${target_name}-config" ]
+
+  deps = [ app_data_model ]
+}
+
+config("platform-config") {
+  include_dirs = [ "." ]
+}
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
