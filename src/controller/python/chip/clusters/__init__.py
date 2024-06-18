@@ -42,8 +42,8 @@ from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilte
                       PowerTopology, PressureMeasurement, ProxyConfiguration, ProxyDiscovery, ProxyValid, PulseWidthModulation,
                       PumpConfigurationAndControl, RadonConcentrationMeasurement, RefrigeratorAlarm,
                       RefrigeratorAndTemperatureControlledCabinetMode, RelativeHumidityMeasurement, RvcCleanMode,
-                      RvcOperationalState, RvcRunMode, ScenesManagement, ServiceArea, SmokeCoAlarm, SoftwareDiagnostics, Switch, TargetNavigator,
-                      TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
+                      RvcOperationalState, RvcRunMode, ScenesManagement, ServiceArea, SmokeCoAlarm, SoftwareDiagnostics, Switch,
+                      TargetNavigator, TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
                       ThreadBorderRouterManagement, ThreadNetworkDiagnostics, TimeFormatLocalization, TimeSynchronization,
                       TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization, UnitTesting, UserLabel,
                       ValveConfigurationAndControl, WakeOnLan, WiFiNetworkDiagnostics, WindowCovering)
