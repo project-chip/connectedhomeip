@@ -47,8 +47,8 @@ static_library("raw") {
   }
   if (chip_device_config_enable_wifipaf) {
     sources += [
-        "WiFiPAF.cpp",
-        "WiFiPAF.h",
+      "WiFiPAF.cpp",
+      "WiFiPAF.h",
     ]
   }
 
