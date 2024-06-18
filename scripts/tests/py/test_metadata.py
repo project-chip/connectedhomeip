@@ -27,6 +27,7 @@ class TestMetadataReader(unittest.TestCase):
     # test-runner-run/run1/app-args: --discriminator 1234 --trace-to json:${TRACE_APP}.json
     # test-runner-run/run1/script-args: --commissioning-method on-network --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
     # test-runner-run/run1/factoryreset: True
+    # test-runner-run/run1/quiet: True
     '''
 
     env_file_content = '''
@@ -44,7 +45,8 @@ class TestMetadataReader(unittest.TestCase):
         app_args="--discriminator 1234 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json",
         run="run1",
         app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-        factoryreset=True
+        factoryreset=True,
+        quiet=True
         )
 
     def generate_temp_file(self, directory: str, file_content: str) -> str:
@@ -60,14 +62,6 @@ class TestMetadataReader(unittest.TestCase):
             
             reader = MetadataReader(env_file)
             self.maxDiff = None
-            
-            test_file_expected_arg_string = (
-                "scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py "
-                "--app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app "
-                "--factoryreset --app-args \"--discriminator 1234 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json\" "
-                "--script \"" + temp_file + "\" --script-args \"--commissioning-method on-network "
-                "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto\"'"
-            )
             
             self.expected_metadata.py_script_path = temp_file
             actual = reader.parse_script(temp_file)[0]
