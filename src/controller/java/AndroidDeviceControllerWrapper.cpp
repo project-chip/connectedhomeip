@@ -568,6 +568,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
         clientType = static_cast<chip::app::Clusters::IcdManagement::ClientTypeEnum>(
             chip::JniReferences::GetInstance().ShortToPrimitive(jClientType));
     }
+    params.SetICDClientType(clientType);
 
     return err;
 }
