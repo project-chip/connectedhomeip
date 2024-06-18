@@ -1670,7 +1670,7 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
 
             if hooks:
                 # Right now, we only support running a single test class at once,
-                # but it's relatively easy to exapand that to make the test process faster
+                # but it's relatively easy to expand that to make the test process faster
                 # TODO: support a list of tests
                 hooks.start(count=1)
                 # Mobly gives the test run time in seconds, lets be a bit more precise
