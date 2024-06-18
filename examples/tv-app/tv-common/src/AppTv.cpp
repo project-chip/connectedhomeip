@@ -588,7 +588,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
         mContentApps.emplace_back(std::move(ptr));
     }
     else if (vendorId == 9050 && productId == 22)
-    {   
+    {
         auto ptr = std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021",
                                                                    make_default_supported_clusters());
         mContentApps.emplace_back(std::move(ptr));
