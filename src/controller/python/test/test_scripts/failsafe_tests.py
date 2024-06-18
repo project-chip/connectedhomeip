@@ -46,7 +46,7 @@ LIGHTING_ENDPOINT_ID = 1
 GROUP_ID = 0
 
 
-def main():
+async def main():
     optParser = OptionParser()
     optParser.add_option(
         "-t",
@@ -95,12 +95,12 @@ def main():
               "Failed to finish network commissioning")
 
     logger.info("Testing commissioning")
-    FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
-                                     setuppin=20202021,
-                                     nodeid=1),
+    FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
+                                           setuppin=20202021,
+                                           nodeid=1),
               "Failed to finish key exchange")
 
-    FailIfNot(asyncio.run(test.TestFailsafe(nodeid=1)), "Failed failsafe test")
+    FailIfNot(await test.TestFailsafe(nodeid=1), "Failed failsafe test")
 
     timeoutTicker.stop()
 
@@ -113,7 +113,9 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+        loop.close()
     except Exception as ex:
         logger.exception(ex)
         TestFail("Exception occurred when running tests.")
