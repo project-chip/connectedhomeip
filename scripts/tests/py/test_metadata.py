@@ -19,6 +19,7 @@ from typing import List
 
 from metadata import MetadataReader, Metadata
 
+
 class TestMetadataReader(unittest.TestCase):
 
     test_file_content = ''' 
@@ -47,7 +48,7 @@ class TestMetadataReader(unittest.TestCase):
         app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
         factoryreset=True,
         quiet=True
-        )
+    )
 
     def generate_temp_file(self, directory: str, file_content: str) -> str:
         fd, temp_file_path = tempfile.mkstemp(dir=directory)
@@ -59,10 +60,10 @@ class TestMetadataReader(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_file = self.generate_temp_file(temp_dir, self.test_file_content)
             env_file = self.generate_temp_file(temp_dir, self.env_file_content)
-            
+
             reader = MetadataReader(env_file)
             self.maxDiff = None
-            
+
             self.expected_metadata.py_script_path = temp_file
             actual = reader.parse_script(temp_file)[0]
             self.assertEqual(self.expected_metadata, actual)
