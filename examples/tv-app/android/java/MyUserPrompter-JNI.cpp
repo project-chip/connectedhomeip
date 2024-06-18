@@ -228,15 +228,6 @@ bool JNIMyUserPrompter::DisplaysPasscodeAndQRCode()
 }
 
 /**
- *  Called to prompt the user for consent to allow the app commissioneeName/vendorId/productId to be installed.
- * For example "[commissioneeName] is requesting permission to install app to this TV, approve?"
- */
-void JNIMyUserPrompter::PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
-{
-    ChipLogError(Zcl, "JNIMyUserPrompter::PromptForAppInstallOKPermission Needs Implementation");
-}
-
-/**
  *   Called to display the given setup passcode to the user,
  * for commissioning the given commissioneeName with the given vendorId and productId,
  * and provide instructions for where to enter it in the commissionee (when pairingHint and pairingInstruction are provided).
