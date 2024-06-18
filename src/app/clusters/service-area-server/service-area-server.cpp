@@ -86,11 +86,6 @@ CHIP_ERROR Instance::Init()
     
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 
-    // features are independent, any combination of supported/not-supported is valid
-    VerifyOrReturnError((mFeature.Raw() && 
-                        !(to_underlying(Feature::kListOrder) || to_underlying(Feature::kSelectWhileRunning))) == 0, 
-                        CHIP_ERROR_INVALID_ARGUMENT);
-
     return CHIP_NO_ERROR;
 }
 
