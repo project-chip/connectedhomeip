@@ -1540,35 +1540,55 @@ class CommissionDeviceTest(MatterBaseTest):
             info.filter_value = conf.discriminators[i]
 
         if conf.commissioning_method == "on-network":
-            return dev_ctrl.CommissionOnNetwork(
-                nodeId=conf.dut_node_ids[i],
-                setupPinCode=info.passcode,
-                filterType=info.filter_type,
-                filter=info.filter_value
-            )
+            try:
+                dev_ctrl.CommissionOnNetwork(
+                    nodeId=conf.dut_node_ids[i],
+                    setupPinCode=info.passcode,
+                    filterType=info.filter_type,
+                    filter=info.filter_value
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         elif conf.commissioning_method == "ble-wifi":
-            return dev_ctrl.CommissionWiFi(
-                info.filter_value,
-                info.passcode,
-                conf.dut_node_ids[i],
-                conf.wifi_ssid,
-                conf.wifi_passphrase,
-                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
-            )
+            try:
+                dev_ctrl.CommissionWiFi(
+                    info.filter_value,
+                    info.passcode,
+                    conf.dut_node_ids[i],
+                    conf.wifi_ssid,
+                    conf.wifi_passphrase,
+                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         elif conf.commissioning_method == "ble-thread":
-            return dev_ctrl.CommissionThread(
-                info.filter_value,
-                info.passcode,
-                conf.dut_node_ids[i],
-                conf.thread_operational_dataset,
-                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
-            )
+            try:
+                dev_ctrl.CommissionThread(
+                    info.filter_value,
+                    info.passcode,
+                    conf.dut_node_ids[i],
+                    conf.thread_operational_dataset,
+                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         elif conf.commissioning_method == "on-network-ip":
-            logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
-            return dev_ctrl.CommissionIP(
-                ipaddr=conf.commissionee_ip_address_just_for_testing,
-                setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
-            )
+            try:
+                logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
+                dev_ctrl.CommissionIP(
+                    ipaddr=conf.commissionee_ip_address_just_for_testing,
+                    setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         else:
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
