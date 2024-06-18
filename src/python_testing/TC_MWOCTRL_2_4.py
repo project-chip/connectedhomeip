@@ -41,8 +41,9 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedWatts attribute"),
             TestStep(3, "Read the SelectedWattIndex attribute"),
-            TestStep(4, "Send the SetCookingParameters command"),
+            TestStep(4, "Send the SetCookingParameters command", "Verify DUT responds w/ status SUCCESS(0x00)."),
             TestStep(5, "Read and verify the SelectedWattIndex attribute"),
+            TestStep(6, "Try to set SelectedWattIndex to an invalid value.", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
         ]
         return steps
 
@@ -88,11 +89,17 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
             await self.send_single_cmd(cmd=commands.SetCookingParameters(wattSettingIndex=newWattIndex), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(5)
         selectedWattIndex = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.SelectedWattIndex)
         asserts.assert_true(selectedWattIndex == newWattIndex, "SelectedWattIndex was not correctly set")
+
+        self.step(6)
+        newWattIndex = len(supportedWattsList)
+        try:
+            await self.send_single_cmd(cmd=commands.SetCookingParameters(wattSettingIndex=newWattIndex), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned")
 
 
 if __name__ == "__main__":

@@ -38,13 +38,29 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-    async def set_bad_cook_time_value_expect_failure(self, endpoint, value):
+    async def set_bad_cook_time_value_expect_failure(self, endpoint, value, expectedError=Status.ConstraintError):
         commands = Clusters.Objects.MicrowaveOvenControl.Commands
         try:
             await self.send_single_cmd(cmd=commands.SetCookingParameters(cookTime=value), endpoint=endpoint)
             asserts.assert_fail("Expected an exception but received none.")
         except InteractionModelError as e:
+            asserts.assert_equal(e.status, expectedError, "Unexpected error received.")
+
+    async def set_bad_cook_mode_value_expect_failure(self, endpoint, value):
+        commands = Clusters.Objects.MicrowaveOvenControl.Commands
+        try:
+            await self.send_single_cmd(cmd=commands.SetCookingParameters(cookMode=value), endpoint=endpoint)
+            asserts.assert_fail("Expected an exception but received none.")
+        except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError, "Expected a CONSTRAINT_ERROR but got a different response.")
+
+    async def send_bad_command_expect_failure(self, endpoint):
+        commands = Clusters.Objects.MicrowaveOvenControl.Commands
+        try:
+            await self.send_single_cmd(cmd=commands.SetCookingParameters(startAfterSetting=1), endpoint=endpoint)
+            asserts.assert_fail("Expected an exception but received none.")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidCmmand, "Expected a INVALID_COMMAND but got a different response.")
 
     async def read_and_check_cook_time_value(self, endpoint, value):
         attributes = Clusters.MicrowaveOvenControl.Attributes
@@ -75,6 +91,13 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
             TestStep(10, "Read the WattRating attribute, if supported", "Verify that the DUT response contains a uint16 value."),
             TestStep(11, "Set the CookTime attribute to 0", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep(12, "Set the CookTime attribute to MaxCookTime+1", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+            TestStep(13, "Set the CookMode attribute to 250", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+
+            TestStep(14, "Manually set DUT into a state where it will respond with INVALID_IN_STATE", ""),
+            TestStep(15, "Set the CookTime attribute to 60", "Verify DUT responds w/ INVALID_IN_STATE(0xCB)"),
+
+            TestStep(16, "Manually set DUT into a state where it will respond with INVALID_COMMAND", ""),
+            TestStep(17, "Send the SetCookingParameters command with StartAfterSetting to True", "Verify DUT responds w/ INVALID_COMMAND(0x85)"),
         ]
         return steps
 
@@ -131,6 +154,28 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
         self.step(12)
         await self.set_bad_cook_time_value_expect_failure(endpoint, maxCookTime+1)
 
+        self.step(13)
+        await self.set_bad_cook_mode_value_expect_failure(endpoint, 250)
+
+        if self.check_pics("MWOCTRL.S.M.ManualSetInvalidInState"):
+            self.step(14)
+            input("Press Enter when done.\n")
+
+            self.step(15)
+            await self.set_bad_cook_time_value_expect_failure(endpoint, maxCookTime+1, Status.InvalidInState)
+        else:
+            self.skip_step(14)
+            self.skip_step(15)            
+    
+        if self.check_pics("MWOCTRL.S.M.ManualSetInvalidCommand"):
+            self.step(16)
+            input("Press Enter when done.\n")
+
+            self.step(17)
+            await self.send_bad_command_expect_failure(endpoint)
+        else:
+            self.skip_step(16)
+            self.skip_step(17)            
 
 if __name__ == "__main__":
     default_matter_test_main()
