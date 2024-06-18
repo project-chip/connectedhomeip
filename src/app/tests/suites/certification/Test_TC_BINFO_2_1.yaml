@@ -90,12 +90,10 @@ tests:
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
-          value: 17
+          value: 18
           saveAs: DataModelRevisionValue
           constraints:
               type: int16u
-              minValue: 0
-              maxValue: 65534
 
     - label: "Step 3: TH writes DataModelRevision as '0x1124' "
       PICS: BINFO.S.A0000
@@ -746,7 +744,7 @@ tests:
 
     - label:
           "Step 62: SpecificationVersion value should in the inclusive range of
-          (0 to 4294967295) and the initial 7 bits are set to zero."
+          (0x01040000 to 0x01050000) and the lower 8 bits are set to zero."
       runIf: "!IsExpectedValue"
       PICS: BINFO.S.A0015
       command: "readAttribute"
@@ -754,9 +752,9 @@ tests:
       response:
           value: SpecificationVersionValue
           constraints:
-              minValue: 0
+              minValue: 0x0104000000
               maxValue: 4294967295
-              hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40]
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80]
 
     - label:
           "Step 63: TH sends Write request message to DUT to change the value of

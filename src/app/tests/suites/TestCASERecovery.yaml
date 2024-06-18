@@ -33,7 +33,9 @@ tests:
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
-          value: 17
+          constraints:
+              type: int16u
+              minValue: 17
 
     - label: "Reboot the server"
       cluster: "SystemCommands"
@@ -72,4 +74,6 @@ tests:
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
-          value: 17
+          constraints:
+              type: int16u
+              minValue: 17
