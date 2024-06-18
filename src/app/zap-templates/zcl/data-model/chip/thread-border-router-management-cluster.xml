@@ -26,7 +26,7 @@ limitations under the License.
     <domain>HRAP</domain>
     <name>Thread Border Router Management</name>
     <code>0x0452</code>
-    <define>THREAD_BORDER_ROUTER_MANAGEMENT</define>
+    <define>THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>Manage the Thread network of Thread Border Router</description>

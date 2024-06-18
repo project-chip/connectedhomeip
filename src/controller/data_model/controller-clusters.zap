@@ -4751,7 +4751,7 @@
           "name": "Thread Border Router Management",
           "code": 1106,
           "mfgCode": null,
-          "define": "THREAD_BORDER_ROUTER_MANAGEMENT",
+          "define": "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
