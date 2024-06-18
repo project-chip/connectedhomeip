@@ -385,14 +385,14 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100ms"
+    - label: "Wait 1s"
       PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: 1000
 
     - label: "Step 6b: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
@@ -425,14 +425,14 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 100ms"
+    - label: "Wait 1s"
       PICS: CC.S.F04
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: 1000
 
     - label: "Step 7b: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
