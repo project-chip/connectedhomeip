@@ -610,7 +610,8 @@ exit:
 }
 
 JNI_METHOD(void, commissionDevice)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials, jobject icdRegistrationInfo)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials,
+ jobject icdRegistrationInfo)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
