@@ -633,28 +633,29 @@ class ChipDeviceControllerBase():
                 self.devCtrl, nodeid)
         ).raise_on_error()
 
-    def _establishPASESession(self, callFunct):
+    async def _establishPASESession(self, callFunct):
         self.CheckIsActive()
 
         with self._pase_establishment_context as ctx:
             self._enablePairingCompleteCallback(True)
-            self._ChipStack.Call(callFunct).raise_on_error()
-            ctx.future.result()
+            res = await self._ChipStack.CallAsync(callFunct)
+            res.raise_on_error()
+            await asyncio.futures.wrap_future(ctx.future)
 
-    def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int) -> None:
-        self._establishPASESession(
+    async def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int) -> None:
+        await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
                 self.devCtrl, setupPinCode, discriminator, nodeid)
         )
 
-    def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = 0) -> None:
-        self._establishPASESession(
+    async def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = 0) -> None:
+        await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
         )
 
-    def EstablishPASESession(self, setUpCode: str, nodeid: int) -> None:
-        self._establishPASESession(
+    async def EstablishPASESession(self, setUpCode: str, nodeid: int) -> None:
+        await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
                 self.devCtrl, setUpCode.encode("utf-8"), nodeid)
         )
@@ -864,18 +865,18 @@ class ChipDeviceControllerBase():
 
         return self._Cluster
 
-    def FindOrEstablishPASESession(self, setupCode: str, nodeid: int, timeoutMs: int = None) -> typing.Optional[DeviceProxyWrapper]:
+    async def FindOrEstablishPASESession(self, setupCode: str, nodeid: int, timeoutMs: int = None) -> typing.Optional[DeviceProxyWrapper]:
         ''' Returns CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device'''
         self.CheckIsActive()
         returnDevice = c_void_p(None)
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+        res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
             self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
-        self.EstablishPASESession(setupCode, nodeid)
+        await self.EstablishPASESession(setupCode, nodeid)
 
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+        res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
             self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
