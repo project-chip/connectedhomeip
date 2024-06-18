@@ -41,6 +41,7 @@ import chip.native
 from chip import ChipDeviceCtrl
 from chip.ChipStack import ChipStack
 from chip.crypto import p256keypair
+from chip.exceptions import ChipStackException
 from chip.utils import CommissioningBuildingBlocks
 from cirque_restart_remote_device import restartRemoteDevice
 from ecdsa import NIST256p
@@ -256,8 +257,9 @@ class BaseTestHelper:
             devCtrl = self.devCtrl
         self.logger.info(
             "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
-        if devCtrl.EstablishPASESessionIP(
-                ip, setuppin, nodeid) is not None:
+        try:
+            devCtrl.EstablishPASESessionIP(ip, setuppin, nodeid)
+        except ChipStackException:
             self.logger.info(
                 "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
             return False
@@ -268,7 +270,9 @@ class BaseTestHelper:
     def TestCommissionOnly(self, nodeid: int):
         self.logger.info(
             "Commissioning device with id {}".format(nodeid))
-        if not self.devCtrl.Commission(nodeid):
+        try:
+            self.devCtrl.Commission(nodeid)
+        except ChipStackException:
             self.logger.info(
                 "Failed to commission device with id {}".format(str(nodeid)))
             return False
@@ -311,8 +315,10 @@ class BaseTestHelper:
 
     def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Commissioning device {}".format(ip))
-        if not self.devCtrl.CommissionIP(ip, setuppin, nodeid):
-            self.logger.info(
+        try:
+            self.devCtrl.CommissionIP(ip, setuppin, nodeid)
+        except ChipStackException:
+            self.logger.exception(
                 "Failed to finish commissioning device {}".format(ip))
             return False
         self.logger.info("Commissioning finished.")
@@ -320,8 +326,10 @@ class BaseTestHelper:
 
     def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
-        if not self.devCtrl.CommissionWithCode(setupPayload, nodeid, chip.discovery.DiscoveryType(discoveryType)):
-            self.logger.info(
+        try:
+            self.devCtrl.CommissionWithCode(setupPayload, nodeid, chip.discovery.DiscoveryType(discoveryType))
+        except ChipStackException:
+            self.logger.exception(
                 "Failed to finish commissioning device {}".format(setupPayload))
             return False
         self.logger.info("Commissioning finished.")
@@ -783,8 +791,10 @@ class BaseTestHelper:
         self.devCtrl2 = self.fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
 
-        if not self.devCtrl2.CommissionIP(ip, setuppin, nodeid):
-            self.logger.info(
+        try:
+            self.devCtrl2.CommissionIP(ip, setuppin, nodeid)
+        except ChipStackException:
+            self.logger.exception(
                 "Failed to finish key exchange with device {}".format(ip))
             return False
 
