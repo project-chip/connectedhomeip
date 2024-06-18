@@ -2,6 +2,7 @@
 
 #include "rvc-mode-delegates.h"
 #include "rvc-operational-state-delegate.h"
+#include "rvc-service-area-delegate.h"
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/clusters/service-area-server/service-area-server.h>
@@ -13,7 +14,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class RvcDevice : public ServiceArea::Delegate
+class RvcDevice
 {
 private:
     RvcRunMode::RvcRunModeDelegate mRunModeDelegate;
@@ -25,15 +26,8 @@ private:
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
     RvcOperationalState::Instance mOperationalStateInstance;
 
-    // note: inheritance from RvcServiceAreaDelegate vs declaring an object eliminates a number of callbacks
-    // there is only one associated ServiceArea delegate, so there should be no confusion.
+    ServiceArea::RvcServiceAreaDelegate mServiceAreaDelegate;
     ServiceArea::Instance mServiceAreaInstance;
-
-    // containers for service area array attributes
-    std::vector<ServiceArea::LocationStructureWrapper>       mSupportedLocations;
-    std::vector<ServiceArea::MapStructureWrapper>            mSupportedMaps;
-    std::vector<uint32_t>                                    mSelectedLocations;
-    std::vector<ServiceArea::Structs::ProgressStruct::Type>  mProgressList;
 
     bool mDocked   = false;
     bool mCharging = false;
@@ -50,7 +44,8 @@ public:
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
         mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint),
-        mServiceAreaInstance(this, aRvcClustersEndpoint, BitMask<ServiceArea::Feature>(0))
+        mServiceAreaDelegate(),
+        mServiceAreaInstance(&mServiceAreaDelegate, aRvcClustersEndpoint, BitMask<ServiceArea::Feature>(0))
     {
         // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
@@ -138,79 +133,6 @@ public:
     void HandleResetMessage();
 
 
-    //*************************************************************************
-    // RVC Service Area overrides
-
-    // command support
-
-    bool IsSetSelectedLocationsAllowed(char* statusText) override;
-
-    bool IsValidSelectLocationsSet(const ServiceArea::Commands::SelectLocations::DecodableType & req,
-                        ServiceArea::SelectLocationsStatus & locationStatus, char* statusText, bool & useStatusText) override;
-
-    bool HandleSkipCurrentLocation(char* skipStatusText) override;
-
-    //*************************************************************************
-    // Supported Locations accessors
-
-    bool IsSupportedLocationsChangeAllowed();
-
-    uint32_t GetNumberOfSupportedLocations() override;
-
-    bool GetSupportedLocationByIndex(uint32_t listIndex, ServiceArea::LocationStructureWrapper & supportedLocation) override;
-
-    bool GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex, ServiceArea::LocationStructureWrapper & supportedLocation) override;
-
-    bool AddSupportedLocation(const ServiceArea::LocationStructureWrapper & newLocation, uint32_t & listIndex) override;
-
-    bool ModifySupportedLocation(uint32_t listIndex, const ServiceArea::LocationStructureWrapper & modifiedLocation) override;
-
-    bool ClearSupportedLocations() override;
-
-    //*************************************************************************
-    // Supported Maps accessors
-
-    bool IsSupportedMapChangeAllowed();
-
-    uint32_t GetNumberOfSupportedMaps() override;
-
-    bool GetSupportedMapByIndex(uint32_t listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
-
-    bool GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, ServiceArea::MapStructureWrapper & supportedMap) override;
-
-    bool AddSupportedMap(const ServiceArea::MapStructureWrapper & newMap, uint32_t & listIndex) override;
-
-    bool ModifySupportedMap(uint32_t listIndex, const ServiceArea::MapStructureWrapper & newMap) override;
-
-    bool ClearSupportedMaps() override;
-
-    //*************************************************************************
-    // Selected Locations accessors
-
-    uint32_t GetNumberOfSelectedLocations() override;
-
-    bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) override;
-
-    // IsSelectedLocation() no override
-
-    bool AddSelectedLocation(uint32_t aLocationId, uint32_t & listIndex) override;
-
-    bool ClearSelectedLocations() override;
-
-    //*************************************************************************
-    // Progress accessors
-
-    uint32_t GetNumberOfProgressElements() override;
-
-    bool GetProgressElementByIndex(uint32_t listIndex, ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
-
-    bool GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex, ServiceArea::Structs::ProgressStruct::Type & aProgressElement) override;
-
-    bool AddProgressElement(const ServiceArea::Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) override;
-
-    bool ModifyProgressElement(uint32_t listIndex, const ServiceArea::Structs::ProgressStruct::Type & modifiedProgressElement) override;
-
-    bool ClearProgress() override;
 };
 
 } // namespace Clusters
