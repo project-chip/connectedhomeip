@@ -18,6 +18,7 @@ import unittest
 
 from metadata import Metadata, MetadataReader
 
+
 class TestMetadataReader(unittest.TestCase):
 
     test_file_content = ''' 
