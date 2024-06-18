@@ -226,21 +226,34 @@ def _singleton(cls):
     return wrapper
 
 
-class CommissioningContext:
-    def __init__(self, devCtrl: ChipDeviceController) -> None:
-        self._devCtrl = devCtrl
+class CallbackContext:
+    def __init__(self) -> None:
+        self._future = None
 
     def __enter__(self):
         self._future = concurrent.futures.Future()
-        self._devCtrl._fabricCheckNodeId = -1
         return self
 
     @property
-    def future(self) -> concurrent.futures.Future:
+    def future(self) -> concurrent.futures.Future | None:
         return self._future
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._future = None
+
+
+class CommissioningContext(CallbackContext):
+    def __init__(self, devCtrl: ChipDeviceController) -> None:
+        super().__init__()
+        self._devCtrl = devCtrl
+
+    def __enter__(self):
+        super().__enter__()
+        self._devCtrl._fabricCheckNodeId = -1
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        super().__exit__(exc_type, exc_value, traceback)
 
 
 class CommissionableNode(discovery.CommissionableNode):
@@ -365,9 +378,9 @@ class ChipDeviceControllerBase():
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
         self._commissioning_context: CommissioningContext = CommissioningContext(self)
-        self._open_window_complete_future: typing.Optional[concurrent.futures.Future] = None
-        self._unpair_device_complete_future: typing.Optional[concurrent.futures.Future] = None
-        self._pase_establishment_complete_future: typing.Optional[concurrent.futures.Future] = None
+        self._open_window_context: CallbackContext = CallbackContext()
+        self._unpair_device_context: CallbackContext = CallbackContext()
+        self._pase_establishment_context: CallbackContext = CallbackContext()
 
     def _set_dev_ctrl(self, devCtrl, pairingDelegate):
         def HandleCommissioningComplete(nodeId: int, err: PyChipError):
@@ -402,14 +415,14 @@ class ChipDeviceControllerBase():
             else:
                 logging.warning("Failed to open commissioning window: {}".format(err))
 
-            if self._open_window_complete_future is None:
+            if self._open_window_context.future is None:
                 logging.exception("HandleOpenWindowComplete called unexpectedly")
                 return
 
             if err.is_success:
-                self._open_window_complete_future.set_result(commissioningParameters)
+                self._open_window_context.future.set_result(commissioningParameters)
             else:
-                self._open_window_complete_future.set_exception(err.to_exception())
+                self._open_window_context.future.set_exception(err.to_exception())
 
         def HandleUnpairDeviceComplete(nodeid: int, err: PyChipError):
             if err.is_success:
@@ -417,14 +430,14 @@ class ChipDeviceControllerBase():
             else:
                 logging.warning("Failed to unpair device: {}".format(err))
 
-            if self._unpair_device_complete_future is None:
+            if self._unpair_device_context.future is None:
                 logging.exception("HandleUnpairDeviceComplete called unexpectedly")
                 return
 
             if err.is_success:
-                self._unpair_device_complete_future.set_result(None)
+                self._unpair_device_context.future.set_result(None)
             else:
-                self._unpair_device_complete_future.set_exception(err.to_exception())
+                self._unpair_device_context.future.set_exception(err.to_exception())
 
         def HandlePASEEstablishmentComplete(err: PyChipError):
             if not err.is_success:
@@ -439,14 +452,14 @@ class ChipDeviceControllerBase():
                     self._commissioning_context.future.set_exception(err.to_exception())
                 return
 
-            if self._pase_establishment_complete_future is None:
+            if self._pase_establishment_context.future is None:
                 logging.exception("HandlePASEEstablishmentComplete called unexpectedly")
                 return
 
             if err.is_success:
-                self._pase_establishment_complete_future.set_result(None)
+                self._pase_establishment_context.future.set_result(None)
             else:
-                self._pase_establishment_complete_future.set_exception(err.to_exception())
+                self._pase_establishment_context.future.set_exception(err.to_exception())
 
         self.pairingDelegate = pairingDelegate
         self.devCtrl = devCtrl
@@ -582,15 +595,12 @@ class ChipDeviceControllerBase():
     def UnpairDevice(self, nodeid: int) -> None:
         self.CheckIsActive()
 
-        self._unpair_device_complete_future = concurrent.futures.Future()
-        try:
+        with self._unpair_device_context as ctx:
             self._ChipStack.Call(
                 lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
                     self.devCtrl, nodeid, self.cbHandleDeviceUnpairCompleteFunct)
             ).raise_on_error()
-            self._unpair_device_complete_future.result()
-        finally:
-            self._unpair_device_complete_future = None
+            ctx.future.result()
 
     def CloseBLEConnection(self):
         self.CheckIsActive()
@@ -621,50 +631,31 @@ class ChipDeviceControllerBase():
                 self.devCtrl, nodeid)
         ).raise_on_error()
 
-    def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int) -> None:
+    def _establishPASESession(self, callFunct):
         self.CheckIsActive()
 
-        self._pase_establishment_complete_future = concurrent.futures.Future()
-        try:
-            self._enablePairingCompeleteCallback(True)
-            self._ChipStack.Call(
-                lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
-                    self.devCtrl, setupPinCode, discriminator, nodeid)
-            ).raise_on_error()
+        with self._pase_establishment_context as ctx:
+            self._enablePairingCompleteCallback(True)
+            self._ChipStack.Call(callFunct).raise_on_error()
+            ctx.future.result()
 
-            self._pase_establishment_complete_future.result()
-        finally:
-            self._pase_establishment_complete_future = None
+    def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int) -> None:
+        self._establishPASESession(
+            lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
+                self.devCtrl, setupPinCode, discriminator, nodeid)
+        )
 
     def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = 0) -> None:
-        self.CheckIsActive()
-
-        self._pase_establishment_complete_future = concurrent.futures.Future()
-        try:
-            self._enablePairingCompeleteCallback(True)
-            self._ChipStack.Call(
-                lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
-                    self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
-            ).raise_on_error()
-
-            self._pase_establishment_complete_future.result()
-        finally:
-            self._pase_establishment_complete_future = None
+        self._establishPASESession(
+            lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
+                self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
+        )
 
     def EstablishPASESession(self, setUpCode: str, nodeid: int) -> None:
-        self.CheckIsActive()
-
-        self._pase_establishment_complete_future = concurrent.futures.Future()
-        try:
-            self._enablePairingCompeleteCallback(True)
-            self._ChipStack.Call(
-                lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
-                    self.devCtrl, setUpCode.encode("utf-8"), nodeid)
-            ).raise_on_error()
-
-            self._pase_establishment_complete_future.result()
-        finally:
-            self._pase_establishment_complete_future = None
+        self._establishPASESession(
+            lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
+                self.devCtrl, setUpCode.encode("utf-8"), nodeid)
+        )
 
     def GetTestCommissionerUsed(self):
         return self._ChipStack.Call(
@@ -805,16 +796,14 @@ class ChipDeviceControllerBase():
             Returns CommissioningParameters
         '''
         self.CheckIsActive()
-        self._open_window_complete_future = concurrent.futures.Future()
-        try:
+
+        with self._open_window_context as ctx:
             self._ChipStack.Call(
                 lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                     self.devCtrl, self.pairingDelegate, nodeid, timeout, iteration, discriminator, option)
             ).raise_on_error()
 
-            return self._open_window_complete_future.result()
-        finally:
-            self._open_window_complete_future = None
+            return ctx.future.result()
 
     def GetCompressedFabricId(self):
         self.CheckIsActive()
@@ -1842,7 +1831,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
         )
 
-        self._issue_node_chain_complete: typing.Optional[concurrent.futures.Future] = None
+        self._issue_node_chain_context: CallbackContext = CallbackContext()
         self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback(_IssueNOCChainCallbackPythonCallback)
 
         pairingDelegate = c_void_p(None)
@@ -2091,10 +2080,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return ctx.future.result()
 
     def NOCChainCallback(self, nocChain):
-        if self._issue_node_chain_complete is None:
+        if self._issue_node_chain_context.future is None:
             logging.exception("NOCChainCallback while not expecting a callback")
             return
-        self._issue_node_chain_complete.set_result(nocChain)
+        self._issue_node_chain_context.future.set_result(nocChain)
         return
 
     def IssueNOCChain(self, csr: Clusters.OperationalCredentials.Commands.CSRResponse, nodeId: int):
@@ -2102,15 +2091,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         The NOC chain will be provided in TLV cert format."""
         self.CheckIsActive()
 
-        self._issue_node_chain_complete = concurrent.futures.Future()
-        try:
+        with self._issue_node_chain_context as ctx:
             self._ChipStack.Call(
                 lambda: self._dmLib.pychip_DeviceController_IssueNOCChain(
                     self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
             ).raise_on_error()
-            return self._issue_node_chain_complete.result()
-        finally:
-            self._issue_node_chain_complete = None
+            return ctx.future.result()
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):
