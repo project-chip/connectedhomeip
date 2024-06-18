@@ -19,6 +19,7 @@ limitations under the License.
 <!--
 TODO: Make these namespace enums global rather than defining them for each cluster.
  This depends on the ability to define global enums via XML tags.
+ See issue [#29818](https://github.com/project-chip/connectedhomeip/issues/29818).
 -->
 
 
