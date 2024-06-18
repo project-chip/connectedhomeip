@@ -161,6 +161,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/examples/shell/standalone:chip-shell",
         "${chip_root}/src/app/tests/integration:chip-im-initiator",
         "${chip_root}/src/app/tests/integration:chip-im-responder",
+        "${chip_root}/src/inet/tests:inet-layer-test-tool",
         "${chip_root}/src/lib/address_resolve:address-resolve-tool",
         "${chip_root}/src/messaging/tests/echo:chip-echo-requester",
         "${chip_root}/src/messaging/tests/echo:chip-echo-responder",

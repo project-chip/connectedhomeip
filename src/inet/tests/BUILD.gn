@@ -14,12 +14,17 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlfaultinjection.gni")
 import("//build_overrides/pigweed.gni")
 
-import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/system/system.gni")
+
+if (chip_build_tests) {
+  import("${chip_root}/build/chip/chip_test_suite.gni")
+}
 
 config("tests_config") {
   include_dirs = [ "." ]
@@ -40,55 +45,61 @@ static_library("helpers") {
     "TestSetupSignallingPosix.cpp",
   ]
 
-  if (current_os != "mbed") {
-    sources += [ "TestInetLayer.cpp" ]
-  }
-
-  if (chip_with_nlfaultinjection) {
-    sources += [
-      "TestSetupFaultInjection.h",
-      "TestSetupFaultInjectionPosix.cpp",
-    ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
+    "${nlfaultinjection_root}:nlfaultinjection",
   ]
+
+  if (chip_with_nlfaultinjection) {
+    sources += [
+      "TestSetupFaultInjection.h",
+      "TestSetupFaultInjectionPosix.cpp",
+    ]
+    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+  }
 }
 
-chip_test_suite("tests") {
-  output_name = "libInetLayerTests"
+if (chip_build_tests) {
+  chip_test_suite("tests") {
+    output_name = "libInetLayerTests"
 
-  public_configs = [ ":tests_config" ]
+    public_configs = [ ":tests_config" ]
+
+    public_deps = [
+      ":helpers",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
+    ]
+    test_sources = [
+      "TestBasicPacketFilters.cpp",
+      "TestInetAddress.cpp",
+      "TestInetErrorStr.cpp",
+    ]
+    sources = []
+
+    if (chip_system_config_use_sockets && current_os != "zephyr") {
+      test_sources += [ "TestInetEndPoint.cpp" ]
+    }
+
+    cflags = [ "-Wconversion" ]
+  }
+}
+
+executable("inet-layer-test-tool") {
+  sources = [ "inet-layer-test-tool.cpp" ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":helpers",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform",
   ]
-  test_sources = [
-    "TestBasicPacketFilters.cpp",
-    "TestInetAddress.cpp",
-    "TestInetErrorStr.cpp",
-  ]
-  sources = []
 
-  if (chip_system_config_use_sockets && current_os != "zephyr") {
-    test_sources += [ "TestInetEndPoint.cpp" ]
-  }
-
-  # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
-  # x64.
-  if (current_os != "mac" && current_os != "zephyr" &&
-      chip_device_platform != "esp32" && current_cpu == "x64" &&
-      chip_device_platform != "ameba") {
-    # TODO: This test does not seem executed
-    sources += [ "TestLwIPDNS.cpp" ]
-  }
-
-  cflags = [ "-Wconversion" ]
+  output_dir = root_out_dir
 }

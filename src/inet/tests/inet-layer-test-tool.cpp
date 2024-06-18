@@ -49,7 +49,7 @@ using namespace chip::System;
 
 /* Preprocessor Macros */
 
-#define kToolName "TestInetLayer"
+#define kToolName "inet-layer-test-tool"
 
 #define kToolOptTCPIP 't'
 
