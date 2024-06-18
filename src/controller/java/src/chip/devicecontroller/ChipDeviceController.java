@@ -373,7 +373,7 @@ public class ChipDeviceController {
    * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
    */
   public void commissionDevice(long deviceId, @Nullable NetworkCredentials networkCredentials) {
-    commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials);
+    commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials, null);
   }
 
   /**
@@ -387,7 +387,25 @@ public class ChipDeviceController {
    */
   public void commissionDevice(
       long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials) {
-    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
+    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials, null);
+  }
+
+  /**
+   * Initiates the automatic commissioning flow using the specified network credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   *
+   * @param deviceId the ID of the node to be commissioned
+   * @param csrNonce a nonce to be used for the CSR request
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   * @param icdRegistrationInfo the informations for ICD registration. For detailed information
+   *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
+   *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
+   *     ICDRegistrationInfo value.
+   */
+  public void commissionDevice(
+      long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials, @Nullable ICDRegistrationInfo icdRegistrationInfo) {
+    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials, icdRegistrationInfo);
   }
 
   /**
@@ -1498,7 +1516,8 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long deviceId,
       @Nullable byte[] csrNonce,
-      @Nullable NetworkCredentials networkCredentials);
+      @Nullable NetworkCredentials networkCredentials,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo);
 
   private native void continueCommissioning(
       long deviceControllerPtr, long devicePtr, boolean ignoreAttestationFailure);
