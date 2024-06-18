@@ -1013,12 +1013,8 @@ class ChipDeviceControllerBase():
         sessionParametersStruct = SessionParametersStruct.parse(b'\x00' * SessionParametersStruct.sizeof())
         sessionParametersByteArray = SessionParametersStruct.build(sessionParametersStruct)
         device = self.GetConnectedDeviceSync(nodeid)
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters(
-            device.deviceProxy, ctypes.c_char_p(sessionParametersByteArray)))
-
-        # 0 is CHIP_NO_ERROR
-        if res != 0:
-            return None
+        self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters(
+            device.deviceProxy, ctypes.c_char_p(sessionParametersByteArray))).raise_on_error()
 
         sessionParametersStruct = SessionParametersStruct.parse(sessionParametersByteArray)
         return SessionParameters(
@@ -1029,8 +1025,6 @@ class ChipDeviceControllerBase():
             interactionModelRevision=sessionParametersStruct.InteractionModelRevision if sessionParametersStruct.InteractionModelRevision != 0 else None,
             specficiationVersion=sessionParametersStruct.SpecificationVersion if sessionParametersStruct.SpecificationVersion != 0 else None,
             maxPathsPerInvoke=sessionParametersStruct.MaxPathsPerInvoke)
-
-        return res
 
     async def TestOnlySendBatchCommands(self, nodeid: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
                                         timedRequestTimeoutMs: typing.Optional[int] = None,
@@ -1803,6 +1797,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback.argtypes = [_OnCheckInCompleteFunct]
 
             self._dmLib.pychip_CheckInDelegate_SetOnCheckInCompleteCallback(_OnCheckInComplete)
+
+            self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters.restype = PyChipError
+            self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters.argtypes = [c_void_p, c_char_p]
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
