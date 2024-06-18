@@ -86,6 +86,8 @@ CHIP_ERROR Instance::Init()
     
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 
+    ReturnErrorOnFailure(mDelegate->Init());
+
     return CHIP_NO_ERROR;
 }
 

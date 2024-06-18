@@ -69,6 +69,12 @@ public:
     friend class Instance;
 
 protected:
+    /**
+     * @brief This method will be called during the ServiceArea server initialization after the Instance information has been
+     * validated and the Instance has been registered. This can be used to initialise app logic.
+     */
+    virtual CHIP_ERROR Init() { return CHIP_NO_ERROR; };
+
     //*************************************************************************
     // Command handling support
 
@@ -402,6 +408,10 @@ protected:
      * @note no notifications or other side effects
      */
     virtual bool ClearProgress() = 0;
+
+    Instance* GetInstance() {
+        return mInstance;
+    }
 
 private:
     Instance * mInstance = nullptr;
