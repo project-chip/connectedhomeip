@@ -593,15 +593,16 @@ class ChipDeviceControllerBase():
 
             return await asyncio.futures.wrap_future(ctx.future)
 
-    def UnpairDevice(self, nodeid: int) -> None:
+    async def UnpairDevice(self, nodeid: int) -> None:
         self.CheckIsActive()
 
         with self._unpair_device_context as ctx:
-            self._ChipStack.Call(
+            res = await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
                     self.devCtrl, nodeid, self.cbHandleDeviceUnpairCompleteFunct)
-            ).raise_on_error()
-            ctx.future.result()
+            )
+            res.raise_on_error()
+            return await asyncio.futures.wrap_future(ctx.future)
 
     def CloseBLEConnection(self):
         self.CheckIsActive()
@@ -781,8 +782,8 @@ class ChipDeviceControllerBase():
         kOriginalSetupCode = 0,
         kTokenWithRandomPin = 1,
 
-    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int,
-                                discriminator: int, option: CommissioningWindowPasscode) -> CommissioningParameters:
+    async def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int,
+                                      discriminator: int, option: CommissioningWindowPasscode) -> CommissioningParameters:
         ''' Opens a commissioning window on the device with the given nodeid.
             nodeid:        Node id of the device
             timeout:       Command timeout
@@ -799,12 +800,13 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         with self._open_window_context as ctx:
-            self._ChipStack.Call(
+            res = await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                     self.devCtrl, self.pairingDelegate, nodeid, timeout, iteration, discriminator, option)
-            ).raise_on_error()
+            )
+            res.raise_on_error()
 
-            return ctx.future.result()
+            return await asyncio.futures.wrap_future(ctx.future)
 
     def GetCompressedFabricId(self):
         self.CheckIsActive()
