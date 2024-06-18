@@ -402,7 +402,7 @@ jshort JniReferences::ShortToPrimitive(jobject boxedShort)
                         ChipLogError(Support, "ShortToPrimitive failed due to %" CHIP_ERROR_FORMAT, err.Format()));
 
     jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "shortValue", "()S");
-    return env->CallShortMethod(boxedDouble, valueMethod);
+    return env->CallShortMethod(boxedShort, valueMethod);
 }
 
 CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback, long subscriptionId)
