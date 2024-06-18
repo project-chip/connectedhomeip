@@ -24,6 +24,7 @@
 #include <gio/gio.h>
 #include <glib.h>
 
+#include <ble/Ble.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/ConnectivityManager.h>
@@ -42,28 +43,30 @@ namespace Internal {
 
 namespace {
 
-gboolean BluezIsServiceOnDevice(BluezGattService1 * aService, BluezDevice1 * aDevice)
+bool BluezIsServiceOnDevice(BluezGattService1 * aService, BluezDevice1 * aDevice)
 {
-    const auto * servicePath = bluez_gatt_service1_get_device(aService);
-    const auto * devicePath  = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aDevice));
-    return strcmp(servicePath, devicePath) == 0 ? TRUE : FALSE;
+    auto servicePath = bluez_gatt_service1_get_device(aService);
+    auto devicePath  = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aDevice));
+    return strcmp(servicePath, devicePath) == 0;
 }
 
-gboolean BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService1 * aService)
+bool BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService1 * aService)
 {
-    const auto * charPath    = bluez_gatt_characteristic1_get_service(aChar);
-    const auto * servicePath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aService));
-    ChipLogDetail(DeviceLayer, "Char %s on service %s", charPath, servicePath);
-    return strcmp(charPath, servicePath) == 0 ? TRUE : FALSE;
+    auto charPath    = bluez_gatt_characteristic1_get_service(aChar);
+    auto servicePath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aService));
+    return strcmp(charPath, servicePath) == 0;
+}
+
+bool BluezIsFlagOnChar(BluezGattCharacteristic1 * aChar, const char * flag)
+{
+    auto charFlags = bluez_gatt_characteristic1_get_flags(aChar);
+    for (size_t i = 0; charFlags[i] != nullptr; i++)
+        if (strcmp(charFlags[i], flag) == 0)
+            return true;
+    return false;
 }
 
 } // namespace
-
-BluezConnection::BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 & aDevice) :
-    mDevice(reinterpret_cast<BluezDevice1 *>(g_object_ref(&aDevice)))
-{
-    Init(aEndpoint);
-}
 
 BluezConnection::IOChannel::~IOChannel()
 {
@@ -85,73 +88,69 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
         mService.reset(reinterpret_cast<BluezGattService1 *>(g_object_ref(aEndpoint.mService.get())));
         mC1.reset(reinterpret_cast<BluezGattCharacteristic1 *>(g_object_ref(aEndpoint.mC1.get())));
         mC2.reset(reinterpret_cast<BluezGattCharacteristic1 *>(g_object_ref(aEndpoint.mC2.get())));
+        return CHIP_NO_ERROR;
     }
-    else
+
+    for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
     {
-        for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
+        GAutoPtr<BluezGattService1> service(bluez_object_get_gatt_service1(&object));
+        if (service && BluezIsServiceOnDevice(service.get(), mDevice.get()))
         {
-            BluezGattService1 * service = bluez_object_get_gatt_service1(&object);
-            if (service != nullptr)
+            if (strcmp(bluez_gatt_service1_get_uuid(service.get()), Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0)
             {
-                if ((BluezIsServiceOnDevice(service, mDevice.get())) == TRUE &&
-                    (strcmp(bluez_gatt_service1_get_uuid(service), Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0))
-                {
-                    mService.reset(service);
-                    break;
-                }
-                g_object_unref(service);
+                ChipLogDetail(DeviceLayer, "CHIP service found");
+                mService.reset(service.release());
+                break;
             }
         }
-
-        VerifyOrExit(mService, ChipLogError(DeviceLayer, "FAIL: NULL service in %s", __func__));
-
-        for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
-        {
-            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(&object);
-            if (char1 != nullptr)
-            {
-                if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
-                    (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0))
-                {
-                    mC1.reset(char1);
-                }
-                else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
-                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0))
-                {
-                    mC2.reset(char1);
-                }
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-                else if ((BluezIsCharOnService(char1, mService.get()) == TRUE) &&
-                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), Ble::CHIP_BLE_CHAR_3_UUID_STR) == 0))
-                {
-                    mC3.reset(char1);
-                }
-#endif
-                else
-                {
-                    g_object_unref(char1);
-                }
-                if (mC1 && mC2)
-                {
-                    break;
-                }
-            }
-        }
-
-        VerifyOrExit(mC1, ChipLogError(DeviceLayer, "FAIL: NULL C1 in %s", __func__));
-        VerifyOrExit(mC2, ChipLogError(DeviceLayer, "FAIL: NULL C2 in %s", __func__));
     }
 
-exit:
+    VerifyOrReturnError(
+        mService, BLE_ERROR_NOT_CHIP_DEVICE,
+        ChipLogError(DeviceLayer, "CHIP service (%s) not found on %s", Ble::CHIP_BLE_SERVICE_LONG_UUID_STR, GetPeerAddress()));
+
+    for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
+    {
+        GAutoPtr<BluezGattCharacteristic1> chr(bluez_object_get_gatt_characteristic1(&object));
+        if (chr && BluezIsCharOnService(chr.get(), mService.get()))
+        {
+            if (strcmp(bluez_gatt_characteristic1_get_uuid(chr.get()), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0 &&
+                BluezIsFlagOnChar(chr.get(), "write"))
+            {
+                ChipLogDetail(DeviceLayer, "Valid C1 characteristic found");
+                mC1.reset(chr.release());
+            }
+            else if (strcmp(bluez_gatt_characteristic1_get_uuid(chr.get()), Ble::CHIP_BLE_CHAR_2_UUID_STR) == 0 &&
+                     BluezIsFlagOnChar(chr.get(), "indicate"))
+            {
+                ChipLogDetail(DeviceLayer, "Valid C2 characteristic found");
+                mC2.reset(chr.release());
+            }
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+            else if (strcmp(bluez_gatt_characteristic1_get_uuid(chr.get()), Ble::CHIP_BLE_CHAR_3_UUID_STR) == 0 &&
+                     BluezIsFlagOnChar(chr.get(), "read"))
+            {
+                ChipLogDetail(DeviceLayer, "Valid C3 characteristic found");
+                mC3.reset(chr.release());
+            }
+#endif
+        }
+    }
+
+    VerifyOrReturnError(mC1, BLE_ERROR_NOT_CHIP_DEVICE,
+                        ChipLogError(DeviceLayer, "No valid C1 (%s) on %s", Ble::CHIP_BLE_CHAR_1_UUID_STR, GetPeerAddress()));
+    VerifyOrReturnError(mC2, BLE_ERROR_NOT_CHIP_DEVICE,
+                        ChipLogError(DeviceLayer, "No valid C2 (%s) on %s", Ble::CHIP_BLE_CHAR_2_UUID_STR, GetPeerAddress()));
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezConnection::BluezDisconnect(BluezConnection * conn)
+CHIP_ERROR BluezConnection::CloseConnectionImpl(BluezConnection * conn)
 {
     GAutoPtr<GError> error;
     gboolean success;
 
-    ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, conn->GetPeerAddress());
+    ChipLogDetail(DeviceLayer, "Close BLE connection: peer=%s", conn->GetPeerAddress());
 
     success = bluez_device1_call_disconnect_sync(conn->mDevice.get(), nullptr, &error.GetReceiver());
     VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message));
@@ -162,7 +161,7 @@ exit:
 
 CHIP_ERROR BluezConnection::CloseConnection()
 {
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezDisconnect, this);
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(CloseConnectionImpl, this);
 }
 
 const char * BluezConnection::GetPeerAddress() const

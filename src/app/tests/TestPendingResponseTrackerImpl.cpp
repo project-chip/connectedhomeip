@@ -16,7 +16,6 @@
  */
 
 #include <algorithm>
-#include <nlunit-test.h>
 #include <vector>
 
 #include <app/PendingResponseTrackerImpl.h>
