@@ -53,7 +53,7 @@ declare_args() {
 
   nxp_idle_mode_duration_s = 600  # 10min Idle Mode Interval
   nxp_active_mode_duration_ms = 10000  # 10s Active Mode Interval
-  nxp_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
+  nxp_active_mode_threshold_ms = 5000  # 5s Active Mode Threshold
   nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 }
 

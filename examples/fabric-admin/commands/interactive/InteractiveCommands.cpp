@@ -149,8 +149,6 @@ char * InteractiveStartCommand::GetCommand(char * command)
     command = new char[cmd.length() + 1];
     strcpy(command, cmd.c_str());
 
-    ChipLogProgress(NotSpecified, "GetCommand: %s", command);
-
     // Do not save empty lines
     if (command != nullptr && *command)
     {

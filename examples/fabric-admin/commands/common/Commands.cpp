@@ -150,6 +150,9 @@ static void DetectAndLogMismatchedDoubleQuotes(int argc, char ** argv)
 
 } // namespace
 
+// Define the static member
+Commands Commands::sInstance;
+
 void Commands::Register(const char * commandSetName, commands_list commandsList, const char * helpText, bool isCluster)
 {
     VerifyOrDieWithMsg(isCluster || helpText != nullptr, NotSpecified, "Non-cluster command sets must have help text");
@@ -337,6 +340,7 @@ Commands::CommandSetMap::iterator Commands::GetCommandSet(std::string commandSet
     {
         std::string key(commandSet.first);
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+
         if (key.compare(commandSetName) == 0)
         {
             return mCommandSets.find(commandSet.first);
@@ -344,6 +348,23 @@ Commands::CommandSetMap::iterator Commands::GetCommandSet(std::string commandSet
     }
 
     return mCommandSets.end();
+}
+
+Command * Commands::GetCommandByName(std::string commandSetName, std::string commandName)
+{
+    auto commandSetIter = GetCommandSet(commandSetName);
+    if (commandSetIter != mCommandSets.end())
+    {
+        auto & commandList = commandSetIter->second.commands;
+        for (auto & command : commandList)
+        {
+            if (command->GetName() == commandName)
+            {
+                return command.get();
+            }
+        }
+    }
+    return nullptr;
 }
 
 Command * Commands::GetCommand(CommandsVector & commands, std::string commandName)
