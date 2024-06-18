@@ -48,7 +48,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: rw61x
+                platform: nxp
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
