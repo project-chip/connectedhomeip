@@ -55,18 +55,19 @@ CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefReq
 } // namespace
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
-                             bool aSuppressResponse) :
+                             bool aSuppressResponse, bool aAllowLargePayload) :
     mExchangeCtx(*this),
-    mCallbackHandle(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
+    mCallbackHandle(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest),
+    mAllowLargePayload(aAllowLargePayload)
 {
     assertChipStackLockedByCurrentThread();
 }
 
 CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messaging::ExchangeManager * apExchangeMgr,
-                             bool aIsTimedRequest, bool aSuppressResponse) :
+                             bool aIsTimedRequest, bool aSuppressResponse, bool aAllowLargePayload) :
     mExchangeCtx(*this),
     mCallbackHandle(apExtendableCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
-    mTimedRequest(aIsTimedRequest), mUseExtendableCallback(true)
+    mTimedRequest(aIsTimedRequest), mUseExtendableCallback(true), mAllowLargePayload(aAllowLargePayload)
 {
     assertChipStackLockedByCurrentThread();
 #if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
@@ -85,7 +86,15 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     {
         mCommandMessageWriter.Reset();
 
-        System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+        System::PacketBufferHandle commandPacket;
+        if (mAllowLargePayload)
+        {
+            commandPacket = System::PacketBufferHandle::New(kMaxLargeSecureSduLengthBytes);
+        }
+        else
+        {
+            commandPacket = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+        }
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         mCommandMessageWriter.Init(std::move(commandPacket));
@@ -139,6 +148,12 @@ CHIP_ERROR CommandSender::TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke
 
 CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {
+    // If the command is expected to be large, ensure that the underlying
+    // session supports it.
+    if (mAllowLargePayload)
+    {
+        VerifyOrReturnError(session->AllowsLargePayload(), CHIP_ERROR_INCORRECT_STATE);
+    }
 
     if (mTimedRequest != mTimedInvokeTimeoutMs.HasValue())
     {
@@ -537,6 +552,23 @@ CHIP_ERROR CommandSender::FinishCommand(FinishCommandParameters & aFinishCommand
     return FinishCommandInternal(aFinishCommandParams);
 }
 
+CHIP_ERROR CommandSender::AddRequestData(const CommandPathParams & aCommandPath, const DataModel::EncodableToTLV & aEncodable,
+                                         AddRequestDataParameters & aAddRequestDataParams)
+{
+    ReturnErrorOnFailure(AllocateBuffer());
+
+    RollbackInvokeRequest rollback(*this);
+    PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
+    ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
+    TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+    FinishCommandParameters finishCommandParams(aAddRequestDataParams);
+    ReturnErrorOnFailure(FinishCommand(finishCommandParams));
+    rollback.DisableAutomaticRollback();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinishCommandParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -643,6 +675,35 @@ void CommandSender::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
+}
+
+CommandSender::RollbackInvokeRequest::RollbackInvokeRequest(CommandSender & aCommandSender) : mCommandSender(aCommandSender)
+{
+    VerifyOrReturn(mCommandSender.mBufferAllocated);
+    VerifyOrReturn(mCommandSender.mState == State::Idle || mCommandSender.mState == State::AddedCommand);
+    VerifyOrReturn(mCommandSender.mInvokeRequestBuilder.GetInvokeRequests().GetError() == CHIP_NO_ERROR);
+    VerifyOrReturn(mCommandSender.mInvokeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    mCommandSender.mInvokeRequestBuilder.Checkpoint(mBackupWriter);
+    mBackupState          = mCommandSender.mState;
+    mRollbackInDestructor = true;
+}
+
+CommandSender::RollbackInvokeRequest::~RollbackInvokeRequest()
+{
+    VerifyOrReturn(mRollbackInDestructor);
+    VerifyOrReturn(mCommandSender.mState == State::AddingCommand);
+    ChipLogDetail(DataManagement, "Rolling back response");
+    // TODO(#30453): Rollback of mInvokeRequestBuilder should handle resetting
+    // InvokeRequests.
+    mCommandSender.mInvokeRequestBuilder.GetInvokeRequests().ResetError();
+    mCommandSender.mInvokeRequestBuilder.Rollback(mBackupWriter);
+    mCommandSender.MoveToState(mBackupState);
+    mRollbackInDestructor = false;
+}
+
+void CommandSender::RollbackInvokeRequest::DisableAutomaticRollback()
+{
+    mRollbackInDestructor = false;
 }
 
 } // namespace app

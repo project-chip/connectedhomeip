@@ -8904,30 +8904,36 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSArray * _Nullable value;
+        MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = cppValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRDeviceEnergyManagementClusterPowerAdjustStruct * newElement_1;
-                    newElement_1 = [MTRDeviceEnergyManagementClusterPowerAdjustStruct new];
-                    newElement_1.minPower = [NSNumber numberWithLongLong:entry_1.minPower];
-                    newElement_1.maxPower = [NSNumber numberWithLongLong:entry_1.maxPower];
-                    newElement_1.minDuration = [NSNumber numberWithUnsignedInt:entry_1.minDuration];
-                    newElement_1.maxDuration = [NSNumber numberWithUnsignedInt:entry_1.maxDuration];
-                    [array_1 addObject:newElement_1];
+            value = [MTRDeviceEnergyManagementClusterPowerAdjustCapabilityStruct new];
+            if (cppValue.Value().powerAdjustCapability.IsNull()) {
+                value.powerAdjustCapability = nil;
+            } else {
+                { // Scope for our temporary variables
+                    auto * array_3 = [NSMutableArray new];
+                    auto iter_3 = cppValue.Value().powerAdjustCapability.Value().begin();
+                    while (iter_3.Next()) {
+                        auto & entry_3 = iter_3.GetValue();
+                        MTRDeviceEnergyManagementClusterPowerAdjustStruct * newElement_3;
+                        newElement_3 = [MTRDeviceEnergyManagementClusterPowerAdjustStruct new];
+                        newElement_3.minPower = [NSNumber numberWithLongLong:entry_3.minPower];
+                        newElement_3.maxPower = [NSNumber numberWithLongLong:entry_3.maxPower];
+                        newElement_3.minDuration = [NSNumber numberWithUnsignedInt:entry_3.minDuration];
+                        newElement_3.maxDuration = [NSNumber numberWithUnsignedInt:entry_3.maxDuration];
+                        [array_3 addObject:newElement_3];
+                    }
+                    CHIP_ERROR err = iter_3.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    value.powerAdjustCapability = array_3;
                 }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                value = array_1;
             }
+            value.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().cause)];
         }
         return value;
     }
@@ -8943,7 +8949,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
             value = nil;
         } else {
             value = [MTRDeviceEnergyManagementClusterForecastStruct new];
-            value.forecastId = [NSNumber numberWithUnsignedShort:cppValue.Value().forecastId];
+            value.forecastID = [NSNumber numberWithUnsignedInt:cppValue.Value().forecastID];
             if (cppValue.Value().activeSlotNumber.IsNull()) {
                 value.activeSlotNumber = nil;
             } else {
@@ -8965,7 +8971,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
             } else {
                 value.latestEndTime = nil;
             }
-            value.isPauseable = [NSNumber numberWithBool:cppValue.Value().isPauseable];
+            value.isPausable = [NSNumber numberWithBool:cppValue.Value().isPausable];
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = cppValue.Value().slots.begin();
@@ -8978,10 +8984,10 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
                     newElement_2.defaultDuration = [NSNumber numberWithUnsignedInt:entry_2.defaultDuration];
                     newElement_2.elapsedSlotTime = [NSNumber numberWithUnsignedInt:entry_2.elapsedSlotTime];
                     newElement_2.remainingSlotTime = [NSNumber numberWithUnsignedInt:entry_2.remainingSlotTime];
-                    if (entry_2.slotIsPauseable.HasValue()) {
-                        newElement_2.slotIsPauseable = [NSNumber numberWithBool:entry_2.slotIsPauseable.Value()];
+                    if (entry_2.slotIsPausable.HasValue()) {
+                        newElement_2.slotIsPausable = [NSNumber numberWithBool:entry_2.slotIsPausable.Value()];
                     } else {
-                        newElement_2.slotIsPauseable = nil;
+                        newElement_2.slotIsPausable = nil;
                     }
                     if (entry_2.minPauseDuration.HasValue()) {
                         newElement_2.minPauseDuration = [NSNumber numberWithUnsignedInt:entry_2.minPauseDuration.Value()];
@@ -15246,6 +15252,82 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkManagementCluster(Attribut
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ThreadBorderRouterManagement;
+    switch (aAttributeId) {
+    case Attributes::BorderRouterName::Id: {
+        using TypeInfo = Attributes::BorderRouterName::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
+        return value;
+    }
+    case Attributes::BorderAgentID::Id: {
+        using TypeInfo = Attributes::BorderAgentID::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSData * _Nonnull value;
+        value = AsData(cppValue);
+        return value;
+    }
+    case Attributes::ThreadVersion::Id: {
+        using TypeInfo = Attributes::ThreadVersion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::InterfaceEnabled::Id: {
+        using TypeInfo = Attributes::InterfaceEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::ActiveDatasetTimestamp::Id: {
+        using TypeInfo = Attributes::ActiveDatasetTimestamp::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ThreadNetworkDirectory;
@@ -19694,6 +19776,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return DecodeAttributeValueForWiFiNetworkManagementCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        return DecodeAttributeValueForThreadBorderRouterManagementCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::ThreadNetworkDirectory::Id: {
         return DecodeAttributeValueForThreadNetworkDirectoryCluster(aPath.mAttributeId, aReader, aError);

@@ -76,7 +76,7 @@ def main(filename, classname, test):
     indent = 6
     header_num = f'{"**#**":<{indent}}'
     header_num_step = f'|{header_num} |*TestStep*   '
-    s = ('[cols="5%,45%,45%"]\n'
+    s = ('[cols="10%,45%,45%"]\n'
          '|===\n'
          f'{header_num_step}|*Expected Outcome*\n')
     for step in steps:

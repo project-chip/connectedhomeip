@@ -259,9 +259,26 @@ DataVersion gDataVersions[APP_LIBRARY_SIZE][ArraySize(contentAppClusters)];
 
 EmberAfDeviceType gContentAppDeviceType[] = { { DEVICE_TYPE_CONTENT_APP, 1 } };
 
+std::vector<SupportedCluster> make_default_supported_clusters()
+{
+    return std::vector<ContentApp::SupportedCluster>{ { Descriptor::Id },      { ApplicationBasic::Id },
+                                                      { KeypadInput::Id },     { ApplicationLauncher::Id },
+                                                      { AccountLogin::Id },    { ContentLauncher::Id },
+                                                      { TargetNavigator::Id }, { Channel::Id } };
+}
+
 } // anonymous namespace
 
-ContentAppFactoryImpl::ContentAppFactoryImpl() {}
+ContentAppFactoryImpl::ContentAppFactoryImpl() :
+    mContentApps{ new ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "20202021", make_default_supported_clusters(),
+                                     nullptr, nullptr),
+                  new ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021",
+                                     make_default_supported_clusters(), nullptr, nullptr),
+                  new ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", make_default_supported_clusters(),
+                                     nullptr, nullptr),
+                  new ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021",
+                                     make_default_supported_clusters(), nullptr, nullptr) }
+{}
 
 uint16_t ContentAppFactoryImpl::GetPlatformCatalogVendorId()
 {
@@ -339,11 +356,12 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 }
 
 EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
-                                                uint16_t productId, const char * szApplicationVersion, jobject manager)
+                                                uint16_t productId, const char * szApplicationVersion,
+                                                std::vector<SupportedCluster> supportedClusters, jobject manager)
 {
     DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
     ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
-                                              mAttributeDelegate, mCommandDelegate);
+                                              std::move(supportedClusters), mAttributeDelegate, mCommandDelegate);
     EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
         app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType));
@@ -355,12 +373,13 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
 }
 
 EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
-                                                uint16_t productId, const char * szApplicationVersion, jobject manager,
-                                                EndpointId desiredEndpointId)
+                                                uint16_t productId, const char * szApplicationVersion,
+                                                std::vector<SupportedCluster> supportedClusters, EndpointId desiredEndpointId,
+                                                jobject manager)
 {
     DataVersion * dataVersionBuf = new DataVersion[ArraySize(contentAppClusters)];
     ContentAppImpl * app = new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "",
-                                              mAttributeDelegate, mCommandDelegate);
+                                              std::move(supportedClusters), mAttributeDelegate, mCommandDelegate);
     EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
         app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, ArraySize(contentAppClusters)),
         Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
@@ -480,21 +499,24 @@ CHIP_ERROR InitVideoPlayerPlatform(jobject contentAppEndpointManager)
 }
 
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, jobject manager)
+                         const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters, jobject manager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, manager);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion,
+                                  std::move(supportedClusters), manager);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return kInvalidEndpointId;
 }
 
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                         const char * szApplicationVersion, EndpointId endpointId, jobject manager)
+                         const char * szApplicationVersion, std::vector<SupportedCluster> supportedClusters, EndpointId endpointId,
+                         jobject manager)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, manager, endpointId);
+    return gFactory.AddContentApp(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion,
+                                  std::move(supportedClusters), endpointId, manager);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return kInvalidEndpointId;
 }

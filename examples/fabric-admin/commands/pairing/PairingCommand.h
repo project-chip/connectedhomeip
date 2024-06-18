@@ -45,6 +45,20 @@ enum class PairingNetworkType
     Thread,
 };
 
+class CommissioningDelegate
+{
+public:
+    virtual void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR err) = 0;
+    virtual ~CommissioningDelegate()                                            = default;
+};
+
+class PairingDelegate
+{
+public:
+    virtual void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) = 0;
+    virtual ~PairingDelegate()                                          = default;
+};
+
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
@@ -73,6 +87,7 @@ public:
         AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
         AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
+
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -202,11 +217,20 @@ public:
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
 
-    /////////// DeviceAttestationDelegate /////////
+    /////////// DeviceAttestationDelegate Interface /////////
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;
     void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
                                       const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
+
+    /////////// CommissioningDelegate /////////
+    void RegisterCommissioningDelegate(CommissioningDelegate * delegate) { mCommissioningDelegate = delegate; }
+    void UnregisterCommissioningDelegate() { mCommissioningDelegate = nullptr; }
+
+    /////////// PairingDelegate /////////
+    void RegisterPairingDelegate(PairingDelegate * delegate) { mPairingDelegate = delegate; }
+    void UnregisterPairingDelegate() { mPairingDelegate = nullptr; }
+    PairingDelegate * GetPairingDelegate() { return mPairingDelegate; }
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -261,6 +285,9 @@ private:
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
+
+    CommissioningDelegate * mCommissioningDelegate = nullptr;
+    PairingDelegate * mPairingDelegate             = nullptr;
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
