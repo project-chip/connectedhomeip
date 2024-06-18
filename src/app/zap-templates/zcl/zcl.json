@@ -649,6 +649,16 @@
             "PreferredExtendedPanID",
             "ThreadNetworks",
             "ThreadNetworkTableSize"
+        ],
+        "Energy Calendar": [
+            "CalendarPeriods",
+            "SpecialDays",
+            "CurrentDay",
+            "NextDay",
+            "CurrentTransition",
+            "CurrentPeakPeriod",
+            "NextPeakPeriod",
+            "FeatureMap"
         ]
     },
     "defaultReportingPolicy": "mandatory",

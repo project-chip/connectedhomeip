@@ -1171,7 +1171,11 @@ class EnergyCalendarCluster(
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: EnergyCalendarClusterPeakPeriodStruct? =
       if (!tlvReader.isNull()) {
-        EnergyCalendarClusterPeakPeriodStruct.fromTlv(AnonymousTag, tlvReader)
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          EnergyCalendarClusterPeakPeriodStruct.fromTlv(AnonymousTag, tlvReader)
+        } else {
+          null
+        }
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -1223,7 +1227,11 @@ class EnergyCalendarCluster(
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: EnergyCalendarClusterPeakPeriodStruct? =
             if (!tlvReader.isNull()) {
-              EnergyCalendarClusterPeakPeriodStruct.fromTlv(AnonymousTag, tlvReader)
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                EnergyCalendarClusterPeakPeriodStruct.fromTlv(AnonymousTag, tlvReader)
+              } else {
+                null
+              }
             } else {
               tlvReader.getNull(AnonymousTag)
               null
@@ -1266,7 +1274,11 @@ class EnergyCalendarCluster(
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: EnergyCalendarClusterPeakPeriodStruct? =
       if (!tlvReader.isNull()) {
-        EnergyCalendarClusterPeakPeriodStruct.fromTlv(AnonymousTag, tlvReader)
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          EnergyCalendarClusterPeakPeriodStruct.fromTlv(AnonymousTag, tlvReader)
+        } else {
+          null
+        }
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -1318,7 +1330,11 @@ class EnergyCalendarCluster(
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: EnergyCalendarClusterPeakPeriodStruct? =
             if (!tlvReader.isNull()) {
-              EnergyCalendarClusterPeakPeriodStruct.fromTlv(AnonymousTag, tlvReader)
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                EnergyCalendarClusterPeakPeriodStruct.fromTlv(AnonymousTag, tlvReader)
+              } else {
+                null
+              }
             } else {
               tlvReader.getNull(AnonymousTag)
               null
