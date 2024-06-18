@@ -565,7 +565,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     chip::app::Clusters::IcdManagement::ClientTypeEnum clientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
     if (jClientType != nullptr)
     {
-        clientType = static_cast<chip::app::Clusters::IcdManagement::ClientTypeEnum>(jClientType)
+        clientType = static_cast<chip::app::Clusters::IcdManagement::ClientTypeEnum>(
+            chip::JniReferences::GetInstance().ShortToPrimitive(jClientType));
     }
 
     return err;
