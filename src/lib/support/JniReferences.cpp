@@ -392,7 +392,7 @@ jdouble JniReferences::DoubleToPrimitive(jobject boxedDouble)
     return env->CallDoubleMethod(boxedDouble, valueMethod);
 }
 
-jShort JniReferences::ShortToPrimitive(jobject boxedShort)
+jshort JniReferences::ShortToPrimitive(jobject boxedShort)
 {
     JNIEnv * env = GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Support, "env cannot be nullptr"));
