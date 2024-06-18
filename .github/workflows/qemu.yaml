@@ -105,7 +105,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/jlatusek/chip-build-linux-qemu:latest
+            image: ghcr.io/project-chip/chip-build-linux-qemu:54
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             # Required for using KVM
