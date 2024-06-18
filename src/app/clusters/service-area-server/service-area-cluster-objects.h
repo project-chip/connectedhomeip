@@ -41,7 +41,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      */
     LocationStructureWrapper()
     {
-        Set(0, 0, 
+        Set(0, 0,
              CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<AreaTypeTag>(),
              DataModel::Nullable<LandmarkTag>(), DataModel::Nullable<PositionTag>(), DataModel::Nullable<FloorSurfaceTag>());
     }
@@ -56,13 +56,13 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * @param[in] aLandmarkTag A common namespace Landmark tag - indicates an association of the location with a home landmark.
      * @param[in] aPositionTag A common namespace Position tag - indicates the position of the location with respect to the landmark.
      * @param[in] aSurfaceTag A common namespace Floor Surface tag - indicates an association of the location with a surface type.
-     * 
+     *
      * @note Requirements regarding what combinations of fields and values are valid are not checked by this class.
      * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    LocationStructureWrapper( uint32_t                                     aLocationId, 
-                              const DataModel::Nullable<uint8_t>         & aMapId, 
+    LocationStructureWrapper( uint32_t                                     aLocationId,
+                              const DataModel::Nullable<uint8_t>         & aMapId,
                               const CharSpan                             & aLocationName,
                               const DataModel::Nullable<int16_t>         & aFloorNumber,
                               const DataModel::Nullable<AreaTypeTag>     & aAreaTypeTag,
@@ -70,15 +70,15 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
                               const DataModel::Nullable<PositionTag>     & aPositionTag,
                               const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag  )
     {
-        Set( aLocationId, aMapId, 
-             aLocationName, aFloorNumber, aAreaTypeTag, 
+        Set( aLocationId, aMapId,
+             aLocationName, aFloorNumber, aAreaTypeTag,
              aLandmarkTag, aPositionTag, aSurfaceTag);
     }
 
     /**
      * @brief This is a copy constructor that initializes the location object with the values from another location object. All values are deep copied.
      * @param[in] aOther The location object to copy.
-     * 
+     *
      * @note If the locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
     LocationStructureWrapper(const LocationStructureWrapper & aOther) { *this = aOther; }
@@ -86,7 +86,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     /**
      * @brief This is an assignment operator that initializes the location object with the values from another location object. All values are deep copied.
      * @param[in] aOther The location object to copy.
-     * 
+     *
      * @note If the locationName is empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
     LocationStructureWrapper & operator=(const LocationStructureWrapper & aOther)
@@ -122,8 +122,8 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * @note If aLocationName is larger than kLocationNameMaxSize, it will be truncated.
      * @note If aLocationName is an empty string and aFloorNumber and aAreaTypeTag are null, locationInfo will be set to null.
      */
-    void Set( uint32_t                                     aLocationId, 
-              const DataModel::Nullable<uint8_t>         & aMapId, 
+    void Set( uint32_t                                     aLocationId,
+              const DataModel::Nullable<uint8_t>         & aMapId,
               const CharSpan                             & aLocationName,
               const DataModel::Nullable<int16_t>         & aFloorNumber,
               const DataModel::Nullable<AreaTypeTag>     & aAreaType,
@@ -149,7 +149,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         {
             locationInfo.locationInfo.SetNull();
         }
-                                                                         
+
         locationInfo.landmarkTag   = aLandmarkTag;
         locationInfo.positionTag   = aPositionTag;
         locationInfo.surfaceTag    = aSurfaceTag;
@@ -185,7 +185,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      * @brief Compare the location's name with the given text.
      * @param[in] aLocationName The name to compare.
      * @return true if the location structure's name field matches aLocationName.
-     * 
+     *
      * @note if locations structure's name field is null, returns false.
      */
     bool DoesNameMatch(const CharSpan & aLocationName) const
@@ -253,7 +253,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     /**
      * @brief Get the location name (for logging).
      * @return The map name as a c style char string.
-     * 
+     *
      * @note This is only available through the LocationStructure object (no access from base structure).
      */
     const char* name_c_str() const
@@ -285,7 +285,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      * @brief This is a full constructor that initializes the map object with the given values. All values are deep copied.
      * @param[in] aMapId The identifier of this map.
      * @param[in] aMapName A human readable name (should not be empty string).
-     * 
+     *
      * @note Requirements regarding what combinations of fields and values are 'valid' are not checked by this class.
      * @note If aMapName is larger than kMapNameMaxSize, it will be truncated.
      */
@@ -318,7 +318,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      * @note Requirements regarding what combinations of fields and values are 'valid' are not checked by this class.
      * @note if aMapName is larger than kMapNameMaxSize, it will be truncated.
      */
-    void Set( uint8_t aMapId, 
+    void Set( uint8_t aMapId,
               const CharSpan & aMapName)
     {
         mapID = aMapId;
@@ -359,7 +359,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     /**
      * @brief Get the map name (for logging).
      * @return The map name as a c style char string.
-     * 
+     *
      * @note This is only available through the MapStructure object (no access from base structure).
      */
     const char* name_c_str() const

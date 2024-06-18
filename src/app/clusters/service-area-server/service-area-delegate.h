@@ -7,7 +7,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *      
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
@@ -82,7 +82,7 @@ protected:
      * @brief can the selected locations be set by the client in the current operating mode?
      * @param[out] statusText text describing why selected locations cannot be set (if return is false)
      * @return true if the current device state allows selected locations to be set by user
-     * 
+     *
      * @note The statusText field SHOULD indicate why the request is not allowed, given the current mode
      *       of the device, which may involve other clusters.
     */
@@ -112,20 +112,20 @@ protected:
      * @brief ask the device to attempt to skip the current location
      * @param[out] skipStatusText text describing why current location cannot be skipped
      * @return true if command is successful, failure if the received skip request cannot be handled due to the current mode of the device.
-     * 
+     *
      * @note server instance code checks current location and selected locations before calling this function
      * @note skipStatusText must be filled out by the function on failure.
-     * 
-     * @note If the device successfully accepts the request and the ListOrder feature is set to 1:       
+     *
+     * @note If the device successfully accepts the request and the ListOrder feature is set to 1:
      *       The server SHALL stop operating at the current location.
      *       The server SHALL attempt to operate at the remaining locations on the SelectedLocations attribute list, starting with the next entry.
      *       If the end of the SelectedLocations attribute list is reached, the server SHALL stop operating.
-     * 
+     *
      * @note If the device successfully accepts the request and the ListOrder feature is set to 0:
      *       The server SHALL stop operating at the current location.
      *       The server SHALL attempt to operate at the locations on the SelectedLocations attribute list where operating has not been completed, using a vendor defined order.
      *       If the server has completed operating at all locations on the SelectedLocations attribute list, the server SHALL stop operating.
-     * 
+     *
      * @note If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string.
      *       If the Status field is not set to Success, or InvalidLocationList, the StatusText field SHALL include a vendor defined error description
      *       which can be used to explain the error to the user. For example, if the Status field is set to InvalidInMode, the StatusText field SHOULD indicate
@@ -146,16 +146,16 @@ protected:
     /**
      * @brief can the supported locations be set in the current operating mode?
      * @return true if the current device state allows supported location updates
-     * 
-     * @note The SupportedLocations attribute list changes (adding or deleting entries, 
-     *       changing their MapID fields, changing the LocationID fields, or nulling the entire list) 
-     *       SHOULD NOT be allowed while the device is operating, to reduce the impact on the clients, 
+     *
+     * @note The SupportedLocations attribute list changes (adding or deleting entries,
+     *       changing their MapID fields, changing the LocationID fields, or nulling the entire list)
+     *       SHOULD NOT be allowed while the device is operating, to reduce the impact on the clients,
      *       and the potential confusion for the users.
-     * 
+     *
      * @note The device implementation MAY allow supported location changes while operating if the device
      *       repopulates the SupportedMaps, SupportedLocations, CurrentLocation, and Progress attributes with
      *       data matching the constraints listed in the requirements for each attribute.
-     * 
+     *
     */
     virtual bool IsSupportedLocationsChangeAllowed() = 0;
 
@@ -170,7 +170,7 @@ protected:
      * @param[in] listIndex the position in the list
      * @param[out] aSupportedLocation  copy of the location contents - if found
      * @return true if location found
-     * 
+     *
      * @note can be used to iterate through supported locations
     */
     virtual bool GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation) = 0;
@@ -181,7 +181,7 @@ protected:
      * @param[out] listIndex the location's index in the list, if found
      * @param[out] aSupportedLocation  copy of the location contents, if found
      * @return true if location found
-     * 
+     *
      * @note may be overloaded in device implementation for optimization, if desired
     */
     virtual bool GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex, LocationStructureWrapper & aSupportedLocation);
@@ -202,7 +202,7 @@ protected:
      * @param[in] listIndex list index of the location being modified
      * @param[in] modifedLocation modified location contents
      * @return true if successful
-     * 
+     *
      * @note caller MUST guarantee modified location is a valid, unique location
      * @note this function SHOULD double check that newLocation's locationID matches the object at listIndex
      */
@@ -211,7 +211,7 @@ protected:
     /**
      * @brief Clear the Supported Locations list
      * @return true if supported locations was not already null
-     * 
+     *
      * @note no notifications or other side effects
      */
     virtual bool ClearSupportedLocations() = 0;
@@ -233,12 +233,12 @@ protected:
     /**
      * @brief can the supported maps attribute be changed in the current operating mode?
      * @return true if the current device state allows supported maps updates
-     * 
-     * @note The SupportedMapss attribute list changes (adding or deleting entries, 
-     *       changing their MapID fields, or nulling the entire list) 
-     *       SHOULD NOT be allowed while the device is operating, to reduce the impact on the clients, 
+     *
+     * @note The SupportedMapss attribute list changes (adding or deleting entries,
+     *       changing their MapID fields, or nulling the entire list)
+     *       SHOULD NOT be allowed while the device is operating, to reduce the impact on the clients,
      *       and the potential confusion for the users.
-     * 
+     *
      * @note The device implementation MAY allow supported maps changes while operating if the device
      *       repopulates the SupportedLocations, CurrentLocation, and Progress attributes with
      *       data matching the constraints listed in the requirements for each attribute.
@@ -266,7 +266,7 @@ protected:
      * @param[out] listIndex the map's index in the list, if found
      * @param[out] aSupportedMap copy of the location contents, if found
      * @return true if a supported map is found.
-     * 
+     *
      * @note may be overloaded in device implementation for optimization, if desired
     */
     virtual bool GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap);
@@ -276,7 +276,7 @@ protected:
      * @param[in] newMap new map to add
      * @param[out] listIndex filled with the list index of the new map, if successful
      * @return true if successful
-     * 
+     *
      * @note caller MUST guarantee newMap is a valid, unique map
      * @note this function SHOULD double check that the added map won't exceed the maximum list size
      */
@@ -287,7 +287,7 @@ protected:
      * @param modifedMap[in] modified map contents
      * @param listIndex[in] list index of the location being modified
      * @return true if successful
-     * 
+     *
      * @note caller MUST guarantee modified map is a valid, unique map
      * @note this function SHOULD double check that modifedMap's mapID matches the object at listIndex
      */
@@ -296,7 +296,7 @@ protected:
     /**
      * @brief Clear the Supported Maps list
      * @return true if supported locations was not already null
-     * 
+     *
      * @note no notifications or other side effects
      */
     virtual bool ClearSupportedMaps() = 0;
@@ -316,7 +316,7 @@ protected:
      * @param[in] listIndex the position in the list
      * @param[in] selectedLocation the selected location value, if found
      * @return true if a selected location is found.
-     * 
+     *
      * @note can be used to iterate through supported locations
     */
     virtual bool GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & selectedLocation) = 0;
@@ -325,7 +325,7 @@ protected:
      * @brief Check if a locationID is in the selected locations list
      * @param[in] aLocationId the locationID to search for
      * @return bool if location found
-     * 
+     *
      * @note may be overloaded in device implementation for optimization, if desired
     */
     virtual bool IsSelectedLocation(uint32_t aLocationId);
@@ -335,7 +335,7 @@ protected:
      * @param[in] aLocationId new locationID to add
      * @param[in] listIndex filled with the list index of the new location, if successful
      * @return true if successful
-     * 
+     *
      * @note caller MUST guarantee aLocationId references a SUPPORTED location, and is unique within selected locations
      * @note this function SHOULD double check that the added location won't exceed the maximum list size
      */
@@ -344,7 +344,7 @@ protected:
     /**
      * @brief Clear the Selected Locations list
      * @return true if selected locations was not already null
-     * 
+     *
      * @note no notifications or other side effects
      */
     virtual bool ClearSelectedLocations() = 0;
@@ -364,7 +364,7 @@ protected:
      * @param[in] listIndex the position in the list
      * @param[out] aProgressElement  copy of the progress element contents - if found
      * @return true if a progress element is found.
-     * 
+     *
      * @note can be used to iterate through the progress list
     */
     virtual bool GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement) = 0;
@@ -375,7 +375,7 @@ protected:
      * @param[out] listIndex the location's index in the list, if found
      * @param[out] aProgressElement  copy of the progress element contents, if found
      * @return true if a progress element is found.
-     * 
+     *
      * @note may be overloaded in device implementation for optimization, if desired
     */
     virtual bool GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement);
@@ -385,7 +385,7 @@ protected:
      * @param[in] newProgressElement new element to add
      * @param[0ut] listIndex filled with the list index for the new element, if successful
      * @return true if successful
-     * 
+     *
      * @note caller MUST guarantee aProgressElement is a valid, unique progress element
      * @note this function SHOULD double check that the added element won't exceed the maximum list size
      */
@@ -396,7 +396,7 @@ protected:
      * @param[in] listIndex list index of the location being modified
      * @param[in] modifedProgressElement modified element's contents
      * @return true if successful
-     * 
+     *
      * @note caller MUST guarantee modified location is a valid, unique location
      * @note this function SHOULD double check that modifedLocation's locationID matches the object at listIndex
      */

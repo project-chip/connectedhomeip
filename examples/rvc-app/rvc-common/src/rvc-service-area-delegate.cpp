@@ -26,7 +26,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     // hardcoded fill of SUPPORTED MAPS for prototyping
     uint8_t supportedMapId_XX  = 3;
     uint8_t supportedMapId_YY  = 245;
-    
+
     GetInstance()->AddSupportedMap(supportedMapId_XX, CharSpan::fromCharString("My Map XX"));
     GetInstance()->AddSupportedMap(supportedMapId_YY, CharSpan::fromCharString("My Map YY"));
 
@@ -39,7 +39,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 
 
     // Location A has name, floor number, uses map XX
-    GetInstance()->AddSupportedLocation(  supportedLocationId_A, 
+    GetInstance()->AddSupportedLocation(  supportedLocationId_A,
                                               DataModel::Nullable<uint_fast8_t>(supportedMapId_XX),
                                               CharSpan::fromCharString("My Location A"),
                                               DataModel::Nullable<int16_t>(4),
@@ -50,7 +50,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 
 
     // Location B has name, uses map XX
-    GetInstance()->AddSupportedLocation(  supportedLocationId_B, 
+    GetInstance()->AddSupportedLocation(  supportedLocationId_B,
                                               DataModel::Nullable<uint_fast8_t>(supportedMapId_XX),
                                               CharSpan::fromCharString("My Location B"),
                                               DataModel::Nullable<int16_t>(),
@@ -63,7 +63,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 
 
     // Location C has full SemData, no name, Map YY
-    GetInstance()->AddSupportedLocation(  supportedLocationId_C, 
+    GetInstance()->AddSupportedLocation(  supportedLocationId_C,
                                               DataModel::Nullable<uint_fast8_t>(supportedMapId_YY),
                                               CharSpan(),
                                               DataModel::Nullable<int16_t>(-1),
@@ -73,7 +73,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
                                               DataModel::Nullable<ServiceArea::FloorSurfaceTag>(ServiceArea::FloorSurfaceTag::kConcrete) );
 
     // Location D has null values for all HomeLocationStruct fields, Map YY
-    GetInstance()->AddSupportedLocation(   supportedLocationId_D, 
+    GetInstance()->AddSupportedLocation(   supportedLocationId_D,
                                               DataModel::Nullable<uint_fast8_t>(supportedMapId_YY),
                                               CharSpan::fromCharString("My Location D"),
                                               DataModel::Nullable<int16_t>(),
@@ -125,12 +125,12 @@ bool RvcServiceAreaDelegate::IsSupportedLocationsChangeAllowed()
     return true; // TODO
 }
 
-uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedLocations() 
+uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedLocations()
 {
     return mSupportedLocations.size();
 }
 
-bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation) 
+bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation)
 {
     bool ret_value = false;
 
@@ -198,9 +198,9 @@ bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const L
     // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded, etc.
 
     // Double-check that locationID's match.
-    VerifyOrExit((modifiedLocation.locationID == mSupportedLocations[listIndex].locationID), 
-                 ChipLogError(Zcl,  "ModifySupportedLocation - new locationID %u does not match existing locationID %u", 
-                              modifiedLocation.locationID, mSupportedLocations[listIndex].locationID));   
+    VerifyOrExit((modifiedLocation.locationID == mSupportedLocations[listIndex].locationID),
+                 ChipLogError(Zcl,  "ModifySupportedLocation - new locationID %u does not match existing locationID %u",
+                              modifiedLocation.locationID, mSupportedLocations[listIndex].locationID));
 
     // checks passed, update the attribute
     mSupportedLocations[listIndex] = modifiedLocation;
@@ -233,12 +233,12 @@ bool RvcServiceAreaDelegate::IsSupportedMapChangeAllowed()
     return true; // TODO
 }
 
-uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedMaps() 
+uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedMaps()
 {
     return mSupportedMaps.size();
 }
 
-bool RvcServiceAreaDelegate::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap) 
+bool RvcServiceAreaDelegate::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap)
 {
     bool ret_value = false;
 
@@ -307,7 +307,7 @@ bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStr
     // Double-check that mapID's match.
     VerifyOrExit((modifiedMap.mapID == mSupportedMaps[listIndex].mapID),
                  ChipLogError(Zcl,  "ModifySupportedMap - mapID's do not match, new mapID %u, existing mapID %u",
-                              modifiedMap.mapID, mSupportedMaps[listIndex].mapID));   
+                              modifiedMap.mapID, mSupportedMaps[listIndex].mapID));
 
     // save modified map
     mSupportedMaps[listIndex] = modifiedMap;
@@ -391,12 +391,12 @@ bool RvcServiceAreaDelegate::ClearSelectedLocations()
 //*************************************************************************
 // Progress List accessors
 
-uint32_t RvcServiceAreaDelegate::GetNumberOfProgressElements() 
+uint32_t RvcServiceAreaDelegate::GetNumberOfProgressElements()
 {
     return mProgressList.size();
 }
 
-bool RvcServiceAreaDelegate::GetProgressElementByIndex(uint32_t listIndex,  Structs::ProgressStruct::Type & aProgressElement) 
+bool RvcServiceAreaDelegate::GetProgressElementByIndex(uint32_t listIndex,  Structs::ProgressStruct::Type & aProgressElement)
 {
     bool ret_value = false;
 
@@ -449,20 +449,20 @@ bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::T
     }
     else
     {
-        ChipLogError(Zcl,  "AddProgressElement %u -progress list is already at maximum size %u", 
+        ChipLogError(Zcl,  "AddProgressElement %u -progress list is already at maximum size %u",
                      newProgressElement.locationID, (uint32_t)kMaxNumProgressElements);
     }
 
     return ret_value;
 }
 
-bool RvcServiceAreaDelegate::ModifyProgressElement(uint32_t listIndex, const Structs::ProgressStruct::Type & modifiedProgressElement) 
+bool RvcServiceAreaDelegate::ModifyProgressElement(uint32_t listIndex, const Structs::ProgressStruct::Type & modifiedProgressElement)
 {
     bool ret_value = false;
 
     // TODO
 
-    return ret_value; 
+    return ret_value;
 }
 
 bool RvcServiceAreaDelegate::ClearProgress()
