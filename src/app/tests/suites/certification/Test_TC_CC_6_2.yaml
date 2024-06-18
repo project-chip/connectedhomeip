@@ -373,7 +373,7 @@ tests:
       arguments:
           values:
               - name: "MoveMode"
-                value: 1
+                value: 3
               - name: "Rate"
                 value: 65535
               - name: "ColorTemperatureMinimumMireds"
