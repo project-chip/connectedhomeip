@@ -25,7 +25,6 @@
 
 #include "fabric_bridge_service/fabric_bridge_service.rpc.pb.h"
 #include "pw_assert/check.h"
-#include "pw_function/function.h"
 #include "pw_hdlc/decoder.h"
 #include "pw_hdlc/default_addresses.h"
 #include "pw_hdlc/rpc_channel.h"
@@ -70,7 +69,7 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
 
     if (addSynchronizedDeviceCall.active())
     {
-        ChipLogError(NotSpecified, "OpenCommissioningWindow is in progress\n");
+        ChipLogError(NotSpecified, "Add Synchronized Device operation is in progress\n");
         return CHIP_ERROR_BUSY;
     }
 
