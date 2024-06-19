@@ -15902,6 +15902,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (void)testSecondBatchHelperRequestWithParams:(MTRUnitTestingClusterTestSecondBatchHelperRequestParams *)params completion:(void (^)(MTRUnitTestingClusterTestBatchHelperResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
+ * Command StringEchoRequest
+ *
+ * Command that takes an argument which is an octet string.  The response echoes
+        the string back. If the string is large then it would require a session that
+        supports large payloads.
+ */
+- (void)stringEchoRequestWithParams:(MTRUnitTestingClusterStringEchoRequestParams *)params completion:(void (^)(MTRUnitTestingClusterStringEchoResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+/**
  * Command TestDifferentVendorMeiRequest
  *
  * Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent.

@@ -13902,6 +13902,7 @@ private:
 | * TestEmitTestFabricScopedEventRequest                              |   0x15 |
 | * TestBatchHelperRequest                                            |   0x16 |
 | * TestSecondBatchHelperRequest                                      |   0x17 |
+| * StringEchoRequest                                                 |   0x18 |
 | * TestDifferentVendorMeiRequest                                     |   0xFFF200AA|
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -14963,6 +14964,44 @@ public:
 
 private:
     chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Type mRequest;
+};
+
+/*
+ * Command StringEchoRequest
+ */
+class UnitTestingStringEchoRequest : public ClusterCommand
+{
+public:
+    UnitTestingStringEchoRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("string-echo-request", credsIssuerConfig)
+    {
+        AddArgument("Payload", &mRequest.payload);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Type mRequest;
 };
 
 /*
@@ -26971,6 +27010,7 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<UnitTestingTestEmitTestFabricScopedEventRequest>(credsIssuerConfig),    //
         make_unique<UnitTestingTestBatchHelperRequest>(credsIssuerConfig),                  //
         make_unique<UnitTestingTestSecondBatchHelperRequest>(credsIssuerConfig),            //
+        make_unique<UnitTestingStringEchoRequest>(credsIssuerConfig),                       //
         make_unique<UnitTestingTestDifferentVendorMeiRequest>(credsIssuerConfig),           //
         //
         // Attributes

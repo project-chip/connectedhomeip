@@ -43022,6 +43022,11 @@ struct Type;
 struct DecodableType;
 } // namespace TestListInt8UReverseRequest
 
+namespace StringEchoResponse {
+struct Type;
+struct DecodableType;
+} // namespace StringEchoResponse
+
 namespace TestEnumsRequest {
 struct Type;
 struct DecodableType;
@@ -43071,6 +43076,11 @@ namespace TestSecondBatchHelperRequest {
 struct Type;
 struct DecodableType;
 } // namespace TestSecondBatchHelperRequest
+
+namespace StringEchoRequest {
+struct Type;
+struct DecodableType;
+} // namespace StringEchoRequest
 
 namespace TestDifferentVendorMeiRequest {
 struct Type;
@@ -44059,6 +44069,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestListInt8UReverseRequest
+namespace StringEchoResponse {
+enum class Fields : uint8_t
+{
+    kPayload = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StringEchoResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StringEchoResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan payload;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StringEchoResponse
 namespace TestEnumsRequest {
 enum class Fields : uint8_t
 {
@@ -44429,6 +44471,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestSecondBatchHelperRequest
+namespace StringEchoRequest {
+enum class Fields : uint8_t
+{
+    kPayload = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StringEchoRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::UnitTesting::Commands::StringEchoResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StringEchoRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan payload;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StringEchoRequest
 namespace TestDifferentVendorMeiRequest {
 enum class Fields : uint8_t
 {

@@ -64543,6 +64543,36 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void stringEchoRequest(StringEchoResponseCallback callback, byte[] payload) {
+      stringEchoRequest(callback, payload, 0);
+    }
+
+    public void stringEchoRequest(StringEchoResponseCallback callback, byte[] payload, int timedInvokeTimeoutMs) {
+      final long commandId = 24L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long payloadFieldID = 0L;
+      BaseTLVType payloadtlvValue = new ByteArrayType(payload);
+      elements.add(new StructElement(payloadFieldID, payloadtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long payloadFieldID = 0L;
+          byte[] payload = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == payloadFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                payload = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(payload);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public void testDifferentVendorMeiRequest(TestDifferentVendorMeiResponseCallback callback, Integer arg1) {
       testDifferentVendorMeiRequest(callback, arg1, 0);
     }
@@ -64630,6 +64660,10 @@ public class ChipClusters {
 
     public interface TestBatchHelperResponseCallback extends BaseClusterCallback {
       void onSuccess(byte[] buffer);
+    }
+
+    public interface StringEchoResponseCallback extends BaseClusterCallback {
+      void onSuccess(byte[] payload);
     }
 
     public interface TestDifferentVendorMeiResponseCallback extends BaseClusterCallback {
