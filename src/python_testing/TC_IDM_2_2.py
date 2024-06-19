@@ -60,7 +60,6 @@ class TC_IDM_2_2(MatterBaseTest):
         read_request_1 = await self.default_controller.ReadAttribute(self.dut_node_id, node_label_attr_path) # [(0, Clusters.BasicInformation.Attributes.NodeLabel)]
         attributes = read_request_1[0]
         basic_information = attributes[basic_info_attr]
-        data_version = basic_information[data_version_attr]
 
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
         asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
@@ -74,7 +73,6 @@ class TC_IDM_2_2(MatterBaseTest):
         read_request_2 = await self.default_controller.ReadAttribute(self.dut_node_id, node_label_attr_all_path) # [(0, Clusters.BasicInformation)]
         attributes = read_request_2[0]
         basic_information = attributes[basic_info_attr]
-        data_version = basic_information[data_version_attr]
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
         asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
         # The output from this command gets many more values from basic_info_attr compared to the first test -- get attribute list, expand test if needed
@@ -105,7 +103,6 @@ class TC_IDM_2_2(MatterBaseTest):
         read_request_5 = await self.default_controller.ReadAttribute(self.dut_node_id, [()]) # This returns a dataclass key of 1, unlike 0 for the earlier ones
         attributes = read_request_5[1]
         unit_testing = attributes[unit_testing_attr]
-        data_version = unit_testing[data_version_attr]
 
         # asserts.assert_in(node_label_attr, unit_testing, "NodeLabel not in UnitTesting")
         asserts.assert_in(data_version_attr, unit_testing, "DataVersion not in UnitTesting")
@@ -117,7 +114,6 @@ class TC_IDM_2_2(MatterBaseTest):
 
         attributes = read_request_6[0]
         basic_information = attributes[basic_info_attr]
-        data_version = basic_information[data_version_attr]
         # asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
         asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
         asserts.assert_true(basic_information[cluster_revision_attr], 3)
