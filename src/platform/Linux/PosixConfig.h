@@ -23,10 +23,10 @@
 
 #pragma once
 
-#include <functional>
-#include <string>
 #include <filesystem>
+#include <functional>
 #include <inttypes.h>
+#include <string>
 
 #include <lib/core/CHIPError.h>
 
@@ -113,7 +113,7 @@ public:
 
 private:
     static ChipLinuxStorage * GetStorageForNamespace(Key key);
-    static std::string GetFilePath(const std::string &defaultFileName);
+    static std::string GetFilePath(const std::string & defaultFileName);
 };
 
 struct PosixConfig::Key

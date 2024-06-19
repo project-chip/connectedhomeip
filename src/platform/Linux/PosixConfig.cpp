@@ -454,10 +454,10 @@ bool PosixConfig::ConfigValueExists(Key key)
     return storage->HasValue(key.Name);
 }
 
-std::string PosixConfig::GetFilePath(const std::string &defaultFileName)
+std::string PosixConfig::GetFilePath(const std::string & defaultFileName)
 {
     // Match what GetFilename in ExamplePersistentStorage.cpp does.
-    const char *dir = std::getenv("TMPDIR");
+    const char * dir = std::getenv("TMPDIR");
     if (dir == nullptr)
     {
         dir = "/tmp";
@@ -474,21 +474,21 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
 
     if (strcmp(ns, kConfigNamespace_ChipFactory) == 0)
     {
-        storage = &gChipLinuxFactoryStorage;
+        storage              = &gChipLinuxFactoryStorage;
         std::string filePath = GetFilePath(CHIP_DEFAULT_FACTORY_FILE_NAME);
-        err     = storage->Init(filePath.c_str());
+        err                  = storage->Init(filePath.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
-        storage = &gChipLinuxConfigStorage;
+        storage              = &gChipLinuxConfigStorage;
         std::string filePath = GetFilePath(CHIP_DEFAULT_CONFIG_FILE_NAME);
-        err     = storage->Init(filePath.c_str());
+        err                  = storage->Init(filePath.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
-        storage = &gChipLinuxCountersStorage;
+        storage              = &gChipLinuxCountersStorage;
         std::string filePath = GetFilePath(CHIP_DEFAULT_DATA_FILE_NAME);
-        err     = storage->Init(filePath.c_str());
+        err                  = storage->Init(filePath.c_str());
     }
 
     SuccessOrExit(err);
