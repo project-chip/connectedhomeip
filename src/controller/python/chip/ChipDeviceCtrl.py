@@ -227,6 +227,12 @@ def _singleton(cls):
 
 
 class CallbackContext:
+    """A context manager for handling callbacks that are expected to be called exactly once.
+
+    The context manager makes sure that no concurrent operations which use the same callback
+    handlers are executed.
+    """
+
     def __init__(self, lock: asyncio.Lock) -> None:
         self._lock = lock
         self._future = None
@@ -248,6 +254,11 @@ class CallbackContext:
 
 
 class CommissioningContext(CallbackContext):
+    """A context manager for handling commissioning callbacks that are expected to be called exactly once.
+
+    This context also resets commissioning related device controller state.
+    """
+
     def __init__(self, devCtrl: ChipDeviceController, lock: asyncio.Lock) -> None:
         super().__init__(lock)
         self._devCtrl = devCtrl
