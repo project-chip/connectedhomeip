@@ -99,5 +99,6 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
                 asserts.assert_equal(source, Clusters.Objects.TimeSynchronization.Enums.TimeSourceEnum.kAdmin)
 
 
+
 if __name__ == "__main__":
     default_matter_test_main()
