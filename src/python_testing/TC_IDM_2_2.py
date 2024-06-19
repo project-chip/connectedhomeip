@@ -18,9 +18,7 @@
 
 import chip.clusters as Clusters
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 class TC_IDM_2_2(MatterBaseTest):
@@ -41,10 +39,8 @@ class TC_IDM_2_2(MatterBaseTest):
         # Test Setup
         cluster_rev_attr = Clusters.BasicInformation.Attributes.ClusterRevision # Global attribute
         cluster_rev_attr_path = [(cluster_rev_attr)]
-        cluster_rev_attr_typed_path = self.get_typed_attribute_path(cluster_rev_attr)
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel # Borrowed from TC_IDM_4_2
         node_label_attr_path = [(0, node_label_attr)]
-        node_label_attr_typed_path = self.get_typed_attribute_path(node_label_attr)
         node_label_attr_all = Clusters.BasicInformation
         node_label_attr_all_path = [(0, node_label_attr_all)]
         data_version_attr = Clusters.Attribute.DataVersion
@@ -53,19 +49,19 @@ class TC_IDM_2_2(MatterBaseTest):
         cluster_revision_attr = Clusters.Objects.BasicInformation.Attributes.ClusterRevision
         network_diagnostics_attr = Clusters.Objects.ThreadNetworkDiagnostics
         unit_testing_attr = Clusters.Objects.UnitTesting
-        
+
         self.print_step(0, "Commissioning - already done")
         self.print_step(1, "Send Request Message to read one attribute on a given cluster and endpoint")
-        
+
         # TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint.
         # AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID, Attribute = Specific Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value to the DUT
-        
+
         read_request_1 = await self.default_controller.ReadAttribute(self.dut_node_id, node_label_attr_path) # [(0, Clusters.BasicInformation.Attributes.NodeLabel)]
         attributes = read_request_1[0]
         basic_information = attributes[basic_info_attr]
         data_version = basic_information[data_version_attr]
-    
+
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
         asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
 
@@ -83,7 +79,6 @@ class TC_IDM_2_2(MatterBaseTest):
         asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
         # The output from this command gets many more values from basic_info_attr compared to the first test -- get attribute list, expand test if needed
         asserts.assert_in(attribute_list_attr, basic_information, "AttributeList not in BasicInformation")
-        attribute_list = basic_information[attribute_list_attr]
 
         ### TH sends the Read Request Message to the DUT to read an attribute from a cluster at all Endpoints
         ### AttributePath = [[Cluster = Specific ClusterID, Attribute = Specific Attribute]]
@@ -119,7 +114,7 @@ class TC_IDM_2_2(MatterBaseTest):
         ### On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints")
         read_request_6 = await self.default_controller.ReadAttribute(self.dut_node_id, [cluster_rev_attr]) # Clusters.BasicInformation.Attributes.ClusterRevision
-        
+
         attributes = read_request_6[0]
         basic_information = attributes[basic_info_attr]
         data_version = basic_information[data_version_attr]
@@ -147,11 +142,10 @@ class TC_IDM_2_2(MatterBaseTest):
         read_request_8 = await self.default_controller.ReadAttribute(self.dut_node_id, [0])
         attributes = read_request_8[0]
         network_diagnostics = attributes[network_diagnostics_attr]
-        data_version = network_diagnostics[data_version_attr]
-        
+
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
         asserts.assert_in(data_version_attr, network_diagnostics, "DataVersion not in ThreadNetworkDiagnostics")
         asserts.assert_in(attribute_list_attr, basic_information, "AttributeList not in BasicInformation")
-    
+
 if __name__ == "__main__":
     default_matter_test_main()
