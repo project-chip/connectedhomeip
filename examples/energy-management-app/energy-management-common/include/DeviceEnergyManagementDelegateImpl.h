@@ -242,8 +242,9 @@ private:
 
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustCapabilityStruct;
 
-    // The DeviceEnergyManagementDelegate owns the master copy of the ForecastStruct object which is accessed via GetForecast and SetForecast.
-    // The slots field of forecast is owned and managed by the object that implements the DEMManufacturerDelegate interface.
+    // The DeviceEnergyManagementDelegate owns the master copy of the ForecastStruct object which is accessed via GetForecast and
+    // SetForecast. The slots field of forecast is owned and managed by the object that implements the DEMManufacturerDelegate
+    // interface.
     //
     // The rationale for this is as follows:
     // It is envisioned there will be one master forecast object declared in DeviceEnergyManagementDelegate. When
