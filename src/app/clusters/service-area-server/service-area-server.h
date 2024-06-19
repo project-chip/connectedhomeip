@@ -48,28 +48,22 @@ class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     /**
-     * @brief Creates a Service Area cluster instance. The Init() function needs to be called for this instance
+     * @brief Creates a Service Area cluster instance. The Init() method needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
      * @param[in] aDelegate A pointer to the delegate to be used by this server.
      * @param[in] aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param[in] aFeature The supported features of this Service Area Cluster
+     * @param[in] aFeature The supported features of this Service Area Cluster.
      *
      * @note the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
 
-    /**
-     * @brief Destructor
-     */
     ~Instance() override;
 
     /**
      * @brief Initialise the Service Area server instance.
      * @return an error if the given endpoint and cluster Id have not been enabled in zap or if the
      *         CommandHandler or AttributeHandler registration fails, else CHIP_NO_ERROR.
-     *         This method also checks if the feature setting is valid, if invalid return value will be CHIP_ERROR_INVALID_ARGUMENT.
-     *
-     * @note This function must be called after defining an Instance class object.
      */
     CHIP_ERROR Init();
 
@@ -79,61 +73,40 @@ private:
     ClusterId mClusterId;
 
     // Attribute Data Store
-    DataModel::Nullable<uint32_t> mCurrentLocation;  // may be volatile - callback to device to refresh value is provided
-    DataModel::Nullable<uint32_t> mEstimatedEndTime; // may be volatile - callback to device to refresh value is provided
+    DataModel::Nullable<uint32_t> mCurrentLocation;
+    DataModel::Nullable<uint32_t> mEstimatedEndTime;
     BitMask<ServiceArea::Feature> mFeature;
 
     //*************************************************************************
     // core functions
 
     /**
-     * @brief Read Attribute - inherited from AttributeAccessInterface
-     * @return appropriately mapped CHIP_ERROR if applicable
+     * @brief Read Attribute - inherited from AttributeAccessInterface.
+     * @return appropriately mapped CHIP_ERROR if applicable.
      */
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     /**
-     * @brief Command handler - inherited from CommandHandlerInterface
-     * @param[in, out] ctx command context
+     * @brief Command handler - inherited from CommandHandlerInterface.
+     * @param[in, out] ctx command context.
      */
     void InvokeCommand(HandlerContext & ctx) override;
 
     //*************************************************************************
     // attribute readers
 
-    /**
-     * @brief Read the Supported Locations Attribute
-     * @param [in, out] aEncoder attribute encoder.
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
     CHIP_ERROR ReadSupportedLocations(chip::app::AttributeValueEncoder & aEncoder);
 
-    /**
-     * @brief Read the Supported Maps Attribute
-     * @param [in, out] aEncoder attribute encoder.
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
     CHIP_ERROR ReadSupportedMaps(chip::app::AttributeValueEncoder & aEncoder);
 
-    /**
-     * @brief Read the Selected Locations Attribute
-     * @param [in, out] aEncoder attribute encoder.
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
     CHIP_ERROR ReadSelectedLocations(chip::app::AttributeValueEncoder & aEncoder);
 
-    /**
-     * Read the Progress Attribute
-     * @param [in, out] aEncoder attribute encoder.
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
     CHIP_ERROR ReadProgress(chip::app::AttributeValueEncoder & aEncoder);
 
     //*************************************************************************
     // command handlers
 
     /**
-     * @brief Handle Command: SelectLocations.
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
      * @param[in] req the command parameters
@@ -141,7 +114,6 @@ private:
     void HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::SelectLocations::DecodableType & req);
 
     /**
-     * @brief Handle Command: SkipCurrentLocation.
      * @param[in, out] ctx Returns the Interaction Model status code which was user determined in the business logic.
      *                     If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
      */
@@ -149,53 +121,25 @@ private:
 
     //*************************************************************************
     // attribute notifications
-
-    /**
-     * @brief Notify MATTER that the attribute has changed
-     */
+    
     void NotifySupportedLocationsChanged();
-
-    /**
-     * @brief Notify MATTER that the attribute has changed
-     */
     void NotifySupportedMapsChanged();
-
-    /**
-     * @brief Notify MATTER that the attribute has changed
-     */
     void NotifySelectedLocationsChanged();
-
-    /**
-     * @brief Notify MATTER that the attribute has changed
-     */
     void NotifyCurrentLocationChanged();
-
-    /**
-     * @brief Notify MATTER that the attribute has changed
-     */
     void NotifyEstimatedEndTimeChanged();
-
-    /**
-     * @brief Notify MATTER that the attribute has changed
-     */
     void NotifyProgressChanged();
 
     //*************************************************************************
     // Supported Locations manipulators
 
     /**
-     * @brief Is the location in the supported locations list?
-     * @param[in] aLocationId ID of the location.
-     * @return true if the location identified by Id is in the supported locations list
-     *
-     * @note  use GetSupportedLocartionById if location contents are needed.
+     * @return true if a location with the aLocationId ID exists in the supported locations attribute. False otherwise.
      */
     bool IsSupportedLocation(uint32_t aLocationId);
 
     /**
-     * @brief check Location against cluster requirements for supported locations
-     * @param[in] aLocation the location structure to be validated.
-     * @return true if meets all checks
+     * @brief Check if the given location adheres to the restrictions required by the supported locations attribute.
+     * @return true if the aLocation meets all checks.
      */
     bool IsValidSupportedLocation(const LocationStructureWrapper & aLocation);
 
@@ -211,20 +155,19 @@ private:
 
 public:
     /**
-     * @brief Add new location to the supported locations list
-     * @param[in] aLocationId unique identifier of this location
-     * @param[in] aMapId identifier of supported map
-     * @param[in] aLocationName human readable name for this location (empty string if not used)
-     * @param[in] aFloorNumber represents floor level - negative values for below ground
+     * @brief Add new location to the supported locations list.
+     * @param[in] aLocationId unique identifier of this location.
+     * @param[in] aMapId identifier of supported map.
+     * @param[in] aLocationName human readable name for this location (empty string if not used).
+     * @param[in] aFloorNumber represents floor level - negative values for below ground.
      * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
-     * home
-     * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark
-     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark
-     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type
-     * @return true if the new location passed validation checks and was successfully added to the list
+     * home.
+     * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
+     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark.
+     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type.
+     * @return true if the new location passed validation checks and was successfully added to the list.
      *
      * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
-     * @note MATTER change notifications are made for the attributes that change.
      */
     bool AddSupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
                               const DataModel::Nullable<int16_t> & aFloorNumber, const DataModel::Nullable<AreaTypeTag> & aAreaType,
@@ -233,22 +176,21 @@ public:
                               const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag);
 
     /**
-     * @brief Modify/replace an existing location in the supported locations list
-     * @param[in] aLocationId unique identifier of this location
-     * @param[in] aMapId identifier of supported map (will not be modified)
-     * @param[in] aLocationName human readable name for this location (empty string if not used)
-     * @param[in] aFloorNumber represents floor level - negative values for below ground
+     * @brief Modify/replace an existing location in the supported locations list.
+     * @param[in] aLocationId unique identifier of this location.
+     * @param[in] aMapId identifier of supported map (will not be modified).
+     * @param[in] aLocationName human readable name for this location (empty string if not used).
+     * @param[in] aFloorNumber represents floor level - negative values for below ground.
      * @param[in] aAreaType common namespace Area tag - indicates an association of the location with an indoor or outdoor area of a
-     * home
-     * @param[in] aLandmarkTag common namespace Landmak tag - indicates an association of the location with a home landmark
-     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark
-     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type
+     * home.
+     * @param[in] aLandmarkTag common namespace Landmark tag - indicates an association of the location with a home landmark.
+     * @param[in] aPositionTag common namespace Position tag - indicates the position of the location with respect to the landmark.
+     * @param[in] aSurfaceTag common namespace Floor Surface tag - indicates an association of the location with a surface type.
      * @return true if the location is a member of supported locations, the modifications pass all validation checks and the
-     * location was modified
+     * location was modified.
      *
-     * @note if aLocationName is larger than kLocationtNameMaxSize, it will be truncated
-     * @note if mapID is changed, SelectedLocations, CurrentLocation, and Progress are cleared.
-     * @note MATTER change notifications are made for the attributes that change
+     * @note if aLocationName is larger than kLocationNameMaxSize, it will be truncated.
+     * @note if mapID is changed, the delegate's HandleSupportedLocationsUpdated method is called.
      */
     bool ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId, const CharSpan & aLocationName,
                                  const DataModel::Nullable<int16_t> & aFloorNumber,
@@ -258,11 +200,9 @@ public:
                                  const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag);
 
     /**
-     * @brief Clear the Supported Locations list
-     * @return true if supported locations was not already null
+     * @return true if the SupportedLocations attribute was not already null.
      *
-     * @note if Supported Locations is cleared, SelectedLocations, CurrentLocation, and Progress are also cleared
-     * @note MATTER change notifications are made for the attributes that change
+     * @note if SupportedLocations is cleared, the delegate's HandleSupportedLocationsUpdated method is called.
      */
     bool ClearSupportedLocations();
 
@@ -270,41 +210,32 @@ public:
     // Supported Maps manipulators
 
     /**
-     * @brief Is the map in the supported maps list?
-     * @param[in] aMapId id of the map
-     * @return true if the map identified by Id is in the supported maps list
-     *
-     * @note - use GetSupportedMapById if map contents are needed.
+     * @return true if a map with the aMapId ID exists in the supported maps attribute. False otherwise.
      */
     bool IsSupportedMap(uint8_t aMapId);
 
     /**
-     * @brief Add new map to the supported maps list.
-     * @param[in] aMapId The ID of the new added map.
-     * @param[in] aMapName The name of the new added map (cannot be an empty string).
+     * @brief Add a new map to the supported maps list.
+     * @param[in] aMapId The ID of the new map to be added.
+     * @param[in] aMapName The name of the map to be added. This cannot be an empty string.
      * @return true if the new map passed validation checks and was successfully added to the list.
-     *
-     * @note MATTER change notifications are made for the attributes that change.
      */
     bool AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName);
 
     /**
-     * @brief rename an existing map in the supported maps list
-     * @param[in] aMapId id of the map
-     * @param[in] newMapName new name of the map (cannot be empty string)
+     * @brief Rename an existing map in the supported maps list.
+     * @param[in] aMapId The id of the map to modify.
+     * @param[in] newMapName The new name of the map. This cannot be empty string.
+     * @return true if the new name passed validation checks and was successfully modified.
      *
-     * @return true if the new name passed validation checks and was successfully modified
      * @note if the specified map is not a member of the supported maps list, returns false with no action taken.
-     * @note MATTER change notifications are made for the attributes that change
      */
     bool RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName);
 
     /**
-     * @brief Clear the Supported Maps list
-     * @return true if Supported Maps list was not already null
+     * @return true if the SupportedMaps attribute was not already null.
      *
-     * @note if list is cleared, SupportedLocations, SelectedLocations, CurrentLocation, and Progress are also cleared
-     * @note MATTER change notifications are made for the attributes that change
+     * @note if SupportedMaps is cleared, the delegate's HandleSupportedLocationsUpdated method is called.
      */
     bool ClearSupportedMaps();
 
@@ -312,43 +243,27 @@ public:
     // Selected Locations manipulators
 
     /**
-     * @brief Add a selected location
-     * @param[in] aSelectedLocation locationID to add
-     * @bool true if successfully added
+     * @brief Add a selected location.
+     * @param[in] aSelectedLocation The locationID to add.
+     * @bool true if successfully added.
      */
     bool AddSelectedLocation(uint32_t & aSelectedLocation);
 
     /**
-     * @brief Is the location in the selected locations list?
-     * @param[in] aLocationId id of the location
-     * @return true if the location identified by Id is in the selected locations list
-     */
-    bool IsSelectedLocation(uint32_t aLocationId);
-
-    /**
-     * @brief Clear the Selected Locations list
-     * @return true if selected locations was not already null
-     *
-     * @note MATTER change notification is made if the attribute changes
+     * @return true if the SelectedLocations attribute was not already null.
      */
     bool ClearSelectedLocations();
 
     //*************************************************************************
     // Current Location manipulators
 
-    /**
-     * @brief Get the Current Location
-     * @return The current location
-     */
     DataModel::Nullable<uint32_t> GetCurrentLocation();
 
     /**
-     * @brief Set the current location
-     * @param[in] aCurrentLocation where the device is currently. Must be a supported location or NULL.
-     * @return true if the current location is set
+     * @param[in] aCurrentLocation The location ID that the CurrentLocation attribute should be set to. Must be a supported location or NULL.
+     * @return true if the current location is set, false otherwise.
      *
-     * @note if current location is set to null, estimated end time will be set to null
-     * @note MATTER change notification is made if the attribute changes
+     * @note if current location is set to null, estimated end time will be set to null.
      */
     bool SetCurrentLocation(const DataModel::Nullable<uint32_t> & aCurrentLocation);
 
@@ -356,20 +271,15 @@ public:
     // Estimated End Time manipulators
 
     /**
-     * @brief Get the estimated end time
      * @return The estimated epoch time in seconds when operation at the location indicated by the CurrentLocation attribute will be
-     * completed, in seconds.
+     * completed.
      */
     DataModel::Nullable<uint32_t> GetEstimatedEndTime();
 
     /**
-     * @brief Set the estimated end time.
      * @param[in] aEstimatedEndTime The estimated epoch time in seconds when operation at the location indicated by the
-     * CurrentLocation attribute will be completed, in seconds.
-     * @return true if attribute is set.
-     *
-     * @note MATTER change notification is made if the change meets the requirements for EstimatedEndTime notification (depends on
-     * old and new values).
+     * CurrentLocation attribute will be completed.
+     * @return true if attribute is set, false otherwise.
      */
     bool SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime);
 
@@ -377,57 +287,40 @@ public:
     // Progress list manipulators
 
     /**
-     * @brief Is the progress element in the progress list?
-     * @param[in] aLocationId location id of the progress element
-     * @return true if the progress element identified by Id is in the progress list
-     */
-    bool IsProgressElement(uint32_t aLocationId);
-
-    /**
-     * @brief Add a progress element containing inactive status to the progress list
-     * @param[in] aLocationId location id of the progress element
-     * @return true if the new progress element passed validation checks and was successfully added to the list
-     *
-     * @note MATTER change notification is made if the attribute changes
+     * @brief Add a progress element in a pending status to the progress list.
+     * @param[in] aLocationId location id of the progress element.
+     * @return true if the new progress element passed validation checks and was successfully added to the list, false otherwise.
      */
     bool AddPendingProgressElement(uint32_t aLocationId);
 
     /**
-     * @brief Set the status of progress element identified by locationID
-     * @param[in] aLocationId the locationID to use
-     * @param[in] status location cluster operation status for this location
-     * @return true if progress element is found and status is set
+     * @brief Set the status of progress element identified by locationID.
+     * @param[in] aLocationId The locationID of the progress element to update.
+     * @param[in] status The location cluster operation status for this location.
+     * @return true if progress element is found and status is set, false otherwise.
      *
-     * @note TotalOperationalTime is set to null if resulting opStatus is not equal to Completed or Skipped
-     * @note MATTER change notification is made if the attribute changes
+     * @note TotalOperationalTime is set to null if resulting opStatus is not equal to Completed or Skipped.
      */
     bool SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opStatus);
 
     /**
-     * @brief Set the total operational time for the progress element identified by locationID
-     * @param[in] aLocationId the locationID to use
-     * @param[in] aTotalOperationalTime total operational time for this location.
-     * @return true if progress element is found and operational time is set
-     *
-     * @note MATTER change notification is made if the attribute changes
+     * @brief Set the total operational time for the progress element identified by locationID.
+     * @param[in] aLocationId The locationID of the progress element to update.
+     * @param[in] aTotalOperationalTime The total operational time for this location.
+     * @return true if progress element is found and operational time is set, false otherwise.
      */
     bool SetProgressTotalOperationalTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime);
 
     /**
-     * @brief Set the estimated time for the  progress element identified by locationID
-     * @param[in] aLocationId the locationID to use
-     * @param[in] aEstimatedTime total operational time for thus location
-     * @return true if progress element is found and operational time is set
-     *
-     * @note MATTER change notification is made if the attribute changes
+     * @brief Set the estimated time for the  progress element identified by locationID.
+     * @param[in] aLocationId The locationID of the progress element to update.
+     * @param[in] aEstimatedTime The estimated time for this location.
+     * @return true if progress element is found and estimated time is set, false otherwise.
      */
     bool SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aEstimatedTime);
 
     /**
-     * @brief Clear the progress list
-     * @return true if selected locations was not already null
-     *
-     * @note MATTER change notification is made if the attribute changes
+     * @return true if the progress list was not already null, false otherwise.
      */
     bool ClearProgress();
 
@@ -435,11 +328,11 @@ public:
     // Feature Map attribute
 
     /**
-     * @brief Check if a feature is supported
-     * @param[in] feature the feature enum
-     * @return true if the feature is supported
+     * @brief Check if a feature is supported.
+     * @param[in] feature the feature enum.
+     * @return true if the feature is supported.
      *
-     * @note the Service Area features are set at startup and are read-only to both device and client
+     * @note the Service Area features are set at startup and are read-only to both device and client.
      */
     bool HasFeature(ServiceArea::Feature feature) const;
 };

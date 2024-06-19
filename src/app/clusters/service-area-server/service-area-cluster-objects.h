@@ -35,9 +35,6 @@ inline constexpr size_t kMapNameMaxSize      = 64u;
  */
 struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::LocationStruct::Type
 {
-    /**
-     * @brief This is a default constructor that initializes the location object with default values.
-     */
     LocationStructureWrapper()
     {
         Set(0, 0, CharSpan(), DataModel::Nullable<int16_t>(), DataModel::Nullable<AreaTypeTag>(),
@@ -274,9 +271,6 @@ private:
  */
 struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::MapStruct::Type
 {
-    /**
-     * @brief This is a default constructor that initializes the map object with default values.
-     */
     MapStructureWrapper() { Set(0, CharSpan()); }
 
     /**

@@ -24,13 +24,6 @@ bool Delegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listInd
     return ret_value;
 };
 
-/**
- * When we cannot guarantee that the restrictions imposed on the SupportedLocations, CurrentLocation and Progress attributes
- * can be upheld, these attributes are set to null.
- *
- * The user is free the redefine this method as their device may have more information on what has changed and may be able to
- * maintain the restrictions on these attributes by selectively editing them.
- */
 void Delegate::HandleSupportedLocationsUpdated()
 {
     mInstance->ClearSelectedLocations();
@@ -99,3 +92,11 @@ bool Delegate::GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex
 
     return ret_value;
 };
+
+bool Delegate::IsProgressElement(uint32_t aLocationId)
+{
+    uint32_t index;
+    Structs::ProgressStruct::Type progressElement;
+
+    return GetProgressElementById(aLocationId, index, progressElement);
+}

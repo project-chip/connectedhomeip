@@ -415,7 +415,7 @@ void Instance::HandleSkipCurrentLocationCmd(HandlerContext & ctx)
     // If the SelectedLocations attribute is null, the response status should be set to InvalidLocationList.
     // If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string.
     VerifyOrExit((mDelegate->GetNumberOfSelectedLocations() != 0), skipStatus = SkipCurrentLocationStatus::kInvalidLocationList;
-                 ChipLogError(Zcl, "Skip Current Location command - Selected Locations atttribute is null");
+                 ChipLogError(Zcl, "Skip Current Location command - Selected Locations attribute is null");
                  cmdStatus = Status::Failure);
 
     // If the CurrentLocation attribute is null, the status should be set to InvalidInMode.
@@ -962,7 +962,7 @@ bool Instance::AddPendingProgressElement(uint32_t aLocationId)
 
     // Each entry in this list SHALL have a unique value for the LocationID field.
 
-    VerifyOrExit(!IsProgressElement(aLocationId),
+    VerifyOrExit(!mDelegate->IsProgressElement(aLocationId),
                  ChipLogError(Zcl, "AddPendingProgressElement - progress element already exists for location %u", aLocationId));
 
     VerifyOrExit(mDelegate->AddProgressElement(inactiveProgress, dummyIndex),
