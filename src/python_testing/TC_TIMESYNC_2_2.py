@@ -101,5 +101,6 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
             asserts.assert_equal(source, Clusters.Objects.TimeSynchronization.Enums.TimeSourceEnum.kAdmin)
 >>>>>>> cc3099c7cf (Created proposed resolution of Github issue #230:)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
