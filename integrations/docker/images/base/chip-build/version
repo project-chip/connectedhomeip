@@ -1,1 +1,1 @@
-58 : Add libgirepository1.0-dev to the base image, to make build_python.sh work (assume we want this everywhere)
+59 : Install order fix for glib with enabled thread sanitizer.
