@@ -345,12 +345,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
       response:
@@ -451,12 +451,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
       response:

@@ -463,7 +463,7 @@ tests:
                                     [
                                         {
                                             AttributeID: 0x0000,
-                                            AttributeValue: 0x01,
+                                            ValueUnsigned8: 0x01,
                                         },
                                     ],
                             },
@@ -473,7 +473,7 @@ tests:
                                     [
                                         {
                                             AttributeID: 0x0000,
-                                            AttributeValue: 0x64,
+                                            ValueUnsigned8: 0x64,
                                         },
                                     ],
                             },
@@ -620,12 +620,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
       response:
@@ -643,7 +643,7 @@ tests:
           to 60 000 000 (60 000s) and a set of extension fields appropriate to
           AC1."
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0001 0x01 60000000 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4001", "attributeValue": "0x01"}]}]' 1 1
+          ./chip-tool scenesmanagement add-scene 0x0001 0x01 60000000 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4001", "ValueUnsigned8": "0x01"}]}]' 1 1
 
           Verify DUT sends a AddSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to G1 and the SceneID field set to 0x01 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 

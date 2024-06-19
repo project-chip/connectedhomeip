@@ -287,12 +287,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
       response:
@@ -309,7 +309,7 @@ tests:
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
           1000 (1s) and a set of extension fields appropriate to AC1."
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0101 0x01 1000 "scene name" '[{"clusterID": "0x0006", "attributeValueList":[{"attributeID": "0x0001", "attributeValue": "0x01"}, ]}, {"clusterID": "0x0008", "attributeValueList":[{"attributeID": "0x0000", "attributeValue": "0x64"}, ]}]' 1 1
+          ./chip-tool scenesmanagement add-scene 0x0101 0x01 1000 "scene name" '[{"clusterID": "0x0006", "attributeValueList":[{"attributeID": "0x0000", "ValueUnsigned8": "0x01"}, ]}, {"clusterID": "0x0008", "attributeValueList":[{"attributeID": "0x0000", "ValueUnsigned8": "0x64"}, ]}]' 1 1
 
           Verify DUT sends a AddSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to 257  and the SceneID field set to 0x01 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
@@ -361,12 +361,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
 
@@ -395,8 +395,8 @@ tests:
           [1708071897.294574][7731:7733] CHIP:TOO:         ClusterID: 6
           [1708071897.294580][7731:7733] CHIP:TOO:         AttributeValueList: 1 entries
           [1708071897.294589][7731:7733] CHIP:TOO:           [1]: {
-          [1708071897.294593][7731:7733] CHIP:TOO:             AttributeID: 1
-          [1708071897.294596][7731:7733] CHIP:TOO:             AttributeValue: 1
+          [1708071897.294593][7731:7733] CHIP:TOO:             AttributeID: 0
+          [1708071897.294596][7731:7733] CHIP:TOO:             ValueUnsigned8: 1
           [1708071897.294599][7731:7733] CHIP:TOO:            }
           [1708071897.294603][7731:7733] CHIP:TOO:        }
           [1708071897.294611][7731:7733] CHIP:TOO:       [2]: {
@@ -404,7 +404,7 @@ tests:
           [1708071897.294621][7731:7733] CHIP:TOO:         AttributeValueList: 1 entries
           [1708071897.294628][7731:7733] CHIP:TOO:           [1]: {
           [1708071897.294633][7731:7733] CHIP:TOO:             AttributeID: 0
-          [1708071897.294636][7731:7733] CHIP:TOO:             AttributeValue: 100
+          [1708071897.294636][7731:7733] CHIP:TOO:             ValueUnsigned8: 100
           [1708071897.294639][7731:7733] CHIP:TOO:            }
           [1708071897.294643][7731:7733] CHIP:TOO:        }
           [1708071897.294647][7731:7733] CHIP:TOO:    }
@@ -543,12 +543,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
 
@@ -557,7 +557,7 @@ tests:
           field set to G1, the SceneID field set to 0x03, the TransitionTime
           field set to G1 and a set of extension fields appropriate to AC1."
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0101 0x03 1 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4002", "attributeValue": "0x01"}]}]' 0xffffffffffff0101 1
+          ./chip-tool scenesmanagement add-scene 0x0101 0x03 1 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4002", "ValueUnsigned8": "0x01"}]}]' 0xffffffffffff0101 1
           Note: As this is a multicast command, no log is expected.
       cluster: "LogCommands"
       command: "UserPrompt"
@@ -599,12 +599,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
     - label:
@@ -633,7 +633,7 @@ tests:
           [1707285444.028853][13682:13684] CHIP:TOO:         AttributeValueList: 1 entries
           [1707285444.028882][13682:13684] CHIP:TOO:           [1]: {
           [1707285444.028896][13682:13684] CHIP:TOO:             AttributeID: 16386
-          [1707285444.028913][13682:13684] CHIP:TOO:             AttributeValue: 1
+          [1707285444.028913][13682:13684] CHIP:TOO:             ValueUnsigned16: 1
           [1707285444.028925][13682:13684] CHIP:TOO:            }
           [1707285444.028937][13682:13684] CHIP:TOO:        }
           [1707285444.028950][13682:13684] CHIP:TOO:    }
