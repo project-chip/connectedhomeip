@@ -241,6 +241,8 @@ class CallbackContext:
         return self._future
 
     async def __aexit__(self, exc_type, exc_value, traceback):
+        if not self._future.done():
+            raise RuntimeError("CallbackContext future not completed")
         self._future = None
         self._lock.release()
 
