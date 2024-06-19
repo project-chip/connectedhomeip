@@ -45,12 +45,9 @@
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
-// TODO: need common mac_init solution for B9X & W91
-#ifndef CONFIG_BOARD_TLSR9118BDK40D
 extern "C" {
-#include <b9x_bt_flash.h>
+extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t *bt_mac);
 }
-#endif
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
 #include <zephyr/pm/policy.h>
@@ -120,10 +117,7 @@ CHIP_ERROR InitBLEMACAddress()
     int error = 0;
     bt_addr_le_t addr;
 
-// TODO: need common mac_init solution for B9X & W91
-#ifndef CONFIG_BOARD_TLSR9118BDK40D
-    b9x_bt_blc_mac_init(addr.a.val);
-#endif
+    telink_bt_blc_mac_init(addr.a.val);
 
     if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
     {
