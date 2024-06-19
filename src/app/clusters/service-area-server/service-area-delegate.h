@@ -310,7 +310,8 @@ protected:
 
     /**
      * This method is called by the server instance to add a new selected location to the list.
-     * The server instance will ensure that the aLocationId references a SUPPORTED location, and is unique within selected locations.
+     * The server instance will ensure that the aLocationId references a SUPPORTED location, and is unique within selected
+     * locations.
      * @param[in] aLocationId The new locationID to add.
      * @param[in] listIndex filled with the list index of the new location, if successful.
      * @return true if successful, false otherwise.

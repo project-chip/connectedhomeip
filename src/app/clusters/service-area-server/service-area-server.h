@@ -260,7 +260,8 @@ public:
     DataModel::Nullable<uint32_t> GetCurrentLocation();
 
     /**
-     * @param[in] aCurrentLocation The location ID that the CurrentLocation attribute should be set to. Must be a supported location or NULL.
+     * @param[in] aCurrentLocation The location ID that the CurrentLocation attribute should be set to. Must be a supported location
+     * or NULL.
      * @return true if the current location is set, false otherwise.
      *
      * @note if current location is set to null, estimated end time will be set to null.
