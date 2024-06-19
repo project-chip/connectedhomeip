@@ -30,7 +30,6 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, utc_time_in_matter_epoch
 from mobly import asserts
 
-
 class TC_TIMESYNC_2_1(MatterBaseTest):
     async def read_ts_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.TimeSynchronization
@@ -41,21 +40,18 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_TIMESYNC_2_1(self):
-        # Establishing features support
-        TSCfeat = self.wait_for_user_input(prompt_msg="Is TSC feature supported? (y or n)\n",
-                                           input_msg="Is TSC feature supported? (y or n)\n", prompt_msg_placeholder="y or n")
-        NTPCfeat = self.wait_for_user_input(prompt_msg="Is NTPC feature supported? (y or n)\n",
-                                            input_msg="Is NTPC feature supported? (y or n)\n", prompt_msg_placeholder="y or n", default_value='n')
-        NTPSfeat = self.wait_for_user_input(prompt_msg="Is NTPS feature supported? (y or n)\n",
-                                            input_msg="Is NTPS feature supported? (y or n)\n", prompt_msg_placeholder="y or n", default_value='n')
-        TZfeat = self.wait_for_user_input(prompt_msg="Is TZ feature supported? (y or n)\n",
-                                          input_msg="Is TZ feature supported? (y or n)\n", prompt_msg_placeholder="y or n")
-
         endpoint = self.user_params.get("endpoint", 0)
+        features = await self.read_single_attribute(dev_ctrl=self.default_controller, node_id=self.dut_node_id,
+                                                    endpoint=endpoint, attribute=Clusters.TimeSynchronization.Attributes.FeatureMap)
+        self.supports_time_zone = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kTimeZone)
+        self.supports_ntpc = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient)
+        self.supports_ntps = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPServer)
+        self.supports_trusted_time_source = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kTimeSyncClient)
+
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
-
+        
         self.print_step(2, "Read Granularity attribute")
         granularity_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.Granularity)
         asserts.assert_less(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kUnknownEnumValue,
@@ -67,17 +63,16 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                             "TimeSource is not in valid range")
 
         self.print_step(4, "Read TrustedTimeSource")
-        if TSCfeat == 'y':
-            trusted_time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint,
-                                                                              attribute=attributes.TrustedTimeSource)
-            if trusted_time_source is not NullValue:
-                asserts.assert_less_equal(trusted_time_source.fabricIndex, 0xFE,
-                                          "FabricIndex for the TrustedTimeSource is out of range")
-                asserts.assert_greater_equal(trusted_time_source.fabricIndex, 1,
-                                             "FabricIndex for the TrustedTimeSource is out of range")
+        trusted_time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint,
+                                                                            attribute=attributes.TrustedTimeSource)
+        if trusted_time_source is not NullValue:
+            asserts.assert_less_equal(trusted_time_source.fabricIndex, 0xFE,
+                                        "FabricIndex for the TrustedTimeSource is out of range")
+            asserts.assert_greater_equal(trusted_time_source.fabricIndex, 1,
+                                        "FabricIndex for the TrustedTimeSource is out of range")
 
         self.print_step(5, "Read DefaultNTP")
-        if NTPCfeat == 'y':
+        if self.supports_ntpc:
             default_ntp = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultNTP)
             if default_ntp is not NullValue:
                 asserts.assert_less_equal(len(default_ntp), 128, "DefaultNTP length must be less than 128")
@@ -92,7 +87,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                 asserts.assert_true(is_web_addr or is_ip_addr, "Returned DefaultNTP value is not a IP address or web address")
 
         self.print_step(6, "Read TimeZone")
-        if TZfeat == 'y':
+        if self.supports_time_zone:
             tz_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeZone)
             asserts.assert_greater_equal(len(tz_dut), 1, "TimeZone must have at least one entry in the list")
             asserts.assert_less_equal(len(tz_dut), 2, "TimeZone may have a maximum of two entries in the list")
@@ -107,16 +102,16 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                 asserts.assert_not_equal(tz_dut[1].validAt, 0, "TimeZone list second entry must have a non-zero ValidAt time")
 
         self.print_step(7, "Read DSTOffset")
-        if TZfeat == 'y':
+        if self.supports_time_zone:
             dst_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.DSTOffset)
             last_valid_until = -1
             last_valid_starting = -1
             for dst in dst_dut:
                 asserts.assert_greater(dst.validStarting, last_valid_starting,
-                                       "DSTOffset list must be sorted by ValidStarting time")
+                                        "DSTOffset list must be sorted by ValidStarting time")
                 last_valid_starting = dst.validStarting
                 asserts.assert_greater_equal(dst.validStarting, last_valid_until,
-                                             "DSTOffset list must have every ValidStarting > ValidUntil of the previous entry")
+                                                "DSTOffset list must have every ValidStarting > ValidUntil of the previous entry")
                 last_valid_until = dst.validUntil
                 if dst.validUntil is NullValue or dst.validUntil is None:
                     asserts.assert_equal(dst, dst_dut[-1], "DSTOffset list must have Null ValidUntil at the end")
@@ -136,7 +131,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
             asserts.assert_less_equal(delta, toleranace, "UTC time is not within tolerance of TH")
 
         self.print_step(9, "Read LocalTime")
-        if TZfeat == 'y':
+        if self.supports_time_zone:
             utc_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
             local_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.LocalTime)
             if utc_dut is NullValue:
@@ -151,32 +146,30 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                 asserts.assert_less_equal(delta, toleranace, "Local time caluclation is not within tolerance of calculated value")
 
         self.print_step(10, "Read TimeZoneDatabase")
-        if TZfeat == 'y':
+        if self.supports_time_zone:
             tz_db_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeZoneDatabase)
             asserts.assert_less(tz_db_dut, Clusters.TimeSynchronization.Enums.TimeZoneDatabaseEnum.kUnknownEnumValue,
                                 "TimeZoneDatabase is not in valid range")
 
         self.print_step(11, "Read NTPServerAvailable")
-        if NTPSfeat == 'y':
+        if self.supports_ntps:        
             # bool typechecking happens in the test read functions, so all we need to do here is do the read
             await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.NTPServerAvailable)
-
+        
         self.print_step(12, "Read TimeZoneListMaxSize")
-        if TZfeat == 'y':
-            size = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeZoneListMaxSize)
-            asserts.assert_greater_equal(size, 1, "TimeZoneListMaxSize must be at least 1")
-            asserts.assert_less_equal(size, 2, "TimeZoneListMaxSize must be max 2")
+        size = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeZoneListMaxSize)
+        asserts.assert_greater_equal(size, 1, "TimeZoneListMaxSize must be at least 1")
+        asserts.assert_less_equal(size, 2, "TimeZoneListMaxSize must be max 2")
 
         self.print_step(13, "Read DSTOffsetListMaxSize")
-        if TZfeat == 'y':
+        if self.supports_time_zone:
             size = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.DSTOffsetListMaxSize)
             asserts.assert_greater_equal(size, 1, "DSTOffsetListMaxSize must be at least 1")
 
         self.print_step(14, "Read SupportsDNSResolve")
         # bool typechecking happens in the test read functions, so all we need to do here is do the read
-        if NTPCfeat == 'y':
+        if self.supports_ntpc:        
             await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportsDNSResolve)
-
 
 if __name__ == "__main__":
     default_matter_test_main()
