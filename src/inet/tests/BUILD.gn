@@ -58,7 +58,6 @@ static_library("helpers") {
       "TestSetupFaultInjection.h",
       "TestSetupFaultInjectionPosix.cpp",
     ]
-    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 }
 
