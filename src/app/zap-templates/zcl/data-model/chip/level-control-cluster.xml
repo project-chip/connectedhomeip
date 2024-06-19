@@ -46,7 +46,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <globalAttribute side="either" code="0xFFFD" value="6"/>
 
     <features>
       <feature bit="0" code="OO" name="OnOff" default="1" summary="Dependency with the On/Off cluster">
@@ -74,8 +74,8 @@ limitations under the License.
     <attribute side="server" code="0x0011" define="ON_LEVEL"                      type="int8u"                isNullable="true"         writable="true"                     optional="false">OnLevel</attribute>
     <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME"            type="int16u"               isNullable="true"         writable="true"                     optional="true">OnTransitionTime</attribute>
     <attribute side="server" code="0x0013" define="OFF_TRANSITION_TIME"           type="int16u"               isNullable="true"         writable="true"                     optional="true">OffTransitionTime</attribute>
-    <attribute side="server" code="0x0014" define="DEFAULT_MOVE_RATE"             type="int8u"                isNullable="true"         writable="true"                     optional="true">DefaultMoveRate</attribute>
-    <attribute side="server" code="0x000F" define="OPTIONS"                       type="OptionsBitmap"  min="0x00" max="0x03"     writable="true"  default="0x00"     optional="false">Options</attribute>
+    <attribute side="server" code="0x0014" define="DEFAULT_MOVE_RATE"             type="int8u"                isNullable="true"   min="0x01" max="0xFF"  writable="true"    optional="true">DefaultMoveRate</attribute>
+    <attribute side="server" code="0x000F" define="OPTIONS"                       type="OptionsBitmap"        min="0x00" max="0x03"     writable="true"  default="0x00"     optional="false">Options</attribute>
     <attribute side="server" code="0x4000" define="START_UP_CURRENT_LEVEL"        type="int8u"                isNullable="true"         writable="true"                     optional="true">
       <description>StartUpCurrentLevel</description>
       <access op="read" role="view"/>
