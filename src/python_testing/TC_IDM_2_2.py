@@ -21,6 +21,7 @@ from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_IDM_2_2(MatterBaseTest):
 
     ROOT_NODE_ENDPOINT_ID = 0
@@ -37,9 +38,9 @@ class TC_IDM_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_IDM_2_2(self):
         # Test Setup
-        cluster_rev_attr = Clusters.BasicInformation.Attributes.ClusterRevision # Global attribute
+        cluster_rev_attr = Clusters.BasicInformation.Attributes.ClusterRevision  # Global attribute
         cluster_rev_attr_path = [(cluster_rev_attr)]
-        node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel # Borrowed from TC_IDM_4_2
+        node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel  # Borrowed from TC_IDM_4_2
         node_label_attr_path = [(0, node_label_attr)]
         node_label_attr_all = Clusters.BasicInformation
         node_label_attr_all_path = [(0, node_label_attr_all)]
@@ -57,20 +58,22 @@ class TC_IDM_2_2(MatterBaseTest):
         # AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID, Attribute = Specific Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value to the DUT
 
-        read_request_1 = await self.default_controller.ReadAttribute(self.dut_node_id, node_label_attr_path) # [(0, Clusters.BasicInformation.Attributes.NodeLabel)]
+        # [(0, Clusters.BasicInformation.Attributes.NodeLabel)]
+        read_request_1 = await self.default_controller.ReadAttribute(self.dut_node_id, node_label_attr_path)
         attributes = read_request_1[0]
         basic_information = attributes[basic_info_attr]
 
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
         asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
 
-        ### TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint
-        ### AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID]]
-        ### On receipt of this message, DUT should send a report data action with the attribute value to the DUT.
+        # TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint
+        # AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID]]
+        # On receipt of this message, DUT should send a report data action with the attribute value to the DUT.
 
         self.print_step(2, "Send Request Message to read all attributes on a given cluster and endpoint")
         asserts.assert_in(node_label_attr, basic_information, "AttributeList not in attributes")
-        read_request_2 = await self.default_controller.ReadAttribute(self.dut_node_id, node_label_attr_all_path) # [(0, Clusters.BasicInformation)]
+        # [(0, Clusters.BasicInformation)]
+        read_request_2 = await self.default_controller.ReadAttribute(self.dut_node_id, node_label_attr_all_path)
         attributes = read_request_2[0]
         basic_information = attributes[basic_info_attr]
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
@@ -78,39 +81,43 @@ class TC_IDM_2_2(MatterBaseTest):
         # The output from this command gets many more values from basic_info_attr compared to the first test -- get attribute list, expand test if needed
         asserts.assert_in(attribute_list_attr, basic_information, "AttributeList not in BasicInformation")
 
-        ### TH sends the Read Request Message to the DUT to read an attribute from a cluster at all Endpoints
-        ### AttributePath = [[Cluster = Specific ClusterID, Attribute = Specific Attribute]]
-        ### On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
+        # TH sends the Read Request Message to the DUT to read an attribute from a cluster at all Endpoints
+        # AttributePath = [[Cluster = Specific ClusterID, Attribute = Specific Attribute]]
+        # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
         self.print_step(3, "Send Request Message to read one attribute on a given cluster at all endpoints")
-        read_request_3 = await self.default_controller.ReadAttribute(self.dut_node_id, [node_label_attr]) # [Clusters.BasicInformation.Attributes.NodeLabel]
+        # [Clusters.BasicInformation.Attributes.NodeLabel]
+        read_request_3 = await self.default_controller.ReadAttribute(self.dut_node_id, [node_label_attr])
         attributes = read_request_3[0]
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
 
-        ### TH sends the Read Request Message to the DUT to read a global attribute from all clusters at that Endpoint
-        ### AttributePath = [[Endpoint = Specific Endpoint, Attribute = Specific Global Attribute]]
-        ### On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
+        # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at that Endpoint
+        # AttributePath = [[Endpoint = Specific Endpoint, Attribute = Specific Global Attribute]]
+        # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(4, "Send Request Message to read one global attribute from all clusters at that endpoint")
         # The output from this command gets many more values from unit_testing_attr compared to the some other tests
-        read_request_4 = await self.default_controller.ReadAttribute(self.dut_node_id, cluster_rev_attr_path) # [(Clusters.BasicInformation.Attributes.ClusterRevision)]
+        # [(Clusters.BasicInformation.Attributes.ClusterRevision)]
+        read_request_4 = await self.default_controller.ReadAttribute(self.dut_node_id, cluster_rev_attr_path)
         attributes = read_request_4[0]
         basic_information = attributes[basic_info_attr]
         asserts.assert_true(basic_information[cluster_revision_attr], 3)
 
-        ### TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints 
+        # TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
         ### AttributePath = [[]]
-        ### On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
+        # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(5, "Send Request Message to read all attributes from all clusters on all endpoints")
-        read_request_5 = await self.default_controller.ReadAttribute(self.dut_node_id, [()]) # This returns a dataclass key of 1, unlike 0 for the earlier ones
+        # This returns a dataclass key of 1, unlike 0 for the earlier ones
+        read_request_5 = await self.default_controller.ReadAttribute(self.dut_node_id, [()])
         attributes = read_request_5[1]
         unit_testing = attributes[unit_testing_attr]
 
         # asserts.assert_in(node_label_attr, unit_testing, "NodeLabel not in UnitTesting")
         asserts.assert_in(data_version_attr, unit_testing, "DataVersion not in UnitTesting")
-        ### TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
-        ### AttributePath = [[Attribute = Specific Global Attribute]]
-        ### On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
+        # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
+        # AttributePath = [[Attribute = Specific Global Attribute]]
+        # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints")
-        read_request_6 = await self.default_controller.ReadAttribute(self.dut_node_id, [cluster_rev_attr]) # Clusters.BasicInformation.Attributes.ClusterRevision
+        # Clusters.BasicInformation.Attributes.ClusterRevision
+        read_request_6 = await self.default_controller.ReadAttribute(self.dut_node_id, [cluster_rev_attr])
 
         attributes = read_request_6[0]
         basic_information = attributes[basic_info_attr]
@@ -118,11 +125,12 @@ class TC_IDM_2_2(MatterBaseTest):
         asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
         asserts.assert_true(basic_information[cluster_revision_attr], 3)
 
-        ### TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
-        ### AttributePath = [[Cluster = Specific ClusterID]]
-        ### On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
+        # TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
+        # AttributePath = [[Cluster = Specific ClusterID]]
+        # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
         self.print_step(7, "Send Request Message to read all attributes from one cluster at all endpoints")
-        read_request_7 = await self.default_controller.ReadAttribute(self.dut_node_id, [node_label_attr_all]) # [Clusters.BasicInformation]
+        # [Clusters.BasicInformation]
+        read_request_7 = await self.default_controller.ReadAttribute(self.dut_node_id, [node_label_attr_all])
         attributes = read_request_7[0]
         basic_information = attributes[basic_info_attr]
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
@@ -130,9 +138,9 @@ class TC_IDM_2_2(MatterBaseTest):
         # The output from this command gets many more values from basic_info_attr compared to the first test -- get attribute list, expand test if needed
         asserts.assert_in(attribute_list_attr, basic_information, "AttributeList not in BasicInformation")
 
-        ### TH sends the Read Request Message to the DUT to read all attributes from all clusters at one Endpoint
-        ### AttributePath = [[Endpoint = Specific Endpoint]]
-        ### On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
+        # TH sends the Read Request Message to the DUT to read all attributes from all clusters at one Endpoint
+        # AttributePath = [[Endpoint = Specific Endpoint]]
+        # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
         self.print_step(8, "Send Request Message to read all attributes from all clusters at one endpoint")
         read_request_8 = await self.default_controller.ReadAttribute(self.dut_node_id, [0])
         attributes = read_request_8[0]
@@ -141,6 +149,7 @@ class TC_IDM_2_2(MatterBaseTest):
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
         asserts.assert_in(data_version_attr, network_diagnostics, "DataVersion not in ThreadNetworkDiagnostics")
         asserts.assert_in(attribute_list_attr, basic_information, "AttributeList not in BasicInformation")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
