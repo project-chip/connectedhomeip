@@ -21987,6 +21987,22 @@
               "source": "server",
               "isIncoming": 0,
               "isEnabled": 1
+            },
+            {
+              "name": "StringEchoRequest",
+              "code": 24,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "StringEchoResponse",
+              "code": 13,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
             }
           ],
           "attributes": [

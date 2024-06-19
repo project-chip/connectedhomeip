@@ -17318,6 +17318,7 @@ public class ClusterIDMapping {
             TestEmitTestFabricScopedEventRequest(21L),
             TestBatchHelperRequest(22L),
             TestSecondBatchHelperRequest(23L),
+            StringEchoRequest(24L),
             TestDifferentVendorMeiRequest(4294049962L),;
             private final long id;
             Command(long id) {
@@ -17653,6 +17654,23 @@ public class ClusterIDMapping {
                     }
                     public static TestSecondBatchHelperRequestCommandField value(int id) throws NoSuchFieldError {
                         for (TestSecondBatchHelperRequestCommandField field : TestSecondBatchHelperRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum StringEchoRequestCommandField {Payload(0),;
+                    private final int id;
+                    StringEchoRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static StringEchoRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (StringEchoRequestCommandField field : StringEchoRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
