@@ -29,8 +29,13 @@ env:
   CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+  await-fast-ci:
+    name: Await Fast CI
+    uses: ./.github/workflows/await-fast-ci.yaml
+    
   efr32:
     name: EFR32
+    needs: await-fast-ci
 
     env:
       SILABS_BOARD: BRD4161A
