@@ -129,7 +129,6 @@ class TC_IDM_2_2(MatterBaseTest):
         read_request_7 = await self.default_controller.ReadAttribute(self.dut_node_id, [node_label_attr_all]) # [Clusters.BasicInformation]
         attributes = read_request_7[0]
         basic_information = attributes[basic_info_attr]
-        data_version = basic_information[data_version_attr]
         asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
         asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
         # The output from this command gets many more values from basic_info_attr compared to the first test -- get attribute list, expand test if needed
