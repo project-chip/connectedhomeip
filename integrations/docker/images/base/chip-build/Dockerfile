@@ -59,7 +59,6 @@ RUN set -x \
     libdmalloc-dev \
     libgif-dev \
     libgirepository-1.0-1 \
-    libgirepository1.0-dev \
     libglib2.0-dev \
     libical-dev \
     libjpeg-dev \
@@ -163,6 +162,16 @@ RUN case ${TARGETPLATFORM} in \
     && return 1 ;\
     ;; \
     esac
+
+# Sanitizer compilation fails if this is installed before 
+# glib recompile.
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing --no-install-recommends \
+    libgirepository1.0-dev \
+    && rm -rf /var/lib/apt/lists/ \
+    && : # last line
+
 
 # Some things that save space
 # Protoc goes from 108M to 4.6M
