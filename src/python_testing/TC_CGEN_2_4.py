@@ -25,6 +25,7 @@ import chip.clusters.enum
 import chip.FabricAdmin
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
+from chip.exceptions import ChipStackError
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -60,11 +61,12 @@ class TC_CGEN_2_4(MatterBaseTest):
         # This will run the commissioning up to the point where stage x is run and the
         # response is sent before the test commissioner simulates a failure
         self.th2.SetTestCommissionerPrematureCompleteAfter(stage)
-        errcode = self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-        logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-        asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
+        ctx = asserts.assert_raises(ChipStackError)
+        with ctx:
+            self.th2.CommissionOnNetwork(
+                nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+        errcode = ctx.exception.chip_error
         asserts.assert_true(errcode.sdk_part == expectedErrorPart, 'Unexpected error type returned from CommissioningComplete')
         asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
@@ -101,10 +103,14 @@ class TC_CGEN_2_4(MatterBaseTest):
 
         logging.info('Step 16 - TH2 fully commissions the DUT')
         self.th2.ResetTestCommissioner()
-        errcode = self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-        logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+
+        ctx = asserts.assert_raises(ChipStackError)
+        with ctx:
+            self.th2.CommissionOnNetwork(
+                nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+        asserts.assert_true(ctx.exception.chip_error.sdk_code == 0x02, 'Unexpected error code returned from CommissioningComplete')
+        logging.info('Commissioning complete done.')
 
         logging.info('Step 17 - TH1 sends an arm failsafe')
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)

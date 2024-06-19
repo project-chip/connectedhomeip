@@ -36,7 +36,7 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
  * @brief Adds a synchronized device to the RPC client.
  *
  * This function attempts to add a device identified by its `nodeId` to the synchronized device list.
- * It logs the progress and checks if an `OpenCommissioningWindow` operation is already in progress.
+ * It logs the progress and checks if an `AddSynchronizedDevice` operation is already in progress.
  * If an operation is in progress, it returns `CHIP_ERROR_BUSY`.
  *
  * @param nodeId The Node ID of the device to be added.

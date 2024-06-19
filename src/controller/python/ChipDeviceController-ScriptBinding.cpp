@@ -76,6 +76,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/SetupDiscriminator.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <system/SystemClock.h>
@@ -140,7 +141,7 @@ PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommission
 
 // Rendezvous
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
-                                               uint32_t setupPINCode, chip::NodeId nodeid);
+                                               bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
@@ -166,18 +167,6 @@ PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::Devic
                                                          chip::NodeId nodeid);
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                                 uint16_t long_discriminator);
-PyChipError pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl);
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                                  uint16_t short_discriminator);
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesVendor(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                      uint16_t vendor);
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                          uint16_t device_type);
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl);
-
 PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl,
                                                         chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                         uint64_t nodeId, uint32_t setupPasscode, const uint8_t filterType,
@@ -190,7 +179,6 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
                                                             chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
                                                             uint16_t discriminator, uint8_t optionInt);
 
-void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
 
@@ -222,7 +210,6 @@ pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete(chip::Controller:
 // BLE
 PyChipError pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
 
-const char * pychip_Stack_ErrorToString(ChipError::StorageType err);
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
@@ -378,11 +365,6 @@ PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommission
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-const char * pychip_DeviceController_ErrorToString(ChipError::StorageType err)
-{
-    return chip::ErrorStr(CHIP_ERROR(err));
-}
-
 const char * pychip_DeviceController_StatusReportToString(uint32_t profileId, uint16_t statusCode)
 {
     // return chip::StatusReportStr(profileId, statusCode);
@@ -390,13 +372,24 @@ const char * pychip_DeviceController_StatusReportToString(uint32_t profileId, ui
 }
 
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
-                                               uint32_t setupPINCode, chip::NodeId nodeid)
+                                               bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid)
 {
+    SetupDiscriminator setupDiscriminator;
+
+    if (isShortDiscriminator)
+    {
+        setupDiscriminator.SetShortValue(discriminator & 0xFu);
+    }
+    else
+    {
+        setupDiscriminator.SetLongValue(discriminator);
+    }
+
     return ToPyChipError(devCtrl->PairDevice(nodeid,
                                              chip::RendezvousParameters()
                                                  .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
                                                  .SetSetupPINCode(setupPINCode)
-                                                 .SetDiscriminator(discriminator),
+                                                 .SetSetupDiscriminator(setupDiscriminator),
                                              sCommissioningParameters));
 }
 
@@ -696,46 +689,6 @@ PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissio
     return ToPyChipError(devCtrl->Commission(nodeid, params));
 }
 
-PyChipError pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, static_cast<uint64_t>(0));
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                                 uint16_t long_discriminator)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kLongDiscriminator, long_discriminator);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                                  uint16_t short_discriminator)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kShortDiscriminator, short_discriminator);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesVendor(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                      uint16_t vendor)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kVendorId, vendor);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                          uint16_t device_type)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kDeviceType, device_type);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
-PyChipError pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl)
-{
-    Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kCommissioningMode);
-    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
-}
-
 PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
     chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
     chip::Controller::DevicePairingDelegate_OnWindowOpenCompleteFunct callback)
@@ -808,11 +761,6 @@ pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete(chip::Controller:
 {
     pairingDelegate->SetExpectingPairingComplete(value);
     return ToPyChipError(CHIP_NO_ERROR);
-}
-
-const char * pychip_Stack_ErrorToString(ChipError::StorageType err)
-{
-    return chip::ErrorStr(CHIP_ERROR(err));
 }
 
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode)

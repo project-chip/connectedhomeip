@@ -19,6 +19,7 @@
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/util/MatterCallbacks.h>
@@ -30,6 +31,7 @@
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <platform/LockTracker.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -65,7 +67,9 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
     {
         mCommandMessageWriter.Reset();
 
-        System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+        const size_t commandBufferMaxSize = mpResponder->GetCommandResponseMaxBufferSize();
+        auto commandPacket                = System::PacketBufferHandle::New(commandBufferMaxSize);
+
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         mCommandMessageWriter.Init(std::move(commandPacket));
@@ -592,11 +596,11 @@ CHIP_ERROR CommandHandlerImpl::AddStatusInternal(const ConcreteCommandPath & aCo
     return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddStatusInternal(aCommandPath, aStatus); });
 }
 
-void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                                   const char * context)
+void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath,
+                                   const Protocols::InteractionModel::ClusterStatusCode & status, const char * context)
 {
 
-    CHIP_ERROR error = FallibleAddStatus(aCommandPath, aStatus, context);
+    CHIP_ERROR error = FallibleAddStatus(aCommandPath, status, context);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -610,33 +614,37 @@ void CommandHandlerImpl::AddStatus(const ConcreteCommandPath & aCommandPath, con
     }
 }
 
-CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::Status status,
+CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & path,
+                                                 const Protocols::InteractionModel::ClusterStatusCode & status,
                                                  const char * context)
 {
-    if (status != Status::Success)
+    if (!status.IsSuccess())
     {
         if (context == nullptr)
         {
             context = "no additional context";
         }
 
-        ChipLogError(DataManagement,
-                     "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus " (%s)",
-                     path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                     ChipLogValueIMStatus(status), context);
+        if (status.HasClusterSpecificCode())
+        {
+            ChipLogError(DataManagement,
+                         "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
+                         " ClusterSpecificCode=%u (%s)",
+                         path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
+                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(status.GetClusterSpecificCode().Value()),
+                         context);
+        }
+        else
+        {
+            ChipLogError(DataManagement,
+                         "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
+                         " (%s)",
+                         path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
+                         ChipLogValueIMStatus(status.GetStatus()), context);
+        }
     }
 
-    return AddStatusInternal(path, StatusIB(status));
-}
-
-CHIP_ERROR CommandHandlerImpl::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
-{
-    return AddStatusInternal(aCommandPath, StatusIB(Status::Success, aClusterStatus));
-}
-
-CHIP_ERROR CommandHandlerImpl::AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
-{
-    return AddStatusInternal(aCommandPath, StatusIB(Status::Failure, aClusterStatus));
+    return AddStatusInternal(path, StatusIB{ status });
 }
 
 CHIP_ERROR CommandHandlerImpl::PrepareInvokeResponseCommand(const ConcreteCommandPath & aResponseCommandPath,
