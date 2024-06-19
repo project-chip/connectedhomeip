@@ -718,11 +718,10 @@ tests:
     - label:
           "Step 62: SpecificationVersion value should in the inclusive range of
           (0x01040000 to 0x0104FF00) and the lower 8 bits are set to zero."
-      runIf: "!IsExpectedValue"
       command: "readAttribute"
       attribute: "SpecificationVersion"
       response:
-          value: SpecificationVersionValue
+          saveAs: SpecificationVersionValue
           constraints:
               minValue: 0x01040000
               maxValue: 0x0104FF00
