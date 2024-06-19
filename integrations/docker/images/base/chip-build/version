@@ -1,1 +1,1 @@
-56 : Update Silabs docker SiSDK 2024.06.0 WiseConnect 3.3.0
+57 : Add libgirepository1.0-dev to the base image, to make build_python.sh work (assume we want this everywhere)
