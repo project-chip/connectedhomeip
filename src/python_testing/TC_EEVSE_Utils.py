@@ -157,6 +157,9 @@ class EEVSEBaseTestHelper:
     async def send_test_event_trigger_charge_demand_clear(self):
         await self.send_test_event_triggers(eventTrigger=0x0099000000000005)
 
+    async def send_test_event_trigger_time_of_use_mode(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000006)
+
     async def send_test_event_trigger_evse_ground_fault(self):
         await self.send_test_event_triggers(eventTrigger=0x0099000000000010)
 
