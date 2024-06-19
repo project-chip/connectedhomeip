@@ -42,7 +42,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-mbed-os:53
+            image: ghcr.io/project-chip/chip-build-mbed-os:54
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -158,7 +158,8 @@ jobs:
                   rm -rf ./out
 
             - name: Build unit tests
-              # Temporarily disable build due to running out of flash space
+              # Temporarily disabled build due to running out of flash space
+              # TODO Issue #33978: re-enable unit testing after split of unit tests is done
               if: false
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
 

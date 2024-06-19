@@ -336,6 +336,21 @@ VIDPID_FALLBACK_ENCODING_TEST_CASES = [
         "test_folder": 'vidpid_fallback_encoding_17',
         "is_success_case": 'false',
     },
+    # Numeric only
+    {
+        "description": 'Fallback VID and PID encoding example from spec: valid and PID numeric only',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:0001',
+        "test_folder": 'vidpid_fallback_encoding_18',
+        "is_success_case": 'true',
+        "fallback_pid": 0x0001
+    },
+    # Not a number at all
+    {
+        "description": 'Fallback VID and PID encoding example from spec: PID is not a number',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:XYZ1',
+        "test_folder": 'vidpid_fallback_encoding_19',
+        "is_success_case": 'false',
+    },
 ]
 
 CD_STRUCT_TEST_CASES = [
@@ -770,7 +785,7 @@ def add_files_to_json_config(files_mapping: dict, json_dict: dict):
             json_dict[output_key_name] = hexlify(file_bytes).decode('utf-8')
 
 
-def generate_test_case_vector_json(test_case_out_dir: str, test_cert: str, test_case):
+def generate_test_case_vector_json(test_case_out_dir: str, test_cert: str, test_case, basic_info_pid: int):
     json_dict = {}
     files_in_path = glob.glob(os.path.join(test_case_out_dir, "*"))
     output_json_filename = test_case_out_dir + "/test_case_vector.json"
@@ -788,14 +803,13 @@ def generate_test_case_vector_json(test_case_out_dir: str, test_cert: str, test_
     if "is_success_case" in test_case:
         # These test cases are expected to fail when error injected in DAC but expected to pass when error injected in PAI
         if (test_cert == 'pai') and (test_case["test_folder"] in ['ext_basic_pathlen0',
-                                                                  'vidpid_fallback_encoding_08',
-                                                                  'vidpid_fallback_encoding_09',
                                                                   'ext_key_usage_dig_sig_wrong'
                                                                   ]):
             json_dict["is_success_case"] = "true"
         else:
             json_dict["is_success_case"] = test_case["is_success_case"]
 
+    json_dict['basic_info_pid'] = basic_info_pid
     # Out of all files we could add, find the ones that were present in test case, and embed them in hex
     files_available = {os.path.basename(path) for path in files_in_path}
     files_to_add = {key: os.path.join(test_case_out_dir, filename)
@@ -809,7 +823,8 @@ def generate_test_case_vector_json(test_case_out_dir: str, test_cert: str, test_
         add_raw_ec_keypair_to_dict_from_der(der_key_filename, json_dict)
 
     with open(output_json_filename, "wt+") as outfile:
-        json.dump(json_dict, outfile, indent=2)
+        json.dump(json_dict, outfile, indent=4)
+        outfile.write('\n')
 
 
 def main():
@@ -900,11 +915,13 @@ def main():
             subprocess.run(cmd, shell=True)
 
             # Generate Test Case Data Container in JSON Format
-            generate_test_case_vector_json(test_case_out_dir, test_cert, test_case)
+            generate_test_case_vector_json(test_case_out_dir, test_cert, test_case, basic_info_pid=0x8000)
 
     for test_cert in ['dac', 'pai']:
         for test_case in VIDPID_FALLBACK_ENCODING_TEST_CASES:
             test_case_out_dir = args.outdir + '/struct_' + test_cert + '_' + test_case["test_folder"]
+            fallback_vid = test_case.get('fallback_vid', 0x0FFF1)
+            fallback_pid = test_case.get('fallback_pid', 0x00B1)
             if test_cert == 'dac':
                 common_name_dac = test_case["common_name"]
                 common_name_pai = ''
@@ -916,14 +933,14 @@ def main():
                     pid_dac = test_case["pid"]
                 else:
                     pid_dac = PID_NOT_PRESENT
-                vid_pai = 0xFFF1
-                pid_pai = 0x00B1
+                vid_pai = fallback_vid
+                pid_pai = fallback_pid
             else:
                 common_name_dac = ''
                 common_name_pai = test_case["common_name"]
                 common_name_pai = common_name_pai.replace('DAC', 'PAI')
-                vid_dac = 0xFFF1
-                pid_dac = 0x00B1
+                vid_dac = fallback_vid
+                pid_dac = fallback_pid
                 if "vid" in test_case:
                     vid_pai = test_case["vid"]
                 else:
@@ -944,12 +961,11 @@ def main():
             builder.make_certs_and_keys()
 
             # Generate Certification Declaration (CD)
-            cmd = chipcert + ' gen-cd -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
-                ' -f 1  -V 0xFFF1  -p 0x00B1 -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
+            cmd = f'{chipcert} gen-cd -K {cd_key} -C {cd_cert} -O {test_case_out_dir}/cd.der -f 1 -V 0x{fallback_vid:04X} -p 0x{fallback_pid:04X} -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
             subprocess.run(cmd, shell=True)
 
             # Generate Test Case Data Container in JSON Format
-            generate_test_case_vector_json(test_case_out_dir, test_cert, test_case)
+            generate_test_case_vector_json(test_case_out_dir, test_cert, test_case, basic_info_pid=fallback_pid)
 
     for test_case in CD_STRUCT_TEST_CASES:
         test_case_out_dir = args.outdir + '/struct_cd_' + test_case["test_folder"]
@@ -1008,7 +1024,7 @@ def main():
         subprocess.run(cmd, shell=True)
 
         # Generate Test Case Data Container in JSON Format
-        generate_test_case_vector_json(test_case_out_dir, 'cd', test_case)
+        generate_test_case_vector_json(test_case_out_dir, 'cd', test_case, basic_info_pid=0x8000)
 
     # Test case: Generate {DAC, PAI, PAA} chain with random (invalid) PAA
     test_case = {
@@ -1049,7 +1065,7 @@ def main():
     subprocess.run(cmd, shell=True)
 
     # Generate Test Case Data Container in JSON Format
-    generate_test_case_vector_json(test_case_out_dir, 'paa', test_case)
+    generate_test_case_vector_json(test_case_out_dir, 'paa', test_case, basic_info_pid=0x8000)
 
 
 if __name__ == '__main__':

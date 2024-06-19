@@ -18,7 +18,6 @@
 import argparse
 import asyncio
 import builtins
-import glob
 import inspect
 import json
 import logging
@@ -30,7 +29,6 @@ import re
 import sys
 import typing
 import uuid
-import xml.etree.ElementTree as ET
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -64,6 +62,7 @@ from global_attribute_ids import GlobalAttributeIds
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+from pics_support import read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -140,50 +139,6 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
     else:
         # On not having found a PAA dir, just return current dir to avoid blow-ups
         return pathlib.Path.cwd()
-
-
-def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
-    pics = {}
-    for raw in lines:
-        line, _, _ = raw.partition("#")
-        line = line.strip()
-
-        if not line:
-            continue
-
-        key, _, val = line.partition("=")
-        val = val.strip()
-        if val not in ["1", "0"]:
-            raise ValueError('PICS {} must have a value of 0 or 1'.format(key))
-
-        pics[key.strip()] = (val == "1")
-    return pics
-
-
-def parse_pics_xml(contents: str) -> dict[str, bool]:
-    pics = {}
-    mytree = ET.fromstring(contents)
-    for pi in mytree.iter('picsItem'):
-        name = pi.find('itemNumber').text
-        support = pi.find('support').text
-        pics[name] = int(json.loads(support.lower())) == 1
-    return pics
-
-
-def read_pics_from_file(path: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
-    if os.path.isdir(os.path.abspath(path)):
-        pics_dict = {}
-        for filename in glob.glob(f'{path}/*.xml'):
-            with open(filename, 'r') as f:
-                contents = f.read()
-                pics_dict.update(parse_pics_xml(contents))
-        return pics_dict
-
-    else:
-        with open(path, 'r') as f:
-            lines = f.readlines()
-            return parse_pics(lines)
 
 
 def type_matches(received_value, desired_type):
@@ -1587,33 +1542,55 @@ class CommissionDeviceTest(MatterBaseTest):
             info.filter_value = conf.discriminators[i]
 
         if conf.commissioning_method == "on-network":
-            return dev_ctrl.CommissionOnNetwork(
-                nodeId=conf.dut_node_ids[i],
-                setupPinCode=info.passcode,
-                filterType=info.filter_type,
-                filter=info.filter_value
-            )
+            try:
+                dev_ctrl.CommissionOnNetwork(
+                    nodeId=conf.dut_node_ids[i],
+                    setupPinCode=info.passcode,
+                    filterType=info.filter_type,
+                    filter=info.filter_value
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         elif conf.commissioning_method == "ble-wifi":
-            return dev_ctrl.CommissionWiFi(
-                info.filter_value,
-                info.passcode,
-                conf.dut_node_ids[i],
-                conf.wifi_ssid,
-                conf.wifi_passphrase
-            )
+            try:
+                dev_ctrl.CommissionWiFi(
+                    info.filter_value,
+                    info.passcode,
+                    conf.dut_node_ids[i],
+                    conf.wifi_ssid,
+                    conf.wifi_passphrase,
+                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         elif conf.commissioning_method == "ble-thread":
-            return dev_ctrl.CommissionThread(
-                info.filter_value,
-                info.passcode,
-                conf.dut_node_ids[i],
-                conf.thread_operational_dataset
-            )
+            try:
+                dev_ctrl.CommissionThread(
+                    info.filter_value,
+                    info.passcode,
+                    conf.dut_node_ids[i],
+                    conf.thread_operational_dataset,
+                    isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR)
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         elif conf.commissioning_method == "on-network-ip":
-            logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
-            return dev_ctrl.CommissionIP(
-                ipaddr=conf.commissionee_ip_address_just_for_testing,
-                setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
-            )
+            try:
+                logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
+                dev_ctrl.CommissionIP(
+                    ipaddr=conf.commissionee_ip_address_just_for_testing,
+                    setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
+                )
+                return True
+            except ChipStackError as e:
+                logging.error("Commissioning failed: %s" % e)
+                return False
         else:
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
@@ -1713,7 +1690,7 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
 
             if hooks:
                 # Right now, we only support running a single test class at once,
-                # but it's relatively easy to exapand that to make the test process faster
+                # but it's relatively easy to expand that to make the test process faster
                 # TODO: support a list of tests
                 hooks.start(count=1)
                 # Mobly gives the test run time in seconds, lets be a bit more precise

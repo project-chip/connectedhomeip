@@ -5318,6 +5318,48 @@ static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttr
     }
     }
 }
+static BOOL AttributeIsSpecifiedInThreadBorderRouterManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThreadBorderRouterManagement;
+    switch (aAttributeId) {
+    case Attributes::BorderRouterName::Id: {
+        return YES;
+    }
+    case Attributes::BorderAgentID::Id: {
+        return YES;
+    }
+    case Attributes::ThreadVersion::Id: {
+        return YES;
+    }
+    case Attributes::InterfaceEnabled::Id: {
+        return YES;
+    }
+    case Attributes::ActiveDatasetTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInThreadNetworkDirectoryCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ThreadNetworkDirectory;
@@ -6872,6 +6914,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);
+    }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        return AttributeIsSpecifiedInThreadBorderRouterManagementCluster(aAttributeId);
     }
     case Clusters::ThreadNetworkDirectory::Id: {
         return AttributeIsSpecifiedInThreadNetworkDirectoryCluster(aAttributeId);

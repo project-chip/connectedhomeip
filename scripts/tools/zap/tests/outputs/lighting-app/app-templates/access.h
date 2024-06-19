@@ -205,6 +205,10 @@
     0x0000003F, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    0x00000062, /* Cluster: Scenes Management, Command: AddScene, Privilege: manage */ \
+    0x00000062, /* Cluster: Scenes Management, Command: RemoveScene, Privilege: manage */ \
+    0x00000062, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
+    0x00000062, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
@@ -243,6 +247,10 @@
     0x00000001, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     0x00000003, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     0x00000004, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    0x00000000, /* Cluster: Scenes Management, Command: AddScene, Privilege: manage */ \
+    0x00000002, /* Cluster: Scenes Management, Command: RemoveScene, Privilege: manage */ \
+    0x00000003, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
+    0x00000004, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -281,6 +289,10 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: AddScene, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: RemoveScene, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

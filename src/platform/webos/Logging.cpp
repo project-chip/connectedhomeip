@@ -1,7 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-#include <lib/support/EnforceFormat.h>
-#include <lib/support/logging/Constants.h>
 #include <platform/logging/LogV.h>
 
 #include <cinttypes>
@@ -9,6 +7,8 @@
 #include <sys/syscall.h>
 #include <sys/time.h>
 #include <unistd.h>
+
+#include <lib/support/logging/Constants.h>
 
 #ifdef USE_SYSLOG
 #include <syslog.h>
@@ -33,7 +33,7 @@ namespace Platform {
 /**
  * CHIP log output functions.
  */
-void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     struct timeval tv;
 

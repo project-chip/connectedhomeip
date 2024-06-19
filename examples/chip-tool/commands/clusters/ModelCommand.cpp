@@ -44,8 +44,11 @@ CHIP_ERROR ModelCommand::RunCommand()
         return SendCommand(commissioneeDeviceProxy, mEndPointId);
     }
 
+    // Check whether the session needs to allow large payload support.
+    TransportPayloadCapability transportPayloadCapability =
+        AllowLargePayload() ? TransportPayloadCapability::kLargePayload : TransportPayloadCapability::kMRPPayload;
     return CurrentCommissioner().GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback,
-                                                    &mOnDeviceConnectionFailureCallback);
+                                                    &mOnDeviceConnectionFailureCallback, transportPayloadCapability);
 }
 
 void ModelCommand::OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
@@ -133,4 +136,9 @@ bool ModelCommand::IsPeerLIT()
 {
     CheckPeerICDType();
     return mIsPeerLIT.ValueOr(false);
+}
+
+bool ModelCommand::AllowLargePayload()
+{
+    return mAllowLargePayload.ValueOr(false);
 }

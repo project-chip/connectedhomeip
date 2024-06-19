@@ -1257,6 +1257,33 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
+    // First check if MTRDevice exists from having loaded from storage, or created by a client.
+    // Do not use deviceForNodeID here, because we don't want to create the device if it does not already exist.
+    os_unfair_lock_lock(&_deviceMapLock);
+    MTRDevice * device = _nodeIDToDeviceMap[@(nodeID)];
+    os_unfair_lock_unlock(&_deviceMapLock);
+
+    // In the case that this device is known to use thread, queue this with subscription attempts as well, to
+    // help with throttling Thread traffic.
+    if (device && [device deviceUsesThread]) {
+        MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
+            MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
+                completion(exchangeManager, session, error, retryDelay);
+                workItemCompletion(MTRAsyncWorkComplete);
+            };
+            [self directlyGetSessionForNode:nodeID completion:completionWrapper];
+        }];
+
+        [_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+    } else {
+        [self directlyGetSessionForNode:nodeID completion:completion];
+    }
+}
+
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
+{
     [self
         asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
             auto connectionBridge = new MTRDeviceConnectionBridge(completion);
