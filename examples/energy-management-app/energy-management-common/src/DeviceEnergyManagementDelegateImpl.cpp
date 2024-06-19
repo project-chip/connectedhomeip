@@ -18,7 +18,7 @@
 
 #include "DeviceEnergyManagementDelegateImpl.h"
 #include "DEMManufacturerDelegate.h"
-#include "DEMUtils.h"
+#include "EnergyTimeUtils.h"
 #include <app/EventLogging.h>
 
 using namespace chip;
@@ -298,7 +298,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SendPowerAdjustEndEvent(CauseEnum cau
 
     if (mpDEMManufacturerDelegate != nullptr)
     {
-        event.energyUse = mpDEMManufacturerDelegate->GetEnergyUse();
+        event.energyUse = mpDEMManufacturerDelegate->GetApproxEnergyDuringSession();
     }
     else
     {
@@ -642,7 +642,7 @@ Status DeviceEnergyManagementDelegate::ModifyForecastRequest(
     else if (mpDEMManufacturerDelegate != nullptr)
     {
         // Determine if the new forecast adjustments are acceptable to the appliance
-        CHIP_ERROR err = mpDEMManufacturerDelegate->HandleModifyRequest(forecastID, slotAdjustments, cause);
+        CHIP_ERROR err = mpDEMManufacturerDelegate->HandleModifyForecastRequest(forecastID, slotAdjustments, cause);
         if (err != CHIP_NO_ERROR)
         {
             status = Status::Failure;

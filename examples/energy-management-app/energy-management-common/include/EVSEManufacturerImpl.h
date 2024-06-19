@@ -94,7 +94,8 @@ public:
      * Implement the DEMManufacturerDelegate interface
      *
      */
-    int64_t GetEnergyUse() override;
+    // The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
+    int64_t GetApproxEnergyDuringSession() override;
     CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration,
                                                               AdjustmentCauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion() override;
@@ -105,7 +106,7 @@ public:
     CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion() override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelRequest() override;
-    CHIP_ERROR HandleModifyRequest(
+    CHIP_ERROR HandleModifyForecastRequest(
         const uint32_t forecastID,
         const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
         AdjustmentCauseEnum cause) override;

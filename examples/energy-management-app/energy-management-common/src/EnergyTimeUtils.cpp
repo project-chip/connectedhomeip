@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <DEMUtils.h>
+#include <EnergyTimeUtils.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
@@ -52,7 +52,7 @@ CHIP_ERROR UtilsGetEpochTS(uint32_t & chipEpoch)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "EVSE: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Zcl, "Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 

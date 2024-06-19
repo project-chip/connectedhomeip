@@ -72,7 +72,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-temperature-levels.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/DEMUtils.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyTimeUtils.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/EVSEManufacturerImpl.cpp

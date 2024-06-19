@@ -21,7 +21,7 @@
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
 
-#include <DEMUtils.h>
+#include <EnergyTimeUtils.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
@@ -371,7 +371,8 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
     }
 }
 
-int64_t EVSEManufacturer::GetEnergyUse()
+// The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
+int64_t EVSEManufacturer::GetApproxEnergyDuringSession()
 {
     return 300;
 }
@@ -418,7 +419,7 @@ CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementCancelRequest()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EVSEManufacturer::HandleModifyRequest(
+CHIP_ERROR EVSEManufacturer::HandleModifyForecastRequest(
     const uint32_t forecastID,
     const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
     AdjustmentCauseEnum cause)

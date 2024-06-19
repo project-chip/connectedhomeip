@@ -20,7 +20,7 @@
 #include <EVSEManufacturerImpl.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 
-#include <DEMUtils.h>
+#include <EnergyTimeUtils.h>
 
 #include "FakeReadings.h"
 

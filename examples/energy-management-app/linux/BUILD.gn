@@ -37,7 +37,7 @@ config("includes") {
 executable("chip-energy-management-app") {
   sources = [
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DEMTestEventTriggers.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DEMUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp",

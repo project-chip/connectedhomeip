@@ -41,7 +41,8 @@ public:
 
     virtual ~DEMManufacturerDelegate() {}
 
-    virtual int64_t GetEnergyUse() = 0;
+    // The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
+    virtual int64_t GetApproxEnergyDuringSession() = 0;
 
     virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration,
                                                                       AdjustmentCauseEnum cause)
@@ -71,7 +72,7 @@ public:
     virtual CHIP_ERROR HandleDeviceEnergyManagementCancelRequest() { return CHIP_NO_ERROR; }
 
     virtual CHIP_ERROR
-    HandleModifyRequest(const uint32_t forecastID,
+    HandleModifyForecastRequest(const uint32_t forecastID,
                         const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
                         AdjustmentCauseEnum cause)
     {

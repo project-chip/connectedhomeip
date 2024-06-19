@@ -70,7 +70,7 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DEMUtils.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyTimeUtils.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EVSEManufacturerImpl.cpp
