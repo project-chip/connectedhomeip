@@ -66,6 +66,6 @@ public final class CommissionParameters {
 
         public CommissionParameters build() {
             return new CommissionParameters(this);
-        } 
+        }
     }
 }
