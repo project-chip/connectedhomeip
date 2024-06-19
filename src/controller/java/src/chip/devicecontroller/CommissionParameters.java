@@ -21,51 +21,51 @@ import javax.annotation.Nullable;
 
 /** Parameters representing commissioning arguments for {@link ChipDeviceController}. */
 public final class CommissionParameters {
-    @Nullable private final byte[] csrNonce;
-    @Nullable private final NetworkCredentials networkCredentials;
-    @Nullable private final ICDRegistrationInfo icdRegistrationInfo;
+  @Nullable private final byte[] csrNonce;
+  @Nullable private final NetworkCredentials networkCredentials;
+  @Nullable private final ICDRegistrationInfo icdRegistrationInfo;
 
-    private CommissionParameters(Builder builder) {
-        csrNonce = builder.csrNonce;
-        networkCredentials = builder.networkCredentials;
-        icdRegistrationInfo = builder.icdRegistrationInfo;
+  private CommissionParameters(Builder builder) {
+    csrNonce = builder.csrNonce;
+    networkCredentials = builder.networkCredentials;
+    icdRegistrationInfo = builder.icdRegistrationInfo;
+  }
+  /* a nonce to be used for the CSR request */
+  public byte[] getCsrNonce() {
+    return csrNonce;
+  }
+
+  /* the credentials (Wi-Fi or Thread) to be provisioned */
+  public NetworkCredentials getNetworkCredentials() {
+    return networkCredentials;
+  }
+  /* the informations for ICD registration. For detailed information {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link CompletionListener.onICDRegistrationInfoRequired} is called to request the ICDRegistrationInfo value. */
+  public ICDRegistrationInfo getICDRegistrationInfo() {
+    return icdRegistrationInfo;
+  }
+
+  public static class Builder {
+    @Nullable private byte[] csrNonce = null;
+    @Nullable private NetworkCredentials networkCredentials = null;
+    @Nullable private ICDRegistrationInfo icdRegistrationInfo = null;
+
+    public Builder setCsrNonce(byte[] csrNonce) {
+      this.csrNonce = csrNonce;
+      return this;
     }
-    /* a nonce to be used for the CSR request */
-    public byte[] getCsrNonce() {
-        return csrNonce;
+
+    public Builder setNetworkCredentials(NetworkCredentials networkCredentials) {
+      this.networkCredentials = networkCredentials;
+      return this;
     }
 
-    /* the credentials (Wi-Fi or Thread) to be provisioned */
-    public NetworkCredentials getNetworkCredentials() {
-        return networkCredentials;
-    }
-    /* the informations for ICD registration. For detailed information {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link CompletionListener.onICDRegistrationInfoRequired} is called to request the ICDRegistrationInfo value. */
-    public ICDRegistrationInfo getICDRegistrationInfo() {
-        return icdRegistrationInfo;
+    public Builder setICDRegistrationInfo(ICDRegistrationInfo icdRegistrationInfo) {
+      this.icdRegistrationInfo = icdRegistrationInfo;
+      return this;
     }
 
-    public static class Builder {
-        @Nullable private byte[] csrNonce = null;
-        @Nullable private NetworkCredentials networkCredentials = null;
-        @Nullable private ICDRegistrationInfo icdRegistrationInfo = null;
-
-        public Builder setCsrNonce(byte[] csrNonce) {
-            this.csrNonce = csrNonce;
-            return this;
-        }
-
-        public Builder setNetworkCredentials(NetworkCredentials networkCredentials) {
-            this.networkCredentials = networkCredentials;
-            return this;
-        }
-
-        public Builder setICDRegistrationInfo(ICDRegistrationInfo icdRegistrationInfo) {
-            this.icdRegistrationInfo = icdRegistrationInfo;
-            return this;
-        }
-
-        public CommissionParameters build() {
-            return new CommissionParameters(this);
-        }
+    public CommissionParameters build() {
+      return new CommissionParameters(this);
     }
+  }
 }
