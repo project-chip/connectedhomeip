@@ -63,7 +63,9 @@ Status EnergyEvseDelegate::Disable()
 
     /* update MinimumChargeCurrent & MaximumChargeCurrent to 0 */
     SetMinimumChargeCurrent(0);
-    SetMaximumChargeCurrent(0);
+
+    mMaximumChargingCurrentLimitFromCommand = 0;
+    ComputeMaxChargeCurrentLimit();
 
     /* update MaximumDischargeCurrent to 0 */
     SetMaximumDischargeCurrent(0);
@@ -1358,24 +1360,6 @@ CHIP_ERROR EnergyEvseDelegate::SetMinimumChargeCurrent(int64_t newValue)
 int64_t EnergyEvseDelegate::GetMaximumChargeCurrent()
 {
     return mMaximumChargeCurrent;
-}
-
-CHIP_ERROR EnergyEvseDelegate::SetMaximumChargeCurrent(int64_t newValue)
-{
-    int64_t oldValue = mMaximumChargeCurrent;
-
-    if (newValue >= kMaximumChargeCurrent)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-
-    mMaximumChargeCurrent = newValue;
-    if (oldValue != mMaximumChargeCurrent)
-    {
-        ChipLogDetail(AppServer, "MaximumChargeCurrent updated to %ld", static_cast<long>(mMaximumChargeCurrent));
-        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id);
-    }
-    return CHIP_NO_ERROR;
 }
 
 /* MaximumDischargeCurrent */
