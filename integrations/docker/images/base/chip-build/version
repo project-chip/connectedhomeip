@@ -1,1 +1,1 @@
-55 : Update to Ubuntu 24.04 as the base build image
+59 : Install order fix for glib with enabled thread sanitizer.

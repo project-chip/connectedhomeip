@@ -230,11 +230,14 @@ class CommissionableNode(discovery.CommissionableNode):
     def SetDeviceController(self, devCtrl: 'ChipDeviceController'):
         self._devCtrl = devCtrl
 
-    def Commission(self, nodeId: int, setupPinCode: int) -> PyChipError:
+    def Commission(self, nodeId: int, setupPinCode: int) -> int:
         ''' Commission the device using the device controller discovered this device.
 
         nodeId: The nodeId commissioned to the device
         setupPinCode: The setup pin code of the device
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
         '''
         return self._devCtrl.CommissionOnNetwork(
             nodeId, setupPinCode, filterType=discovery.FilterType.INSTANCE_NAME, filter=self.instanceName)
@@ -254,13 +257,18 @@ class DeviceProxyWrapper():
         that is not an issue that needs to be accounted for and it will become very apparent
         if that happens.
     '''
+    class DeviceProxyType(enum.Enum):
+        OPERATIONAL = enum.auto(),
+        COMMISSIONEE = enum.auto(),
 
-    def __init__(self, deviceProxy: ctypes.c_void_p, dmLib=None):
+    def __init__(self, deviceProxy: ctypes.c_void_p, proxyType, dmLib=None):
         self._deviceProxy = deviceProxy
         self._dmLib = dmLib
+        self._proxyType = proxyType
 
     def __del__(self):
-        if (self._dmLib is not None and hasattr(builtins, 'chipStack') and builtins.chipStack is not None):
+        # Commissionee device proxies are owned by the DeviceCommissioner. See #33031
+        if (self._proxyType == self.DeviceProxyType.OPERATIONAL and self._dmLib is not None and hasattr(builtins, 'chipStack') and builtins.chipStack is not None):
             # This destructor is called from any threading context, including on the Matter threading context.
             # So, we cannot call chipStack.Call or chipStack.CallAsyncWithCompleteCallback which waits for the posted work to
             # actually be executed. Instead, we just post/schedule the work and move on.
@@ -360,7 +368,10 @@ class ChipDeviceControllerBase():
                 logging.exception("HandleCommissioningComplete called unexpectedly")
                 return
 
-            self._commissioning_complete_future.set_result(err)
+            if err.is_success:
+                self._commissioning_complete_future.set_result(nodeId)
+            else:
+                self._commissioning_complete_future.set_exception(err.to_exception())
 
         def HandleFabricCheck(nodeId):
             self.fabricCheckNodeId = nodeId
@@ -408,14 +419,17 @@ class ChipDeviceControllerBase():
                 # During Commissioning, HandlePASEEstablishmentComplete will also be called.
                 # Only complete the future if PASE session establishment failed.
                 if not err.is_success:
-                    self._commissioning_complete_future.set_result(err)
+                    self._commissioning_complete_future.set_exception(err.to_exception())
                 return
 
             if self._pase_establishment_complete_future is None:
                 logging.exception("HandlePASEEstablishmentComplete called unexpectedly")
                 return
 
-            self._pase_establishment_complete_future.set_result(err)
+            if err.is_success:
+                self._pase_establishment_complete_future.set_result(None)
+            else:
+                self._pase_establishment_complete_future.set_exception(err.to_exception())
 
         self.pairingDelegate = pairingDelegate
         self.devCtrl = devCtrl
@@ -533,7 +547,12 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         )
 
-    def ConnectBLE(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> PyChipError:
+    def ConnectBLE(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> int:
+        """Connect to a BLE device using the given discriminator and setup pin code.
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
+        """
         self.CheckIsActive()
 
         self._commissioning_complete_future = concurrent.futures.Future()
@@ -545,11 +564,7 @@ class ChipDeviceControllerBase():
                     self.devCtrl, discriminator, isShortDiscriminator, setupPinCode, nodeid)
             ).raise_on_error()
 
-            # TODO: Change return None. Only returning on success is not useful.
-            # but that is what the previous implementation did.
-            res = self._commissioning_complete_future.result()
-            res.raise_on_error()
-            return res
+            return self._commissioning_complete_future.result()
         finally:
             self._commissioning_complete_future = None
 
@@ -595,7 +610,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl, nodeid)
         ).raise_on_error()
 
-    def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int):
+    def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int) -> None:
         self.CheckIsActive()
 
         self._pase_establishment_complete_future = concurrent.futures.Future()
@@ -606,16 +621,11 @@ class ChipDeviceControllerBase():
                     self.devCtrl, setupPinCode, discriminator, nodeid)
             ).raise_on_error()
 
-            # TODO: This is a bit funky, but what the API returned with the previous
-            # implementation. We should revisit this.
-            err = self._pase_establishment_complete_future.result()
-            if not err.is_success:
-                return err.to_exception()
-            return None
+            self._pase_establishment_complete_future.result()
         finally:
             self._pase_establishment_complete_future = None
 
-    def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = 0):
+    def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = 0) -> None:
         self.CheckIsActive()
 
         self._pase_establishment_complete_future = concurrent.futures.Future()
@@ -626,16 +636,11 @@ class ChipDeviceControllerBase():
                     self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
             ).raise_on_error()
 
-            # TODO: This is a bit funky, but what the API returned with the previous
-            # implementation. We should revisit this.
-            err = self._pase_establishment_complete_future.result()
-            if not err.is_success:
-                return err.to_exception()
-            return None
+            self._pase_establishment_complete_future.result()
         finally:
             self._pase_establishment_complete_future = None
 
-    def EstablishPASESession(self, setUpCode: str, nodeid: int):
+    def EstablishPASESession(self, setUpCode: str, nodeid: int) -> None:
         self.CheckIsActive()
 
         self._pase_establishment_complete_future = concurrent.futures.Future()
@@ -646,12 +651,7 @@ class ChipDeviceControllerBase():
                     self.devCtrl, setUpCode.encode("utf-8"), nodeid)
             ).raise_on_error()
 
-            # TODO: This is a bit funky, but what the API returned with the previous
-            # implementation. We should revisit this.
-            err = self._pase_establishment_complete_future.result()
-            if not err.is_success:
-                return err.to_exception()
-            return None
+            self._pase_establishment_complete_future.result()
         finally:
             self._pase_establishment_complete_future = None
 
@@ -861,7 +861,23 @@ class ChipDeviceControllerBase():
 
         return self._Cluster
 
-    def GetConnectedDeviceSync(self, nodeid, allowPASE: bool = True, timeoutMs: int = None):
+    def FindOrEstablishPASESession(self, setupCode: str, nodeid: int, timeoutMs: int = None) -> typing.Optional[DeviceProxyWrapper]:
+        ''' Returns CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device'''
+        self.CheckIsActive()
+        returnDevice = c_void_p(None)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
+        if res.is_success:
+            return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+
+        self.EstablishPASESession(setupCode, nodeid)
+
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
+        if res.is_success:
+            return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
+
+    def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: int = None):
         ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
         nodeId: Target's Node ID
@@ -882,7 +898,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
                 logging.info('Using PASE connection')
-                return DeviceProxyWrapper(returnDevice)
+                return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
         class DeviceAvailableClosure():
             def deviceAvailable(self, device, err):
@@ -916,7 +932,7 @@ class ChipDeviceControllerBase():
         if returnDevice.value is None:
             returnErr.raise_on_error()
 
-        return DeviceProxyWrapper(returnDevice, self._dmLib)
+        return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
     async def WaitForActive(self, nodeid, *, timeoutSeconds=30.0, stayActiveDurationMs=30000):
         ''' Waits a LIT ICD device to become active. Will send a StayActive command to the device on active to allow human operations.
@@ -948,7 +964,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
                 logging.info('Using PASE connection')
-                return DeviceProxyWrapper(returnDevice)
+                return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
@@ -987,7 +1003,7 @@ class ChipDeviceControllerBase():
         else:
             await future
 
-        return DeviceProxyWrapper(future.result(), self._dmLib)
+        return DeviceProxyWrapper(future.result(), DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
     def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
         ''' Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
@@ -1853,17 +1869,19 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def fabricAdmin(self) -> FabricAdmin:
         return self._fabricAdmin
 
-    def Commission(self, nodeid) -> PyChipError:
+    def Commission(self, nodeid) -> int:
         '''
         Start the auto-commissioning process on a node after establishing a PASE connection.
         This function is intended to be used in conjunction with `EstablishPASESessionBLE` or
         `EstablishPASESessionIP`. It can be called either before or after the DevicePairingDelegate
         receives the OnPairingComplete call. Commissioners that want to perform simple
-        auto-commissioning should use the supplied "PairDevice" functions above, which will
+        auto-commissioning should use the supplied "CommissionWithCode" function, which will
         establish the PASE connection and commission automatically.
 
-        Return:
-          bool: True if successful, False otherwise.
+        Raises a ChipStackError on failure.
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.CheckIsActive()
 
@@ -1879,13 +1897,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
         finally:
             self._commissioning_complete_future = None
 
-    def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> PyChipError:
+    def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
         ''' Commissions a Thread device over BLE
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
-    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> PyChipError:
+    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
         ''' Commissions a Wi-Fi device over BLE.
         '''
         self.SetWiFiCredentials(ssid, credentials)
@@ -1988,7 +2006,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self.fabricCheckNodeId
 
     def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
-                            filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None, discoveryTimeoutMsec: int = 30000) -> PyChipError:
+                            filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None, discoveryTimeoutMsec: int = 30000) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
         Supported filters are:
@@ -2004,6 +2022,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
             DiscoveryFilterType.COMPRESSED_FABRIC_ID
 
         The filter can be an integer, a string or None depending on the actual type of selected filter.
+
+        Raises a ChipStackError on failure.
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.CheckIsActive()
 
@@ -2023,9 +2046,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         finally:
             self._commissioning_complete_future = None
 
-    def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> PyChipError:
+    def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.
             setupPayload may be a QR or manual code.
+
+            Raises a ChipStackError on failure.
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.CheckIsActive()
 
@@ -2042,8 +2070,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         finally:
             self._commissioning_complete_future = None
 
-    def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> PyChipError:
-        """ DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode` """
+    def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> int:
+        """ DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
+
+        Raises a ChipStackError on failure.
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
+        """
         self.CheckIsActive()
 
         self._commissioning_complete_future = concurrent.futures.Future()
