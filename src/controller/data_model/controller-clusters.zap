@@ -4772,16 +4772,16 @@
               "isEnabled": 1
             },
             {
-              "name": "DatasetResponse",
-              "code": 3,
+              "name": "SetActiveDatasetRequest",
+              "code": 4,
               "mfgCode": null,
-              "source": "server",
-              "isIncoming": 1,
+              "source": "client",
+              "isIncoming": 0,
               "isEnabled": 1
             },
             {
-              "name": "SetActiveDatasetRequest",
-              "code": 4,
+              "name": "SetPendingDatasetRequest",
+              "code": 5,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 0,
@@ -4815,10 +4815,10 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
+              "minInterval": 0,
+              "maxInterval": 65344,
               "reportableChange": 0
             }
           ]
