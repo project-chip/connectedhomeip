@@ -121,7 +121,7 @@ private:
 
     //*************************************************************************
     // attribute notifications
-    
+
     void NotifySupportedLocationsChanged();
     void NotifySupportedMapsChanged();
     void NotifySelectedLocationsChanged();
