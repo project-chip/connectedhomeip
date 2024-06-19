@@ -163,7 +163,7 @@ RUN case ${TARGETPLATFORM} in \
     ;; \
     esac
 
-# Sanitizer compilation fails if this is installed before 
+# Sanitizer compilation fails if this is installed before
 # glib recompile.
 RUN set -x \
     && apt-get update \
