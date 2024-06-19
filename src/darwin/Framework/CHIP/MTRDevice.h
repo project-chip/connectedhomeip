@@ -130,7 +130,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * interestedPathsForAttributes may contain either MTRClusterPath or MTRAttributePath to specify interested clusters and attributes, or NSNumber for endpoints.
  *
- * interestedPathsForAttributes may contain either MTRClusterPath or MTREventPath to specify interested clusters and events, or NSNumber for endpoints.
+ * interestedPathsForEvents may contain either MTRClusterPath or MTREventPath to specify interested clusters and events, or NSNumber for endpoints.
  *
  * For both interested paths arguments, if nil is specified, then no filter will be applied.
  *
