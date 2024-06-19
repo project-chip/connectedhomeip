@@ -51,7 +51,6 @@ static_library("helpers") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
-    "${nlfaultinjection_root}:nlfaultinjection",
   ]
 
   if (chip_with_nlfaultinjection) {

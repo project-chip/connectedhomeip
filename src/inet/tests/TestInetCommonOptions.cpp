@@ -199,13 +199,11 @@ bool NetworkOptions::HandleOption(const char * progName, OptionSet * optSet, int
 FaultInjectionOptions::FaultInjectionOptions()
 {
     static OptionDef optionDefs[] = {
-#if CHIP_CONFIG_TEST || CHIP_SYSTEM_CONFIG_TEST || INET_CONFIG_TEST
         { "faults", kArgumentRequired, kToolCommonOpt_FaultInjection },
         { "iterations", kArgumentRequired, kToolCommonOpt_FaultTestIterations },
         { "debug-resource-usage", kNoArgument, kToolCommonOpt_DebugResourceUsage },
         { "print-fault-counters", kNoArgument, kToolCommonOpt_PrintFaultCounters },
         { "extra-cleanup-time", kArgumentRequired, kToolCommonOpt_ExtraCleanupTime },
-#endif
         {}
     };
     OptionDefs = optionDefs;
@@ -213,7 +211,6 @@ FaultInjectionOptions::FaultInjectionOptions()
     HelpGroupName = "FAULT INJECTION OPTIONS";
 
     OptionHelp =
-#if CHIP_CONFIG_TEST || CHIP_SYSTEM_CONFIG_TEST || INET_CONFIG_TEST
         "  --faults <fault-string>\n"
         "       Inject specified fault(s) into the operation of the tool at runtime.\n"
         "\n"
@@ -233,7 +230,6 @@ FaultInjectionOptions::FaultInjectionOptions()
         "       should fail a normal happy-sequence test, but not necessarily a fault-injection test.\n"
         "       The value is in milliseconds; a common value is 10000.\n"
         "\n"
-#endif
         "";
 
     // Defaults
@@ -253,7 +249,6 @@ bool FaultInjectionOptions::HandleOption(const char * progName, OptionSet * optS
 
     switch (id)
     {
-#if CHIP_CONFIG_TEST || CHIP_SYSTEM_CONFIG_TEST || INET_CONFIG_TEST
     case kToolCommonOpt_FaultInjection: {
         chip::Platform::ScopedMemoryString mutableArg(arg, strlen(arg));
         assert(mutableArg);
@@ -285,7 +280,6 @@ bool FaultInjectionOptions::HandleOption(const char * progName, OptionSet * optS
             return false;
         }
         break;
-#endif // CHIP_CONFIG_TEST || CHIP_SYSTEM_CONFIG_TEST || INET_CONFIG_TEST
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", progName, name);
         return false;
