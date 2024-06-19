@@ -268,7 +268,7 @@ class DeviceProxyWrapper():
 
     def __del__(self):
         # Commissionee device proxies are owned by the DeviceCommissioner. See #33031
-        if (self._proxyType == self.DeviceProxyType.OPERATIONAL and self.self._dmLib is not None and hasattr(builtins, 'chipStack') and builtins.chipStack is not None):
+        if (self._proxyType == self.DeviceProxyType.OPERATIONAL and self._dmLib is not None and hasattr(builtins, 'chipStack') and builtins.chipStack is not None):
             # This destructor is called from any threading context, including on the Matter threading context.
             # So, we cannot call chipStack.Call or chipStack.CallAsyncWithCompleteCallback which waits for the posted work to
             # actually be executed. Instead, we just post/schedule the work and move on.
