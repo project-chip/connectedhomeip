@@ -51,7 +51,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
-        
+
         self.print_step(2, "Read Granularity attribute")
         granularity_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.Granularity)
         asserts.assert_less(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kUnknownEnumValue,
@@ -69,7 +69,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
             asserts.assert_less_equal(trusted_time_source.fabricIndex, 0xFE,
                                         "FabricIndex for the TrustedTimeSource is out of range")
             asserts.assert_greater_equal(trusted_time_source.fabricIndex, 1,
-                                        "FabricIndex for the TrustedTimeSource is out of range")
+                                            "FabricIndex for the TrustedTimeSource is out of range")
 
         self.print_step(5, "Read DefaultNTP")
         if self.supports_ntpc:
