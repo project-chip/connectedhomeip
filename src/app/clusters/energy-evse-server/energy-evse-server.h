@@ -36,7 +36,6 @@ namespace EnergyEvse {
 
 // Spec-defined constraints
 constexpr int64_t kMinimumChargeCurrent         = 0;
-constexpr int64_t kMaximumChargeCurrent         = 80000;
 constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
 constexpr uint8_t kEvseTargetsMaxNumberOfDays   = 7;
 constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
@@ -173,9 +172,8 @@ class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
              OptionalCommands aOptionalCmds) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
-        CommandHandlerInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
-        mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);

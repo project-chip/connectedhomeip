@@ -309,9 +309,9 @@ public:
 
 private:
     /* Constants */
-    static constexpr int kDefaultMinChargeCurrent                     = 6000;                  /* 6A */
-    static constexpr int kDefaultUserMaximumChargeCurrent             = kMaximumChargeCurrent; /* 80A */
-    static constexpr int kDefaultRandomizationDelayWindow             = 600;                   /* 600s */
+    static constexpr int kDefaultMinChargeCurrent                     = 6000;  /* 6A */
+    static constexpr int kDefaultUserMaximumChargeCurrent             = 80000; /* 80A */
+    static constexpr int kDefaultRandomizationDelayWindow             = 600;   /* 600s */
     static constexpr int kMaxVehicleIDBufSize                         = 32;
     static constexpr int kPeriodicCheckIntervalRealTimeClockNotSynced = 30;
 
