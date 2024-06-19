@@ -35,6 +35,7 @@ jobs:
         
     asr:
         name: ASR
+        needs: await-fast-ci
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
