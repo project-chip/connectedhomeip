@@ -1,1 +1,1 @@
-57 : [Telink] Update Docker image (Zephyr update)
+58 : Add libgirepository1.0-dev to the base image, to make build_python.sh work (assume we want this everywhere)
