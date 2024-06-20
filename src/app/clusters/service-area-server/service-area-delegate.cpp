@@ -19,14 +19,14 @@ bool Delegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listInd
     }
 
     return false;
-};
+}
 
 void Delegate::HandleSupportedLocationsUpdated()
 {
     mInstance->ClearSelectedLocations();
     mInstance->SetCurrentLocation(DataModel::Nullable<uint32_t>());
     mInstance->ClearProgress();
-};
+}
 
 bool Delegate::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
 {
@@ -43,7 +43,7 @@ bool Delegate::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStru
     }
 
     return false;
-};
+}
 
 bool Delegate::IsSelectedLocation(uint32_t aLocationId)
 {
@@ -61,7 +61,7 @@ bool Delegate::IsSelectedLocation(uint32_t aLocationId)
     }
 
     return false;
-};
+}
 
 bool Delegate::GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
@@ -79,7 +79,7 @@ bool Delegate::GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex
     }
 
     return false;
-};
+}
 
 bool Delegate::IsProgressElement(uint32_t aLocationId)
 {
