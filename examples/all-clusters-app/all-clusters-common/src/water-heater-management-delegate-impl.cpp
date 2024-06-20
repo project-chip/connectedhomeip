@@ -93,11 +93,15 @@ BoostStateEnum WaterHeaterManagementDelegate::GetBoostState()
 
 Protocols::InteractionModel::Status WaterHeaterManagementDelegate::HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat)
 {
+    ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleBoost");
+
     return Status::Success;
 }
 
 Protocols::InteractionModel::Status WaterHeaterManagementDelegate::HandleCancelBoost()
 {
+    ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleCancelBoost");
+
     return Status::Success;
 }
 
