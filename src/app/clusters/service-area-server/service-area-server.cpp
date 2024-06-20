@@ -37,13 +37,7 @@
 
 void MatterServiceAreaPluginServerInitCallback(){};
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ServiceArea;
-using namespace chip::app::Clusters::ServiceArea::Commands;
-using namespace chip::app::Clusters::ServiceArea::Attributes;
-using Status = Protocols::InteractionModel::Status;
+using Status = chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -53,10 +47,10 @@ namespace ServiceArea {
 // ****************************************************************************
 // Service Area Server Instance
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature) :
-    AttributeAccessInterface(MakeOptional(aEndpointId), Clusters::ServiceArea::Id),
-    CommandHandlerInterface(MakeOptional(aEndpointId), Clusters::ServiceArea::Id), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(Clusters::ServiceArea::Id), mFeature(aFeature)
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<Feature> aFeature) :
+    AttributeAccessInterface(MakeOptional(aEndpointId), Id),
+    CommandHandlerInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mEndpointId(aEndpointId),
+    mClusterId(Id), mFeature(aFeature)
 {
     ChipLogProgress(Zcl, "Service Area: Instance constructor");
     mDelegate->SetInstance(this);
@@ -73,9 +67,8 @@ CHIP_ERROR Instance::Init()
     ChipLogProgress(Zcl, "Service Area: INIT");
 
     // Check if the cluster has been selected in zap
-    VerifyOrReturnError(emberAfContainsServer(mEndpointId, chip::app::Clusters::ServiceArea::Id), CHIP_ERROR_INVALID_ARGUMENT,
-                        ChipLogError(Zcl, "Service Area: The cluster with Id %lu was not enabled in zap.",
-                                     long(chip::app::Clusters::ServiceArea::Id)));
+    VerifyOrReturnError(emberAfContainsServer(mEndpointId, Id), CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl, "Service Area: The cluster with Id %lu was not enabled in zap.", long(Id)));
 
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
 
@@ -96,43 +89,43 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     switch (aPath.mAttributeId)
     {
 
-    case ServiceArea::Attributes::SupportedLocations::Id: {
+    case Attributes::SupportedLocations::Id: {
         ChipLogProgress(Zcl, "Service Area: Read SupportedLocations");
         ReturnErrorOnFailure(ReadSupportedLocations(aEncoder));
         break;
     }
 
-    case ServiceArea::Attributes::SupportedMaps::Id: {
+    case Attributes::SupportedMaps::Id: {
         ChipLogProgress(Zcl, "Service Area: Read SupportedMaps");
         ReturnErrorOnFailure(ReadSupportedMaps(aEncoder));
         break;
     }
 
-    case ServiceArea::Attributes::SelectedLocations::Id: {
+    case Attributes::SelectedLocations::Id: {
         ChipLogProgress(Zcl, "Service Area: Read SelectedLocations");
         ReturnErrorOnFailure(ReadSelectedLocations(aEncoder));
         break;
     }
 
-    case ServiceArea::Attributes::CurrentLocation::Id: {
+    case Attributes::CurrentLocation::Id: {
         ChipLogProgress(Zcl, "Service Area: Read CurrentLocation");
         ReturnErrorOnFailure(aEncoder.Encode(GetCurrentLocation()));
         break;
     }
 
-    case ServiceArea::Attributes::EstimatedEndTime::Id: {
+    case Attributes::EstimatedEndTime::Id: {
         ChipLogProgress(Zcl, "Service Area: Read EstimatedEndTime");
         ReturnErrorOnFailure(aEncoder.Encode(GetEstimatedEndTime()));
         break;
     }
 
-    case ServiceArea::Attributes::Progress::Id: {
+    case Attributes::Progress::Id: {
         ChipLogProgress(Zcl, "Service Area: Read Progress");
         ReturnErrorOnFailure(ReadProgress(aEncoder));
         break;
     }
 
-    case ServiceArea::Attributes::FeatureMap::Id: {
+    case Attributes::FeatureMap::Id: {
         ReturnErrorOnFailure(aEncoder.Encode(mFeature.Raw()));
         break;
     }
@@ -172,7 +165,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 //*************************************************************************
 // attribute readers
 
-CHIP_ERROR Instance::ReadSupportedLocations(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::ReadSupportedLocations(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfSupportedLocations() == 0)
     {
@@ -193,7 +186,7 @@ CHIP_ERROR Instance::ReadSupportedLocations(chip::app::AttributeValueEncoder & a
     }
 }
 
-CHIP_ERROR Instance::ReadSupportedMaps(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::ReadSupportedMaps(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfSupportedMaps() == 0)
     {
@@ -214,7 +207,7 @@ CHIP_ERROR Instance::ReadSupportedMaps(chip::app::AttributeValueEncoder & aEncod
     }
 }
 
-CHIP_ERROR Instance::ReadSelectedLocations(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::ReadSelectedLocations(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfSelectedLocations() == 0)
     {
@@ -235,7 +228,7 @@ CHIP_ERROR Instance::ReadSelectedLocations(chip::app::AttributeValueEncoder & aE
     }
 }
 
-CHIP_ERROR Instance::ReadProgress(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::ReadProgress(AttributeValueEncoder & aEncoder)
 {
     if (mDelegate->GetNumberOfProgressElements() == 0)
     {
@@ -378,21 +371,21 @@ exit:
     // If the Status field is set to DuplicatedLocations, the StatusText field SHALL be an empty string.
     case SelectLocationsStatus::kUnsupportedLocation:
     case SelectLocationsStatus::kDuplicatedLocations:
-        response.statusText = chip::Optional(chip::CharSpan::fromCharString(""));
+        response.statusText = Optional(CharSpan::fromCharString(""));
         break;
 
     // If the Status field is set to Success, the StatusText field is optional.
     case SelectLocationsStatus::kSuccess:
         if (useLocationStatusText)
         {
-            response.statusText = chip::Optional(chip::CharSpan::fromCharString(locationStatusText));
+            response.statusText = Optional(CharSpan::fromCharString(locationStatusText));
         }
         break;
 
     // If the Status field is not set to Success, or UnsupportedLocation, or DuplicatedLocations,
     // the StatusText field SHALL include a vendor-defined error description
     default:
-        response.statusText = chip::Optional(chip::CharSpan::fromCharString(locationStatusText));
+        response.statusText = Optional(CharSpan::fromCharString(locationStatusText));
         break;
 
     } // end switch
@@ -439,7 +432,7 @@ exit:
     {
     // If the Status field is set to InvalidLocationList, the StatusText field SHALL be an empty string
     case SkipCurrentLocationStatus::kInvalidLocationList:
-        response.statusText = chip::Optional(chip::CharSpan::fromCharString(""));
+        response.statusText = Optional(CharSpan::fromCharString(""));
         break;
 
     case SkipCurrentLocationStatus::kSuccess:
@@ -448,7 +441,7 @@ exit:
     // If the Status field is not set to Success, or InvalidLocationList,
     // the StatusText field SHALL include a vendor defined error description
     default:
-        response.statusText = chip::Optional(chip::CharSpan::fromCharString(skipStatusText));
+        response.statusText = Optional(CharSpan::fromCharString(skipStatusText));
         break;
 
     } // end switch
@@ -1074,7 +1067,7 @@ bool Instance::ClearProgress()
 
 // attribute manipulators - Feature Map
 
-bool Instance::HasFeature(ServiceArea::Feature feature) const
+bool Instance::HasFeature(Feature feature) const
 {
     return mFeature.Has(feature);
 }
