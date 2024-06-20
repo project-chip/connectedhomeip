@@ -259,6 +259,9 @@ class HostApp(Enum):
         elif self == HostApp.ENERGY_MANAGEMENT:
             yield 'chip-energy-management-app'
             yield 'chip-energy-management-app.map'
+        elif self == HostApp.AIR_QUALITY_SENSOR:
+            yield 'chip-air-quality-sensor-app'
+            yield 'chip-air-quality-sensor-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -349,8 +352,10 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('is_ubsan=true')
 
         if use_dmalloc:
-            self.extra_gn_options.append('chip_config_memory_debug_checks=true')
-            self.extra_gn_options.append('chip_config_memory_debug_dmalloc=true')
+            self.extra_gn_options.append(
+                'chip_config_memory_debug_checks=true')
+            self.extra_gn_options.append(
+                'chip_config_memory_debug_dmalloc=true')
 
             # this is from `dmalloc -b -l DMALLOC_LOG -i 1 high`
             self.build_env['DMALLOC_OPTIONS'] = 'debug=0x4f4ed03,inter=1,log=DMALLOC_LOG'
@@ -390,7 +395,8 @@ class HostBuilder(GnBuilder):
         if minmdns_address_policy:
             if use_platform_mdns:
                 raise Exception('Address policy applies to minmdns only')
-            self.extra_gn_options.append('chip_minmdns_default_policy="%s"' % minmdns_address_policy)
+            self.extra_gn_options.append(
+                'chip_minmdns_default_policy="%s"' % minmdns_address_policy)
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
@@ -420,7 +426,8 @@ class HostBuilder(GnBuilder):
 
         if enable_test_event_triggers is not None:
             if 'EVSE' in enable_test_event_triggers:
-                self.extra_gn_options.append('chip_enable_energy_evse_trigger=true')
+                self.extra_gn_options.append(
+                    'chip_enable_energy_evse_trigger=true')
 
         if enable_dnssd_tests is not None:
             if enable_dnssd_tests:
@@ -435,13 +442,15 @@ class HostBuilder(GnBuilder):
         if app == HostApp.CERT_TOOL:
             # Certification only built for openssl
             if self.board == HostBoard.ARM64 and crypto_library == HostCryptoLibrary.MBEDTLS:
-                raise Exception("MbedTLS not supported for cross compiling cert tool")
+                raise Exception(
+                    "MbedTLS not supported for cross compiling cert tool")
             self.build_command = 'src/tools/chip-cert'
         elif app == HostApp.ADDRESS_RESOLVE:
             self.build_command = 'src/lib/address_resolve:address-resolve-tool'
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
-            self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
+            self.extra_gn_options.append(
+                'chip_project_config_include_dirs=["//config/python"]')
             self.build_command = 'chip-repl'
 
         if self.app == HostApp.SIMULATED_APP1:
@@ -529,7 +538,8 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.TESTS and self.use_coverage:
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
-            self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
+            self._Execute(['mkdir', '-p', self.coverage_dir],
+                          title="Create coverage output location")
 
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
@@ -552,8 +562,10 @@ class HostBuilder(GnBuilder):
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
             self._Execute(['lcov', '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
-                           '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_test.info'),
-                           '--output-file', os.path.join(self.coverage_dir, 'lcov_final.info')
+                           '--add-tracefile', os.path.join(
+                               self.coverage_dir, 'lcov_test.info'),
+                           '--output-file', os.path.join(
+                               self.coverage_dir, 'lcov_final.info')
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
