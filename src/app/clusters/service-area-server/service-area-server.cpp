@@ -35,8 +35,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-void MatterServiceAreaPluginServerInitCallback(){};
-
 using Status = chip::Protocols::InteractionModel::Status;
 
 namespace chip {
