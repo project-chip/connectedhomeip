@@ -195,7 +195,7 @@ class TC_IDM_1_2(MatterBaseTest):
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
         TH2 = new_fabric_admin.NewController(nodeId=112233)
 
-        devices = TH2.DiscoverCommissionableNodes(
+        devices = await TH2.DiscoverCommissionableNodes(
             filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=discriminator, stopOnFirst=False)
         # For some reason, the devices returned here aren't filtered, so filter ourselves
         device = next(filter(lambda d: d.commissioningMode == 2 and d.longDiscriminator == discriminator, devices))
