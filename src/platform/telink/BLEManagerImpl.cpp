@@ -46,7 +46,7 @@
 #include <zephyr/sys/util.h>
 
 extern "C" {
-extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t *bt_mac);
+extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
 }
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
