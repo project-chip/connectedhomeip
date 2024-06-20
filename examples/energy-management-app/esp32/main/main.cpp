@@ -98,6 +98,19 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 DeviceLayer::ESP32SecureCertDACProvider gSecureCertDACProvider;
 #endif // CONFIG_SEC_CERT_DAC_PROVIDER
 
+chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
+{
+#if CONFIG_SEC_CERT_DAC_PROVIDER
+    return &gSecureCertDACProvider;
+#elif CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    return &sFactoryDataProvider;
+#else // EXAMPLE_DAC_PROVIDER
+    return chip::Credentials::Examples::GetExampleDACProvider();
+#endif
+}
+
+} // namespace
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -119,19 +132,6 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
-{
-#if CONFIG_SEC_CERT_DAC_PROVIDER
-    return &gSecureCertDACProvider;
-#elif CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
-    return &sFactoryDataProvider;
-#else // EXAMPLE_DAC_PROVIDER
-    return chip::Credentials::Examples::GetExampleDACProvider();
-#endif
-}
-
-} // namespace
 
 void ApplicationInit()
 {
