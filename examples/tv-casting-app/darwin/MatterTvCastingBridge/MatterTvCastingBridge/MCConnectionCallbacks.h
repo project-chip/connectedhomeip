@@ -26,8 +26,10 @@
 @interface MCConnectionCallbacks : NSObject
 
 /**
- * @param connectionCompleteCallback is required.
- * @param commissionerDeclarationCallback is optional.
+ * @param connectionCompleteCallback (Required) The callback called when the connection process has ended, regardless of whether it was successful or not.
+ * @param commissionerDeclarationCallback (Optional) The callback called when the Client/Commissionee receives a CommissionerDeclaration message from the CastingPlayer/Commissioner. This callback is needed to support UDC features where a reply from the Commissioner is expected. It provides information indicating the Commissioner’s pre-commissioning state.
+ *
+ * For example: During CastingPlayer/Commissioner-Generated passcode commissioning, the Commissioner replies with a CommissionerDeclaration message with PasscodeDialogDisplayed and CommissionerPasscode set to true. Given these Commissioner state details, the client is expected to perform some actions and responf accrdingly.
  *
  * @return A new instance of MCConnectionCallbacks.
  */
@@ -35,12 +37,12 @@
            commissionerDeclarationCallback:(void (^_Nullable)(MCCommissionerDeclaration * _Nonnull))commissionerDeclarationCallback;
 
 /**
- * (Required) The callback called when the connection process has ended, regardless of whether it was successful or not.
+ * The callback called when the connection process has ended, regardless of whether it was successful or not.
  */
 @property void (^_Nullable connectionCompleteCallback)(NSError * _Nonnull);
 
 /**
- * (Optional) The callback called when the Client/Commissionee receives a CommissionerDeclaration
+ * The callback called when the Client/Commissionee receives a CommissionerDeclaration
  * message from the CastingPlayer/Commissioner. This callback is needed to support UDC features
  * where a reply from the Commissioner is expected. It provides information indicating the
  * Commissioner’s pre-commissioning state.

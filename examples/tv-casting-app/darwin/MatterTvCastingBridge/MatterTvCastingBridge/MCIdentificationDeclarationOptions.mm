@@ -18,7 +18,6 @@
 
 #import "core/IdentificationDeclarationOptions.h" // from tv-casting-common
 #import "core/Types.h" // from tv-casting-common
-#import "include/CHIPProjectAppConfig.h" // from tv-casting-common
 
 @interface MCIdentificationDeclarationOptions ()
 
@@ -134,23 +133,18 @@
 
 - (NSString *)description
 {
-    NSMutableString * sb = [NSMutableString stringWithFormat:@"MCIdentificationDeclarationOptions::noPasscode: %d\n", self.noPasscode];
-    [sb appendFormat:@"MCIdentificationDeclarationOptions::cdUponPasscodeDialog: %d\n", self.cdUponPasscodeDialog];
-    [sb appendFormat:@"MCIdentificationDeclarationOptions::commissionerPasscode: %d\n", self.commissionerPasscode];
+    NSMutableString * sb = [NSMutableString stringWithFormat:@"MCIdentificationDeclarationOptions::noPasscode:                %d\n", self.noPasscode];
+    [sb appendFormat:@"MCIdentificationDeclarationOptions::cdUponPasscodeDialog:      %d\n", self.cdUponPasscodeDialog];
+    [sb appendFormat:@"MCIdentificationDeclarationOptions::commissionerPasscode:      %d\n", self.commissionerPasscode];
     [sb appendFormat:@"MCIdentificationDeclarationOptions::commissionerPasscodeReady: %d\n", self.commissionerPasscodeReady];
-    [sb appendFormat:@"MCIdentificationDeclarationOptions::cancelPasscode: %d\n", self.cancelPasscode];
-    [sb appendString:@"MCIdentificationDeclarationOptions::targetAppInfos list: \n"];
+    [sb appendFormat:@"MCIdentificationDeclarationOptions::cancelPasscode:            %d\n", self.cancelPasscode];
+    [sb appendString:@"MCIdentificationDeclarationOptions::targetAppInfos list:\n"];
 
     for (MCTargetAppInfo * targetAppInfo in self.targetAppInfos) {
-        [sb appendFormat:@"\t\tTargetAppInfo - Vendor ID: %d, Product ID: %d\n", targetAppInfo.vendorId, targetAppInfo.productId];
+        [sb appendFormat:@"\t\t%@\n", [targetAppInfo description]];
     }
 
     return [sb copy];
-}
-
-- (void)logDetail
-{
-    ChipLogDetail(AppServer, "MCIdentificationDeclarationOptions::logDetail()\n%@", [self description]);
 }
 
 - (matter::casting::core::IdentificationDeclarationOptions)getCppIdentificationDeclarationOptions
@@ -165,11 +159,11 @@
     NSArray<MCTargetAppInfo *> * targetAppInfos = [self getTargetAppInfoList];
     for (MCTargetAppInfo * appInfo in targetAppInfos) {
         chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
-        targetAppInfo.vendorId = appInfo.vendorId;
-        targetAppInfo.productId = appInfo.productId;
+        targetAppInfo.vendorId = appInfo.getVendorId;
+        targetAppInfo.productId = appInfo.getProductId;
         CHIP_ERROR err = cppIdOptions.addTargetAppInfo(targetAppInfo);
         if (err != CHIP_NO_ERROR) {
-            ChipLogError(AppServer, "MCIdentificationDeclarationOptions.getCppIdentificationDeclarationOptions() Failed to add TargetAppInfo with Vendor ID: %d, Product ID: %d", appInfo.vendorId, appInfo.productId);
+            ChipLogError(AppServer, "MCIdentificationDeclarationOptions.getCppIdentificationDeclarationOptions() Failed to add TargetAppInfo: %@", appInfo.description);
         }
     }
 

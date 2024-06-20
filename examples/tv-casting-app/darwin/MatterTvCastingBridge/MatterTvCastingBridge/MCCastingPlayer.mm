@@ -18,6 +18,7 @@
 #import "MCCastingPlayer.h"
 
 #import "MCCastingApp.h"
+#import "MCCastingApp_Internal.h"
 #import "MCCommissionerDeclaration_Internal.h"
 #import "MCConnectionCallbacks.h"
 #import "MCEndpoint_Internal.h"
@@ -33,6 +34,8 @@
 @interface MCCastingPlayer ()
 
 @property (nonatomic, readwrite) matter::casting::memory::Strong<matter::casting::core::CastingPlayer> cppCastingPlayer;
+
+- (matter::casting::core::IdentificationDeclarationOptions)setupCppIdOptions:(MCIdentificationDeclarationOptions * _Nullable)identificationDeclarationOptions;
 
 @end
 
@@ -73,13 +76,9 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 
     dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
     dispatch_sync(workQueue, ^{
-        matter::casting::core::IdentificationDeclarationOptions cppIdOptions;
-        if (identificationDeclarationOptions != nil) {
-            cppIdOptions = [identificationDeclarationOptions getCppIdentificationDeclarationOptions];
-        } else {
-            ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks()client did not set the optional MCIdentificationDeclarationOptions using default options");
-        }
+        matter::casting::core::IdentificationDeclarationOptions cppIdOptions = [self setupCppIdOptions:identificationDeclarationOptions];
 
+        // Handles the connection complete event and calls the MCConnectionCallbacks connectionCompleteCallback callback provided by the Swift client. This callback is called by the cpp layer when the connection process has ended, regardless of whether it was successful or not.
         void (^connectCallback)(CHIP_ERROR, matter::casting::core::CastingPlayer *) = ^(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
             ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() connectCallback() called");
             dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
@@ -91,16 +90,18 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
                 }
             });
         };
+        // Handles the Commissioner Declaration event and calls the MCConnectionCallbacks commissionerDeclarationCallback callback provided by the Swift client. This callback is called by the cpp layer when the Commissionee receives a CommissionerDeclaration message from the CastingPlayer/Commissioner.
         void (^commissionerDeclarationCallback)(const chip::Transport::PeerAddress & source, const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) = ^(const chip::Transport::PeerAddress & source, const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) {
-            ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() commissionerDeclarationCallback() called with cpp CommissionerDeclaration");
+            ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() commissionerDeclarationCallback() called with cpp CommissionerDeclaration message");
             dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
             dispatch_async(clientQueue, ^{
                 if (connectionCallbacks.commissionerDeclarationCallback) {
+                    // convert cppCommissionerDeclaration to a shared_ptr<CommissionerDeclaration> and pass it to the client callback
                     auto cppCommissionerDeclarationPtr = std::make_shared<chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration>(cppCommissionerDeclaration);
                     MCCommissionerDeclaration * objcCommissionerDeclaration = [[MCCommissionerDeclaration alloc] initWithCppCommissionerDeclaration:cppCommissionerDeclarationPtr];
                     connectionCallbacks.commissionerDeclarationCallback(objcCommissionerDeclaration);
                 } else {
-                    ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() commissionerDeclarationCallback(), client failed to set the c commissionerDeclarationCallback() callback");
+                    ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() commissionerDeclarationCallback(), client failed to set the optional commissionerDeclarationCallback() callback");
                 }
             });
         };
@@ -119,10 +120,25 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return nil;
 }
 
+- (matter::casting::core::IdentificationDeclarationOptions)setupCppIdOptions:(MCIdentificationDeclarationOptions * _Nullable)identificationDeclarationOptions
+{
+    matter::casting::core::IdentificationDeclarationOptions cppIdOptions;
+    if (identificationDeclarationOptions != nil) {
+        cppIdOptions = [identificationDeclarationOptions getCppIdentificationDeclarationOptions];
+    } else {
+        ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks()->setupCppIdOptions() helper. Client did not set the optional MCIdentificationDeclarationOptions using default options");
+    }
+    return cppIdOptions;
+}
+
 - (NSError *)continueConnecting
 {
     ChipLogProgress(AppServer, "MCCastingPlayer.continueConnecting() called");
     VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning], [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE], ChipLogError(AppServer, "MCCastingPlayer.continueConnecting() MCCastingApp NOT running"));
+
+    ChipLogProgress(AppServer, "MCCastingPlayer.continueConnecting() calling MCCastingApp.updateCommissionableDataProvider()");
+    NSError * updateError = [[MCCastingApp getSharedInstance] updateCommissionableDataProvider];
+    VerifyOrReturnValue(updateError == nil, updateError, ChipLogError(AppServer, "MCCastingPlayer.continueConnecting() call to updateCommissionableDataProvider() failed with error: %@", updateError));
 
     __block CHIP_ERROR err = CHIP_NO_ERROR;
     dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
@@ -289,8 +305,9 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 - (void)logAllEndpoints
 {
     NSArray<MCEndpoint *> * endpointsArray = [self endpoints];
+    ChipLogDetail(AppServer, "MCCastingPlayer logAllEndpoints():");
     for (MCEndpoint * endpoint in endpointsArray) {
-        [endpoint logDetail];
+        ChipLogDetail(AppServer, "MCCastingPlayer MCEndpoint details: %@", [endpoint description]);
     }
 }
 

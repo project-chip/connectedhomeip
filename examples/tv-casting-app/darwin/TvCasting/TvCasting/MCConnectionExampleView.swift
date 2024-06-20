@@ -38,7 +38,7 @@ struct MCConnectionExampleView: View {
                 if selectedCastingPlayer?.supportsCommissionerGeneratedPasscode() == true {
                     Text("Verifying or Establishing Connection, using Casting Player/Commissioner-Generated passcode, with Casting Player: \(self.selectedCastingPlayer!.deviceName())\n\nEnter the passcode displayed on the Casting Player when prompted.").padding()
                 } else {
-                    Text("Sorry, the selected Casting Player does not support Casting Player/Commissioner-Generated passcode commissioning. \n\nCasting Player selected: \(self.selectedCastingPlayer!.deviceName()) \n\nRoute back to select a different Casting Player.").padding()
+                    Text("\(self.selectedCastingPlayer!.deviceName()) does not support Casting Player/Commissioner-Generated passcode commissioning. \n\nSelect a different Casting Player.").padding()
                 }
             } else {
                 Text("Verifying or Establishing Connection to Casting Player: \(self.selectedCastingPlayer!.deviceName())").padding()
@@ -74,7 +74,7 @@ struct MCConnectionExampleView: View {
                     self.Log.info("MCConnectionExampleView calling MCConnectionExampleViewModel.connect() with useCommissionerGeneratedPasscode: \(String(describing: self.useCommissionerGeneratedPasscode))")
                     viewModel.connect(selectedCastingPlayer: self.selectedCastingPlayer, useCommissionerGeneratedPasscode: self.useCommissionerGeneratedPasscode)
                 } else {
-                    self.Log.error("MCConnectionExampleView Sorry, the selected Casting Player does not support Commissioner-Generated passcode commissioning. Casting Player: \(self.selectedCastingPlayer!.deviceName()), Route back to try again.")
+                    self.Log.error("MCConnectionExampleView \(self.selectedCastingPlayer!.deviceName()) does not support Casting Player/Commissioner-Generated passcode commissioning. Select a different Casting Player.")
                 }
             } else {
                 self.Log.info("MCConnectionExampleView calling MCConnectionExampleViewModel.connect() with useCommissionerGeneratedPasscode: \(String(describing: self.useCommissionerGeneratedPasscode))")

@@ -69,30 +69,32 @@ class MCConnectionExampleViewModel: ObservableObject {
                         self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling displayPasscodeInputDialog()")
                         self.displayPasscodeInputDialog(on: topViewController, continueConnecting: { passcode in
                             self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Continuing to connect with user entered MCCastingPlayer/Commissioner-Generated passcode: \(passcode)")
-                            if let castingApp = MCCastingApp.getSharedInstance() {
-                                let commissionableData: MCCommissionableData = MCCommissionableData(
+
+                            // Update the CommissionableData in the client defined MCAppParametersDataSource with the user entered CastingPlayer/Commissioner-Generated setup passcode. This is mandatory for the Commissioner-Generated passcode commissioning flow since the commissioning session's PAKE verifier needs to be updated with the entered passcode. Get the singleton instane of the MCInitializationExample.
+                            let initializationExample = MCInitializationExample.shared
+                            self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback calling MCInitializationExample.getAppParametersDataSource()")
+                            if let dataSource = initializationExample.getAppParametersDataSource() {
+                                let newCommissionableData = MCCommissionableData(
                                     passcode: UInt32(passcode) ?? 0,
                                     discriminator: 0,
                                     spake2pIterationCount: 1000,
                                     spake2pVerifier: nil,
                                     spake2pSalt: nil
                                 )
-                                // Update the CommissionableData DataProvider with the user entered CastingPlayer/Commissioner-Generated
-                                // setup passcode. This is mandatory for the Commissioner-Generated passcode commissioning flow since
-                                // the commissioning session's PAKE verifier needs to be updated with the entered passcode.
-                                let errUpdate = castingApp.updateCommissionableDataProvider(commissionableData)
-                                if errUpdate != nil {
-                                    self.connectionStatus = "MCCastingPlayer.updateCommissionableDataProvider() failed with: \(String(describing: errUpdate)) \n\nRoute back and try again."
-                                    self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, MCCastingPlayer.updateCommissionableDataProvider() failed due to: \(errUpdate)")
-                                }
-                                self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling MCCastingPlayer.continueConnecting()")
-                                let errContinue = selectedCastingPlayer?.continueConnecting()
-                                if errContinue == nil {
-                                    self.connectionStatus = "Continuing to connect with user entered passcode: \(passcode)"
-                                } else {
-                                    self.connectionStatus = "Continue Connecting to Casting Player failed with: \(String(describing: errContinue)) \n\nRoute back and try again."
-                                    self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, MCCastingPlayer.continueConnecting() failed due to: \(errContinue)")
-                                }
+                                dataSource.update(newCommissionableData)
+                                self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Updated MCAppParametersDataSource instance with new MCCommissionableData.")
+                            } else {
+                                self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, InitializationExample.getAppParametersDataSource() failed")
+                                self.connectionStatus = "Failed to update the MCAppParametersDataSource with the user entered passcode: \n\nRoute back and try again."
+                            }
+
+                            self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling MCCastingPlayer.continueConnecting()")
+                            let errContinue = selectedCastingPlayer?.continueConnecting()
+                            if errContinue == nil {
+                                self.connectionStatus = "Continuing to connect with user entered passcode: \(passcode)"
+                            } else {
+                                self.connectionStatus = "Continue Connecting to Casting Player failed with: \(String(describing: errContinue)) \n\nRoute back and try again."
+                                self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, MCCastingPlayer.continueConnecting() failed due to: \(errContinue)")
                             }
                         }, cancelConnecting: {
                             self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Connection attempt cancelled by the user, calling MCCastingPlayer.stopConnecting()")
@@ -117,14 +119,14 @@ class MCConnectionExampleViewModel: ObservableObject {
 
         if useCommissionerGeneratedPasscode {
             identificationDeclarationOptions = MCIdentificationDeclarationOptions(commissionerPasscodeOnly: true)
-            targetAppInfo.vendorId = kDesiredEndpointVendorIdCGP
+            targetAppInfo.setVendorId(kDesiredEndpointVendorIdCGP)
             connectionCallbacks = MCConnectionCallbacks(
                 callbacks: connectionCompleteCallback,
                 commissionerDeclarationCallback: commissionerDeclarationCallback
             )
         } else {
             identificationDeclarationOptions = MCIdentificationDeclarationOptions()
-            targetAppInfo.vendorId = kDesiredEndpointVendorId
+            targetAppInfo.setVendorId(kDesiredEndpointVendorId)
             connectionCallbacks = MCConnectionCallbacks(
                 callbacks: connectionCompleteCallback,
                 commissionerDeclarationCallback: nil
@@ -132,7 +134,7 @@ class MCConnectionExampleViewModel: ObservableObject {
         }
 
         identificationDeclarationOptions.addTargetAppInfo(targetAppInfo)
-        identificationDeclarationOptions.logDetail()
+        self.Log.info("MCConnectionExampleViewModel.connect() MCIdentificationDeclarationOptions description: \n\(identificationDeclarationOptions.description)")
 
         self.Log.info("MCConnectionExampleViewModel.connect() calling MCCastingPlayer.verifyOrEstablishConnection()")
         let err = selectedCastingPlayer?.verifyOrEstablishConnection(with: connectionCallbacks, identificationDeclarationOptions: identificationDeclarationOptions)

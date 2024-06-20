@@ -33,7 +33,8 @@ struct TvCastingApp: App {
                     {
                         self.Log.info("CHIP_CASTING_SIMPLIFIED = 1")
                         
-                        let err: Error? = MCInitializationExample().initialize()
+                        let initializationExample = MCInitializationExample.shared
+                        let err: Error? = initializationExample.initialize()
                         if err != nil
                         {
                             self.Log.error("MCCastingApp initialization failed \(err)")

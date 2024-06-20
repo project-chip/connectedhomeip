@@ -17,6 +17,18 @@
 
 #import "MCTargetAppInfo.h"
 
+@interface MCTargetAppInfo ()
+
+// Private properties:
+
+/** Target Target Content Application Vendor ID, 0 means unspecified */
+@property (nonatomic) uint16_t vendorId;
+
+/** Target Target Content Application Product ID, 0 means unspecified */
+@property (nonatomic) uint16_t productId;
+
+@end
+
 @implementation MCTargetAppInfo
 
 - (instancetype)init
@@ -27,6 +39,46 @@
         _productId = 0;
     }
     return self;
+}
+
+- (instancetype)initWithVendorId:(uint16_t)vendorId
+{
+    return [self initWithVendorId:vendorId productId:0];
+}
+
+- (instancetype)initWithVendorId:(uint16_t)vendorId productId:(uint16_t)productId
+{
+    self = [super init];
+    if (self) {
+        _vendorId = vendorId;
+        _productId = productId;
+    }
+    return self;
+}
+
+- (uint16_t)getVendorId
+{
+    return _vendorId;
+}
+
+- (void)setVendorId:(uint16_t)vendorId
+{
+    _vendorId = vendorId;
+}
+
+- (uint16_t)getProductId
+{
+    return _productId;
+}
+
+- (void)setProductId:(uint16_t)productId
+{
+    _productId = productId;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"MCTargetAppInfo: vendorId: %d, productId: %d", self.vendorId, self.productId];
 }
 
 @end

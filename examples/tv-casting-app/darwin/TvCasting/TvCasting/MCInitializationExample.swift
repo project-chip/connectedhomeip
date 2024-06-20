@@ -19,6 +19,7 @@ import Foundation
 import Security
 import os.log
 
+// This class needs to be imlemented by the client.
 class MCAppParametersDataSource : NSObject, MCDataSource
 {    
     let Log = Logger(subsystem: "com.matter.casting",
@@ -47,8 +48,9 @@ class MCAppParametersDataSource : NSObject, MCDataSource
     * post-initialization. For example, when the Commissioner-Generated Passcode feature is used.
     */
     func update(_ newCommissionableData: MCCommissionableData) {
-        Log.info("MCAppParametersDataSource.updateCommissionableData()")
+        Log.info("MCAppParametersDataSource.update() - Before update, passcode: \(self.commissionableData.passcode)")
         self.commissionableData = newCommissionableData
+        Log.info("MCAppParametersDataSource.update() - After update, passcode: \(self.commissionableData.passcode)")
     }
     
     func clientQueue() -> DispatchQueue {
@@ -118,18 +120,39 @@ class MCAppParametersDataSource : NSObject, MCDataSource
     }
 }
 
+// This class is a singleton
 class MCInitializationExample {
+    static let shared = MCInitializationExample()
+
     let Log = Logger(subsystem: "com.matter.casting",
                      category: "MCInitializationExample")
+
+    // We store the client defined instance of the MCAppParametersDataSource passed to CastingApp.initialize(). MCAppParametersDataSource may need to be updated by the client in case of the Casting Player/Commissioner-Generated passcode commissioning flow.
+    private var appParametersDataSource: MCAppParametersDataSource?
+
+    private init() {
+        // Private initialization to ensure just one instance is created.
+    }
+
     func initialize() -> Error? {
         if let castingApp = MCCastingApp.getSharedInstance()
         {
-            Log.info("MCInitializationExample initialize() calling MCCastingApp.initializeWithDataSource()")
-            return castingApp.initialize(with: MCAppParametersDataSource())
+            Log.info("MCInitializationExample.initialize() calling MCCastingApp.initializeWithDataSource()")
+
+            let dataSource = MCAppParametersDataSource()
+            appParametersDataSource = dataSource
+
+            return castingApp.initialize(with: dataSource)
         }
         else
         {
             return NSError(domain: "com.matter.casting", code: Int(MATTER_ERROR_INCORRECT_STATE.code))
         }
+    }
+
+    // Getter method for the stored instance of MCAppParametersDataSource
+    func getAppParametersDataSource() -> MCAppParametersDataSource? {
+        Log.info("MCInitializationExample.getAppParametersDataSource()")
+        return appParametersDataSource
     }
 }

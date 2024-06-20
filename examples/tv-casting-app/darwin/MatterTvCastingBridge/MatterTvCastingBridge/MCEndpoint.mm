@@ -160,8 +160,4 @@
     return [NSString stringWithFormat:@"<MCEndpoint: identifier=%@, vendorId=%@, productId=%@>", [self identifier], [self vendorId], [self productId]];
 }
 
-- (void)logDetail
-{
-    ChipLogDetail(AppServer, "MCEndpoint Details: %@", [self description]);
-}
 @end

@@ -26,13 +26,30 @@
  */
 @interface MCTargetAppInfo : NSObject
 
-/** Target Target Content Application Vendor ID, 0 means unspecified */
-@property (nonatomic) uint16_t vendorId;
-
-/** Target Target Content Application Product ID, 0 means unspecified */
-@property (nonatomic) uint16_t productId;
+/** Initialize with vendorId and productId set to 0 */
 
 - (instancetype)init;
+
+/** Initialize with vendorId, productId defaults to 0 */
+- (instancetype _Nonnull)initWithVendorId:(uint16_t)vendorId;
+
+/** Initialize with vendorId and productId */
+- (instancetype _Nonnull)initWithVendorId:(uint16_t)vendorId productId:(uint16_t)productId NS_DESIGNATED_INITIALIZER;
+
+/** Vendor ID getter */
+- (uint16_t)getVendorId;
+
+/** Vendor ID setter */
+- (void)setVendorId:(uint16_t)vendorId;
+
+/** Product ID getter */
+- (uint16_t)getProductId;
+
+/** Product ID setter */
+- (void)setProductId:(uint16_t)productId;
+
+/** Description method */
+- (NSString * _Nonnull)description;
 
 @end
 

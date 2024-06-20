@@ -29,7 +29,6 @@ struct MCDiscoveryExampleView: View {
     // Enable navigating to the MCConnectionExampleView with or without the use
     // Commissioner-Generated Passcode (CGP) flag.
     @State private var navigateWithUseCGP = false
-    @State private var navigateWithoutUseCGP = false
     
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
@@ -64,26 +63,19 @@ struct MCDiscoveryExampleView: View {
                 ForEach(viewModel.displayedCastingPlayers) { castingPlayer in
                     ZStack {
                         NavigationLink(
-                            destination: MCConnectionExampleView(_selectedCastingPlayer: castingPlayer, _useCommissionerGeneratedPasscode: false),
-                            isActive: Binding(
-                                get: { navigateWithoutUseCGP && selectedCastingPlayer?.id == castingPlayer.id },
-                                set: { newValue in
-                                    if !newValue {
-                                        navigateWithoutUseCGP = false
-                                        selectedCastingPlayer = nil
-                                    }
-                                }
+                            destination: MCConnectionExampleView(
+                                _selectedCastingPlayer: selectedCastingPlayer,
+                                _useCommissionerGeneratedPasscode: navigateWithUseCGP
                             ),
-                            label: { EmptyView() }
-                        )
-                        NavigationLink(
-                            destination: MCConnectionExampleView(_selectedCastingPlayer: castingPlayer, _useCommissionerGeneratedPasscode: true),
                             isActive: Binding(
-                                get: { navigateWithUseCGP && selectedCastingPlayer?.id == castingPlayer.id },
+                                get: { selectedCastingPlayer?.id == castingPlayer.id },
                                 set: { newValue in
-                                    if !newValue {
+                                    if newValue {
+                                        selectedCastingPlayer = castingPlayer
                                         navigateWithUseCGP = false
+                                    } else {
                                         selectedCastingPlayer = nil
+                                        navigateWithUseCGP = false
                                     }
                                 }
                             ),
@@ -98,7 +90,7 @@ struct MCDiscoveryExampleView: View {
                             .border(Color.black, width: 1)
                             .onTapGesture {
                                 selectedCastingPlayer = castingPlayer
-                                navigateWithoutUseCGP = true
+                                navigateWithUseCGP = false
                             }
                             .gesture(
                                 LongPressGesture()

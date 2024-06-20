@@ -229,15 +229,14 @@ static const uint32_t kTargetPlayerDeviceType = 0x23;
     ChipLogProgress(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() called with desiredContentAppVendorId: %d", desiredContentAppVendorId);
 
     MCIdentificationDeclarationOptions * identificationDeclarationOptions = [[MCIdentificationDeclarationOptions alloc] init];
-    MCTargetAppInfo * targetAppInfo = [[MCTargetAppInfo alloc] init];
-    targetAppInfo.vendorId = desiredContentAppVendorId;
+    MCTargetAppInfo * targetAppInfo = [[MCTargetAppInfo alloc] initWithVendorId:desiredContentAppVendorId];
     BOOL success = [identificationDeclarationOptions addTargetAppInfo:targetAppInfo];
     if (success) {
         ChipLogProgress(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() Target app info added successfully");
     } else {
         ChipLogProgress(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() Failed to add target app info");
     }
-    [identificationDeclarationOptions logDetail];
+    ChipLogProgress(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() MCIdentificationDeclarationOptions: \n%@", [identificationDeclarationOptions description]);
 
     void (^connectionCompletionBlock)(NSError * _Nullable) = ^(NSError * _Nullable err) {
         dispatch_async(clientQueue, ^{

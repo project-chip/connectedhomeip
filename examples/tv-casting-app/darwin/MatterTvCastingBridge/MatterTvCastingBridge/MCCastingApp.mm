@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MCCastingApp.h"
+#import "MCCastingApp_Internal.h"
 
 #import "MCCommissionableDataProvider.h"
 #import "MCCommonCaseDeviceServerInitParamsProvider.h"
@@ -43,8 +43,7 @@
 // queue used to perform all work performed by the MatterTvCastingBridge
 @property (atomic) dispatch_queue_t workQueue;
 
-// used to update the commissionableDataProvider post initialization, this is necessary for the
-// Commissioner-Generated passcode commissioning feature.
+// Client defiend data source used to initialize the MCCommissionableDataProvider and, if needed, update the MCCommissionableDataProvider post initialization. This is necessary for the Commissioner-Generated passcode commissioning feature.
 @property (nonatomic, strong) id<MCDataSource> dataSource;
 
 @end
@@ -74,6 +73,7 @@
 - (NSError *)initializeWithDataSource:(id)dataSource
 {
     ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() called");
+    // store the data source provided by the client
     _dataSource = dataSource;
 
     // get the clientQueue
@@ -109,13 +109,9 @@
     return [MCErrorUtils NSErrorFromChipError:CHIP_NO_ERROR];
 }
 
-- (NSError *)updateCommissionableDataProvider:(MCCommissionableData *)newCommissionableData
+- (NSError *)updateCommissionableDataProvider
 {
     ChipLogProgress(AppServer, "MCCastingApp.UpdateCommissionableDataProvider() called");
-
-    if (_dataSource) {
-        [_dataSource update:newCommissionableData];
-    }
 
     _commissionableDataProvider = new matter::casting::support::MCCommissionableDataProvider();
     VerifyOrReturnValue(_commissionableDataProvider->Initialize(_dataSource) == CHIP_NO_ERROR,

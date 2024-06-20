@@ -50,7 +50,7 @@
  *     expected to perform some actions, detailed in the continueConnecting() API below, and then
  *     call the continueConnecting() API to complete the process.
  * @param timeout time (in sec) to keep the commissioning window open, if commissioning is required.
- *     Needs to be >= CastingPlayer.kMinCommissioningWindowTimeoutSec.
+ *     Needs to be >= MCCastingPlayer.kMinCommissioningWindowTimeoutSec.
  * @param identificationDeclarationOptions (Optional) Parameters in the IdentificationDeclaration
  *     message sent by the Commissionee to the Commissioner. These parameters specify the
  *     information relating to the requested commissioning session.
@@ -60,26 +60,45 @@
  *     list of optional parameters.
  *     <p>Furthermore, attributes (such as VendorId) describe the TargetApp/Endpoint that the client
  *     wants to interact with after commissioning. If this value is passed in,
- *    verifyOrEstablishConnection() will force UDC, in case the desired TargetApp is not found in
+ *     verifyOrEstablishConnection() will force UDC, in case the desired TargetApp is not found in
  *     the on-device cached information/CastingStore.
  * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
  */
-- (NSError *)verifyOrEstablishConnectionWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks
-                                              timeout:(long)timeout
-                     identificationDeclarationOptions:(MCIdentificationDeclarationOptions * _Nullable)identificationDeclarationOptions;
+- (NSError * _Nullable)verifyOrEstablishConnectionWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks
+                                                        timeout:(long)timeout
+                               identificationDeclarationOptions:(MCIdentificationDeclarationOptions * _Nullable)identificationDeclarationOptions;
 
 /**
- * @brief The simplified version of the verifyOrEstablishConnectionWithCallbacks() API above.
+ * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
+ *     commissioning session request. If the CastingApp does not have the nodeId and fabricIndex
+ *     of this CastingPlayer cached on disk, this will execute the User Directed Commissioning
+ *     (UDC) process by sending an IdentificationDeclaration message to the Commissioner. This method will run verifyOrEstablishConnection() with a default timeout of MCCastingPlayer.kMinCommissioningWindowTimeoutSec.
+ * @param identificationDeclarationOptions (Optional) Parameters in the IdentificationDeclaration
+ *     message sent by the Commissionee to the Commissioner. These parameters specify the
+ *     information relating to the requested commissioning session.
+ *     <p>For example: To invoke the CastingPlayer/Commissioner-Generated passcode commissioning
+ *     flow, the client would call this API with IdentificationDeclarationOptions containing
+ *     CommissionerPasscode set to true. See IdentificationDeclarationOptions.java for a complete
+ *     list of optional parameters.
+ *     <p>Furthermore, attributes (such as VendorId) describe the TargetApp/Endpoint that the client
+ *     wants to interact with after commissioning. If this value is passed in,
+ *     verifyOrEstablishConnection() will force UDC, in case the desired TargetApp is not found in
+ *     the on-device cached information/CastingStore.
  * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
+ * @see verifyOrEstablishConnectionWithCallbacks:timeout:identificationDeclarationOptions:
  */
-- (NSError *)verifyOrEstablishConnectionWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks
-                     identificationDeclarationOptions:(MCIdentificationDeclarationOptions * _Nullable)identificationDeclarationOptions;
+- (NSError * _Nullable)verifyOrEstablishConnectionWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks
+                               identificationDeclarationOptions:(MCIdentificationDeclarationOptions * _Nullable)identificationDeclarationOptions;
 
 /**
- * @brief The simplified version of the verifyOrEstablishConnectionWithCallbacks() API above.
+ * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
+ *     commissioning session request. If the CastingApp does not have the nodeId and fabricIndex
+ *     of this CastingPlayer cached on disk, this will execute the User Directed Commissioning
+ *     (UDC) process by sending an IdentificationDeclaration message to the Commissioner. This method will run verifyOrEstablishConnection() with a default timeout of MCCastingPlayer.kMinCommissioningWindowTimeoutSec and MCIdentificationDeclarationOptions initailized with the defualt values.
  * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
+ * @see verifyOrEstablishConnectionWithCallbacks:timeout:identificationDeclarationOptions:
  */
-- (NSError *)verifyOrEstablishConnectionWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks;
+- (NSError * _Nullable)verifyOrEstablishConnectionWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks;
 
 /**
  * @brief This is a continuation of the CastingPlayer/Commissioner-Generated passcode
@@ -97,13 +116,13 @@
  *     <p>5. Client prompted user to input Passcode from Commissioner.
  *     <p>6. Client has updated the CastingApp's MCCommissionableDataProvider with the user entered
  *     passcode via the following function call:
- *     MCCastingApp.updateCommissionableDataProvider(MCCommissionableData). This updates the
+ *     MCDataSource.update(MCCommissionableData). This updates the
  *     commissioning session's PAKE verifier with the user entered passcode.
  *     <p>Note: The same connectionCallbacks and commissioningWindowTimeoutSec parameters passed
  *     into verifyOrEstablishConnection() will be used.
  * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
  */
-- (NSError *)continueConnecting;
+- (NSError * _Nullable)continueConnecting;
 
 /**
  * @brief This cancels the CastingPlayer/Commissioner-Generated passcode commissioning flow
@@ -117,7 +136,7 @@
  *     VerifyOrEstablishConnection() API above since no connection is established.
  * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
  */
-- (NSError *)stopConnecting;
+- (NSError * _Nullable)stopConnecting;
 
 /**
  * @brief Sets the internal connection state of this MCCastingPlayer to "disconnected"
