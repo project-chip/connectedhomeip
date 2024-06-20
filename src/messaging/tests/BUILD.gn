@@ -32,6 +32,7 @@ static_library("helpers") {
   deps = [
     "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",

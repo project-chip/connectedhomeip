@@ -93,16 +93,12 @@ public:
     static constexpr System::Clock::Timeout kResponsiveIdleRetransTimeout   = System::Clock::Milliseconds32(10);
     static constexpr System::Clock::Timeout kResponsiveActiveRetransTimeout = System::Clock::Milliseconds32(10);
 
-    MessagingContext() :
-        mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT))
-    {}
-    // TODO Replace VerifyOrDie with Pigweed assert after transition app/tests to Pigweed.
-    // TODO Currently src/app/icd/server/tests is using MessagingConetext as dependency.
-    ~MessagingContext() { VerifyOrDie(mInitialized == false); }
+    MessagingContext() : mpData(new MessagingContextData()) {}
+    // TODO Currently src/app/icd/server/tests is using MessagingContext as dependency.
+    ~MessagingContext() { delete mpData; }
 
     // Whether Alice and Bob are initialized, must be called before Init
-    void ConfigInitializeNodes(bool initializeNodes) { mInitializeNodes = initializeNodes; }
+    void ConfigInitializeNodes(bool initializeNodes) { mpData->mInitializeNodes = initializeNodes; }
 
     /// Initialize the underlying layers and test suite pointer
     CHIP_ERROR Init(TransportMgrBase * transport, IOContext * io);
@@ -129,18 +125,18 @@ public:
     static const uint16_t kAliceKeyId   = 2;
     static const uint16_t kCharlieKeyId = 3;
     static const uint16_t kDavidKeyId   = 4;
-    GroupId GetFriendsGroupId() const { return mFriendsGroupId; }
+    GroupId GetFriendsGroupId() const { return mpData->mFriendsGroupId; }
 
-    SessionManager & GetSecureSessionManager() { return mSessionManager; }
-    Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
-    secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
-    FabricTable & GetFabricTable() { return mFabricTable; }
-    Crypto::DefaultSessionKeystore & GetSessionKeystore() { return mSessionKeystore; }
+    SessionManager & GetSecureSessionManager() { return mpData->mSessionManager; }
+    Messaging::ExchangeManager & GetExchangeManager() { return mpData->mExchangeManager; }
+    secure_channel::MessageCounterManager & GetMessageCounterManager() { return mpData->mMessageCounterManager; }
+    FabricTable & GetFabricTable() { return mpData->mFabricTable; }
+    Crypto::DefaultSessionKeystore & GetSessionKeystore() { return mpData->mSessionKeystore; }
 
-    FabricIndex GetAliceFabricIndex() { return mAliceFabricIndex; }
-    FabricIndex GetBobFabricIndex() { return mBobFabricIndex; }
-    const FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
-    const FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
+    FabricIndex GetAliceFabricIndex() { return mpData->mAliceFabricIndex; }
+    FabricIndex GetBobFabricIndex() { return mpData->mBobFabricIndex; }
+    const FabricInfo * GetAliceFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mAliceFabricIndex); }
+    const FabricInfo * GetBobFabric() { return mpData->mFabricTable.FindFabricWithIndex(mpData->mBobFabricIndex); }
 
     CHIP_ERROR CreateSessionBobToAlice(); // Creates PASE session
     CHIP_ERROR CreateCASESessionBobToAlice();
@@ -167,8 +163,8 @@ public:
     CHIP_ERROR CreateAliceFabric();
     CHIP_ERROR CreateBobFabric();
 
-    const Transport::PeerAddress & GetAliceAddress() { return mAliceAddress; }
-    const Transport::PeerAddress & GetBobAddress() { return mBobAddress; }
+    const Transport::PeerAddress & GetAliceAddress() { return mpData->mAliceAddress; }
+    const Transport::PeerAddress & GetBobAddress() { return mpData->mBobAddress; }
 
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
@@ -176,35 +172,44 @@ public:
     Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
     Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
 
-    System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
+    System::Layer & GetSystemLayer() { return mpData->mIOContext->GetSystemLayer(); }
 
 private:
-    bool mInitializeNodes = true;
-    bool mInitialized;
-    FabricTable mFabricTable;
+    struct MessagingContextData
+    {
+        MessagingContextData() :
+            mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
+            mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT))
+        {}
+        ~MessagingContextData() { EXPECT_FALSE(mInitialized); }
 
-    SessionManager mSessionManager;
-    Messaging::ExchangeManager mExchangeManager;
-    secure_channel::MessageCounterManager mMessageCounterManager;
-    IOContext * mIOContext;
-    TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
-    chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
-    chip::PersistentStorageOperationalKeystore mOpKeyStore;
-    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
-    chip::Crypto::DefaultSessionKeystore mSessionKeystore;
+        bool mInitializeNodes = true;
+        bool mInitialized;
+        FabricTable mFabricTable;
 
-    FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
-    FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
-    GroupId mFriendsGroupId       = 0x0101;
-    Transport::PeerAddress mAliceAddress;
-    Transport::PeerAddress mBobAddress;
-    Transport::PeerAddress mCharlieAddress;
-    Transport::PeerAddress mDavidAddress;
-    SessionHolder mSessionAliceToBob;
-    SessionHolder mSessionBobToAlice;
-    SessionHolder mSessionCharlieToDavid;
-    SessionHolder mSessionDavidToCharlie;
-    Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
+        SessionManager mSessionManager;
+        Messaging::ExchangeManager mExchangeManager;
+        secure_channel::MessageCounterManager mMessageCounterManager;
+        IOContext * mIOContext;
+        TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
+        chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
+        chip::PersistentStorageOperationalKeystore mOpKeyStore;
+        chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+        chip::Crypto::DefaultSessionKeystore mSessionKeystore;
+
+        FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
+        FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
+        GroupId mFriendsGroupId       = 0x0101;
+        Transport::PeerAddress mAliceAddress;
+        Transport::PeerAddress mBobAddress;
+        Transport::PeerAddress mCharlieAddress;
+        Transport::PeerAddress mDavidAddress;
+        SessionHolder mSessionAliceToBob;
+        SessionHolder mSessionBobToAlice;
+        SessionHolder mSessionCharlieToDavid;
+        SessionHolder mSessionDavidToCharlie;
+        Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
+    } * mpData;
 };
 
 // LoopbackMessagingContext enriches MessagingContext with an async loopback transport

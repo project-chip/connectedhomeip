@@ -22,7 +22,7 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
@@ -37,8 +37,6 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
-
-using TestContext = chip::Test::AppContext;
 
 using namespace chip;
 using namespace chip::app;
@@ -130,45 +128,11 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
 
 namespace {
 
-class TestServerCommandDispatch : public ::testing::Test
+class TestServerCommandDispatch : public chip::Test::AppContext
 {
-public:
-    // Performs shared setup for all tests in the test suite
-    static void SetUpTestSuite()
-    {
-        if (mpContext == nullptr)
-        {
-            mpContext = new TestContext();
-            ASSERT_NE(mpContext, nullptr);
-        }
-        mpContext->SetUpTestSuite();
-    }
-
-    // Performs shared teardown for all tests in the test suite
-    static void TearDownTestSuite()
-    {
-        mpContext->TearDownTestSuite();
-        if (mpContext != nullptr)
-        {
-            delete mpContext;
-            mpContext = nullptr;
-        }
-    }
-
 protected:
-    // Performs setup for each test in the suite
-    void SetUp() { mpContext->SetUp(); }
-
-    // Performs teardown for each test in the suite
-    void TearDown() { mpContext->TearDown(); }
-
-    static TestContext * mpContext;
-
-    // Helpers
-
-    static void TestDataResponseHelper(const EmberAfEndpointType * aEndpoint, bool aExpectSuccess);
+    void TestDataResponseHelper(const EmberAfEndpointType * aEndpoint, bool aExpectSuccess);
 };
-TestContext * TestServerCommandDispatch::mpContext = nullptr;
 
 // We want to send a TestSimpleArgumentRequest::Type, but get a
 // TestStructArrayArgumentResponse in return, so need to shadow the actual
@@ -181,7 +145,7 @@ struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentR
 TEST_F(TestServerCommandDispatch, TestNoHandler)
 {
     FakeRequest request;
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     request.arg1 = true;
 
@@ -203,12 +167,12 @@ TEST_F(TestServerCommandDispatch, TestNoHandler)
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 static const int kDescriptorAttributeArraySize = 254;
@@ -261,7 +225,7 @@ DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpointClusters3);
 void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType * aEndpoint, bool aExpectSuccess)
 {
     FakeRequest request;
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
     bool onFailureWasCalled = false;
@@ -307,13 +271,13 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_TRUE(onSuccessWasCalled == aExpectSuccess && onFailureWasCalled != aExpectSuccess);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     onSuccessWasCalled = false;
     onFailureWasCalled = false;
@@ -346,12 +310,12 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     };
 
     chip::Controller::ReadAttribute<Clusters::UnitTesting::Attributes::AcceptedCommandList::TypeInfo>(
-        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, readSuccessCb, readFailureCb);
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, readSuccessCb, readFailureCb);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_TRUE(onSuccessWasCalled && !onFailureWasCalled);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }

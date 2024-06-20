@@ -20,7 +20,7 @@
 #include <map>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
@@ -46,7 +46,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
 
-using TestContext = chip::Test::AppContext;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -72,41 +71,7 @@ constexpr AttributeId kTestBadAttribute =
 
 constexpr int kListAttributeItems = 5;
 
-class TestReadChunking : public ::testing::Test
-{
-public:
-    // Performs shared setup for all tests in the test suite
-    static void SetUpTestSuite()
-    {
-        if (mpContext == nullptr)
-        {
-            mpContext = new TestContext();
-            ASSERT_NE(mpContext, nullptr);
-        }
-        mpContext->SetUpTestSuite();
-    }
-
-    // Performs shared teardown for all tests in the test suite
-    static void TearDownTestSuite()
-    {
-        mpContext->TearDownTestSuite();
-        if (mpContext != nullptr)
-        {
-            delete mpContext;
-            mpContext = nullptr;
-        }
-    }
-
-protected:
-    // Performs setup for each test in the suite
-    void SetUp() { mpContext->SetUp(); }
-
-    // Performs teardown for each test in the suite
-    void TearDown() { mpContext->TearDown(); }
-
-    static TestContext * mpContext;
-};
-TestContext * TestReadChunking::mpContext = nullptr;
+using TestReadChunking = chip::Test::AppContext;
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
@@ -511,7 +476,7 @@ void TestMutableReadCallback::OnAttributeData(const app::ConcreteDataAttributePa
  */
 TEST_F(TestReadChunking, TestChunking)
 {
-    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
+    auto sessionHandle                   = GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -542,12 +507,12 @@ TEST_F(TestReadChunking, TestChunking)
 
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(850 + i));
 
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mBufferedCallback,
+        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
         EXPECT_TRUE(readCallback.mOnReportEnd);
 
         //
@@ -556,7 +521,7 @@ TEST_F(TestReadChunking, TestChunking)
         EXPECT_EQ(readCallback.mAttributeCount, 6 + ArraySize(GlobalAttributesNotInMetadata));
         readCallback.mAttributeCount = 0;
 
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
         //
         // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
@@ -573,7 +538,7 @@ TEST_F(TestReadChunking, TestChunking)
 // Similar to the test above, but for the list chunking feature.
 TEST_F(TestReadChunking, TestListChunking)
 {
-    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
+    auto sessionHandle                   = GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -617,12 +582,12 @@ TEST_F(TestReadChunking, TestListChunking)
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(
             static_cast<uint32_t>(maxPacketSize - packetSize));
 
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mBufferedCallback,
+        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         // Up until our packets are big enough, we might just keep getting
         // errors due to the inability to encode even a single IB in a packet.
@@ -654,7 +619,7 @@ TEST_F(TestReadChunking, TestListChunking)
             EXPECT_FALSE(readCallback.mBufferedCallback.mSawEmptyList);
         }
 
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
         //
         // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
@@ -674,7 +639,7 @@ TEST_F(TestReadChunking, TestListChunking)
 // Read an attribute that can never fit into the buffer. Result in an empty report, server should shutdown the transaction.
 TEST_F(TestReadChunking, TestBadChunking)
 {
-    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
+    auto sessionHandle                   = GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -695,12 +660,12 @@ TEST_F(TestReadChunking, TestBadChunking)
     TestReadCallback readCallback;
 
     {
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mBufferedCallback,
+        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         // The server should return an empty list as attribute data for the first report (for list chunking), and encodes nothing
         // (then shuts down the read handler) for the second report.
@@ -711,11 +676,11 @@ TEST_F(TestReadChunking, TestBadChunking)
         EXPECT_FALSE(readCallback.mOnReportEnd);
 
         // The server should shutted down, while the client is still alive (pending for the attribute data.)
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
     }
 
     // Sanity check
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }
@@ -725,7 +690,7 @@ TEST_F(TestReadChunking, TestBadChunking)
  */
 TEST_F(TestReadChunking, TestDynamicEndpoint)
 {
-    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
+    auto sessionHandle                   = GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -745,21 +710,21 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
 
     {
 
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mBufferedCallback,
+        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Subscribe);
         // Enable the new endpoint
         emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         EXPECT_TRUE(readCallback.mOnSubscriptionEstablished);
         readCallback.mAttributeCount = 0;
 
         emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
         // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
@@ -774,7 +739,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
         // Disable the new endpoint
         emberAfEndpointEnableDisable(kTestEndpointId4, false);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         // We may receive some attribute reports for descriptor cluster, but we do not care about it for now.
 
@@ -784,7 +749,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
         readCallback.mOnReportEnd    = false;
 
         emberAfEndpointEnableDisable(kTestEndpointId4, true);
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
         // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
@@ -797,9 +762,9 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
     chip::test_utils::SleepMillis(SecondsToMilliseconds(2));
 
     // Destroying the read client will terminate the subscription transaction.
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }
@@ -857,7 +822,7 @@ struct Instruction
     std::vector<AttributesList> attributesWithSameDataVersion;
 };
 
-void DriveIOUntilSubscriptionEstablished(TestContext * pContext, TestMutableReadCallback * callback)
+void DriveIOUntilSubscriptionEstablished(TestReadChunking * pContext, TestMutableReadCallback * callback)
 {
     callback->mOnReportEnd = false;
     pContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnSubscriptionEstablished; });
@@ -866,7 +831,7 @@ void DriveIOUntilSubscriptionEstablished(TestContext * pContext, TestMutableRead
     callback->mActionOn.clear();
 }
 
-void DriveIOUntilEndOfReport(TestContext * pContext, TestMutableReadCallback * callback)
+void DriveIOUntilEndOfReport(TestReadChunking * pContext, TestMutableReadCallback * callback)
 {
     callback->mOnReportEnd = false;
     pContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnReportEnd; });
@@ -895,7 +860,7 @@ void ExpectSameDataVersions(TestMutableReadCallback * callback, AttributesList a
     }
 }
 
-void DoTest(TestContext * pContext, TestMutableReadCallback * callback, Instruction instruction)
+void DoTest(TestReadChunking * pContext, TestMutableReadCallback * callback, Instruction instruction)
 {
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(instruction.chunksize);
 
@@ -919,7 +884,7 @@ void DoTest(TestContext * pContext, TestMutableReadCallback * callback, Instruct
 TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
 {
     using namespace TestSetDirtyBetweenChunksUtil;
-    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
+    auto sessionHandle                   = GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -953,7 +918,7 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
 
             gIterationCount = 1;
 
-            app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mBufferedCallback,
+            app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                        app::ReadClient::InteractionType::Subscribe);
 
             EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
@@ -965,11 +930,11 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                 // We are expected to miss attributes on kTestEndpointId during initial reports.
                 ChipLogProgress(DataManagement, "Case 1-1: Set dirty during priming report.");
                 readCallback.mActionOn[AttrOnEp5<Attr1>] = TouchAttrOp(AttrOnEp1<Attr1>);
-                DriveIOUntilSubscriptionEstablished(mpContext, &readCallback);
+                DriveIOUntilSubscriptionEstablished(this, &readCallback);
                 CheckValues(&readCallback, { { AttrOnEp1<Attr1>, 1 } });
 
                 ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
-                DoTest(mpContext, &readCallback, Instruction{ .chunksize = 2, .expectedValues = { { AttrOnEp1<Attr1>, 2 } } });
+                DoTest(this, &readCallback, Instruction{ .chunksize = 2, .expectedValues = { { AttrOnEp1<Attr1>, 2 } } });
             }
 
             // CASE 2 -- Set dirty during chunked report, the attribute is already dirty.
@@ -977,7 +942,7 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                 ChipLogProgress(DataManagement, "Case 2: Set dirty during chunked report by wildcard path.");
                 readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 3);
                 DoTest(
-                    mpContext, &readCallback,
+                    this, &readCallback,
                     Instruction{ .chunksize      = 2,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 2), WriteAttrOp(AttrOnEp5<Attr2>, 2),
                                                      WriteAttrOp(AttrOnEp5<Attr3>, 2) },
@@ -991,7 +956,7 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                                 "Case 3-1: Set dirty during chunked report by wildcard path -- new dirty attribute.");
                 readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 4);
                 DoTest(
-                    mpContext, &readCallback,
+                    this, &readCallback,
                     Instruction{ .chunksize      = 1,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 4), WriteAttrOp(AttrOnEp5<Attr2>, 4) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 4 }, { AttrOnEp5<Attr2>, 4 }, { AttrOnEp5<Attr3>, 4 } },
@@ -1002,7 +967,7 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                 app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(1);
                 readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr1>, 5);
                 DoTest(
-                    mpContext, &readCallback,
+                    this, &readCallback,
                     Instruction{ .chunksize      = 1,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr2>, 5), WriteAttrOp(AttrOnEp5<Attr3>, 5) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 5 }, { AttrOnEp5<Attr2>, 5 }, { AttrOnEp5<Attr3>, 5 } },
@@ -1032,18 +997,18 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
         {
             TestMutableReadCallback readCallback;
 
-            app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mBufferedCallback,
+            app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                        app::ReadClient::InteractionType::Subscribe);
 
             EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-            DriveIOUntilSubscriptionEstablished(mpContext, &readCallback);
+            DriveIOUntilSubscriptionEstablished(this, &readCallback);
 
             // Note, although the two attributes comes from the same cluster, they are generated by different interested paths.
             // In this case, we won't reset the path iterator.
             ChipLogProgress(DataManagement, "Case 1-1: Test set dirty during reports generated by concrete paths.");
             readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 4);
-            DoTest(mpContext, &readCallback,
+            DoTest(this, &readCallback,
                    Instruction{ .chunksize      = 1,
                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 3), WriteAttrOp(AttrOnEp5<Attr2>, 3),
                                                     WriteAttrOp(AttrOnEp5<Attr3>, 3) },
@@ -1051,16 +1016,16 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
 
             // The attribute failed to catch last report will be picked by this report.
             ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
-            DoTest(mpContext, &readCallback, { .chunksize = 1, .expectedValues = { { AttrOnEp5<Attr3>, 4 } } });
+            DoTest(this, &readCallback, { .chunksize = 1, .expectedValues = { { AttrOnEp5<Attr3>, 4 } } });
         }
     }
 
     chip::test_utils::SleepMillis(SecondsToMilliseconds(3));
 
     // Destroying the read client will terminate the subscription transaction.
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(1);
     emberAfClearDynamicEndpoint(0);
