@@ -56,16 +56,11 @@ class DeviceConformanceTests(BasicCompositionTests):
             record_problem(location, problem, ProblemSeverity.WARNING)
 
         ignore_attributes: dict[int, list[int]] = {}
-        ignore_features: dict[int, list[int]] = {}
         if ignore_in_progress:
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
             in_progress_attributes = {Clusters.BasicInformation.id: [0x15, 0x016],
                                       Clusters.PowerSource.id: [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A]}
             ignore_attributes.update(in_progress_attributes)
-            # The spec currently has an error on the power source features
-            # This should be removed once https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/7823 lands
-            in_progress_features = {Clusters.PowerSource.id: [(1 << 2), (1 << 3), (1 << 4), (1 << 5)]}
-            ignore_features.update(in_progress_features)
 
         if is_ci:
             # The network commissioning clusters on the CI select the features on the fly and end up non-conformant
@@ -116,15 +111,11 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if f not in self.xml_clusters[cluster_id].features.keys():
                         record_error(location=location, problem=f'Unknown feature with mask 0x{f:02x}')
                         continue
-                    if cluster_id in ignore_features and f in ignore_features[cluster_id]:
-                        continue
                     xml_feature = self.xml_clusters[cluster_id].features[f]
                     conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if not conformance_allowed(conformance_decision, allow_provisional):
                         record_error(location=location, problem=f'Disallowed feature with mask 0x{f:02x}')
                 for feature_mask, xml_feature in self.xml_clusters[cluster_id].features.items():
-                    if cluster_id in ignore_features and feature_mask in ignore_features[cluster_id]:
-                        continue
                     conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
                         record_error(
