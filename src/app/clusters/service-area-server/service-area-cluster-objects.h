@@ -147,7 +147,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         // Save the location name to buffer, so access and lifetime is controlled.
         // If aLocationName is not null, create a CharSpan to reference the text.
         // Make sure there is always a terminating character, mainly so we can get c_str for logging.
-        memset(mLocationNameBuffer, 0, sizeof(mLocationNameBuffer + 1));
+        memset(mLocationNameBuffer, 0, sizeof(mLocationNameBuffer));
 
         // this assumes locationInfo structure was created above, if appropriate
         if (!locationInfo.locationInfo.IsNull())
@@ -326,7 +326,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
         // Save the map name to the buffer so that access and lifetime is controlled.
         // Create a CharSpan reference the text.
         // Make sure there is always a terminating character, mainly so we can get c_str for logging.
-        memset(mMapNameBuffer, 0, sizeof(mMapNameBuffer + 1));
+        memset(mMapNameBuffer, 0, sizeof(mMapNameBuffer));
 
         if (aMapName.size() == 0)
         {
