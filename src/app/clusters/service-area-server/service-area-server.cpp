@@ -80,44 +80,31 @@ CHIP_ERROR Instance::Init()
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogDetail(Zcl, "Service Area: Reading");
+    ChipLogDetail(Zcl, "Service Area: Reading attribute");
 
     switch (aPath.mAttributeId)
     {
 
-    case Attributes::SupportedLocations::Id: {
-        ChipLogProgress(Zcl, "Service Area: Read SupportedLocations");
+    case Attributes::SupportedLocations::Id:
         return ReadSupportedLocations(aEncoder);
-    }
 
-    case Attributes::SupportedMaps::Id: {
-        ChipLogProgress(Zcl, "Service Area: Read SupportedMaps");
+    case Attributes::SupportedMaps::Id:
         return ReadSupportedMaps(aEncoder);
-    }
 
-    case Attributes::SelectedLocations::Id: {
-        ChipLogProgress(Zcl, "Service Area: Read SelectedLocations");
+    case Attributes::SelectedLocations::Id:
         return ReadSelectedLocations(aEncoder);
-    }
 
-    case Attributes::CurrentLocation::Id: {
-        ChipLogProgress(Zcl, "Service Area: Read CurrentLocation");
+    case Attributes::CurrentLocation::Id:
         return aEncoder.Encode(GetCurrentLocation());
-    }
 
-    case Attributes::EstimatedEndTime::Id: {
-        ChipLogProgress(Zcl, "Service Area: Read EstimatedEndTime");
+    case Attributes::EstimatedEndTime::Id:
         return aEncoder.Encode(GetEstimatedEndTime());
-    }
 
-    case Attributes::Progress::Id: {
-        ChipLogProgress(Zcl, "Service Area: Read Progress");
+    case Attributes::Progress::Id:
         return ReadProgress(aEncoder);
-    }
 
-    case Attributes::FeatureMap::Id: {
+    case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mFeature.Raw());
-    }
 
     default:
         ChipLogProgress(Zcl, "Service Area: Read unsupported attribute %u", aPath.mAttributeId);
