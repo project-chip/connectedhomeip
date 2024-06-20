@@ -1,0 +1,28 @@
+# MDNS Dictionary Constants extracted from connectedhomeip/src/lib/dnssd/minimal_mdns/core/Constants.h
+
+# QType
+A         = "\x01"
+NS        = "\x02"
+CNAME     = "\x05"
+SOA       = "\x06"
+NULLVALUE = "\x0A"
+WKS       = "\x0B"
+PTR       = "\x0C"
+HINFO     = "\x0D"
+MINFO     = "\x0E"
+MX        = "\x0F"
+TXT       = "\x10"
+ISDN      = "\x14"
+AAAA      = "\x1C"
+SRV       = "\x21"
+DNAM      = "\x27"
+ANY       = "\xFF"
+
+# QClass
+IN_UNICAST  = "\x80\x01"
+IN_FLUSH    = "\x80\x01"
+
+# ResourceType
+kAnswer     = "\x01"
+kAuthority  = "\x02"
+kAdditional = "\x03"

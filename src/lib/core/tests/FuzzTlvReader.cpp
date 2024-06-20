@@ -4,10 +4,17 @@
 #include "lib/core/TLV.h"
 #include "lib/core/TLVUtilities.h"
 
+using namespace chip;
+using namespace chip::TLV;
+
 using chip::TLV::TLVReader;
 
 static CHIP_ERROR FuzzIterator(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
+    aReader.GetLength();
+    aReader.GetTag();
+    aReader.GetType();
+
     return CHIP_NO_ERROR;
 }
 
