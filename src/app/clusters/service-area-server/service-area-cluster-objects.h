@@ -189,20 +189,30 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     }
 
     /**
+     * This is use for configuring the IsEqual method.
+     * If kIgnoreLocationId is set, the location IDs are ignored when checking for equality.
+     * If kIgnoreMapId is set, the map IDs are ignored when checking for equality.
+     */
+    enum class IsEqualConfig : uint8_t
+    {
+        kIgnoreLocationId = 0x1,
+        kIgnoreMapId      = 0x2,
+    };
+
+    /**
      * @brief Checks if the given LocationStructureWrapper is equal to this one.
      * @param aOther The location to compare with.
-     * @param aIgnoreLocationId If true, the location IDs are ignored when checking for equality.
-     * @param aIgnoreMapId If true, the map IDs are ignored when checking for equality.
+     * @param aConfig Set if the location IDs and/or the map IDs should be ignored when checking for equality.
      * @return True if both locations are equal. False otherwise.
      */
-    bool IsEqual(const LocationStructureWrapper & aOther, bool aIgnoreLocationId, bool aIgnoreMapId) const
+    bool IsEqual(const LocationStructureWrapper & aOther, BitMask<IsEqualConfig> aConfig) const
     {
-        if (!aIgnoreLocationId && (locationID != aOther.locationID))
+        if (!aConfig.Has(IsEqualConfig::kIgnoreLocationId) && (locationID != aOther.locationID))
         {
             return false;
         }
 
-        if (!aIgnoreMapId && (mapID != aOther.mapID))
+        if (!aConfig.Has(IsEqualConfig::kIgnoreMapId) && (mapID != aOther.mapID))
         {
             return false;
         }

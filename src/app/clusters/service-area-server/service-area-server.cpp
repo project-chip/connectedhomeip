@@ -557,15 +557,23 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
 {
     uint8_t locationIndex = 0;
     LocationStructureWrapper entry;
+    BitMask<LocationStructureWrapper::IsEqualConfig> config;
+
+    if (ignoreLocationId) {
+        config.Set(LocationStructureWrapper::IsEqualConfig::kIgnoreLocationId);
+    }
 
     // If the SupportedMaps attribute is not null, each entry in this list SHALL have a unique value for the combination of the
     // MapID and LocationInfo fields. If the SupportedMaps attribute is null, each entry in this list SHALL have a unique value for
     // the LocationInfo field.
-    bool isSupportedMapsNull = mDelegate->GetNumberOfSupportedMaps() == 0;
+    if (mDelegate->GetNumberOfSupportedMaps() == 0)
+    {
+        config.Set(LocationStructureWrapper::IsEqualConfig::kIgnoreMapId);
+    }
 
     while (mDelegate->GetSupportedLocationByIndex(locationIndex++, entry))
     {
-        if (aLocation.IsEqual(entry, ignoreLocationId, isSupportedMapsNull))
+        if (aLocation.IsEqual(entry, config))
         {
             return false;
         }
