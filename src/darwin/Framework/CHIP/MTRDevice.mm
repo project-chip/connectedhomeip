@@ -160,6 +160,7 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
+using namespace chip::Tracing::DarwinFramework;
 
 typedef void (^FirstReportHandler)(void);
 
@@ -1184,6 +1185,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     if (HadSubscriptionEstablishedOnce(_internalDeviceState)) {
         [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
     } else {
+        MATTER_LOG_METRIC_END(kMetricMTRDeviceInitialSubscriptionSetup, CHIP_NO_ERROR);
         [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
     }
 
@@ -2339,6 +2341,10 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             }
         });
     }
+
+    // This marks begin of initial subscription to the device (before CASE is established). The end is only marked after successfully setting
+    // up the subscription since it is always retried as long as the MTRDevice is kept running.
+    MATTER_LOG_METRIC_BEGIN(kMetricMTRDeviceInitialSubscriptionSetup);
 
     // Call directlyGetSessionForNode because the subscription setup already goes through the subscription pool queue
     [_deviceController
