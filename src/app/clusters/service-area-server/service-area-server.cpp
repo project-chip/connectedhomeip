@@ -730,7 +730,7 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
     while (mDelegate->GetSupportedMapByIndex(mapIndex++, entry))
     {
         // the name cannot be the same as an existing map
-        VerifyOrExit(!entry.DoesNameMatch(aMapName),
+        VerifyOrExit(!entry.IsNameEqual(aMapName),
                      ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.name_c_str()));
 
         //  Each entry in this list SHALL have a unique value for the MapID field.
@@ -780,7 +780,7 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
             continue; // don't check local modified map against it's own list entry
         }
 
-        VerifyOrExit(!entry.DoesNameMatch(newMapName),
+        VerifyOrExit(!entry.IsNameEqual(newMapName),
                      ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.name_c_str()));
 
         ++loopIndex;

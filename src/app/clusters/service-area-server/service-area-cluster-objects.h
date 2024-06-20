@@ -178,7 +178,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
      *
      * @note if locations structure's name field is null, returns false.
      */
-    bool DoesNameMatch(const CharSpan & aLocationName) const
+    bool IsNameEqual(const CharSpan & aLocationName) const
     {
         if (!locationInfo.locationInfo.IsNull())
         {
@@ -215,7 +215,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         if (!locationInfo.locationInfo.IsNull())
         {
 
-            if (!DoesNameMatch(aOther.locationInfo.locationInfo->locationName))
+            if (!IsNameEqual(aOther.locationInfo.locationInfo->locationName))
             {
                 return false;
             }
@@ -341,7 +341,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
      * @param[in] aMapName The name to compare.
      * @return true if the map structure's name field matches aMapName.
      */
-    bool DoesNameMatch(const CharSpan & aMapName) const { return name.data_equal(aMapName); }
+    bool IsNameEqual(const CharSpan & aMapName) const { return name.data_equal(aMapName); }
 
     /**
      * @brief Get the map name (for logging).
