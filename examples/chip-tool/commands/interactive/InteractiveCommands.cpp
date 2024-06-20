@@ -71,6 +71,7 @@ struct InteractiveServerResult
     bool mIsAsyncReport = false;
     uint16_t mTimeout   = 0;
     int mStatus         = EXIT_SUCCESS;
+    std::vector<std::string> mPendingResults;
     std::vector<std::string> mResults;
     std::vector<InteractiveServerResultLog> mLogs;
 
@@ -104,9 +105,20 @@ struct InteractiveServerResult
         mIsAsyncReport = isAsyncReport;
         mTimeout       = timeout;
 
-        if (mIsAsyncReport && mTimeout)
+        if (mIsAsyncReport)
         {
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(StartAsyncTimeout, reinterpret_cast<intptr_t>(this));
+            if (mTimeout)
+            {
+                chip::DeviceLayer::PlatformMgr().ScheduleWork(StartAsyncTimeout, reinterpret_cast<intptr_t>(this));
+            }
+
+            if (!mPendingResults.empty())
+            {
+                mResults = std::move(mPendingResults);
+            }
+
+            // Reset the pending results.
+            mPendingResults.clear();
         }
     }
 
@@ -123,6 +135,7 @@ struct InteractiveServerResult
         mIsAsyncReport = false;
         mTimeout       = 0;
         mStatus        = EXIT_SUCCESS;
+        mPendingResults.clear();
         mResults.clear();
         mLogs.clear();
     }
@@ -165,9 +178,24 @@ struct InteractiveServerResult
     void MaybeAddResult(const char * result)
     {
         auto lock = ScopedLock(mMutex);
-        VerifyOrReturn(mEnabled);
+        // If we are not waiting for a result it could be that a report came in *before* the command to wait for
+        // it has happened. The result is stored until the next command. If the next command is an async
+        // command the pending result would be promote to a valid result so it could be dispatched properly.
+        if (!mEnabled)
+        {
+            mPendingResults.push_back(result);
+            return;
+        }
 
         mResults.push_back(result);
+    }
+
+    bool HasResults()
+    {
+        auto lock = ScopedLock(mMutex);
+        VerifyOrReturnValue(mEnabled, false);
+
+        return !mResults.empty();
     }
 
     std::string AsJsonString()
@@ -337,7 +365,16 @@ bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
     }
 
     gInteractiveServerResult.Setup(isAsyncReport, timeout);
-    VerifyOrReturnValue(!isAsyncReport, true);
+
+    if (isAsyncReport)
+    {
+        if (gInteractiveServerResult.HasResults())
+        {
+            mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
+            gInteractiveServerResult.Reset();
+        }
+        return true;
+    }
 
     auto shouldStop = ParseCommand(msg, &gInteractiveServerResult.mStatus);
     mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
