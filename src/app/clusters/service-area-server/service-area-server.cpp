@@ -72,9 +72,7 @@ CHIP_ERROR Instance::Init()
 
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(mDelegate->Init());
-
-    return CHIP_NO_ERROR;
+    return mDelegate->Init();
 }
 
 //*************************************************************************
@@ -89,48 +87,40 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     case Attributes::SupportedLocations::Id: {
         ChipLogProgress(Zcl, "Service Area: Read SupportedLocations");
-        ReturnErrorOnFailure(ReadSupportedLocations(aEncoder));
-        break;
+        return ReadSupportedLocations(aEncoder);
     }
 
     case Attributes::SupportedMaps::Id: {
         ChipLogProgress(Zcl, "Service Area: Read SupportedMaps");
-        ReturnErrorOnFailure(ReadSupportedMaps(aEncoder));
-        break;
+        return ReadSupportedMaps(aEncoder);
     }
 
     case Attributes::SelectedLocations::Id: {
         ChipLogProgress(Zcl, "Service Area: Read SelectedLocations");
-        ReturnErrorOnFailure(ReadSelectedLocations(aEncoder));
-        break;
+        return ReadSelectedLocations(aEncoder);
     }
 
     case Attributes::CurrentLocation::Id: {
         ChipLogProgress(Zcl, "Service Area: Read CurrentLocation");
-        ReturnErrorOnFailure(aEncoder.Encode(GetCurrentLocation()));
-        break;
+        return aEncoder.Encode(GetCurrentLocation());
     }
 
     case Attributes::EstimatedEndTime::Id: {
         ChipLogProgress(Zcl, "Service Area: Read EstimatedEndTime");
-        ReturnErrorOnFailure(aEncoder.Encode(GetEstimatedEndTime()));
-        break;
+        return aEncoder.Encode(GetEstimatedEndTime());
     }
 
     case Attributes::Progress::Id: {
         ChipLogProgress(Zcl, "Service Area: Read Progress");
-        ReturnErrorOnFailure(ReadProgress(aEncoder));
-        break;
+        return ReadProgress(aEncoder);
     }
 
     case Attributes::FeatureMap::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature.Raw()));
-        break;
+        return aEncoder.Encode(mFeature.Raw());
     }
 
     default:
         ChipLogProgress(Zcl, "Service Area: Read unsupported attribute %u", aPath.mAttributeId);
-        break;
     }
 
     return CHIP_NO_ERROR;
@@ -142,22 +132,13 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case Commands::SelectLocations::Id:
-
-        CommandHandlerInterface::HandleCommand<Commands::SelectLocations::DecodableType>(
+        return CommandHandlerInterface::HandleCommand<Commands::SelectLocations::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSelectLocationsCmd(ctx, req); });
-        break;
 
     case Commands::SkipCurrentLocation::Id:
-
-        CommandHandlerInterface::HandleCommand<Commands::SkipCurrentLocation::DecodableType>(
+        return CommandHandlerInterface::HandleCommand<Commands::SkipCurrentLocation::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipCurrentLocationCmd(ctx); });
-        break;
-
-    default:
-        break;
     }
-
-    return;
 }
 
 //*************************************************************************
@@ -941,7 +922,6 @@ bool Instance::AddPendingProgressElement(uint32_t aLocationId)
                  ChipLogError(Zcl, "AddPendingProgressElement - not a supported location %u", aLocationId));
 
     // Each entry in this list SHALL have a unique value for the LocationID field.
-
     VerifyOrExit(!mDelegate->IsProgressElement(aLocationId),
                  ChipLogError(Zcl, "AddPendingProgressElement - progress element already exists for location %u", aLocationId));
 
