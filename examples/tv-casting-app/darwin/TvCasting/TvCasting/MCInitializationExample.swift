@@ -127,7 +127,9 @@ class MCInitializationExample {
     let Log = Logger(subsystem: "com.matter.casting",
                      category: "MCInitializationExample")
 
-    // We store the client defined instance of the MCAppParametersDataSource passed to CastingApp.initialize(). MCAppParametersDataSource may need to be updated by the client in case of the Casting Player/Commissioner-Generated passcode commissioning flow.
+    // We store the client defined instance of the MCAppParametersDataSource passed to CastingApp.initialize().
+    // MCAppParametersDataSource may need to be updated by the client in case of the Casting 
+    // Player/Commissioner-Generated passcode commissioning flow.
     private var appParametersDataSource: MCAppParametersDataSource?
 
     private init() {

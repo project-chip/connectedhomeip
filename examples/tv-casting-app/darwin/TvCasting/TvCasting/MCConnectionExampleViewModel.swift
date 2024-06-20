@@ -70,7 +70,11 @@ class MCConnectionExampleViewModel: ObservableObject {
                         self.displayPasscodeInputDialog(on: topViewController, continueConnecting: { passcode in
                             self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Continuing to connect with user entered MCCastingPlayer/Commissioner-Generated passcode: \(passcode)")
 
-                            // Update the CommissionableData in the client defined MCAppParametersDataSource with the user entered CastingPlayer/Commissioner-Generated setup passcode. This is mandatory for the Commissioner-Generated passcode commissioning flow since the commissioning session's PAKE verifier needs to be updated with the entered passcode. Get the singleton instane of the MCInitializationExample.
+                            // Update the CommissionableData in the client defined MCAppParametersDataSource with the user
+                            // entered CastingPlayer/Commissioner-Generated setup passcode. This is mandatory for the
+                            // Commissioner-Generated passcode commissioning flow since the commissioning session's PAKE
+                            // verifier needs to be updated with the entered passcode. Get the singleton instane of the
+                            // MCInitializationExample.
                             let initializationExample = MCInitializationExample.shared
                             self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback calling MCInitializationExample.getAppParametersDataSource()")
                             if let dataSource = initializationExample.getAppParametersDataSource() {

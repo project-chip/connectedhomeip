@@ -22,8 +22,8 @@
 
 /**
  * This class contains the optional parameters used in the IdentificationDeclaration Message, sent
- * by the Commissionee (CastingApp) to the Commissioner (CastingPlayer). The options specify information relating to the
- * requested UDC commissioning session.
+ * by the Commissionee (CastingApp) to the Commissioner (CastingPlayer). The options specify
+ * information relating to the requested UDC commissioning session.
  */
 @interface MCIdentificationDeclarationOptions : NSObject
 

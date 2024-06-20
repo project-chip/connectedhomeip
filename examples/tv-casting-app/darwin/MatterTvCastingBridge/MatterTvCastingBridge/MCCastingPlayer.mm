@@ -78,7 +78,9 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     dispatch_sync(workQueue, ^{
         matter::casting::core::IdentificationDeclarationOptions cppIdOptions = [self setupCppIdOptions:identificationDeclarationOptions];
 
-        // Handles the connection complete event and calls the MCConnectionCallbacks connectionCompleteCallback callback provided by the Swift client. This callback is called by the cpp layer when the connection process has ended, regardless of whether it was successful or not.
+        // Handles the connection complete event and calls the MCConnectionCallbacks connectionCompleteCallback callback provided by
+        // the Swift client. This callback is called by the cpp layer when the connection process has ended, regardless of whether it
+        // was successful or not.
         void (^connectCallback)(CHIP_ERROR, matter::casting::core::CastingPlayer *) = ^(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
             ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() connectCallback() called");
             dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
@@ -90,15 +92,20 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
                 }
             });
         };
-        // Handles the Commissioner Declaration event and calls the MCConnectionCallbacks commissionerDeclarationCallback callback provided by the Swift client. This callback is called by the cpp layer when the Commissionee receives a CommissionerDeclaration message from the CastingPlayer/Commissioner.
-        void (^commissionerDeclarationCallback)(const chip::Transport::PeerAddress & source, const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) = ^(const chip::Transport::PeerAddress & source, const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) {
+        // Handles the Commissioner Declaration event and calls the MCConnectionCallbacks commissionerDeclarationCallback callback
+        // provided by the Swift client. This callback is called by the cpp layer when the Commissionee receives a
+        // CommissionerDeclaration message from the CastingPlayer/Commissioner.
+        void (^commissionerDeclarationCallback)(const chip::Transport::PeerAddress & source, const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) = ^(const chip::Transport::PeerAddress &
+                                                                                                                                                                                                           source,
+            const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) {
             ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() commissionerDeclarationCallback() called with cpp CommissionerDeclaration message");
             dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
             dispatch_async(clientQueue, ^{
                 if (connectionCallbacks.commissionerDeclarationCallback) {
                     // convert cppCommissionerDeclaration to a shared_ptr<CommissionerDeclaration> and pass it to the client callback
                     auto cppCommissionerDeclarationPtr = std::make_shared<chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration>(cppCommissionerDeclaration);
-                    MCCommissionerDeclaration * objcCommissionerDeclaration = [[MCCommissionerDeclaration alloc] initWithCppCommissionerDeclaration:cppCommissionerDeclarationPtr];
+                    MCCommissionerDeclaration * objcCommissionerDeclaration = [[MCCommissionerDeclaration alloc]
+                        initWithCppCommissionerDeclaration:cppCommissionerDeclarationPtr];
                     connectionCallbacks.commissionerDeclarationCallback(objcCommissionerDeclaration);
                 } else {
                     ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() commissionerDeclarationCallback(), client failed to set the optional commissionerDeclarationCallback() callback");
@@ -134,7 +141,8 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 - (NSError *)continueConnecting
 {
     ChipLogProgress(AppServer, "MCCastingPlayer.continueConnecting() called");
-    VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning], [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE], ChipLogError(AppServer, "MCCastingPlayer.continueConnecting() MCCastingApp NOT running"));
+    VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning], [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE],
+        ChipLogError(AppServer, "MCCastingPlayer.continueConnecting() MCCastingApp NOT running"));
 
     ChipLogProgress(AppServer, "MCCastingPlayer.continueConnecting() calling MCCastingApp.updateCommissionableDataProvider()");
     NSError * updateError = [[MCCastingApp getSharedInstance] updateCommissionableDataProvider];
@@ -146,7 +154,8 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
         err = _cppCastingPlayer->ContinueConnecting();
     });
     if (err != CHIP_NO_ERROR) {
-        ChipLogError(AppServer, "MCCastingPlayer.continueConnecting() call to cppCastingPlayer->ContinueConnecting() failed due to %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "MCCastingPlayer.continueConnecting() call to cppCastingPlayer->ContinueConnecting() failed due to %" CHIP_ERROR_FORMAT,
+            err.Format());
         return [MCErrorUtils NSErrorFromChipError:err];
     }
     return nil;
@@ -163,7 +172,8 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
         err = _cppCastingPlayer->StopConnecting();
     });
     if (err != CHIP_NO_ERROR) {
-        ChipLogError(AppServer, "MCCastingPlayer.continueConnecting() call to cppCastingPlayer->StopConnecting() failed due to %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "MCCastingPlayer.continueConnecting() call to cppCastingPlayer->StopConnecting() failed due to %" CHIP_ERROR_FORMAT,
+            err.Format());
         return [MCErrorUtils NSErrorFromChipError:err];
     }
     return nil;
@@ -205,7 +215,8 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 - (NSString * _Nonnull)description
 {
     return [NSString stringWithFormat:@"%@ with Product ID: %hu and Vendor ID: %hu. Resolved IPAddr?: %@. Supports Commissioner-Generated Passcode?: %@.",
-                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO", self.supportsCommissionerGeneratedPasscode ? @"YES" : @"NO"];
+                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO",
+                     self.supportsCommissionerGeneratedPasscode ? @"YES" : @"NO"];
 }
 
 - (NSString * _Nonnull)identifier

@@ -72,7 +72,9 @@
  * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
  *     commissioning session request. If the CastingApp does not have the nodeId and fabricIndex
  *     of this CastingPlayer cached on disk, this will execute the User Directed Commissioning
- *     (UDC) process by sending an IdentificationDeclaration message to the Commissioner. This method will run verifyOrEstablishConnection() with a default timeout of MCCastingPlayer.kMinCommissioningWindowTimeoutSec.
+ *     (UDC) process by sending an IdentificationDeclaration message to the Commissioner. This method
+ *     will run verifyOrEstablishConnection() with a default timeout of
+ *     MCCastingPlayer.kMinCommissioningWindowTimeoutSec.
  * @param identificationDeclarationOptions (Optional) Parameters in the IdentificationDeclaration
  *     message sent by the Commissionee to the Commissioner. These parameters specify the
  *     information relating to the requested commissioning session.
@@ -94,7 +96,10 @@
  * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
  *     commissioning session request. If the CastingApp does not have the nodeId and fabricIndex
  *     of this CastingPlayer cached on disk, this will execute the User Directed Commissioning
- *     (UDC) process by sending an IdentificationDeclaration message to the Commissioner. This method will run verifyOrEstablishConnection() with a default timeout of MCCastingPlayer.kMinCommissioningWindowTimeoutSec and MCIdentificationDeclarationOptions initailized with the defualt values.
+ *     (UDC) process by sending an IdentificationDeclaration message to the Commissioner. This method
+ *     will run verifyOrEstablishConnection() with a default timeout of
+ *     MCCastingPlayer.kMinCommissioningWindowTimeoutSec and MCIdentificationDeclarationOptions
+ *     initailized with the defualt values.
  * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
  * @see verifyOrEstablishConnectionWithCallbacks:timeout:identificationDeclarationOptions:
  */
