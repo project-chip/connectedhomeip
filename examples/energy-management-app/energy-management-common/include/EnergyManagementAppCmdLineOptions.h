@@ -32,4 +32,3 @@ chip::BitMask<Feature> GetFeatureMapFromCmdLine();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
