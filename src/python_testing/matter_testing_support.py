@@ -766,11 +766,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
 
-    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
+    async def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
         try:
-            commissioning_params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
-                                                                    discriminator=rnd_discriminator, option=1)
+            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
+                                                                          discriminator=rnd_discriminator, option=1)
             params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
             return params
 
@@ -1522,10 +1522,10 @@ class CommissionDeviceTest(MatterBaseTest):
                          (conf.root_of_trust_index, conf.fabric_id, node_id))
             logging.info("Commissioning method: %s" % conf.commissioning_method)
 
-            if not self._commission_device(commission_idx):
+            if not asyncio.run(self._commission_device(commission_idx)):
                 raise signals.TestAbortAll("Failed to commission node")
 
-    def _commission_device(self, i) -> bool:
+    async def _commission_device(self, i) -> bool:
         dev_ctrl = self.default_controller
         conf = self.matter_test_config
 
@@ -1541,7 +1541,7 @@ class CommissionDeviceTest(MatterBaseTest):
 
         if conf.commissioning_method == "on-network":
             try:
-                dev_ctrl.CommissionOnNetwork(
+                await dev_ctrl.CommissionOnNetwork(
                     nodeId=conf.dut_node_ids[i],
                     setupPinCode=info.passcode,
                     filterType=info.filter_type,
@@ -1553,7 +1553,7 @@ class CommissionDeviceTest(MatterBaseTest):
                 return False
         elif conf.commissioning_method == "ble-wifi":
             try:
-                dev_ctrl.CommissionWiFi(
+                await dev_ctrl.CommissionWiFi(
                     info.filter_value,
                     info.passcode,
                     conf.dut_node_ids[i],
@@ -1567,7 +1567,7 @@ class CommissionDeviceTest(MatterBaseTest):
                 return False
         elif conf.commissioning_method == "ble-thread":
             try:
-                dev_ctrl.CommissionThread(
+                await dev_ctrl.CommissionThread(
                     info.filter_value,
                     info.passcode,
                     conf.dut_node_ids[i],
@@ -1581,7 +1581,7 @@ class CommissionDeviceTest(MatterBaseTest):
         elif conf.commissioning_method == "on-network-ip":
             try:
                 logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
-                dev_ctrl.CommissionIP(
+                await dev_ctrl.CommissionIP(
                     ipaddr=conf.commissionee_ip_address_just_for_testing,
                     setupPinCode=info.passcode, nodeid=conf.dut_node_ids[i]
                 )

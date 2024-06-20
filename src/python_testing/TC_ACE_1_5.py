@@ -51,10 +51,10 @@ class TC_ACE_1_5(MatterBaseTest):
         self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
                                                   paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
-        params = self.openCommissioningWindow(self.th1, self.dut_node_id)
+        params = await self.openCommissioningWindow(self.th1, self.dut_node_id)
         self.print_step(2, "TH1 opens the commissioning window on the DUT")
 
-        self.th2.CommissionOnNetwork(
+        await self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
         logging.info('Commissioning complete done. Successful.')
