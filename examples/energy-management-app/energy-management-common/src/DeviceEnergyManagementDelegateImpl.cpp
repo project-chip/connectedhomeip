@@ -76,7 +76,8 @@ void DeviceEnergyManagementDelegate::SetDEMManufacturerDelegate(
  *   6) generate a PowerAdjustEnd event with cause NormalCompletion
  *   7) if necessary, update the forecast with new expected end time
  */
-Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS, AdjustmentCauseEnum cause)
+Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
+                                                          AdjustmentCauseEnum cause)
 {
     bool sendEvent = false;
 
@@ -362,7 +363,8 @@ Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t req
 
     if (mpDEMManufacturerDelegate != nullptr)
     {
-        CHIP_ERROR err = mpDEMManufacturerDelegate->HandleDeviceEnergyManagementStartTimeAdjustRequest(requestedStartTimeUtc, cause);
+        CHIP_ERROR err =
+            mpDEMManufacturerDelegate->HandleDeviceEnergyManagementStartTimeAdjustRequest(requestedStartTimeUtc, cause);
         if (err != CHIP_NO_ERROR)
         {
             // Reset state

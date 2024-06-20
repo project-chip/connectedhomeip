@@ -29,7 +29,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 
-static constexpr uint16_t MAX_SLOTS = 10;
+static constexpr uint16_t MAX_SLOTS             = 10;
 static constexpr uint16_t MAX_POWER_ADJUSTMENTS = 5;
 
 static chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::Type sSlots[MAX_SLOTS];
