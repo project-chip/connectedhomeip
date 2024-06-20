@@ -37,6 +37,7 @@ namespace WaterHeaterManagement {
 class Delegate
 {
 public:
+    Delegate() = default;
     virtual ~Delegate() = default;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
@@ -54,7 +55,7 @@ public:
      *
      * @return  Success if the boost command is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
-    virtual Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat);
+    virtual Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat) = 0;
 
     /**
      * @brief Delegate should implement a handler to cancel a boost command.

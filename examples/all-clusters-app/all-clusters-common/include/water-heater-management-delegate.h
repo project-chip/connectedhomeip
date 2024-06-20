@@ -32,7 +32,8 @@ namespace WaterHeaterManagement {
 class WaterHeaterManagementDelegate : public WaterHeaterManagement::Delegate
 {
 public:
-    ~WaterHeaterManagementDelegate();
+    WaterHeaterManagementDelegate() = default;
+    virtual ~WaterHeaterManagementDelegate() = default;
 
     /**
      * @brief Delegate should implement a handler to start boosting the water temperature as required.

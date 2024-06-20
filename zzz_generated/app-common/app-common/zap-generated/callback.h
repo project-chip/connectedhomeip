@@ -5880,18 +5880,6 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
 /**
- * @brief Water Heater Management Cluster Boost Command callback (from client)
- */
-bool emberAfWaterHeaterManagementClusterBoostCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WaterHeaterManagement::Commands::Boost::DecodableType & commandData);
-/**
- * @brief Water Heater Management Cluster CancelBoost Command callback (from client)
- */
-bool emberAfWaterHeaterManagementClusterCancelBoostCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WaterHeaterManagement::Commands::CancelBoost::DecodableType & commandData);
-/**
  * @brief Demand Response Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
  */
 bool emberAfDemandResponseLoadControlClusterRegisterLoadControlProgramRequestCallback(
