@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,29 +49,27 @@ static chip::ArgParser::OptionSet sCmdLineOptions = {
     "-f, --featureSet <value>" // option help text
 };
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DeviceEnergyManagement {
+
 // Keep track of the parsed featureMap option
-static chip::BitMask<DeviceEnergyManagement::Feature>
-    sFeatureMap(DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
-                DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
-                DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
-                DeviceEnergyManagement::Feature::kConstraintBasedAdjustment);
+static chip::BitMask<Feature>
+    sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
+                Feature::kStateForecastReporting, Feature::kStartTimeAdjustment,
+                Feature::kPausable, Feature::kForecastAdjustment,
+                Feature::kConstraintBasedAdjustment);
 
-void ApplicationInit()
-{
-    ChipLogDetail(AppServer, "Energy Management App: ApplicationInit()");
-    EvseApplicationInit();
-}
-
-void ApplicationShutdown()
-{
-    ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
-    EvseApplicationShutdown();
-}
-
-chip::BitMask<DeviceEnergyManagement::Feature> GetFeatureMap()
+chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 {
     return sFeatureMap;
 }
+
+} // namespace DeviceEnergyManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 static uint32_t ParseNumber(const char * pString)
 {
@@ -86,6 +84,18 @@ static uint32_t ParseNumber(const char * pString)
     }
 
     return num;
+}
+
+void ApplicationInit()
+{
+    ChipLogDetail(AppServer, "Energy Management App: ApplicationInit()");
+    EvseApplicationInit();
+}
+
+void ApplicationShutdown()
+{
+    ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
+    EvseApplicationShutdown();
 }
 
 static bool FeatureMapOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,

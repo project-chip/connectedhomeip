@@ -21,4 +21,15 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/BitMask.h>
 
-chip::BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature> GetFeatureMap();
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DeviceEnergyManagement {
+
+chip::BitMask<Feature> GetFeatureMapFromCmdLine();
+
+} // namespace DeviceEnergyManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+

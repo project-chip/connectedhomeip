@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ public:
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
-    virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause) override;
+    virtual Status PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS, AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Make the ESA end the active power adjustment session & return to normal (or idle) power levels.
@@ -81,7 +81,7 @@ public:
      * @return Success if the StartTime in the Forecast is updated, otherwise the command SHALL be rejected with appropriate
      * IM_Status.
      */
-    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) override;
+    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTimeUtc, AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Handler for PauseRequest command
@@ -96,7 +96,7 @@ public:
      * @param duration Duration that the ESA SHALL be paused for.
      * @return  Success if the ESA is paused, otherwise returns other IM_Status.
      */
-    virtual Status PauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) override;
+    virtual Status PauseRequest(const uint32_t durationS, AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Handler for ResumeRequest command
@@ -236,8 +236,8 @@ private:
     ESATypeEnum mEsaType;
     bool mEsaCanGenerate;
     ESAStateEnum mEsaState;
-    int64_t mAbsMinPower;
-    int64_t mAbsMaxPower;
+    int64_t mAbsMinPowerMw;
+    int64_t mAbsMaxPowerMw;
     OptOutStateEnum mOptOutState;
 
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustCapabilityStruct;
@@ -281,13 +281,10 @@ private:
     bool mPowerAdjustmentInProgress;
 
     // Keep track of when that PowerAdjustment started
-    uint32_t mPowerAdjustmentStartTime;
+    uint32_t mPowerAdjustmentStartTimeUtc;
 
     // Keep track whether a PauseRequest is in progress
     bool mPauseRequestInProgress;
-
-    // Keep track of when that PauseRequest started
-    uint32_t mPauseRequestStartTime;
 };
 
 } // namespace DeviceEnergyManagement

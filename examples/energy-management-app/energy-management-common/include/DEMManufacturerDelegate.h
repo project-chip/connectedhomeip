@@ -44,7 +44,7 @@ public:
     // The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
     virtual int64_t GetApproxEnergyDuringSession() = 0;
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration,
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
                                                                       AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
@@ -54,13 +54,13 @@ public:
 
     virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause) { return CHIP_NO_ERROR; }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime,
+    virtual CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTimeUtc,
                                                                           AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementPauseRequest(const uint32_t duration, AdjustmentCauseEnum cause)
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPauseRequest(const uint32_t durationS, AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }

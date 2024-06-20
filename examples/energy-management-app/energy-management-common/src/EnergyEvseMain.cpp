@@ -61,8 +61,6 @@ static std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
 static std::unique_ptr<PowerTopologyDelegate> gPTDelegate;
 static std::unique_ptr<PowerTopologyInstance> gPTInstance;
 
-extern chip::BitMask<DeviceEnergyManagement::Feature> GetFeatureMap();
-
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
 {
     return gEvseManufacturer.get();
@@ -90,7 +88,7 @@ CHIP_ERROR DeviceEnergyManagementInit()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMap();
+    BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
 
     /* Manufacturer may optionally not support all features, commands & attributes */
     gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate, featureMap);

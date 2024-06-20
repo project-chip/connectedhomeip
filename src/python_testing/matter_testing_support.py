@@ -253,11 +253,11 @@ class EventChangeCallback:
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
             self._q.put(res)
 
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout: int = 10):
-        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
-           It returns the event data so that the values can be checked."""
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeoutS: int = 10):
+        """This function allows a test script to block waiting for the specific event to arrive with a timeout
+           (specified in seconds). It returns the event data so that the values can be checked."""
         try:
-            res = self._q.get(block=True, timeout=timeout)
+            res = self._q.get(block=True, timeout=timeoutS)
         except queue.Empty:
             asserts.fail("Failed to receive a report for the event {}".format(expected_event))
 

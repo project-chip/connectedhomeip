@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +18,8 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/DataModelTypes.h>
 #include <system/SystemLayer.h>
-
-#define MAX_SLOTS 10
 
 class FakeReadings
 {

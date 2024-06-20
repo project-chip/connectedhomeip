@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -377,7 +377,7 @@ int64_t EVSEManufacturer::GetApproxEnergyDuringSession()
     return 300;
 }
 
-CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration,
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
                                                                             AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
@@ -393,13 +393,13 @@ CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementCancelPowerAdjustReques
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime,
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTimeUtc,
                                                                                 AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPauseRequest(const uint32_t duration, AdjustmentCauseEnum cause)
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPauseRequest(const uint32_t durationS, AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }

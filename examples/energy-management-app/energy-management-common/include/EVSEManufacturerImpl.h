@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,13 +96,13 @@ public:
      */
     // The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
     int64_t GetApproxEnergyDuringSession() override;
-    CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t power, const uint32_t duration,
+    CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
                                                               AdjustmentCauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion() override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime,
                                                                   AdjustmentCauseEnum cause) override;
-    CHIP_ERROR HandleDeviceEnergyManagementPauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementPauseRequest(const uint32_t durationS, AdjustmentCauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion() override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelRequest() override;
