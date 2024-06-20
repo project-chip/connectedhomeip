@@ -80,7 +80,7 @@ CHIP_ERROR Instance::Init()
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogError(Zcl, "Service Area: Reading");
+    ChipLogDetail(Zcl, "Service Area: Reading");
 
     switch (aPath.mAttributeId)
     {
