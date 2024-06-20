@@ -33,7 +33,6 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/tests/MessagingContext.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -65,7 +64,7 @@ protected:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        chip::Test::AppContext::SetUp();
+        AppContext::SetUp();
 
         CHIP_ERROR err = CHIP_NO_ERROR;
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
@@ -79,7 +78,7 @@ protected:
     void TearDown()
     {
         chip::app::EventManagement::DestroyEventManagement();
-        chip::Test::AppContext::TearDown();
+        AppContext::TearDown();
     }
 
 private:

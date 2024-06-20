@@ -36,7 +36,6 @@
 #include <controller/InvokeInteraction.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/tests/MessagingContext.h>
 
 using namespace chip;
 using namespace chip::app;

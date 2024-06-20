@@ -109,12 +109,12 @@ public:
 namespace chip {
 namespace app {
 
-class TestAclAttribute : public chip::Test::AppContext
+class TestAclAttribute : public Test::AppContext
 {
 public:
     void SetUp() override
     {
-        chip::Test::AppContext::SetUp();
+        AppContext::SetUp();
 
         Access::GetAccessControl().Finish();
         Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);

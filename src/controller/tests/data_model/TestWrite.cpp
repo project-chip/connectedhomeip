@@ -27,7 +27,6 @@
 #include <controller/WriteInteraction.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 
 using namespace chip;

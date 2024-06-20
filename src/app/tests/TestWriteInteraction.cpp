@@ -58,7 +58,7 @@ class TestWriteInteraction : public chip::Test::AppContext
 public:
     void SetUp() override
     {
-        chip::Test::AppContext::SetUp();
+        AppContext::SetUp();
 
         gTestStorage.ClearStorage();
         gGroupsProvider.SetStorageDelegate(&gTestStorage);
@@ -78,7 +78,7 @@ public:
         {
             provider->Finish();
         }
-        chip::Test::AppContext::TearDown();
+        AppContext::TearDown();
     }
 
     void TestWriteClient();

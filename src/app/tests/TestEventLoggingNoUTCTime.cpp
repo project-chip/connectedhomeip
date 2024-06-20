@@ -79,7 +79,7 @@ public:
     // Performs shared setup for all tests in the test suite
     static void SetUpTestSuite()
     {
-        chip::Test::AppContext::SetUpTestSuite();
+        AppContext::SetUpTestSuite();
         sClock.Emplace(chip::System::SystemClock());
     }
 
@@ -87,7 +87,7 @@ public:
     static void TearDownTestSuite()
     {
         sClock.ClearValue();
-        chip::Test::AppContext::TearDownTestSuite();
+        AppContext::TearDownTestSuite();
     }
 
     // Performs setup for each individual test in the test suite
@@ -99,7 +99,7 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        chip::Test::AppContext::SetUp();
+        AppContext::SetUp();
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
@@ -109,7 +109,7 @@ public:
     void TearDown() override
     {
         chip::app::EventManagement::DestroyEventManagement();
-        chip::Test::AppContext::TearDown();
+        AppContext::TearDown();
     }
 
 private:

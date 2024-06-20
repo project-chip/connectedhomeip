@@ -65,7 +65,7 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        chip::Test::AppContext::SetUp();
+        AppContext::SetUp();
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
@@ -75,7 +75,7 @@ public:
     void TearDown() override
     {
         chip::app::EventManagement::DestroyEventManagement();
-        chip::Test::AppContext::TearDown();
+        AppContext::TearDown();
     }
 
 private:

@@ -35,7 +35,6 @@
 #include <lib/core/TLV.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/interaction_model/StatusCode.h>
 

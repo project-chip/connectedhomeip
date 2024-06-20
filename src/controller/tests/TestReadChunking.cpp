@@ -44,7 +44,6 @@
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/tests/MessagingContext.h>
 
 using namespace chip;
 using namespace chip::app;

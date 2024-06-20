@@ -236,7 +236,7 @@ class TestReadInteraction : public chip::Test::AppContext
 public:
     static void SetUpTestSuite()
     {
-        chip::Test::AppContext::SetUpTestSuite();
+        AppContext::SetUpTestSuite();
 
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
@@ -255,7 +255,7 @@ public:
     {
         chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
 
-        chip::Test::AppContext::TearDownTestSuite();
+        AppContext::TearDownTestSuite();
     }
 
     void SetUp()
@@ -266,7 +266,7 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        chip::Test::AppContext::SetUp();
+        AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
@@ -275,7 +275,7 @@ public:
     void TearDown()
     {
         chip::app::EventManagement::DestroyEventManagement();
-        chip::Test::AppContext::TearDown();
+        AppContext::TearDown();
     }
 
     void TestReadClient();
