@@ -137,19 +137,17 @@ CHIP_ERROR Instance::ReadSupportedLocations(AttributeValueEncoder & aEncoder)
     {
         return aEncoder.EncodeNull();
     }
-    else
-    {
-        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-            uint8_t locationIndex = 0;
-            LocationStructureWrapper supportedLocation;
 
-            while (mDelegate->GetSupportedLocationByIndex(locationIndex++, supportedLocation))
-            {
-                ReturnErrorOnFailure(encoder.Encode(supportedLocation));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        uint8_t locationIndex = 0;
+        LocationStructureWrapper supportedLocation;
+
+        while (mDelegate->GetSupportedLocationByIndex(locationIndex++, supportedLocation))
+        {
+            ReturnErrorOnFailure(encoder.Encode(supportedLocation));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR Instance::ReadSupportedMaps(AttributeValueEncoder & aEncoder)
@@ -158,19 +156,17 @@ CHIP_ERROR Instance::ReadSupportedMaps(AttributeValueEncoder & aEncoder)
     {
         return aEncoder.EncodeNull();
     }
-    else
-    {
-        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-            uint32_t mapIndex = 0;
-            MapStructureWrapper supportedMap;
 
-            while (mDelegate->GetSupportedMapByIndex(mapIndex++, supportedMap))
-            {
-                ReturnErrorOnFailure(encoder.Encode(supportedMap));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        uint32_t mapIndex = 0;
+        MapStructureWrapper supportedMap;
+
+        while (mDelegate->GetSupportedMapByIndex(mapIndex++, supportedMap))
+        {
+            ReturnErrorOnFailure(encoder.Encode(supportedMap));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR Instance::ReadSelectedLocations(AttributeValueEncoder & aEncoder)
@@ -179,19 +175,17 @@ CHIP_ERROR Instance::ReadSelectedLocations(AttributeValueEncoder & aEncoder)
     {
         return aEncoder.EncodeNull();
     }
-    else
-    {
-        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-            uint32_t locationIndex = 0;
-            uint32_t selectedLocation;
 
-            while (mDelegate->GetSelectedLocationByIndex(locationIndex++, selectedLocation))
-            {
-                ReturnErrorOnFailure(encoder.Encode(selectedLocation));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        uint32_t locationIndex = 0;
+        uint32_t selectedLocation;
+
+        while (mDelegate->GetSelectedLocationByIndex(locationIndex++, selectedLocation))
+        {
+            ReturnErrorOnFailure(encoder.Encode(selectedLocation));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR Instance::ReadProgress(AttributeValueEncoder & aEncoder)
@@ -200,19 +194,17 @@ CHIP_ERROR Instance::ReadProgress(AttributeValueEncoder & aEncoder)
     {
         return aEncoder.EncodeNull();
     }
-    else
-    {
-        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-            uint32_t locationIndex = 0;
-            Structs::ProgressStruct::Type progressElement;
 
-            while (mDelegate->GetProgressElementByIndex(locationIndex++, progressElement))
-            {
-                ReturnErrorOnFailure(encoder.Encode(progressElement));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        uint32_t locationIndex = 0;
+        Structs::ProgressStruct::Type progressElement;
+
+        while (mDelegate->GetProgressElementByIndex(locationIndex++, progressElement))
+        {
+            ReturnErrorOnFailure(encoder.Encode(progressElement));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 //*************************************************************************
