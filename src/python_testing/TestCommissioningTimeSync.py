@@ -56,9 +56,9 @@ class TestCommissioningTimeSync(MatterBaseTest):
         return super().teardown_test()
 
     async def commission_and_base_checks(self):
-        params = self.default_controller.OpenCommissioningWindow(
+        params = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
-        self.commissioner.CommissionOnNetwork(
+        await self.commissioner.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
         self.commissioned = True

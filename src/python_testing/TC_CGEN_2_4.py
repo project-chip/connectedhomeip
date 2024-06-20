@@ -42,9 +42,9 @@ kSendNOC = 19
 
 class TC_CGEN_2_4(MatterBaseTest):
 
-    def OpenCommissioningWindow(self) -> CommissioningParameters:
+    async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
-            params = self.th1.OpenCommissioningWindow(
+            params = await self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
@@ -56,14 +56,14 @@ class TC_CGEN_2_4(MatterBaseTest):
             self, stage: int, expectedErrorPart: chip.native.ErrorSDKPart, expectedErrCode: int):
 
         logging.info("-----------------Fail on step {}-------------------------".format(stage))
-        params = self.OpenCommissioningWindow()
+        params = await self.OpenCommissioningWindow()
         self.th2.ResetTestCommissioner()
         # This will run the commissioning up to the point where stage x is run and the
         # response is sent before the test commissioner simulates a failure
         self.th2.SetTestCommissionerPrematureCompleteAfter(stage)
         ctx = asserts.assert_raises(ChipStackError)
         with ctx:
-            self.th2.CommissionOnNetwork(
+            await self.th2.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
         errcode = ctx.exception.chip_error
@@ -99,12 +99,12 @@ class TC_CGEN_2_4(MatterBaseTest):
         await self.CommissionToStageSendCompleteAndCleanup(kSendNOC, chip.native.ErrorSDKPart.IM_CLUSTER_STATUS, 0x02)
 
         logging.info('Step 15 - TH1 opens a commissioning window')
-        params = self.OpenCommissioningWindow()
+        params = await self.OpenCommissioningWindow()
 
         logging.info('Step 16 - TH2 fully commissions the DUT')
         self.th2.ResetTestCommissioner()
 
-        self.th2.CommissionOnNetwork(
+        await self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
         logging.info('Commissioning complete done.')

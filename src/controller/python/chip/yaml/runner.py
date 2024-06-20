@@ -665,7 +665,7 @@ class CommissionerCommandAction(BaseAction):
             return _ActionResult(status=_ActionStatus.SUCCESS, response=_GetCommissionerNodeIdResult(dev_ctrl.nodeId))
 
         try:
-            dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
+            await dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
             return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
         except ChipStackError:
             return _ActionResult(status=_ActionStatus.ERROR, response=None)
