@@ -191,6 +191,16 @@ CHIP_ERROR EnergyEvseInit()
         return err;
     }
 
+    err = gEvseTargetsDelegate->LoadTargets();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to LoadTargets");
+        gEvseTargetsDelegate.reset();
+        gEvseInstance.reset();
+        gEvseDelegate.reset();
+        return err;
+    }
+
     return CHIP_NO_ERROR;
 }
 
