@@ -43,12 +43,13 @@ shared_library("CHIPController") {
   output_dir = "${target_out_dir}/pychip"
 
   # TODO: Update to use GN tools to get actual paths
+  python_version = exec_script("python-version.py", [], "trim string")
   include_dirs = [ "${chip_root}/third_party/pybind11/repo/include" ]
   if (current_os == "mac") {
     include_dirs +=
-        [ "${chip_root}/.environment/cipd/packages/python/include/python3.9" ]
+        [ "${chip_root}/.environment/cipd/packages/python/include/python" + python_version ]
   } else if (current_os == "linux") {
-    include_dirs += [ "/usr/include/python3.9" ]
+    include_dirs += [ "/usr/include/python" + python_version ]
   } else {
     assert(false, "OS not supported.")
   }
@@ -86,7 +87,7 @@ shared_library("CHIPController") {
     ]
   }
   if (current_os == "linux") {
-    libs = [ "python3.9" ]
+    libs = [ "python" + python_version ]
   }
 }
 
