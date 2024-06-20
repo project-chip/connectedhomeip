@@ -60,7 +60,7 @@ COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 
 COPY --from=asr /opt/asr /opt/asr
 
-COPY --from=efr32 /opt/silabs/gecko_sdk /opt/silabs/gecko_sdk
+COPY --from=efr32 /opt/silabs/simplicity_sdk /opt/silabs/simplicity_sdk
 COPY --from=efr32 /opt/silabs/wiseconnect-wifi-bt-sdk /opt/silabs/wiseconnect-wifi-bt-sdk
 COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
 
@@ -113,8 +113,10 @@ ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
 ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
-ENV SILABS_BOARD=BRD4161A
-ENV GSDK_ROOT=/opt/silabs/gecko_sdk/
+ENV SILABS_BOARD=BRD4186C
+# Keep GSDK_ROOT name until rename transition to SISDK is completed
+ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
+ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
