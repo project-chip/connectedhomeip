@@ -252,6 +252,7 @@
 [submodule "third_party/boringssl/repo/src"]
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
+	branch = master
 [submodule "third_party/mt793x_sdk/filogic"]
 	path = third_party/mt793x_sdk/filogic
 	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git

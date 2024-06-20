@@ -158,6 +158,7 @@ macro(matter_build target)
         ${CHIP_ROOT}/src/include
         ${CHIP_ROOT}/third_party/nlassert/repo/include
         ${CHIP_ROOT}/third_party/nlio/repo/include
+        ${CHIP_ROOT}/third_party/nlfaultinjection/include
         ${CHIP_ROOT}/zzz_generated/app-common
         ${CMAKE_CURRENT_BINARY_DIR}/gen/include
     )
