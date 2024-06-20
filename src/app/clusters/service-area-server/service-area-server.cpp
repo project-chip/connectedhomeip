@@ -503,8 +503,6 @@ bool Instance::IsSupportedLocation(uint32_t aLocationId)
 
 bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocation)
 {
-    bool ret_value = false;
-
     // If the HomeLocationInfo field is null, the LandmarkTag field SHALL NOT be null.
     // If the LandmarkTag field is null, the HomeLocationInfo field SHALL NOT be null.
     VerifyOrExit(
@@ -547,10 +545,10 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
     }
 
     // success
-    ret_value = true;
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocation, bool ignoreLocationId)
@@ -589,7 +587,6 @@ bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nulla
                                     const DataModel::Nullable<PositionTag> & aPositionTag,
                                     const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
 {
-    bool ret_value = false;
     uint32_t dummyIndex;
 
     // create location object for validation
@@ -618,11 +615,11 @@ bool Instance::AddSupportedLocation(uint32_t aLocationId, const DataModel::Nulla
     VerifyOrExit(mDelegate->AddSupportedLocation(aNewLocation, dummyIndex), /* log error in delegate function*/);
 
     // success!
-    ret_value = true;
     NotifySupportedLocationsChanged();
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nullable<uint8_t> & aMapId,
@@ -632,7 +629,6 @@ bool Instance::ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nu
                                        const DataModel::Nullable<PositionTag> & aPositionTag,
                                        const DataModel::Nullable<FloorSurfaceTag> & aSurfaceTag)
 {
-    bool ret_value    = false;
     bool mapIDChanged = false;
     uint32_t listIndex;
 
@@ -675,22 +671,20 @@ bool Instance::ModifySupportedLocation(uint32_t aLocationId, const DataModel::Nu
                      /* if false, should be logged as error in delegate function */);
     }
 
-    ret_value = true;
     if (mapIDChanged)
     {
         mDelegate->HandleSupportedLocationsUpdated();
     }
 
     NotifySupportedLocationsChanged();
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::ClearSupportedLocations()
 {
-    bool ret_value = false;
-
     // does device mode allow this attribute to be updated?
     VerifyOrExit(mDelegate->IsSupportedLocationsChangeAllowed(), /* if false, should be logged as error in delegate function */);
 
@@ -698,12 +692,11 @@ bool Instance::ClearSupportedLocations()
     {
         mDelegate->HandleSupportedLocationsUpdated();
         NotifySupportedLocationsChanged();
-
-        ret_value = true;
+        return true;
     }
 
 exit:
-    return ret_value;
+    return false;
 }
 
 //*************************************************************************
@@ -719,8 +712,6 @@ bool Instance::IsSupportedMap(uint8_t aMapId)
 
 bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
 {
-    bool ret_value = false;
-
     uint8_t mapIndex = 0;
     MapStructureWrapper entry;
 
@@ -753,17 +744,15 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
     }
 
     // map successfully added
-    ret_value = true;
     NotifySupportedMapsChanged();
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
 {
-    bool ret_value = false;
-
     uint32_t modifiedIndex;
     uint32_t loopIndex = 0;
     MapStructureWrapper modifiedMap;
@@ -774,7 +763,7 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
 
     VerifyOrExit(mapExists, ChipLogError(Zcl, "RenameSupportedMap Id %u - map does not exist", aMapId));
 
-    //  Map name SHALL include readable text that describes the mapname (cannot be empty string)
+    //  Map name SHALL include readable text that describes the map's name. It cannot be empty string.
     VerifyOrExit((newMapName.size() != 0), ChipLogError(Zcl, "RenameSupportedMap %u - Name must not be empty string", aMapId));
 
     // update the local copy of the map
@@ -797,30 +786,27 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
     VerifyOrExit(mDelegate->ModifySupportedMap(modifiedIndex, modifiedMap), /* log error in delegate function*/);
 
     // map successfully renamed
-    ret_value = true;
     NotifySupportedMapsChanged();
-    // note - no need to modifiy other lists when a map is renamed
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::ClearSupportedMaps()
 {
-    bool ret_value = false;
-
     // does device mode allow this attribute to be updated?
     VerifyOrExit(mDelegate->IsSupportedMapChangeAllowed(), /* if false, should be logged as error in delegate function */);
 
     if (mDelegate->ClearSupportedMaps())
     {
-        ret_value = true;
         ClearSupportedLocations();
         NotifySupportedMapsChanged();
+        return true;
     }
 
 exit:
-    return ret_value;
+    return false;
 }
 
 //*************************************************************************
@@ -828,7 +814,6 @@ exit:
 
 bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
 {
-    bool ret_value;
     uint32_t dummyIndex;
 
     char locationStatusText[kMaxSizeStatusText + 1] = { '\0' };
@@ -853,23 +838,21 @@ bool Instance::AddSelectedLocation(uint32_t & aSelectedLocation)
                  /* if false, should be logged as error in delegate function */);
 
     // success
-    ret_value = true;
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::ClearSelectedLocations()
 {
-    bool ret_value = false;
-
     if (mDelegate->ClearSelectedLocations())
     {
-        ret_value = true;
         NotifySelectedLocationsChanged();
+        return true;
     }
 
-    return ret_value;
+    return false;
 }
 
 //*************************************************************************
@@ -912,7 +895,6 @@ DataModel::Nullable<uint32_t> Instance::GetEstimatedEndTime()
 
 bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime)
 {
-    bool ret_value      = false;
     bool doChangeNotify = false;
 
     // EstimatedEndTime SHALL be null if the CurrentLocation attribute is null.
@@ -941,10 +923,10 @@ bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstima
     }
 
     // success
-    ret_value = true;
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 //*************************************************************************
@@ -952,7 +934,6 @@ exit:
 
 bool Instance::AddPendingProgressElement(uint32_t aLocationId)
 {
-    bool ret_value = false;
     uint32_t dummyIndex;
 
     // create progress element
@@ -977,16 +958,15 @@ bool Instance::AddPendingProgressElement(uint32_t aLocationId)
                  /* if false, should be logged as error in delegate function */);
 
     // success
-    ret_value = true;
     NotifyProgressChanged();
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opStatus)
 {
-    bool ret_value = false;
     uint32_t listIndex;
 
     Structs::ProgressStruct::Type progressElement;
@@ -994,8 +974,8 @@ bool Instance::SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opS
     VerifyOrExit(mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement),
                  ChipLogError(Zcl, "SetProgressStatus - progress element does not exist for location %u", aLocationId));
 
-    // if status value not changing, no need to modify the existing element
-    VerifyOrExit((progressElement.status != opStatus), ret_value = true);
+    // If the status value is not changing, there in no need to modify the existing element.
+    if (progressElement.status == opStatus) { return true; }
 
     // set the progress status in the local copy
     progressElement.status = opStatus;
@@ -1011,16 +991,15 @@ bool Instance::SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opS
                  /* if false, should be logged as error in delegate function */);
 
     // success
-    ret_value = true;
     NotifyProgressChanged();
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
 {
-    bool ret_value = false;
     uint32_t listIndex;
 
     Structs::ProgressStruct::Type progressElement;
@@ -1029,8 +1008,8 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataM
         mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement),
         ChipLogError(Zcl, "SetProgressTotalOperationalTime - progress element does not exist for location %u", aLocationId));
 
-    // if time value not changing, no need to modify the existing element
-    VerifyOrExit((progressElement.totalOperationalTime != aTotalOperationalTime), ret_value = true);
+    // If the time value is not changing, there is no need to modify the existing element.
+    if (progressElement.totalOperationalTime == aTotalOperationalTime) { return true; }
 
     // This attribute SHALL be null if the Status field is not set to Completed or Skipped
     VerifyOrExit((aTotalOperationalTime.IsNull() || (progressElement.status == OperationalStatusEnum::kCompleted) ||
@@ -1048,16 +1027,15 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataM
                  /* if false, should be logged as error in delegate function */);
 
     // success
-    ret_value = true;
     NotifyProgressChanged();
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::Nullable<uint32_t> & aEstimatedTime)
 {
-    bool ret_value = false;
     uint32_t listIndex;
 
     Structs::ProgressStruct::Type progressElement;
@@ -1065,8 +1043,8 @@ bool Instance::SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::N
     VerifyOrExit(mDelegate->GetProgressElementById(aLocationId, listIndex, progressElement),
                  ChipLogError(Zcl, "SetProgressEstimatedTime - progress element does not exist for location %u", aLocationId));
 
-    // if time value not changing, no need to modify the existing element
-    VerifyOrExit((progressElement.estimatedTime != aEstimatedTime), ret_value = true);
+    // If the time value is not changing, there is no need to modify the existing element.
+    if (progressElement.estimatedTime == aEstimatedTime) { return true; };
 
     // set the time in the local copy
     progressElement.estimatedTime.Value() = aEstimatedTime;
@@ -1076,24 +1054,22 @@ bool Instance::SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::N
                  /* if false, should be logged as error in delegate function */);
 
     // success
-    ret_value = true;
     NotifyProgressChanged();
+    return true;
 
 exit:
-    return ret_value;
+    return false;
 }
 
 bool Instance::ClearProgress()
 {
-    bool ret_value = false;
-
     if (mDelegate->ClearProgress())
     {
-        ret_value = true;
         NotifyProgressChanged();
+        return true;
     }
 
-    return ret_value;
+    return false;
 }
 
 // attribute manipulators - Feature Map
