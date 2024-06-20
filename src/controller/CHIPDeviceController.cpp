@@ -841,7 +841,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             DeviceLayer::ConnectivityMgr().WiFiPAFConnect(this, OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
         }
-        ChipLogProgress(Controller, "WiFi-PAF: Request to subscrib the NAN-USD device complete");
+        ChipLogProgress(Controller, "WiFi-PAF: Request to subscribe the NAN-USD device complete");
     }
 #endif
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), params.GetMRPConfig());
