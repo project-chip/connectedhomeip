@@ -1,1 +1,1 @@
-59 : Install order fix for glib with enabled thread sanitizer.
+60 : Add missing xz for esp32, upfate location of qemu-system-xtensa
