@@ -187,7 +187,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # To get a PASE session, we need an open commissioning window
         discriminator = random.randint(0, 4095)
 
-        params = self.default_controller.OpenCommissioningWindow(
+        params = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
 
         # TH2 = new controller that's not connected over CASE
@@ -201,14 +201,14 @@ class TC_IDM_1_2(MatterBaseTest):
         device = next(filter(lambda d: d.commissioningMode == 2 and d.longDiscriminator == discriminator, devices))
         for a in device.addresses:
             try:
-                TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode,
-                                           nodeid=self.dut_node_id+1, port=device.port)
+                await TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode,
+                                                 nodeid=self.dut_node_id+1, port=device.port)
                 break
             except ChipStackError:
                 continue
 
         try:
-            TH2.GetConnectedDeviceSync(nodeid=self.dut_node_id+1, allowPASE=True, timeoutMs=1000)
+            await TH2.GetConnectedDevice(nodeid=self.dut_node_id+1, allowPASE=True, timeoutMs=1000)
         except TimeoutError:
             asserts.fail("Unable to establish a PASE session to the device")
 
@@ -263,7 +263,7 @@ class TC_IDM_1_2(MatterBaseTest):
 
         # Try with RevokeCommissioning
         # First open a commissioning window for us to revoke, so we know this command is able to succeed absent this error
-        _ = self.default_controller.OpenCommissioningWindow(
+        _ = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
         cmd = FakeRevokeCommissioning()
         try:
