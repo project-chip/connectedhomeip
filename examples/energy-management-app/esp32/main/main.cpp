@@ -117,11 +117,9 @@ namespace Clusters {
 namespace DeviceEnergyManagement {
 
 // Keep track of the parsed featureMap option
-static chip::BitMask<Feature>
-    sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
-                Feature::kStateForecastReporting, Feature::kStartTimeAdjustment,
-                Feature::kPausable, Feature::kForecastAdjustment,
-                Feature::kConstraintBasedAdjustment);
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
+                                          Feature::kStateForecastReporting, Feature::kStartTimeAdjustment, Feature::kPausable,
+                                          Feature::kForecastAdjustment, Feature::kConstraintBasedAdjustment);
 
 chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 {
