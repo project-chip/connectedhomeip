@@ -180,7 +180,7 @@ public:
     typedef void (*OnConnectionCompleteFunct)(void * appState);
     typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
     CHIP_ERROR WiFiPAFConnect(void * appState, OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError);
-    CHIP_ERROR WiFiPAFSend(chip::System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR WiFiPAFSend(System::PacketBufferHandle && msgBuf);
     Transport::WiFiPAFBase * GetWiFiPAF();
     void SetWiFiPAF(Transport::WiFiPAFBase * pmWiFiPAF);
 #endif
