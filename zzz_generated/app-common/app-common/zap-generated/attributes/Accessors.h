@@ -1136,14 +1136,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 namespace TimeSynchronization {
 namespace Attributes {
 
-namespace TimeSource {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        chip::app::Clusters::TimeSynchronization::TimeSourceEnum * value); // TimeSourceEnum
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace TimeSource
-
 namespace TimeZoneDatabase {
 Protocols::InteractionModel::Status
 Get(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum * value); // TimeZoneDatabaseEnum
