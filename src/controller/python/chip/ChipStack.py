@@ -35,7 +35,6 @@ from threading import Condition, Lock
 import chip.native
 from chip.native import PyChipError
 
-from .ChipUtility import ChipUtility
 from .clusters import Attribute as ClusterAttribute
 from .clusters import Command as ClusterCommand
 from .exceptions import ChipStackError, ChipStackException, DeviceError
@@ -247,33 +246,6 @@ class ChipStack(object):
             raise res.to_exception()
         return callObj
 
-    def ErrorToException(self, err, devStatusPtr=None):
-        if err == 0x2C and devStatusPtr:
-            devStatus = devStatusPtr.contents
-            msg = ChipUtility.CStringToString(
-                (
-                    self._ChipStackLib.pychip_Stack_StatusReportToString(
-                        devStatus.ProfileId, devStatus.StatusCode
-                    )
-                )
-            )
-            sysErrorCode = (
-                devStatus.SysErrorCode if (
-                    devStatus.SysErrorCode != 0) else None
-            )
-            if sysErrorCode is not None:
-                msg = msg + " (system err %d)" % (sysErrorCode)
-            return DeviceError(
-                devStatus.ProfileId, devStatus.StatusCode, sysErrorCode, msg
-            )
-        else:
-            return ChipStackError(
-                err,
-                ChipUtility.CStringToString(
-                    (self._ChipStackLib.pychip_Stack_ErrorToString(err))
-                ),
-            )
-
     def LocateChipDLL(self):
         self._loadLib()
         return self._chipDLLPath
@@ -302,8 +274,6 @@ class ChipStack(object):
                 c_uint16,
             ]
             self._ChipStackLib.pychip_Stack_StatusReportToString.restype = c_char_p
-            self._ChipStackLib.pychip_Stack_ErrorToString.argtypes = [c_uint32]
-            self._ChipStackLib.pychip_Stack_ErrorToString.restype = c_char_p
 
             self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.argtypes = [
                 _ChipThreadTaskRunnerFunct, py_object]
