@@ -39,29 +39,20 @@ constexpr size_t kMaxNumProgressElements   = 255;
 constexpr size_t kMaxSizeStatusText = 256;
 
 /**
- * Uncopyable is a helper to ensure that Service Area cluster instances and delegates
- * are unique and cannot be copied.
- */
-class Uncopyable
-{
-protected:
-    Uncopyable() {}
-    ~Uncopyable() = default;
-
-private:
-    Uncopyable(const Uncopyable &)             = delete;
-    Uncopyable & operator=(const Uncopyable &) = delete;
-};
-
-/**
  * ServiceArea::Delegate Defines methods for implementing application-specific
  * logic for the Service Area Cluster.
  */
-class Delegate : public Uncopyable
+class Delegate
 {
 public:
     Delegate()          = default;
     virtual ~Delegate() = default;
+
+    /**
+     * Stop this class objects from being copied.
+     */
+    Delegate(const Delegate &) = delete;
+    Delegate & operator=(const Delegate &) = delete;
 
     friend class Instance;
 

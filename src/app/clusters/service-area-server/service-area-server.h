@@ -44,7 +44,7 @@ namespace ServiceArea {
  * Custom implementations of the Service Area cluster override functions in the Delegate class
  * must be provided to operate with specific devices.
  */
-class Instance : public AttributeAccessInterface, public CommandHandlerInterface, public Uncopyable
+class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
     /**
@@ -59,6 +59,13 @@ public:
     Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<ServiceArea::Feature> aFeature);
 
     ~Instance() override;
+
+    /**
+     * Stop this class objects from being copied.
+     */
+    Instance(const Instance &) = delete;
+    Instance & operator=(const Instance &) = delete;
+
 
     /**
      * @brief Initialise the Service Area server instance.
