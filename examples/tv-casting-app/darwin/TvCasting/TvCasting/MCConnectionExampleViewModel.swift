@@ -63,7 +63,7 @@ class MCConnectionExampleViewModel: ObservableObject {
         let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { commissionerDeclarationMessage in
             DispatchQueue.main.async {
                 self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, recived a message form the MCCastingPlayer:\n\(commissionerDeclarationMessage)")
-                if commissionerDeclarationMessage.getCommissionerPasscode() {
+                if commissionerDeclarationMessage.commissionerPasscode {
                     self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling getTopMostViewController()")
                     if let topViewController = self.getTopMostViewController() {
                         self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling displayPasscodeInputDialog()")
@@ -118,19 +118,19 @@ class MCConnectionExampleViewModel: ObservableObject {
         }
 
         let identificationDeclarationOptions: MCIdentificationDeclarationOptions
-        let targetAppInfo: MCTargetAppInfo = MCTargetAppInfo()
+        let targetAppInfo: MCTargetAppInfo
         let connectionCallbacks: MCConnectionCallbacks
 
         if useCommissionerGeneratedPasscode {
             identificationDeclarationOptions = MCIdentificationDeclarationOptions(commissionerPasscodeOnly: true)
-            targetAppInfo.setVendorId(kDesiredEndpointVendorIdCGP)
+            targetAppInfo = MCTargetAppInfo(vendorId: kDesiredEndpointVendorIdCGP)
             connectionCallbacks = MCConnectionCallbacks(
                 callbacks: connectionCompleteCallback,
                 commissionerDeclarationCallback: commissionerDeclarationCallback
             )
         } else {
             identificationDeclarationOptions = MCIdentificationDeclarationOptions()
-            targetAppInfo.setVendorId(kDesiredEndpointVendorId)
+            targetAppInfo = MCTargetAppInfo(vendorId: kDesiredEndpointVendorId)
             connectionCallbacks = MCConnectionCallbacks(
                 callbacks: connectionCompleteCallback,
                 commissionerDeclarationCallback: nil

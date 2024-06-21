@@ -21,35 +21,6 @@
 
 @interface MCIdentificationDeclarationOptions ()
 
-// Private properties:
-
-/**
- * Feature: Target Content Application - Flag to instruct the Commissioner not to display a
- * Passcode input dialog, and instead send a CommissionerDeclaration message if a commissioning
- * Passcode is needed.
- */
-@property (nonatomic) BOOL noPasscode;
-/**
- * Feature: Coordinate Passcode Dialogs - Flag to instruct the Commissioner to send a
- * CommissionerDeclaration message when the Passcode input dialog on the Commissioner has been
- * shown to the user.
- */
-@property (nonatomic) BOOL cdUponPasscodeDialog;
-/**
- * Feature: Commissioner-Generated Passcode - Flag to instruct the Commissioner to use the
- * Commissioner-generated Passcode for commissioning.
- */
-@property (nonatomic) BOOL commissionerPasscode;
-/**
- * Feature: Commissioner-Generated Passcode - Flag to indicate whether or not the Commissionee has
- * obtained the Commissioner Passcode from the user and is therefore ready for commissioning.
- */
-@property (nonatomic) BOOL commissionerPasscodeReady;
-/**
- * Feature: Coordinate Passcode Dialogs Flag - to indicate when the Commissionee user has decided
- * to exit the commissioning process.
- */
-@property (nonatomic) BOOL cancelPasscode;
 /**
  * Feature: Target Content Application - The set of content app Vendor IDs (and optionally,
  * Product IDs) that can be used for authentication. Also, if TargetAppInfo is passed in,
@@ -159,8 +130,8 @@
     NSArray<MCTargetAppInfo *> * targetAppInfos = [self getTargetAppInfoList];
     for (MCTargetAppInfo * appInfo in targetAppInfos) {
         chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
-        targetAppInfo.vendorId = appInfo.getVendorId;
-        targetAppInfo.productId = appInfo.getProductId;
+        targetAppInfo.vendorId = appInfo.vendorId;
+        targetAppInfo.productId = appInfo.productId;
         CHIP_ERROR err = cppIdOptions.addTargetAppInfo(targetAppInfo);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "MCIdentificationDeclarationOptions.getCppIdentificationDeclarationOptions() Failed to add TargetAppInfo: %@", appInfo.description);

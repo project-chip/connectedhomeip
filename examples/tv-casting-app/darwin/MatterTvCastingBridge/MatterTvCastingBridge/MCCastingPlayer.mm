@@ -133,7 +133,7 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     if (identificationDeclarationOptions != nil) {
         cppIdOptions = [identificationDeclarationOptions getCppIdentificationDeclarationOptions];
     } else {
-        ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks()->setupCppIdOptions() helper. Client did not set the optional MCIdentificationDeclarationOptions using default options");
+        ChipLogProgress(AppServer, "MCCastingPlayer.setupCppIdOptions() Client did not set the optional MCIdentificationDeclarationOptions using default options");
     }
     return cppIdOptions;
 }

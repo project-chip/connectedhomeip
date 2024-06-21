@@ -32,9 +32,7 @@ struct TvCastingApp: App {
                     if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "1"
                     {
                         self.Log.info("CHIP_CASTING_SIMPLIFIED = 1")
-                        
-                        let initializationExample = MCInitializationExample.shared
-                        let err: Error? = initializationExample.initialize()
+                        let err: Error? = MCInitializationExample.shared.initialize()
                         if err != nil
                         {
                             self.Log.error("MCCastingApp initialization failed \(err)")

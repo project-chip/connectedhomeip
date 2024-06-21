@@ -48,19 +48,41 @@ typedef NS_ENUM(NSInteger, CdError) {
     kUnexpectedCommissionerPasscodeReady = 18
 };
 
+/** Feature: All - Indicates errors incurred during commissioning. */
+@property (nonatomic, readonly) CdError errorCode;
+/**
+ * Feature: Coordinate PIN Dialogs - When NoPasscode field set to true, and the Commissioner
+ * determines that a Passcode code will be needed for commissioning.
+ */
+@property (nonatomic, readonly) BOOL needsPasscode;
+/**
+ * Feature: Target Content Application - No apps with AccountLogin cluster implementation were
+ * found for the last IdentificationDeclaration request. Only apps which provide access to the
+ * vendor id of the Commissionee will be considered.
+ */
+@property (nonatomic, readonly) BOOL noAppsFound;
+/**
+ * Feature: Coordinate PIN Dialogs - A Passcode input dialog is now displayed for the user on the
+ * Commissioner.
+ */
+@property (nonatomic, readonly) BOOL passcodeDialogDisplayed;
+/**
+ * Feature: Commissioner-Generated Passcode - A Passcode is now displayed for the user by the
+ * CastingPlayer/Commissioner.
+ */
+@property (nonatomic, readonly) BOOL commissionerPasscode;
+/**
+ * Feature: Commissioner-Generated Passcode - The user experience conveying a Passcode to the user
+ * also displays a QR code.
+ */
+@property (nonatomic, readonly) BOOL qRCodeDisplayed;
+
 - (instancetype)initWithOptions:(NSInteger)errorCode
                   needsPasscode:(BOOL)needsPasscode
                     noAppsFound:(BOOL)noAppsFound
         passcodeDialogDisplayed:(BOOL)passcodeDialogDisplayed
            commissionerPasscode:(BOOL)commissionerPasscode
                 qRCodeDisplayed:(BOOL)qRCodeDisplayed;
-
-- (CdError)getErrorCode;
-- (BOOL)getNeedsPasscode;
-- (BOOL)getNoAppsFound;
-- (BOOL)getPasscodeDialogDisplayed;
-- (BOOL)getCommissionerPasscode;
-- (BOOL)getQRCodeDisplayed;
 
 - (NSString *)description;
 - (void)logDetail;

@@ -32,22 +32,10 @@ class MCContentLauncherLaunchURLExampleViewModel: ObservableObject {
     {
         self.Log.info("MCContentLauncherLaunchURLExampleViewModel.invokeCommand()")
         castingPlayer.logAllEndpoints()
-        var selectedEndpoint: MCEndpoint?
 
-        // select the MCEndpoint on the MCCastingPlayer to invoke the command on
-        if let endpoint = castingPlayer.endpoints().filter({ $0.vendorId().intValue == sampleEndpointVid }).first {
-            selectedEndpoint = endpoint
-        // For the example Commissioner-Generated passcode commissioning flow, run demo interactions with the Endpoint with
-        // ID 1. For this flow, we commissioned with the Target Content Application with Vendor ID 1111. Since this target
-        // content application does not report its Endpoint's Vendor IDs, we find the desired endpoint based on the Endpoint
-        // ID. See connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-        } else if let endpoint = castingPlayer.endpoints().filter({ $0.identifier().intValue == 1 }).first {
-            self.Log.info("MCContentLauncherLaunchURLExampleViewModel.invokeCommand() No endpoint matching the sampleEndpointVid: \(String(describing: self.sampleEndpointVid)), but found endpoint with identifier: 1")
-            selectedEndpoint = endpoint
-        }
-
-        guard let endpoint = selectedEndpoint else {
-            self.Log.error("No endpoint matching the example VID or identifier 1 found")
+        // Use MCEndpointSelector to select the endpoint
+        guard let endpoint = MCEndpointSelector.selectEndpoint(from: castingPlayer, sampleEndpointVid: sampleEndpointVid) else {
+            self.Log.error("MCContentLauncherLaunchURLExampleViewModel.invokeCommand() No endpoint matching the example VID or identifier 1 found")
             DispatchQueue.main.async {
                 self.status = "No endpoint matching the example VID or identifier 1 found"
             }
