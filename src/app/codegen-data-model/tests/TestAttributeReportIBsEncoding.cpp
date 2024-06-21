@@ -24,7 +24,7 @@ using namespace chip::app;
 namespace chip {
 namespace Test {
 
-CHIP_ERROR DecodedAttributeData::DecodeFrom(const chip::app::AttributeDataIB::Parser & parser)
+CHIP_ERROR DecodedAttributeData::DecodeFrom(const AttributeDataIB::Parser & parser)
 {
     ReturnErrorOnFailure(parser.GetDataVersion(&dataVersion));
 
