@@ -5,7 +5,7 @@ specific scenarios.
 
 ### Building with IPV4 Disabled
 
-Enable the options below through `idf.py menuconfig` and build the app.
+Configure below options through `idf.py menuconfig` and build the app.
 
 ```
 CONFIG_DISABLE_IPV4=y
