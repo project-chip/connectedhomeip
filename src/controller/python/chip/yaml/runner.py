@@ -712,7 +712,7 @@ class DiscoveryCommandAction(BaseAction):
         self.filterType, self.filter = DiscoveryCommandAction._filter_for_step(test_step)
 
     async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
-        devices = dev_ctrl.DiscoverCommissionableNodes(
+        devices = await dev_ctrl.DiscoverCommissionableNodes(
             filterType=self.filterType, filter=self.filter, stopOnFirst=True, timeoutSecond=5)
 
         # Devices will be a list: [CommissionableNode(), ...]
