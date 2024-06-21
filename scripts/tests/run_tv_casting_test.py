@@ -64,7 +64,7 @@ class ProcessManager:
         self.process.wait()
 
 
-def remove_cached_files(cached_file_pattern: str) -> bool:
+def remove_cached_files(cached_file_pattern: str):
     """Remove any cached files that match the provided pattern."""
 
     cached_files = glob.glob(cached_file_pattern)  # Returns a list of paths that match the pattern.
@@ -73,10 +73,8 @@ def remove_cached_files(cached_file_pattern: str) -> bool:
         try:
             os.remove(cached_file)
         except OSError as e:
-            logging.error(f'Failed to remove cached file `{cached_file}` with error: `{e.strerror}`.')
-            return False
-
-    return True
+            logging.error(f'Failed to remove cached file `{cached_file}` with error: `{e.strerror}`')
+            raise  # Re-raise the OSError to propagate it up.
 
 
 def dump_temporary_logs_to_console(log_file_path: str):
@@ -351,8 +349,12 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
 if __name__ == '__main__':
 
     # Start with a clean slate by removing any previously cached entries.
-    cached_file_pattern = '/tmp/chip_*'
-    if not remove_cached_files(cached_file_pattern):
+    try:
+        cached_file_pattern = '/tmp/chip_*'
+        remove_cached_files(cached_file_pattern)
+    except OSError as e:
+        logging.error(
+            f'Error while removing cached files with file pattern: {cached_file_pattern}')
         sys.exit(1)
 
     # Test casting (discovery and commissioning) between the Linux tv-casting-app and the tv-app.
