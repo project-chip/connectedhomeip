@@ -30,6 +30,8 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ThreadStackManager.h>
 
+#include <zephyr/version.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -52,18 +54,30 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
 void ThreadStackManagerImpl::_LockThreadStack()
 {
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
+    openthread_mutex_lock();
+#else
     openthread_api_mutex_lock(openthread_get_default_context());
+#endif
 }
 
 bool ThreadStackManagerImpl::_TryLockThreadStack()
 {
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
+    return openthread_mutex_try_lock() == 0;
+#else
     // There's no openthread_api_mutex_try_lock() in Zephyr, so until it's contributed we must use the low-level API
     return k_mutex_lock(&openthread_get_default_context()->api_lock, K_NO_WAIT) == 0;
+#endif
 }
 
 void ThreadStackManagerImpl::_UnlockThreadStack()
 {
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 1
+    openthread_mutex_unlock();
+#else
     openthread_api_mutex_unlock(openthread_get_default_context());
+#endif
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
