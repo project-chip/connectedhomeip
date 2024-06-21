@@ -999,7 +999,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 // If the station interface has been assigned an IPv4 address, and has
                 // an IPv4 gateway, then presume that the device has IPv4 Internet
                 // connectivity.
-#if LWIP_IPV4
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
                 if (!ip4_addr_isany_val(*netif_ip4_addr(netif)) && !ip4_addr_isany_val(*netif_ip4_gw(netif)))
                 {
                     haveIPv4Conn = true;
