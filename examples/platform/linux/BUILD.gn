@@ -24,6 +24,7 @@ declare_args() {
   chip_enable_boolean_state_configuration_trigger = false
   chip_enable_energy_evse_trigger = false
   chip_enable_energy_reporting_trigger = false
+  chip_enable_water_heater_management_trigger = false
 }
 
 config("app-main-config") {
@@ -117,6 +118,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${chip_enable_energy_evse_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${chip_enable_energy_reporting_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMEN_TRIGGER=${chip_enable_water_heater_management_trigger}",
   ]
 
   public_configs = [ ":app-main-config" ]
