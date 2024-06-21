@@ -1,6 +1,6 @@
 # Configuration options
 
-This file lists down few config options to be enabled in through menuconfig for
+This file lists down few config options to be configured through menuconfig for
 specific scenarios.
 
 ### Building with IPV4 Disabled
