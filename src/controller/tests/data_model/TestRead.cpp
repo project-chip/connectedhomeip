@@ -294,6 +294,11 @@ protected:
     bool mEmitSubscriptionError      = false;
     int32_t mNumActiveSubscriptions  = 0;
     bool mAlterSubscriptionIntervals = false;
+
+protected:
+    struct TestReadHandler_ParallelReads_TestCase_Parameters;
+    void TestReadHandler_ParallelReads_TestCase(const TestReadHandler_ParallelReads_TestCase_Parameters & params,
+                                                std::function<void()> body);
 };
 
 uint16_t TestRead::mMaxInterval = 66;
@@ -3629,16 +3634,15 @@ TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
     app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
 }
 
-struct TestReadHandler_ParallelReads_TestCase_Parameters
+struct TestRead::TestReadHandler_ParallelReads_TestCase_Parameters
 {
     int ReadHandlerCapacity = -1;
     int PathPoolCapacity    = -1;
     int MaxFabrics          = -1;
 };
 
-static void TestReadHandler_ParallelReads_TestCase(TestRead * apContext,
-                                                   const TestReadHandler_ParallelReads_TestCase_Parameters & params,
-                                                   std::function<void()> body)
+void TestRead::TestReadHandler_ParallelReads_TestCase(const TestReadHandler_ParallelReads_TestCase_Parameters & params,
+                                                      std::function<void()> body)
 {
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
     app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(params.ReadHandlerCapacity);
@@ -3649,10 +3653,10 @@ static void TestReadHandler_ParallelReads_TestCase(TestRead * apContext,
 
     // Clean up
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-    apContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     // Sanity check
-    EXPECT_EQ(apContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
     app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
@@ -3673,7 +3677,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
 
     auto TestCase = [&](const TestReadHandler_ParallelReads_TestCase_Parameters & params, std::function<void()> body) {
-        TestReadHandler_ParallelReads_TestCase(this, params, body);
+        TestReadHandler_ParallelReads_TestCase(params, body);
     };
 
     // Case 1.1: 2 reads used up the path pool (but not the ReadHandler pool), and one incoming oversized read request =>

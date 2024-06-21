@@ -70,8 +70,6 @@ constexpr AttributeId kTestBadAttribute =
 
 constexpr int kListAttributeItems = 5;
 
-using TestReadChunking = chip::Test::AppContext;
-
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x00000002, INT8U, 1, 0),
@@ -456,6 +454,15 @@ void TestMutableReadCallback::OnAttributeData(const app::ConcreteDataAttributePa
     // Ignore all other attributes, we don't care above the global attributes.
 }
 
+class TestReadChunking : public chip::Test::AppContext
+{
+protected:
+    struct Instruction;
+    void DoTest(TestMutableReadCallback * callback, Instruction instruction);
+    void DriveIOUntilSubscriptionEstablished(TestMutableReadCallback * callback);
+    void DriveIOUntilEndOfReport(TestMutableReadCallback * callback);
+};
+
 /*
  * This validates all the various corner cases encountered during chunking by
  * artificially reducing the size of a packet buffer used to encode attribute data
@@ -809,35 +816,6 @@ enum AttrIds
 using AttributeWithValue = std::pair<AttributeIdWithEndpointId, uint8_t>;
 using AttributesList     = std::vector<AttributeIdWithEndpointId>;
 
-struct Instruction
-{
-    // The maximum number of attributes should be iterated in a single report chunk.
-    uint32_t chunksize;
-    // A list of functions that will be executed before driving the main loop.
-    std::vector<std::function<void()>> preworks;
-    // A list of pair for attributes and their expected values in the report.
-    std::vector<AttributeWithValue> expectedValues;
-    // A list of list of various attributes which should have the same data version in the report.
-    std::vector<AttributesList> attributesWithSameDataVersion;
-};
-
-void DriveIOUntilSubscriptionEstablished(TestReadChunking * pContext, TestMutableReadCallback * callback)
-{
-    callback->mOnReportEnd = false;
-    pContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnSubscriptionEstablished; });
-    EXPECT_TRUE(callback->mOnReportEnd);
-    EXPECT_TRUE(callback->mOnSubscriptionEstablished);
-    callback->mActionOn.clear();
-}
-
-void DriveIOUntilEndOfReport(TestReadChunking * pContext, TestMutableReadCallback * callback)
-{
-    callback->mOnReportEnd = false;
-    pContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnReportEnd; });
-    EXPECT_TRUE(callback->mOnReportEnd);
-    callback->mActionOn.clear();
-}
-
 void CheckValues(TestMutableReadCallback * callback, std::vector<AttributeWithValue> expectedValues = {})
 {
     for (const auto & vals : expectedValues)
@@ -859,7 +837,38 @@ void ExpectSameDataVersions(TestMutableReadCallback * callback, AttributesList a
     }
 }
 
-void DoTest(TestReadChunking * pContext, TestMutableReadCallback * callback, Instruction instruction)
+}; // namespace TestSetDirtyBetweenChunksUtil
+
+struct TestReadChunking::Instruction
+{
+    // The maximum number of attributes should be iterated in a single report chunk.
+    uint32_t chunksize;
+    // A list of functions that will be executed before driving the main loop.
+    std::vector<std::function<void()>> preworks;
+    // A list of pair for attributes and their expected values in the report.
+    std::vector<TestSetDirtyBetweenChunksUtil::AttributeWithValue> expectedValues;
+    // A list of list of various attributes which should have the same data version in the report.
+    std::vector<TestSetDirtyBetweenChunksUtil::AttributesList> attributesWithSameDataVersion;
+};
+
+void TestReadChunking::DriveIOUntilSubscriptionEstablished(TestMutableReadCallback * callback)
+{
+    callback->mOnReportEnd = false;
+    GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnSubscriptionEstablished; });
+    EXPECT_TRUE(callback->mOnReportEnd);
+    EXPECT_TRUE(callback->mOnSubscriptionEstablished);
+    callback->mActionOn.clear();
+}
+
+void TestReadChunking::DriveIOUntilEndOfReport(TestMutableReadCallback * callback)
+{
+    callback->mOnReportEnd = false;
+    GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback->mOnReportEnd; });
+    EXPECT_TRUE(callback->mOnReportEnd);
+    callback->mActionOn.clear();
+}
+
+void TestReadChunking::DoTest(TestMutableReadCallback * callback, Instruction instruction)
 {
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(instruction.chunksize);
 
@@ -868,17 +877,15 @@ void DoTest(TestReadChunking * pContext, TestMutableReadCallback * callback, Ins
         act();
     }
 
-    DriveIOUntilEndOfReport(pContext, callback);
+    DriveIOUntilEndOfReport(callback);
 
-    CheckValues(callback, instruction.expectedValues);
+    TestSetDirtyBetweenChunksUtil::CheckValues(callback, instruction.expectedValues);
 
     for (const auto & attrList : instruction.attributesWithSameDataVersion)
     {
-        ExpectSameDataVersions(callback, attrList);
+        TestSetDirtyBetweenChunksUtil::ExpectSameDataVersions(callback, attrList);
     }
 }
-
-}; // namespace TestSetDirtyBetweenChunksUtil
 
 TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
 {
@@ -929,11 +936,11 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                 // We are expected to miss attributes on kTestEndpointId during initial reports.
                 ChipLogProgress(DataManagement, "Case 1-1: Set dirty during priming report.");
                 readCallback.mActionOn[AttrOnEp5<Attr1>] = TouchAttrOp(AttrOnEp1<Attr1>);
-                DriveIOUntilSubscriptionEstablished(this, &readCallback);
+                DriveIOUntilSubscriptionEstablished(&readCallback);
                 CheckValues(&readCallback, { { AttrOnEp1<Attr1>, 1 } });
 
                 ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
-                DoTest(this, &readCallback, Instruction{ .chunksize = 2, .expectedValues = { { AttrOnEp1<Attr1>, 2 } } });
+                DoTest(&readCallback, Instruction{ .chunksize = 2, .expectedValues = { { AttrOnEp1<Attr1>, 2 } } });
             }
 
             // CASE 2 -- Set dirty during chunked report, the attribute is already dirty.
@@ -941,7 +948,7 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                 ChipLogProgress(DataManagement, "Case 2: Set dirty during chunked report by wildcard path.");
                 readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 3);
                 DoTest(
-                    this, &readCallback,
+                    &readCallback,
                     Instruction{ .chunksize      = 2,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 2), WriteAttrOp(AttrOnEp5<Attr2>, 2),
                                                      WriteAttrOp(AttrOnEp5<Attr3>, 2) },
@@ -955,7 +962,7 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                                 "Case 3-1: Set dirty during chunked report by wildcard path -- new dirty attribute.");
                 readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 4);
                 DoTest(
-                    this, &readCallback,
+                    &readCallback,
                     Instruction{ .chunksize      = 1,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 4), WriteAttrOp(AttrOnEp5<Attr2>, 4) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 4 }, { AttrOnEp5<Attr2>, 4 }, { AttrOnEp5<Attr3>, 4 } },
@@ -966,7 +973,7 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                 app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(1);
                 readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr1>, 5);
                 DoTest(
-                    this, &readCallback,
+                    &readCallback,
                     Instruction{ .chunksize      = 1,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr2>, 5), WriteAttrOp(AttrOnEp5<Attr3>, 5) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 5 }, { AttrOnEp5<Attr2>, 5 }, { AttrOnEp5<Attr3>, 5 } },
@@ -1001,13 +1008,13 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
 
             EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-            DriveIOUntilSubscriptionEstablished(this, &readCallback);
+            DriveIOUntilSubscriptionEstablished(&readCallback);
 
             // Note, although the two attributes comes from the same cluster, they are generated by different interested paths.
             // In this case, we won't reset the path iterator.
             ChipLogProgress(DataManagement, "Case 1-1: Test set dirty during reports generated by concrete paths.");
             readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 4);
-            DoTest(this, &readCallback,
+            DoTest(&readCallback,
                    Instruction{ .chunksize      = 1,
                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 3), WriteAttrOp(AttrOnEp5<Attr2>, 3),
                                                     WriteAttrOp(AttrOnEp5<Attr3>, 3) },
@@ -1015,7 +1022,7 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
 
             // The attribute failed to catch last report will be picked by this report.
             ChipLogProgress(DataManagement, "Case 1-2: Check for attributes missed last report.");
-            DoTest(this, &readCallback, { .chunksize = 1, .expectedValues = { { AttrOnEp5<Attr3>, 4 } } });
+            DoTest(&readCallback, { .chunksize = 1, .expectedValues = { { AttrOnEp5<Attr3>, 4 } } });
         }
     }
 
