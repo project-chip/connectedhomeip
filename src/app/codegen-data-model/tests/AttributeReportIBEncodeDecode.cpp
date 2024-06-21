@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "TestAttributeReportIBsEncoding.h"
+#include "AttributeReportIBEncodeDecode.h"
 
 #include <app/MessageDef/AttributePathIB.h>
 #include <app/MessageDef/AttributeReportIB.h>

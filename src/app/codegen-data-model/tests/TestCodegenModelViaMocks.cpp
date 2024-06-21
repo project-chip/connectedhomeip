@@ -16,8 +16,8 @@
  */
 #include <app/codegen-data-model/CodegenDataModel.h>
 
+#include <app/codegen-data-model/tests/AttributeReportIBEncodeDecode.h>
 #include <app/codegen-data-model/tests/EmberReadWriteOverride.h>
-#include <app/codegen-data-model/tests/TestAttributeReportIBsEncoding.h>
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
