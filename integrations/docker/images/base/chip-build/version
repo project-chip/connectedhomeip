@@ -1,1 +1,1 @@
-55 : Update to Ubuntu 24.04 as the base build image
+60 : Add missing xz for esp32, upfate location of qemu-system-xtensa

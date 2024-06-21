@@ -45,7 +45,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         self.print_step(0, "Commissioning, already done")
 
         self.print_step(1, "TH1 opens a commissioning window")
-        params = self.default_controller.OpenCommissioningWindow(
+        params = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         self.print_step(2, "Commission to TH2")
@@ -53,10 +53,9 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
         TH2 = new_fabric_admin.NewController(nodeId=112233)
 
-        errcode = TH2.CommissionOnNetwork(
+        await TH2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
-        asserts.assert_true(errcode.is_success, 'Commissioning on TH2 did not complete successfully')
 
         self.print_step(3, "TH2 reads the current fabric")
         th2_fabric_idx = await self.read_single_attribute_check_success(
