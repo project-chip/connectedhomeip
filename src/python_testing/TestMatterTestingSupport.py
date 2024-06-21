@@ -15,9 +15,6 @@
 #    limitations under the License.
 #
 
-# test-runner-runs: run1
-# test-runner-run/run1/script-args: --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-
 import os
 import time
 import typing
