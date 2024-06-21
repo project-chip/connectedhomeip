@@ -352,7 +352,7 @@ if __name__ == '__main__':
     try:
         cached_file_pattern = '/tmp/chip_*'
         remove_cached_files(cached_file_pattern)
-    except OSError as e:
+    except OSError:
         logging.error(
             f'Error while removing cached files with file pattern: {cached_file_pattern}')
         sys.exit(1)
