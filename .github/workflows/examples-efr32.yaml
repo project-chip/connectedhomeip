@@ -33,7 +33,7 @@ jobs:
     name: EFR32
 
     env:
-      SILABS_BOARD: BRD4161A
+      SILABS_BOARD: BRD4187C
       BUILD_TYPE: gn_efr32
 
     runs-on: ubuntu-latest

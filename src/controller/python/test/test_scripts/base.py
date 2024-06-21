@@ -234,7 +234,7 @@ class BaseTestHelper:
     async def TestRevokeCommissioningWindow(self, ip: str, setuppin: int, nodeid: int):
         await self.devCtrl.SendCommand(
             nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
-        if not self.TestPaseOnly(ip=ip, setuppin=setuppin, nodeid=nodeid, devCtrl=self.devCtrl2):
+        if not await self.TestPaseOnly(ip=ip, setuppin=setuppin, nodeid=nodeid, devCtrl=self.devCtrl2):
             return False
 
         await self.devCtrl2.SendCommand(
@@ -248,17 +248,17 @@ class BaseTestHelper:
             nodeid, 0, Clusters.AdministratorCommissioning.Commands.RevokeCommissioning(), timedRequestTimeoutMs=10000)
         return True
 
-    def TestEnhancedCommissioningWindow(self, ip: str, nodeid: int):
-        params = self.devCtrl.OpenCommissioningWindow(nodeid=nodeid, timeout=600, iteration=10000, discriminator=3840, option=1)
-        return self.TestPaseOnly(ip=ip, nodeid=nodeid, setuppin=params.setupPinCode, devCtrl=self.devCtrl2)
+    async def TestEnhancedCommissioningWindow(self, ip: str, nodeid: int):
+        params = await self.devCtrl.OpenCommissioningWindow(nodeid=nodeid, timeout=600, iteration=10000, discriminator=3840, option=1)
+        return await self.TestPaseOnly(ip=ip, nodeid=nodeid, setuppin=params.setupPinCode, devCtrl=self.devCtrl2)
 
-    def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int, devCtrl=None):
+    async def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int, devCtrl=None):
         if devCtrl is None:
             devCtrl = self.devCtrl
         self.logger.info(
             "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
         try:
-            devCtrl.EstablishPASESessionIP(ip, setuppin, nodeid)
+            await devCtrl.EstablishPASESessionIP(ip, setuppin, nodeid)
         except ChipStackException:
             self.logger.info(
                 "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
@@ -267,11 +267,11 @@ class BaseTestHelper:
             "Successfully established PASE session with device id: {} addr: {}".format(str(nodeid), ip))
         return True
 
-    def TestCommissionOnly(self, nodeid: int):
+    async def TestCommissionOnly(self, nodeid: int):
         self.logger.info(
             "Commissioning device with id {}".format(nodeid))
         try:
-            self.devCtrl.Commission(nodeid)
+            await self.devCtrl.Commission(nodeid)
         except ChipStackException:
             self.logger.info(
                 "Failed to commission device with id {}".format(str(nodeid)))
@@ -280,17 +280,17 @@ class BaseTestHelper:
             "Successfully commissioned device with id {}".format(str(nodeid)))
         return True
 
-    def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
+    async def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
         self.logger.info(
             "Conducting key exchange with device {}".format(discriminator))
-        if not self.devCtrl.ConnectBLE(discriminator, setuppin, nodeid):
+        if not await self.devCtrl.ConnectBLE(discriminator, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(discriminator))
             return False
         self.logger.info("Device finished key exchange.")
         return True
 
-    def TestCommissionFailure(self, nodeid: int, failAfter: int):
+    async def TestCommissionFailure(self, nodeid: int, failAfter: int):
         self.devCtrl.ResetTestCommissioner()
         a = self.devCtrl.SetTestCommissionerSimulateFailureOnStage(failAfter)
         if not a:
@@ -299,10 +299,10 @@ class BaseTestHelper:
 
         self.logger.info(
             "Commissioning device, expecting failure after stage {}".format(failAfter))
-        self.devCtrl.Commission(nodeid)
+        await self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
-    def TestCommissionFailureOnReport(self, nodeid: int, failAfter: int):
+    async def TestCommissionFailureOnReport(self, nodeid: int, failAfter: int):
         self.devCtrl.ResetTestCommissioner()
         a = self.devCtrl.SetTestCommissionerSimulateFailureOnReport(failAfter)
         if not a:
@@ -310,13 +310,13 @@ class BaseTestHelper:
             return True
         self.logger.info(
             "Commissioning device, expecting failure on report for stage {}".format(failAfter))
-        self.devCtrl.Commission(nodeid)
+        await self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
-    def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
+    async def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Commissioning device {}".format(ip))
         try:
-            self.devCtrl.CommissionIP(ip, setuppin, nodeid)
+            await self.devCtrl.CommissionIP(ip, setuppin, nodeid)
         except ChipStackException:
             self.logger.exception(
                 "Failed to finish commissioning device {}".format(ip))
@@ -324,10 +324,10 @@ class BaseTestHelper:
         self.logger.info("Commissioning finished.")
         return True
 
-    def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
+    async def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
         try:
-            self.devCtrl.CommissionWithCode(setupPayload, nodeid, chip.discovery.DiscoveryType(discoveryType))
+            await self.devCtrl.CommissionWithCode(setupPayload, nodeid, chip.discovery.DiscoveryType(discoveryType))
         except ChipStackException:
             self.logger.exception(
                 "Failed to finish commissioning device {}".format(setupPayload))
@@ -335,7 +335,7 @@ class BaseTestHelper:
         self.logger.info("Commissioning finished.")
         return True
 
-    def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int, ip_override: str = None):
+    async def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int, ip_override: str = None):
         self.logger.info("Testing discovery")
         device = self.TestDiscovery(discriminator=discriminator)
         if not device:
@@ -345,7 +345,7 @@ class BaseTestHelper:
         if ip_override:
             address = ip_override
         self.logger.info("Testing commissioning")
-        if not self.TestCommissioning(address, setuppin, nodeid):
+        if not await self.TestCommissioning(address, setuppin, nodeid):
             self.logger.info("Failed to finish commissioning")
             return False
         return True
@@ -792,7 +792,7 @@ class BaseTestHelper:
             self.controllerNodeId, self.paaTrustStorePath)
 
         try:
-            self.devCtrl2.CommissionIP(ip, setuppin, nodeid)
+            await self.devCtrl2.CommissionIP(ip, setuppin, nodeid)
         except ChipStackException:
             self.logger.exception(
                 "Failed to finish key exchange with device {}".format(ip))
@@ -1313,15 +1313,15 @@ class BaseTestHelper:
             return False
         return True
 
-    def TestFabricScopedCommandDuringPase(self, nodeid: int):
+    async def TestFabricScopedCommandDuringPase(self, nodeid: int):
         '''Validates that fabric-scoped commands fail during PASE with UNSUPPORTED_ACCESS
 
         The nodeid is the PASE pseudo-node-ID used during PASE establishment
         '''
         status = None
         try:
-            asyncio.run(self.devCtrl.SendCommand(
-                nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel("roboto")))
+            await self.devCtrl.SendCommand(
+                nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel("roboto"))
         except IM.InteractionModelError as ex:
             status = ex.status
 

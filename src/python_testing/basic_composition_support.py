@@ -98,10 +98,10 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 
 class BasicCompositionTests:
-    def connect_over_pase(self, dev_ctrl):
+    async def connect_over_pase(self, dev_ctrl):
         setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
         asserts.assert_true(setupCode, "Require either --qr-code or --manual-code.")
-        dev_ctrl.FindOrEstablishPASESession(setupCode, self.dut_node_id)
+        await dev_ctrl.FindOrEstablishPASESession(setupCode, self.dut_node_id)
 
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]):
         node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
@@ -121,7 +121,7 @@ class BasicCompositionTests:
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
         if do_test_over_pase:
-            self.connect_over_pase(dev_ctrl)
+            await self.connect_over_pase(dev_ctrl)
             node_id = self.dut_node_id
         else:
             # Using the already commissioned node
