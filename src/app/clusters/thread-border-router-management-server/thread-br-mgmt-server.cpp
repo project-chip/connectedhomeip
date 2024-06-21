@@ -89,7 +89,8 @@ void ServerInstance::HandleGetDatasetRequest(HandlerContext & ctx, Delegate::Dat
     CHIP_ERROR err = mDelegate->GetDataset(dataset, type);
     if (err != CHIP_NO_ERROR)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, StatusIB(err).mStatus);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath,
+                                      err == CHIP_IM_GLOBAL_STATUS(NotFound) ? StatusIB(err).mStatus : Status::Failure);
         return;
     }
     response.dataset = dataset.AsByteSpan();
