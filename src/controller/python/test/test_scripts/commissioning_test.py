@@ -125,7 +125,7 @@ async def main():
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     logger.info("Testing discovery")
-    FailIfNot(test.TestDiscovery(discriminator=options.discriminator),
+    FailIfNot(await test.TestDiscovery(discriminator=options.discriminator),
               "Failed to discover any devices.")
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),

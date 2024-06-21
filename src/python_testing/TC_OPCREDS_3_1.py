@@ -34,7 +34,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
 
-        devices = dev_ctrl.DiscoverCommissionableNodes(
+        devices = await dev_ctrl.DiscoverCommissionableNodes(
             filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=longDiscriminator, stopOnFirst=False)
         # For some reason, the devices returned here aren't filtered, so filter ourselves
         device = next(filter(lambda d: d.commissioningMode ==

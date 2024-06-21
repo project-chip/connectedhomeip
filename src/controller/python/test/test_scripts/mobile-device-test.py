@@ -59,7 +59,7 @@ ALL_TESTS = ['network_commissioning', 'datamodel']
 
 async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
     logger.info("Testing discovery")
-    device = test.TestDiscovery(discriminator=discriminator)
+    device = await test.TestDiscovery(discriminator=discriminator)
     FailIfNot(device, "Failed to discover any devices.")
 
     address = device.addresses[0]
