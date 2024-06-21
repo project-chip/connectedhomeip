@@ -210,10 +210,10 @@ class BaseTestHelper:
             return None
         return ctypes.string_at(addrStrStorage).decode("utf-8")
 
-    def TestDiscovery(self, discriminator: int):
+    async def TestDiscovery(self, discriminator: int):
         self.logger.info(
             f"Discovering commissionable nodes with discriminator {discriminator}")
-        res = self.devCtrl.DiscoverCommissionableNodes(
+        res = await self.devCtrl.DiscoverCommissionableNodes(
             chip.discovery.FilterType.LONG_DISCRIMINATOR, discriminator, stopOnFirst=True, timeoutSecond=3)
         if not res:
             self.logger.info(
@@ -337,7 +337,7 @@ class BaseTestHelper:
 
     async def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int, ip_override: str = None):
         self.logger.info("Testing discovery")
-        device = self.TestDiscovery(discriminator=discriminator)
+        device = await self.TestDiscovery(discriminator=discriminator)
         if not device:
             self.logger.info("Failed to discover any devices.")
             return False
