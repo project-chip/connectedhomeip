@@ -70,7 +70,6 @@ tests:
                          0x0000,
                          0x0001,
                          0x0002,
-                         0x0003,
                          0xFFF8, # GeneratedCommandList
                          0xFFF9, # AcceptedCommandList
                          0xFFFA, # EventList
@@ -90,7 +89,6 @@ tests:
                          0x0000,
                          0x0001,
                          0x0002,
-                         0x0003,
                          0xFFF8, # GeneratedCommandList
                          0xFFF9, # AcceptedCommandList
                          0xFFFB, # AttributeList
@@ -108,8 +106,8 @@ tests:
           constraints:
               type: list
               contains: [
-                         0x0004, # PowerThreshold
-                         0x0005  # PowerThresholdSourse
+                         0x0003, # PowerThreshold
+                         0x0004  # PowerThresholdSourse
                         ]
 
     - label: "Step 5: Read the global attribute: EventList"
