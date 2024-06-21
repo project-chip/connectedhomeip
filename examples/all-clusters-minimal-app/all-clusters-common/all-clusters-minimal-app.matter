@@ -4421,114 +4421,114 @@ cluster ColorControl = 768 {
     int8u hue = 0;
     DirectionEnum direction = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveHueRequest {
     MoveModeEnum moveMode = 0;
     int8u rate = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepHueRequest {
     StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     int8u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveToSaturationRequest {
     int8u saturation = 0;
     int16u transitionTime = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct MoveSaturationRequest {
     MoveModeEnum moveMode = 0;
     int8u rate = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepSaturationRequest {
     StepModeEnum stepMode = 0;
     int8u stepSize = 1;
     int8u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveToHueAndSaturationRequest {
     int8u hue = 0;
     int8u saturation = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveToColorRequest {
     int16u colorX = 0;
     int16u colorY = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveColorRequest {
     int16s rateX = 0;
     int16s rateY = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct StepColorRequest {
     int16s stepX = 0;
     int16s stepY = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct MoveToColorTemperatureRequest {
     int16u colorTemperatureMireds = 0;
     int16u transitionTime = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct EnhancedMoveToHueRequest {
     int16u enhancedHue = 0;
     DirectionEnum direction = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct EnhancedMoveHueRequest {
     MoveModeEnum moveMode = 0;
     int16u rate = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
   }
 
   request struct EnhancedStepHueRequest {
     StepModeEnum stepMode = 0;
     int16u stepSize = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct EnhancedMoveToHueAndSaturationRequest {
     int16u enhancedHue = 0;
     int8u saturation = 1;
     int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
   }
 
   request struct ColorLoopSetRequest {
@@ -4537,13 +4537,13 @@ cluster ColorControl = 768 {
     ColorLoopDirectionEnum direction = 2;
     int16u time = 3;
     int16u startHue = 4;
-    bitmap8 optionsMask = 5;
-    bitmap8 optionsOverride = 6;
+    OptionsBitmap optionsMask = 5;
+    OptionsBitmap optionsOverride = 6;
   }
 
   request struct StopMoveStepRequest {
-    bitmap8 optionsMask = 0;
-    bitmap8 optionsOverride = 1;
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
   }
 
   request struct MoveColorTemperatureRequest {
@@ -4551,8 +4551,8 @@ cluster ColorControl = 768 {
     int16u rate = 1;
     int16u colorTemperatureMinimumMireds = 2;
     int16u colorTemperatureMaximumMireds = 3;
-    bitmap8 optionsMask = 4;
-    bitmap8 optionsOverride = 5;
+    OptionsBitmap optionsMask = 4;
+    OptionsBitmap optionsOverride = 5;
   }
 
   request struct StepColorTemperatureRequest {
@@ -4561,8 +4561,8 @@ cluster ColorControl = 768 {
     int16u transitionTime = 2;
     int16u colorTemperatureMinimumMireds = 3;
     int16u colorTemperatureMaximumMireds = 4;
-    bitmap8 optionsMask = 5;
-    bitmap8 optionsOverride = 6;
+    OptionsBitmap optionsMask = 5;
+    OptionsBitmap optionsOverride = 6;
   }
 
   /** Move to specified hue. */
