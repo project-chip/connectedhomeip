@@ -71,7 +71,15 @@ WaterHeaterManagementDelegate * GetWhmDelegate()
 
 void SetTestEventTrigger_BasicInstallationTestEvent()
 {
-    //    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+
+    dg->SetHeaterTypes(BitMask<WaterHeaterTypeBitmap>(WaterHeaterTypeBitmap::kImmersionElement2));
+    dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement2));
+    dg->SetTankVolume(21);
+    dg->SetEstimatedHeatRequired(10000);
+    dg->SetTankPercentage(35);
+    dg->SetBoostState(BoostStateEnum::kInactive);
+
 }
 
 void SetTestEventTrigger_BasicInstallationTestEventClear()
@@ -96,7 +104,11 @@ void SetTestEventTrigger_WaterTemperature66CTestEvent()
 
 void SetTestEventTrigger_ManualModeTestEvent()
 {
-    //    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+
+    dg->
+        ChipLogProgress(Support, "[Whm::kManualModeTestEvent] => Simulate the Water Heater Mode being set to MANUAL");
+        SetTestEventTrigger_ManualModeTestEvent();
 }
 
 void SetTestEventTrigger_OffModeTestEvent()
@@ -109,7 +121,7 @@ void SetTestEventTrigger_DrawOffHotWaterTestEvent()
     //    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 }
 
-bool HandleWhmTestEventTrigger(uint64_t eventTrigger)
+bool HandleWaterHeaterManagementTestEventTrigger(uint64_t eventTrigger)
 {
     WaterHeaterManagementTrigger trigger = static_cast<WaterHeaterManagementTrigger>(eventTrigger);
 

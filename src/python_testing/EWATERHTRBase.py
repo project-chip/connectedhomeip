@@ -70,25 +70,25 @@ class EWATERHTRBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def send_test_event_trigger_basic_installation_test_event(self):
-        await self.send_test_event_triggers(eventTrigger=0x0098000000000000)
+        await self.send_test_event_triggers(eventTrigger=0x0094000000000000)
 
     async def send_test_event_trigger_basic_installation_test_eventClear(self):
-        await self.send_test_event_triggers(eventTrigger=0x0098000000000001)
+        await self.send_test_event_triggers(eventTrigger=0x0094000000000001)
 
     async def send_test_event_trigger_water_temperature20C_test_event(self):
-        await self.send_test_event_triggers(eventTrigger=0x0098000000000002)
+        await self.send_test_event_triggers(eventTrigger=0x0094000000000002)
 
     async def send_test_event_trigger_water_temperature61C_test_event(self):
-        await self.send_test_event_triggers(eventTrigger=0x0098000000000003)
+        await self.send_test_event_triggers(eventTrigger=0x0094000000000003)
 
     async def send_test_event_trigger_water_temperature66C_test_event(self):
-        await self.send_test_event_triggers(eventTrigger=0x0098000000000004)
+        await self.send_test_event_triggers(eventTrigger=0x0094000000000004)
 
     async def send_test_event_trigger_manual_mode_test_event(self):
-        await self.send_test_event_triggers(eventTrigger=0x0098000000000005)
+        await self.send_test_event_triggers(eventTrigger=0x0094000000000005)
 
     async def send_test_event_trigger_off_mode_test_event(self):
-        await self.send_test_event_triggers(eventTrigger=0x0098000000000006)
+        await self.send_test_event_triggers(eventTrigger=0x0094000000000006)
 
     async def send_test_event_trigger_draw_off_hot_water_test_event(self):
-        await self.send_test_event_triggers(eventTrigger=0x0098000000000007)
+        await self.send_test_event_triggers(eventTrigger=0x0094000000000007)
