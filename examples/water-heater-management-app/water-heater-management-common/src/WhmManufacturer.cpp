@@ -36,15 +36,19 @@ using Protocols::InteractionModel::Status;
 
 CHIP_ERROR WhmManufacturer::Init()
 {
-    /* Manufacturers should modify this to do any custom initialisation */
-
-    /* Register callbacks */
     WaterHeaterManagementDelegate * dg = GetWhmManufacturer()->GetWhmDelegate();
     if (dg == nullptr)
     {
         ChipLogError(AppServer, "WhmDelegate is not initialized");
         return CHIP_ERROR_UNINITIALIZED;
     }
+
+    dg->SetHeaterTypes(BitMask<WaterHeaterTypeBitmap>(WaterHeaterTypeBitmap::kImmersionElement1));
+    dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement1));
+    dg->SetTankVolume(20);
+    dg->SetEstimatedHeatRequired(10000);
+    dg->SetTankPercentage(35);
+    dg->SetBoostState(BoostStateEnum::kInactive);
 
     return CHIP_NO_ERROR;
 }

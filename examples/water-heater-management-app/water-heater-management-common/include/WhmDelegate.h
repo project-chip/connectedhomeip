@@ -67,6 +67,15 @@ public:
     Percent GetTankPercentage()             override;
     BoostStateEnum GetBoostState()          override;
 
+    // ------------------------------------------------------------------
+    // Set attribute methods
+    void SetHeaterTypes(WaterHeaterTypeBitmap heaterTypes);
+    void SetHeatDemand(WaterHeaterDemandBitmap heatDemand);
+    void SetTankVolume(uint16_t tankVolume);
+    void SetEstimatedHeatRequired(int64_t estimatedHeatRequired);
+    void SetTankPercentage(Percent tankPercentage);
+    void SetBoostState(BoostStateEnum boostState);
+
 private:
     WaterHeaterTypeBitmap mHeaterTypes;
     WaterHeaterDemandBitmap mHeatDemand;

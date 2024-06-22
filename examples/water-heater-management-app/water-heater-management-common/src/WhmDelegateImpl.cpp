@@ -93,6 +93,36 @@ BoostStateEnum WaterHeaterManagementDelegate::GetBoostState()
     return mBoostState;
 }
 
+void WaterHeaterManagementDelegate::SetHeaterTypes(WaterHeaterTypeBitmap heaterTypes)
+{
+    mHeaterTypes = heaterTypes;
+}
+
+void WaterHeaterManagementDelegate::SetHeatDemand(WaterHeaterDemandBitmap heatDemand)
+{
+    mHeatDemand = heatDemand;
+}
+
+void WaterHeaterManagementDelegate::SetTankVolume(uint16_t tankVolume)
+{
+    mTankVolume = tankVolume;
+}
+
+void WaterHeaterManagementDelegate::SetEstimatedHeatRequired(int64_t estimatedHeatRequired)
+{
+    mEstimatedHeatRequired = estimatedHeatRequired;
+}
+
+void WaterHeaterManagementDelegate::SetTankPercentage(Percent tankPercentage)
+{
+    mTankPercentage = tankPercentage;
+}
+
+void WaterHeaterManagementDelegate::SetBoostState(BoostStateEnum boostState)
+{
+    mBoostState = boostState;
+}
+
 Protocols::InteractionModel::Status WaterHeaterManagementDelegate::HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat)
 {
     ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleBoost");
