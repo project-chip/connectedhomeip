@@ -104,11 +104,13 @@ void SetTestEventTrigger_WaterTemperature66CTestEvent()
 
 void SetTestEventTrigger_ManualModeTestEvent()
 {
+#if 0
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
     dg->
         ChipLogProgress(Support, "[Whm::kManualModeTestEvent] => Simulate the Water Heater Mode being set to MANUAL");
         SetTestEventTrigger_ManualModeTestEvent();
+#endif
 }
 
 void SetTestEventTrigger_OffModeTestEvent()

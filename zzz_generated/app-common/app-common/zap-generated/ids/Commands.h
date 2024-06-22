@@ -1073,6 +1073,20 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace EnergyEvseMode
 
+namespace WaterHeaterMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace WaterHeaterMode
+
 namespace DeviceEnergyManagementMode {
 namespace Commands {
 

@@ -2796,6 +2796,28 @@ enum class Feature : uint32_t
 };
 } // namespace EnergyEvseMode
 
+namespace WaterHeaterMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kOff    = 0x4000,
+    kManual = 0x4001,
+    kTimed  = 0x4002,
+    // kUnknownEnumValue intentionally not defined. This enum never goes
+    // through DataModel::Decode, likely because it is a part of a derived
+    // cluster. As a result having kUnknownEnumValue in this enum is error
+    // prone, and was removed. See
+    // src/app/common/templates/config-data.yaml.
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace WaterHeaterMode
+
 namespace DeviceEnergyManagementMode {
 
 // Enum for ModeTag
