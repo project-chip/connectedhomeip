@@ -37,6 +37,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using TestContext = chip::Test::AppContext;
 
@@ -144,11 +145,13 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         }
         else if (responseDirective == kSendSuccessStatusCodeWithClusterStatus)
         {
-            apCommandObj->AddClusterSpecificSuccess(aCommandPath, kTestSuccessClusterStatus);
+            apCommandObj->AddStatus(
+                aCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kTestSuccessClusterStatus));
         }
         else if (responseDirective == kSendErrorWithClusterStatus)
         {
-            apCommandObj->AddClusterSpecificFailure(aCommandPath, kTestFailureClusterStatus);
+            apCommandObj->AddStatus(
+                aCommandPath, Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kTestFailureClusterStatus));
         }
         else if (responseDirective == kAsync)
         {

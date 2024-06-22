@@ -278,6 +278,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 }
                 if (err != CHIP_ERROR_ENDPOINT_EXISTS)
                 {
+                    gDevices[index] = nullptr;
                     return -1;
                 }
                 // Handle wrap condition

@@ -46,7 +46,7 @@ config("nxp_platform_config") {
   }
   if (chip_enable_wifi && chip_enable_openthread) {
     # Disable thread nwk commissioning instance on endpoint 0, when OTBR is enabled
-    defines += [ "_NO_NETWORK_COMMISSIONING_DRIVER_" ]
+    defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
   }
 }
 

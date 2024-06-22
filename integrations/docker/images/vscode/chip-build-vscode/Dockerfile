@@ -4,7 +4,6 @@ FROM ghcr.io/project-chip/chip-build-nrf-platform:${VERSION} AS nrf
 FROM ghcr.io/project-chip/chip-build-efr32:${VERSION} AS efr32
 FROM ghcr.io/project-chip/chip-build-android:${VERSION} AS android
 FROM ghcr.io/project-chip/chip-build-esp32-qemu:${VERSION} as esp32
-FROM ghcr.io/project-chip/chip-build-mbed-os:${VERSION} AS mbedos
 FROM ghcr.io/project-chip/chip-build-telink:${VERSION} AS telink
 FROM ghcr.io/project-chip/chip-build-infineon:${VERSION} AS p6
 FROM ghcr.io/project-chip/chip-build-tizen:${VERSION} AS tizen
@@ -36,9 +35,6 @@ COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r23c /opt/android/android-ndk-r23c
 COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
 
-# FIXME: OpenOCD was removed during the move to infineon's repo
-# COPY --from=mbedos /opt/openocd/ /opt/openocd/
-
 COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 
 COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
@@ -64,7 +60,7 @@ COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 
 COPY --from=asr /opt/asr /opt/asr
 
-COPY --from=efr32 /opt/silabs/gecko_sdk /opt/silabs/gecko_sdk
+COPY --from=efr32 /opt/silabs/simplicity_sdk /opt/silabs/simplicity_sdk
 COPY --from=efr32 /opt/silabs/wiseconnect-wifi-bt-sdk /opt/silabs/wiseconnect-wifi-bt-sdk
 COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
 
@@ -76,6 +72,15 @@ COPY --from=nuttx /opt/nuttx /opt/nuttx
 RUN set -x \
     && mkdir -p /opt/android/sdk/licenses \
     && chmod -R a+w /opt/android/sdk/licenses \
+    && : # last line
+
+# mbedos requirements are generally just PIP packages
+RUN set -x \
+    && pip3 install --break-system-packages --no-cache-dir -U mbed-cli==1.10.5 mbed-tools==7.44.0 \
+    && : # last line
+RUN set -x \
+    && mbed config -G GCC_ARM_PATH /opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/ \
+    && mbed toolchain -G -s GCC_ARM \
     && : # last line
 
 # Required for the Tizen SDK:
@@ -100,7 +105,7 @@ RUN set -x \
 
 # Required for the Bouffalolab platform
 RUN set -x \
-    && pip3 install bflb-iot-tool==1.8.6 \
+    && pip3 install --break-system-packages bflb-iot-tool==1.8.6 \
     && : # last line
 
 ENV PATH $PATH:/usr/lib/kotlinc/bin
@@ -108,8 +113,10 @@ ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
 ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
-ENV SILABS_BOARD=BRD4161A
-ENV GSDK_ROOT=/opt/silabs/gecko_sdk/
+ENV SILABS_BOARD=BRD4186C
+# Keep GSDK_ROOT name until rename transition to SISDK is completed
+ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
+ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
@@ -122,7 +129,7 @@ ENV NXP_K32W1_SDK_ROOT=/opt/k32w/k32w1
 ENV NXP_SDK_ROOT=/opt/nxp-sdk/rw61x
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
-ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
+ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr

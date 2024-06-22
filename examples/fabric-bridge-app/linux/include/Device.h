@@ -32,7 +32,7 @@ class Device
 public:
     static const int kDeviceNameSize = 32;
 
-    Device(chip::NodeId nodeId, const char * name);
+    Device(chip::NodeId nodeId);
     virtual ~Device() {}
 
     bool IsReachable();
@@ -41,6 +41,7 @@ public:
     void SetLocation(std::string location) { mLocation = location; };
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
+    inline chip::NodeId GetNodeId() { return mNodeId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
     inline char * GetName() { return mName; };
