@@ -28,7 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
-#define WHM_ENDPOINT 1
+static constexpr int WHM_ENDPOINT = 1;
 
 using namespace chip;
 using namespace chip::app;
@@ -59,11 +59,11 @@ CHIP_ERROR WhmInit()
 
     if (gWhmDelegate || gWhmInstance)
     {
-        ChipLogError(AppServer, "EVSE Instance or Delegate already exist.");
+        ChipLogError(AppServer, "WaterHeaterManager Instance or Delegate already exist.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    gWhmDelegate = std::make_unique<WaterHeaterManagementDelegate>();
+    gWhmDelegate = std::make_unique<WaterHeaterManagementDelegate>(WHM_ENDPOINT);
     if (!gWhmDelegate)
     {
         ChipLogError(AppServer, "Failed to allocate memory for WaterHeaterManagementDelegate");
@@ -82,15 +82,18 @@ CHIP_ERROR WhmInit()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    err = gWhmInstance->Init(); /* Register Attribute & Command handlers */
+    ChipLogDetail(AppServer, "WhmInit5");
+    /* Register Attribute & Command handlers */
+    err = gWhmInstance->Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Init failed on gWhmInstance");
+        ChipLogError(AppServer, "gWhmInstance->Init failed %s", chip::ErrorStr(err));
         gWhmInstance.reset();
         gWhmDelegate.reset();
         return err;
     }
 
+    ChipLogDetail(AppServer, "WhmInit6");
     return CHIP_NO_ERROR;
 }
 
@@ -123,6 +126,8 @@ CHIP_ERROR WhmShutdown()
  */
 CHIP_ERROR WhmManufacturerInit()
 {
+    ChipLogDetail(AppServer, "WhmManufacturerInit");
+
     CHIP_ERROR err;
 
     if (gWhmManufacturer)
@@ -165,6 +170,8 @@ CHIP_ERROR WhmManufacturerShutdown()
 
 void WhmApplicationInit()
 {
+    ChipLogDetail(AppServer, "Water Heater Management App: WhmApplicationInit()");
+
     if (WhmInit() != CHIP_NO_ERROR)
     {
         return;
@@ -180,7 +187,7 @@ void WhmApplicationInit()
 
 void WhmApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Water Heater Management App: ApplicationShutdown()");
+    ChipLogDetail(AppServer, "Water Heater Management App: WhmApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
     WhmManufacturerShutdown();       /* Free the WhmManufacturer */

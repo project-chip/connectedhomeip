@@ -21,13 +21,13 @@
 
 void ApplicationInit()
 {
-    ChipLogDetail(AppServer, "Energy Management App: ApplicationInit()");
+    ChipLogDetail(AppServer, "Water Heater Management App: ApplicationInit()");
     WhmApplicationInit();
 }
 
 void ApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
+    ChipLogDetail(AppServer, "Water Heater Management App: ApplicationShutdown()");
     WhmApplicationShutdown();
 }
 

@@ -37,6 +37,7 @@ namespace WaterHeaterManagement {
 
 CHIP_ERROR Instance::Init()
 {
+    ChipLogError(Zcl, "PETER Instance::Init");
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 

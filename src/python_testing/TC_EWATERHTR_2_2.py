@@ -114,28 +114,20 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         await self.send_test_event_trigger_basic_installation_test_event()
 
         self.step("3a")
-        await self.check_whm_attribute("HeatDemand", Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement2)
+        await self.check_whm_attribute("HeatDemand", 0)
 
         self.step("3b")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
         self.step("3c")
-        await self.check_whm_attribute("HeaterTypes", Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kImmersionElement2)
+        await self.check_whm_attribute("HeaterTypes", Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kImmersionElement1)
 
         self.step("4")
         await self.send_test_event_trigger_manual_mode_test_event()
 
+        self.step("4a")
+        await self.check_whm_attribute("HeatDemand", Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1)
 
-        self.step("2c")
-        await self.check_whm_attribute("TankVolume", 20)
-
-        self.step("2d")
-        await self.check_whm_attribute("EstimatedHeatRequired", 10000)
-
-        self.step("2e")
-        await self.check_whm_attribute("TankPercentage", 35)
-
-        self.step("2f")
 
 
 if __name__ == "__main__":

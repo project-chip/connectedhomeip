@@ -29,4 +29,4 @@ chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 matter_enable_tracing_support = true
 
 chip_enable_read_client = false
-chip_enable_water_heater_mamagement_trigger = true
+chip_enable_water_heater_management_trigger = true

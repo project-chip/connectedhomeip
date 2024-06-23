@@ -41,6 +41,7 @@ void WaterHeaterManagement::Shutdown()
         delete gWhmInstance;
         gWhmInstance = nullptr;
     }
+
     if (gWhmDelegate != nullptr)
     {
         delete gWhmDelegate;
@@ -50,25 +51,34 @@ void WaterHeaterManagement::Shutdown()
 
 void emberAfWaterHeaterManagementClusterInitCallback(chip::EndpointId endpointId)
 {
+#if 0
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gWhmInstance == nullptr && gWhmDelegate == nullptr);
 
-    gWhmDelegate = new WaterHeaterManagementDelegate;
     EndpointId waterHeaterManagementEndpoint = 0x01;
+
+    gWhmDelegate = new WaterHeaterManagementDelegate(waterHeaterManagementEndpoint);
     gWhmInstance =
         new WaterHeaterManagement::Instance(waterHeaterManagementEndpoint,
                                             *gWhmDelegate,
                                             BitMask<Feature, uint32_t>(Feature::kEnergyManagement, Feature::kTankPercent));
 
     gWhmInstance->Init();
+#endif
 }
 
-WaterHeaterTypeBitmap WaterHeaterManagementDelegate::GetHeaterTypes()
+/*********************************************************************************
+ *
+ * Methods implementing the WaterHeaterManagement::Delegate interace
+ *
+ *********************************************************************************/
+
+BitMask<WaterHeaterTypeBitmap> WaterHeaterManagementDelegate::GetHeaterTypes()
 {
     return mHeaterTypes;
 }
 
-WaterHeaterDemandBitmap WaterHeaterManagementDelegate::GetHeatDemand()
+BitMask<WaterHeaterDemandBitmap> WaterHeaterManagementDelegate::GetHeatDemand()
 {
     return mHeatDemand;
 }
@@ -93,13 +103,14 @@ BoostStateEnum WaterHeaterManagementDelegate::GetBoostState()
     return mBoostState;
 }
 
-void WaterHeaterManagementDelegate::SetHeaterTypes(WaterHeaterTypeBitmap heaterTypes)
+void WaterHeaterManagementDelegate::SetHeaterTypes(BitMask<WaterHeaterTypeBitmap> heaterTypes)
 {
     mHeaterTypes = heaterTypes;
 }
 
-void WaterHeaterManagementDelegate::SetHeatDemand(WaterHeaterDemandBitmap heatDemand)
+void WaterHeaterManagementDelegate::SetHeatDemand(BitMask<WaterHeaterDemandBitmap> heatDemand)
 {
+    ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetHeatDemand %d", heatDemand.Raw());
     mHeatDemand = heatDemand;
 }
 
@@ -135,5 +146,129 @@ Protocols::InteractionModel::Status WaterHeaterManagementDelegate::HandleCancelB
     ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleCancelBoost");
 
     return Status::Success;
+}
+
+/*********************************************************************************
+ *
+ * Methods implementing the ModeBase::Delegate interface
+ *
+ *********************************************************************************/
+
+CHIP_ERROR WaterHeaterManagementDelegate::Init()
+{
+    return CHIP_NO_ERROR;
+}
+
+void WaterHeaterManagementDelegate::HandleChangeToMode(uint8_t NewMode,
+                                                       ModeBase::Commands::ChangeToModeResponse::Type & response)
+{
+    ChipLogError(Zcl, "WaterHeaterManagementDelegate::HandleChangeToMode");
+    response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+}
+
+CHIP_ERROR WaterHeaterManagementDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+{
+    ChipLogError(Zcl, "WaterHeaterManagementDelegate::GetModeLabelByIndex");
+    if (modeIndex >= ArraySize(kModeOptions))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
+}
+
+CHIP_ERROR WaterHeaterManagementDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+{
+    ChipLogError(Zcl, "WaterHeaterManagementDelegate::GetModeValueByIndex");
+    if (modeIndex >= ArraySize(kModeOptions))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    value = kModeOptions[modeIndex].mode;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WaterHeaterManagementDelegate::GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags)
+{
+    ChipLogError(Zcl, "WaterHeaterManagementDelegate::GetModeTagsByIndex");
+    if (modeIndex >= ArraySize(kModeOptions))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    if (tags.size() < kModeOptions[modeIndex].modeTags.size())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
+    tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
+
+    return CHIP_NO_ERROR;
+}
+
+/*********************************************************************************
+ *
+ * WaterHeaterManagementDelegate specific methods
+ *
+ *********************************************************************************/
+
+void WaterHeaterManagementDelegate::SetWaterHeaterMode(uint8_t modeValue)
+{
+    for (int i = 0; i < 100; i++)
+    {
+        ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetWaterHeaterMode %d", modeValue);
+    }
+    bool isSupported = mInstance->IsSupportedMode(modeValue);
+    if (!isSupported)
+    {
+        ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetWaterHeaterMode bad mode");
+        return;
+    }
+
+    for (int i = 0; i < 100; i++)
+    {
+        ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetWaterHeaterMode2 %d", modeValue);
+    }
+    Protocols::InteractionModel::Status status = mInstance->UpdateCurrentMode(modeValue);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetWaterHeaterMode updateMode failed");
+        return;
+    }
+
+    for (int i = 0; i < 100; i++)
+    {
+        ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetWaterHeaterMode3 %d", modeValue);
+    }
+    bool found = false;
+    uint8_t rawBitmask = mHeaterTypes.Raw();
+    uint8_t bit = 0;
+    while (rawBitmask != 0 && !found)
+    {
+        if (rawBitmask &1 )
+        {
+            found = true;
+        }
+        else
+        {
+            bit++;
+            rawBitmask >>= 1;
+        }
+    }
+
+    for (int i = 0; i < 100; i++)
+    {
+        ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetWaterHeaterMode4 %d", modeValue);
+    }
+
+    if (found)
+    {
+        SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(1 << bit));
+    }
+    else
+    {
+        ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetWaterHeaterMode Failed to find heaterType");
+    }
+
 }
 

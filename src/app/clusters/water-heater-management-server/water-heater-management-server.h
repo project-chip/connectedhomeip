@@ -67,8 +67,8 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual WaterHeaterTypeBitmap GetHeaterTypes()  = 0;
-    virtual WaterHeaterDemandBitmap GetHeatDemand() = 0;
+    virtual BitMask<WaterHeaterTypeBitmap> GetHeaterTypes()  = 0;
+    virtual BitMask<WaterHeaterDemandBitmap> GetHeatDemand() = 0;
     virtual uint16_t GetTankVolume()                = 0;
     virtual int64_t GetEstimatedHeatRequired()      = 0;
     virtual Percent GetTankPercentage()             = 0;
