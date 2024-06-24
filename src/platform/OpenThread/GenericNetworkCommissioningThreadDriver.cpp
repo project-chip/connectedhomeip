@@ -99,7 +99,11 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
 
     if (!GetEnabled())
     {
-        // If backup is found, set InterfaceEnabled to default value (true).
+        // When reverting configuration, set InterfaceEnabled to default value (true).
+        // From the spec:
+        // If InterfaceEnabled is written to false on the same interface as that which is used to write the value, the Administrator
+        // could await the recovery of network configuration to prior safe values, before being able to communicate with the
+        // node again.
         ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Delete(kInterfaceEnabled));
     }
 
