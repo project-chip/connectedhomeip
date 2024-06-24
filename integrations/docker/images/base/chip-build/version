@@ -1,1 +1,1 @@
-59 : Install order fix for glib with enabled thread sanitizer.
+61 : Update env variable in vscode image

@@ -261,8 +261,6 @@ template("siwx917_sdk") {
       defines += [ "LWIP_IPV6=0" ]
     }
 
-    defines += board_defines
-
     if (chip_enable_wifi_ipv4) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
     }
