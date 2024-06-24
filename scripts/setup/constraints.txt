@@ -16,7 +16,7 @@ attrs==23.2.0
     # via
     #   jsonschema
     #   referencing
-bitarray==2.6.0
+bitarray==2.9.2
     # via -r requirements.esp32.txt
 bitstring==3.1.9
     # via
@@ -92,9 +92,9 @@ exceptiongroup==1.2.1
     # via ipython
 executing==2.0.1
     # via stack-data
-fastcore==1.5.46
+fastcore==1.5.48
     # via ghapi
-filelock==3.15.1
+filelock==3.15.4
     # via
     #   cachecontrol
     #   virtualenv
@@ -177,7 +177,7 @@ protobuf==4.24.4
     # via
     #   -r requirements.all.txt
     #   mypy-protobuf
-psutil==5.9.8
+psutil==6.0.0
     # via portpicker
 ptyprocess==0.7.0
     # via pexpect
@@ -295,7 +295,7 @@ urllib3==1.26.19
     # via
     #   idf-component-manager
     #   requests
-virtualenv==20.26.2
+virtualenv==20.26.3
     # via -r requirements.all.txt
 watchdog==4.0.1
     # via -r requirements.all.txt
@@ -311,11 +311,11 @@ wheel==0.43.0 ; sys_platform == "linux"
     #   pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==24.0
+pip==24.1
     # via
     #   ghapi
     #   pip-tools
-setuptools==70.0.0
+setuptools==70.1.0
     # via
     #   pip-tools
     #   west
