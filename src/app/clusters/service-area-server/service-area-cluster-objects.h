@@ -182,7 +182,7 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     {
         if (!locationInfo.locationInfo.IsNull())
         {
-            return locationInfo.locationInfo->locationName.data_equal(aLocationName);
+            return locationInfo.locationInfo.Value().locationName.data_equal(aLocationName);
         }
 
         return false; // name is Null or text sizes do not match
@@ -225,17 +225,17 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
         if (!locationInfo.locationInfo.IsNull())
         {
 
-            if (!IsNameEqual(aOther.locationInfo.locationInfo->locationName))
+            if (!IsNameEqual(aOther.locationInfo.locationInfo.Value().locationName))
             {
                 return false;
             }
 
-            if (locationInfo.locationInfo->floorNumber != aOther.locationInfo.locationInfo->floorNumber)
+            if (locationInfo.locationInfo.Value().floorNumber != aOther.locationInfo.locationInfo.Value().floorNumber)
             {
                 return false;
             }
 
-            if (locationInfo.locationInfo->areaType != aOther.locationInfo.locationInfo->areaType)
+            if (locationInfo.locationInfo.Value().areaType != aOther.locationInfo.locationInfo.Value().areaType)
             {
                 return false;
             }
