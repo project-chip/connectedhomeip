@@ -11,10 +11,10 @@ which is built on the TI Platform.
 
 ## Texas Instruments SimpleLink SDK
 
-This Texas Instruments Matter GitHub repository contains the software
-development components and tools that enable engineers to develop Matter based
-products. This repository is the starting point for Matter development on all
-SimpleLink Thread and Wi-Fi wireless microcontrollers (MCUs).
+This Matter GitHub repository contains the software development components and
+tools that enable engineers to develop Matter based products. This repository is
+the starting point for Matter development on all SimpleLink Thread and Wi-Fi
+wireless microcontrollers (MCUs).
 
 The SimpleLink MCU portfolio offers a single development environment that
 delivers flexible hardware, software, and tool options for customers developing
@@ -150,17 +150,6 @@ For instructions on how to configure the OpenThread build configuration for a
 Matter application, please refer to the guide linked below.
 
 -   [OpenThread Library Configuration](./ti_openthread_library_usage.md)
-
-<hr>
-
-## TI Matter Product Certification
-
-For instructions on how to certify both Software and Hardware Matter components,
-please refer to the guide linked below.
-
--   [TI Matter Product Certification](./ti_matter_product_certification.md)
-
-<hr>
 
 ### TI Support
 
