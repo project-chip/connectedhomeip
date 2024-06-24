@@ -40,7 +40,7 @@ ti/ti_platform_overview
 -   [Silicon Labs - Getting Started](./silabs_getting_started.md)
 -   [Silicon Labs - Software Update](./silabs_efr32_software_update.md)
 -   [Silicon Labs - CLI Guide](./silabs_cli_guide.md)
--   [TI - Platform Overview](./ti/ti_platform_overview.md)
+-   [TI - Platform Overview](./ti/matter-users-guide/ti_matter_overview.md)
 
 ## Tool Guides
 

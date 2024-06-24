@@ -1,10 +1,5 @@
 # Configure The Board Files with SysConfig
 
-## Table of Contents
-
--   [Reserve Peripherals](#Reserve-Peripherals)
--   [Hardware View](#Hardware-View)
-
 The board view shows you what pins are available on your board, and what
 peripherals are assigned to what pins. Hover over each pin for more information.
 
@@ -44,7 +39,7 @@ Below are the steps required to utilize the Reserve Peripherals feature.
 2.  Open the panel \"Reserve Peripherals\"
 
     <div style="text-align: center;">
-      <img src="images/syscfg-reserve-peripheral-panel.png" width=30%>
+      <img src="images/reserve-peripheral-panel.png" width=30%>
     </div>
 
 3.  Reserve the resources
@@ -53,7 +48,7 @@ Below are the steps required to utilize the Reserve Peripherals feature.
     15
 
     <div style="text-align: center;">
-      <img src="images/syscfg-reserve-gpio.png" width=30%>
+      <img src="images/reserve-gpio.png" width=30%>
     </div>
 
 SysConfig ensures no resource conflict occurs. In case no solution can be found,
@@ -70,5 +65,5 @@ resources.
 Sysconfig Hardware View:
 
 <div style="text-align: center;">
-  <img src="images/syscfg_hardware_view.png" width=30%>
+  <img src="images/hardware_view.png" width=30%>
 </div>
