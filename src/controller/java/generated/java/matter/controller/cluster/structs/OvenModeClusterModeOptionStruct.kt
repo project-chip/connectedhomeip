@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class OvenModeClusterModeOptionStruct(
   val label: String,
   val mode: UByte,
-  val modeTags: List<OvenModeClusterModeTagStruct>
+  val modeTags: List<OvenModeClusterModeTagStruct>,
 ) {
   override fun toString(): String = buildString {
     append("OvenModeClusterModeOptionStruct {\n")
