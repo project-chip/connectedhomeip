@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,6 +99,7 @@ public:
 
     /**
      * Handle application logic when the mode is changing.
+     *
      * @param mode The new mode that the device is requested to transition to.
      * @param response A reference to a response that will be sent to the client. The contents of which con be modified by the
      * application.
@@ -107,17 +108,22 @@ public:
 
     /**
      * Get the mode label of the Nth mode in the list of modes.
+     *
      * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
      * @param label A reference to the mutable char span which will be mutated to receive the label on success. Use
      * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
+     *
      * @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available labels.
      */
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
+
     /**
      * Get the mode value of the Nth mode in the list of modes.
+     *
      * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
      * @param value a reference to the uint8_t variable that is to contain the mode value.
+     *
      * @return Returns a CHIP_NO_ERROR if there was no error and the value was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available values.
      */
@@ -128,6 +134,7 @@ public:
      * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
      * @param tags a reference to an existing and initialised buffer that is to contain the mode tags. std::copy can be used
      * to copy into the buffer.
+     *
      * @return Returns a CHIP_NO_ERROR if there was no error and the mode tags were returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available mode tags.
      */
@@ -139,18 +146,55 @@ public:
      *
      *********************************************************************************/
 
+    /**
+     * @brief Set the Water Header Mode and act accordingly.
+     *
+     * @param mode  The Water Heater Mode (e.g. OFF, MANUAL or TIMED).
+     */
     void SetWaterHeaterMode(uint8_t mode);
 
+    /**
+     * @brief Set the water temperature of the tank
+     *
+     * @param waterTemperature  The water temperature in 100th's Celsius
+     */
     void SetWaterTemperature(uint16_t waterTemperature);
+
+    /**
+     * @brief Set the target water temperature of the tank
+     *
+     * @param targetWaterTemperature  The water temperature in 100th's Celsius
+     */
     void SetTargetWaterTemperature(uint16_t targetWaterTemperature);
 
-    void CheckHeatDemand();
+    /**
+     * @brief Determine whether the heating sources need to be turned on or off
+     */
+    void CheckIfHeatNeedsToBeTurnedOnOrOff();
 
+    /**
+     * @brief Static timer callback for when Boost timer expires.
+     */
     static void BoostTimerExpiry(System::Layer * systemLayer, void * delegate);
+
+    /**
+     * @brief Object timer callback for when Boost timer expires.
+     */
     void HandleBoostTimerExpiry();
 
+    /**
+     * Determines whether the tank water temperature has reached the target temperature.
+     *
+     * @return Returns True is tank water temperature has reached the target temperature, False otherwise.
+     */
     bool HasWaterTemperatureReachedTarget() const;
 
+    /**
+     * Simulates water being drawn from the water tank.
+     *
+     * @param percentageReplaced  The % of water being replaced with water with a temperature of replacedWaterTemperature.
+     * @param replacedWaterTemperature  The temperature of the percentageReplaced water.
+     */
     void DrawOffHotWater(uint8_t percentageReplaced, uint16_t replacedWaterTemperature);
 
     /*********************************************************************************
@@ -159,8 +203,15 @@ public:
      *
      *********************************************************************************/
 
+    // The Water Header Modes
+
+    // The device will not attempt to keep the water warm.
     static constexpr uint8_t ModeOff    = 0;
+
+    // The device will attempt to keep the water warm based on the OccupiedHeatingSetpoint attribute of the associated Thermostat cluster.
     static constexpr uint8_t ModeManual = 1;
+
+    // The device will attempt to keep the water warm based on the Schedules attribute of the associated Thermostat cluster.
     static constexpr uint8_t ModeTimed  = 2;
 
 private:
@@ -171,6 +222,7 @@ private:
      *
      *********************************************************************************/
 
+    // Need the following so can determine which features are supported
     WaterHeaterManagement::Instance *mpWhmInstance;
 
     // Target water temperature in 100ths of a C
@@ -179,15 +231,32 @@ private:
     // Actual water temperature in 100ths of a C
     uint16_t mHotWaterTemperature;
 
+    // The % of hot water remaining at mHotWaterTemperature
     uint8_t mPercentageHotWater;
+
+    // The (100 - mPercentageHotWater)% of water at mReplacedWaterTemperature
     uint16_t mReplacedWaterTemperature;
 
+    // Boost command parameters
+
+    // This field SHALL indicate whether the BOOST state should be automatically canceled once the hot water has first reached the set point temperature (or the TemporarySetpoint temperature, if specified) for the TargetPercentage (if specified).
     Optional<bool> mBoostOneShot;
+
+    // This field indicates that the consumer wants the water to be heated as quickly as practicable. This MAY cause multiple heat sources to be activated (e.g. a heat pump and direct electric heating element).
     Optional<bool> mBoostEmergencyBoost;
+
+    // This field indicates the target temperature to which to heat the hot water for this Boost command. It SHALL be used instead of the normal set point temperature whilst the BOOST state is active.
     Optional<int16_t> mBoostTemporarySetpoint;
+
+    // If the tank supports the TankPercent feature, this field indicates the amount of water that SHALL be heated by this Boost command before the heater is switched off.
+    // This field is optional, however it SHALL be included if the TargetReheat field is included.
     Optional<chip::Percent> mBoostTargetPercentage;
+
+    // If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because the TargetPercentage of the water in the tank has been heated to the set point (or TemporarySetpoint if included), this field indicates the percentage to which the hot water in the tank SHALL be allowed to fall before again beginning to reheat it.
+    // For example if the TargetPercentage was 80%, and the TargetReheat was 40%, then after initial heating to 80% hot water, the tank may have hot water drawn off until only 40% hot water remains. At this point the heater will begin to heat back up to 80% of hot water. If this field and the OneShot field were both omitted, heating would begin again after any water draw which reduced the TankPercentage below 80%.
     Optional<chip::Percent> mBoostTargetReheat;
 
+    // Track whether the water temperature has reached the water temperature specified in the boost command. Used in conjunction with the boost command boostTargetReheat parameter
     bool mBoostTargetTemperatureReached;
 
     /*********************************************************************************
@@ -196,12 +265,25 @@ private:
      *
      *********************************************************************************/
 
+    // Access to the Water Heater Mode instance
     ModeBase::Instance mWaterHeaterModeInstance;
+
+    // This attribute SHALL indicate the methods to call for heat that the controller supports. If a bit is set then the controller supports the corresponding method.
     BitMask<WaterHeaterTypeBitmap> mHeaterTypes;
+
+    // This attribute SHALL indicate if the controller is asking for heat. If a bit is set then the corresponding call for heat is active.
     BitMask<WaterHeaterDemandBitmap> mHeatDemand;
+
+    // This attribute SHALL indicate the volume of water that the hot water tank can hold (in units of Litres). This allows an energy management system to estimate the required heating energy needed to reach the target temperature.
     uint16_t mTankVolume;
+
+    // This attribute SHALL indicate the estimated heat energy needed to raise the water temperature to the target setpoint. This can be computed by taking the specific heat capacity of water (4182 J/kg °C) and by knowing the current temperature of the water, the tank volume and target temperature.
     int64_t mEstimatedHeatRequired;
+
+    // This attribute SHALL indicate an approximate level of hot water stored in the tank, which may help consumers understand the amount of hot water remaining in the tank.
     Percent mTankPercentage;
+
+    // This attribute SHALL indicate if the BOOST state, as triggered by a Boost command, is currently active.
     BoostStateEnum mBoostState;
 
     /*********************************************************************************
@@ -227,10 +309,6 @@ private:
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTimed) }
     };
 };
-
-Instance * GetWaterHeaterManagementInstance();
-
-void Shutdown();
 
 } // namespace WaterHeaterManagement
 } // namespace Clusters

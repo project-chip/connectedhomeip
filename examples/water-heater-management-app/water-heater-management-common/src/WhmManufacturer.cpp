@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,18 +21,11 @@
 
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
-#include <app/server/Server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
-using namespace chip::app;
-using namespace chip::app::DataModel;
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WaterHeaterManagement;
-
-using Protocols::InteractionModel::Status;
 
 CHIP_ERROR WhmManufacturer::Init()
 {
@@ -66,33 +59,31 @@ void SetTestEventTrigger_BasicInstallationTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
+    // Simulate installation in a 100L tank full of water at 20C, with a target temperature of 60C, in OFF mode
     dg->SetTankVolume(100);
     dg->SetTargetWaterTemperature(6000);
-
     dg->SetHeaterTypes(BitMask<WaterHeaterTypeBitmap>(WaterHeaterTypeBitmap::kImmersionElement1));
-    //dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement2));
-    //    dg->SetEstimatedHeatRequired(10000);
     dg->SetBoostState(BoostStateEnum::kInactive);
     dg->DrawOffHotWater(100, 2000);
-
 }
 
 void SetTestEventTrigger_BasicInstallationTestEventClear()
 {
-    //    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 }
 
 void SetTestEventTrigger_WaterTemperature20CTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
-    dg->DrawOffHotWater(100, 2000);
+    // Simulate 100% of the water in the tank being at 20C
+    dg->SetWaterTemperature(2000);
 }
 
 void SetTestEventTrigger_WaterTemperature61CTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
+    // Simulate 100% of the water in the tank being at 61C
     dg->SetWaterTemperature(6100);
 }
 
@@ -100,6 +91,7 @@ void SetTestEventTrigger_WaterTemperature66CTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
+    // Simulate 100% of the water in the tank being at 66C
     dg->SetWaterTemperature(6600);
 }
 
@@ -107,6 +99,7 @@ void SetTestEventTrigger_ManualModeTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
+    // Simulate the Water Heater Mode being set to MANUAL
     dg->SetWaterHeaterMode(WaterHeaterManagementDelegate::ModeManual);
 }
 
@@ -114,6 +107,7 @@ void SetTestEventTrigger_OffModeTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
+    // Simulate the Water Heater Mode being set to OFF
     dg->SetWaterHeaterMode(WaterHeaterManagementDelegate::ModeOff);
 }
 
@@ -121,6 +115,7 @@ void SetTestEventTrigger_DrawOffHotWaterTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
+    // Simulate drawing off 25% of the tank volume of hot water, replaced with water at 20C
     dg->DrawOffHotWater(25, 2000);
 }
 

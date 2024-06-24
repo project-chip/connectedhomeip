@@ -16,12 +16,9 @@
 
 
 import logging
-import time
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from EWATERHTRBase import EWATERHTRBase
 
@@ -32,12 +29,12 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
 
     def desc_TC_EWATERHTR_2_3(self) -> str:
         """Returns a description of this test"""
-        return "[TC-EWATERHTR-2.1] Attributes with attributes with DUT as Server\n" \
-            "This test case verifies the non-global attributes of the Water Heater Management cluster server."
+        return "[TC-EWATERHTR-2.3] Attributes with attributes with DUT as Server\n" \
+            "This test case verifies the functionality of the Water Heater Management cluster server with the TankPercentage feature."
 
     def pics_TC_EWATERHTR_2_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["EWATERHTR.S", "EWATERHTR.S.F00"]
+        return ["EWATERHTR.S", "EWATERHTR.S.F01"]
 
     def steps_TC_EWATERHTR_2_3(self) -> list[TestStep]:
         steps = [

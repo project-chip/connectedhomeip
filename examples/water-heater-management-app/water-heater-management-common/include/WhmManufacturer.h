@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,6 @@
 #include <WhmDelegate.h>
 #include <WhmInstance.h>
 
-using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -29,6 +28,8 @@ namespace WaterHeaterManagement {
 
 /**
  * The WhmManufacturer example class
+ *
+ * Helps with handling the test triggers.
  */
 
 class WhmManufacturer
@@ -47,6 +48,7 @@ public:
         {
             return mWhmInstance->GetDelegate();
         }
+
         return nullptr;
     }
 

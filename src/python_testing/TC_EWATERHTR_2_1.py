@@ -18,10 +18,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from EWATERHTRBase import EWATERHTRBase
 
 logger = logging.getLogger(__name__)
@@ -36,7 +33,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
 
     def pics_TC_EWATERHTR_2_1(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["EWATERHTR.S", "EWATERHTR.S.F00"]
+        return ["EWATERHTR.S", "EWATERHTR.S.F00", "EWATERHTR.S.F01"]
 
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
         steps = [

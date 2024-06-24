@@ -21,12 +21,8 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
 
 static constexpr int WHM_ENDPOINT = 1;
 
@@ -47,7 +43,7 @@ WhmManufacturer * WaterHeaterManagement::GetWhmManufacturer()
 }
 
 /*
- *  @brief  Creates a Delegate and Instance for EVSE cluster
+ *  @brief  Creates a Delegate and Instance for Water Heater Management cluster
  *
  * The Instance is a container around the Delegate, so
  * create the Delegate first, then wrap it in the Instance
@@ -82,7 +78,6 @@ CHIP_ERROR WhmInit()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    ChipLogDetail(AppServer, "WhmInit5");
     /* Register Attribute & Command handlers */
     err = gWhmInstance->Init();
     if (err != CHIP_NO_ERROR)
@@ -94,7 +89,7 @@ CHIP_ERROR WhmInit()
     }
 
     gWhmDelegate->SetWaterHeaterManagementInstance(*gWhmInstance);
-    ChipLogDetail(AppServer, "WhmInit6");
+
     return CHIP_NO_ERROR;
 }
 
@@ -105,7 +100,7 @@ CHIP_ERROR WhmShutdown()
      */
     if (gWhmInstance)
     {
-        /* deregister attribute & command handlers */
+        /* Deregister attribute & command handlers */
         gWhmInstance->Shutdown();
         gWhmInstance.reset();
     }
@@ -127,8 +122,6 @@ CHIP_ERROR WhmShutdown()
  */
 CHIP_ERROR WhmManufacturerInit()
 {
-    ChipLogDetail(AppServer, "WhmManufacturerInit");
-
     CHIP_ERROR err;
 
     if (gWhmManufacturer)
@@ -171,8 +164,6 @@ CHIP_ERROR WhmManufacturerShutdown()
 
 void WhmApplicationInit()
 {
-    ChipLogDetail(AppServer, "Water Heater Management App: WhmApplicationInit()");
-
     if (WhmInit() != CHIP_NO_ERROR)
     {
         return;
@@ -188,8 +179,6 @@ void WhmApplicationInit()
 
 void WhmApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Water Heater Management App: WhmApplicationShutdown()");
-
     /* Shutdown in reverse order that they were created */
-    WhmManufacturerShutdown();       /* Free the WhmManufacturer */
+    WhmManufacturerShutdown();
 }

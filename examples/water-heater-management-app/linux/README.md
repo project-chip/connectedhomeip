@@ -156,13 +156,12 @@ When you want to test this cluster you can use chip-repl or chip-tool by hand.
 CHIP-REPL is slightly easier to interact with when dealing with some of the
 complex structures.
 
-There are several test scripts provided for EVSE (in
+There are several test scripts provided for the Water Heating Management cluster (in
 [src/python_testing](src/python_testing)):
 
--   `TC_EEVSE_2_2`: This validates the primary functionality
--   `TC_EEVSE_2_3`: This validates Get/Set/Clear target commands
--   `TC_EEVSE_2_4`: This validates Faults
--   `TC_EEVSE_2_5`: This validates EVSE diagnostic command (optional)
+-   `TC_EWATERHTR_2_1`: This test case verifies the non-global attributes of the Water Heater Management cluster server.
+-   `TC_EWATERHTR_2_2`: This validates the primary functionality
+-   `TC_EWATERHTR_2_3`: This validates Get/Set/Clear target commands
 
 These scripts require the use of Test Event Triggers via the GeneralDiagnostics
 cluster on Endpoint 0. This requires an `enableKey` (16 bytes) and a set of
@@ -172,6 +171,7 @@ By default the test event support is not enabled, and when compiling the example
 app you need to add `chip_enable_water_management_heater_trigger=true` to the gn args.
 
           $ gn gen out/debug --args='chip_enable_water_management_heater_trigger=true'
+gn gen out/debug --args="chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false chip_inet_config_enable_ipv4=false chip_enable_water_heater_management_trigger=true"
           $ ninja -C out/debug
 
 Once the application is built you also need to tell it at runtime what the
