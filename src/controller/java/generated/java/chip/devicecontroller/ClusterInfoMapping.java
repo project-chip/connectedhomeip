@@ -11619,9 +11619,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.EnergyCalendarClusterCalendarPeriod> valueList) {
+    public void onSuccess(@Nullable List<ChipStructs.EnergyCalendarClusterCalendarPeriodStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.EnergyCalendarClusterCalendarPeriod>");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.EnergyCalendarClusterCalendarPeriodStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -11640,7 +11640,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.EnergyCalendarClusterDayStruct> valueList) {
+    public void onSuccess(@Nullable List<ChipStructs.EnergyCalendarClusterDayStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.EnergyCalendarClusterDayStruct>");
       responseValues.put(commandResponseInfo, valueList);
