@@ -31,8 +31,14 @@ config("openthread_efr32_config") {
   include_dirs = [
     "${chip_root}/examples/platform/efr32",
     "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
-    "${sl_ot_efr32_root}",
     "${sl_ot_platform_abstraction}/include",
+    "${sl_ot_efr32_root}",
+
+    #TODO TEST is this needed here if it is in efr32_sdk.gni!!!!
+    "${sl_ot_platform_abstraction}/rtos",
+
+    #this is for sl_openthread_features_config.h. should use generated one per board
+    "${sl_ot_libs_path}/config",
   ]
 
   # temporarily disable check until gsdk pulls in a more recent version of openthread
@@ -54,6 +60,9 @@ source_set("openthread_core_config_efr32") {
 source_set("libopenthread-efr32") {
   sources = [
     "${openthread_root}/examples/apps/cli/cli_uart.cpp",
+    "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
+    "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
+    "${openthread_root}/examples/platforms/utils/settings_ram.c",
     "${sl_ot_efr32_root}/alarm.c",
     "${sl_ot_efr32_root}/crypto.c",
     "${sl_ot_efr32_root}/entropy.c",
@@ -61,10 +70,16 @@ source_set("libopenthread-efr32") {
     "${sl_ot_efr32_root}/ieee802154-packet-utils.cpp",
     "${sl_ot_efr32_root}/misc.c",
     "${sl_ot_efr32_root}/radio.c",
+    "${sl_ot_efr32_root}/radio_coex.c",
+    "${sl_ot_efr32_root}/radio_extension.c",
+    "${sl_ot_efr32_root}/radio_power_manager.c",
+    "${sl_ot_efr32_root}/sl_gp_interface.c",
     "${sl_ot_efr32_root}/sleep.c",
     "${sl_ot_efr32_root}/soft_source_match_table.c",
     "${sl_ot_efr32_root}/system.c",
   ]
+
+  include_dirs = [ "${openthread_root}/examples/platforms/utils" ]
 
   public_deps = [
     ":openthread_core_config_efr32",

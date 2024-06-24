@@ -150,12 +150,16 @@ if (wifi_soc != true) {  # CCP board
           "${openthread_root}/src/cli/cli_history.hpp",
           "${openthread_root}/src/cli/cli_joiner.cpp",
           "${openthread_root}/src/cli/cli_joiner.hpp",
+          "${openthread_root}/src/cli/cli_link_metrics.cpp",
+          "${openthread_root}/src/cli/cli_link_metrics.hpp",
           "${openthread_root}/src/cli/cli_mac_filter.cpp",
           "${openthread_root}/src/cli/cli_mac_filter.hpp",
+          "${openthread_root}/src/cli/cli_mdns.cpp",
+          "${openthread_root}/src/cli/cli_mdns.hpp",
           "${openthread_root}/src/cli/cli_network_data.cpp",
           "${openthread_root}/src/cli/cli_network_data.hpp",
-          "${openthread_root}/src/cli/cli_output.cpp",
-          "${openthread_root}/src/cli/cli_output.hpp",
+          "${openthread_root}/src/cli/cli_ping.cpp",
+          "${openthread_root}/src/cli/cli_ping.hpp",
           "${openthread_root}/src/cli/cli_srp_client.cpp",
           "${openthread_root}/src/cli/cli_srp_client.hpp",
           "${openthread_root}/src/cli/cli_srp_server.cpp",
@@ -164,6 +168,8 @@ if (wifi_soc != true) {  # CCP board
           "${openthread_root}/src/cli/cli_tcp.hpp",
           "${openthread_root}/src/cli/cli_udp.cpp",
           "${openthread_root}/src/cli/cli_udp.hpp",
+          "${openthread_root}/src/cli/cli_utils.cpp",
+          "${openthread_root}/src/cli/cli_utils.hpp",
           "${openthread_root}/src/cli/x509_cert_key.hpp",
         ]
       }
@@ -196,6 +202,11 @@ if (wifi_soc != true) {  # CCP board
       }
 
       public_configs += [ "${openthread_root}:openthread_${XTD}_config" ]
+
+      if (silabs_family == "mgm24") {
+        # Locally set silabs_family to efr32mg24 as mgm24 doesn't have dedicated sl_ot_platform libs
+        silabs_family = "efr32mg24"
+      }
 
       libs = [
         "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",
