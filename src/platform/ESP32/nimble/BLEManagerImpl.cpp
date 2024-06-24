@@ -715,7 +715,7 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
     CancelBleAdvTimeoutTimer();
 
     CHIP_ERROR err = SystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeoutInMs), BleAdvTimeoutHandler, nullptr);
-    if((err != CHIP_NO_ERROR))
+    if ((err != CHIP_NO_ERROR))
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
