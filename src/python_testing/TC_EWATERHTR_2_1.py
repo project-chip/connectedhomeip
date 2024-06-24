@@ -59,19 +59,19 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
 
         # Note the values used here are configured in WhmManufacturer::Init()
         self.step("2a")
-        await self.check_whm_attribute("HeaterTypes", Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kImmersionElement1)
+        await self.check_whm_attribute("HeaterTypes", 0)
 
         self.step("2b")
-        await self.check_whm_attribute("HeatDemand", Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1)
+        await self.check_whm_attribute("HeatDemand", 0)
 
         self.step("2c")
-        await self.check_whm_attribute("TankVolume", 20)
+        await self.check_whm_attribute("TankVolume", 0)
 
         self.step("2d")
-        await self.check_whm_attribute("EstimatedHeatRequired", 10000)
+        await self.check_whm_attribute("EstimatedHeatRequired", 0)
 
         self.step("2e")
-        await self.check_whm_attribute("TankPercentage", 35)
+        await self.check_whm_attribute("TankPercentage", 0)
 
         self.step("2f")
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)

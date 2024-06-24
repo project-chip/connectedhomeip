@@ -156,9 +156,16 @@ void Instance::HandleBoost(HandlerContext & ctx, const Commands::Boost::Decodabl
                 return;
             }
 
-            if (targetPercentage.HasValue() && oneShot.HasValue())
+            if (!targetPercentage.HasValue())
             {
-                ChipLogError(Zcl, "Cannot specify targetReheat+targetPercentage and oneShot. oneShot must be excluded");
+                ChipLogError(Zcl, "targetPercentage must be specified if targetReheat specified");
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+                return;
+            }
+
+            if (oneShot.HasValue())
+            {
+                ChipLogError(Zcl, "Cannot specify targetReheat with targetPercentage and oneShot. oneShot must be excluded");
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
                 return;
             }

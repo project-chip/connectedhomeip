@@ -93,6 +93,7 @@ CHIP_ERROR WhmInit()
         return err;
     }
 
+    gWhmDelegate->SetWaterHeaterManagementInstance(*gWhmInstance);
     ChipLogDetail(AppServer, "WhmInit6");
     return CHIP_NO_ERROR;
 }

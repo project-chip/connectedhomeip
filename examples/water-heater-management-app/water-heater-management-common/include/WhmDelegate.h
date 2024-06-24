@@ -40,6 +40,8 @@ public:
 
     virtual ~WaterHeaterManagementDelegate() = default;
 
+    void SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance);
+
     /*********************************************************************************
      *
      * Methods implementing the WaterHeaterManagement::Delegate interace
@@ -165,6 +167,31 @@ private:
 
     /*********************************************************************************
      *
+     * WaterHeaterManagementDelegate specific attributes
+     *
+     *********************************************************************************/
+
+    WaterHeaterManagement::Instance *mpWhmInstance;
+
+    // Target water temperature in 100ths of a C
+    uint16_t mTargetWaterTemperature;
+
+    // Actual water temperature in 100ths of a C
+    uint16_t mHotWaterTemperature;
+
+    uint8_t mPercentageHotWater;
+    uint16_t mReplacedWaterTemperature;
+
+    Optional<bool> mBoostOneShot;
+    Optional<bool> mBoostEmergencyBoost;
+    Optional<int16_t> mBoostTemporarySetpoint;
+    Optional<chip::Percent> mBoostTargetPercentage;
+    Optional<chip::Percent> mBoostTargetReheat;
+
+    bool mBoostTargetTemperatureReached;
+
+    /*********************************************************************************
+     *
      * Member variables implementing the WaterHeaterManagement::Delegate interface
      *
      *********************************************************************************/
@@ -199,29 +226,6 @@ private:
                                                  .mode     = ModeTimed,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTimed) }
     };
-
-    /*********************************************************************************
-     *
-     * WaterHeaterManagementDelegate specific attributes
-     *
-     *********************************************************************************/
-
-    // Target water temperature in 100ths of a C
-    uint16_t mTargetWaterTemperature;
-
-    // Actual water temperature in 100ths of a C
-    uint16_t mHotWaterTemperature;
-
-    uint8_t mPercentageHotWater;
-    uint16_t mReplacedWaterTemperature;
-
-    Optional<bool> mBoostOneShot;
-    Optional<bool> mBoostEmergencyBoost;
-    Optional<int16_t> mBoostTemporarySetpoint;
-    Optional<chip::Percent> mBoostTargetPercentage;
-    Optional<chip::Percent> mBoostTargetReheat;
-
-    bool mBoostTargetTemperatureReached;
 };
 
 Instance * GetWaterHeaterManagementInstance();
