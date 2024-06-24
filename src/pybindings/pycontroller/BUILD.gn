@@ -19,6 +19,7 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/config/python/python_config.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/config/python/python_config.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${dir_pw_unit_test}/test.gni")
 
