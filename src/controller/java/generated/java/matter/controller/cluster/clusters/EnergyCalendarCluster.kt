@@ -88,10 +88,10 @@ class EnergyCalendarCluster(
     object SubscriptionEstablished : StartDateAttributeSubscriptionState()
   }
 
-  class CalendarPeriodsAttribute(val value: List<EnergyCalendarClusterCalendarPeriod>)
+  class CalendarPeriodsAttribute(val value: List<EnergyCalendarClusterCalendarPeriodStruct>?)
 
   sealed class CalendarPeriodsAttributeSubscriptionState {
-    data class Success(val value: List<EnergyCalendarClusterCalendarPeriod>) :
+    data class Success(val value: List<EnergyCalendarClusterCalendarPeriodStruct>?) :
       CalendarPeriodsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : CalendarPeriodsAttributeSubscriptionState()
@@ -99,10 +99,10 @@ class EnergyCalendarCluster(
     object SubscriptionEstablished : CalendarPeriodsAttributeSubscriptionState()
   }
 
-  class SpecialDaysAttribute(val value: List<EnergyCalendarClusterDayStruct>)
+  class SpecialDaysAttribute(val value: List<EnergyCalendarClusterDayStruct>?)
 
   sealed class SpecialDaysAttributeSubscriptionState {
-    data class Success(val value: List<EnergyCalendarClusterDayStruct>) :
+    data class Success(val value: List<EnergyCalendarClusterDayStruct>?) :
       SpecialDaysAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : SpecialDaysAttributeSubscriptionState()
@@ -696,13 +696,18 @@ class EnergyCalendarCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<EnergyCalendarClusterCalendarPeriod> =
-      buildList<EnergyCalendarClusterCalendarPeriod> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(EnergyCalendarClusterCalendarPeriod.fromTlv(AnonymousTag, tlvReader))
+    val decodedValue: List<EnergyCalendarClusterCalendarPeriodStruct>? =
+      if (!tlvReader.isNull()) {
+        buildList<EnergyCalendarClusterCalendarPeriodStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(EnergyCalendarClusterCalendarPeriodStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
         }
-        tlvReader.exitContainer()
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
       }
 
     return CalendarPeriodsAttribute(decodedValue)
@@ -749,16 +754,21 @@ class EnergyCalendarCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<EnergyCalendarClusterCalendarPeriod> =
-            buildList<EnergyCalendarClusterCalendarPeriod> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(EnergyCalendarClusterCalendarPeriod.fromTlv(AnonymousTag, tlvReader))
+          val decodedValue: List<EnergyCalendarClusterCalendarPeriodStruct>? =
+            if (!tlvReader.isNull()) {
+              buildList<EnergyCalendarClusterCalendarPeriodStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(EnergyCalendarClusterCalendarPeriodStruct.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
               }
-              tlvReader.exitContainer()
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
             }
 
-          emit(CalendarPeriodsAttributeSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(CalendarPeriodsAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(CalendarPeriodsAttributeSubscriptionState.SubscriptionEstablished)
@@ -793,13 +803,18 @@ class EnergyCalendarCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<EnergyCalendarClusterDayStruct> =
-      buildList<EnergyCalendarClusterDayStruct> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(EnergyCalendarClusterDayStruct.fromTlv(AnonymousTag, tlvReader))
+    val decodedValue: List<EnergyCalendarClusterDayStruct>? =
+      if (!tlvReader.isNull()) {
+        buildList<EnergyCalendarClusterDayStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(EnergyCalendarClusterDayStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
         }
-        tlvReader.exitContainer()
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
       }
 
     return SpecialDaysAttribute(decodedValue)
@@ -844,16 +859,21 @@ class EnergyCalendarCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<EnergyCalendarClusterDayStruct> =
-            buildList<EnergyCalendarClusterDayStruct> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(EnergyCalendarClusterDayStruct.fromTlv(AnonymousTag, tlvReader))
+          val decodedValue: List<EnergyCalendarClusterDayStruct>? =
+            if (!tlvReader.isNull()) {
+              buildList<EnergyCalendarClusterDayStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(EnergyCalendarClusterDayStruct.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
               }
-              tlvReader.exitContainer()
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
             }
 
-          emit(SpecialDaysAttributeSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(SpecialDaysAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(SpecialDaysAttributeSubscriptionState.SubscriptionEstablished)

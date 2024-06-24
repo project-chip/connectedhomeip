@@ -25,8 +25,8 @@ import matter.tlv.TlvWriter
 class EnergyCalendarClusterPeakPeriodStruct(
   val severity: UInt,
   val peakPeriod: UInt,
-  val startTime: ULong,
-  val endTime: ULong
+  val startTime: ULong?,
+  val endTime: ULong?
 ) {
   override fun toString(): String = buildString {
     append("EnergyCalendarClusterPeakPeriodStruct {\n")
@@ -42,8 +42,16 @@ class EnergyCalendarClusterPeakPeriodStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SEVERITY), severity)
       put(ContextSpecificTag(TAG_PEAK_PERIOD), peakPeriod)
-      put(ContextSpecificTag(TAG_START_TIME), startTime)
-      put(ContextSpecificTag(TAG_END_TIME), endTime)
+      if (startTime != null) {
+        put(ContextSpecificTag(TAG_START_TIME), startTime)
+      } else {
+        putNull(ContextSpecificTag(TAG_START_TIME))
+      }
+      if (endTime != null) {
+        put(ContextSpecificTag(TAG_END_TIME), endTime)
+      } else {
+        putNull(ContextSpecificTag(TAG_END_TIME))
+      }
       endStructure()
     }
   }
@@ -58,8 +66,20 @@ class EnergyCalendarClusterPeakPeriodStruct(
       tlvReader.enterStructure(tlvTag)
       val severity = tlvReader.getUInt(ContextSpecificTag(TAG_SEVERITY))
       val peakPeriod = tlvReader.getUInt(ContextSpecificTag(TAG_PEAK_PERIOD))
-      val startTime = tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
-      val endTime = tlvReader.getULong(ContextSpecificTag(TAG_END_TIME))
+      val startTime =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_START_TIME))
+          null
+        }
+      val endTime =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_END_TIME))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_END_TIME))
+          null
+        }
 
       tlvReader.exitContainer()
 

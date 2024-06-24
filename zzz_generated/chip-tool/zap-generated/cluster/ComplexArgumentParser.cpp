@@ -4026,54 +4026,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Struct
     ComplexArgumentParser::Finalize(request.auxiliaryLoad);
 }
 
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::Date::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    char labelWithMember[kMaxLabelLength];
-    if (value.isMember("year"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "year");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.year, value["year"]));
-    }
-    valueCopy.removeMember("year");
-
-    if (value.isMember("month"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "month");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.month, value["month"]));
-    }
-    valueCopy.removeMember("month");
-
-    if (value.isMember("day"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "day");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.day, value["day"]));
-    }
-    valueCopy.removeMember("day");
-
-    if (value.isMember("dayOfWeek"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeek");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeek, value["dayOfWeek"]));
-    }
-    valueCopy.removeMember("dayOfWeek");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Structs::Date::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.year);
-    ComplexArgumentParser::Finalize(request.month);
-    ComplexArgumentParser::Finalize(request.day);
-    ComplexArgumentParser::Finalize(request.dayOfWeek);
-}
-
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type & request,
                                         Json::Value & value)
 {
@@ -4123,7 +4075,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Struct
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::Type & request,
+                                        chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -4132,8 +4084,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("CalendarPeriod.startDate", "startDate", value.isMember("startDate")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CalendarPeriod.days", "days", value.isMember("days")));
+        ComplexArgumentParser::EnsureMemberExist("CalendarPeriodStruct.startDate", "startDate", value.isMember("startDate")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CalendarPeriodStruct.days", "days", value.isMember("days")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "startDate");
@@ -4147,7 +4099,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.startDate);
     ComplexArgumentParser::Finalize(request.days);

@@ -288,13 +288,10 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::EnergyCalendar::Structs::Date::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::DecodableType & value);
+                           const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::DecodableType & value);

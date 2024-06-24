@@ -21354,11 +21354,11 @@ void registerClusterEnergyCalendar(Commands & commands, CredentialIssuerCommands
             Id, "event-id", 0, UINT32_MAX, Attributes::EventID::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
             Id, "start-date", 0, UINT32_MAX, Attributes::StartDate::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::Type>>>>(
             Id, "calendar-periods", Attributes::CalendarPeriods::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>>>>(
             Id, "special-days", Attributes::SpecialDays::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<
             WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>>>(

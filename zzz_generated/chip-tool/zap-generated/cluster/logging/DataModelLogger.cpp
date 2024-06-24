@@ -3570,47 +3570,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::EnergyCalendar::Structs::Date::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Year", indent + 1, value.year);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Year'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Month", indent + 1, value.month);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Month'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Day", indent + 1, value.day);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Day'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("DayOfWeek", indent + 1, value.dayOfWeek);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayOfWeek'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -3651,8 +3610,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -14122,12 +14082,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("StartDate", 1, value);
         }
         case EnergyCalendar::Attributes::CalendarPeriods::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::DecodableType> value;
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::DecodableType>>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CalendarPeriods", 1, value);
         }
         case EnergyCalendar::Attributes::SpecialDays::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType> value;
+            chip::app::DataModel::Nullable<
+                chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType>>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SpecialDays", 1, value);
         }

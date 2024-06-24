@@ -5439,7 +5439,7 @@ cluster EnergyEvse = 153 {
 
 /** The Energy Calendar Cluster provides a mechanism for communicating schedules associated with various forms of energy consumption. */
 cluster EnergyCalendar = 154 {
-  revision 2;
+  revision 3;
 
   enum PeakPeriodSeverityEnum : enum8 {
     kUnused = 0;
@@ -5483,30 +5483,23 @@ cluster EnergyCalendar = 154 {
     optional AuxiliaryLoadBitmap auxiliaryLoad = 3;
   }
 
-  struct Date {
-    optional nullable int16u year = 0;
-    optional nullable int8u month = 1;
-    optional nullable int8u day = 2;
-    optional nullable int8u dayOfWeek = 3;
-  }
-
   struct DayStruct {
-    optional Date date = 0;
+    optional date date = 0;
     optional TransitionDayOfWeekBitmap daysOfWeek = 1;
     TransitionStruct transitions[] = 2;
     optional int32u calendarID = 3;
   }
 
-  struct CalendarPeriod {
-    epoch_s startDate = 0;
+  struct CalendarPeriodStruct {
+    nullable epoch_s startDate = 0;
     DayStruct days[] = 1;
   }
 
   struct PeakPeriodStruct {
     PeakPeriodSeverityEnum severity = 0;
     int16u peakPeriod = 1;
-    epoch_s startTime = 2;
-    epoch_s endTime = 3;
+    nullable epoch_s startTime = 2;
+    nullable epoch_s endTime = 3;
   }
 
   readonly attribute nullable int32u calendarID = 0;
@@ -5514,8 +5507,8 @@ cluster EnergyCalendar = 154 {
   readonly attribute nullable int32u providerID = 2;
   readonly attribute nullable int32u eventID = 3;
   readonly attribute nullable epoch_s startDate = 4;
-  readonly attribute CalendarPeriod calendarPeriods[] = 5;
-  readonly attribute DayStruct specialDays[] = 6;
+  readonly attribute nullable CalendarPeriodStruct calendarPeriods[] = 5;
+  readonly attribute nullable DayStruct specialDays[] = 6;
   readonly attribute nullable DayStruct currentDay = 7;
   readonly attribute nullable DayStruct nextDay = 8;
   readonly attribute nullable TransitionStruct currentTransition = 9;

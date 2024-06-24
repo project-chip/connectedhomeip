@@ -459,20 +459,15 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar:
 
 static void Finalize(chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::Date::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::EnergyCalendar::Structs::Date::Type & request);
-
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::Type & request);
+static void Finalize(chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type & request,
                         Json::Value & value);

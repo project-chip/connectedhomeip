@@ -26582,8 +26582,8 @@ class EnergyCalendar(Cluster):
                 ClusterObjectFieldDescriptor(Label="providerID", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="eventID", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="startDate", Tag=0x00000004, Type=typing.Union[Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="calendarPeriods", Tag=0x00000005, Type=typing.List[EnergyCalendar.Structs.CalendarPeriod]),
-                ClusterObjectFieldDescriptor(Label="specialDays", Tag=0x00000006, Type=typing.List[EnergyCalendar.Structs.DayStruct]),
+                ClusterObjectFieldDescriptor(Label="calendarPeriods", Tag=0x00000005, Type=typing.Union[Nullable, typing.List[EnergyCalendar.Structs.CalendarPeriodStruct]]),
+                ClusterObjectFieldDescriptor(Label="specialDays", Tag=0x00000006, Type=typing.Union[Nullable, typing.List[EnergyCalendar.Structs.DayStruct]]),
                 ClusterObjectFieldDescriptor(Label="currentDay", Tag=0x00000007, Type=typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]),
                 ClusterObjectFieldDescriptor(Label="nextDay", Tag=0x00000008, Type=typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]),
                 ClusterObjectFieldDescriptor(Label="currentTransition", Tag=0x00000009, Type=typing.Union[Nullable, EnergyCalendar.Structs.TransitionStruct]),
@@ -26602,8 +26602,8 @@ class EnergyCalendar(Cluster):
     providerID: 'typing.Union[Nullable, uint]' = None
     eventID: 'typing.Union[Nullable, uint]' = None
     startDate: 'typing.Union[Nullable, uint]' = None
-    calendarPeriods: 'typing.List[EnergyCalendar.Structs.CalendarPeriod]' = None
-    specialDays: 'typing.List[EnergyCalendar.Structs.DayStruct]' = None
+    calendarPeriods: 'typing.Union[Nullable, typing.List[EnergyCalendar.Structs.CalendarPeriodStruct]]' = None
+    specialDays: 'typing.Union[Nullable, typing.List[EnergyCalendar.Structs.DayStruct]]' = None
     currentDay: 'typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]' = None
     nextDay: 'typing.Union[Nullable, EnergyCalendar.Structs.DayStruct]' = None
     currentTransition: 'typing.Union[Nullable, EnergyCalendar.Structs.TransitionStruct]' = None
@@ -26673,50 +26673,33 @@ class EnergyCalendar(Cluster):
             auxiliaryLoad: 'typing.Optional[uint]' = None
 
         @dataclass
-        class Date(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="year", Tag=0, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="month", Tag=1, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="day", Tag=2, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=3, Type=typing.Union[None, Nullable, uint]),
-                    ])
-
-            year: 'typing.Union[None, Nullable, uint]' = None
-            month: 'typing.Union[None, Nullable, uint]' = None
-            day: 'typing.Union[None, Nullable, uint]' = None
-            dayOfWeek: 'typing.Union[None, Nullable, uint]' = None
-
-        @dataclass
         class DayStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="date", Tag=0, Type=typing.Optional[EnergyCalendar.Structs.Date]),
+                        ClusterObjectFieldDescriptor(Label="date", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="daysOfWeek", Tag=1, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="transitions", Tag=2, Type=typing.List[EnergyCalendar.Structs.TransitionStruct]),
                         ClusterObjectFieldDescriptor(Label="calendarID", Tag=3, Type=typing.Optional[uint]),
                     ])
 
-            date: 'typing.Optional[EnergyCalendar.Structs.Date]' = None
+            date: 'typing.Optional[uint]' = None
             daysOfWeek: 'typing.Optional[uint]' = None
             transitions: 'typing.List[EnergyCalendar.Structs.TransitionStruct]' = field(default_factory=lambda: [])
             calendarID: 'typing.Optional[uint]' = None
 
         @dataclass
-        class CalendarPeriod(ClusterObject):
+        class CalendarPeriodStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="startDate", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="startDate", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="days", Tag=1, Type=typing.List[EnergyCalendar.Structs.DayStruct]),
                     ])
 
-            startDate: 'uint' = 0
+            startDate: 'typing.Union[Nullable, uint]' = NullValue
             days: 'typing.List[EnergyCalendar.Structs.DayStruct]' = field(default_factory=lambda: [])
 
         @dataclass
@@ -26727,14 +26710,14 @@ class EnergyCalendar(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="severity", Tag=0, Type=EnergyCalendar.Enums.PeakPeriodSeverityEnum),
                         ClusterObjectFieldDescriptor(Label="peakPeriod", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="startTime", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="endTime", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="startTime", Tag=2, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="endTime", Tag=3, Type=typing.Union[Nullable, uint]),
                     ])
 
             severity: 'EnergyCalendar.Enums.PeakPeriodSeverityEnum' = 0
             peakPeriod: 'uint' = 0
-            startTime: 'uint' = 0
-            endTime: 'uint' = 0
+            startTime: 'typing.Union[Nullable, uint]' = NullValue
+            endTime: 'typing.Union[Nullable, uint]' = NullValue
 
     class Attributes:
         @dataclass
@@ -26829,9 +26812,9 @@ class EnergyCalendar(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[EnergyCalendar.Structs.CalendarPeriod])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[EnergyCalendar.Structs.CalendarPeriodStruct]])
 
-            value: 'typing.List[EnergyCalendar.Structs.CalendarPeriod]' = field(default_factory=lambda: [])
+            value: 'typing.Union[Nullable, typing.List[EnergyCalendar.Structs.CalendarPeriodStruct]]' = NullValue
 
         @dataclass
         class SpecialDays(ClusterAttributeDescriptor):
@@ -26845,9 +26828,9 @@ class EnergyCalendar(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[EnergyCalendar.Structs.DayStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[EnergyCalendar.Structs.DayStruct]])
 
-            value: 'typing.List[EnergyCalendar.Structs.DayStruct]' = field(default_factory=lambda: [])
+            value: 'typing.Union[Nullable, typing.List[EnergyCalendar.Structs.DayStruct]]' = NullValue
 
         @dataclass
         class CurrentDay(ClusterAttributeDescriptor):

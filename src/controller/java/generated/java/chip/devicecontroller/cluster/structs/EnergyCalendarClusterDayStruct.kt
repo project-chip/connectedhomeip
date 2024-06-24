@@ -25,7 +25,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class EnergyCalendarClusterDayStruct(
-  val date: Optional<EnergyCalendarClusterDate>,
+  val date: Optional<ULong>,
   val daysOfWeek: Optional<UInt>,
   val transitions: List<EnergyCalendarClusterTransitionStruct>,
   val calendarID: Optional<ULong>
@@ -44,7 +44,7 @@ class EnergyCalendarClusterDayStruct(
       startStructure(tlvTag)
       if (date.isPresent) {
         val optdate = date.get()
-        optdate.toTlv(ContextSpecificTag(TAG_DATE), this)
+        put(ContextSpecificTag(TAG_DATE), optdate)
       }
       if (daysOfWeek.isPresent) {
         val optdaysOfWeek = daysOfWeek.get()
@@ -73,7 +73,7 @@ class EnergyCalendarClusterDayStruct(
       tlvReader.enterStructure(tlvTag)
       val date =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_DATE))) {
-          Optional.of(EnergyCalendarClusterDate.fromTlv(ContextSpecificTag(TAG_DATE), tlvReader))
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_DATE)))
         } else {
           Optional.empty()
         }

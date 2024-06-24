@@ -24350,33 +24350,6 @@ public:
 using DecodableType = Type;
 
 } // namespace TransitionStruct
-namespace Date {
-enum class Fields : uint8_t
-{
-    kYear      = 0,
-    kMonth     = 1,
-    kDay       = 2,
-    kDayOfWeek = 3,
-};
-
-struct Type
-{
-public:
-    Optional<DataModel::Nullable<uint16_t>> year;
-    Optional<DataModel::Nullable<uint8_t>> month;
-    Optional<DataModel::Nullable<uint8_t>> day;
-    Optional<DataModel::Nullable<uint8_t>> dayOfWeek;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace Date
 namespace DayStruct {
 enum class Fields : uint8_t
 {
@@ -24389,7 +24362,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<Structs::Date::Type> date;
+    Optional<uint32_t> date;
     Optional<chip::BitMask<TransitionDayOfWeekBitmap>> daysOfWeek;
     DataModel::List<const Structs::TransitionStruct::Type> transitions;
     Optional<uint32_t> calendarID;
@@ -24402,7 +24375,7 @@ public:
 struct DecodableType
 {
 public:
-    Optional<Structs::Date::DecodableType> date;
+    Optional<uint32_t> date;
     Optional<chip::BitMask<TransitionDayOfWeekBitmap>> daysOfWeek;
     DataModel::DecodableList<Structs::TransitionStruct::DecodableType> transitions;
     Optional<uint32_t> calendarID;
@@ -24413,7 +24386,7 @@ public:
 };
 
 } // namespace DayStruct
-namespace CalendarPeriod {
+namespace CalendarPeriodStruct {
 enum class Fields : uint8_t
 {
     kStartDate = 0,
@@ -24423,7 +24396,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint32_t startDate = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> startDate;
     DataModel::List<const Structs::DayStruct::Type> days;
 
     static constexpr bool kIsFabricScoped = false;
@@ -24434,7 +24407,7 @@ public:
 struct DecodableType
 {
 public:
-    uint32_t startDate = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> startDate;
     DataModel::DecodableList<Structs::DayStruct::DecodableType> days;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -24442,7 +24415,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 };
 
-} // namespace CalendarPeriod
+} // namespace CalendarPeriodStruct
 namespace PeakPeriodStruct {
 enum class Fields : uint8_t
 {
@@ -24457,8 +24430,8 @@ struct Type
 public:
     PeakPeriodSeverityEnum severity = static_cast<PeakPeriodSeverityEnum>(0);
     uint16_t peakPeriod             = static_cast<uint16_t>(0);
-    uint32_t startTime              = static_cast<uint32_t>(0);
-    uint32_t endTime                = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> startTime;
+    DataModel::Nullable<uint32_t> endTime;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -24538,11 +24511,12 @@ struct TypeInfo
 namespace CalendarPeriods {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriod::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CalendarPeriods::Id; }
@@ -24552,11 +24526,12 @@ struct TypeInfo
 namespace SpecialDays {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType> &;
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::DecodableType>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyCalendar::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SpecialDays::Id; }
