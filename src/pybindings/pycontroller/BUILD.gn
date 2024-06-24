@@ -47,7 +47,7 @@ shared_library("CHIPController") {
   include_dirs = [ "${chip_root}/third_party/pybind11/repo/include" ]
   if (current_os == "mac") {
     include_dirs +=
-        [ "${chip_root}/.environment/cipd/packages/python/include/python" + python_version ]
+        [ "${chip_root}/.environment/cipd/packages/python/include/python3.11"]
   } else if (current_os == "linux") {
     include_dirs += [ "/usr/include/python" + python_version ]
   } else {
