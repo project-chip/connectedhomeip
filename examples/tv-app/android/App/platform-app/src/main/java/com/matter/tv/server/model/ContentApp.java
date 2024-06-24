@@ -67,7 +67,9 @@ public class ContentApp {
   }
 
   public Set<SupportedCluster> getSupportedClusters() {
-    return supportedClusters != null ? Collections.unmodifiableSet(supportedClusters) : Collections.EMPTY_SET;
+    return supportedClusters != null
+        ? Collections.unmodifiableSet(supportedClusters)
+        : Collections.EMPTY_SET;
   }
 
   public String getVersion() {
