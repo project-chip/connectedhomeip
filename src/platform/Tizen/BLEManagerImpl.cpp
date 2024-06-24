@@ -578,8 +578,8 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
                  ChipLogError(DeviceLayer, "bt_gatt_service_add_characteristic() failed: %s", get_error_message(ret)));
 
     // Create 2nd Characteristic (Client RX Buffer)
-    ret = bt_gatt_characteristic_create(Ble::CHIP_BLE_CHAR_2_UUID_STR, BT_GATT_PERMISSION_READ,
-                                        BT_GATT_PROPERTY_READ | BT_GATT_PROPERTY_INDICATE, nullptr, 0, &char2);
+    ret = bt_gatt_characteristic_create(Ble::CHIP_BLE_CHAR_2_UUID_STR, BT_GATT_PERMISSION_READ, BT_GATT_PROPERTY_INDICATE, nullptr,
+                                        0, &char2);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed: %s", get_error_message(ret)));
 
