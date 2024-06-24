@@ -88,13 +88,16 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 
 #if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID)
-    static_assert(CONFIG_WIFI_NETWORK_ENDPOINT_ID != CONFIG_THREAD_NETWORK_ENDPOINT_ID, "Wi-Fi network endpoint id and Thread network endpoint id should not be the same.");
+    static_assert(CONFIG_WIFI_NETWORK_ENDPOINT_ID != CONFIG_THREAD_NETWORK_ENDPOINT_ID,
+                  "Wi-Fi network endpoint id and Thread network endpoint id should not be the same.");
 #endif
 #if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID)
-    static_assert(CONFIG_WIFI_NETWORK_ENDPOINT_ID != CONFIG_ETHERNET_NETWORK_ENDPOINT_ID, "Wi-Fi network endpoint id and Ethernet network endpoint id should not be the same.");
+    static_assert(CONFIG_WIFI_NETWORK_ENDPOINT_ID != CONFIG_ETHERNET_NETWORK_ENDPOINT_ID,
+                  "Wi-Fi network endpoint id and Ethernet network endpoint id should not be the same.");
 #endif
 #if defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID) && defined(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID)
-    static_assert(CONFIG_THREAD_NETWORK_ENDPOINT_ID != CONFIG_ETHERNET_NETWORK_ENDPOINT_ID, "Thread network endpoint id and Ethernet network endpoint id should not be the same.");
+    static_assert(CONFIG_THREAD_NETWORK_ENDPOINT_ID != CONFIG_ETHERNET_NETWORK_ENDPOINT_ID,
+                  "Thread network endpoint id and Ethernet network endpoint id should not be the same.");
 #endif
 
     return CHIP_NO_ERROR;
