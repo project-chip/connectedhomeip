@@ -62,7 +62,7 @@
    <xi:include href="chip/messages-cluster.xml" />   
    <xi:include href="chip/mode-base-cluster.xml" />
    <xi:include href="chip/mode-select-cluster.xml" />
-   <xi:include href="chip/namespaces.xml" />
+   <xi:include href="chip/semantic-tag-namespace-enums.xml" />
    <xi:include href="chip/network-commissioning-cluster.xml" />
    <xi:include href="chip/occupancy-sensing-cluster.xml" />
    <xi:include href="chip/onoff-cluster.xml" />
