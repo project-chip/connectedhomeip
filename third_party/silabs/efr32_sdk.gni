@@ -419,8 +419,6 @@ template("efr32_sdk") {
       ]
     }
 
-    defines += board_defines
-
     if (use_wstk_leds) {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/leddrv/inc" ]
 
@@ -505,38 +503,7 @@ template("efr32_sdk") {
       defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
     }
 
-    if (silabs_family == "efr32mg12") {
-      _include_dirs += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Include",
-        "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg1x",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg1x/config",
-        "${efr32_sdk_root}/platform/service/device_init/config/s1/",
-        "${efr32_sdk_root}/platform/emdrv/spidrv/inc",
-        "${efr32_sdk_root}/protocol/bluetooth/bgcommon/inc",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F",
-      ]
-
-      if (silabs_board == "BRD4304A") {
-        _include_dirs +=
-            [ "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/" ]
-      }
-
-      libs += [
-        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg12_gcc_release.a",
-        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
-        "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg1x_gcc.a",
-      ]
-
-      if (!chip_enable_ble_rs911x) {
-        libs += [
-          "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg12_gcc_release.a",
-          "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg12_gcc_release.a",
-          "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg12_gcc_release.a",
-        ]
-      }
-
-      defines += [ "EFR32MG12" ]
-    } else if (silabs_family == "efr32mg24") {
+    if (silabs_family == "efr32mg24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
@@ -929,34 +896,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (silabs_family == "efr32mg12") {
-      sources += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Source/startup_efr32mg12p.c",
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Source/system_efr32mg12p.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/crypto_aes.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_protocol_crypto/src/sli_protocol_crypto_crypto.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/crypto_management.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_driver_trng.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_aead.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_cipher.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_hash.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_mac.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s1.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s1.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s1.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s1.c",
-        "${efr32_sdk_root}/protocol/bluetooth/bgcommon/src/sl_bt_mbedtls_context.c",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F/port.c",
-        "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
-        "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy.c",
-        "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy_poll.c",
-        "${efr32_sdk_root}/util/third_party/mbedtls/library/hmac_drbg.c",
-      ]
-
-      if (silabs_board == "BRD4304A") {
-        sources += [ "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c" ]
-      }
-    } else if (silabs_family == "efr32mg24") {
+    if (silabs_family == "efr32mg24") {
       sources += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Source/startup_efr32mg24.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Source/system_efr32mg24.c",
