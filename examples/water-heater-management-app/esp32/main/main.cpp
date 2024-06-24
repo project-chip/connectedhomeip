@@ -16,7 +16,7 @@
  */
 
 #include "DeviceCallbacks.h"
-#include <EnergyEvseMain.h>
+#include "WhmMain.h"
 
 #include "esp_log.h"
 #include <common/CHIPDeviceManager.h>
@@ -78,7 +78,7 @@ extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_s
 extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
 #endif
 
-static const char * TAG = "energy-management-app";
+static const char * TAG = "water-heater-management-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 static DeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
@@ -113,13 +113,13 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 void ApplicationInit()
 {
-    ESP_LOGD(TAG, "Energy Management App: ApplicationInit()");
-    EvseApplicationInit();
+    ESP_LOGD(TAG, "Water Heater Management App: ApplicationInit()");
+    WhmApplicationInit();
 }
 
-void ApplicationShutdown()
+void WhmApplicationShutdown()
 {
-    ESP_LOGD(TAG, "Energy Management App: ApplicationShutdown()");
+    ESP_LOGD(TAG, "Water Heater Management App: ApplicationShutdown()");
     EvseApplicationShutdown();
 }
 
@@ -178,9 +178,9 @@ extern "C" void app_main()
     chip::rpc::Init();
 #endif
 
-    ESP_LOGI(TAG, "==================================================");
-    ESP_LOGI(TAG, "chip-esp32-energy-management-example starting");
-    ESP_LOGI(TAG, "==================================================");
+    ESP_LOGI(TAG, "===================================================");
+    ESP_LOGI(TAG, "chip-esp32-water-heater-management-example starting");
+    ESP_LOGI(TAG, "===================================================");
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #if CONFIG_OPENTHREAD_CLI
