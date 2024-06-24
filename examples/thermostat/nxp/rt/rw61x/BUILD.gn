@@ -165,7 +165,6 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
     "${common_example_dir}/matter_button/source/AppMatterButtonEmpty.cpp",
-    "${common_example_dir}/matter_cli/source/AppMatterCli.cpp",
   ]
 
   deps = [ "${chip_root}/examples/${app_common_folder}" ]
@@ -175,6 +174,10 @@ rt_executable("thermostat") {
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",
       "${chip_root}/src/lib/shell:shell",
+    ]
+    sources += [
+      "${common_example_dir}/matter_cli/source/AppCLIBase.cpp",
+      "${common_example_dir}/matter_cli/source/AppCLIFreeRTOS.cpp",
     ]
   }
 
