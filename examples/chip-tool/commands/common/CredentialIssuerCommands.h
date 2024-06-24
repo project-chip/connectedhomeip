@@ -68,8 +68,10 @@ public:
      *
      * @param[in] path Path to the JSON file containing list of revoked DACs or PAIs.
      *                 It can be generated using credentials/generate-revocation-set.py script
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual void SetupDeviceAttestationRevocationSetPath(const char * path) = 0;
+    virtual CHIP_ERROR SetDeviceAttestationRevocationSetPath(const char * path) = 0;
 
     /**
      * @brief Add a list of additional non-default CD verifying keys (by certificate)

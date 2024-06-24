@@ -24,6 +24,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 class ExampleCredentialIssuerCommands : public CredentialIssuerCommands
@@ -45,14 +46,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void SetupDeviceAttestationRevocationSetPath(const char * path) override
+    CHIP_ERROR SetDeviceAttestationRevocationSetPath(const char * path) override
     {
-        if (path)
-        {
-            // As we know that we are using DefaultDACVerifier, we can downcast from
-            // DeviceAttestationVerifier to DefaultDACVerifier to set the revocation set
-            static_cast<chip::Credentials::DefaultDACVerifier *>(mDacVerifier)->SetDeviceAttestationRevocationSetPath(path);
-        }
+        VerifyOrReturnError(path != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(mTestDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(path));
+        mDacVerifier->SetRevocationDelegate(&mTestDacRevocationDelegate);
+        return CHIP_NO_ERROR;
     }
 
     chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() override { return &mOpCredsIssuer; }
@@ -119,4 +118,5 @@ protected:
 private:
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
     chip::Credentials::DeviceAttestationVerifier * mDacVerifier;
+    chip::Credentials::TestDACRevocationDelegateImpl mTestDacRevocationDelegate;
 };

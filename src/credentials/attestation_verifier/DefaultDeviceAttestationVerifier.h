@@ -77,10 +77,6 @@ public:
     void CheckForRevokedDACChain(const AttestationInfo & info,
                                  Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
-    // Set the path to the device attestation revocation set JSON file.
-    // revocation set can be generated using credentials/generate-revocation-set.py script
-    void SetDeviceAttestationRevocationSetPath(const char * path) { mDeviceAttestationRevocationSetPath = path; }
-
     CsaCdKeysTrustStore * GetCertificationDeclarationTrustStore() override { return &mCdKeysTrustStore; }
 
 protected:
@@ -88,20 +84,6 @@ protected:
 
     CsaCdKeysTrustStore mCdKeysTrustStore;
     const AttestationTrustStore * mAttestationTrustStore;
-
-private:
-    CHIP_ERROR GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexString);
-    CHIP_ERROR GetSerialNumberHexStr(const ByteSpan & certDer, MutableCharSpan & outSerialNumberHexString);
-    CHIP_ERROR GetIssuerNameBase64Str(const ByteSpan & certDer, MutableCharSpan & outIssuerNameBase64String);
-
-    bool IsCertificateRevoked(const ByteSpan & certDer);
-
-    // Searches the revocation set and returns true if for the given AKID, issuer name and serial number
-    // the entry is found in the revocation set, false otherwise.
-    bool IsEntryExistsInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
-                                      const CharSpan & serialNumberHexStr);
-
-    const char * mDeviceAttestationRevocationSetPath = nullptr;
 };
 
 /**
