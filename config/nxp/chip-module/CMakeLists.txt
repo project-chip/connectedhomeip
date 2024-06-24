@@ -237,7 +237,7 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
         COMMAND
         cp ${PROJECT_BINARY_DIR}/../modules/connectedhomeip/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
     )
-
+    add_dependencies(build_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
     set(BLOCK_SIZE "1024")
     dt_nodelabel(dts_partition_path NODELABEL "boot_partition")
     dt_reg_size(mcuboot_size PATH ${dts_partition_path})
@@ -249,7 +249,7 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/${ZEPHYR_OUTPUT_NAME}.bin of=${PROJECT_BINARY_DIR}/zephyr_full.bin bs=${BLOCK_SIZE} seek=${boot_blocks}
     )
-    add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
+    add_dependencies(merge_mcuboot build_mcuboot)
 
     if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         chip_ota_image(chip-ota-image

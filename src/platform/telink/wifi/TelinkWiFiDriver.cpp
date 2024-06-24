@@ -122,7 +122,22 @@ void TelinkWiFiDriver::OnNetworkStatusChanged(Status status)
 
     if (mpNetworkStatusChangeCallback)
     {
-        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, NullOptional, NullOptional);
+        const uint8_t * ssid{};
+        size_t ssidLen{};
+        WiFiManager::WiFiInfo wifiInfo;
+
+        if (CHIP_NO_ERROR == WiFiManager::Instance().GetWiFiInfo(wifiInfo))
+        {
+            ssid    = wifiInfo.mSsid;
+            ssidLen = wifiInfo.mSsidLen;
+        }
+        else
+        {
+            ssid    = WiFiManager::Instance().GetWantedNetwork().ssid;
+            ssidLen = WiFiManager::Instance().GetWantedNetwork().ssidLen;
+        }
+        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, MakeOptional(ByteSpan(wifiInfo.mSsid, wifiInfo.mSsidLen)),
+                                                                NullOptional);
     }
 
     if (mpConnectCallback)
@@ -249,11 +264,10 @@ void TelinkWiFiDriver::LoadFromStorage()
     mStagingNetwork = network;
 }
 
-void TelinkWiFiDriver::OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status)
+void TelinkWiFiDriver::OnScanWiFiNetworkDone(const WiFiManager::ScanDoneStatus & status)
 {
     VerifyOrReturn(mScanCallback != nullptr);
-    mScanCallback->OnFinished(status == WiFiManager::WiFiRequestStatus::SUCCESS ? Status::kSuccess : Status::kUnknownError,
-                              CharSpan(), &mScanResponseIterator);
+    mScanCallback->OnFinished(status ? Status::kUnknownError : Status::kSuccess, CharSpan(), &mScanResponseIterator);
     mScanCallback = nullptr;
 }
 
@@ -267,13 +281,34 @@ void TelinkWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * ca
     mScanCallback    = callback;
     CHIP_ERROR error = WiFiManager::Instance().Scan(
         ssid, [](const WiFiScanResponse & response) { Instance().OnScanWiFiNetworkResult(response); },
-        [](WiFiManager::WiFiRequestStatus status) { Instance().OnScanWiFiNetworkDone(status); });
+        [](const WiFiManager::ScanDoneStatus & status) { Instance().OnScanWiFiNetworkDone(status); });
 
     if (error != CHIP_NO_ERROR)
     {
         mScanCallback = nullptr;
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
     }
+}
+
+uint32_t TelinkWiFiDriver::GetSupportedWiFiBandsMask() const
+{
+    uint32_t bands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+    return bands;
+}
+
+void TelinkWiFiDriver::StartDefaultWiFiNetwork(void)
+{
+    chip::ByteSpan ssidSpan = ByteSpan(Uint8::from_const_char(CONFIG_DEFAULT_WIFI_SSID), strlen(CONFIG_DEFAULT_WIFI_SSID));
+    chip::ByteSpan passwordSpan =
+        ByteSpan(Uint8::from_const_char(CONFIG_DEFAULT_WIFI_PASSWORD), strlen(CONFIG_DEFAULT_WIFI_PASSWORD));
+
+    char debugBuffer[1] = { 0 };
+    MutableCharSpan debugText(debugBuffer, 0);
+    uint8_t outNetworkIndex = 0;
+
+    AddOrUpdateNetwork(ssidSpan, passwordSpan, debugText, outNetworkIndex);
+    CommitConfiguration();
+    RevertConfiguration();
 }
 
 } // namespace NetworkCommissioning

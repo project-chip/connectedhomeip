@@ -19,4 +19,4 @@ RUN set -x \
     && : # last line
 
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
-ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
+ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
