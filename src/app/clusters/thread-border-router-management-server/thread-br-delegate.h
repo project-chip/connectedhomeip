@@ -43,6 +43,9 @@ public:
     class ActivateDatasetCallback
     {
     public:
+        // If the dataset is set successfully, OnActivateDatasetComplete should be called with CHIP_NO_ERROR when the
+        // Border Router is attached to the Thread network.
+        // If an error occurs while setting the active dataset, this callback should be called with the error.
         virtual void OnActivateDatasetComplete(CHIP_ERROR error) = 0;
     };
 
