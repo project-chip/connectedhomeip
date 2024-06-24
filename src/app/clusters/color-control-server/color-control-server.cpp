@@ -21,10 +21,10 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <lib/core/Optional.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <tracing/macros.h>
-#include <lib/core/Optional.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
@@ -438,7 +438,8 @@ Status ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
 }
 
 bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride)
+                                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride)
 {
     EndpointId endpoint = commandPath.mEndpointId;
     Status status       = Status::Success;
@@ -465,7 +466,9 @@ bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, c
     return true;
 }
 
-bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionMask, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionOverride)
+bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint,
+                                            chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionMask,
+                                            chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionOverride)
 {
     // From 5.2.2.2.1.10 of ZCL7 document 14-0129-15f-zcl-ch-5-lighting.docx:
     //   "Command execution SHALL NOT continue beyond the Options processing if
@@ -507,7 +510,8 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, chip::BitMask<c
     // ---------- The following order is important in decision making -------
     // -----------more readable ----------
     //
-    if (optionMask == static_cast<ColorControl::OptionsBitmap>(0xFF) && optionOverride ==  static_cast<ColorControl::OptionsBitmap>(0xFF))
+    if (optionMask == static_cast<ColorControl::OptionsBitmap>(0xFF) &&
+        optionOverride == static_cast<ColorControl::OptionsBitmap>(0xFF))
     {
         // 0xFF are the default values passed to the command handler when
         // the payload is not present - in that case there is use of option
@@ -1329,7 +1333,9 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
  * @return false Failed
  */
 bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                        MoveModeEnum moveMode, uint16_t rate, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride,
+                                        MoveModeEnum moveMode, uint16_t rate,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride,
                                         bool isEnhanced)
 {
     MATTER_TRACE_SCOPE("moveHue", "ColorControl");
@@ -1435,8 +1441,10 @@ exit:
  * @return false Failed
  */
 bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          uint16_t hue, DirectionEnum moveDirection, uint16_t transitionTime, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
-                                          chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced)
+                                          uint16_t hue, DirectionEnum moveDirection, uint16_t transitionTime,
+                                          chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                                          chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride,
+                                          bool isEnhanced)
 {
     MATTER_TRACE_SCOPE("moveToHue", "ColorControl");
     EndpointId endpoint = commandPath.mEndpointId;
@@ -1568,10 +1576,10 @@ exit:
  * @return true Success
  * @return false Failed
  */
-bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath, uint16_t hue,
-                                                       uint8_t saturation, uint16_t transitionTime, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
-                                                       chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced)
+bool ColorControlServer::moveToHueAndSaturationCommand(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, uint16_t hue, uint8_t saturation,
+    uint16_t transitionTime, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced)
 {
     MATTER_TRACE_SCOPE("moveToHueAndSaturation", "ColorControl");
     // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
@@ -1610,8 +1618,10 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
  * @return false Failed
  */
 bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                        StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTime, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
-                                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced)
+                                        StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTime,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride,
+                                        bool isEnhanced)
 {
     MATTER_TRACE_SCOPE("stepHue", "ColorControl");
     EndpointId endpoint = commandPath.mEndpointId;
@@ -1807,14 +1817,14 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
                                                const Commands::StepSaturation::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("stepSaturation", "ColorControl");
-    auto stepMode             = commandData.stepMode;
-    uint8_t stepSize          = commandData.stepSize;
-    uint8_t transitionTime    = commandData.transitionTime;
-    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask       = commandData.optionsMask;
-    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride   = commandData.optionsOverride;
-    EndpointId endpoint       = commandPath.mEndpointId;
-    Status status             = Status::Success;
-    uint8_t currentSaturation = 0;
+    auto stepMode                                                                   = commandData.stepMode;
+    uint8_t stepSize                                                                = commandData.stepSize;
+    uint8_t transitionTime                                                          = commandData.transitionTime;
+    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask     = commandData.optionsMask;
+    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride = commandData.optionsOverride;
+    EndpointId endpoint                                                             = commandPath.mEndpointId;
+    Status status                                                                   = Status::Success;
+    uint8_t currentSaturation                                                       = 0;
 
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
@@ -1871,17 +1881,17 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
                                           const Commands::ColorLoopSet::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("colorLoop", "ColorControl");
-    auto updateFlags          = commandData.updateFlags;
-    auto action               = commandData.action;
-    auto direction            = commandData.direction;
-    uint16_t time             = commandData.time;
-    uint16_t startHue         = commandData.startHue;
-    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask       = commandData.optionsMask;
-    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride   = commandData.optionsOverride;
-    EndpointId endpoint       = commandPath.mEndpointId;
-    Status status             = Status::Success;
-    uint8_t isColorLoopActive = 0;
-    uint8_t deactiveColorLoop = 0;
+    auto updateFlags                                                                = commandData.updateFlags;
+    auto action                                                                     = commandData.action;
+    auto direction                                                                  = commandData.direction;
+    uint16_t time                                                                   = commandData.time;
+    uint16_t startHue                                                               = commandData.startHue;
+    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask     = commandData.optionsMask;
+    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride = commandData.optionsOverride;
+    EndpointId endpoint                                                             = commandPath.mEndpointId;
+    Status status                                                                   = Status::Success;
+    uint8_t isColorLoopActive                                                       = 0;
+    uint8_t deactiveColorLoop                                                       = 0;
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
     VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
@@ -2202,12 +2212,12 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
 bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::MoveColor::DecodableType & commandData)
 {
-    int16_t rateX           = commandData.rateX;
-    int16_t rateY           = commandData.rateY;
+    int16_t rateX                                                                   = commandData.rateX;
+    int16_t rateY                                                                   = commandData.rateY;
     chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask     = commandData.optionsMask;
     chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride = commandData.optionsOverride;
-    EndpointId endpoint     = commandPath.mEndpointId;
-    Status status           = Status::Success;
+    EndpointId endpoint                                                             = commandPath.mEndpointId;
+    Status status                                                                   = Status::Success;
 
     Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
     Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
@@ -2297,16 +2307,16 @@ exit:
 bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::StepColor::DecodableType & commandData)
 {
-    int16_t stepX           = commandData.stepX;
-    int16_t stepY           = commandData.stepY;
-    uint16_t transitionTime = commandData.transitionTime;
+    int16_t stepX                                                                   = commandData.stepX;
+    int16_t stepY                                                                   = commandData.stepY;
+    uint16_t transitionTime                                                         = commandData.transitionTime;
     chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask     = commandData.optionsMask;
     chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride = commandData.optionsOverride;
-    EndpointId endpoint     = commandPath.mEndpointId;
-    uint16_t currentColorX  = 0;
-    uint16_t currentColorY  = 0;
-    uint16_t colorX         = 0;
-    uint16_t colorY         = 0;
+    EndpointId endpoint                                                             = commandPath.mEndpointId;
+    uint16_t currentColorX                                                          = 0;
+    uint16_t currentColorY                                                          = 0;
+    uint16_t colorX                                                                 = 0;
+    uint16_t colorY                                                                 = 0;
 
     Status status = Status::Success;
 
@@ -2629,16 +2639,16 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
 bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                               const Commands::MoveColorTemperature::DecodableType & commandData)
 {
-    auto moveMode                    = commandData.moveMode;
-    uint16_t rate                    = commandData.rate;
-    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
-    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
-    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask              = commandData.optionsMask;
-    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride          = commandData.optionsOverride;
-    EndpointId endpoint              = commandPath.mEndpointId;
-    Status status                    = Status::Success;
-    uint16_t tempPhysicalMin         = MIN_TEMPERATURE_VALUE;
-    uint16_t tempPhysicalMax         = MAX_TEMPERATURE_VALUE;
+    auto moveMode                                                                   = commandData.moveMode;
+    uint16_t rate                                                                   = commandData.rate;
+    uint16_t colorTemperatureMinimum                                                = commandData.colorTemperatureMinimumMireds;
+    uint16_t colorTemperatureMaximum                                                = commandData.colorTemperatureMaximumMireds;
+    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask     = commandData.optionsMask;
+    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride = commandData.optionsOverride;
+    EndpointId endpoint                                                             = commandPath.mEndpointId;
+    Status status                                                                   = Status::Success;
+    uint16_t tempPhysicalMin                                                        = MIN_TEMPERATURE_VALUE;
+    uint16_t tempPhysicalMax                                                        = MAX_TEMPERATURE_VALUE;
     uint16_t transitionTime;
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
@@ -2751,17 +2761,17 @@ bool ColorControlServer::moveToColorTempCommand(app::CommandHandler * commandObj
 bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                               const Commands::StepColorTemperature::DecodableType & commandData)
 {
-    auto stepMode                    = commandData.stepMode;
-    uint16_t stepSize                = commandData.stepSize;
-    uint16_t transitionTime          = commandData.transitionTime;
-    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
-    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
-    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask              = commandData.optionsMask;
-    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride          = commandData.optionsOverride;
-    EndpointId endpoint              = commandPath.mEndpointId;
-    Status status                    = Status::Success;
-    uint16_t tempPhysicalMin         = MIN_TEMPERATURE_VALUE;
-    uint16_t tempPhysicalMax         = MAX_TEMPERATURE_VALUE;
+    auto stepMode                                                                   = commandData.stepMode;
+    uint16_t stepSize                                                               = commandData.stepSize;
+    uint16_t transitionTime                                                         = commandData.transitionTime;
+    uint16_t colorTemperatureMinimum                                                = commandData.colorTemperatureMinimumMireds;
+    uint16_t colorTemperatureMaximum                                                = commandData.colorTemperatureMaximumMireds;
+    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask     = commandData.optionsMask;
+    chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride = commandData.optionsOverride;
+    EndpointId endpoint                                                             = commandPath.mEndpointId;
+    Status status                                                                   = Status::Success;
+    uint16_t tempPhysicalMin                                                        = MIN_TEMPERATURE_VALUE;
+    uint16_t tempPhysicalMax                                                        = MAX_TEMPERATURE_VALUE;
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrExit(colorTempTransitionState != nullptr, status = Status::UnsupportedEndpoint);
