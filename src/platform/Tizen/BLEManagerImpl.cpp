@@ -201,7 +201,7 @@ void BLEManagerImpl::ReadValueRequestedCb(const char * remoteAddress, int reques
     GAutoPtr<char> value;
 
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid.GetReceiver(), &type) == BT_ERROR_NONE,
-                   ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
+                   ChipLogError(DeviceLayer, "Failed to fetch GATT attribute from GATT handle"));
     ChipLogProgress(DeviceLayer, "Gatt read requested on %s: uuid=%s", __ConvertAttTypeToStr(type), StringOrNullMarker(uuid.get()));
 
     ret = bt_gatt_get_value(gattHandle, &value.GetReceiver(), &len);
@@ -229,7 +229,7 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
     VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid.GetReceiver(), &type) == BT_ERROR_NONE,
-                   ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
+                   ChipLogError(DeviceLayer, "Failed to fetch GATT attribute from GATT handle"));
     ChipLogProgress(DeviceLayer, "Gatt write requested on %s: uuid=%s len=%d", __ConvertAttTypeToStr(type),
                     StringOrNullMarker(uuid.get()), len);
     ChipLogByteSpan(DeviceLayer, ByteSpan(Uint8::from_const_char(value), len));
@@ -241,10 +241,10 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
     VerifyOrReturn(ret == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "bt_gatt_server_send_response() failed: %s", get_error_message(ret)));
 
-    HandleRXCharWrite(conn, Uint8::from_const_char(value), len);
+    HandleC1CharWrite(conn, Uint8::from_const_char(value), len);
 }
 
-void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h charHandle)
+void BLEManagerImpl::IndicationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h charHandle)
 {
     GAutoPtr<char> uuid;
     BLEConnection * conn = nullptr;
@@ -265,9 +265,9 @@ void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h se
 
     int ret = __GetAttInfo(charHandle, &uuid.GetReceiver(), &type);
     VerifyOrReturn(ret == BT_ERROR_NONE,
-                   ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from CHAR handle: %s", get_error_message(ret)));
+                   ChipLogError(DeviceLayer, "Failed to fetch GATT attribute from CHAR handle: %s", get_error_message(ret)));
 
-    ChipLogProgress(DeviceLayer, "Notification State Changed %d on %s: %s", notify, __ConvertAttTypeToStr(type),
+    ChipLogProgress(DeviceLayer, "Indication state changed %d on %s: %s", notify, __ConvertAttTypeToStr(type),
                     StringOrNullMarker(uuid.get()));
     NotifyBLESubscribed(conn, notify ? true : false);
 }
@@ -284,7 +284,7 @@ void BLEManagerImpl::WriteCompletedCb(int result, bt_gatt_h gattHandle, void * u
     sInstance.NotifyHandleWriteComplete(conn);
 }
 
-void BLEManagerImpl::CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData)
+void BLEManagerImpl::CharacteristicIndicationCb(bt_gatt_h characteristic, char * value, int len, void * userData)
 {
     auto conn = static_cast<BLEConnection *>(userData);
 
@@ -292,8 +292,8 @@ void BLEManagerImpl::CharacteristicNotificationCb(bt_gatt_h characteristic, char
     VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Connection object is invalid"));
     VerifyOrReturn(conn->gattCharC2Handle == characteristic, ChipLogError(DeviceLayer, "Gatt characteristic handle did not match"));
 
-    ChipLogProgress(DeviceLayer, "Notification Received from CHIP peripheral [%s]", conn->peerAddr);
-    sInstance.HandleTXCharChanged(conn, Uint8::from_const_char(value), len);
+    ChipLogProgress(DeviceLayer, "Indication received from CHIP peripheral [%s]", conn->peerAddr);
+    sInstance.HandleC2CharChanged(conn, Uint8::from_const_char(value), len);
 }
 
 void BLEManagerImpl::IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server,
@@ -596,7 +596,7 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     ret = bt_gatt_server_set_characteristic_notification_state_change_cb(
         char2,
         +[](bool notify, bt_gatt_server_h gattServer, bt_gatt_h charHandle, void * self) {
-            return reinterpret_cast<BLEManagerImpl *>(self)->NotificationStateChangedCb(notify, gattServer, charHandle);
+            return reinterpret_cast<BLEManagerImpl *>(self)->IndicationStateChangedCb(notify, gattServer, charHandle);
         },
         this);
     VerifyOrExit(ret == BT_ERROR_NONE,
@@ -745,7 +745,7 @@ static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle
 
     int ret = __GetAttInfo(charHandle, &uuid.GetReceiver(), &type);
     VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from CHAR handle: %s", get_error_message(ret)));
+                 ChipLogError(DeviceLayer, "Failed to fetch GATT attribute from CHAR handle: %s", get_error_message(ret)));
 
     if (strcasecmp(uuid.get(), Ble::CHIP_BLE_CHAR_1_UUID_STR) == 0)
     {
@@ -771,7 +771,7 @@ static bool __GattClientForeachServiceCb(int total, int index, bt_gatt_h svcHand
 
     int ret = __GetAttInfo(svcHandle, &uuid.GetReceiver(), &type);
     VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from SVC handle: %s", get_error_message(ret)));
+                 ChipLogError(DeviceLayer, "Failed to fetch GATT attribute from SVC handle: %s", get_error_message(ret)));
 
     if (strcasecmp(uuid.get(), chip::Ble::CHIP_BLE_SERVICE_LONG_UUID_STR) == 0)
     {
@@ -861,7 +861,7 @@ void BLEManagerImpl::RemoveConnectionData(const char * remoteAddr)
     ChipLogProgress(DeviceLayer, "Connection Removed");
 }
 
-void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
+void BLEManagerImpl::HandleC1CharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
     System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
     VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
@@ -874,7 +874,7 @@ void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
+void BLEManagerImpl::HandleC2CharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
     System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
     VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
@@ -1183,7 +1183,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 
     ChipLogProgress(DeviceLayer, "Sending Notification Enable Request to CHIP Peripheral: %s", conId->peerAddr);
 
-    ret = bt_gatt_client_set_characteristic_value_changed_cb(conId->gattCharC2Handle, CharacteristicNotificationCb, conId);
+    ret = bt_gatt_client_set_characteristic_value_changed_cb(conId->gattCharC2Handle, CharacteristicIndicationCb, conId);
     VerifyOrExit(
         ret == BT_ERROR_NONE,
         ChipLogError(DeviceLayer, "bt_gatt_client_set_characteristic_value_changed_cb() failed: %s", get_error_message(ret)));
