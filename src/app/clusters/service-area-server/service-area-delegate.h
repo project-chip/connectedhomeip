@@ -51,7 +51,7 @@ public:
     /**
      * Stop this class objects from being copied.
      */
-    Delegate(const Delegate &) = delete;
+    Delegate(const Delegate &)             = delete;
     Delegate & operator=(const Delegate &) = delete;
 
     friend class Instance;

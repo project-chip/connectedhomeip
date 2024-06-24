@@ -46,9 +46,8 @@ namespace ServiceArea {
 // Service Area Server Instance
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, BitMask<Feature> aFeature) :
-    AttributeAccessInterface(MakeOptional(aEndpointId), Id),
-    CommandHandlerInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(Id), mFeature(aFeature)
+    AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(Id), mFeature(aFeature)
 {
     ChipLogProgress(Zcl, "Service Area: Instance constructor");
     mDelegate->SetInstance(this);
@@ -508,7 +507,8 @@ bool Instance::IsUniqueSupportedLocation(const LocationStructureWrapper & aLocat
     LocationStructureWrapper entry;
     BitMask<LocationStructureWrapper::IsEqualConfig> config;
 
-    if (ignoreLocationId) {
+    if (ignoreLocationId)
+    {
         config.Set(LocationStructureWrapper::IsEqualConfig::kIgnoreLocationId);
     }
 
@@ -925,7 +925,10 @@ bool Instance::SetProgressStatus(uint32_t aLocationId, OperationalStatusEnum opS
                  ChipLogError(Zcl, "SetProgressStatus - progress element does not exist for location %u", aLocationId));
 
     // If the status value is not changing, there in no need to modify the existing element.
-    if (progressElement.status == opStatus) { return true; }
+    if (progressElement.status == opStatus)
+    {
+        return true;
+    }
 
     // set the progress status in the local copy
     progressElement.status = opStatus;
@@ -959,7 +962,10 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aLocationId, const DataM
         ChipLogError(Zcl, "SetProgressTotalOperationalTime - progress element does not exist for location %u", aLocationId));
 
     // If the time value is not changing, there is no need to modify the existing element.
-    if (progressElement.totalOperationalTime == aTotalOperationalTime) { return true; }
+    if (progressElement.totalOperationalTime == aTotalOperationalTime)
+    {
+        return true;
+    }
 
     // This attribute SHALL be null if the Status field is not set to Completed or Skipped
     VerifyOrExit((aTotalOperationalTime.IsNull() || (progressElement.status == OperationalStatusEnum::kCompleted) ||
@@ -994,7 +1000,10 @@ bool Instance::SetProgressEstimatedTime(uint32_t aLocationId, const DataModel::N
                  ChipLogError(Zcl, "SetProgressEstimatedTime - progress element does not exist for location %u", aLocationId));
 
     // If the time value is not changing, there is no need to modify the existing element.
-    if (progressElement.estimatedTime == aEstimatedTime) { return true; };
+    if (progressElement.estimatedTime == aEstimatedTime)
+    {
+        return true;
+    };
 
     // set the time in the local copy
     progressElement.estimatedTime.Value() = aEstimatedTime;

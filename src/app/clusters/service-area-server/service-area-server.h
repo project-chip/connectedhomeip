@@ -63,9 +63,8 @@ public:
     /**
      * Stop this class objects from being copied.
      */
-    Instance(const Instance &) = delete;
+    Instance(const Instance &)             = delete;
     Instance & operator=(const Instance &) = delete;
-
 
     /**
      * @brief Initialise the Service Area server instance.
