@@ -16,8 +16,7 @@ programming infrastructure for their Matter devices.
 TI Matter examples allow the use of factory data in the following two ways:
 
 -   **Example Out of Box Factory Data** : Use TI example DAC values to get
-    started. This is intended to be used when just starting with Matter or
-    during development until customer or product specific data is not required.
+    started. This is intended to be used during development.
 -   **Custom factory data** : Allows users to configure custom factory data via
     a JSON file. The custom values are then processed by a script provided by TI
     and merged with the Matter application to create a binary that can be
@@ -50,8 +49,8 @@ Each element is described in more detail below:
 
 ## How to use
 
-Out of box factory data location is configured to be on second last page of
-flash. For CC13x4, the starting address is `0xFE800`. This can be configured in
+Out of box factory data location is configured to be on second to last page of
+flash. For CC13x4_CC26x4, the starting address is `0xFE800`. This can be configured in
 the linker file.
 
 To configure:
@@ -94,7 +93,7 @@ FLASH_FACTORY_DATA (R)  : ORIGIN = 0x000fe800, LENGTH = 0x00000900
 
 3. In the example's args.gni file, set 'custom_factory_data' to true
 
-It is recommended to keep 2 dedicated pages for CC13x4 for factory data.
+It is recommended to keep 2 dedicated pages for CC13x4_CC26x4 for factory data.
 
 ### Formatting certs and keys for JSON file
 
