@@ -198,6 +198,7 @@ public class AppPlatformService {
       Collection<SupportedCluster> supportedClusters) {
     return supportedClusters
         .stream()
+        .filter(Objects::nonNull)
         .map(AppPlatformService::mapSupportedCluster)
         .collect(Collectors.toList());
   }
