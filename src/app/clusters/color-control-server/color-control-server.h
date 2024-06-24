@@ -142,20 +142,20 @@ public:
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
     bool stopMoveStepCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                             uint8_t optionsMask, uint8_t optionsOverride);
+                             chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride);
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     bool moveHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                        MoveModeEnum moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride, bool isEnhanced);
+                        MoveModeEnum moveMode, uint16_t rate, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
     bool moveToHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, uint16_t hue,
-                          DirectionEnum moveDirection, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
+                          DirectionEnum moveDirection, uint16_t transitionTime, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride,
                           bool isEnhanced);
     bool moveToHueAndSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                       uint16_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
-                                       uint8_t optionsOverride, bool isEnhanced);
+                                       uint16_t hue, uint8_t saturation, uint16_t transitionTime, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                                       chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
     bool stepHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                        StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
-                        uint8_t optionsOverride, bool isEnhanced);
+                        StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTime, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsMask,
+                        chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionsOverride, bool isEnhanced);
     bool moveSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::ColorControl::Commands::MoveSaturation::DecodableType & commandData);
     bool moveToSaturationCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -216,7 +216,7 @@ private:
         }
     }
 
-    bool shouldExecuteIfOff(chip::EndpointId endpoint, uint8_t optionMask, uint8_t optionOverride);
+    bool shouldExecuteIfOff(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionMask, chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> optionOverride);
     void handleModeSwitch(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum newColorMode);
     uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * p, uint16_t rate);
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
