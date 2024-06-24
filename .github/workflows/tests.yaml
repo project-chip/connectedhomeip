@@ -92,7 +92,7 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
-                      src/app/zap-templates/zcl/data-model/chip/namespaces.xml \
+                      src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/access-control-definitions.xml \
                       src/app/zap-templates/zcl/data-model/chip/access-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/account-login-cluster.xml \
