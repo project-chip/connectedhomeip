@@ -48,8 +48,8 @@ async def establish_session(devCtrl: ChipDeviceCtrl.ChipDeviceControllerBase, pa
     if isinstance(parameter, commissioning.PaseOverBLEParameters):
         await devCtrl.EstablishPASESessionBLE(parameter.setup_pin, parameter.discriminator, parameter.temporary_nodeid)
     elif isinstance(parameter, commissioning.PaseOverIPParameters):
-        device = devCtrl.DiscoverCommissionableNodes(filterType=discovery.FilterType.LONG_DISCRIMINATOR,
-                                                     filter=parameter.long_discriminator, stopOnFirst=True)
+        device = await devCtrl.DiscoverCommissionableNodes(filterType=discovery.FilterType.LONG_DISCRIMINATOR,
+                                                           filter=parameter.long_discriminator, stopOnFirst=True)
         if not device:
             raise ValueError("No commissionable device found")
         selected_address = None
