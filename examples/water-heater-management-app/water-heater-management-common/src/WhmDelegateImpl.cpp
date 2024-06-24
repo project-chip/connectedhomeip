@@ -87,37 +87,67 @@ BoostStateEnum WaterHeaterManagementDelegate::GetBoostState()
 
 void WaterHeaterManagementDelegate::SetHeaterTypes(BitMask<WaterHeaterTypeBitmap> heaterTypes)
 {
-    mHeaterTypes = heaterTypes;
+    if (mHeaterTypes != heaterTypes)
+    {
+        mHeaterTypes = heaterTypes;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::HeaterTypes::Id);
+    }
 }
 
 void WaterHeaterManagementDelegate::SetHeatDemand(BitMask<WaterHeaterDemandBitmap> heatDemand)
 {
-    mHeatDemand = heatDemand;
+    if (mHeatDemand != heatDemand)
+    {
+        mHeatDemand = heatDemand;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::HeatDemand::Id);
+    }
 }
 
 void WaterHeaterManagementDelegate::SetTankVolume(uint16_t tankVolume)
 {
-    mTankVolume = tankVolume;
+    if (mTankVolume != tankVolume)
+    {
+        mTankVolume = tankVolume;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::TankVolume::Id);
+    }
 }
 
 void WaterHeaterManagementDelegate::SetEstimatedHeatRequired(int64_t estimatedHeatRequired)
 {
-    mEstimatedHeatRequired = estimatedHeatRequired;
+    if (mEstimatedHeatRequired != estimatedHeatRequired)
+    {
+        mEstimatedHeatRequired = estimatedHeatRequired;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::EstimatedHeatRequired::Id);
+    }
 }
 
 void WaterHeaterManagementDelegate::SetTankPercentage(Percent tankPercentage)
 {
     if (mpWhmInstance != nullptr && mpWhmInstance->HasFeature(Feature::kTankPercent))
     {
-        mTankPercentage = tankPercentage;
+        if (mTankPercentage != tankPercentage)
+        {
+            mTankPercentage = tankPercentage;
 
-        CheckIfHeatNeedsToBeTurnedOnOrOff();
+            CheckIfHeatNeedsToBeTurnedOnOrOff();
+
+            MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::TankPercentage::Id);
+        }
     }
 }
 
 void WaterHeaterManagementDelegate::SetBoostState(BoostStateEnum boostState)
 {
-    mBoostState = boostState;
+    if (mBoostState != boostState)
+    {
+        mBoostState = boostState;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::BoostState::Id);
+    }
 }
 
 /**

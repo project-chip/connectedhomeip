@@ -25,8 +25,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class EnergyEvseClusterChargingTargetScheduleStruct(
-  val dayOfWeekForSequence: UByte,
-  val chargingTargets: List<EnergyEvseClusterChargingTargetStruct>,
+  val dayOfWeekForSequence: Optional<UByte>,
+  val chargingTargets: Optional<List<EnergyEvseClusterChargingTargetStruct>>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterChargingTargetScheduleStruct {\n")

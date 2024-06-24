@@ -63,7 +63,6 @@ void SetTestEventTrigger_BasicInstallationTestEvent()
     dg->SetTankVolume(100);
     dg->SetTargetWaterTemperature(6000);
     dg->SetHeaterTypes(BitMask<WaterHeaterTypeBitmap>(WaterHeaterTypeBitmap::kImmersionElement1));
-    dg->SetBoostState(BoostStateEnum::kInactive);
     dg->DrawOffHotWater(100, 2000);
 }
 
