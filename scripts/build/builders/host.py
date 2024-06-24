@@ -430,8 +430,7 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_enable_dnssd_tests=false')
 
         if chip_casting_simplified is not None:
-            if chip_casting_simplified:
-                self.extra_gn_options.append('chip_casting_simplified=true')
+            self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
