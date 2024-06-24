@@ -60,6 +60,7 @@ public:
 
     static void OnTriggerOffWithEffect(OnOffEffect * effect);
     void IdentifyEventHandler();
+
 private:
     friend LightingManager & LightMgr(void);
     State_t mState;
@@ -73,7 +74,6 @@ private:
     static void TimerEventHandler(TimerHandle_t xTimer);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
     static void OffEffectTimerEventHandler(AppEvent * aEvent);
-    
 
     static LightingManager sLight;
 };

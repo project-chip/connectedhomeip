@@ -283,7 +283,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     }
 
     /* reset SoC to kick MCUBoot */
-    ChipLogProgress(SoftwareUpdate,"Resetting device to kick off MCUBoot");
+    ChipLogProgress(SoftwareUpdate, "Resetting device to kick off MCUBoot");
     SysCtrlSystemReset();
 }
 

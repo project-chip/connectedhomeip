@@ -2,13 +2,19 @@
 
 ## Overview
 
-TI Matter example applications provide configuration options for how Thread code is included in the build. Thread code can be included in as:
+TI Matter example applications provide configuration options for how Thread code
+is included in the build. Thread code can be included in as:
 
-  1. Thread certified library optimized for Matter (recommended for development and production)
-  2. Full Source (can be used for development)
-  3. Custom option where customers can update the Thread config file to change the included OpenThread feature set
+1. Thread certified library optimized for Matter (recommended for development
+   and production)
+2. Full Source (can be used for development)
+3. Custom option where customers can update the Thread config file to change the
+   included OpenThread feature set
 
-The library builds have been optimized for Matter to disable features such as Thread Joiner capability in order to save on Flash/RAM usage. Refer to the `ti_matter_production_certification.md` to get the cert ID for your Matter certification application when using the certified Thread libraries from TI.
+The library builds have been optimized for Matter to disable features such as
+Thread Joiner capability in order to save on Flash/RAM usage. Refer to the
+`ti_matter_production_certification.md` to get the cert ID for your Matter
+certification application when using the certified Thread libraries from TI.
 
 Build arguments have been added to enable Matter applications to link against
 certified OpenThread FTD/MTD libraries or custom user libraries.
@@ -26,8 +32,8 @@ chip_openthread_ftd = true
 ```
 
 -   **TI Certified OpenThread Library**:
-    
-    * Typically this is used for development.
+
+    -   Typically this is used for development.
 
     1. `ot_ti_lib_dir` Is set to an empty string
 
@@ -66,7 +72,10 @@ chip_openthread_ftd = true
         ```
 
 -   **Custom OpenThread Library**:
-    * The custom OpenThread library is used to implement extra features, or when modifying the stack in anyway.
+
+    -   The custom OpenThread library is used to implement extra features, or
+        when modifying the stack in anyway.
+
     1.  `ot_ti_lib_dir` Points to a library directory containing a custom
         `libopenthread-ftd/mtd` variant
 

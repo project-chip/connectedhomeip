@@ -50,8 +50,8 @@ Each element is described in more detail below:
 ## How to use
 
 Out of box factory data location is configured to be on second to last page of
-flash. For CC13x4_CC26x4, the starting address is `0xFE800`. This can be configured in
-the linker file.
+flash. For CC13x4_CC26x4, the starting address is `0xFE800`. This can be
+configured in the linker file.
 
 To configure:
 

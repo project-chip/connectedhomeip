@@ -204,11 +204,13 @@ void ThreadStackManagerImpl::GetExtAddress(otExtAddress & aExtAddr)
     memcpy(aExtAddr.m8, extAddr->m8, OT_EXT_ADDRESS_SIZE);
 }
 
-bool ThreadStackManagerImpl::IsThreadAttached(){
+bool ThreadStackManagerImpl::IsThreadAttached()
+{
     return _IsThreadAttached();
 }
 
-bool ThreadStackManagerImpl::IsThreadEnabled(){
+bool ThreadStackManagerImpl::IsThreadEnabled()
+{
     return _IsThreadEnabled();
 }
 

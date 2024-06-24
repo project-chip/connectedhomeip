@@ -107,7 +107,7 @@ as reference for your own application.
 -   [pump-app](../../../../examples/pump-app/cc13x4_26x4/README.md)
 -   [pump-controller-app](../../../../examples/pump-controller-app/cc13x4_26x4/README.md)
 -   [lighting-app](../../../../examples/lighting-app/cc13x4_26x4/README.md)
-<hr>
+    <hr>
 
 ### Build system
 

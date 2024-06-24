@@ -53,7 +53,6 @@
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 #include <src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
 
-
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
 
@@ -103,7 +102,6 @@ void CancelTimer(void);
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
-
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static DefaultOTARequestor sRequestorCore;
 static DefaultOTARequestorStorage sRequestorStorage;
@@ -128,7 +126,7 @@ TimerHandle_t sOTAInitTimer = 0;
 
 // The OTA Init Timer is only started upon the first Thread State Change
 // detected if the device is already on a Thread Network, or during the AppTask
-// Init sequence if the device is not yet on a Thread Network. Once the timer 
+// Init sequence if the device is not yet on a Thread Network. Once the timer
 // has been started once, it does not need to be started again so the flag will
 // be set to false.
 bool isAppStarting = true;
@@ -158,20 +156,23 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
         PLAT_LOG("Thread State Change");
         bool isThreadAttached = ThreadStackMgrImpl().IsThreadAttached();
 
-        if(isThreadAttached){
+        if (isThreadAttached)
+        {
             PLAT_LOG("Device is on the Thread Network");
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-            if(isAppStarting){
+            if (isAppStarting)
+            {
                 StartTimer(OTAREQUESTOR_INIT_TIMER_DELAY_MS);
                 isAppStarting = false;
-            }   
+            }
 #endif
         }
         break;
     }
 }
 
-void OTAInitTimerEventHandler(TimerHandle_t xTimer){
+void OTAInitTimerEventHandler(TimerHandle_t xTimer)
+{
     InitializeOTARequestor();
 }
 
@@ -217,17 +218,17 @@ int AppTask::Init()
     }
 
     // Create FreeRTOS sw timer for OTA timer.
-    sOTAInitTimer = xTimerCreate("OTAInitTmr",                 // Just a text name, not used by the RTOS kernel
-                            OTAREQUESTOR_INIT_TIMER_DELAY_MS,  // timer period (mS)
-                            false,                             // no timer reload (==one-shot)
-                            (void *) this,                     // init timer id = light obj context
-                            OTAInitTimerEventHandler           // timer callback handler
+    sOTAInitTimer = xTimerCreate("OTAInitTmr",                     // Just a text name, not used by the RTOS kernel
+                                 OTAREQUESTOR_INIT_TIMER_DELAY_MS, // timer period (mS)
+                                 false,                            // no timer reload (==one-shot)
+                                 (void *) this,                    // init timer id = light obj context
+                                 OTAInitTimerEventHandler          // timer callback handler
     );
 
     if (sOTAInitTimer == NULL)
     {
         PLAT_LOG("sOTAInitTimer timer create failed");
-    } 
+    }
     else
     {
         PLAT_LOG("sOTAInitTimer timer created successfully ");
@@ -295,7 +296,7 @@ int AppTask::Init()
     PLAT_LOG("Initialize Server");
     static CommonCaseDeviceServerInitParams initParams;
     static DefaultTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;  
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
@@ -304,11 +305,12 @@ int AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     bool isThreadEnabled = ThreadStackMgrImpl().IsThreadEnabled();
-    if(!isThreadEnabled && isAppStarting){
+    if (!isThreadEnabled && isAppStarting)
+    {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    PLAT_LOG("Thread is Disabled, enable OTA Requestor");
-    StartTimer(OTAREQUESTOR_INIT_TIMER_DELAY_MS);
-    isAppStarting = false;
+        PLAT_LOG("Thread is Disabled, enable OTA Requestor");
+        StartTimer(OTAREQUESTOR_INIT_TIMER_DELAY_MS);
+        isAppStarting = false;
 #endif
     }
 
@@ -353,20 +355,20 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void StartTimer(uint32_t aTimeoutMs)
 {
-        PLAT_LOG("Start OTA Init Timer")
-        if (xTimerIsTimerActive(sOTAInitTimer))
-        {
-            PLAT_LOG("app timer already started!");
-            CancelTimer();
-        }
+    PLAT_LOG("Start OTA Init Timer")
+    if (xTimerIsTimerActive(sOTAInitTimer))
+    {
+        PLAT_LOG("app timer already started!");
+        CancelTimer();
+    }
 
-        // timer is not active, change its period to required value (== restart).
-        // FreeRTOS- Block for a maximum of 100 ticks if the change period command
-        // cannot immediately be sent to the timer command queue.
-        if (xTimerChangePeriod(sOTAInitTimer, pdMS_TO_TICKS(aTimeoutMs), 100) != pdPASS)
-        {
-            PLAT_LOG("sOTAInitTimer timer start() failed");
-        }  
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sOTAInitTimer, pdMS_TO_TICKS(aTimeoutMs), 100) != pdPASS)
+    {
+        PLAT_LOG("sOTAInitTimer timer start() failed");
+    }
 }
 
 void CancelTimer(void)
