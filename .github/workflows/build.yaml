@@ -371,7 +371,8 @@ jobs:
 
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
-        runs-on: macos-14
+        runs-on: macos-13
+        python-version: '3.11'
         if: github.actor != 'restyled-io[bot]'
 
         steps:
