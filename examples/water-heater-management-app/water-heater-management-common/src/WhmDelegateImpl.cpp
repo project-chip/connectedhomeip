@@ -49,22 +49,18 @@ void WaterHeaterManagement::Shutdown()
     }
 }
 
+#if 0
 void emberAfWaterHeaterManagementClusterInitCallback(chip::EndpointId endpointId)
 {
-#if 0
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gWhmInstance == nullptr && gWhmDelegate == nullptr);
-
-    EndpointId waterHeaterManagementEndpoint = 0x01;
-
-    gWhmDelegate = new WaterHeaterManagementDelegate(waterHeaterManagementEndpoint);
-    gWhmInstance =
-        new WaterHeaterManagement::Instance(waterHeaterManagementEndpoint,
-                                            *gWhmDelegate,
-                                            BitMask<Feature, uint32_t>(Feature::kEnergyManagement, Feature::kTankPercent));
-
-    gWhmInstance->Init();
+}
 #endif
+
+WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint):
+    mWaterHeaterModeInstance(this, clustersEndpoint, WaterHeaterMode::Id, 0),
+    mTankPercentage(0),
+    mBoostState(BoostStateEnum::kActive),
+    mBoostTargetTemperatureReached(false)
+{
 }
 
 /*********************************************************************************
@@ -127,7 +123,11 @@ void WaterHeaterManagementDelegate::SetEstimatedHeatRequired(int64_t estimatedHe
 
 void WaterHeaterManagementDelegate::SetTankPercentage(Percent tankPercentage)
 {
+    ChipLogProgress(Zcl, "WaterHeaterManagementDelegate::SetBoostState tankPercentage %d", tankPercentage);
+
     mTankPercentage = tankPercentage;
+
+    CheckHeatDemand();
 }
 
 void WaterHeaterManagementDelegate::SetBoostState(BoostStateEnum boostState)
@@ -135,25 +135,6 @@ void WaterHeaterManagementDelegate::SetBoostState(BoostStateEnum boostState)
     ChipLogProgress(Zcl, "WaterHeaterManagementDelegate::SetBoostState boostState %d", static_cast<int>(boostState));
 
     mBoostState = boostState;
-}
-
-bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
-{
-    bool reached = false;
-
-    if (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue())
-    {
-        ChipLogError(Zcl, "WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget: mWaterTemperature %u mBoostState %d mBoostTemporarySetpoint %u", mWaterTemperature, (int) mBoostState, mBoostTemporarySetpoint.Value());
-        reached = mWaterTemperature >= mBoostTemporarySetpoint.Value();
-    }
-    else
-    {
-        ChipLogError(Zcl, "WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget: mBoostState %d mTargetWaterTemperature %u", (int) mBoostState, mTargetWaterTemperature);
-
-        reached = mWaterTemperature >= mTargetWaterTemperature;
-    }
-
-    return reached;
 }
 
 Protocols::InteractionModel::Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat)
@@ -165,6 +146,7 @@ Protocols::InteractionModel::Status WaterHeaterManagementDelegate::HandleBoost(u
     mBoostTemporarySetpoint = temporarySetpoint;
     mBoostTargetPercentage = targetPercentage;
     mBoostTargetReheat = targetReheat;
+    mBoostTargetTemperatureReached = false;
 
     if (oneShot.HasValue() && oneShot.Value() && HasWaterTemperatureReachedTarget())
     {
@@ -319,7 +301,9 @@ CHIP_ERROR WaterHeaterManagementDelegate::GetModeTagsByIndex(uint8_t modeIndex, 
 
 void WaterHeaterManagementDelegate::SetWaterTemperature(uint16_t waterTemperature)
 {
-    mWaterTemperature = waterTemperature;
+    mHotWaterTemperature = waterTemperature;
+
+    mTankPercentage = 100;
 
     CheckHeatDemand();
 }
@@ -331,9 +315,59 @@ void WaterHeaterManagementDelegate::SetTargetWaterTemperature(uint16_t targetWat
     CheckHeatDemand();
 }
 
+void WaterHeaterManagementDelegate::DrawOffHotWater(uint8_t percentageReplaced, uint16_t replacedWaterTemperature)
+{
+    if (mTankPercentage >= percentageReplaced)
+    {
+        mTankPercentage -= percentageReplaced;
+    }
+    else
+    {
+        mTankPercentage = 0;
+    }
+
+    mReplacedWaterTemperature = replacedWaterTemperature;
+
+    CheckHeatDemand();
+}
+
+bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
+{
+    bool reached = false;
+
+    uint16_t targetTemperature = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue()) ? mBoostTemporarySetpoint.Value() : mTargetWaterTemperature;
+    uint8_t targetPercentage;
+
+    if (mBoostState == BoostStateEnum::kActive && mBoostTargetTemperatureReached && mBoostTargetReheat.HasValue())
+    {
+        // If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because the TargetPercentage
+        // of the water in the tank has been heated to the set point (or TemporarySetpoint if included), this field indicates the
+        // percentage to which the hot water in the tank SHALL be allowed to fall before again beginning to reheat it.
+        //
+        // For example if the TargetPercentage was 80%, and the TargetReheat was 40%, then after initial heating to 80% hot water,
+        // the tank may have hot water drawn off until only 40% hot water remains. At this point the heater will begin to heat back
+        // up to 80% of hot water. If this field and the OneShot field were both omitted, heating would begin again after any water
+        // draw which reduced the TankPercentage below 80%.
+
+        // If this field is included then the TargetPercentage field SHALL also be included, and the OneShot excluded.
+
+        targetPercentage = mBoostTargetReheat.Value();
+    }
+    else
+    {
+        targetPercentage = (mBoostState == BoostStateEnum::kActive && mBoostTargetPercentage.HasValue()) ? mBoostTargetPercentage.Value() : 100;
+    }
+
+    ChipLogError(Zcl, "WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget: mHotWaterTemperature %u mBoostState %d mBoostTargetPercentage %u targetPercentage %u targetTemperature %u", mHotWaterTemperature, (int) mBoostState, mBoostTargetPercentage.HasValue() ? mBoostTargetPercentage.Value() : 255, targetPercentage, targetTemperature);
+
+    reached = (mTankPercentage >= targetPercentage) && (mHotWaterTemperature >= targetTemperature);
+
+    return reached;
+}
+
 void WaterHeaterManagementDelegate::CheckHeatDemand()
 {
-    ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand mWaterTemperature %u mTargetWaterTemperature %u mHeatDemand 0x%02x boostState %d", mWaterTemperature, mTargetWaterTemperature, mHeatDemand.Raw(), (int)BoostStateEnum::kActive);
+    ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand mHotWaterTemperature %u mTargetWaterTemperature %u mHeatDemand 0x%02x boostState %d mBoostTargetTemperatureReached %d", mHotWaterTemperature, mTargetWaterTemperature, mHeatDemand.Raw(), (int)BoostStateEnum::kActive, mBoostTargetTemperatureReached);
 
     bool turningHeatOff = false;
 
@@ -342,6 +376,11 @@ void WaterHeaterManagementDelegate::CheckHeatDemand()
         uint8_t mode = mInstance->GetCurrentMode();
         if (mHeatDemand.Raw() == 0)
         {
+            if (mBoostState == BoostStateEnum::kActive)
+            {
+                mBoostTargetTemperatureReached = false;
+            }
+
             if (mBoostState == BoostStateEnum::kActive || mode == ModeManual)
             {
                 bool found = false;
@@ -382,7 +421,10 @@ void WaterHeaterManagementDelegate::CheckHeatDemand()
     {
         ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand Turning heat on2");
         SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(0));
+        mTankPercentage = 100;
         turningHeatOff = true;
+
+        mBoostTargetTemperatureReached = (mBoostState == BoostStateEnum::kActive);
     }
 
     if (turningHeatOff)

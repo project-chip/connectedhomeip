@@ -42,15 +42,7 @@ CHIP_ERROR WhmManufacturer::Init()
         ChipLogError(AppServer, "WhmDelegate is not initialized");
         return CHIP_ERROR_UNINITIALIZED;
     }
-#if 0
-    dg->SetHeaterTypes(BitMask<WaterHeaterTypeBitmap>(WaterHeaterTypeBitmap::kImmersionElement1));
-    dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement1));
-    dg->SetTankVolume(20);
-    dg->SetEstimatedHeatRequired(10000);
-    dg->SetTankPercentage(35);
-    dg->SetBoostState(BoostStateEnum::kInactive);
-#endif
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -74,14 +66,14 @@ void SetTestEventTrigger_BasicInstallationTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
+    dg->SetTankVolume(100);
+    dg->SetTargetWaterTemperature(6000);
+
     dg->SetHeaterTypes(BitMask<WaterHeaterTypeBitmap>(WaterHeaterTypeBitmap::kImmersionElement1));
     //dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement2));
-    dg->SetTankVolume(100);
     //    dg->SetEstimatedHeatRequired(10000);
-    dg->SetTankPercentage(100);
     dg->SetBoostState(BoostStateEnum::kInactive);
-    dg->SetWaterTemperature(2000);
-    dg->SetTargetWaterTemperature(6000);
+    dg->DrawOffHotWater(100, 2000);
 
 }
 
@@ -94,7 +86,7 @@ void SetTestEventTrigger_WaterTemperature20CTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
-    dg->SetWaterTemperature(2000);
+    dg->DrawOffHotWater(100, 2000);
 }
 
 void SetTestEventTrigger_WaterTemperature61CTestEvent()
@@ -127,7 +119,9 @@ void SetTestEventTrigger_OffModeTestEvent()
 
 void SetTestEventTrigger_DrawOffHotWaterTestEvent()
 {
-    //    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+
+    dg->DrawOffHotWater(25, 2000);
 }
 
 bool HandleWaterHeaterManagementTestEventTrigger(uint64_t eventTrigger)
