@@ -11,11 +11,10 @@ guides to get started.
 
 ---
 
-- [Matter ESP32 All Clusters Example](#matter-esp32-all-clusters-example)
-    - [Cluster control](#cluster-control)
-      - [onoff](#onoff)
-      - [levelcontrol](#levelcontrol)
-    - [Multiple Network Interfaces](#multiple-network-interfaces)
+-   [Cluster control](#cluster-control)
+-   [Matter OTA guide](../../../docs/guides/esp32/ota.md)
+-   [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
+-   [Multiple Network Interfaces](#multiple-network-interfaces)
 
 ---
 
