@@ -37,8 +37,8 @@ class EWATERHTRBase:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
-    async def send_boost_command(self, duration: int, one_shot: typing.Optional[bool], emergency_boost: typing.Optional[bool],
-                                 temporary_setpoint: typing.Optional[int], target_percentage: typing.Optional[int] , target_reheat: typing.Optional[int],
+    async def send_boost_command(self, duration: int, one_shot: typing.Optional[bool], emergency_boost: typing.Optional[bool]=None,
+                                 temporary_setpoint: typing.Optional[int]=None, target_percentage: typing.Optional[int]=None , target_reheat: typing.Optional[int]=None,
                                  endpoint: int = None, timedRequestTimeoutMs: int = 3000,
                                  expected_status: Status = Status.Success):
         try:
@@ -48,9 +48,9 @@ class EWATERHTRBase:
                 emergencyBoost=emergency_boost,
                 temporarySetpoint=temporary_setpoint,
                 targetPercentage=target_percentage,
-                targetReheat=target_reheat,
+                targetReheat=target_reheat),
                 endpoint=endpoint,
-                timedRequestTimeoutMs=timedRequestTimeoutMs))
+                timedRequestTimeoutMs=timedRequestTimeoutMs)
 
             asserts.assert_equal(expected_status, Status.Success)
 
@@ -72,7 +72,7 @@ class EWATERHTRBase:
     async def send_test_event_trigger_basic_installation_test_event(self):
         await self.send_test_event_triggers(eventTrigger=0x0094000000000000)
 
-    async def send_test_event_trigger_basic_installation_test_eventClear(self):
+    async def send_test_event_trigger_basic_installation_test_event_clear(self):
         await self.send_test_event_triggers(eventTrigger=0x0094000000000001)
 
     async def send_test_event_trigger_water_temperature20C_test_event(self):

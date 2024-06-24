@@ -76,10 +76,12 @@ void SetTestEventTrigger_BasicInstallationTestEvent()
 
     dg->SetHeaterTypes(BitMask<WaterHeaterTypeBitmap>(WaterHeaterTypeBitmap::kImmersionElement1));
     //dg->SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(WaterHeaterDemandBitmap::kImmersionElement2));
-    dg->SetTankVolume(21);
-    dg->SetEstimatedHeatRequired(10000);
-    dg->SetTankPercentage(35);
+    dg->SetTankVolume(100);
+    //    dg->SetEstimatedHeatRequired(10000);
+    dg->SetTankPercentage(100);
     dg->SetBoostState(BoostStateEnum::kInactive);
+    dg->SetWaterTemperature(2000);
+    dg->SetTargetWaterTemperature(6000);
 
 }
 
@@ -90,29 +92,37 @@ void SetTestEventTrigger_BasicInstallationTestEventClear()
 
 void SetTestEventTrigger_WaterTemperature20CTestEvent()
 {
-    //    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+
+    dg->SetWaterTemperature(2000);
 }
 
 void SetTestEventTrigger_WaterTemperature61CTestEvent()
 {
-    //    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+
+    dg->SetWaterTemperature(6100);
 }
 
 void SetTestEventTrigger_WaterTemperature66CTestEvent()
 {
-    //    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+
+    dg->SetWaterTemperature(6600);
 }
 
 void SetTestEventTrigger_ManualModeTestEvent()
 {
     WaterHeaterManagementDelegate * dg = GetWhmDelegate();
 
-    dg->SetWaterHeaterMode(WaterHeaterManagementDelegate::ModeOff);
+    dg->SetWaterHeaterMode(WaterHeaterManagementDelegate::ModeManual);
 }
 
 void SetTestEventTrigger_OffModeTestEvent()
 {
-    //    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+
+    dg->SetWaterHeaterMode(WaterHeaterManagementDelegate::ModeOff);
 }
 
 void SetTestEventTrigger_DrawOffHotWaterTestEvent()

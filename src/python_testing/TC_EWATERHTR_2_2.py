@@ -16,6 +16,7 @@
 
 
 import logging
+import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -120,15 +121,179 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
         self.step("3c")
-        await self.check_whm_attribute("HeaterTypes", Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kImmersionElement1)
+        heaterTypes = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")
+        asserts.assert_equal(heaterTypes, Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterTypeBitmap.kImmersionElement1)
 
         self.step("4")
         await self.send_test_event_trigger_manual_mode_test_event()
 
         self.step("4a")
-        await self.check_whm_attribute("HeatDemand", Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1)
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
 
+        self.step("5")
+        await self.send_test_event_trigger_water_temperature61C_test_event()
 
+        self.step("5a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("6")
+        await self.send_test_event_trigger_water_temperature20C_test_event()
+
+        self.step("6a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+
+        self.step("7")
+        await self.send_test_event_trigger_off_mode_test_event()
+
+        self.step("7a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("8")
+        await self.send_boost_command(duration=5, one_shot=True)
+
+        self.step("8a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+
+        self.step("8b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        self.step("9")
+        time.sleep(6)
+
+        self.step("9a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("9b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+
+        self.step("10")
+        await self.send_boost_command(duration=600, one_shot=True)
+
+        self.step("10a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+
+        self.step("10b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        self.step("11")
+        await self.send_test_event_trigger_water_temperature61C_test_event()
+
+        self.step("11a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("11b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+
+        self.step("12")
+        await self.send_test_event_trigger_water_temperature20C_test_event()
+
+        self.step("12a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("13")
+        await self.send_boost_command(duration=600, one_shot=True)
+
+        self.step("13a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+
+        self.step("13b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        self.step("14")
+        await self.send_test_event_trigger_water_temperature61C_test_event()
+
+        self.step("14a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("14b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        self.step("15")
+        await self.send_test_event_trigger_water_temperature20C_test_event()
+
+        self.step("15a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+
+        self.step("15b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        self.step("16")
+        await self.send_cancel_boost_command()
+
+        self.step("16a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("16b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+
+        self.step("17")
+        await self.send_boost_command(duration=600, temporary_setpoint=6500)
+
+        self.step("17a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+
+        self.step("17b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        self.step("18")
+        await self.send_test_event_trigger_water_temperature61C_test_event()
+
+        self.step("18a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+
+        self.step("18b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        self.step("19")
+        await self.send_test_event_trigger_water_temperature66C_test_event()
+
+        self.step("19a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("19b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+
+        self.step("20")
+        await self.send_boost_command(duration=600, temporary_setpoint=7000)
+
+        self.step("20a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
+
+        self.step("20b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
+
+        self.step("21")
+        await self.send_cancel_boost_command()
+
+        self.step("21a")
+        heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
+        asserts.assert_equal(heatDemand, 0)
+
+        self.step("21b")
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+
+        self.step("22")
+        await self.send_cancel_boost_command(expected_status=Status.InvalidInState)
+
+        self.step("23")
+        await self.send_test_event_trigger_basic_installation_test_event_clear()
 
 if __name__ == "__main__":
     default_matter_test_main()
