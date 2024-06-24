@@ -37,7 +37,7 @@ class EWATERHTRBase:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
-    async def send_boost_command(self, duration: int, one_shot: typing.Optional[bool], emergency_boost: typing.Optional[bool]=None,
+    async def send_boost_command(self, duration: int, one_shot: typing.Optional[bool]=None, emergency_boost: typing.Optional[bool]=None,
                                  temporary_setpoint: typing.Optional[int]=None, target_percentage: typing.Optional[int]=None , target_reheat: typing.Optional[int]=None,
                                  endpoint: int = None, timedRequestTimeoutMs: int = 3000,
                                  expected_status: Status = Status.Success):

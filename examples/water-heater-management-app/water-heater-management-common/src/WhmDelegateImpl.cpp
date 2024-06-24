@@ -110,7 +110,8 @@ void WaterHeaterManagementDelegate::SetHeaterTypes(BitMask<WaterHeaterTypeBitmap
 
 void WaterHeaterManagementDelegate::SetHeatDemand(BitMask<WaterHeaterDemandBitmap> heatDemand)
 {
-    ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetHeatDemand %d", heatDemand.Raw());
+    ChipLogProgress(Zcl, "WaterHeaterManagementDelegate::SetHeatDemand %d", heatDemand.Raw());
+
     mHeatDemand = heatDemand;
 }
 
@@ -131,24 +132,53 @@ void WaterHeaterManagementDelegate::SetTankPercentage(Percent tankPercentage)
 
 void WaterHeaterManagementDelegate::SetBoostState(BoostStateEnum boostState)
 {
+    ChipLogProgress(Zcl, "WaterHeaterManagementDelegate::SetBoostState boostState %d", static_cast<int>(boostState));
+
     mBoostState = boostState;
+}
+
+bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
+{
+    bool reached = false;
+
+    if (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue())
+    {
+        ChipLogError(Zcl, "WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget: mWaterTemperature %u mBoostState %d mBoostTemporarySetpoint %u", mWaterTemperature, (int) mBoostState, mBoostTemporarySetpoint.Value());
+        reached = mWaterTemperature >= mBoostTemporarySetpoint.Value();
+    }
+    else
+    {
+        ChipLogError(Zcl, "WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget: mBoostState %d mTargetWaterTemperature %u", (int) mBoostState, mTargetWaterTemperature);
+
+        reached = mWaterTemperature >= mTargetWaterTemperature;
+    }
+
+    return reached;
 }
 
 Protocols::InteractionModel::Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat)
 {
-    ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleBoost");
+    ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleBoost oneShot %d", (int)(oneShot.HasValue()?oneShot.Value():0));
 
-    if (oneShot.HasValue() && oneShot.Value() && mWaterTemperature >= mTargetWaterTemperature)
+    mBoostOneShot = oneShot;
+    mBoostEmergencyBoost = emergencyBoost;
+    mBoostTemporarySetpoint = temporarySetpoint;
+    mBoostTargetPercentage = targetPercentage;
+    mBoostTargetReheat = targetReheat;
+
+    if (oneShot.HasValue() && oneShot.Value() && HasWaterTemperatureReachedTarget())
     {
         ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleBoost oneShot==true and waterTemperature >= targetWaterTemperature");
+
         DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
-        mBoostInProgress = false;
-        SetBoostState(BoostStateEnum::kActive);
+
+        SetBoostState(BoostStateEnum::kInactive);
+
         return Status::Success;
     }
 
     // If a timer is running, cancel it so we can start it with the new duration
-    if (mBoostInProgress)
+    if (mBoostState == BoostStateEnum::kActive)
     {
         DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
     }
@@ -162,12 +192,12 @@ Protocols::InteractionModel::Status WaterHeaterManagementDelegate::HandleBoost(u
         }
     }
 
-    mBoostInProgress = true;
-
     SetBoostState(BoostStateEnum::kActive);
 
+    ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleBoost2 oneShot %d", (int)(oneShot.HasValue()?oneShot.Value():0));
     CheckHeatDemand();
 
+    ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleBoost3 oneShot %d", (int)(oneShot.HasValue()?oneShot.Value():0));
     return Status::Success;
 }
 
@@ -196,18 +226,31 @@ void WaterHeaterManagementDelegate::HandleBoostTimerExpiry()
     ChipLogError(AppServer, "WaterHeaterManagementDelegate::HandleBoostTimerExpiry");
 
     // The PowerAdjustment is no longer in progress
-    mBoostInProgress = false;
-
     SetBoostState(BoostStateEnum::kInactive);
 
     CheckHeatDemand();
 }
 
-Protocols::InteractionModel::Status WaterHeaterManagementDelegate::HandleCancelBoost()
+Status WaterHeaterManagementDelegate::HandleCancelBoost()
 {
     ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleCancelBoost");
 
-    return Status::Success;
+    Status status = Status::Success;
+
+    if (mBoostState == BoostStateEnum::kActive)
+    {
+        SetBoostState(BoostStateEnum::kInactive);
+
+        DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
+
+        CheckHeatDemand();
+    }
+    else
+    {
+        status = Status::InvalidInState;
+    }
+
+    return status;
 }
 
 /*********************************************************************************
@@ -290,42 +333,45 @@ void WaterHeaterManagementDelegate::SetTargetWaterTemperature(uint16_t targetWat
 
 void WaterHeaterManagementDelegate::CheckHeatDemand()
 {
-    ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand mWaterTemperature %u mTargetWaterTemperature %u mHeatDemand 0x%02x", mWaterTemperature, mTargetWaterTemperature, mHeatDemand.Raw());
+    ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand mWaterTemperature %u mTargetWaterTemperature %u mHeatDemand 0x%02x boostState %d", mWaterTemperature, mTargetWaterTemperature, mHeatDemand.Raw(), (int)BoostStateEnum::kActive);
 
     bool turningHeatOff = false;
 
-    if (mWaterTemperature < mTargetWaterTemperature)
+    if (!HasWaterTemperatureReachedTarget())
     {
         uint8_t mode = mInstance->GetCurrentMode();
-        if ((mBoostInProgress || mode == ModeManual) && mHeatDemand.Raw() == 0)
+        if (mHeatDemand.Raw() == 0)
         {
-            bool found = false;
-            uint8_t rawBitmask = mHeaterTypes.Raw();
-            uint8_t bit = 0;
-            while (rawBitmask != 0 && !found)
+            if (mBoostState == BoostStateEnum::kActive || mode == ModeManual)
             {
-                if (rawBitmask & 1)
+                bool found = false;
+                uint8_t rawBitmask = mHeaterTypes.Raw();
+                uint8_t bit = 0;
+                while (rawBitmask != 0 && !found)
                 {
-                    found = true;
+                    if (rawBitmask & 1)
+                    {
+                        found = true;
+                    }
+                    else
+                    {
+                        bit++;
+                        rawBitmask >>= 1;
+                    }
+                }
+
+                if (found)
+                {
+                    ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand Turning heat on1");
+                    SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(1 << bit));
                 }
                 else
                 {
-                    bit++;
-                    rawBitmask >>= 1;
+                    ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand Failed to find heaterType");
                 }
             }
-
-            if (found)
-            {
-                ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand Turning heat on1");
-                SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(1 << bit));
-            }
-            else
-            {
-                ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand Failed to find heaterType");
-            }
         }
-        else if (mHeatDemand.Raw() != 0)
+        else if (mBoostState == BoostStateEnum::kInactive && mode == ModeOff)
         {
             ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand turning heating off due to mode");
             SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(0));
@@ -336,14 +382,15 @@ void WaterHeaterManagementDelegate::CheckHeatDemand()
     {
         ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand Turning heat on2");
         SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(0));
-            turningHeatOff = true;
+        turningHeatOff = true;
     }
 
     if (turningHeatOff)
     {
-        if (mBoostState == BoostStateEnum::kActive)
+        if (mBoostState == BoostStateEnum::kActive && mBoostOneShot.HasValue() && mBoostOneShot.Value())
         {
-            mBoostState = BoostStateEnum::kInactive;
+            ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckHeatDemand mBoostState %d mBoostOneShot %d", (int) mBoostState, (int)(mBoostOneShot.HasValue() ? mBoostOneShot.Value() : 0))
+            SetBoostState(BoostStateEnum::kInactive);
 
             DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
         }

@@ -38,8 +38,7 @@ class WaterHeaterManagementDelegate : public WaterHeaterManagement::Delegate,
 public:
     WaterHeaterManagementDelegate(EndpointId clustersEndpoint):
         mWaterHeaterModeInstance(this, clustersEndpoint, WaterHeaterMode::Id, 0),
-        mBoostState(BoostStateEnum::kActive),
-        mBoostInProgress(false)
+        mBoostState(BoostStateEnum::kActive)
     {
     }
 
@@ -152,6 +151,8 @@ public:
     static void BoostTimerExpiry(System::Layer * systemLayer, void * delegate);
     void HandleBoostTimerExpiry();
 
+    bool HasWaterTemperatureReachedTarget() const;
+    
     /*********************************************************************************
      *
      * Public constants
@@ -213,7 +214,11 @@ private:
     // Actual water temperature in 100ths of a C
     uint16_t mWaterTemperature;
 
-    bool mBoostInProgress;
+    Optional<bool> mBoostOneShot;
+    Optional<bool> mBoostEmergencyBoost;
+    Optional<int16_t> mBoostTemporarySetpoint;
+    Optional<chip::Percent> mBoostTargetPercentage;
+    Optional<chip::Percent> mBoostTargetReheat;
 };
 
 Instance * GetWaterHeaterManagementInstance();

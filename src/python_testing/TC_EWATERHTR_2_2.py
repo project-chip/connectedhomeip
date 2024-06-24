@@ -200,7 +200,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         asserts.assert_equal(heatDemand, 0)
 
         self.step("13")
-        await self.send_boost_command(duration=600, one_shot=True)
+        await self.send_boost_command(duration=600)
 
         self.step("13a")
         heatDemand = await self.read_whm_attribute_expect_success(attribute="HeatDemand")
@@ -267,7 +267,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         asserts.assert_equal(heatDemand, 0)
 
         self.step("19b")
-        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
+        await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
         self.step("20")
         await self.send_boost_command(duration=600, temporary_setpoint=7000)
