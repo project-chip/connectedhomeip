@@ -5921,42 +5921,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTREnergyCalendarClusterDate
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _year = nil;
-
-        _month = nil;
-
-        _day = nil;
-
-        _dayOfWeek = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTREnergyCalendarClusterDate alloc] init];
-
-    other.year = self.year;
-    other.month = self.month;
-    other.day = self.day;
-    other.dayOfWeek = self.dayOfWeek;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: year:%@; month:%@; day:%@; dayOfWeek:%@; >", NSStringFromClass([self class]), _year, _month, _day, _dayOfWeek];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTREnergyCalendarClusterDayStruct
 - (instancetype)init
 {
@@ -5993,12 +5957,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTREnergyCalendarClusterCalendarPeriod
+@implementation MTREnergyCalendarClusterCalendarPeriodStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _startDate = @(0);
+        _startDate = nil;
 
         _days = [NSArray array];
     }
@@ -6007,7 +5971,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTREnergyCalendarClusterCalendarPeriod alloc] init];
+    auto other = [[MTREnergyCalendarClusterCalendarPeriodStruct alloc] init];
 
     other.startDate = self.startDate;
     other.days = self.days;
@@ -6032,9 +5996,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peakPeriod = @(0);
 
-        _startTime = @(0);
+        _startTime = nil;
 
-        _endTime = @(0);
+        _endTime = nil;
     }
     return self;
 }

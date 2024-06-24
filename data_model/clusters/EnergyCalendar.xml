@@ -83,16 +83,16 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="PeakPeriodSeverityEnum">
-      <item value="0" name="Unused">
+      <item value="0" name="Unused" summary="Unused">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Low">
+      <item value="1" name="Low" summary="Low">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Medium">
+      <item value="2" name="Medium" summary="Medium">
         <mandatoryConform/>
       </item>
-      <item value="3" name="High">
+      <item value="3" name="High" summary="High">
         <mandatoryConform/>
       </item>
     </enum>
@@ -145,35 +145,20 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <struct name="Date">
-      <field id="0" name="Year" type="uint16">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Month" type="uint8">
-        <mandatoryConform/>
-        <constraint type="between" from="1" to="12"/>
-      </field>
-      <field id="2" name="Day" type="uint8">
-        <mandatoryConform/>
-        <constraint type="between" from="1" to="31"/>
-      </field>
-      <field id="3" name="DayOfWeek" type="uint8">
-        <mandatoryConform/>
-        <constraint type="between" from="1" to="7"/>
-      </field>
-    </struct>
-    <struct name="CalendarPeriod">
+    <struct name="CalendarPeriodStruct">
       <field id="0" name="StartDate" type="epoch-s">
+        <quality nullable="true"/>
         <mandatoryConform/>
+        <constraint type="min" value="StartDate Attribute"/>
       </field>
       <field id="1" name="Days" type="list">
         <entry type="DayStruct"/>
         <mandatoryConform/>
-        <constraint type="minCount" value="1"/>
+        <constraint type="countBetween" from="1" to="7"/>
       </field>
     </struct>
     <struct name="DayStruct">
-      <field id="0" name="Date" type="Date">
+      <field id="0" name="Date" type="date">
         <optionalConform choice="a"/>
       </field>
       <field id="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap">
@@ -183,30 +168,32 @@ Davis, CA 95616, USA
       <field id="2" name="Transitions" type="list">
         <entry type="TransitionStruct"/>
         <mandatoryConform/>
-        <constraint type="minCount" value="1"/>
+        <constraint type="countBetween" from="1" to="48"/>
       </field>
       <field id="3" name="CalendarID" type="uint32">
-        <optionalConform choice="a"/>
+        <optionalConform/>
       </field>
     </struct>
     <struct name="PeakPeriodStruct">
       <field id="0" name="Severity" type="PeakPeriodSeverityEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="PeakPeriod" type="uint16">
+      <field id="1" name="PeakPeriod" type="uint16" default="0">
         <mandatoryConform/>
       </field>
       <field id="2" name="StartTime" type="epoch-s">
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="EndTime" type="epoch-s">
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="TransitionStruct">
       <field id="0" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="1439"/>
+        <constraint type="max" value="1499"/>
       </field>
       <field id="1" name="PriceTier" type="uint32">
         <optionalConform choice="a" more="true">
@@ -228,67 +215,70 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="CalendarID" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="Name" type="string" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="12"/>
     </attribute>
     <attribute id="0x0002" name="ProviderID" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="EventID" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="StartDate" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
+      <constraint type="desc"/>
     </attribute>
     <attribute id="0x0005" name="CalendarPeriods" type="list" default="empty">
-      <entry type="CalendarPeriod"/>
+      <entry type="CalendarPeriodStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
+      <constraint type="countBetween" from="1" to="4"/>
     </attribute>
     <attribute id="0x0006" name="SpecialDays" type="list" default="empty">
       <entry type="DayStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
+      <constraint type="maxCount" value="50"/>
     </attribute>
     <attribute id="0x0007" name="CurrentDay" type="DayStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0008" name="NextDay" type="DayStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0009" name="CurrentTransition" type="TransitionStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x000A" name="CurrentPeakPeriod" type="PeakPeriodStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PEAKP"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x000B" name="NextPeakPeriod" type="PeakPeriodStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PEAKP"/>
       </mandatoryConform>
