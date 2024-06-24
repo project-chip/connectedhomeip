@@ -196,11 +196,7 @@ Requires API's in a crc.h to implement CRC functionality.
 #ifndef NV_LINUX
 
 #include <ti/devices/DeviceFamily.h>
-/* CC23X0 and CC27XX does not support GPRAM,
- * so VIMS access is not needed */
-#if !defined(DeviceFamily_CC23X0R5) && !defined(DeviceFamily_CC23X0R2) && !defined(DeviceFamily_CC27XX)
-#include DeviceFamily_constructPath(driverlib / vims.h)
-#endif
+#include <ti/devices/cc13x4_cc26x4/driverlib/vims.h>
 
 #ifdef NVOCMP_MIN_VDD_FLASH_MV
 #include <driverlib/aon_batmon.h>

@@ -1,3 +1,16 @@
+```{toctree}
+:glob:
+:maxdepth: 1
+:hidden:
+
+matter-migration-guide/matter_cc2674_migration.md
+matter-syscfg/getting-started.md
+matter-syscfg/sysconfig-board.md
+matter-users-guide/ti_openthread_library_usage.md
+matter-users-guide/ti_factory_data_user_guide.md
+matter-users-guide/enabling_icd_on_ti_devices.md
+```
+
 # Texas Instruments platform overview
 
 The Texas Instruments Matter platform is based on the TI SimpleLink™ SDK.
@@ -6,7 +19,7 @@ The following diagram is a simplified representation of a Matter application
 which is built on the TI Platform.
 
 <div style="text-align: center;">
-  <img src="./.././../images/matter_ti_overview_simplified.png" width=30%>
+  <img src="../images/matter_ti_overview_simplified.png" width=30%>
 </div>
 
 ## Texas Instruments SimpleLink SDK
@@ -90,7 +103,7 @@ by the platform implementation files.
 Below are several resources available for Matter development:
 
 -   [Matter Protocol Overview](https://handbook.buildwithmatter.com/howitworks/roles/)
--   [Matter Build Guide](../../BUILDING.md)
+-   [Matter Build Guide](../BUILDING.md)
 -   [Matter over Thread Getting Started](https://dev.ti.com/tirex/explore/node?node=A__AciOYyNq9gli.nsvJzBtQg__com.ti.SIMPLELINK_ACADEMY_CC13XX_CC26XX_SDK__AfkT0vQ__LATEST)
 -   [TI Matter over Wi-Fi Getting Started](https://e2e.ti.com/support/wireless-connectivity/wi-fi-group/wifi/f/wi-fi-forum/1122413/faq-cc3235sf-matter----getting-started-guide)
 -   [TI Matter Application Development](https://dev.ti.com/tirex/explore/node?node=A__AXNOPYikmtBCHJ-L6eRivA__com.ti.SIMPLELINK_ACADEMY_CC13XX_CC26XX_SDK__AfkT0vQ__LATEST)
@@ -103,10 +116,10 @@ Below are several resources available for Matter development:
 Sample Matter applications are provided for the TI platform. These can be used
 as reference for your own application.
 
--   [lock-app](../../../../examples/lock-app/cc13x4_26x4/README.md)
--   [pump-app](../../../../examples/pump-app/cc13x4_26x4/README.md)
--   [pump-controller-app](../../../../examples/pump-controller-app/cc13x4_26x4/README.md)
--   [lighting-app](../../../../examples/lighting-app/cc13x4_26x4/README.md)
+-   [lock-app](../../../examples/lock-app/cc13x4_26x4/README.md)
+-   [pump-app](../../../examples/pump-app/cc13x4_26x4/README.md)
+-   [pump-controller-app](../../../examples/pump-controller-app/cc13x4_26x4/README.md)
+-   [lighting-app](../../../examples/lighting-app/cc13x4_26x4/README.md)
     <hr>
 
 ### Build system
@@ -122,7 +135,7 @@ SimpleLink SDK.
 For instructions on how to migrate the CC1354P10-6 examples to either the
 CC2674P10 or the CC2674R10, please refer to the guide linked below.
 
--   [TI CC2674 Migration Guide](../matter-migration-guide/matter_cc2674_migration.md)
+-   [TI CC2674 Migration Guide](./matter-migration-guide/matter_cc2674_migration.md)
 
 <hr>
 
@@ -131,7 +144,7 @@ CC2674P10 or the CC2674R10, please refer to the guide linked below.
 For instructions on how to program custom factory data on TI devices, please
 refer to the guide linked below.
 
--   [TI Factory Data User Guide](./ti_factory_data_user_guide.md)
+-   [TI Factory Data User Guide](./matter-users-guide/ti_factory_data_user_guide.md)
 
 <hr>
 
@@ -140,7 +153,7 @@ refer to the guide linked below.
 For instructions on how to use the Matter ICD feature on TI devices, please
 refer to the guide linked below.
 
--   [Enabling ICD On TI Devices](./enabling_icd_on_ti_devices.md)
+-   [Enabling ICD On TI Devices](./matter-users-guide/enabling_icd_on_ti_devices.md)
 
 <hr>
 
@@ -149,7 +162,7 @@ refer to the guide linked below.
 For instructions on how to configure the OpenThread build configuration for a
 Matter application, please refer to the guide linked below.
 
--   [OpenThread Library Configuration](./ti_openthread_library_usage.md)
+-   [OpenThread Library Configuration](./matter-users-guide/ti_openthread_library_usage.md)
 
 ### TI Support
 
