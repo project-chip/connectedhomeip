@@ -404,13 +404,6 @@ jobs:
               run: |
                   for BUILD_TYPE in default python_lib; do
                       case $BUILD_TYPE in
-                          # We want to build various standalone example apps
-                          # (similar to what examples-linux-standalone.yaml
-                          # does), so use target_os="all" to get those picked
-                          # up as part of the "unified" build.  But then to
-                          # save CI resources we want to exclude the
-                          # "host clang" build, which uses the pigweed
-                          # clang.
                           "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
