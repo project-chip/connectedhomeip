@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class DeviceEnergyManagementClusterSlotAdjustmentStruct(
   val slotIndex: UByte,
   val nominalPower: Optional<Long>,
-  val duration: UInt
+  val duration: UInt,
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterSlotAdjustmentStruct {\n")
@@ -56,7 +56,7 @@ class DeviceEnergyManagementClusterSlotAdjustmentStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): DeviceEnergyManagementClusterSlotAdjustmentStruct {
       tlvReader.enterStructure(tlvTag)
       val slotIndex = tlvReader.getUByte(ContextSpecificTag(TAG_SLOT_INDEX))
