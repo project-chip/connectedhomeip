@@ -85,6 +85,19 @@ Ninja to build the executable.
 
     ```
 
+-   If your target Launchpad is the cc1354P10_1, then you will need to update the
+    args.gni accordingly:
+    ```
+    --- a/examples/lock-app/cc13x4_26x4/args.gni
+    +++ b/examples/lock-app/cc13x4_26x4/args.gni
+    @@ -20,7 +20,7 @@ ti_simplelink_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+     ti_simplelink_sysconfig_target =
+         get_label_info(":sysconfig", "label_no_toolchain")
+
+    -ti_simplelink_board = "LP_EM_CC1354P10_6"
+    +ti_simplelink_board = "LP_EM_CC1354P10_1"
+    ```
+
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
