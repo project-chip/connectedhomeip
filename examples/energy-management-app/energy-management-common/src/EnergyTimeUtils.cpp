@@ -31,12 +31,17 @@ using namespace chip::app::Clusters::EnergyEvse::Attributes;
 using chip::app::LogEvent;
 using chip::Protocols::InteractionModel::Status;
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DeviceEnergyManagement {
+
 /**
  * @brief   Helper function to get current timestamp in Epoch format
  *
  * @param[out]   chipEpoch reference to hold return timestamp. Set to 0 if an error occurs.
  */
-CHIP_ERROR UtilsGetEpochTS(uint32_t & chipEpoch)
+CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
 {
     chipEpoch = 0;
 
@@ -78,7 +83,7 @@ CHIP_ERROR UtilsGetEpochTS(uint32_t & chipEpoch)
  * @return  bitmap value for day of week
  * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
  */
-uint8_t UtilsGetLocalDayOfWeekFromUnixEpoch(time_t unixEpoch)
+uint8_t GetLocalDayOfWeekFromUnixEpoch(time_t unixEpoch)
 {
     // Define a timezone structure and initialize it to the local timezone
     // This will capture any daylight saving time changes
@@ -100,7 +105,7 @@ uint8_t UtilsGetLocalDayOfWeekFromUnixEpoch(time_t unixEpoch)
  *
  * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
  */
-CHIP_ERROR UtilsGetLocalDayOfWeekNow(uint8_t & dayOfWeekMap)
+CHIP_ERROR GetLocalDayOfWeekNow(uint8_t & dayOfWeekMap)
 {
     chip::System::Clock::Milliseconds64 cTMs;
     CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
@@ -110,7 +115,12 @@ CHIP_ERROR UtilsGetLocalDayOfWeekNow(uint8_t & dayOfWeekMap)
         return err;
     }
     time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
-    dayOfWeekMap     = UtilsGetLocalDayOfWeekFromUnixEpoch(unixEpoch);
+    dayOfWeekMap     = GetLocalDayOfWeekFromUnixEpoch(unixEpoch);
 
     return CHIP_NO_ERROR;
 }
+
+} // namespace DeviceEnergyManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -265,11 +265,11 @@ class EventChangeCallback:
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
 
-    def wait_for_event_expect_no_report(self, timeout: int = 10):
-        """This function succceeds/returns if an event does not arrive within the timeout.
+    def wait_for_event_expect_no_report(self, timeoutS: int = 10):
+        """This function succceeds/returns if an event does not arrive within the timeout specified in seconds.
            If an event does arrive, an assert is called."""
         try:
-            res = self._q.get(block=True, timeout=timeout)
+            res = self._q.get(block=True, timeout=timeoutS)
         except queue.Empty:
             return
 
