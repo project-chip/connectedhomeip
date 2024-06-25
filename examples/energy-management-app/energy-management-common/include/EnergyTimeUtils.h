@@ -64,4 +64,3 @@ CHIP_ERROR GetLocalDayOfWeekNow(uint8_t & dayOfWeekMap);
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
