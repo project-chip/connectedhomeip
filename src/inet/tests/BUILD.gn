@@ -97,6 +97,7 @@ executable("inet-layer-test-tool") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
   ]
 
   output_dir = root_out_dir
