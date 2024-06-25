@@ -56,13 +56,13 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CONFIG_WIFI_NETWORK_COMMISSIONING_DRIVER
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(CONFIG_WIFI_NETWORK_ENDPOINT_ID /* Endpoint Id */,
                                       &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET && CONFIG_ETHERNET_NETWORK_COMMISSIONING_DRIVER
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET && CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
 app::Clusters::NetworkCommissioning::Instance
     sEthernetNetworkCommissioningInstance(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID /* Endpoint Id */,
                                           &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
@@ -76,15 +76,15 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     InitWiFi();
-#if CONFIG_WIFI_NETWORK_COMMISSIONING_DRIVER
+#if CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
     sWiFiNetworkCommissioningInstance.Init();
-#endif // CONFIG_WIFI_NETWORK_COMMISSIONING_DRIVER
+#endif // CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     InitEthernet();
-#if CONFIG_ETHERNET_NETWORK_COMMISSIONING_DRIVER
+#if CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
     sEthernetNetworkCommissioningInstance.Init();
-#endif // CONFIG_ETHERNET_NETWORK_COMMISSIONING_DRIVER
+#endif // CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
 #endif
 
 #if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID)

@@ -157,6 +157,12 @@ menu "CHIP Core"
             help
                 Option to enable/disable CHIP log level filtering APIs.
 
+        config ENABLE_CHIP_DATA_MODEL
+            bool "Enable CHIP data model"
+            default y
+            help
+                Option to enable/disable CHIP data model.
+
     endmenu # "General Options"
 
     menu "Networking Options"
@@ -1290,7 +1296,7 @@ menu "CHIP Device Layer"
     menu "Network Commissioning Driver Endpoint Id"
         config THREAD_NETWORK_COMMISSIONING_DRIVER
             bool "Use the generic Thread network commissioning driver"
-            depends on ENABLE_MATTER_OVER_THREAD
+            depends on ENABLE_MATTER_OVER_THREAD && ENABLE_CHIP_DATA_MODEL
             default y
             help
                 Option to enable/disable the use of generic Thread network commissioning driver.
@@ -1305,7 +1311,7 @@ menu "CHIP Device Layer"
 
         config WIFI_NETWORK_COMMISSIONING_DRIVER
             bool "Use ESP Wi-Fi network commissioning driver"
-            depends on ENABLE_WIFI_STATION || ENABLE_WIFI_AP
+            depends on (ENABLE_WIFI_STATION || ENABLE_WIFI_AP) && ENABLE_CHIP_DATA_MODEL
             default y
             help
                 Option to enable/disable the use of ESP Wi-Fi network commissioning driver.
@@ -1320,7 +1326,7 @@ menu "CHIP Device Layer"
 
         config ETHERNET_NETWORK_COMMISSIONING_DRIVER
             bool "Use ESP Ethernet network commissioning driver"
-            depends on ENABLE_ETHERNET_TELEMETRY
+            depends on ENABLE_ETHERNET_TELEMETRY && ENABLE_CHIP_DATA_MODEL
             default y
             help
                 Option to enable/disable the use of ESP Ethernet network commissioning driver.
