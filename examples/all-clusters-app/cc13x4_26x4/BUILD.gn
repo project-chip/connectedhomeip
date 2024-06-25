@@ -96,6 +96,7 @@ ti_simplelink_executable("all-clusters-app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/cc13x4_26x4:cc13x4_26x4-attestation-credentials",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/openthread:openthread",
   ]
   defines = []

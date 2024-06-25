@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
 import logging
 import os
 import signal
@@ -63,6 +64,19 @@ class ProcessManager:
         self.process.wait()
 
 
+def remove_cached_files(cached_file_pattern: str):
+    """Remove any cached files that match the provided pattern."""
+
+    cached_files = glob.glob(cached_file_pattern)  # Returns a list of paths that match the pattern.
+
+    for cached_file in cached_files:
+        try:
+            os.remove(cached_file)
+        except OSError as e:
+            logging.error(f'Failed to remove cached file `{cached_file}` with error: `{e.strerror}`')
+            raise  # Re-raise the OSError to propagate it up.
+
+
 def dump_temporary_logs_to_console(log_file_path: str):
     """Dump log file to the console; log file will be removed once the function exits."""
     """Write the entire content of `log_file_path` to the console."""
@@ -86,7 +100,7 @@ def handle_casting_failure(test_sequence_name: str, log_file_paths: List[str]):
     sys.exit(1)
 
 
-def stop_app(test_sequence_name: str, app_name: str, app: subprocess.Popen):
+def stop_app(test_sequence_name: str, app_name: str, app: subprocess.Popen) -> bool:
     """Stop the given `app` subprocess."""
 
     app.terminate()
@@ -115,7 +129,7 @@ def parse_output_msg_in_subprocess(
     log_paths: List[str],
     test_sequence_name: str,
     test_sequence_step: Step
-):
+) -> bool:
     """Parse the output of a given `app` subprocess and validate its output against the expected `output_msg` in the given `Step`."""
 
     if not test_sequence_step.output_msg:
@@ -168,7 +182,7 @@ def send_input_cmd_to_subprocess(
     tv_app_info: Tuple[subprocess.Popen, TextIO],
     test_sequence_name: str,
     test_sequence_step: Step
-):
+) -> bool:
     """Send a given input command (`input_cmd`) from the `Step` to its given `app` subprocess."""
 
     if not test_sequence_step.input_cmd:
@@ -176,17 +190,14 @@ def send_input_cmd_to_subprocess(
         return False
 
     app_subprocess, app_log_file = (tv_casting_app_info if test_sequence_step.app == App.TV_CASTING_APP else tv_app_info)
+    app_name = test_sequence_step.app.value
 
-    app_subprocess.stdin.write(test_sequence_step.input_cmd)
+    input_cmd = test_sequence_step.input_cmd
+    app_subprocess.stdin.write(input_cmd)
     app_subprocess.stdin.flush()
 
-    # Read in the next line which should be the `input_cmd` that was issued.
-    next_line = app_subprocess.stdout.readline()
-    app_log_file.write(next_line)
-    app_log_file.flush()
-    next_line = next_line.rstrip('\n')
-
-    logging.info(f'{test_sequence_name} - Sent `{next_line}` to the {test_sequence_step.app.value} subprocess.')
+    input_cmd = input_cmd.rstrip('\n')
+    logging.info(f'{test_sequence_name} - Sent `{input_cmd}` to the {app_name} subprocess.')
 
     return True
 
@@ -338,7 +349,13 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
 if __name__ == '__main__':
 
     # Start with a clean slate by removing any previously cached entries.
-    os.system('rm -f /tmp/chip_*')
+    try:
+        cached_file_pattern = '/tmp/chip_*'
+        remove_cached_files(cached_file_pattern)
+    except OSError:
+        logging.error(
+            f'Error while removing cached files with file pattern: {cached_file_pattern}')
+        sys.exit(1)
 
     # Test casting (discovery and commissioning) between the Linux tv-casting-app and the tv-app.
     test_casting_fn()
