@@ -126,8 +126,13 @@ if (wifi_soc != true) {  # CCP board
     }
 
     source_set("ot-efr32-cert") {
+      sources = [
+        "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
+        "${openthread_root}/examples/platforms/utils/mac_frame.h",
+      ]
+
       if (enable_openthread_cli) {
-        sources = [
+        sources += [
           "${openthread_root}/examples/apps/cli/cli_uart.cpp",
           "${openthread_root}/src/cli/cli.cpp",
           "${openthread_root}/src/cli/cli.hpp",

@@ -29,15 +29,13 @@ config("openthread_efr32_config") {
   ]
 
   include_dirs = [
+    "${sl_ot_efr32_root}",
     "${chip_root}/examples/platform/efr32",
     "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
     "${sl_ot_platform_abstraction}/include",
-    "${sl_ot_efr32_root}",
-
-    #TODO TEST is this needed here if it is in efr32_sdk.gni!!!!
     "${sl_ot_platform_abstraction}/rtos",
 
-    #this is for sl_openthread_features_config.h. should use generated one per board
+    #TODO this is for sl_openthread_features_config.h. should use generated one per board when sl_ot_abstraction is integrated
     "${sl_ot_libs_path}/config",
   ]
 
