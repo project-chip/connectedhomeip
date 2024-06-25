@@ -36,7 +36,7 @@ import matter.tlv.TlvReader
 
 class EnergyCalendarCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class CalendarIDAttribute(val value: UInt?)
 
@@ -244,7 +244,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeCalendarIDAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<CalendarIDAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -257,7 +257,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -337,7 +337,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeNameAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NameAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -350,7 +350,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -430,7 +430,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeProviderIDAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ProviderIDAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -443,7 +443,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -523,7 +523,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeEventIDAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventIDAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -536,7 +536,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -616,7 +616,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeStartDateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<StartDateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -629,7 +629,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -715,7 +715,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeCalendarPeriodsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<CalendarPeriodsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -728,7 +728,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -822,7 +822,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeSpecialDaysAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<SpecialDaysAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -835,7 +835,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -921,7 +921,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeCurrentDayAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<CurrentDayAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -934,7 +934,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1014,7 +1014,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeNextDayAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NextDayAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -1027,7 +1027,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1107,7 +1107,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeCurrentTransitionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<CurrentTransitionAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
@@ -1120,7 +1120,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1206,7 +1206,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeCurrentPeakPeriodAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<CurrentPeakPeriodAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
@@ -1219,7 +1219,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1309,7 +1309,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeNextPeakPeriodAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NextPeakPeriodAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 11u
     val attributePaths =
@@ -1322,7 +1322,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1409,7 +1409,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -1422,7 +1422,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1506,7 +1506,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -1519,7 +1519,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1603,7 +1603,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -1616,7 +1616,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1698,7 +1698,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1711,7 +1711,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1786,7 +1786,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1799,7 +1799,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1867,7 +1867,7 @@ class EnergyCalendarCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1880,7 +1880,7 @@ class EnergyCalendarCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

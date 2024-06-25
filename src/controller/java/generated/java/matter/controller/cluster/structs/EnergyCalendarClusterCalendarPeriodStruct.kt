@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class EnergyCalendarClusterCalendarPeriodStruct(
   val startDate: UInt?,
-  val days: List<EnergyCalendarClusterDayStruct>
+  val days: List<EnergyCalendarClusterDayStruct>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyCalendarClusterCalendarPeriodStruct {\n")
