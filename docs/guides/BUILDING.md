@@ -8,7 +8,7 @@ that generates inputs to [ninja](https://ninja-build.org/).
 
 The build system has been tested on the following Operating Systems:
 
--   macOS 10.15
+-   macOS 13
 -   Debian 11 (64 bit required)
 -   Ubuntu 22.04 LTS
 
@@ -107,7 +107,20 @@ sudo apt-get install libsdl2-dev
 
 ### Installing prerequisites on macOS
 
-On macOS, install Xcode from the Mac App Store.
+On macOS, install Xcode from the Mac App Store. After installing Xcode, install python3.11 using brew:
+
+``` sh
+    brew install python@3.11
+    python3 -m pip install --upgrade setuptools
+    python3 -m pip install --upgrade pip
+    cd /usr/local/bin
+    ln -sf python3.11 python3
+    ln -sf python3 python
+    ln -sf pip3.11 pip3
+    ln -sf pip3 pip
+
+    
+```
 
 #### UI builds
 
