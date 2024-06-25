@@ -32,10 +32,10 @@ extern "C" {
 #include "sl_si91x_driver.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
+#include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
-#include "sl_wifi.h"
 #ifdef __cplusplus
 }
 #endif
@@ -193,8 +193,9 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
     UNUSED_PARAMETER(netif);
     sl_status_t status;
-    status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *)p->payload, p->len);
-    if (status != SL_STATUS_OK) {
+    status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *) p->payload, p->len);
+    if (status != SL_STATUS_OK)
+    {
         return ERR_IF;
     }
     return ERR_OK;
