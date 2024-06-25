@@ -639,8 +639,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Emb
         moveToColorCommand.colorX          = static_cast<uint16_t>(data->args[0]);
         moveToColorCommand.colorY          = static_cast<uint16_t>(data->args[1]);
         moveToColorCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
-        moveToColorCommand.optionsMask     = static_cast<uint8_t>(data->args[3]);
-        moveToColorCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        moveToColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
+        moveToColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand);
         break;
 
