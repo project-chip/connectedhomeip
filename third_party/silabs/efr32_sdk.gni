@@ -531,6 +531,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24/config",
         "${efr32_sdk_root}/platform/service/device_init/config/s2/",
         "${efr32_sdk_root}/platform/emdrv/spidrv/inc",
+        "${efr32_sdk_root}/platform/emdrv/spidrv/config",
         "${efr32_sdk_root}/platform/emdrv/dmadrv/inc/s2_signals",
       ]
 
