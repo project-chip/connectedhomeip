@@ -24,7 +24,7 @@ from mobly import asserts
 logger = logging.getLogger(__name__)
 
 
-class DEMBaseTestHelper:
+class DEMTestBase:
 
     async def read_dem_attribute_expect_success(self, endpoint: int = None, attribute: str = ""):
         cluster = Clusters.Objects.DeviceEnergyManagement
