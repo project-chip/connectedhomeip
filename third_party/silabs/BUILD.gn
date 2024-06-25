@@ -66,8 +66,6 @@ if (wifi_soc != true) {  # CCP board
   if (use_silabs_thread_lib) {
     config("libopenthread-platform_config") {
       include_dirs = [ "${openthread_root}/examples/platforms" ]
-
-      defines = [ "SL_CONFIG_OPENTHREAD_LIB=1" ]
     }
 
     copy("copy_openthread_system") {
@@ -198,6 +196,20 @@ if (wifi_soc != true) {  # CCP board
       XTD = "ftd"
       if (!chip_openthread_ftd) {
         XTD = "mtd"
+      } else {
+        # additional files needs for ftd lib
+        sources += [
+          "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
+          "${openthread_root}/examples/platforms/utils/link_metrics.h",
+          "${openthread_root}/src/core/api/link_api.cpp",
+          "${openthread_root}/src/core/mac/mac.cpp",
+          "${openthread_root}/src/core/mac/mac_frame.cpp",
+          "${openthread_root}/src/core/mac/sub_mac.cpp",
+          "${openthread_root}/src/core/thread/mle.cpp",
+          "${sl_ot_platform_abstraction}/efr32/radio.c",
+        ]
+
+        include_dirs = [ "${sl_ot_platform_abstraction}/include" ]
       }
 
       # Use silabs openthread library stack with or without coap api enabled

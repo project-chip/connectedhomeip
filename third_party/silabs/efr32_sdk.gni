@@ -65,6 +65,9 @@ declare_args() {
 
   silabs_log_enabled = true
 
+  # Enable Synchronized Sleepy End Device
+  enable_synchronized_sed = false
+
   # Argument to enable IPv4 for wifi
   # aligning to match chip_inet_config_enable_ipv4 default configuration
   chip_enable_wifi_ipv4 = false
@@ -95,9 +98,6 @@ declare_args() {
   sl_ot_libs_path = "${efr32_sdk_root}/protocol/openthread"
   sl_ot_platform_abstraction =
       "${efr32_sdk_root}/protocol/openthread/platform-abstraction"
-
-  # Enable Synchronized Sleepy End Device
-  enable_synchronized_sed = use_silabs_thread_lib
 
   # board related pre-generated files path (default)
   sl_pre_gen_path =
@@ -317,6 +317,7 @@ template("efr32_sdk") {
       "SL_MATTER_BLE_EXTENDED_ADV=${sl_matter_ble_extended_adv}",
       "SL_MEMORY_POOL_LIGHT=1",
       "SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE=\"sl_openthread_features_config.h\"",
+      "SL_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
       "CIRCULAR_QUEUE_USE_LOCAL_CONFIG_HEADER=1",
       "MATTER_INTEGRATION=1",
     ]
@@ -327,16 +328,23 @@ template("efr32_sdk") {
       defines += [ "SILABS_LOG_ENABLED=0" ]
     }
 
-    # Temporary configuration to enable COAP specific configurations
-    if (use_thread_coap_lib) {
-      defines += [ "SL_USE_COAP_CONFIG=1" ]
-    }
-
     if (sl_uart_log_output) {
       defines += [
         "SILABS_LOG_OUT_UART=1",
         "SILABS_LOG_OUT_RTT=0",
       ]
+    }
+
+    if (use_silabs_thread_lib) {
+      defines += [ "SL_CONFIG_OPENTHREAD_LIB=1" ]
+    } else {
+      defines += [ "SL_CONFIG_OPENTHREAD_LIB=0" ]
+    }
+
+    if (use_thread_coap_lib) {
+      defines += [ "SL_USE_COAP_CONFIG=1" ]
+    } else {
+      defines += [ "SL_USE_COAP_CONFIG=0" ]
     }
 
     if (chip_enable_ble_rs911x) {
@@ -462,7 +470,6 @@ template("efr32_sdk") {
           defines += [
             "CHIP_DEVICE_CONFIG_THREAD_SSED=1",
             "SL_CSL_ENABLE=1",
-            "SL_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
           ]
         }
       }
