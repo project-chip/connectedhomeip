@@ -184,19 +184,6 @@ Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<b
         DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
     }
 
-    // See if the water temperature is already at the target temperature in which case nothing to do
-    if (oneShot.HasValue() && oneShot.Value() && HasWaterTemperatureReachedTarget())
-    {
-        ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleBoost oneShot==true and waterTemperature >= targetWaterTemperature");
-
-        // Cancel any previous timers
-        DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
-
-        SetBoostState(BoostStateEnum::kInactive);
-
-        return Status::Success;
-    }
-
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(durationS), BoostTimerExpiry, this);
     if (err != CHIP_NO_ERROR)
     {
@@ -246,8 +233,6 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
 {
     ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleCancelBoost");
 
-    Status status = Status::Success;
-
     if (mBoostState == BoostStateEnum::kActive)
     {
         SetBoostState(BoostStateEnum::kInactive);
@@ -256,12 +241,8 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
 
         CheckIfHeatNeedsToBeTurnedOnOrOff();
     }
-    else
-    {
-        status = Status::InvalidInState;
-    }
 
-    return status;
+    return Status::Success;
 }
 
 /*********************************************************************************

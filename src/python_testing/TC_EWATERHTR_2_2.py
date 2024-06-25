@@ -95,7 +95,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
             TestStep("21", "TH sends CancelBoost. Verify Command response is Success"),
             TestStep("21a", "TH reads HeatDemand attribute. Verify value is 0x00 (no demand on any source)"),
             TestStep("21b", "TH reads BoostState attribute. Verify value is 0 (Inactive)"),
-            TestStep("22", "TH sends CancelBoost. Verify Command response is InvalidInState"),
+            TestStep("22", "TH sends CancelBoost. Verify Command response is Success"),
             TestStep("23", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER for Basic installation Test Event Clear. Verify Command response is Success"),
         ]
 
@@ -289,7 +289,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
 
         self.step("22")
-        await self.send_cancel_boost_command(expected_status=Status.InvalidInState)
+        await self.send_cancel_boost_command()
 
         self.step("23")
         await self.send_test_event_trigger_basic_installation_test_event_clear()
