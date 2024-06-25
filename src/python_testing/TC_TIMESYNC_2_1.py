@@ -38,13 +38,13 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
 
         features = await self.read_single_attribute(dev_ctrl=self.default_controller, node_id=self.dut_node_id,
                                                     endpoint=endpoint, attribute=Clusters.TimeSynchronization.Attributes.FeatureMap)
-        
+
         self.supports_time_zone = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kTimeZone)
         self.supports_ntpc = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient)
         self.supports_ntps = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPServer)
         self.supports_trusted_time_source = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kTimeSyncClient)
-        timesource_attr_id = Clusters.Objects.TimeSynchronization.Attributes.TimeSource.attribute_id 
-        
+        timesource_attr_id = Clusters.Objects.TimeSynchronization.Attributes.TimeSource.attribute_id
+
         # Reading attributes from DUT
         timesync_attr_list = Clusters.Objects.TimeSynchronization.Attributes.AttributeList
         read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [timesync_attr_list])
@@ -55,7 +55,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
-        
+
         self.print_step(2, "Read Granularity attribute")
         granularity_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.Granularity)
         asserts.assert_less(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kUnknownEnumValue,
