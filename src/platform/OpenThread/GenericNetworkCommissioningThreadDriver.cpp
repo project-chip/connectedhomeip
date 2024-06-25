@@ -268,7 +268,7 @@ CHIP_ERROR GenericThreadDriver::BackupConfiguration()
 void GenericThreadDriver::CheckInterfaceEnabled()
 {
     bool enabled = GetEnabled();
-    ChipLogProgress(DeviceLayer, "OpenThread InterfaceEnabled: %s", enabled ? "true" : "false");
+    ChipLogProgress(DeviceLayer, "OpenThread InterfaceEnabled: %d", enabled);
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
     // If the Thread interface is enabled and stack has been provisioned, but is not currently enabled, enable it now.
     if (enabled && ThreadStackMgrImpl().IsThreadProvisioned() && !ThreadStackMgrImpl().IsThreadEnabled())
