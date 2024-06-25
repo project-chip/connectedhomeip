@@ -28,7 +28,7 @@ class EnergyCalendarClusterDayStruct(
   val date: Optional<UInt>,
   val daysOfWeek: Optional<UByte>,
   val transitions: List<EnergyCalendarClusterTransitionStruct>,
-  val calendarID: Optional<UInt>
+  val calendarID: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyCalendarClusterDayStruct {\n")
