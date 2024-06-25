@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,22 +16,29 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of logging support
- *          for Open IOT SDK platform.
- */
-
 #pragma once
 
-#include <lib/support/logging/Constants.h>
+#include "AppCLIBase.h"
 
 namespace chip {
-namespace Logging {
-namespace Platform {
+namespace NXP {
+namespace App {
 
-void ois_logging_init(void);
+class AppCLIZephyr : public AppCLIBase
+{
+public:
+    virtual ~AppCLIZephyr() = default;
 
-} // namespace Platform
-} // namespace Logging
+    virtual CHIP_ERROR Init(void) override;
+
+    virtual void ResetCmdHandle(void) override;
+
+    static AppCLIZephyr & GetDefaultInstance();
+
+private:
+    bool isShellInitialized = false;
+};
+AppCLIBase & GetAppCLI();
+} // namespace App
+} // namespace NXP
 } // namespace chip

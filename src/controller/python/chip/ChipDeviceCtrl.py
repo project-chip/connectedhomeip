@@ -38,7 +38,6 @@ import json
 import logging
 import secrets
 import threading
-import time
 import typing
 from ctypes import (CDLL, CFUNCTYPE, POINTER, Structure, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8,
                     c_uint16, c_uint32, c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
@@ -729,8 +728,8 @@ class ChipDeviceControllerBase():
 
         return (address.value.decode(), port.value) if error == 0 else None
 
-    def DiscoverCommissionableNodes(self, filterType: discovery.FilterType = discovery.FilterType.NONE, filter: typing.Any = None,
-                                    stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
+    async def DiscoverCommissionableNodes(self, filterType: discovery.FilterType = discovery.FilterType.NONE, filter: typing.Any = None,
+                                          stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
         ''' Discover commissionable nodes via DNS-SD with specified filters.
             Supported filters are:
 
@@ -752,27 +751,36 @@ class ChipDeviceControllerBase():
         if isinstance(filter, int):
             filter = str(filter)
 
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes(
-                self.devCtrl, int(filterType), str(filter).encode("utf-8"))).raise_on_error()
+        # Discovery is also used during commissioning. Make sure this manual discovery
+        # and commissioning attempts do not interfere with each other.
+        async with self._commissioning_lock:
+            res = await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes(
+                    self.devCtrl, int(filterType), str(filter).encode("utf-8")))
+            res.raise_on_error()
 
-        if timeoutSecond != 0:
-            if stopOnFirst:
-                target = time.time() + timeoutSecond
-                while time.time() < target:
-                    if self._ChipStack.Call(
-                            lambda: self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode(self.devCtrl)):
-                        break
-                    time.sleep(0.1)
-            else:
-                time.sleep(timeoutSecond)
+            async def _wait_discovery():
+                while not await self._ChipStack.CallAsync(
+                        lambda: self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode(self.devCtrl)):
+                    await asyncio.sleep(0.1)
+                return
 
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_StopCommissionableDiscovery(self.devCtrl)).raise_on_error()
+            try:
+                if stopOnFirst:
+                    await asyncio.wait_for(_wait_discovery(), timeoutSecond)
+                else:
+                    await asyncio.sleep(timeoutSecond)
+            except TimeoutError:
+                # Expected timeout, do nothing
+                pass
+            finally:
+                res = await self._ChipStack.CallAsync(
+                    lambda: self._dmLib.pychip_DeviceController_StopCommissionableDiscovery(self.devCtrl))
+                res.raise_on_error()
 
-        return self.GetDiscoveredDevices()
+            return await self.GetDiscoveredDevices()
 
-    def GetDiscoveredDevices(self):
+    async def GetDiscoveredDevices(self):
         def GetDevices(devCtrl):
             devices = []
 
@@ -786,7 +794,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_IterateDiscoveredCommissionableNodes(devCtrl.devCtrl, HandleDevice)
             return devices
 
-        return self._ChipStack.Call(lambda: GetDevices(self))
+        return await self._ChipStack.CallAsync(lambda: GetDevices(self))
 
     def GetIPForDiscoveredDevice(self, idx, addrStr, length):
         self.CheckIsActive()
