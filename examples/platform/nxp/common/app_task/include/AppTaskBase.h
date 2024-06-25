@@ -130,14 +130,22 @@ public:
      */
     static void InitServer(intptr_t arg);
 
-    /* Commissioning handlers */
-    virtual void StartCommissioningHandler(void){};
-    virtual void StopCommissioningHandler(void){};
-    virtual void SwitchCommissioningStateHandler(void){};
-    virtual void FactoryResetHandler(void){};
+    /**
+     * Commissioning handlers
+     * Generic implementation is provided within this class
+     * Can be overridden by a child class
+     */
+    virtual void StartCommissioningHandler(void);
+    virtual void StopCommissioningHandler(void);
+    virtual void SwitchCommissioningStateHandler(void);
+    virtual void FactoryResetHandler(void);
 
 private:
     inline static chip::CommonCaseDeviceServerInitParams initParams;
+    /* Functions used by the public commisioning handlers */
+    static void StartCommissioning(intptr_t arg);
+    static void StopCommissioning(intptr_t arg);
+    static void SwitchCommissioningState(intptr_t arg);
 };
 
 /**

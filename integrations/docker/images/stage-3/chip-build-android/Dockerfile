@@ -59,9 +59,9 @@ RUN set -x \
     && export PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH \
     && cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1t.tar.gz \
     && mkdir -p $OPENSSL_ARMV7 && cd $OPENSSL_ARMV7 && tar xfz /tmp/openssl-1.1.1t.tar.gz \
-    && cd $OPENSSL_ARMV7/openssl-1.1.1t && CC=clang ANDROID_API=26 ./Configure android-arm -U__ANDROID_API__ -D__ANDROID_API__=26 && make SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
+    && cd $OPENSSL_ARMV7/openssl-1.1.1t && CC=clang ANDROID_API=26 ./Configure android-arm -U__ANDROID_API__ -D__ANDROID_API__=26 && make -j$(nproc) SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
     && mkdir -p $OPENSSL_X86 && cd $OPENSSL_X86 && tar xfz /tmp/openssl-1.1.1t.tar.gz \
-    && cd $OPENSSL_X86/openssl-1.1.1t && CC=clang ANDROID_API=26 ./Configure android-x86 -U__ANDROID_API__ -D__ANDROID_API__=26 && make SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
+    && cd $OPENSSL_X86/openssl-1.1.1t && CC=clang ANDROID_API=26 ./Configure android-x86 -U__ANDROID_API__ -D__ANDROID_API__=26 && make  -j$(nproc) SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
     && rm -rf /tmp/openssl-1.1.1t.tar.gz \
     && : # last line
 

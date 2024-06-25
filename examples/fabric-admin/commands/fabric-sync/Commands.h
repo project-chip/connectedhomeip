@@ -27,6 +27,7 @@ void registerCommandsFabricSync(Commands & commands, CredentialIssuerCommands * 
 
     commands_list clusterCommands = {
         make_unique<FabricSyncAddDeviceCommand>(credsIssuerConfig),
+        make_unique<FabricSyncDeviceCommand>(credsIssuerConfig),
     };
 
     commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for fabric synchronization.");

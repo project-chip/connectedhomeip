@@ -26,6 +26,7 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 config("openthread_rw61x_config") {
+  defines = []
   include_dirs = [
     "${openthread_nxp_root}/src/common",
     "${openthread_nxp_root}/src/common/br",
@@ -38,7 +39,7 @@ config("openthread_rw61x_config") {
     include_dirs += [ "${openthread_nxp_root}/src/common/spinel" ]
   }
   if (chip_enable_wifi && chip_enable_openthread) {
-    defines = [
+    defines += [
       "OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE=1",
       "OPENTHREAD_CONFIG_COMMISSIONER_ENABLE=1",
       "OPENTHREAD_CONFIG_BORDER_ROUTING_ENABLE=1",
@@ -53,6 +54,10 @@ config("openthread_rw61x_config") {
       "OPENTHREAD_CONFIG_GENERIC_TASKLET_ENABLE=1",
     ]
   }
+  # ot cli configs
+  defines += [
+    "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1"
+  ]
 }
 
 #Config used by the openthread stack to get the path to OpenthreadConfig.h

@@ -28,7 +28,7 @@ class BindingClusterTargetStruct(
   val group: Optional<UShort>,
   val endpoint: Optional<UShort>,
   val cluster: Optional<UInt>,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("BindingClusterTargetStruct {\n")

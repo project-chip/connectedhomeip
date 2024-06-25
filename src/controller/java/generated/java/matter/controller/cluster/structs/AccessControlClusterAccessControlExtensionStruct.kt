@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class AccessControlClusterAccessControlExtensionStruct(
   val data: ByteArray,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessControlExtensionStruct {\n")
@@ -48,7 +48,7 @@ class AccessControlClusterAccessControlExtensionStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): AccessControlClusterAccessControlExtensionStruct {
       tlvReader.enterStructure(tlvTag)
       val data = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))

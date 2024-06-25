@@ -63,7 +63,10 @@ mw320_executable("shell_mw320") {
     "${chip_root}/src/setup_payload",
   ]
 
-  deps = [ "${chip_root}/src/platform:syscalls_stub" ]
+  deps = [
+    "${chip_root}/src/platform:syscalls_stub",
+    "${chip_root}/src/platform/logging:default",
+  ]
 
   include_dirs = [
     "${chip_root}/src/platform/nxp/mw320",
