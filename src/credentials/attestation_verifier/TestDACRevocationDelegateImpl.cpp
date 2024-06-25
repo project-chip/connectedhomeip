@@ -186,10 +186,17 @@ void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
         if (IsCertificateRevoked(info.paiDerBuffer))
         {
             ChipLogProgress(NotSpecified, "Found revoked PAI in %s", mDeviceAttestationRevocationSetPath);
-            attestationError = AttestationVerificationResult::kPaiRevoked;
+
+            if (attestationError == AttestationVerificationResult::kDacRevoked)
+            {
+                attestationError = AttestationVerificationResult::kPaiAndDacRevoked;
+            }
+            else
+            {
+                attestationError = AttestationVerificationResult::kPaiRevoked;
+            }
         }
     }
-
     onCompletion->mCall(onCompletion->mContext, info, attestationError);
 }
 

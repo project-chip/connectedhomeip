@@ -79,6 +79,8 @@ enum class AttestationVerificationResult : uint16_t
 
     kInternalError = 900,
 
+    kPaiAndDacRevoked = 1000,
+
     kNotImplemented = 0xFFFFU,
 
     // TODO: Add more attestation verification errors
