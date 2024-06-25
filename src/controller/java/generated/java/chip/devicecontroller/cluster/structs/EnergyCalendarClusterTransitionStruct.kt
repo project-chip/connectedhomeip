@@ -27,7 +27,7 @@ class EnergyCalendarClusterTransitionStruct(
   val transitionTime: UInt,
   val priceTier: Optional<ULong>,
   val friendlyCredit: Optional<Boolean>,
-  val auxiliaryLoad: Optional<UInt>
+  val auxiliaryLoad: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyCalendarClusterTransitionStruct {\n")
@@ -92,7 +92,7 @@ class EnergyCalendarClusterTransitionStruct(
         transitionTime,
         priceTier,
         friendlyCredit,
-        auxiliaryLoad
+        auxiliaryLoad,
       )
     }
   }

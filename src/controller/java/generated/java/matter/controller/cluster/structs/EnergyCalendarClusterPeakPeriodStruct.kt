@@ -26,7 +26,7 @@ class EnergyCalendarClusterPeakPeriodStruct(
   val severity: UByte,
   val peakPeriod: UShort,
   val startTime: UInt?,
-  val endTime: UInt?
+  val endTime: UInt?,
 ) {
   override fun toString(): String = buildString {
     append("EnergyCalendarClusterPeakPeriodStruct {\n")
