@@ -77,7 +77,7 @@ public:
 
 private:
     CHIP_ERROR BackupActiveDataset();
-    ActivateDatasetCallback * mCallback = nullptr;
+    ActivateDatasetCallback * mCallback        = nullptr;
     Thread::OperationalDataset mStagingDataset = {};
 };
 } // namespace ThreadBorderRouterManagement
