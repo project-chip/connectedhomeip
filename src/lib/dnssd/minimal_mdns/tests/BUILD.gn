@@ -46,6 +46,9 @@ chip_test_suite("tests") {
 if (enable_fuzz_test_targets) {
   chip_fuzz_target("fuzz-minmdns-packet-parsing") {
     sources = [ "FuzzPacketParsing.cpp" ]
-    public_deps = [ "${chip_root}/src/lib/dnssd/minimal_mdns" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/platform/logging:default",
+    ]
   }
 }
