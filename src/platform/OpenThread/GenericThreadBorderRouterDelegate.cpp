@@ -121,35 +121,16 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::GetDataset(Thread::OperationalData
 CHIP_ERROR GenericThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
                                                                ActivateDatasetCallback * callback)
 {
-    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
-
-    VerifyOrReturnError(callback, CHIP_ERROR_INVALID_ARGUMENT);
-    otOperationalDatasetTlvs datasetTlvs;
-    memcpy(datasetTlvs.mTlvs, activeDataset.AsByteSpan().data(), activeDataset.AsByteSpan().size());
-    datasetTlvs.mLength = activeDataset.AsByteSpan().size();
-
-    ScopedThreadLock threadLock;
-    // Save the previous thread state and dataset for reverting
-    bool threadIsEnabled = GetThreadEnabled();
-    ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFailsafeThreadEnabledKey, threadIsEnabled));
-    if (threadIsEnabled)
+    CHIP_ERROR err = BackupActiveDataset();
+    if (err == CHIP_NO_ERROR)
     {
-        otOperationalDatasetTlvs stagingDataset;
-        ReturnErrorCodeIf(otDatasetGetActiveTlvs(otInst, &stagingDataset) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
-        if (activeDataset.AsByteSpan().data_equal(ByteSpan(stagingDataset.mTlvs, stagingDataset.mLength)))
-        {
-            callback->OnActivateDatasetComplete(CHIP_NO_ERROR);
-            return CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFailsafeThreadDatasetTlvsKey,
-                                                                                   stagingDataset.mTlvs, stagingDataset.mLength));
+        err = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(activeDataset, nullptr);
     }
-    SetThreadEnabled(false);
-    ReturnErrorCodeIf(otDatasetSetActiveTlvs(otInst, &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
-    SetThreadEnabled(true);
-    mCallback = callback;
-    return CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        mCallback = callback;
+    }
+    return err;
 }
 
 void GenericThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -163,45 +144,53 @@ void GenericThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer
             delegate->mCallback->OnActivateDatasetComplete(CHIP_NO_ERROR);
             // Delete Failsafe Keys after activating dataset is completed
             DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadDatasetTlvsKey);
-            DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadEnabledKey);
             delegate->mCallback = nullptr;
         }
     }
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::RevertActiveDataset()
+CHIP_ERROR GenericThreadBorderRouterDelegate::BackupActiveDataset()
 {
-    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
-
-    bool threadIsEnabled = false;
-    CHIP_ERROR err       = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadEnabledKey, &threadIsEnabled);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    // If active dataset is already backed up, return with no error
+    CHIP_ERROR err = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadDatasetTlvsKey, nullptr, 0);
+    if (err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL)
     {
         return CHIP_NO_ERROR;
     }
-    ReturnErrorOnFailure(err);
+    GetDataset(mStagingDataset, DatasetType::kActive);
+    ByteSpan dataset = mStagingDataset.AsByteSpan();
+    return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFailsafeThreadDatasetTlvsKey, dataset.data(), dataset.size());
+}
 
-    ScopedThreadLock threadLock;
-    if (threadIsEnabled)
-    {
-        otOperationalDatasetTlvs stagingDataset;
-        size_t datasetTlvslen = 0;
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadDatasetTlvsKey, stagingDataset.mTlvs,
-                                                                    sizeof(stagingDataset.mTlvs), &datasetTlvslen);
-        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-        {
-            return CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(err);
-        stagingDataset.mLength = datasetTlvslen;
-        ReturnErrorOnFailure(SetThreadEnabled(false));
-        ReturnErrorCodeIf(otDatasetSetActiveTlvs(otInst, &stagingDataset) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
-    }
-    ReturnErrorOnFailure(SetThreadEnabled(threadIsEnabled));
-    // Delete Failsafe Keys after reverting.
+CHIP_ERROR GenericThreadBorderRouterDelegate::CommitActiveDataset()
+{
+    // Delete Failsafe Key when committing.
     DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadDatasetTlvsKey);
-    DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadEnabledKey);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GenericThreadBorderRouterDelegate::RevertActiveDataset()
+{
+    // The FailSafe Timer is triggered and the previous command request should be handled, so reset the callback.
+    mCallback = nullptr;
+    uint8_t datasetBytes[Thread::kSizeOperationalDataset];
+    size_t datasetLength;
+    CHIP_ERROR err = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadDatasetTlvsKey, datasetBytes,
+                                                                           sizeof(datasetBytes), &datasetLength);
+    // If no backup could be found, it means the active datset has not been modified since the fail-safe was armed,
+    // so return with no error.
+    ReturnErrorCodeIf(err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = mStagingDataset.Init(ByteSpan(datasetBytes, datasetLength));
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingDataset, nullptr);
+    }
+
+    // Always delete the backup, regardless if it can be successfully restored.
+    DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadDatasetTlvsKey);
     return CHIP_NO_ERROR;
 }
 
@@ -216,33 +205,6 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::SetPendingDataset(const Thread::Op
     datasetTlvs.mLength = pendingDataset.AsByteSpan().size();
     ReturnErrorCodeIf(otDatasetSetPendingTlvs(otInst, &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR GenericThreadBorderRouterDelegate::SetThreadEnabled(bool enabled)
-{
-    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
-    bool isEnabled    = (otThreadGetDeviceRole(otInst) != OT_DEVICE_ROLE_DISABLED);
-    bool isIp6Enabled = otIp6IsEnabled(otInst);
-    if (enabled && !isIp6Enabled)
-    {
-        ReturnErrorCodeIf(otIp6SetEnabled(otInst, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
-    }
-    if (enabled != isEnabled)
-    {
-        ReturnErrorCodeIf(otThreadSetEnabled(otInst, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
-    }
-    if (!enabled && isIp6Enabled)
-    {
-        ReturnErrorCodeIf(otIp6SetEnabled(otInst, enabled) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
-    }
-    return CHIP_NO_ERROR;
-}
-
-bool GenericThreadBorderRouterDelegate::GetThreadEnabled()
-{
-    otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    return otInst && otIp6IsEnabled(otInst) && (otThreadGetDeviceRole(otInst) != OT_DEVICE_ROLE_DISABLED);
 }
 
 } // namespace ThreadBorderRouterManagement
