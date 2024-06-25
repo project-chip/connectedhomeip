@@ -29,29 +29,43 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    def pics_TC_TIMESYNC_2_1(self) -> list[str]:
+        return ["TIMESYNC.S"]
+
     @async_test_body
     async def test_TC_TIMESYNC_2_1(self):
-        endpoint = self.user_params.get("endpoint", 0)
+        endpoint = 0
 
         features = await self.read_single_attribute(dev_ctrl=self.default_controller, node_id=self.dut_node_id,
                                                     endpoint=endpoint, attribute=Clusters.TimeSynchronization.Attributes.FeatureMap)
+        
         self.supports_time_zone = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kTimeZone)
         self.supports_ntpc = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient)
         self.supports_ntps = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPServer)
         self.supports_trusted_time_source = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kTimeSyncClient)
+        timesource_attr_id = Clusters.Objects.TimeSynchronization.Attributes.TimeSource.attribute_id 
+        
+        # Reading attributes from DUT
+        timesync_attr_list = Clusters.Objects.TimeSynchronization.Attributes.AttributeList
+        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [timesync_attr_list])
+        attributes_list = read_request[0]
+
+        # Extracting gathered attributes dictionary values into a list containing only supported attribute ids
+        attribute_list_confined = list([values for values in attributes_list[list(attributes_list.keys())[0]].values()])[1]
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
-
+        
         self.print_step(2, "Read Granularity attribute")
         granularity_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.Granularity)
         asserts.assert_less(granularity_dut, Clusters.TimeSynchronization.Enums.GranularityEnum.kUnknownEnumValue,
                             "Granularity is not in valid range")
 
         self.print_step(3, "Read TimeSource")
-        time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
-        asserts.assert_less(time_source, Clusters.TimeSynchronization.Enums.TimeSourceEnum.kUnknownEnumValue,
-                            "TimeSource is not in valid range")
+        if timesource_attr_id in attribute_list_confined:
+            time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
+            asserts.assert_less(time_source, Clusters.TimeSynchronization.Enums.TimeSourceEnum.kUnknownEnumValue,
+                                "TimeSource is not in valid range")
 
         self.print_step(4, "Read TrustedTimeSource")
         if self.supports_trusted_time_source:
