@@ -516,8 +516,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
         break;
 
     case Clusters::ColorControl::Commands::StopMoveStep::Id:
-        stopMoveStepCommand.optionsMask     = static_cast<uint8_t>(data->args[0]);
-        stopMoveStepCommand.optionsOverride = static_cast<uint8_t>(data->args[1]);
+        stopMoveStepCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[0]);
+        stopMoveStepCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          stopMoveStepCommand, onSuccess, onFailure);
         break;
