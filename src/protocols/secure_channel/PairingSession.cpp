@@ -86,11 +86,8 @@ void PairingSession::Finish()
         event.SecureSessionEstablished.TransportType = to_underlying(address.GetTransportType());
         event.SecureSessionEstablished.SecureSessionType =
             to_underlying(mSecureSessionHolder->AsSecureSession()->GetSecureSessionType());
-        if (mSecureSessionHolder->AsSecureSession()->GetSecureSessionType() == Transport::SecureSession::Type::kCASE)
-        {
-            event.SecureSessionEstablished.PeerNodeId  = mSecureSessionHolder->GetPeer().GetNodeId();
-            event.SecureSessionEstablished.FabricIndex = mSecureSessionHolder->GetPeer().GetFabricIndex();
-        }
+        event.SecureSessionEstablished.PeerNodeId  = mSecureSessionHolder->GetPeer().GetNodeId();
+        event.SecureSessionEstablished.FabricIndex = mSecureSessionHolder->GetPeer().GetFabricIndex();
         if (DeviceLayer::PlatformMgr().PostEvent(&event) != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Failed to post Secure Session established event");
