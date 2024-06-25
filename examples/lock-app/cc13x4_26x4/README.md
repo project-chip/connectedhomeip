@@ -85,8 +85,9 @@ Ninja to build the executable.
 
     ```
 
--   If your target Launchpad is the cc1354P10_1, then you will need to update the
-    args.gni accordingly:
+-   If your target Launchpad is the cc1354P10_1, then you will need to update
+    the args.gni accordingly:
+
     ```
     --- a/examples/lock-app/cc13x4_26x4/args.gni
     +++ b/examples/lock-app/cc13x4_26x4/args.gni
