@@ -50,11 +50,11 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
             TestStep("4b", "TH reads BoostState attribute. Verify value is 1 (Active)"),
             TestStep("5", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER for Water Temperature 61C Test Event. Verify Command response is Success"),
             TestStep("5a", "TH reads HeatDemand attribute. Verify value is 0x00 (no demand on any source)"),
-            TestStep("5b", "TH reads BoostState attribute. Verify value is 0 (Inactive)"),
+            TestStep("5b", "TH reads BoostState attribute. Verify value is 0 (Active)"),
             TestStep("5c", "TH reads TankPercentage attribute. Verify value is 100%"),
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER for Draw off hot water Test Event. Verify Command response is Success"),
             TestStep("6a", "TH reads HeatDemand attribute. Verify value is greater than 0x00 (demand on at least one source) and (HeaterDemand & (!HeaterTypes)) is zero (demand is only from declared supported types)"),
-            TestStep("6b", "TH reads BoostState attribute. Verify value is 0 (Inactive)"),
+            TestStep("6b", "TH reads BoostState attribute. Verify value is 0 (Active)"),
             TestStep("6c", "TH reads TankPercentage attribute. Verify value is 75%"),
             TestStep("7", "TH sends CancelBoost. Verify Command response is Success"),
             TestStep("7a", "TH reads HeatDemand attribute. Verify value is 0x00 (no demand on any source)"),
@@ -128,8 +128,6 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         asserts.assert_equal(heatDemand, 0)
 
         self.step("5b")
-        # TODO
-        # await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
         self.step("5c")
@@ -143,8 +141,6 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
         asserts.assert_not_equal(heatDemand & Clusters.WaterHeaterManagement.Bitmaps.WaterHeaterDemandBitmap.kImmersionElement1, 0)
 
         self.step("6b")
-        # TODO
-        # await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kInactive)
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
         self.step("6c")
