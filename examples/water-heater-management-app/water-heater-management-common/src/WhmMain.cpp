@@ -147,6 +147,9 @@ CHIP_ERROR WhmManufacturerInit()
         return err;
     }
 
+    // Let the WhmDelegate know about the WhmManufacturer object.
+    gWhmDelegate->SetWhmManufacturer(*gWhmManufacturer);
+
     return CHIP_NO_ERROR;
 }
 

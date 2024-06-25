@@ -44,6 +44,62 @@ CHIP_ERROR WhmManufacturer::Shutdown()
     return CHIP_NO_ERROR;
 }
 
+BitMask<WaterHeaterDemandBitmap> WhmManufacturer::DetermineHeatingSources()
+{
+    WaterHeaterManagementDelegate * dg = GetWhmManufacturer()->GetWhmDelegate();
+    if (dg == nullptr)
+    {
+        ChipLogError(AppServer, "WhmDelegate is not initialized");
+        return BitMask<WaterHeaterDemandBitmap>(0);
+    }
+
+    // A list of valid heaterTypes
+    uint8_t waterHeaterTypeValues[] =
+    {
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement1),
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement2),
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kHeatPump),
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kBoiler),
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kOther),
+    };
+
+    // The corresponding list of valid headerDemands
+    uint8_t waterHeaterDemandValues[] =
+    {
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement1),
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement2),
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kHeatPump),
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kBoiler),
+        static_cast<uint8_t>(WaterHeaterTypeBitmap::kOther),
+    };
+
+    // Iterate across the valid waterHeaterTypes seeing which heating sources are available based on heaterTypes.
+    // Set the corresponding bit in the heaterDemand bitmap.
+    BitMask<WaterHeaterTypeBitmap> heaterTypes = dg->GetHeaterTypes();
+
+    uint8_t heaterDemandMask = 0;
+    for (uint8_t idx = 0; idx < sizeof(waterHeaterTypeValues) / sizeof(waterHeaterTypeValues[0]); idx++)
+    {
+        // Is this heating source being used?
+        if (heaterTypes.Raw() & waterHeaterTypeValues[idx])
+        {
+            heaterDemandMask |= waterHeaterDemandValues[idx];
+        }
+    }
+
+    return BitMask<WaterHeaterDemandBitmap>(heaterDemandMask);
+}
+
+void WhmManufacturer::TurnHeatingOn()
+{
+    ChipLogProgress(AppServer, "WhmManufacturer::TurnHeatingOn");
+}
+
+void WhmManufacturer::TurnHeatingOff()
+{
+    ChipLogProgress(AppServer, "WhmManufacturer::TurnHeatingOff");
+}
+
 WaterHeaterManagementDelegate * GetWhmDelegate()
 {
     WhmManufacturer * mn = GetWhmManufacturer();

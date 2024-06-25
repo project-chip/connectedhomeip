@@ -31,6 +31,8 @@ namespace WaterHeaterManagement {
 
 using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
 
+class WhmManufacturer;
+
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class WaterHeaterManagementDelegate : public WaterHeaterManagement::Delegate,
                                       public ModeBase::Delegate
@@ -41,6 +43,8 @@ public:
     virtual ~WaterHeaterManagementDelegate() = default;
 
     void SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance);
+
+    void SetWhmManufacturer(WhmManufacturer & whmManufacturer);
 
     /*********************************************************************************
      *
@@ -224,6 +228,9 @@ private:
 
     // Need the following so can determine which features are supported
     WaterHeaterManagement::Instance *mpWhmInstance;
+
+    // Pointer to the manufacturer specific object which understand the hardware
+    WhmManufacturer * mpWhmManufacturer;
 
     // Target water temperature in 100ths of a C
     uint16_t mTargetWaterTemperature;

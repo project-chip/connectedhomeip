@@ -18,6 +18,7 @@
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 
 #include <WhmDelegate.h>
+#include <WhmManufacturer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -28,6 +29,7 @@ using Protocols::InteractionModel::Status;
 
 WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint):
     mpWhmInstance(nullptr),
+    mpWhmManufacturer(nullptr),
     mBoostTargetTemperatureReached(false),
     mWaterHeaterModeInstance(this, clustersEndpoint, WaterHeaterMode::Id, 0),
     mTankVolume(0),
@@ -47,6 +49,11 @@ void WaterHeaterManagementDelegate::SetWaterHeaterManagementInstance(WaterHeater
         // less code for the feature kTankPercent case.
         mTankPercentage = 100;
     }
+}
+
+void WaterHeaterManagementDelegate::SetWhmManufacturer(WhmManufacturer & whmManufacturer)
+{
+    mpWhmManufacturer = &whmManufacturer;
 }
 
 /*********************************************************************************
@@ -418,31 +425,19 @@ void WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
             // If a boost command is in progress or in manual mode, find a heating source and "turn it on".
             if (mBoostState == BoostStateEnum::kActive || mode == ModeManual)
             {
-                // Look through the heaterTypes attribute for a valid source
-                bool found = false;
-                uint8_t rawBitmask = mHeaterTypes.Raw();
-                uint8_t bit = 0;
-                while (rawBitmask != 0 && !found)
+                if (mpWhmManufacturer != nullptr)
                 {
-                    if (rawBitmask & 1)
-                    {
-                        found = true;
-                    }
-                    else
-                    {
-                        bit++;
-                        rawBitmask >>= 1;
-                    }
-                }
+                    // Find out from the manufacturer object the heating sources to use.
+                    BitMask<WaterHeaterDemandBitmap> heaterDemand = mpWhmManufacturer->DetermineHeatingSources();
 
-                if (found)
-                {
-                    // Found a source - use it to turn the heating on
-                    SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(1 << bit));
+                    SetHeatDemand(heaterDemand);
+
+                    // And turn the heating of the water tank on.
+                    mpWhmManufacturer->TurnHeatingOn();
                 }
                 else
                 {
-                    ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff Failed to find heaterType");
+                    ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff: Failed as mpWhmManufacturer == nullptr");
                 }
             }
         }
@@ -477,6 +472,16 @@ void WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
             SetBoostState(BoostStateEnum::kInactive);
 
             DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
+        }
+
+        // Turn the heating off
+        if (mpWhmManufacturer != nullptr)
+        {
+            mpWhmManufacturer->TurnHeatingOff();
+        }
+        else
+        {
+            ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff: Failed to turn the heating off as mpWhmManufacturer == nullptr");
         }
     }
 }

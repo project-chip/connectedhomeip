@@ -62,6 +62,21 @@ public:
      */
     CHIP_ERROR Shutdown();
 
+    /**
+     * @brief   Called to determine which heating sources to use,
+     */
+    BitMask<WaterHeaterDemandBitmap> DetermineHeatingSources();
+
+    /**
+     * @brief   Turn the heating of the water tank on.
+     */
+    void TurnHeatingOn();
+
+    /**
+     * @brief   Turn the heating of the water tank off.
+     */
+    void TurnHeatingOff();
+
 private:
     WaterHeaterManagementInstance * mWhmInstance;
 };
