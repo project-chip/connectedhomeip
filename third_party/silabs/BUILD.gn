@@ -197,7 +197,7 @@ if (wifi_soc != true) {  # CCP board
       if (!chip_openthread_ftd) {
         XTD = "mtd"
       } else {
-        # additional files needs for ftd lib
+        # additional files needed for ftd lib
         sources += [
           "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
           "${openthread_root}/examples/platforms/utils/link_metrics.h",

@@ -78,7 +78,7 @@ extern "C" {
 #include "sl_si91x_trng.h"
 #define TRNGKEY_SIZE 4
 #endif // SLI_SI91X_MCU_INTERFACE
-} // extern "C" {
+}
 
 WfxRsi_t wfx_rsi;
 
