@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,35 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/openthread.gni")
 
-import("${chip_root}/build/chip/tools.gni")
-
-assert(chip_build_tools)
-
-project_dir = "./.."
-
-executable("chip-shell") {
-  sources = [ "main.cpp" ]
-
+source_set("logging") {
   deps = [
-    "${chip_root}/src/lib/shell",
-    "${chip_root}/src/platform",
-    "${chip_root}/src/platform/logging:default",
-    "${project_dir}/shell_common:shell_common",
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
   ]
-
-  cflags = [ "-Wconversion" ]
-
-  output_dir = root_out_dir
-}
-
-group("standalone") {
-  deps = [ ":chip-shell" ]
-}
-
-group("default") {
-  deps = [ ":chip-shell" ]
+  sources = [ "Logging.cpp" ]
 }
