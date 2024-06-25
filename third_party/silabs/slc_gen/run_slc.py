@@ -16,8 +16,10 @@ def asBoolean(valueToTest):
 def isMG24(partnumber):
     return ("EFR32MG24" in partnumber or "MGM240" in partnumber)
 
+
 def isMG26(partnumber):
     return ("EFR32MG26" in partnumber)
+
 
 root_path = sys.argv[1]
 silabs_board = str(sys.argv[2]).lower()
