@@ -69,10 +69,14 @@ public:
 
     virtual CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) = 0;
 
+    // The Delegate implement should back up the old active dataset at the begining of function if no backup already exists.
     virtual CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCallback * callback) = 0;
 
-    // The Thread BR should be able to revert the active dataset set by SetActiveDataset(), and restore
-    // the previous status of Thread BR.
+    // The Delegate implement should remove the backup active dataset in this function.
+    virtual CHIP_ERROR CommitActiveDataset() = 0;
+
+    // The Delegate implement should restore the backup active dataset in this function.
+    // Once RevertActiveDataset is called the ActivateDatasetCallback of previous SetActiveDataset should never be called.
     virtual CHIP_ERROR RevertActiveDataset() = 0;
 
     virtual CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) = 0;

@@ -34,7 +34,6 @@ class GenericThreadBorderRouterDelegate : public Delegate
 public:
     static constexpr char kThreadBorderRourterName[]      = "Espressif-ThreadBR";
     static constexpr char kFailsafeThreadDatasetTlvsKey[] = "g/fs/td";
-    static constexpr char kFailsafeThreadEnabledKey[]     = "g/fs/te";
 
     GenericThreadBorderRouterDelegate()  = default;
     ~GenericThreadBorderRouterDelegate() = default;
@@ -70,14 +69,16 @@ public:
 
     CHIP_ERROR RevertActiveDataset() override;
 
+    CHIP_ERROR CommitActiveDataset() override;
+
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
 
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
-    CHIP_ERROR SetThreadEnabled(bool enabled);
-    bool GetThreadEnabled();
+    CHIP_ERROR BackupActiveDataset();
     ActivateDatasetCallback * mCallback = nullptr;
+    Thread::OperationalDataset mStagingDataset = {};
 };
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters
