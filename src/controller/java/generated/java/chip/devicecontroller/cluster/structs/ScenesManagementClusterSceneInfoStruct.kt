@@ -28,7 +28,7 @@ class ScenesManagementClusterSceneInfoStruct(
   val currentGroup: UInt,
   val sceneValid: Boolean,
   val remainingCapacity: UInt,
-  val fabricIndex: UInt
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("ScenesManagementClusterSceneInfoStruct {\n")
@@ -79,7 +79,7 @@ class ScenesManagementClusterSceneInfoStruct(
         currentGroup,
         sceneValid,
         remainingCapacity,
-        fabricIndex
+        fabricIndex,
       )
     }
   }
