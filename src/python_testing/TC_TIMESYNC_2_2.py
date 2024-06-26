@@ -81,7 +81,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
 
         self.print_step(5, "Read time source")
-        if timesource_attr_id in attribute_list:        
+        if timesource_attr_id in attribute_list:
             source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
             if utc_dut_initial is NullValue:
                 asserts.assert_equal(source, Clusters.Objects.TimeSynchronization.Enums.TimeSourceEnum.kAdmin)
