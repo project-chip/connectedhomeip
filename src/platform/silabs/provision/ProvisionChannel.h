@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
@@ -15,35 +14,31 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *  To enable these credentias, compile the app with option
- *  "chip_build_device_attestation_credentials=true".
- */
+#pragma once
 
-#ifndef SL_PROVISION_VERSION_1_0
-#define SL_PROVISION_VERSION_1_0 0
-#endif
+#include <lib/core/CHIPError.h>
+#include <stddef.h>
+#include <stdint.h>
 
-#ifndef SL_CREDENTIALS_DAC_OFFSET
-#define SL_CREDENTIALS_DAC_OFFSET 0x0000
-#endif
+namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace Provision {
 
-#ifndef SL_CREDENTIALS_DAC_SIZE
-#define SL_CREDENTIALS_DAC_SIZE 0
-#endif
+class Channel
+{
+public:
+    Channel()  = default;
+    ~Channel() = default;
 
-#ifndef SL_CREDENTIALS_PAI_OFFSET
-#define SL_CREDENTIALS_PAI_OFFSET 0x0200
-#endif
+    CHIP_ERROR Init();
+    CHIP_ERROR Read(uint8_t * buffer, size_t buffer_length, size_t & bytes_read);
+    CHIP_ERROR Write(const uint8_t * buffer, size_t buffer_length);
 
-#ifndef SL_CREDENTIALS_PAI_SIZE
-#define SL_CREDENTIALS_PAI_SIZE 0
-#endif
+    static CHIP_ERROR Update(uint16_t handle);
+};
 
-#ifndef SL_CREDENTIALS_CD_OFFSET
-#define SL_CREDENTIALS_CD_OFFSET 0x0400
-#endif
-
-#ifndef SL_CREDENTIALS_CD_SIZE
-#define SL_CREDENTIALS_CD_SIZE 0
-#endif
+} // namespace Provision
+} // namespace Silabs
+} // namespace DeviceLayer
+} // namespace chip
