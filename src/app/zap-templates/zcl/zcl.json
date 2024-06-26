@@ -636,7 +636,6 @@
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
-        "Water Heater Management": ["FeatureMap"],
         "Wi-Fi Network Management": ["SSID"]
     },
     "defaultReportingPolicy": "mandatory",
