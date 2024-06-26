@@ -219,8 +219,6 @@ source_set("efr32-common") {
     ":efr32-common-config",
     "${efr32_sdk_build_root}:silabs_config",
     ":chip_examples_project_config",
-
-    "${chip_root}/src/platform/silabs/provision:provision-config",
   ]
 
   # DIC
