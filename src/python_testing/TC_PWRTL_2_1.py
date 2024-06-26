@@ -40,36 +40,35 @@ class TC_PWRTL_2_1(MatterBaseTest):
 
         attributes = Clusters.PowerTopology.Attributes
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = 1
+        
+        powertop_attr_list = Clusters.Objects.PowerTopology.Attributes.AttributeList
+        powertop_cluster = Clusters.Objects.PowerTopology
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=powertop_cluster, attribute=powertop_attr_list)
+        avail_endpoints_attr_id = Clusters.Objects.PowerTopology.Attributes.ActiveEndpoints.attribute_id
+        act_endpoints_attr_id = Clusters.Objects.PowerTopology.Attributes.AvailableEndpoints.attribute_id
 
         self.print_step(1, "Commissioning, already done")
 
-        if not self.check_pics("PWRTL.S.A0000"):
-            logging.info("Test skipped because PICS PWRTL.S.A0000 is not set")
-            return
-
         self.print_step(2, "Read AvailableAttributes attribute")
-        available_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology, attribute=attributes.AvailableEndpoints)
+        if avail_endpoints_attr_id in attribute_list:
+            available_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology, attribute=attributes.AvailableEndpoints)
 
-        if available_endpoints == NullValue:
-            logging.info("AvailableEndpoints is null")
-        else:
-            logging.info("AvailableEndpoints: %s" % (available_endpoints))
-
-            asserts.assert_less_equal(len(available_endpoints), 21,
-                                      "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
-
-        if not self.check_pics("PWRTL.S.A0001"):
-            logging.info("Test skipped because PICS PWRTL.S.A0001 is not set")
-            return
+            if available_endpoints == NullValue or available_endpoints == []:
+                logging.info("AvailableEndpoints is null or an empty list")
+            else:
+                logging.info("AvailableEndpoints: %s" % (available_endpoints))
+                asserts.assert_less_equal(len(available_endpoints), 21,
+                                        "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
 
         self.print_step(3, "Read ActiveEndpoints attribute")
-        active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
-        logging.info("ActiveEndpoints: %s" % (active_endpoints))
+        if act_endpoints_attr_id in attribute_list:
+            active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
+            logging.info("ActiveEndpoints: %s" % (active_endpoints))
 
-        if available_endpoints == NullValue:
-            asserts.assert_true(active_endpoints == NullValue,
-                                "ActiveEndpoints should be null when AvailableEndpoints is null: %s" % active_endpoints)
+            if available_endpoints == NullValue or available_endpoints == []:
+                asserts.assert_true(active_endpoints == NullValue or active_endpoints == [],
+                                    "ActiveEndpoints should be null when AvailableEndpoints is null: %s" % active_endpoints)
 
 
 if __name__ == "__main__":
