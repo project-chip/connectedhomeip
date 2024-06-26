@@ -38,7 +38,7 @@ idf_build_set_property(C_COMPILE_OPTIONS "-Os" APPEND)
 idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-security" APPEND)
 
 # We don't need Thread Network Commissioning Driver
-idf_build_set_property(COMPILE_OPTIONS "-D_NO_NETWORK_COMMISSIONING_DRIVER_" APPEND)
+idf_build_set_property(COMPILE_OPTIONS "-D_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" APPEND)
 
 # -Wmaybe-uninitialized has too many false positives, including on std::optional
 # and chip::Optional.  Make it nonfatal.
