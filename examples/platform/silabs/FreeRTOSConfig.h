@@ -113,7 +113,7 @@ extern uint32_t SystemCoreClock;
 #if SL_ICD_ENABLED
 #include "sl_si91x_m4_ps.h"
 #endif // SL_ICD_ENABLED
-#else // For EFR32
+#else  // For EFR32
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
@@ -179,7 +179,7 @@ extern uint32_t SystemCoreClock;
 #define configTIMER_TASK_PRIORITY (55) /* Highest priority */
 #else
 #define configTIMER_TASK_PRIORITY (40) /* Highest priority */
-#endif // SLI_SI917
+#endif                                 // SLI_SI917
 #define configTIMER_QUEUE_LENGTH (10)
 #define configTIMER_TASK_STACK_DEPTH (1024)
 

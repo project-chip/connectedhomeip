@@ -16,9 +16,9 @@
  */
 #pragma once
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <event_groups.h>
 #include <wfx_host_events.h>
-#include <app/icd/server/ICDServerConfig.h>
 
 #ifndef RSI_BLE_ENABLE
 #define RSI_BLE_ENABLE (1)
