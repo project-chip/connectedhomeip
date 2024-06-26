@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Root directory for nlunit-test.
-  nlunit_test_root = "//third_party/nlunit-test"
-}
+python_config_script = get_path_info("python_config.py", "abspath")
+
+python_config = exec_script(python_config_script, [], "json")

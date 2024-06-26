@@ -89,9 +89,9 @@ async def main():
               "Failed to finish network commissioning")
 
     logger.info("Commissioning DUT from first commissioner")
-    FailIfNot(test.TestPaseOnly(ip=options.deviceAddress, setuppin=20202021, nodeid=1),
+    FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress, setuppin=20202021, nodeid=1),
               "Unable to establish PASE connection to device")
-    FailIfNot(test.TestCommissionOnly(nodeid=1), "Unable to commission device")
+    FailIfNot(await test.TestCommissionOnly(nodeid=1), "Unable to commission device")
 
     logger.info("Creating controller on a new fabric")
     FailIfNot(test.CreateNewFabricController(), "Unable to create new controller")
@@ -103,7 +103,7 @@ async def main():
               "RevokeCommissioning test failed")
 
     logger.info("Test Enhanced Commissioning Window")
-    FailIfNot(test.TestEnhancedCommissioningWindow(ip=options.deviceAddress, nodeid=1), "EnhancedCommissioningWindow open failed")
+    FailIfNot(await test.TestEnhancedCommissioningWindow(ip=options.deviceAddress, nodeid=1), "EnhancedCommissioningWindow open failed")
 
     timeoutTicker.stop()
 

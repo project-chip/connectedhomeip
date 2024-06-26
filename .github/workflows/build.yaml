@@ -42,7 +42,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:55
+            image: ghcr.io/project-chip/chip-build:60
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -138,7 +138,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:55
+            image: ghcr.io/project-chip/chip-build:60
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -281,7 +281,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:55
+            image: ghcr.io/project-chip/chip-build:60
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -332,7 +332,7 @@ jobs:
                   scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
-                  pip3 install -r src/setup_payload/python/requirements.txt
+                  pip3 install -r scripts/setup/requirements.setuppayload.txt
                   python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
 
     build_linux_python_lighting_device:
@@ -342,7 +342,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:55
+            image: ghcr.io/project-chip/chip-build:60
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -372,6 +372,7 @@ jobs:
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
         runs-on: macos-13
+        python-version: '3.11'
         if: github.actor != 'restyled-io[bot]'
 
         steps:
@@ -404,13 +405,6 @@ jobs:
               run: |
                   for BUILD_TYPE in default python_lib; do
                       case $BUILD_TYPE in
-                          # We want to build various standalone example apps
-                          # (similar to what examples-linux-standalone.yaml
-                          # does), so use target_os="all" to get those picked
-                          # up as part of the "unified" build.  But then to
-                          # save CI resources we want to exclude the
-                          # "host clang" build, which uses the pigweed
-                          # clang.
                           "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
@@ -451,7 +445,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:55
+            image: ghcr.io/project-chip/chip-build:60
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"

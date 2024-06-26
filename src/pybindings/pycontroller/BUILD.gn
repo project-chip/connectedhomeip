@@ -17,7 +17,9 @@ import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
 
+import("${chip_root}/config/python/python_config.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/config/python/python_config.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${dir_pw_unit_test}/test.gni")
 
@@ -44,11 +46,14 @@ shared_library("CHIPController") {
 
   # TODO: Update to use GN tools to get actual paths
   include_dirs = [ "${chip_root}/third_party/pybind11/repo/include" ]
+  version = python_config.version
   if (current_os == "mac") {
     include_dirs +=
-        [ "${chip_root}/.environment/cipd/packages/python/include/python3.9" ]
+        [ "${chip_root}/.environment/cipd/packages/python/include/python" +
+          version.major + "." + version.minor ]
   } else if (current_os == "linux") {
-    include_dirs += [ "/usr/include/python3.9" ]
+    include_dirs +=
+        [ "/usr/include/python" + version.major + "." + version.minor ]
   } else {
     assert(false, "OS not supported.")
   }
@@ -86,7 +91,7 @@ shared_library("CHIPController") {
     ]
   }
   if (current_os == "linux") {
-    libs = [ "python3.9" ]
+    libs = [ "python" + version.major + "." + version.minor ]
   }
 }
 
