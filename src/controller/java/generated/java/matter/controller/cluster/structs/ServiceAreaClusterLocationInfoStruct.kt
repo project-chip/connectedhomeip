@@ -26,7 +26,7 @@ class ServiceAreaClusterLocationInfoStruct(
   val locationInfo: ServiceAreaClusterHomeLocationStruct?,
   val landmarkTag: UByte?,
   val positionTag: UByte?,
-  val surfaceTag: UByte?,
+  val surfaceTag: UByte?
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterLocationInfoStruct {\n")
@@ -76,7 +76,7 @@ class ServiceAreaClusterLocationInfoStruct(
         if (!tlvReader.isNull()) {
           ServiceAreaClusterHomeLocationStruct.fromTlv(
             ContextSpecificTag(TAG_LOCATION_INFO),
-            tlvReader,
+            tlvReader
           )
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_LOCATION_INFO))
@@ -110,7 +110,7 @@ class ServiceAreaClusterLocationInfoStruct(
         locationInfo,
         landmarkTag,
         positionTag,
-        surfaceTag,
+        surfaceTag
       )
     }
   }
