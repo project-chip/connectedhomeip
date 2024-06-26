@@ -37,6 +37,8 @@ WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clusters
     mTankPercentage(0),
     mBoostState(BoostStateEnum::kInactive)
 {
+    // Initialise the WaterHeaterMode instance
+    mWaterHeaterModeInstance.Init();
 }
 
 void WaterHeaterManagementDelegate::SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance)
@@ -484,4 +486,3 @@ void WaterHeaterManagementDelegate::SetWaterHeaterMode(uint8_t modeValue)
 
     CheckIfHeatNeedsToBeTurnedOnOrOff();
 }
-
