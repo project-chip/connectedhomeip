@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent(
   val softwareVersion: UInt,
-  val productID: UShort
+  val productID: UShort,
 ) {
   override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {\n")
@@ -48,7 +48,7 @@ class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {
       tlvReader.enterStructure(tlvTag)
       val softwareVersion = tlvReader.getUInt(ContextSpecificTag(TAG_SOFTWARE_VERSION))

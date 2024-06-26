@@ -124,7 +124,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "UnableToStartOrResume"}')
             else:
-                self.wait_for_user_input(step_name)
+                self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
             await self.read_operational_state_with_check(3, op_states.kError)
 
@@ -138,7 +138,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
                 self.write_to_app_pipe('{"Name": "Docked"}')
                 self.write_to_app_pipe('{"Name": "Charging"}')
             else:
-                self.wait_for_user_input(step_name)
+                self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
             await self.read_operational_state_with_check(6, rvc_op_states.kCharging)
 
@@ -150,7 +150,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe('{"Name": "Charged"}')
             else:
-                self.wait_for_user_input(step_name)
+                self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
             await self.read_operational_state_with_check(9, rvc_op_states.kDocked)
 
@@ -163,7 +163,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
                 await self.send_run_change_to_mode_cmd(rvc_app_run_mode_cleaning)
                 await self.send_run_change_to_mode_cmd(rvc_app_run_mode_idle)
             else:
-                self.wait_for_user_input(step_name)
+                self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
             await self.read_operational_state_with_check(9, rvc_op_states.kSeekingCharger)
 
