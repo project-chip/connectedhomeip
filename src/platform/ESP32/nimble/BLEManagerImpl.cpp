@@ -82,7 +82,6 @@ namespace Internal {
 
 namespace {
 
-TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 static constexpr uint16_t kNewConnectionScanTimeout = 60;
 static constexpr uint16_t kConnectTimeout           = 20;
@@ -209,16 +208,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
 
-    // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
-                                       1,                   // == default timer period
-                                       false,               // no timer reload (==one-shot)
-                                       (void *) this,       // init timer id = ble obj context
-                                       BleAdvTimeoutHandler // timer callback handler
-    );
-
-    VerifyOrReturnError(sbleAdvTimeoutTimer != nullptr, CHIP_ERROR_NO_MEMORY);
-
     // Initialize the Chip BleLayer.
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
@@ -253,9 +242,7 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
-    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
-    xTimerDelete(sbleAdvTimeoutTimer, portMAX_DELAY);
-    sbleAdvTimeoutTimer = nullptr;
+    CancelBleAdvTimeoutTimer();
 
     BleLayer::Shutdown();
 
@@ -286,7 +273,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
+void BLEManagerImpl::BleAdvTimeoutHandler(System::Layer *, void *)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
@@ -298,7 +285,6 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         BLEMgrImpl().mFlags.Clear(Flags::kExtAdvertisingEnabled);
         BLEMgrImpl().StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS);
 #endif
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
     else
@@ -308,9 +294,9 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         BLEMgrImpl().mFlags.Set(Flags::kExtAdvertisingEnabled);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
         BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 #endif
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
@@ -719,26 +705,17 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 }
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 {
-    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
-
-    if (xTimerStop(sbleAdvTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    if (SystemLayer().IsTimerActive(BleAdvTimeoutHandler, nullptr))
     {
-        ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
+        SystemLayer().CancelTimer(BleAdvTimeoutHandler, nullptr);
     }
 }
 void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 {
-    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
+    CancelBleAdvTimeoutTimer();
 
-    if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
-    {
-        CancelBleAdvTimeoutTimer();
-    }
-
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
-    // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(100)) != pdPASS)
+    CHIP_ERROR err = SystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeoutInMs), BleAdvTimeoutHandler, nullptr);
+    if ((err != CHIP_NO_ERROR))
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
