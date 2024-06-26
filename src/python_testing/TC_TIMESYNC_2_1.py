@@ -43,15 +43,11 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
         self.supports_ntpc = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPClient)
         self.supports_ntps = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kNTPServer)
         self.supports_trusted_time_source = bool(features & Clusters.TimeSynchronization.Bitmaps.Feature.kTimeSyncClient)
-        timesource_attr_id = Clusters.Objects.TimeSynchronization.Attributes.TimeSource.attribute_id
 
-        # Reading attributes from DUT
+        time_cluster = Clusters.Objects.TimeSynchronization
         timesync_attr_list = Clusters.Objects.TimeSynchronization.Attributes.AttributeList
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [timesync_attr_list])
-        attributes_list = read_request[0]
-
-        # Extracting gathered attributes dictionary values into a list containing only supported attribute ids
-        attribute_list_confined = list([values for values in attributes_list[list(attributes_list.keys())[0]].values()])[1]
+        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=time_cluster, attribute=timesync_attr_list)
+        timesource_attr_id = Clusters.Objects.TimeSynchronization.Attributes.TimeSource.attribute_id
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
@@ -62,7 +58,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                             "Granularity is not in valid range")
 
         self.print_step(3, "Read TimeSource")
-        if timesource_attr_id in attribute_list_confined:
+        if timesource_attr_id in attribute_list:
             time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
             asserts.assert_less(time_source, Clusters.TimeSynchronization.Enums.TimeSourceEnum.kUnknownEnumValue,
                                 "TimeSource is not in valid range")
