@@ -3107,6 +3107,33 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentAppObserver::Sta
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(MeterIdentification::MeterTypeEnum val)
+{
+    using EnumType = MeterIdentification::MeterTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUtility:
+    case EnumType::kPrivate:
+    case EnumType::kGeneric:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(MeterIdentification::PowerThresholdSourceEnum val)
+{
+    using EnumType = MeterIdentification::PowerThresholdSourceEnum;
+    switch (val)
+    {
+    case EnumType::kContract:
+    case EnumType::kRegulator:
+    case EnumType::kEquipment:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(UnitTesting::SimpleEnum val)
 {
     using EnumType = UnitTesting::SimpleEnum;
