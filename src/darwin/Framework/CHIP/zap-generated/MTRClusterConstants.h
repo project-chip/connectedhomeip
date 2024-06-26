@@ -3487,7 +3487,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID MTR_PROVISIONALLY_AVAILABLE = 0x00000052,
     MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldPolicyID MTR_PROVISIONALLY_AVAILABLE = 0x00000053,
     MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID MTR_PROVISIONALLY_AVAILABLE = 0x00000054,
-    MTRAttributeIDTypeClusterThermostatAttributeQueuedPresetID MTR_PROVISIONALLY_AVAILABLE = 0x00000055,
     MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -6592,7 +6591,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterThermostatCommandStartPresetsSchedulesEditRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRCommandIDTypeClusterThermostatCommandCancelPresetsSchedulesEditRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRCommandIDTypeClusterThermostatCommandCommitPresetsSchedulesRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTRCommandIDTypeClusterThermostatCommandCancelSetActivePresetRequestID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
     MTRCommandIDTypeClusterThermostatCommandSetTemperatureSetpointHoldPolicyID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
 
     // Cluster FanControl deprecated command id names

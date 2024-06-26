@@ -4052,7 +4052,6 @@ enum class Feature : uint32_t
     kMatterScheduleConfiguration = 0x80,
     kPresets                     = 0x100,
     kSetpoints                   = 0x200,
-    kQueuedPresetsSupported      = 0x400,
 };
 
 // Bitmap for HVACSystemTypeBitmap

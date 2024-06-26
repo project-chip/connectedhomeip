@@ -6654,7 +6654,6 @@ cluster Thermostat = 513 {
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
     kSetpoints = 0x200;
-    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -6752,11 +6751,6 @@ cluster Thermostat = 513 {
     PresetTypeFeaturesBitmap presetTypeFeatures = 2;
   }
 
-  struct QueuedPresetStruct {
-    nullable octet_string<16> presetHandle = 0;
-    nullable epoch_s transitionTimestamp = 1;
-  }
-
   struct ScheduleTypeStruct {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
@@ -6831,7 +6825,6 @@ cluster Thermostat = 513 {
   readonly attribute optional boolean presetsSchedulesEditable = 82;
   readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
-  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6869,7 +6862,6 @@ cluster Thermostat = 513 {
 
   request struct SetActivePresetRequestRequest {
     octet_string<16> presetHandle = 0;
-    optional int16u delayMinutes = 1;
   }
 
   request struct StartPresetsSchedulesEditRequestRequest {
@@ -6898,8 +6890,6 @@ cluster Thermostat = 513 {
   command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
   /** This command is used to notify the server that all edits are done and should be committed. */
   command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
-  /** This command is sent to cancel a queued preset. */
-  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
   /** This command sets the set point hold policy. */
   command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }

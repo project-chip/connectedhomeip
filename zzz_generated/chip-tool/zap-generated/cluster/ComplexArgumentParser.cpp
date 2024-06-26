@@ -4176,38 +4176,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::P
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("QueuedPresetStruct.presetHandle", "presetHandle",
-                                                                  value.isMember("presetHandle")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("QueuedPresetStruct.transitionTimestamp", "transitionTimestamp",
-                                                                  value.isMember("transitionTimestamp")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
-    valueCopy.removeMember("presetHandle");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitionTimestamp");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTimestamp, value["transitionTimestamp"]));
-    valueCopy.removeMember("transitionTimestamp");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.presetHandle);
-    ComplexArgumentParser::Finalize(request.transitionTimestamp);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::Type & request,
                                         Json::Value & value)
 {

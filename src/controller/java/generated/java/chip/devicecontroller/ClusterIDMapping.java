@@ -11893,7 +11893,6 @@ public class ClusterIDMapping {
             PresetsSchedulesEditable(82L),
             TemperatureSetpointHoldPolicy(83L),
             SetpointHoldExpiryTimestamp(84L),
-            QueuedPreset(85L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -11949,7 +11948,6 @@ public class ClusterIDMapping {
             StartPresetsSchedulesEditRequest(7L),
             CancelPresetsSchedulesEditRequest(8L),
             CommitPresetsSchedulesRequest(9L),
-            CancelSetActivePresetRequest(10L),
             SetTemperatureSetpointHoldPolicy(11L),;
             private final long id;
             Command(long id) {
@@ -12036,7 +12034,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SetActivePresetRequestCommandField {PresetHandle(0),DelayMinutes(1),;
+                }public enum SetActivePresetRequestCommandField {PresetHandle(0),;
                     private final int id;
                     SetActivePresetRequestCommandField(int id) {
                         this.id = id;
