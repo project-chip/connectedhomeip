@@ -104,7 +104,3 @@ typedef void mbedtls_ecp_restart_ctx;
 
 // SLC GENERATED
 #include "sl_mbedtls_config.h"
-
-#if SL_MBEDTLS_USE_TINYCRYPT
-#include "mbedtls/check_config.h"
-#endif // SL_MBEDTLS_USE_TINYCRYPT
