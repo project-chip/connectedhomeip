@@ -44,7 +44,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 #if defined(__APPLE__) || defined(__gnu_linux__)
     timespec ts;
     timespec_get(&ts, TIME_UTC);
-    printf("[%lld] ", static_cast<long long>(ts.tv_sec * 1000 + ts.tv_nsec / 1000000));
+    printf("[%lld.%ld] ", static_cast<long long>(ts.tv_sec), static_cast<long>(ts.tv_nsec / 1000000));
 #endif
 
 #if defined(__APPLE__)
