@@ -145,15 +145,9 @@
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": [
-                "Always",
-                "Conditional",
-                "Never"
-            ]
+            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
         },
-        "bool": [
-            "commandDiscovery"
-        ]
+        "bool": ["commandDiscovery"]
     },
     "defaults": {
         "text": {
@@ -199,13 +193,8 @@
             "SpecificationVersion",
             "MaxPathsPerInvoke"
         ],
-        "Bridged Device Basic Information": [
-            "ProductAppearance"
-        ],
-        "Descriptor": [
-            "ClusterRevision",
-            "FeatureMap"
-        ],
+        "Bridged Device Basic Information": ["ProductAppearance"],
+        "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
             "ESACanGenerate",
@@ -248,11 +237,7 @@
             "SessionEnergyDischarged",
             "FeatureMap"
         ],
-        "Energy EVSE Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "FeatureMap"
-        ],
+        "Energy EVSE Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -392,21 +377,14 @@
             "CurrentMaxRate",
             "OverrunCount"
         ],
-        "Channel": [
-            "Lineup",
-            "CurrentChannel"
-        ],
+        "Channel": ["Lineup", "CurrentChannel"],
         "Media Playback": [
             "SampledPosition",
             "ActiveAudioTrack",
             "ActiveTextTrack"
         ],
-        "Application Launcher": [
-            "CurrentApp"
-        ],
-        "Application Basic": [
-            "Application"
-        ],
+        "Application Launcher": ["CurrentApp"],
+        "Application Basic": ["Application"],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
@@ -418,9 +396,7 @@
             "TimeZoneListMaxSize",
             "DSTOffsetListMaxSize"
         ],
-        "Temperature Control": [
-            "SupportedTemperatureLevels"
-        ],
+        "Temperature Control": ["SupportedTemperatureLevels"],
         "Dishwasher Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -428,11 +404,7 @@
             "OnMode",
             "FeatureMap"
         ],
-        "Microwave Oven Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "FeatureMap"
-        ],
+        "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
             "CookTime",
             "MaxCookTime",
@@ -459,16 +431,8 @@
             "OnMode",
             "FeatureMap"
         ],
-        "RVC Clean Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "FeatureMap"
-        ],
-        "RVC Run Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "FeatureMap"
-        ],
+        "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Operational State": [
             "OperationalState",
             "OperationalError",
@@ -645,13 +609,8 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": [
-            "AirQuality",
-            "FeatureMap"
-        ],
-        "Thermostat": [
-            "QueuedPreset"
-        ],
+        "Air Quality": ["AirQuality", "FeatureMap"],
+        "Thermostat": ["QueuedPreset"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
@@ -695,14 +654,7 @@
         ]
     },
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": [
-        "ARRAY",
-        "BITMAP",
-        "ENUM",
-        "NUMBER",
-        "STRING",
-        "STRUCT"
-    ],
+    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
     "fabricHandling": {
         "automaticallyCreateFields": true,
         "indexFieldId": 254,
