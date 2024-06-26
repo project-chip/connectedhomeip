@@ -30,14 +30,12 @@ ALL_PLATFORM_SDK = [
 all_platform_sdk_list = list(map(lambda plat: plat["plat_name"], ALL_PLATFORM_SDK))
 
 
-def clean_sdk(sdk_target_location):
+def clean_sdk_local_changes(sdk_target_location):
     print("SDK will be cleaned all local modification(s) will be lost")
     # Cleaning all local modifications
     git_clean_command = "git reset --hard && git clean -xdf"
     command = ['west', 'forall', '-c', git_clean_command, '-a']
     subprocess.run(command, cwd=sdk_target_location, check=True)
-    # Retrying an update
-    update_platform_sdk_version(sdk_target_location, False)
 
 
 def init_platform_sdk_version(sdk_target_location, force):
@@ -64,7 +62,11 @@ def update_platform_sdk_version(sdk_target_location, force):
         subprocess.run(command, cwd=sdk_target_location, check=True)
     except (RuntimeError, subprocess.CalledProcessError) as exception:
         if force:
-            clean_sdk(sdk_target_location)
+            # In case of force update option and in case of update failure:
+            # 1. try to clean all local modications if any
+            # 2. Retry the west update command. It should be successfull now as all local modifications have been cleaned
+            clean_sdk_local_changes(sdk_target_location)
+            subprocess.run(command, cwd=sdk_target_location, check=True)
         else:
             print(exception)
             print("Error SDK cannot be updated, local changes should be cleaned manually or use --force to force update")
