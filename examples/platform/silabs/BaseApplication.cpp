@@ -38,12 +38,12 @@
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
+#include <ProvisionManager.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/silabs/ProvisionManager.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <sl_cmsis_os2_common.h>
