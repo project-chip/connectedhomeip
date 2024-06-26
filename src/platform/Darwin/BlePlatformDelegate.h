@@ -30,14 +30,16 @@ namespace Internal {
 class BlePlatformDelegateImpl : public Ble::BlePlatformDelegate
 {
 public:
-    virtual bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
-    virtual bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
-    virtual bool CloseConnection(BLE_CONNECTION_OBJECT connObj);
+    virtual CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId,
+                                               const ChipBleUUID * charId);
+    virtual CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId,
+                                                 const ChipBleUUID * charId);
+    virtual CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT connObj);
     virtual uint16_t GetMTU(BLE_CONNECTION_OBJECT connObj) const;
-    virtual bool SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                PacketBufferHandle pBuf);
-    virtual bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                  PacketBufferHandle pBuf);
+    virtual CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                      PacketBufferHandle pBuf);
+    virtual CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                        PacketBufferHandle pBuf);
 };
 
 } // namespace Internal
