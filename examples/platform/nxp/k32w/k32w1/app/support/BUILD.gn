@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nxp_sdk.gni")
 
 import("${chip_root}/third_party/nxp/nxp_sdk.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 config("support_config") {
-  include_dirs = [ "../../../../.." ]
+  include_dirs = [ "${chip_root}" ]
 
   # Link options that provides replace dynamic memory operations in standard
   # library with the FreeRTOS malloc in platform code.
@@ -32,7 +31,7 @@ config("support_config") {
     "-Wl,--wrap=MemoryAlloc",
 
     # Wrap these in case internal newlib call them (e.g. strdup will)
-    # directly call _malloc_r)
+    # directly call _malloc_r
     "-Wl,--wrap=_malloc_r",
     "-Wl,--wrap=_realloc_r",
     "-Wl,--wrap=_free_r",
@@ -41,7 +40,7 @@ config("support_config") {
   ]
 }
 
-source_set("freertos_mbedtls_utils") {
+source_set("freertos_memory_utils") {
   sources = [
     "FreeRtosHooks.c",
     "FreeRtosHooks.h",

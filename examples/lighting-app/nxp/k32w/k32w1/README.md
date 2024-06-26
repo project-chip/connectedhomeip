@@ -122,20 +122,28 @@ does a clean soft reset that takes into account Matter shutdown procedure.
 In order to build the Matter example, we recommend using a Linux distribution
 (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W1 SDK for Matter](https://mcuxpresso.nxp.com/). Creating an
-    nxp.com account is required before being able to download the SDK. Once the
-    account is created, login and follow the steps for downloading K32W148-EVK
-    MCUXpresso SDK. The SDK Builder UI selection should be similar with the one
-    from the image below.
+- Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md) to setup the environment to be able to build Matter
 
-    ![MCUXpresso SDK Download](../../../../platform/nxp/k32w/k32w1/doc/images/mcux-sdk-download.jpg)
-
-    Please refer to Matter release notes for getting the latest released SDK.
+-   Download the NXP MCUXpresso git SDK and associated middleware from GitHub using the west tool.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/github_sdk/rw_k32w1
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rw_k32w1$ west init -l manifest --mf west.yml
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rw_k32w1$ west update
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd -
+```
+
+- In case there are local modification to the already installed git NXP SDK. Use the west forall command instead of the west init to reset the west workspace before running the west update command. Warning: all local changes will be lost after running this command.
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rw_k32w1$ west forall -c "git reset --hard && git clean -xdf" -a
+```
+
+-   Start building the application.
+
+```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w1
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w1$ gn gen out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w1$ ninja -C out/debug
