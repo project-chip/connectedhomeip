@@ -99,6 +99,7 @@ static_library("efr32") {
     "${chip_root}/src/platform/logging:headers",
   ]
   deps = [ "${silabs_platform_dir}/provision:provision-headers" ]
+  public_configs = []
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
