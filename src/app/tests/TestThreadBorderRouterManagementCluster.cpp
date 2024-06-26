@@ -130,10 +130,10 @@ public:
     uint8_t mActiveDataset[Thread::kSizeOperationalDataset];
     size_t mActiveDatasetLen = 0;
     uint8_t mPendingDataset[Thread::kSizeOperationalDataset];
-    size_t mPendingDatasetLen           = 0;
-    bool mUseInvalidBorderRouterName    = true;
-    size_t mTestBorderAgentIdLen        = kBorderAgentIdLength - 1;
-    bool mInterfaceEnabled              = false;
+    size_t mPendingDatasetLen        = 0;
+    bool mUseInvalidBorderRouterName = true;
+    size_t mTestBorderAgentIdLen     = kBorderAgentIdLength - 1;
+    bool mInterfaceEnabled           = false;
 };
 
 constexpr chip::EndpointId sTestEndpointId    = 1;
