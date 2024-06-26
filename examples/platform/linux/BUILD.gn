@@ -80,7 +80,7 @@ source_set("app-main") {
     ":energy-reporting-test-event-trigger",
     ":smco-test-event-trigger",
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform/logging:force_stdio",
+    "${chip_root}/src/platform/logging:stdio",
   ]
   deps = [
     ":ota-test-event-trigger",

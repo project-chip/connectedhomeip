@@ -70,7 +70,6 @@ silabs_executable("efr32_device_tests") {
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
     "${examples_common_plat_dir}/PigweedLogger.cpp",
-    "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_common_plat_dir}/syscalls_stubs.cpp",
     "${examples_plat_dir}/uart.cpp",
     "src/main.cpp",
