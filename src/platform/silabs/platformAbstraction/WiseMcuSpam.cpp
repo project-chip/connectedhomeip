@@ -16,6 +16,7 @@
  */
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <sl_si91x_button_pin_config.h>
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -151,6 +152,11 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
     }
     Silabs::GetPlatform().mButtonCallback(btn, btnAction);
 }
+}
+
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    return (button < SL_SI91x_BUTTON_COUNT) ? sButtonStates[button] : 0;
 }
 
 } // namespace Silabs

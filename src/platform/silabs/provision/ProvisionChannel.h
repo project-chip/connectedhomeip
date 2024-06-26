@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,23 +16,29 @@
  */
 #pragma once
 
-#include <credentials/DeviceAttestationCredsProvider.h>
+#include <lib/core/CHIPError.h>
+#include <stddef.h>
+#include <stdint.h>
 
 namespace chip {
-namespace Credentials {
+namespace DeviceLayer {
 namespace Silabs {
+namespace Provision {
 
-/**
- * @brief Get implementation of a sample DAC provider to validate device
- *        attestation procedure.
- *
- * @returns a singleton DeviceAttestationCredentialsProvider that relies on no
- *          storage abstractions.
- */
-DeviceAttestationCredentialsProvider * GetSilabsDacProvider();
+class Channel
+{
+public:
+    Channel()  = default;
+    ~Channel() = default;
 
-void SilabsDacProviderMigration(void);
+    CHIP_ERROR Init();
+    CHIP_ERROR Read(uint8_t * buffer, size_t buffer_length, size_t & bytes_read);
+    CHIP_ERROR Write(const uint8_t * buffer, size_t buffer_length);
 
+    static CHIP_ERROR Update(uint16_t handle);
+};
+
+} // namespace Provision
 } // namespace Silabs
-} // namespace Credentials
+} // namespace DeviceLayer
 } // namespace chip
