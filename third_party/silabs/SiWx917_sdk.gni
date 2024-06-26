@@ -491,6 +491,7 @@ template("siwx917_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/aes.c",
       "${chip_root}/third_party/mbedtls/repo/library/asn1parse.c",
       "${chip_root}/third_party/mbedtls/repo/library/asn1write.c",
+      "${chip_root}/third_party/mbedtls/repo/library/base64.c",
       "${chip_root}/third_party/mbedtls/repo/library/bignum.c",
       "${chip_root}/third_party/mbedtls/repo/library/ccm.c",
       "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
@@ -505,10 +506,12 @@ template("siwx917_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/hkdf.c",
       "${chip_root}/third_party/mbedtls/repo/library/hmac_drbg.c",
       "${chip_root}/third_party/mbedtls/repo/library/md.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pem.c",
       "${chip_root}/third_party/mbedtls/repo/library/pkcs5.c",
       "${chip_root}/third_party/mbedtls/repo/library/platform.c",
       "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
       "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
@@ -588,10 +591,8 @@ template("siwx917_sdk") {
     }
     if (invoker.enable_dic) {
       sources += [
-        "${chip_root}/third_party/mbedtls/repo/library/base64.c",
         "${chip_root}/third_party/mbedtls/repo/library/debug.c",
         "${chip_root}/third_party/mbedtls/repo/library/ecjpake.c",
-        "${chip_root}/third_party/mbedtls/repo/library/pem.c",
         "${chip_root}/third_party/mbedtls/repo/library/rsa.c",
         "${chip_root}/third_party/mbedtls/repo/library/rsa_internal.c",
         "${chip_root}/third_party/mbedtls/repo/library/sha1.c",
@@ -600,14 +601,10 @@ template("siwx917_sdk") {
         "${chip_root}/third_party/mbedtls/repo/library/ssl_msg.c",
         "${chip_root}/third_party/mbedtls/repo/library/ssl_srv.c",
         "${chip_root}/third_party/mbedtls/repo/library/ssl_tls.c",
-        "${chip_root}/third_party/mbedtls/repo/library/x509.c",
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
       ]
     }
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      "${examples_plat_dir}:siwx917-common-config",
-    ]
+    public_configs = [ ":${sdk_target_name}_config" ]
   }
 }
