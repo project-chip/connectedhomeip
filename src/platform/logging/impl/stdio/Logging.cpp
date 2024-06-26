@@ -23,6 +23,7 @@ namespace Platform {
 // TODO: investigate whether pw_chrono or pw_log could be used here
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
+    // Stdout needs to be locked, because it's printed in pieces
 #if defined(_POSIX_THREAD_SAFE_FUNCTIONS)
     flockfile(stdout);
 #endif
@@ -43,7 +44,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 #if defined(__APPLE__) || defined(__gnu_linux__)
     timespec ts;
     timespec_get(&ts, TIME_UTC);
-    printf("[%lld.%06ld] ", static_cast<long long>(ts.tv_sec), static_cast<long>(ts.tv_nsec / 1000));
+    printf("[%lld] ", static_cast<long long>(ts.tv_sec * 1000 + ts.tv_nsec / 1000000));
 #endif
 
 #if defined(__APPLE__)
@@ -55,7 +56,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     printf("[%lld:%lld] ", static_cast<long long>(syscall(SYS_getpid)), static_cast<long long>(syscall(SYS_gettid)));
 #endif
 
-    printf("CHIP:%s: ", module);
+    printf("[%s] ", module);
     vprintf(msg, v);
     printf("\033[0m\n");
 
