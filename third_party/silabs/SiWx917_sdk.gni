@@ -152,6 +152,8 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/inc",
+
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/inc",
     ]
 
     if (use_system_view) {
@@ -303,9 +305,9 @@ template("siwx917_sdk") {
         "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
         "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
-        "SL_SI91X_MCU_WIRELESS_BASED_WAKEUP=1",
-        "SL_SI91X_MCU_BUTTON_BASED_WAKEUP=1",
-        "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
+        "SL_SI91X_NPSS_GPIO_BTN_HANDLER=1",
+        "SL_SI91X_POWER_MANAGER_UC_AVAILABLE=1",
+        "SL_SI91X_TICKLESS_MODE=1",
       ]
 
       if (si91x_alarm_based_periodic_wakeup) {
@@ -412,6 +414,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/board/silabs/src/rsi_board.c",
       "${wifi_sdk_root}/components/common/src/sl_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_system_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/rsi_debug.c",
@@ -574,9 +577,21 @@ template("siwx917_sdk") {
 
     if (chip_enable_icd_server) {
       sources += [
+        "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_power_manager_handler.c",
+        "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_power_manager_wakeup_handler.c",
+
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/sl_si91x_m4_ps.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
+
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sl_si91x_power_manager.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sli_si91x_power_manager.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sli_si91x_power_manager_wakeup_init.c",
+        "${wifi_sdk_root}/third_party/silicon_labs/freertos/src/sl_si91x_low_power_tickless_mode.c",
+        
+        # "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
+        # "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
+        
+        # "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
       ]
     }
     public_deps = [
