@@ -37,6 +37,7 @@ namespace ThreadBorderRouterManagement {
 class ServerInstance : public CommandHandlerInterface, public AttributeAccessInterface, public Delegate::ActivateDatasetCallback
 {
 public:
+    using Status = Protocols::InteractionModel::Status;
     ServerInstance(EndpointId endpointId, Delegate * delegate) :
         CommandHandlerInterface(Optional<EndpointId>(endpointId), Id),
         AttributeAccessInterface(Optional<EndpointId>(endpointId), Id), mDelegate(delegate)
@@ -55,26 +56,27 @@ public:
     void OnActivateDatasetComplete(CHIP_ERROR error) override;
 
 private:
+    friend class TestThreadBorderRouterManagementCluster;
     // Command Handlers
-    void HandleGetActiveDatasetRequest(HandlerContext & ctx, const Commands::GetActiveDatasetRequest::DecodableType & req)
+    Status HandleGetActiveDatasetRequest(bool isOverCASESession, Thread::OperationalDataset & dataset)
     {
-        HandleGetDatasetRequest(ctx, Delegate::DatasetType::kActive);
+        return HandleGetDatasetRequest(isOverCASESession, Delegate::DatasetType::kActive, dataset);
     }
-    void HandleGetPendingDatasetRequest(HandlerContext & ctx, const Commands::GetPendingDatasetRequest::DecodableType & req)
+    Status HandleGetPendingDatasetRequest(bool isOverCASESession, Thread::OperationalDataset & dataset)
     {
-        HandleGetDatasetRequest(ctx, Delegate::DatasetType::kPending);
+        return HandleGetDatasetRequest(isOverCASESession, Delegate::DatasetType::kPending, dataset);
     }
-    void HandleSetActiveDatasetRequest(HandlerContext & ctx, const Commands::SetActiveDatasetRequest::DecodableType & req);
-    void HandleSetPendingDatasetRequest(HandlerContext & ctx, const Commands::SetPendingDatasetRequest::DecodableType & req);
-    void HandleGetDatasetRequest(HandlerContext & ctx, Delegate::DatasetType type);
+    Status HandleSetActiveDatasetRequest(bool failSafeArmed, const Commands::SetActiveDatasetRequest::DecodableType & req);
+    Status HandleSetPendingDatasetRequest(const Commands::SetPendingDatasetRequest::DecodableType & req);
+    Status HandleGetDatasetRequest(bool isOverCASESession, Delegate::DatasetType type, Thread::OperationalDataset & dataset);
 
     // Attribute Read handler
-    CHIP_ERROR ReadFeatureMap(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadBorderRouterName(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadBorderAgentID(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadThreadVersion(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadInterfaceEnabled(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadActiveDatasetTimestamp(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadFeatureMap(BitFlags<Feature> & feature);
+    CHIP_ERROR ReadBorderRouterName(MutableCharSpan & borderRouterName);
+    CHIP_ERROR ReadBorderAgentID(MutableByteSpan & borderAgentId);
+    CHIP_ERROR ReadThreadVersion(uint16_t & threadVersion);
+    CHIP_ERROR ReadInterfaceEnabled(bool & interfaceEnable);
+    CHIP_ERROR ReadActiveDatasetTimestamp(Optional<uint64_t> & activeDatasetTimestamp);
 
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void OnFailSafeTimerExpired();

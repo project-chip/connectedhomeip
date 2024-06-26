@@ -45,60 +45,37 @@ namespace ThreadBorderRouterManagement {
 
 using Protocols::InteractionModel::Status;
 
-static bool CheckOverCASESession(CommandHandlerInterface::HandlerContext & ctx)
+static bool IsOverCASESession(CommandHandlerInterface::HandlerContext & ctx)
 {
     Messaging::ExchangeContext * exchangeCtx = ctx.mCommandHandler.GetExchangeContext();
-    if (!exchangeCtx || !exchangeCtx->HasSessionHandle() || !exchangeCtx->GetSessionHandle()->IsSecureSession() ||
-        exchangeCtx->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() != Transport::SecureSession::Type::kCASE)
-    {
-        ChipLogError(Zcl, "This command MUST be over a valid CASE session");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedAccess);
-        return false;
-    }
-    return true;
+    return exchangeCtx && exchangeCtx->HasSessionHandle() && exchangeCtx->GetSessionHandle()->IsSecureSession() &&
+        exchangeCtx->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() == Transport::SecureSession::Type::kCASE;
 }
 
-static bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
+static bool IsFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
 {
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
-    if (failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()))
-    {
-        return true;
-    }
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::FailsafeRequired);
-    return false;
+    return failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex());
 }
 
-static bool CheckDelegate(CommandHandlerInterface::HandlerContext & ctx, Delegate * delegate)
+Status ServerInstance::HandleGetDatasetRequest(bool isOverCASESession, Delegate::DatasetType type,
+                                               Thread::OperationalDataset & dataset)
 {
-    if (!delegate)
+    if (!isOverCASESession)
     {
-        ChipLogError(Zcl, "Thread Border Router Management server not initialized");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+        return Status::UnsupportedAccess;
     }
-    return delegate;
-}
 
-void ServerInstance::HandleGetDatasetRequest(HandlerContext & ctx, Delegate::DatasetType type)
-{
-    VerifyOrReturn(CheckOverCASESession(ctx));
-    VerifyOrReturn(CheckDelegate(ctx, mDelegate));
-
-    Commands::DatasetResponse::Type response;
-    Thread::OperationalDataset dataset;
     CHIP_ERROR err = mDelegate->GetDataset(dataset, type);
     if (err != CHIP_NO_ERROR)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath,
-                                      err == CHIP_IM_GLOBAL_STATUS(NotFound) ? StatusIB(err).mStatus : Status::Failure);
-        return;
+        return err == CHIP_IM_GLOBAL_STATUS(NotFound) ? StatusIB(err).mStatus : Status::Failure;
     }
-    response.dataset = dataset.AsByteSpan();
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    return Status::Success;
 }
 
-void ServerInstance::HandleSetActiveDatasetRequest(HandlerContext & ctx,
-                                                   const Commands::SetActiveDatasetRequest::DecodableType & req)
+Status ServerInstance::HandleSetActiveDatasetRequest(bool failSafeArmed,
+                                                     const Commands::SetActiveDatasetRequest::DecodableType & req)
 {
     // The SetActiveDatasetRequest command SHALL be FailSafeArmed. Upon receiving this command, the Thread BR will set its
     // active dataset. If the dataset is set successfully, OnActivateDatasetComplete will be called with CHIP_NO_ERROR, prompting
@@ -106,144 +83,153 @@ void ServerInstance::HandleSetActiveDatasetRequest(HandlerContext & ctx,
     // dataset, the Thread BR should respond with a failure status. In this case, when the FailSafe timer expires, the active
     // dataset set by this command will be reverted. If the FailSafe timer expires before the Thread BR responds, the Thread BR will
     // respond with a timeout status and the active dataset should also be reverted.
-    VerifyOrReturn(CheckFailSafeArmed(ctx));
-    VerifyOrReturn(CheckDelegate(ctx, mDelegate));
-    if (mAsyncCommandHandle.Get() != nullptr)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
-        return;
-    }
+    ReturnErrorCodeIf(!failSafeArmed, Status::FailsafeRequired);
+    ReturnErrorCodeIf(!mDelegate, Status::InvalidInState);
 
     Thread::OperationalDataset activeDataset;
     Thread::OperationalDataset currentActiveDataset;
     uint64_t currentActiveDatasetTimestamp;
-    if (activeDataset.Init(req.activeDataset) != CHIP_NO_ERROR)
-    {
-        // If any of the parameters in the ActiveDataset is invalid, the command SHALL fail with a status code
-        // of INVALID_COMMAND.
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        return;
-    }
+    // If any of the parameters in the ActiveDataset is invalid, the command SHALL fail with a status code
+    // of INVALID_COMMAND.
+    ReturnErrorCodeIf(activeDataset.Init(req.activeDataset) != CHIP_NO_ERROR, Status::InvalidCommand);
 
+    // If this command is invoked when the ActiveDatasetTimestamp attribute is not null, the command SHALL
+    // fail with a status code of INVALID_IN_STATE.
     if (mDelegate->GetDataset(currentActiveDataset, Delegate::DatasetType::kActive) == CHIP_NO_ERROR &&
         currentActiveDataset.GetActiveTimestamp(currentActiveDatasetTimestamp) == CHIP_NO_ERROR)
     {
-        // If this command is invoked when the ActiveDatasetTimestamp attribute is not null, the command SHALL
-        // fail with a status code of INVALID_IN_STATE.
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
-        return;
+        return Status::InvalidInState;
     }
 
-    mPath               = ctx.mRequestPath;
-    mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
-    ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
     mBreadcrumb    = req.breadcrumb;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if ((err = mDelegate->SetActiveDataset(activeDataset, this)) != CHIP_NO_ERROR)
-    {
-        OnActivateDatasetComplete(err);
-    }
+    CHIP_ERROR err = mDelegate->SetActiveDataset(activeDataset, this);
+    return StatusIB(err).mStatus;
 }
 
-void ServerInstance::HandleSetPendingDatasetRequest(HandlerContext & ctx,
-                                                    const Commands::SetPendingDatasetRequest::DecodableType & req)
+Status ServerInstance::HandleSetPendingDatasetRequest(const Commands::SetPendingDatasetRequest::DecodableType & req)
 {
-    VerifyOrReturn(CheckDelegate(ctx, mDelegate));
+    ReturnErrorCodeIf(!mDelegate, Status::InvalidInState);
     bool panChangeSupported;
     if (mDelegate->GetPanChangeSupported(panChangeSupported) != CHIP_NO_ERROR || !panChangeSupported)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
-        return;
+        return Status::UnsupportedCommand;
     }
     Thread::OperationalDataset pendingDataset;
-    if (pendingDataset.Init(req.pendingDataset) != CHIP_NO_ERROR)
-    {
-        // If any of the parameters in the PendingDataset is invalid, the command SHALL fail with a status code
-        // of INVALID_COMMAND.
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        return;
-    }
+    // If any of the parameters in the PendingDataset is invalid, the command SHALL fail with a status code
+    // of INVALID_COMMAND.
+    ReturnErrorCodeIf(pendingDataset.Init(req.pendingDataset) != CHIP_NO_ERROR, Status::InvalidCommand);
     CHIP_ERROR err = mDelegate->SetPendingDataset(pendingDataset);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, StatusIB(err).mStatus);
+    return StatusIB(err).mStatus;
 }
 
-void ServerInstance::InvokeCommand(HandlerContext & ctx)
+void AddDatasetResponse(CommandHandlerInterface::HandlerContext & ctx, Status status, Thread::OperationalDataset & dataset)
 {
-    switch (ctx.mRequestPath.mCommandId)
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+    Commands::DatasetResponse::Type response;
+    response.dataset = dataset.AsByteSpan();
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+void ServerInstance::InvokeCommand(HandlerContext & ctxt)
+{
+    switch (ctxt.mRequestPath.mCommandId)
     {
     case Commands::GetActiveDatasetRequest::Id:
-        HandleCommand<Commands::GetActiveDatasetRequest::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleGetActiveDatasetRequest(ctx, req); });
+        HandleCommand<Commands::GetActiveDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
+            Thread::OperationalDataset dataset;
+            Status status = HandleGetActiveDatasetRequest(IsOverCASESession(ctx), dataset);
+            AddDatasetResponse(ctx, status, dataset);
+        });
         break;
     case Commands::GetPendingDatasetRequest::Id:
-        HandleCommand<Commands::GetPendingDatasetRequest::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleGetPendingDatasetRequest(ctx, req); });
+        HandleCommand<Commands::GetPendingDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
+            Thread::OperationalDataset dataset;
+            Status status = HandleGetPendingDatasetRequest(IsOverCASESession(ctx), dataset);
+            AddDatasetResponse(ctx, status, dataset);
+        });
         break;
     case Commands::SetActiveDatasetRequest::Id:
-        HandleCommand<Commands::SetActiveDatasetRequest::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleSetActiveDatasetRequest(ctx, req); });
+        HandleCommand<Commands::SetActiveDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
+            if (!mAsyncCommandHandle.Get())
+            {
+                mPath               = ctx.mRequestPath;
+                mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
+                ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
+                Status status = HandleSetActiveDatasetRequest(IsFailSafeArmed(ctx), req);
+                if (status != Status::Success)
+                {
+                    OnActivateDatasetComplete(ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(status)));
+                }
+            }
+            else
+            {
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
+            }
+        });
         break;
     case Commands::SetPendingDatasetRequest::Id:
-        HandleCommand<Commands::SetPendingDatasetRequest::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleSetPendingDatasetRequest(ctx, req); });
+        HandleCommand<Commands::SetPendingDatasetRequest::DecodableType>(ctxt, [this](HandlerContext & ctx, const auto & req) {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, HandleSetPendingDatasetRequest(req));
+        });
         break;
     default:
         break;
     }
 }
 
-CHIP_ERROR ServerInstance::ReadFeatureMap(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServerInstance::ReadFeatureMap(BitFlags<Feature> & featureMap)
 {
-    BitFlags<Feature> featureMap;
     bool panChangeSupported;
     ReturnErrorOnFailure(mDelegate->GetPanChangeSupported(panChangeSupported));
     if (panChangeSupported)
     {
         featureMap.Set(Feature::kPANChange);
     }
-    return aEncoder.Encode(featureMap);
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ServerInstance::ReadBorderRouterName(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServerInstance::ReadBorderRouterName(MutableCharSpan & borderRouterName)
 {
-    char borderRouterName[kBorderRouterNameMaxLength];
-    MutableCharSpan borderRouterNameSpan(borderRouterName);
-    ReturnErrorOnFailure(mDelegate->GetBorderRouterName(borderRouterNameSpan));
-    return aEncoder.Encode(borderRouterNameSpan);
+    ReturnErrorOnFailure(mDelegate->GetBorderRouterName(borderRouterName));
+    ReturnErrorCodeIf(borderRouterName.size() > kBorderRouterNameMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ServerInstance::ReadBorderAgentID(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServerInstance::ReadBorderAgentID(MutableByteSpan & borderAgentId)
 {
-    uint8_t borderAgentId[kBorderAgentIdLength];
-    MutableByteSpan borderAgentIdSpan(borderAgentId);
-    ReturnErrorOnFailure(mDelegate->GetBorderAgentId(borderAgentIdSpan));
-    return aEncoder.Encode(borderAgentIdSpan);
+    ReturnErrorOnFailure(mDelegate->GetBorderAgentId(borderAgentId));
+    ReturnErrorCodeIf(borderAgentId.size() != kBorderAgentIdLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ServerInstance::ReadThreadVersion(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServerInstance::ReadThreadVersion(uint16_t & threadVersion)
 {
-    uint16_t threadVersion;
-    ReturnErrorOnFailure(mDelegate->GetThreadVersion(threadVersion));
-    return aEncoder.Encode(threadVersion);
+    return mDelegate->GetThreadVersion(threadVersion);
 }
 
-CHIP_ERROR ServerInstance::ReadInterfaceEnabled(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServerInstance::ReadInterfaceEnabled(bool & interfaceEnabled)
 {
-    bool interfaceEnabled;
-    ReturnErrorOnFailure(mDelegate->GetInterfaceEnabled(interfaceEnabled));
-    return aEncoder.Encode(interfaceEnabled);
+    return mDelegate->GetInterfaceEnabled(interfaceEnabled);
 }
 
-CHIP_ERROR ServerInstance::ReadActiveDatasetTimestamp(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServerInstance::ReadActiveDatasetTimestamp(Optional<uint64_t> & activeDatasetTimestamp)
 {
+    uint64_t activeDatasetTimestampValue;
     Thread::OperationalDataset activeDataset;
-    uint64_t activeDatasetTimestamp;
     if (mDelegate->GetDataset(activeDataset, Delegate::DatasetType::kActive) == CHIP_NO_ERROR &&
-        activeDataset.GetActiveTimestamp(activeDatasetTimestamp) == CHIP_NO_ERROR)
+        activeDataset.GetActiveTimestamp(activeDatasetTimestampValue) == CHIP_NO_ERROR)
     {
-        return aEncoder.Encode(DataModel::MakeNullable(activeDatasetTimestamp));
+        activeDatasetTimestamp.SetValue(activeDatasetTimestampValue);
     }
-    return aEncoder.EncodeNull();
+    else
+    {
+        activeDatasetTimestamp.ClearValue();
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ServerInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -260,24 +246,63 @@ CHIP_ERROR ServerInstance::Read(const ConcreteReadAttributePath & aPath, Attribu
     CHIP_ERROR status = CHIP_NO_ERROR;
     switch (aPath.mAttributeId)
     {
-    case Globals::Attributes::FeatureMap::Id:
-        status = ReadFeatureMap(aEncoder);
+    case Globals::Attributes::FeatureMap::Id: {
+        BitFlags<Feature> featureMap;
+        status = ReadFeatureMap(featureMap);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(featureMap);
+        }
         break;
-    case Attributes::BorderRouterName::Id:
-        status = ReadBorderRouterName(aEncoder);
+    }
+    case Attributes::BorderRouterName::Id: {
+        char borderRouterNameBuf[kBorderRouterNameMaxLength + 1];
+        MutableCharSpan borderRouterName(borderRouterNameBuf);
+        status = ReadBorderRouterName(borderRouterName);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(borderRouterName);
+        }
         break;
-    case Attributes::BorderAgentID::Id:
-        status = ReadBorderAgentID(aEncoder);
+    }
+    case Attributes::BorderAgentID::Id: {
+        uint8_t borderAgentIDBuf[kBorderAgentIdLength];
+        MutableByteSpan borderAgentID(borderAgentIDBuf);
+        status = ReadBorderAgentID(borderAgentID);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(borderAgentID);
+        }
         break;
-    case Attributes::ThreadVersion::Id:
-        status = ReadThreadVersion(aEncoder);
+    }
+    case Attributes::ThreadVersion::Id: {
+        uint16_t threadVersion;
+        status = ReadThreadVersion(threadVersion);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(threadVersion);
+        }
         break;
-    case Attributes::InterfaceEnabled::Id:
-        status = ReadInterfaceEnabled(aEncoder);
+    }
+    case Attributes::InterfaceEnabled::Id: {
+        bool interfaceEnabled;
+        status = ReadInterfaceEnabled(interfaceEnabled);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(interfaceEnabled);
+        }
         break;
-    case Attributes::ActiveDatasetTimestamp::Id:
-        status = ReadActiveDatasetTimestamp(aEncoder);
+    }
+    case Attributes::ActiveDatasetTimestamp::Id: {
+        Optional<uint64_t> activeDatasetTimestamp;
+        status = ReadActiveDatasetTimestamp(activeDatasetTimestamp);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = activeDatasetTimestamp.HasValue() ? aEncoder.Encode(DataModel::MakeNullable(activeDatasetTimestamp.Value()))
+                                                       : aEncoder.EncodeNull();
+        }
         break;
+    }
     default:
         break;
     }
