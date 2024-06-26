@@ -59,13 +59,8 @@ config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
 
   # Link options that provide a replacement for dynamic memory operations in standard
-  # library with the FreeRTOS malloc in platform code.
+  # library with the sl_memory_manager in platform code.
   ldflags = [
-    # memory allocation -- these must be re-entrant and do locking
-    "-Wl,--wrap=malloc",
-    "-Wl,--wrap=free",
-    "-Wl,--wrap=realloc",
-    "-Wl,--wrap=calloc",
     "-Wl,--wrap=MemoryAlloc",
 
     # Wrap these in case internal newlib call them (e.g. strdup will)
@@ -234,7 +229,6 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
-    "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "${silabs_plat_si91x_wifi_dir}/dhcp_client.cpp",

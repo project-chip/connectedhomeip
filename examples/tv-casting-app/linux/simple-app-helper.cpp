@@ -389,7 +389,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         unsigned long index = static_cast<unsigned long>(strtol(argv[1], &eptr, 10));
         std::vector<matter::casting::memory::Strong<matter::casting::core::CastingPlayer>> castingPlayers =
             matter::casting::core::CastingPlayerDiscovery::GetInstance()->GetCastingPlayers();
-        VerifyOrReturnValue(0 <= index && index < castingPlayers.size(), CHIP_ERROR_INVALID_ARGUMENT,
+        VerifyOrReturnValue(index < castingPlayers.size(), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(AppServer, "Invalid casting player index provided: %lu", index));
         targetCastingPlayer = castingPlayers.at(index);
 
