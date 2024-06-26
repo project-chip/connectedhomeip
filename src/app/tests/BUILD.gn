@@ -123,6 +123,19 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
+source_set("thread-border-router-management-test-srcs") {
+  sources = [ "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-mgmt-server.cpp" ]
+
+  deps = [ "${chip_root}/src/app/server"]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("app-test-stubs") {
   sources = [
     "test-ember-api.cpp",
@@ -176,6 +189,7 @@ chip_test_suite("tests") {
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
+    "TestThreadBorderRouterManagementCluster.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
@@ -189,6 +203,7 @@ chip_test_suite("tests") {
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":power-cluster-test-srcs",
+    ":thread-border-router-management-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
