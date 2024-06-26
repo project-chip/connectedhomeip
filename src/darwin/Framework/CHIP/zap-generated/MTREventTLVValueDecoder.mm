@@ -3156,15 +3156,6 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
             memberValue = [NSNumber numberWithLongLong:cppValue.maximumCurrent];
             value.maximumCurrent = memberValue;
         } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.maximumDischargingCurrent.HasValue()) {
-                memberValue = [NSNumber numberWithLongLong:cppValue.maximumDischargingCurrent.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.maximumDischargingCurrent = memberValue;
-        } while (0);
 
         return value;
     }
@@ -3196,15 +3187,6 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
             NSNumber * _Nonnull memberValue;
             memberValue = [NSNumber numberWithLongLong:cppValue.energyTransferred];
             value.energyTransferred = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.energyDischarged.HasValue()) {
-                memberValue = [NSNumber numberWithLongLong:cppValue.energyDischarged.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.energyDischarged = memberValue;
         } while (0);
 
         return value;

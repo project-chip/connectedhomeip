@@ -22985,8 +22985,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<chip::BitMask<TargetDayOfWeekBitmap>> dayOfWeekForSequence;
-    Optional<DataModel::List<const Structs::ChargingTargetStruct::Type>> chargingTargets;
+    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
+    DataModel::List<const Structs::ChargingTargetStruct::Type> chargingTargets;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -22996,8 +22996,8 @@ public:
 struct DecodableType
 {
 public:
-    Optional<chip::BitMask<TargetDayOfWeekBitmap>> dayOfWeekForSequence;
-    Optional<DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType>> chargingTargets;
+    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
+    DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> chargingTargets;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -23746,10 +23746,9 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kSessionID                 = 0,
-    kState                     = 1,
-    kMaximumCurrent            = 2,
-    kMaximumDischargingCurrent = 3,
+    kSessionID      = 0,
+    kState          = 1,
+    kMaximumCurrent = 2,
 };
 
 struct Type
@@ -23763,7 +23762,6 @@ public:
     uint32_t sessionID     = static_cast<uint32_t>(0);
     StateEnum state        = static_cast<StateEnum>(0);
     int64_t maximumCurrent = static_cast<int64_t>(0);
-    Optional<int64_t> maximumDischargingCurrent;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -23778,7 +23776,6 @@ public:
     uint32_t sessionID     = static_cast<uint32_t>(0);
     StateEnum state        = static_cast<StateEnum>(0);
     int64_t maximumCurrent = static_cast<int64_t>(0);
-    Optional<int64_t> maximumDischargingCurrent;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -23792,7 +23789,6 @@ enum class Fields : uint8_t
     kState             = 1,
     kReason            = 2,
     kEnergyTransferred = 4,
-    kEnergyDischarged  = 5,
 };
 
 struct Type
@@ -23807,7 +23803,6 @@ public:
     StateEnum state                        = static_cast<StateEnum>(0);
     EnergyTransferStoppedReasonEnum reason = static_cast<EnergyTransferStoppedReasonEnum>(0);
     int64_t energyTransferred              = static_cast<int64_t>(0);
-    Optional<int64_t> energyDischarged;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -23823,7 +23818,6 @@ public:
     StateEnum state                        = static_cast<StateEnum>(0);
     EnergyTransferStoppedReasonEnum reason = static_cast<EnergyTransferStoppedReasonEnum>(0);
     int64_t energyTransferred              = static_cast<int64_t>(0);
-    Optional<int64_t> energyDischarged;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

@@ -2707,12 +2707,11 @@ enum class SupplyStateEnum : uint8_t
     kDischargingEnabled  = 0x02,
     kDisabledError       = 0x03,
     kDisabledDiagnostics = 0x04,
-    kEnabled             = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 6,
+    kUnknownEnumValue = 5,
 };
 
 // Bitmap for Feature

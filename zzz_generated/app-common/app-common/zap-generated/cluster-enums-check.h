@@ -1861,7 +1861,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
     case EnumType::kDischargingEnabled:
     case EnumType::kDisabledError:
     case EnumType::kDisabledDiagnostics:
-    case EnumType::kEnabled:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

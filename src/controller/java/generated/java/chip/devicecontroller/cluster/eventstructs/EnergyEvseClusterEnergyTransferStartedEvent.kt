@@ -17,7 +17,6 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,14 +26,12 @@ class EnergyEvseClusterEnergyTransferStartedEvent(
   val sessionID: ULong,
   val state: UInt,
   val maximumCurrent: Long,
-  val maximumDischargingCurrent: Optional<Long>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterEnergyTransferStartedEvent {\n")
     append("\tsessionID : $sessionID\n")
     append("\tstate : $state\n")
     append("\tmaximumCurrent : $maximumCurrent\n")
-    append("\tmaximumDischargingCurrent : $maximumDischargingCurrent\n")
     append("}\n")
   }
 
@@ -44,10 +41,6 @@ class EnergyEvseClusterEnergyTransferStartedEvent(
       put(ContextSpecificTag(TAG_SESSION_I_D), sessionID)
       put(ContextSpecificTag(TAG_STATE), state)
       put(ContextSpecificTag(TAG_MAXIMUM_CURRENT), maximumCurrent)
-      if (maximumDischargingCurrent.isPresent) {
-        val optmaximumDischargingCurrent = maximumDischargingCurrent.get()
-        put(ContextSpecificTag(TAG_MAXIMUM_DISCHARGING_CURRENT), optmaximumDischargingCurrent)
-      }
       endStructure()
     }
   }
@@ -56,28 +49,16 @@ class EnergyEvseClusterEnergyTransferStartedEvent(
     private const val TAG_SESSION_I_D = 0
     private const val TAG_STATE = 1
     private const val TAG_MAXIMUM_CURRENT = 2
-    private const val TAG_MAXIMUM_DISCHARGING_CURRENT = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEnergyTransferStartedEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getULong(ContextSpecificTag(TAG_SESSION_I_D))
       val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
       val maximumCurrent = tlvReader.getLong(ContextSpecificTag(TAG_MAXIMUM_CURRENT))
-      val maximumDischargingCurrent =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAXIMUM_DISCHARGING_CURRENT))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MAXIMUM_DISCHARGING_CURRENT)))
-        } else {
-          Optional.empty()
-        }
 
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterEnergyTransferStartedEvent(
-        sessionID,
-        state,
-        maximumCurrent,
-        maximumDischargingCurrent,
-      )
+      return EnergyEvseClusterEnergyTransferStartedEvent(sessionID, state, maximumCurrent)
     }
   }
 }

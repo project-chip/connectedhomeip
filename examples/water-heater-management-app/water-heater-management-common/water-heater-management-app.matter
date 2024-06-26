@@ -1709,7 +1709,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 cluster EnergyEvse = 153 {
-  revision 4;
+  revision 2;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
@@ -1753,7 +1753,6 @@ cluster EnergyEvse = 153 {
     kDischargingEnabled = 2;
     kDisabledError = 3;
     kDisabledDiagnostics = 4;
-    kEnabled = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -1781,8 +1780,8 @@ cluster EnergyEvse = 153 {
   }
 
   struct ChargingTargetScheduleStruct {
-    optional TargetDayOfWeekBitmap dayOfWeekForSequence = 0;
-    optional ChargingTargetStruct chargingTargets[] = 1;
+    TargetDayOfWeekBitmap dayOfWeekForSequence = 0;
+    ChargingTargetStruct chargingTargets[] = 1;
   }
 
   info event EVConnected = 0 {
@@ -1801,7 +1800,6 @@ cluster EnergyEvse = 153 {
     int32u sessionID = 0;
     StateEnum state = 1;
     amperage_ma maximumCurrent = 2;
-    optional amperage_ma maximumDischargingCurrent = 3;
   }
 
   info event EnergyTransferStopped = 3 {
@@ -1809,7 +1807,6 @@ cluster EnergyEvse = 153 {
     StateEnum state = 1;
     EnergyTransferStoppedReasonEnum reason = 2;
     energy_mwh energyTransferred = 4;
-    optional energy_mwh energyDischarged = 5;
   }
 
   critical event Fault = 4 {
