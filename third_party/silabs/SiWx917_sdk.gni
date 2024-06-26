@@ -580,10 +580,10 @@ template("siwx917_sdk") {
         "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_power_manager_handler.c",
         "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_power_manager_wakeup_handler.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/sl_si91x_m4_ps.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sl_si91x_power_manager.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sli_si91x_power_manager.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sli_si91x_power_manager_wakeup_init.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
         "${wifi_sdk_root}/third_party/silicon_labs/freertos/src/sl_si91x_low_power_tickless_mode.c",
       ]
     }
