@@ -313,7 +313,8 @@ class HostBuilder(GnBuilder):
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
                  enable_test_event_triggers=None,
-                 enable_dnssd_tests: Optional[bool] = None
+                 enable_dnssd_tests: Optional[bool] = None,
+                 chip_casting_simplified: Optional[bool] = None
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -427,6 +428,9 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_enable_dnssd_tests=true')
             else:
                 self.extra_gn_options.append('chip_enable_dnssd_tests=false')
+
+        if chip_casting_simplified is not None:
+            self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:

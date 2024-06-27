@@ -29,7 +29,6 @@ public:
     void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override;
     void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName, uint16_t pairingHint,
                                      const char * pairingInstruction) override;
-    void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override;
     void HidePromptsOnCancel(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override;
     bool DisplaysPasscodeAndQRCode() override;
     void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName, uint32_t passcode,

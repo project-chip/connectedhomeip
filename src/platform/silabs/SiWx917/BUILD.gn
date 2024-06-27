@@ -47,7 +47,6 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/InetPlatformConfig.h",
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.cpp",
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.h",
-    "${silabs_platform_dir}/Logging.cpp",
     "${silabs_platform_dir}/MigrationManager.cpp",
     "${silabs_platform_dir}/MigrationManager.h",
     "${silabs_platform_dir}/PlatformManagerImpl.cpp",
@@ -97,4 +96,12 @@ static_library("SiWx917") {
     "wifi/wifi_config.h",
   ]
   public_configs = [ ":siwx917-platform-wifi-config" ]
+}
+
+source_set("logging") {
+  sources = [ "${chip_root}/src/platform/silabs/Logging.cpp" ]
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 }

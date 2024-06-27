@@ -233,14 +233,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
 #else
-            uint8_t macAddress[8] = { 0 };
-            if (esp_read_mac(macAddress, ESP_MAC_IEEE802154) != ESP_OK)
+            if (esp_read_mac(ifp->MacAddress, ESP_MAC_IEEE802154) != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "Failed to get network hardware address");
             }
             else
             {
-                ifp->hardwareAddress = ByteSpan(macAddress, 8);
+                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 8);
             }
 #endif
 
