@@ -14,8 +14,8 @@
 package com.matter.casting.support;
 
 /**
- * Feature: Target Content Application - The set of content app Vendor IDs (and optionally, Product
- * IDs) that can be used for authentication.
+ * Feature: Target Content Application - An entry in the IdentificationDeclarationOptions.java
+ * TargetAppList which contains a TargetVendorId and an optional TargetProductId.
  */
 public class TargetAppInfo {
   /** Target Target Content Application Vendor ID, null means unspecified */

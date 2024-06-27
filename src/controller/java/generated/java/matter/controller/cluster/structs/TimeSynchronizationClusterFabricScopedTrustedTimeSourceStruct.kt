@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(
   val nodeID: ULong,
-  val endpoint: UShort
+  val endpoint: UShort,
 ) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {\n")
@@ -48,7 +48,7 @@ class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_I_D))

@@ -22,6 +22,13 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <lib/support/CHIPMem.h>
 
+class CommissioningWindowDelegate
+{
+public:
+    virtual void OnCommissioningWindowOpened(chip::NodeId deviceId, CHIP_ERROR err, chip::SetupPayload payload) = 0;
+    virtual ~CommissioningWindowDelegate()                                                                      = default;
+};
+
 class OpenCommissioningWindowCommand : public CHIPCommand
 {
 public:
@@ -31,6 +38,7 @@ public:
         mOnOpenBasicCommissioningWindowCallback(OnOpenBasicCommissioningWindowResponse, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId, "Node to send command to.");
+        AddArgument("endpoint-id", 0, UINT16_MAX, &mEndpointId, "Endpoint to send command to.");
         AddArgument("option", 0, 2, &mCommissioningWindowOption,
                     "1 to use Enhanced Commissioning Method.\n  0 to use Basic Commissioning Method.");
         AddArgument("window-timeout", 0, UINT16_MAX, &mCommissioningWindowTimeout,
@@ -41,6 +49,9 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout, "Time, in seconds, before this command is considered to have timed out.");
     }
 
+    void RegisterDelegate(CommissioningWindowDelegate * delegate) { mDelegate = delegate; }
+    void UnregisterDelegate() { mDelegate = nullptr; }
+
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
 
@@ -50,7 +61,9 @@ public:
 
 private:
     NodeId mNodeId;
+    chip::EndpointId mEndpointId;
     chip::Controller::CommissioningWindowOpener::CommissioningWindowOption mCommissioningWindowOption;
+    CommissioningWindowDelegate * mDelegate = nullptr;
     uint16_t mCommissioningWindowTimeout;
     uint32_t mIteration;
     uint16_t mDiscriminator;

@@ -61,6 +61,8 @@ static_library("fabric-admin-utils") {
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
     "commands/clusters/ModelCommand.cpp",
     "commands/clusters/ModelCommand.h",
+    "commands/clusters/ReportCommand.cpp",
+    "commands/clusters/ReportCommand.h",
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
@@ -155,7 +157,7 @@ executable("fabric-admin") {
 
   deps = [
     ":fabric-admin-utils",
-    "${chip_root}/src/platform/logging:force_stdio",
+    "${chip_root}/src/platform/logging:stdio",
   ]
 
   output_dir = root_out_dir
