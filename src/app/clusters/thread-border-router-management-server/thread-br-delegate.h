@@ -74,7 +74,7 @@ public:
     // The Delegate implementation should back up the old active dataset at the beginning of function if no backup already exists.
     virtual CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCallback * callback) = 0;
 
-    // The Delegate implement should remove the backup active dataset in this function.
+    // The Delegate implementation should remove the backup active dataset in this function.
     virtual CHIP_ERROR CommitActiveDataset() = 0;
 
     // The Delegate implement should restore the backup active dataset in this function.
