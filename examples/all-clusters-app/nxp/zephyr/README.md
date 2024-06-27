@@ -10,18 +10,18 @@ commissioning and different cluster control.
 
 <hr>
 
--   [Introduction](#intro)
+-   [Introduction](#introduction)
 -   [Building](#building)
--   [Flashing and debugging](#flashdebug)
--   [Factory data](#factorydata)
--   [Manufacturing data](#manufacturing)
+-   [Flashing and debugging](#flashing-and-debugging)
+-   [Factory data](#factory-data)
+-   [Manufacturing data](#generate-factory-data)
 -   [OTA Software Update](#ota-software-update)
 -   [Testing the example](#testing-the-example)
--   [Using Matter CLI in NXP Zephyr examples](#matter-cli)
+-   [Using Matter CLI in NXP Zephyr examples](#using-matter-cli-in-nxp-zephyr-examples)
 
 <hr>
 
-<a name="intro"></a>
+<a name="introduction"></a>
 
 ## Introduction
 
@@ -57,12 +57,12 @@ Prerequisites:
 $ west init zephyrproject -m https://github.com/nxp-zephyr-ear/zephyr.git --mr zephyr_rw61x_v3.6_RFP
 ```
 
-> **Note**: Currently, supported NXP platforms in Zephyr targetting Matter are
+> **Note**: Currently, supported NXP platforms in Zephyr targeting Matter are
 > not available in the official Zephyr repo, you'll have to use the NXP fork
 > `https://github.com/nxp-zephyr-ear/zephyr` github repo. Reach to your NXP
 > contact for more details.
 
-Steps to build the example, targetting `rd_rw612_bga` board:
+Steps to build the example, targeting `rd_rw612_bga` board:
 
 1. Activate your Matter env:
 
@@ -89,7 +89,7 @@ command from. The binaries will be created in `build/zephyr` with the name
 You can get more details on `west build` with
 [Zephyr's building guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#building-west-build)
 
-<a name="flashdebug"></a>
+<a name="flashing-and-debugging"></a>
 
 ## Flashing and debugging
 
@@ -118,7 +118,7 @@ To debug a Matter with Zephyr application, you could use several methods:
 > **Note**: As the build provides an elf file, any compatible debugging tool can
 > be used.
 
-<a name="factorydata"></a>
+<a name="factory-data"></a>
 
 ## Factory data
 
@@ -128,8 +128,8 @@ the the section below to build with factory data.
 You may refer to `src/platform/nxp/zephyr/boards/<board>/<board>.overlay` file
 to obtain the memory region used by this partition.
 
-For example, the factory data partition on rd_rw612_bga is reserved in the last
-sector of the flexspi flash of RD BGA board, at `0x1BFFF000`.
+For example, the factory data partition on `rd_rw612_bga` is reserved in the
+last sector of the `flexspi` flash of `RD BGA` board, at `0x1BFFF000`.
 
 ```
 &flexspi {
@@ -164,13 +164,15 @@ west build -b rd_rw612_bga -p  <path to example folder> -- -DFILE_SUFFIX=fdata
 `prj_fdata.conf` configuration file will enable `CONFIG_CHIP_FACTORY_DATA`
 Kconfig so the application will load the factory data at boot.
 
+<a name="generate-factory-data"></a>
+
 ### Generate factory data
 
 #### Automatically (recommended)
 
 The factory data can be generated automatically during the build of the
-application. To do so, you can uncomment the `CONFIG_CHIP_FACTORY_DATA_BUILD=y`
-in `prj_fdata.conf`.
+application. To do so, you can use the configuration
+`CONFIG_CHIP_FACTORY_DATA_BUILD=y` in `prj_fdata.conf`.
 
 You will have to specify the source of the certificates to be used for the
 factory data. Please refer to `CHIP_FACTORY_DATA_CERT_SOURCE` Kconfig for more
@@ -208,7 +210,7 @@ See
 To know how to commission a device over BLE, follow the instructions from
 [chip-tool's README.md 'Commission a device over BLE'](../../../chip-tool/README.md#commission-a-device-over-ble).
 
-<a name="matter-cli"></a>
+<a name="using-matter-cli-in-nxp-zephyr-examples"></a>
 
 ## Using Matter CLI in NXP Zephyr examples
 
@@ -228,7 +230,7 @@ As an example, the Matter CLI on `rd_rw612_bga` is configured to be output on
 `flexcomm3` with a baudrate of `115200`. The logs are configured to be output on
 `flexcomm0` with a baudrate of `115200`.
 
-> **Note**: `flexcomm3` is wired to the USB FTDI port of the RD BGA board by
+> **Note**: `flexcomm3` is wired to the USB `FTDI` port of the `RD BGA` board by
 > default. `flexcomm0` is wired to `GPIO2` (RX) and `GPIO3` (TX). Those pins are
 > accessible on `HD2` pin header.
 
