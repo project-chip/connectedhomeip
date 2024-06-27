@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN apt update -y \
     && apt install vim -fy \
     && apt clean \
-    && pip3 install bflb-iot-tool==1.8.6 \
+    && pip3 install --break-system-packages bflb-iot-tool==1.8.6 \
     && : # last line
 
 COPY setup.sh /tmp

@@ -52,21 +52,23 @@ struct LinuxDeviceOptions
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     uint16_t securedDevicePort         = CHIP_PORT;
     uint16_t unsecuredCommissionerPort = CHIP_UDC_PORT;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    uint16_t securedCommissionerPort = CHIP_PORT + 12; // TODO: why + 12?
-#endif                                                 // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    uint16_t securedCommissionerPort    = CHIP_PORT + 12; // TODO: why + 12?
+    chip::FabricId commissionerFabricId = chip::kUndefinedFabricId;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     const char * command                = nullptr;
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
-    bool traceStreamDecodeEnabled       = false;
-    bool traceStreamToLogEnabled        = false;
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    bool traceStreamDecodeEnabled = false;
+    bool traceStreamToLogEnabled  = false;
     chip::Optional<std::string> traceStreamFilename;
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr;
     chip::CSRResponseOptions mCSRResponseOptions;
     uint8_t testEventTriggerEnableKey[16] = { 0 };
-    chip::FabricId commissionerFabricId   = chip::kUndefinedFabricId;
     std::vector<std::string> traceTo;
     bool mSimulateNoInternalTime = false;
 #if defined(PW_RPC_ENABLED)

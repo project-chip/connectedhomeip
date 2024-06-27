@@ -58,7 +58,7 @@ int main(int argc, char * argv[])
     }
 
     ExampleCredentialIssuerCommands credIssuerCommands;
-    Commands commands;
+    Commands & commands = CommandMgr();
 
     registerCommandsFabricSync(commands, &credIssuerCommands);
     registerCommandsInteractive(commands, &credIssuerCommands);

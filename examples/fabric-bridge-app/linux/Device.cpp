@@ -25,11 +25,11 @@
 
 using namespace chip::app::Clusters::Actions;
 
-Device::Device(chip::NodeId nodeId, const char * name)
+Device::Device(chip::NodeId nodeId)
 {
-    chip::Platform::CopyString(mName, name);
     mReachable  = false;
-    mEndpointId = 0;
+    mNodeId     = nodeId;
+    mEndpointId = chip::kInvalidEndpointId;
 }
 
 bool Device::IsReachable()
