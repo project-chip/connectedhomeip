@@ -17,8 +17,8 @@ thus the `OTAImageProcessorImpl` instance should take this into account.
 
 ## Usage
 
-This is a wrapper over standard `ota_multi_image_tool.py`, so the options for
-`create` are also available here:
+This is a wrapper over standard `ota_image_tool.py`, so the options for `create`
+are also available here:
 
 ```
 python3 ./scripts/tools/silabs/ota/ota_multi_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256
