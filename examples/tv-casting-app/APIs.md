@@ -929,7 +929,7 @@ CommissionerDeclaration message as follows:
    `StopConnecting` to alert the `CastingPlayer` that the commissioning attempt
    was canceled.
 1. The Casting Client should then update the commissioning session's PAKE
-   verifier with the user-entered Passcode using the API's described in the
+   verifier with the user-entered Passcode using the APIs described in the
    Initialize the Casting Client section above.
 1. Finally, the Casting Client should call `ContinueConnecting` to send a second
    IdentificationDeclaration message to the `CastingPlayer` with
@@ -1001,7 +1001,7 @@ targetCastingPlayer->VerifyOrEstablishConnection(connectionCallbacks,
 ...
 ```
 
-On Andorid, the Casting Client can connect to a `CastingPlayer`, using the
+On Android, the Casting Client can connect to a `CastingPlayer`, using the
 optional `CastingPlayer` / Commissioner-Generated Passcode UDC feature, by
 successfully calling `verifyOrEstablishConnection`, updating the PAKE verifier
 and then calling `continueConnecting` on the `CastingPlayer`.
