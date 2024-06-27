@@ -46,7 +46,7 @@ shared_library("jni") {
     "${chip_root}/src/app/server/java:jni",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
-    "${chip_root}/src/platform:default_logging",
+    "${chip_root}/src/platform:default-logging",
     "${chip_root}/third_party/inipp",
   ]
 

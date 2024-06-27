@@ -100,7 +100,7 @@ static_library("webos") {
   ]
 
   deps = [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/setup_payload",
   ]
 
@@ -155,7 +155,7 @@ static_library("webos") {
 
 source_set("logging") {
   deps = [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_base",
   ]
   sources = [ "Logging.cpp" ]

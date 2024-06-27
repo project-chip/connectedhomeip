@@ -69,7 +69,7 @@ static_library("stm32") {
       "SystemPlatformConfig.h",
     ]
 
-    deps += [ "${chip_root}/src/platform:logging_header" ]
+    deps += [ "${chip_root}/src/platform:logging-header" ]
   }
 
   public = [

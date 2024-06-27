@@ -73,7 +73,7 @@ static_library("mw320") {
   # Use ethernet/wifi interface for network commissioning. Default: WiFi
   defines += [ "USE_ETHERNET_COMMISSION=0" ]
 
-  deps = [ "${chip_root}/src/platform:logging_header" ]
+  deps = [ "${chip_root}/src/platform:logging-header" ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
@@ -95,7 +95,7 @@ static_library("mw320") {
 
 source_set("logging") {
   deps = [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_base",
   ]
   sources = [ "Logging.cpp" ]

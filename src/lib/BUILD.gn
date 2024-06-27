@@ -59,7 +59,7 @@ source_set("without-logging") {
 static_library("lib") {
   public_deps = [
     ":without-logging",
-    "${chip_root}/src/platform:default_logging",
+    "${chip_root}/src/platform:default-logging",
   ]
 
   output_name = "libCHIP"
@@ -73,7 +73,7 @@ static_library("lib") {
 static_library("with-stdio-logging") {
   public_deps = [
     ":without-logging",
-    "${chip_root}/src/platform:stdio_logging",
+    "${chip_root}/src/platform:stdio-logging",
   ]
 
   output_name = "libCHIPWithStdioLogging"

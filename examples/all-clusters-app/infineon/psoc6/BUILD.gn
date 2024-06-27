@@ -138,7 +138,7 @@ psoc6_executable("clusters_app") {
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform:default_logging",
+    "${chip_root}/src/platform:default-logging",
     "${chip_root}/src/setup_payload",
   ]
 

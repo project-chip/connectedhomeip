@@ -77,7 +77,7 @@ ti_simplelink_executable("lighting_app") {
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/platform/cc13x4_26x4:cc13x4_26x4-attestation-credentials",
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform:default_logging",
+    "${chip_root}/src/platform:default-logging",
     "${chip_root}/third_party/openthread:openthread",
   ]
   defines = []

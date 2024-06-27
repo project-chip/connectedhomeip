@@ -43,7 +43,7 @@ template("matter_wpan_app") {
 
     deps = [
       "${chip_root}/examples/shell/shell_common:shell_common",
-      "${chip_root}/src/platform:default_logging",
+      "${chip_root}/src/platform:default-logging",
       app_data_model,
     ]
 

@@ -143,7 +143,7 @@ silabs_executable("lighting_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/src/platform:default_logging",
+    "${chip_root}/src/platform:default-logging",
     app_data_model,
   ]
 

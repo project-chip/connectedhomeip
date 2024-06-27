@@ -74,7 +74,7 @@ static_library("openiotsdk") {
     "${chip_root}/src/platform:platform_base",
   ]
 
-  deps = [ "${chip_root}/src/platform:logging_header" ]
+  deps = [ "${chip_root}/src/platform:logging-header" ]
 
   if (chip_enable_ota_requestor) {
     sources += [
@@ -89,7 +89,7 @@ static_library("openiotsdk") {
 source_set("logging") {
   public_deps = [
     ":openiotsdk",
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_base",
   ]
   sources = [ "${chip_root}/src/platform/openiotsdk/Logging.cpp" ]

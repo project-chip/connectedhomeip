@@ -120,7 +120,7 @@ executable("chip-trace-decoder") {
 
   output_dir = root_out_dir
 
-  deps = [ "${chip_root}/src/platform:stdio_logging" ]
+  deps = [ "${chip_root}/src/platform:stdio-logging" ]
 
   public_deps = [
     "${chip_root}/src/lib",

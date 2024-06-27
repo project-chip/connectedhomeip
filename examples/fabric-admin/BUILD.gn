@@ -84,7 +84,7 @@ static_library("fabric-admin-utils") {
 
   sources += [ "commands/interactive/InteractiveCommands.cpp" ]
   deps += [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${editline_root}:editline",
   ]
 
@@ -157,7 +157,7 @@ executable("fabric-admin") {
 
   deps = [
     ":fabric-admin-utils",
-    "${chip_root}/src/platform:stdio_logging",
+    "${chip_root}/src/platform:stdio-logging",
   ]
 
   output_dir = root_out_dir

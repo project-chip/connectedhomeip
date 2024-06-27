@@ -120,7 +120,7 @@ stm32_executable("lighting_app") {
     ]
   }
 
-  deps += [ "${chip_root}/src/platform:default_logging" ]
+  deps += [ "${chip_root}/src/platform:default-logging" ]
 
   # Add the startup file to the target
   sources += [ "${examples_plat_dir}/startup_files/startup_${stm32_mcu}.s" ]

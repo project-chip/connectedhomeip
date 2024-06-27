@@ -47,7 +47,7 @@ static_library("cc13x4_26x4") {
     "SystemPlatformConfig.h",
   ]
 
-  deps = [ "${chip_root}/src/platform:logging_header" ]
+  deps = [ "${chip_root}/src/platform:logging-header" ]
 
   public = [
     "${chip_root}/src/credentials/CHIPCert.h",
@@ -107,7 +107,7 @@ static_library("cc13x4_26x4") {
 source_set("logging") {
   deps = [
     ":cc13x4_26x4",  # TODO: is this necessary?
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_base",
   ]
   sources = [ "../Logging.cpp" ]

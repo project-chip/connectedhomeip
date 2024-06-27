@@ -64,7 +64,7 @@ static_library("ESP32") {
 
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/setup_payload",
   ]
 
@@ -211,7 +211,7 @@ static_library("ESP32") {
 
 source_set("logging") {
   deps = [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_base",
   ]
   sources = [ "Logging.cpp" ]

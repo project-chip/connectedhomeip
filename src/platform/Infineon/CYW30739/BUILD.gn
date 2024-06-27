@@ -92,7 +92,7 @@ static_library("CYW30739") {
 
 source_set("logging") {
   deps = [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform",
   ]
   sources = [ "Logging.cpp" ]

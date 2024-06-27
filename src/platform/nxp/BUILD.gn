@@ -22,7 +22,7 @@ group("nxp") {
 
 source_set("logging") {
   public_deps = [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform",
   ]
 

@@ -27,7 +27,7 @@ shared_library("jni") {
   sources = [ "MessagingContext-JNI.cpp" ]
   deps = [
     "${chip_root}/src/messaging/tests:helpers",
-    "${chip_root}/src/platform:default_logging",
+    "${chip_root}/src/platform:default-logging",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]

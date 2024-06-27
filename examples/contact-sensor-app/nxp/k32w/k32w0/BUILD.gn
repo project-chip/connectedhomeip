@@ -113,7 +113,7 @@ k32w0_executable("contact_sensor_app") {
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform:default_logging",
+    "${chip_root}/src/platform:default-logging",
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",

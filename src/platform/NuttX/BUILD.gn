@@ -152,7 +152,7 @@ static_library("NuttX") {
 
 source_set("logging") {
   deps = [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_base",
   ]
 

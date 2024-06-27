@@ -92,7 +92,7 @@ static_library("chip-tool-utils") {
     sources += [ "commands/interactive/InteractiveCommands.cpp" ]
     deps += [
       "${chip_root}/examples/common/websocket-server",
-      "${chip_root}/src/platform:logging_header",
+      "${chip_root}/src/platform:logging-header",
       "${editline_root}:editline",
     ]
   }
@@ -132,7 +132,7 @@ executable("chip-tool") {
 
   deps = [
     ":chip-tool-utils",
-    "${chip_root}/src/platform:stdio_logging",
+    "${chip_root}/src/platform:stdio-logging",
   ]
 
   output_dir = root_out_dir

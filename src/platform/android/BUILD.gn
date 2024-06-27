@@ -42,7 +42,7 @@ static_library("logging") {
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:logging_constants",
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_config_header",
   ]
 

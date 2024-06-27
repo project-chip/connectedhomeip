@@ -85,7 +85,7 @@ static_library("nxp_platform") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  deps += [ "${chip_root}/src/platform:logging_header" ]
+  deps += [ "${chip_root}/src/platform:logging-header" ]
 
   if (chip_enable_ble) {
     sources += [

@@ -95,7 +95,7 @@ static_library("efr32") {
   }
 
   public_deps = [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_base",
   ]
   deps = [ "${silabs_platform_dir}/provision:provision-headers" ]
@@ -166,7 +166,7 @@ static_library("efr32") {
 source_set("logging") {
   sources = [ "${chip_root}/src/platform/silabs/Logging.cpp" ]
   deps = [
-    "${chip_root}/src/platform:logging_header",
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_base",
   ]
 }

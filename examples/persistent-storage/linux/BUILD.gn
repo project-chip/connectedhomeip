@@ -22,7 +22,7 @@ executable("persistent_storage") {
 
   deps = [
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform:default_logging",
+    "${chip_root}/src/platform:default-logging",
   ]
 
   cflags = [ "-Wconversion" ]
