@@ -339,7 +339,7 @@ public:
      *  This will send either a Read Request or a Subscribe Request depending on
      *  the InteractionType this read client was initialized with.
      *
-     *  If the requests contains more data version filters than can fit in the request packet
+     *  If the params contain more data version filters than can fit in the request packet
      *  the list will be truncated as needed, i.e. filter inclusion is on a best effort basis.
      *
      *  @retval #others fail to send read request

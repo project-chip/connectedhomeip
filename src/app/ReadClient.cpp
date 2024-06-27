@@ -462,7 +462,7 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
                                                      const Span<DataVersionFilter> & aDataVersionFilters,
                                                      bool & aEncodedDataVersionList)
 {
-    // Give the callback a chance first, otherwise use the list we have.
+    // Give the callback a chance first, otherwise use the list we have, if any.
     ReturnErrorOnFailure(
         mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList));
 
