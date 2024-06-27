@@ -156,18 +156,21 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
             if (aLocationName.empty())
             {
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, 0);
+                mLocationNameBuffer[0] = '\0';
             }
             else if (aLocationName.size() > sizeof(mLocationNameBuffer))
             {
                 // Save the truncated name that fits into available size.
                 memcpy(mLocationNameBuffer, aLocationName.data(), sizeof(mLocationNameBuffer));
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeof(mLocationNameBuffer));
+                mLocationNameBuffer[kLocationNameMaxSize] = '\0';
             }
             else
             {
                 // Save full name.
                 memcpy(mLocationNameBuffer, aLocationName.data(), aLocationName.size());
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, aLocationName.size());
+                mLocationNameBuffer[aLocationName.size()] = '\0';
             }
         }
     }
@@ -261,19 +264,18 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     }
 
     /**
-     * @brief Get the location name (for logging).
-     * @return The map name as a c style char string.
+     * @return The location name as a c style char string.
      *
      * @note This is only available through the LocationStructure object (no access from base structure).
      */
-    const char * name_c_str() const
+    const char * GetNameAsCString() const
     {
         // note: if name is null, this will return an empty terminated c string - ""
         return mLocationNameBuffer;
     }
 
 private:
-    // extra char to allow for terminating 0 ( or name_c_str())
+    // The extra char is to allow for the null terminator \0 (for GetNameAsCString()).
     char mLocationNameBuffer[kLocationNameMaxSize + 1];
 };
 
@@ -329,21 +331,24 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
         // Make sure there is always a terminating character, mainly so we can get c_str for logging.
         memset(mMapNameBuffer, 0, sizeof(mMapNameBuffer));
 
-        if (aMapName.size() == 0)
+        if (aMapName.empty())
         {
             name = CharSpan(mMapNameBuffer, 0);
+            mMapNameBuffer[0] = '\0';
         }
         else if (aMapName.size() > sizeof(mMapNameBuffer))
         {
             // Save the truncated name that fits into available size.
             memcpy(mMapNameBuffer, aMapName.data(), sizeof(mMapNameBuffer));
             name = CharSpan(mMapNameBuffer, sizeof(mMapNameBuffer));
+            mMapNameBuffer[kMapNameMaxSize] = '\0';
         }
         else
         {
             // Save full name.
             memcpy(mMapNameBuffer, aMapName.data(), aMapName.size());
             name = CharSpan(mMapNameBuffer, aMapName.size());
+            mMapNameBuffer[aMapName.size()] = '\0';
         }
     }
 
@@ -355,15 +360,14 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     bool IsNameEqual(const CharSpan & aMapName) const { return name.data_equal(aMapName); }
 
     /**
-     * @brief Get the map name (for logging).
      * @return The map name as a c style char string.
      *
      * @note This is only available through the MapStructure object (no access from base structure).
      */
-    const char * name_c_str() const { return mMapNameBuffer; }
+    const char * GetNameAsCString() const { return mMapNameBuffer; }
 
 private:
-    // extra char to allow for terminating 0 (for name_c_str())
+    // The extra char is to allow for the null terminator \0 (for GetNameAsCString()).
     char mMapNameBuffer[kMapNameMaxSize + 1];
 };
 

@@ -467,7 +467,7 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
         // If all three of the following are null, HomeLocationInfo's LocationName field SHALL NOT be an empty string:
         // HomeLocationInfo's FloorNumber field HomeLocationInfo's AreaType field, the LandmarkTag field
         VerifyOrExit(
-            ((aLocation.locationInfo.locationInfo.Value().locationName.size() != 0) ||
+            ((!aLocation.locationInfo.locationInfo.Value().locationName.empty()) ||
              !aLocation.locationInfo.locationInfo.Value().floorNumber.IsNull() ||
              !aLocation.locationInfo.locationInfo.Value().areaType.IsNull() || !aLocation.locationInfo.landmarkTag.IsNull()),
             ChipLogError(Zcl,
@@ -674,14 +674,14 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
                  ChipLogError(Zcl, "AddSupportedMap %u - maximum number of entries", aMapId));
 
     //  Map name SHALL include readable text that describes the mapname (cannot be empty string)
-    VerifyOrExit((aMapName.size() != 0), ChipLogError(Zcl, "AddSupportedMap %u - Name must not be empty string", aMapId));
+    VerifyOrExit((!aMapName.empty()), ChipLogError(Zcl, "AddSupportedMap %u - Name must not be empty string", aMapId));
 
     // Each entry in this list SHALL have a unique value for the Name field.
     while (mDelegate->GetSupportedMapByIndex(mapIndex++, entry))
     {
         // the name cannot be the same as an existing map
         VerifyOrExit(!entry.IsNameEqual(aMapName),
-                     ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.name_c_str()));
+                     ChipLogError(Zcl, "AddSupportedMap %u - A map already exists with same name '%s'", aMapId, entry.GetNameAsCString()));
 
         //  Each entry in this list SHALL have a unique value for the MapID field.
         VerifyOrExit((aMapId != entry.mapID), ChipLogError(Zcl, "AddSupportedMap - non-unique Id %u", aMapId));
@@ -725,11 +725,11 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
     {
         if (modifiedIndex == loopIndex)
         {
-            continue; // don't check local modified map against it's own list entry
+            continue; // don't check local modified map against its own list entry
         }
 
         VerifyOrExit(!entry.IsNameEqual(newMapName),
-                     ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.name_c_str()));
+                     ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.GetNameAsCString()));
 
         ++loopIndex;
     }
