@@ -57,6 +57,8 @@ enum class EnergyEvseTrigger : uint64_t
     kEVChargeDemand = 0x0099000000000004,
     // EV Charge Demand Test Event Clear | Simulate the EV becoming fully charged
     kEVChargeDemandClear = 0x0099000000000005,
+    // EV Charge TimeOfUse Mode | Simulate putting the EVSE into a Mode with the TimeOfUse tag included
+    kEVTimeOfUseMode = 0x0099000000000006,
     // EVSE has a GroundFault fault
     kEVSEGroundFault = 0x0099000000000010,
     // EVSE has a OverTemperature fault
