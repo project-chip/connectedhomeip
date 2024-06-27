@@ -455,17 +455,17 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             return PrintAllCommands();
         }
         char * eptr;
-        uint32_t passcode = (uint32_t) strtol(argv[1], &eptr, 10);
+        uint32_t userEnteredPasscode = (uint32_t) strtol(argv[1], &eptr, 10);
         if (gAwaitingCommissionerPasscodeInput)
         {
-            ChipLogProgress(AppServer, "CommandHandler() setcommissionerpasscode user entered passcode: %d", passcode);
+            ChipLogProgress(AppServer, "CommandHandler() setcommissionerpasscode user-entered passcode: %d", userEnteredPasscode);
             gAwaitingCommissionerPasscodeInput = false;
 
             // Per connectedhomeip/examples/platform/linux/LinuxCommissionableDataProvider.h: We don't support overriding the
-            // passcode post-init (it is deprecated!). Therefore we need to initiate a new provider with the user entered
+            // passcode post-init (it is deprecated!). Therefore we need to initiate a new provider with the user-entered
             // Commissioner-generated passcode, and then update the CastigApp's AppParameters to update the commissioning session's
             // passcode.
-            LinuxDeviceOptions::GetInstance().payload.setUpPINCode = passcode;
+            LinuxDeviceOptions::GetInstance().payload.setUpPINCode = userEnteredPasscode;
             LinuxCommissionableDataProvider gCommissionableDataProvider;
             CHIP_ERROR err = CHIP_NO_ERROR;
             err            = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());

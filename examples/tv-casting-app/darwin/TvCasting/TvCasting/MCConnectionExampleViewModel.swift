@@ -67,8 +67,8 @@ class MCConnectionExampleViewModel: ObservableObject {
                     self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling getTopMostViewController()")
                     if let topViewController = self.getTopMostViewController() {
                         self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling displayPasscodeInputDialog()")
-                        self.displayPasscodeInputDialog(on: topViewController, continueConnecting: { passcode in
-                            self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Continuing to connect with user entered MCCastingPlayer/Commissioner-Generated passcode: \(passcode)")
+                        self.displayPasscodeInputDialog(on: topViewController, continueConnecting: { userEnteredPasscode in
+                            self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Continuing to connect with user entered MCCastingPlayer/Commissioner-Generated passcode: \(userEnteredPasscode)")
 
                             // Update the CommissionableData in the client defined MCAppParametersDataSource with the user
                             // entered CastingPlayer/Commissioner-Generated setup passcode. This is mandatory for the
@@ -79,14 +79,14 @@ class MCConnectionExampleViewModel: ObservableObject {
                             self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback calling MCInitializationExample.getAppParametersDataSource()")
                             if let dataSource = initializationExample.getAppParametersDataSource() {
                                 let newCommissionableData = MCCommissionableData(
-                                    passcode: UInt32(passcode) ?? 0,
+                                    passcode: UInt32(userEnteredPasscode) ?? 0,
                                     discriminator: 0,
                                     spake2pIterationCount: 1000,
                                     spake2pVerifier: nil,
                                     spake2pSalt: nil
                                 )
                                 dataSource.update(newCommissionableData)
-                                self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Updated MCAppParametersDataSource instance with new MCCommissionableData.")
+                                self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Updated MCAppParametersDataSource instance with new MCCommissionableData.")
                             } else {
                                 self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, InitializationExample.getAppParametersDataSource() failed")
                                 self.connectionStatus = "Failed to update the MCAppParametersDataSource with the user entered passcode: \n\nRoute back and try again."
@@ -95,7 +95,7 @@ class MCConnectionExampleViewModel: ObservableObject {
                             self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, calling MCCastingPlayer.continueConnecting()")
                             let errContinue = selectedCastingPlayer?.continueConnecting()
                             if errContinue == nil {
-                                self.connectionStatus = "Continuing to connect with user entered passcode: \(passcode)"
+                                self.connectionStatus = "Continuing to connect with user entered passcode: \(userEnteredPasscode)"
                             } else {
                                 self.connectionStatus = "Continue Connecting to Casting Player failed with: \(String(describing: errContinue)) \n\nRoute back and try again."
                                 self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, MCCastingPlayer.continueConnecting() failed due to: \(errContinue)")

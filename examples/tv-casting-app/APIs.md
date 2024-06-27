@@ -158,6 +158,16 @@ client's lifecycle:
     the Matter specification's "Onboarding Payload" section for more details on
     commissioning data.
 
+    For the optional `CastingPlayer` / Commissioner-Generated Passcode User
+    Directed Commissioning (UDC) feature, Commissioning Data `DataProvider`
+    needs to be updated post Casting Client initialization. In this scenario,
+    the `CastingPlayer` generates a Passcode and displays it for the user. The
+    user enters the Passcode into the Casting Client UX. The Casting Client
+    generates a PAKE verifier based upon this Passcode and enters commissioning
+    mode using this PAKE verifier. The APIs needed for this update are described
+    below. See the Matter specification’s UDC section for more information on
+    the Commissioner-Generated Passcode feature.
+
     On Linux, define a function `InitCommissionableDataProvider` to initialize a
     `LinuxCommissionableDataProvider` that can provide the required values to
     the `CastingApp`.
@@ -185,33 +195,76 @@ client's lifecycle:
     }
     ```
 
+    On Linux, to utilize the optional `CastingPlayer` / Commissioner-Generated
+    Passcode UDC feature, the Casting Client may initialize a new
+    `LinuxCommissionableDataProvider` with the user-entered `CastingPlayer`
+    generated Passcode. The new `LinuxCommissionableDataProvider` may be passed
+    to the CastingApp using `UpdateCommissionableDataProvider`.
+
+    ```c
+        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = userEnteredPasscode;
+        LinuxCommissionableDataProvider gCommissionableDataProvider;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        err = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
+        err = matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(&gCommissionableDataProvider);
+    ```
+
     On Android, define a `commissioningDataProvider` that can provide the
-    required values to the `CastingApp`.
+    required values to the `CastingApp`. To utilize the optional `CastingPlayer`
+    / Commissioner-Generated Passcode UDC feature, the Casting Client may also
+    define a function to update the CommissionableDataProvider
+    post-initialization. `updateCommissionableDataSetupPasscode` is an example
+    function to update the CommissionableData with the `CastingPlayer` generated
+    passcode.
 
     ```java
-    private static final DataProvider<CommissionableData> commissionableDataProvider =
-      new DataProvider<CommissionableData>() {
+    // Dummy values for commissioning demonstration only. These are hard coded in the example tv-app:
+    // connectedhomeip/examples/tv-app/tv-common/src/AppTv.cpp
+    private static final long DUMMY_SETUP_PASSCODE = 20202021;
+    private static final int DUMMY_DISCRIMINATOR = 3874;
+
+    public static class CommissionableDataProvider implements DataProvider<CommissionableData> {
+    CommissionableData commissionableData =
+        new CommissionableData(DUMMY_SETUP_PASSCODE, DUMMY_DISCRIMINATOR);
+
         @Override
         public CommissionableData get() {
-          // dummy values for demonstration only
-          return new CommissionableData(20202021, 3874);
+          return commissionableData;
+        }
+
+        // For the optional CastingPlayer / Commissioner-Generated Passcode UDC feature.
+        public void updateCommissionableDataSetupPasscode(long setupPasscode, int discriminator) {
+            commissionableData.setSetupPasscode(setupPasscode);
+            commissionableData.setDiscriminator(discriminator);
         }
       };
     ```
 
     On iOS, add a `func commissioningDataProvider` to the
     `MCAppParametersDataSource` class defined above, that can provide the
-    required values to the `MCCastingApp`.
+    required values to the `MCCastingApp`. To utilize the optional
+    `CastingPlayer` / Commissioner-Generated Passcode UDC feature, the Casting
+    Client may also add a function to update the CommissionableDataProvider
+    post-initialization. `update` is an example function to update the
+    CommissionableData with the `CastingPlayer` generated passcode.
 
     ```swift
+    // Dummy values for demonstration only.
+    private var commissionableData: MCCommissionableData = MCCommissionableData(
+        passcode: 20202021,
+        discriminator: 3874,
+        spake2pIterationCount: 1000,
+        spake2pVerifier: nil,
+        spake2pSalt: nil
+    )
+
     func castingAppDidReceiveRequestForCommissionableData(_ sender: Any) -> MCCommissionableData {
-        // dummy values for demonstration only
-        return MCCommissionableData(
-            passcode: 20202021,
-            discriminator: 3874,
-            spake2pIterationCount: 1000,
-            spake2pVerifier: nil,
-            spake2pSalt: nil)
+        return commissionableData
+    }
+
+    // For the optional CastingPlayer / Commissioner-Generated Passcode UDC feature.
+    func update(_ newCommissionableData: MCCommissionableData) {
+        self.commissionableData = newCommissionableData
     }
     ```
 
@@ -703,9 +756,13 @@ Each `CastingPlayer` object created during
 [Discovery](#discover-casting-players) contains information such as
 `deviceName`, `vendorId`, `productId`, etc. which can help the user pick the
 right `CastingPlayer`. A Casting Client can attempt to connect to the
-`selectedCastingPlayer` using Matter User Directed Commissioning (UDC). The
-Matter TV Casting library locally caches information required to reconnect to a
-`CastingPlayer`, once the Casting client has been commissioned by it. After
+`selectedCastingPlayer` using Matter User Directed Commissioning (UDC). To
+utilize the optional `CastingPlayer` / Commissioner-Generated Passcode UDC
+feature to connect to a `CastingPlayer`, the `CastingPlayer` object must
+indicate its support for it via the`supportsCommissionerGeneratedPasscode` flag.
+
+The Matter TV Casting library locally caches information required to reconnect
+to a `CastingPlayer`, once the Casting client has been commissioned by it. After
 that, the Casting client is able to skip the full UDC process by establishing
 CASE with the `CastingPlayer` directly. Once connected, the `CastingPlayer`
 object will contain the list of available Endpoints on that `CastingPlayer`.
@@ -734,12 +791,18 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
 }
 
 ...
+matter::casting::core::IdentificationDeclarationOptions idOptions;
+chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+targetAppInfo.vendorId = kDesiredEndpointVendorId;
+CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
+
+matter::casting::core::ConnectionCallbacks connectionCallbacks;
+connectionCallbacks.mOnConnectionComplete = ConnectionHandler;
+
 // targetCastingPlayer is a discovered CastingPlayer
-matter::casting::core::EndpointFilter desiredEndpointFilter;
-desiredEndpointFilter.vendorId = kDesiredEndpointVendorId;
-targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler,
+targetCastingPlayer->VerifyOrEstablishConnection(connectionCallbacks,
                                                     matter::casting::core::kCommissioningWindowTimeoutSec,
-                                                    desiredEndpointFilter);
+                                                    idOptions);
 ...
 ```
 
@@ -747,44 +810,51 @@ On Android, the Casting Client may call `verifyOrEstablishConnection` on the
 `CastingPlayer` object it wants to connect to.
 
 ```java
-private static final long MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
+private static final short MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
+private static final Integer DESIRED_TARGET_APP_VENDOR_ID = 65521;
 
-EndpointFilter desiredEndpointFilter = new EndpointFilter();
-desiredEndpointFilter.vendorId = DESIRED_ENDPOINT_VENDOR_ID;
+IdentificationDeclarationOptions idOptions = new IdentificationDeclarationOptions();
+TargetAppInfo targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID);
+idOptions.addTargetAppInfo(targetAppInfo);
 
-MatterError err = targetCastingPlayer.verifyOrEstablishConnection(
-                      MIN_CONNECTION_TIMEOUT_SEC,
-                      desiredEndpointFilter,
-                      new MatterCallback<Void>() {
-                        @Override
-                        public void handle(Void v) {
-                          Log.i(
-                              TAG,
-                              "Connected to CastingPlayer with deviceId: "
-                                  + targetCastingPlayer.getDeviceId());
-                          getActivity()
-                              .runOnUiThread(
-                                  () -> {
-                                    connectionFragmentStatusTextView.setText(
-                                        "Connected to Casting Player with device name: "
-                                            + targetCastingPlayer.getDeviceName()
-                                            + "\n\n");
-                                    connectionFragmentNextButton.setEnabled(true);
-                                  });
-                        }
-                      },
-                      new MatterCallback<MatterError>() {
-                        @Override
-                        public void handle(MatterError err) {
-                          Log.e(TAG, "CastingPLayer connection failed: " + err);
-                          getActivity()
-                              .runOnUiThread(
-                                  () -> {
-                                    connectionFragmentStatusTextView.setText(
-                                        "Casting Player connection failed due to: " + err + "\n\n");
-                                  });
-                        }
-                      });
+ConnectionCallbacks connectionCallbacks =
+    new ConnectionCallbacks(
+        new MatterCallback<Void>() {
+        @Override
+        public void handle(Void v) {
+            Log.i(
+                TAG,
+                "Successfully connected to CastingPlayer with deviceId: "
+                    + targetCastingPlayer.getDeviceId());
+            getActivity()
+                .runOnUiThread(
+                    () -> {
+                    connectionFragmentStatusTextView.setText(
+                        "Successfully connected to Casting Player with device name: "
+                            + targetCastingPlayer.getDeviceName()
+                            + "\n\n");
+                    connectionFragmentNextButton.setEnabled(true);
+                    });
+        }
+        },
+        new MatterCallback<MatterError>() {
+        @Override
+        public void handle(MatterError err) {
+            Log.e(TAG, "CastingPlayer connection failed: " + err);
+            getActivity()
+                .runOnUiThread(
+                    () -> {
+                    connectionFragmentStatusTextView.setText(
+                        "Casting Player connection failed due to: " + err + "\n\n");
+                    });
+        }
+        },
+        onCommissionerDeclaration:null
+    );
+
+MatterError err =
+    targetCastingPlayer.verifyOrEstablishConnection(
+        connectionCallbacks, MIN_CONNECTION_TIMEOUT_SEC, idOptions);
 
 if (err.hasError())
 {
@@ -810,21 +880,280 @@ let kDesiredEndpointVendorId: UInt16 = 65521;
 @Published var connectionStatus: String?;
 
 func connect(selectedCastingPlayer: MCCastingPlayer?) {
-    let desiredEndpointFilter: MCEndpointFilter = MCEndpointFilter()
-    desiredEndpointFilter.vendorId = kDesiredEndpointVendorId
-    selectedCastingPlayer?.verifyOrEstablishConnection(completionBlock: { err in
-        self.Log.error("MCConnectionExampleViewModel connect() completed with \(err)")
-        if(err == nil)
-        {
-            self.connectionSuccess = true
-            self.connectionStatus = "Connected!"
+
+    let connectionCompleteCallback: (Swift.Error?) -> Void = { err in
+        self.Log.error("MCConnectionExampleViewModel connect() completed with: \(err)")
+        DispatchQueue.main.async {
+            if err == nil {
+                self.connectionSuccess = true
+                self.connectionStatus = "Successfully connected to Casting Player!"
+            } else {
+                self.connectionSuccess = false
+                self.connectionStatus = "Connection to Casting Player failed with: \(String(describing: err))"
+            }
         }
-        else
+    }
+
+    let identificationDeclarationOptions: MCIdentificationDeclarationOptions
+    let targetAppInfo: MCTargetAppInfo
+    let connectionCallbacks: MCConnectionCallbacks
+    identificationDeclarationOptions = MCIdentificationDeclarationOptions()
+    targetAppInfo = MCTargetAppInfo(vendorId: kDesiredEndpointVendorId)
+    connectionCallbacks = MCConnectionCallbacks(
+        callbacks: connectionCompleteCallback,
+        commissionerDeclarationCallback: nil
+    )
+    identificationDeclarationOptions.addTargetAppInfo(targetAppInfo)
+
+    let err = selectedCastingPlayer?.verifyOrEstablishConnection(with: connectionCallbacks, identificationDeclarationOptions: identificationDeclarationOptions)
+    if err != nil {
+        self.Log.error("MCConnectionExampleViewModel connect(), MCCastingPlayer.verifyOrEstablishConnection() failed due to: \(err)")
+    }
+}
+```
+
+For a Casting Client to connect to a `CastingPlayer` using the optional
+`CastingPlayer` / Commissioner-Generated Passcode UDC feature, the Casting
+Client may specify optional parameters in the `VerifyOrEstablishConnection`
+function call, handle and then respond to the CastingPlayer's
+CommissionerDeclaration message as follows:
+
+1. In `VerifyOrEstablishConnection` the Casting Client should set the UDC
+   IdentificationDeclaration `CommissionerPasscode` field to true and provide a
+   `ConnectionCallbacks` callback to handle the CastingPlayer's
+   CommissionerDeclaration message.
+1. Upon receiving the CastingPlayer’s CommissionerDeclaration message with
+   PasscodeDialogDisplayed set to true, the Casting Client should prompt the
+   user to input the Passcode displayed on the `CastingPlayer` UX. If the user
+   declines to enter the Passcode, the Casting Client should call
+   `StopConnecting` to alert the `CastingPlayer` that the commissioning attempt
+   was canceled.
+1. The Casting Client should then update the commissioning session's PAKE
+   verifier with the user-entered Passcode using the API's described in the
+   Initialize the Casting Client section above.
+1. Finally, the Casting Client should call `ContinueConnecting` to send a second
+   IdentificationDeclaration message to the `CastingPlayer` with
+   `CommissionerPasscodeReady` set to true.
+
+On Linux, the Casting Client can connect to a `CastingPlayer`, using the
+optional `CastingPlayer` / Commissioner-Generated Passcode UDC feature, by
+successfully calling `VerifyOrEstablishConnection`, updating the PAKE verifier
+and then calling `ContinueConnecting` on the `CastingPlayer`.
+
+```c
+// VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
+const uint16_t kDesiredEndpointVendorId = 65521;
+
+void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
+{
+    if(err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "ConnectionHandler: Successfully connected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+        ...
+    }
+}
+
+// For the optional CastingPlayer / Commissioner-Generated Passcode UDC feature.
+void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source,
+                                     chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
+{
+    ChipLogProgress(AppServer,
+                    "simple-app-helper.cpp::CommissionerDeclarationCallback() called with CommissionerDeclaration message:");
+    if (cd.GetCommissionerPasscode())
+    {
+        // A Passcode is now displayed for the user by the CastingPlayer. Prompt the user to enter the Passcode.
+        ...
+
+        // Update the commissioning session's PAKE verifier with the user-entered Passcode
+        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = userEnteredPasscode;
+        LinuxCommissionableDataProvider gCommissionableDataProvider;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        err = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
+        err = matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(&gCommissionableDataProvider);
+
+        // Call continueConnecting to complete commissioning.
+        err = targetCastingPlayer->ContinueConnecting();
+        if (err != CHIP_NO_ERROR)
         {
-            self.connectionSuccess = false
-            self.connectionStatus = "Connection failed with \(String(describing: err))"
+            ChipLogError(AppServer, "CommandHandler() setcommissionerpasscode ContinueConnecting() err %" CHIP_ERROR_FORMAT,
+                            err.Format());
         }
-    }, desiredEndpointFilter: desiredEndpointFilter)
+    }
+}
+
+...
+matter::casting::core::IdentificationDeclarationOptions idOptions;
+chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+targetAppInfo.vendorId = kDesiredEndpointVendorId;
+CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
+
+matter::casting::core::ConnectionCallbacks connectionCallbacks;
+connectionCallbacks.mOnConnectionComplete = ConnectionHandler;
+
+// For the optional CastingPlayer / Commissioner-Generated Passcode UDC feature.
+idOptions.mCommissionerPasscode = true;
+connectionCallbacks.mCommissionerDeclarationCallback = CommissionerDeclarationCallback;
+
+// targetCastingPlayer is a discovered CastingPlayer
+targetCastingPlayer->VerifyOrEstablishConnection(connectionCallbacks,
+                                                    matter::casting::core::kCommissioningWindowTimeoutSec,
+                                                    idOptions);
+...
+```
+
+On Andorid, the Casting Client can connect to a `CastingPlayer`, using the
+optional `CastingPlayer` / Commissioner-Generated Passcode UDC feature, by
+successfully calling `verifyOrEstablishConnection`, updating the PAKE verifier
+and then calling `continueConnecting` on the `CastingPlayer`.
+
+```java
+private static final short MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
+private static final Integer DESIRED_TARGET_APP_VENDOR_ID = 65521;
+
+// Constructor to set only the commissionerPasscode.
+IdentificationDeclarationOptions idOptions = new IdentificationDeclarationOptions(commissionerPasscode:true);
+TargetAppInfo targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID);
+idOptions.addTargetAppInfo(targetAppInfo);
+
+ConnectionCallbacks connectionCallbacks =
+    new ConnectionCallbacks(
+        new MatterCallback<Void>() {
+            @Override
+            public void handle(Void v) {
+                Log.i(
+                    TAG,
+                    "Successfully connected to CastingPlayer with deviceId: "
+                        + targetCastingPlayer.getDeviceId());
+                getActivity()
+                    .runOnUiThread(
+                        () -> {
+                        connectionFragmentStatusTextView.setText(
+                            "Successfully connected to Casting Player with device name: "
+                                + targetCastingPlayer.getDeviceName()
+                                + "\n\n");
+                        connectionFragmentNextButton.setEnabled(true);
+                        });
+            }
+        },
+        new MatterCallback<MatterError>() {
+            @Override
+            public void handle(MatterError err) {
+                Log.e(TAG, "CastingPlayer connection failed: " + err);
+                getActivity()
+                    .runOnUiThread(
+                        () -> {
+                        connectionFragmentStatusTextView.setText(
+                            "Casting Player connection failed due to: " + err + "\n\n");
+                        });
+            }
+        },
+        new MatterCallback<CommissionerDeclaration>() {
+            @Override
+            public void handle(CommissionerDeclaration cd) {
+            getActivity()
+                .runOnUiThread(
+                    () -> {
+                        connectionFragmentStatusTextView.setText(
+                            "CommissionerDeclaration message received from Casting Player: \n\n");
+                        if (cd.getCommissionerPasscode()) {
+
+                        displayPasscodeInputDialog(getActivity());
+                        ...
+
+                        // Update the commissioning session's PAKE verifier with the user-entered Passcode
+                        InitializationExample.commissionableDataProvider.updateCommissionableDataSetupPasscode(
+                                        passcodeLongValue, DEFAULT_DISCRIMINATOR_FOR_CGP_FLOW);
+
+                        // Call continueConnecting to complete commissioning.
+                        MatterError err = targetCastingPlayer.continueConnecting();
+                        ...
+                        }
+                    });
+            }
+        }
+    );
+
+MatterError err =
+    targetCastingPlayer.verifyOrEstablishConnection(
+        connectionCallbacks, MIN_CONNECTION_TIMEOUT_SEC, idOptions);
+...
+```
+
+On iOS, the Casting Client can connect to a `CastingPlayer`, using the optional
+`CastingPlayer` / Commissioner-Generated Passcode UDC feature, by successfully
+calling `verifyOrEstablishConnection`, updating the PAKE verifier and then
+calling `continueConnecting` on the `CastingPlayer`.
+
+```swift
+// VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
+let kDesiredEndpointVendorId: UInt16 = 65521;
+
+@Published var connectionSuccess: Bool?;
+
+@Published var connectionStatus: String?;
+
+func connect(selectedCastingPlayer: MCCastingPlayer?) {
+
+    let connectionCompleteCallback: (Swift.Error?) -> Void = { err in
+        self.Log.error("MCConnectionExampleViewModel connect() completed with: \(err)")
+        DispatchQueue.main.async {
+            if err == nil {
+                self.connectionSuccess = true
+                self.connectionStatus = "Successfully connected to Casting Player!"
+            } else {
+                self.connectionSuccess = false
+                self.connectionStatus = "Connection to Casting Player failed with: \(String(describing: err))"
+            }
+        }
+    }
+
+    let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { commissionerDeclarationMessage in
+        DispatchQueue.main.async {
+            self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, recived a message form the MCCastingPlayer:\n\(commissionerDeclarationMessage)")
+            if commissionerDeclarationMessage.commissionerPasscode {
+                if let topViewController = self.getTopMostViewController() {
+                    self.displayPasscodeInputDialog(on: topViewController, continueConnecting: { userEnteredPasscode in
+                        self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Continuing to connect with user entered MCCastingPlayer/Commissioner-Generated passcode: \(passcode)")
+
+                        // Update the commissioning session's PAKE verifier with the user-entered Passcode
+                        if let dataSource = initializationExample.getAppParametersDataSource() {
+                            let newCommissionableData = MCCommissionableData(
+                                passcode: UInt32(userEnteredPasscode) ?? 0,
+                                discriminator: 0,
+                                ...
+                            )
+                            dataSource.update(newCommissionableData)
+                        }
+
+                        // Call continueConnecting to complete commissioning.
+                        let errContinue = selectedCastingPlayer?.continueConnecting()
+                        if errContinue == nil {
+                            self.connectionStatus = "Continuing to connect with user entered passcode: \(userEnteredPasscode)"
+                        }
+                        ...
+                    }, cancelConnecting: {
+                        self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Connection attempt cancelled by the user, calling MCCastingPlayer.stopConnecting()")
+                        let err = selectedCastingPlayer?.stopConnecting()
+                        ...
+                    })
+                }
+            }
+        }
+    }
+
+    let identificationDeclarationOptions: MCIdentificationDeclarationOptions
+    let targetAppInfo: MCTargetAppInfo
+    let connectionCallbacks: MCConnectionCallbacks
+    identificationDeclarationOptions = MCIdentificationDeclarationOptions(commissionerPasscodeOnly: true)
+    targetAppInfo = MCTargetAppInfo(vendorId: kDesiredEndpointVendorId)
+    connectionCallbacks = MCConnectionCallbacks(
+        callbacks: connectionCompleteCallback,
+        commissionerDeclarationCallback: commissionerDeclarationCallback
+    )
+    identificationDeclarationOptions.addTargetAppInfo(targetAppInfo)
+
+    let err = selectedCastingPlayer?.verifyOrEstablishConnection(with: connectionCallbacks, identificationDeclarationOptions: identificationDeclarationOptions)
+    ...
 }
 ```
 
@@ -864,26 +1193,22 @@ On Android, it can select an `Endpoint` as shown below.
 ```java
 private static final Integer SAMPLE_ENDPOINT_VID = 65521;
 
-private Endpoint selectFirstEndpointByVID()
-{
-    Endpoint endpoint = null;
-    if(selectedCastingPlayer != null)
-    {
-        List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
-        if (endpoints == null)
-        {
-            Log.e(TAG, "No Endpoints found on CastingPlayer");
-        }
-        else
-        {
-            endpoint = endpoints
-                    .stream()
-                    .filter(e -> SAMPLE_ENDPOINT_VID.equals(e.getVendorId()))
-                    .findFirst()
-                    .get();
-        }
+public static Endpoint selectFirstEndpointByVID(CastingPlayer selectedCastingPlayer) {
+Endpoint endpoint = null;
+if (selectedCastingPlayer != null) {
+    List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
+    if (endpoints == null) {
+    Log.e(TAG, "selectFirstEndpointByVID() No Endpoints found on CastingPlayer");
+    } else {
+    endpoint =
+        endpoints
+            .stream()
+            .filter(e -> SAMPLE_ENDPOINT_VID.equals(e.getVendorId()))
+            .findFirst()
+            .orElse(null);
     }
-    return endpoint;
+}
+return endpoint;
 }
 ```
 
@@ -893,10 +1218,19 @@ On iOS, it can select an `MCEndpoint` similarly and as shown below.
 // VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
 let sampleEndpointVid: Int = 65521
 ...
-// select the MCEndpoint on the MCCastingPlayer to invoke the command on
-if let endpoint: MCEndpoint = castingPlayer.endpoints().filter({ $0.vendorId().intValue == sampleEndpointVid}).first
-{
-...
+
+// Select the MCEndpoint on the MCCastingPlayer to invoke the command on
+static func selectEndpoint(from castingPlayer: MCCastingPlayer, sampleEndpointVid: Int) -> MCEndpoint? {
+    Log.info("MCEndpointSelector.selectEndpoint()")
+
+    if let endpoint = castingPlayer.endpoints().filter({ $0.vendorId().intValue == sampleEndpointVid }).first {
+        Log.info("MCEndpointSelector.selectEndpoint() Found endpoint matching the sampleEndpointVid: \(sampleEndpointVid)")
+        return endpoint
+    }
+    ...
+
+    Log.error("No endpoint matching the example VID or identifier 1 found")
+    return nil
 }
 ```
 
