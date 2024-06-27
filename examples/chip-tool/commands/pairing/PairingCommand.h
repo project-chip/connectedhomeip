@@ -44,6 +44,7 @@ enum class PairingNetworkType
     None,
     WiFi,
     Thread,
+    WiFiOrThread,
 };
 
 class PairingCommand : public CHIPCommand,
@@ -83,6 +84,11 @@ public:
             AddArgument("password", &mPassword);
             break;
         case PairingNetworkType::Thread:
+            AddArgument("operationalDataset", &mOperationalDataset);
+            break;
+        case PairingNetworkType::WiFiOrThread:
+            AddArgument("ssid", &mSSID);
+            AddArgument("password", &mPassword);
             AddArgument("operationalDataset", &mOperationalDataset);
             break;
         }
