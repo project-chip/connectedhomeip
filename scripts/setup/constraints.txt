@@ -315,7 +315,7 @@ pip==24.1
     # via
     #   ghapi
     #   pip-tools
-setuptools==70.1.0
+setuptools==70.1.1
     # via
     #   pip-tools
     #   west
