@@ -48,7 +48,7 @@ if (enable_fuzz_test_targets) {
     sources = [ "FuzzPacketParsing.cpp" ]
     public_deps = [
       "${chip_root}/src/lib/dnssd/minimal_mdns",
-      "${chip_root}/src/platform/logging:default",
+      "${chip_root}/src/platform:default_logging",
     ]
   }
 }

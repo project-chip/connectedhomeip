@@ -64,8 +64,8 @@ mw320_executable("shell_mw320") {
   ]
 
   deps = [
+    "${chip_root}/src/platform:default_logging",
     "${chip_root}/src/platform:syscalls_stub",
-    "${chip_root}/src/platform/logging:default",
   ]
 
   include_dirs = [

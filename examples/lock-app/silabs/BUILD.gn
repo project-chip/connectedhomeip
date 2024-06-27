@@ -128,7 +128,7 @@ silabs_executable("lock_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/src/platform/logging:default",
+    "${chip_root}/src/platform:default_logging",
     app_data_model,
   ]
 

@@ -166,7 +166,7 @@ silabs_executable("light_switch_app") {
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
-      "${chip_root}/src/platform/logging:default",
+      "${chip_root}/src/platform:default_logging",
     ]
 
     if (wifi_soc) {

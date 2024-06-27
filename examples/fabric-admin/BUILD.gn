@@ -157,7 +157,7 @@ executable("fabric-admin") {
 
   deps = [
     ":fabric-admin-utils",
-    "${chip_root}/src/platform/logging:stdio",
+    "${chip_root}/src/platform:stdio_logging",
   ]
 
   output_dir = root_out_dir

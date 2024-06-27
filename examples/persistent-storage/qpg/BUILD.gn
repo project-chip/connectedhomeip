@@ -44,7 +44,7 @@ qpg_executable("persistent_storage_app") {
     ":sdk",
     "${chip_root}/src/app",
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform/logging:default",
+    "${chip_root}/src/platform:default_logging",
   ]
 
   include_dirs += [
