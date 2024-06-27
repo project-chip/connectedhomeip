@@ -830,6 +830,7 @@ private:
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     bool mRunCommissioningAfterConnection  = false;
     Internal::InvokeCancelFn mInvokeCancelFn;
+    Internal::WriteCancelFn mWriteCancelFn;
 
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 
@@ -973,6 +974,8 @@ private:
     OnICDManagementStayActiveResponse(void * context,
                                       const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data);
 
+    static void OnInterfaceEnableWriteSuccessResponse(void * context);
+
     /**
      * @brief
      *   This function processes the CSR sent by the device.
@@ -1025,6 +1028,10 @@ private:
                                         Optional<System::Clock::Timeout> timeout = NullOptional, bool fireAndForget = false);
     void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
                                       app::AttributePathParams * readPaths, size_t readPathsSize);
+    template <typename AttrType>
+    CHIP_ERROR SendCommissioningWriteRequest(DeviceProxy * device, EndpointId endpoint, ClusterId cluster, AttributeId attribute,
+                                             const AttrType & requestData, WriteResponseSuccessCallback successCb,
+                                             WriteResponseFailureCallback failureCb);
     void CancelCommissioningInteractions();
     void CancelCASECallbacks();
 
