@@ -89,7 +89,7 @@ source_set("default") {
 stdio_archive = "$root_out_dir/liblogging-stdio.a"
 
 source_set("stdio") {
-  sources = [ "impl/stdio/Logging.cpp" ]
+  sources = [ "../StdioLoggingImpl.cpp" ]
 
   deps = [
     "${chip_root}/src/lib/core:chip_config_header",
