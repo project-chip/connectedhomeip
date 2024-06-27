@@ -55,14 +55,14 @@ class Identify(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    identifyTime: 'uint' = None
-    identifyType: 'Identify.Enums.IdentifyTypeEnum' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    identifyTime: 'uint' = 0
+    identifyType: 'Identify.Enums.IdentifyTypeEnum' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class EffectIdentifierEnum(MatterIntEnum):
@@ -105,7 +105,7 @@ class Identify(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000003
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -121,7 +121,7 @@ class Identify(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000003
             command_id: typing.ClassVar[int] = 0x00000040
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -281,13 +281,13 @@ class Groups(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    nameSupport: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    nameSupport: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -320,7 +320,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000004
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -354,7 +354,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000004
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -390,7 +390,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000004
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -424,7 +424,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000004
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -442,7 +442,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000004
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -455,7 +455,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000004
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -603,17 +603,17 @@ class OnOff(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    onOff: 'bool' = None
+    onOff: 'bool' = False
     globalSceneControl: 'typing.Optional[bool]' = None
     onTime: 'typing.Optional[uint]' = None
     offWaitTime: 'typing.Optional[uint]' = None
     startUpOnOff: 'typing.Union[None, Nullable, OnOff.Enums.StartUpOnOffEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class DelayedAllOffEffectVariantEnum(MatterIntEnum):
@@ -668,7 +668,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000006
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -681,7 +681,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000006
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -694,7 +694,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000006
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -707,7 +707,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000006
             command_id: typing.ClassVar[int] = 0x00000040
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -725,7 +725,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000006
             command_id: typing.ClassVar[int] = 0x00000041
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -738,7 +738,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000006
             command_id: typing.ClassVar[int] = 0x00000042
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -949,14 +949,14 @@ class OnOffSwitchConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    switchType: 'uint' = None
-    switchActions: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    switchType: 'uint' = 0
+    switchActions: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -1118,26 +1118,26 @@ class LevelControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    currentLevel: 'typing.Union[Nullable, uint]' = None
+    currentLevel: 'typing.Union[Nullable, uint]' = NullValue
     remainingTime: 'typing.Optional[uint]' = None
     minLevel: 'typing.Optional[uint]' = None
     maxLevel: 'typing.Optional[uint]' = None
     currentFrequency: 'typing.Optional[uint]' = None
     minFrequency: 'typing.Optional[uint]' = None
     maxFrequency: 'typing.Optional[uint]' = None
-    options: 'uint' = None
+    options: 'uint' = 0
     onOffTransitionTime: 'typing.Optional[uint]' = None
-    onLevel: 'typing.Union[Nullable, uint]' = None
+    onLevel: 'typing.Union[Nullable, uint]' = NullValue
     onTransitionTime: 'typing.Union[None, Nullable, uint]' = None
     offTransitionTime: 'typing.Union[None, Nullable, uint]' = None
     defaultMoveRate: 'typing.Union[None, Nullable, uint]' = None
     startUpCurrentLevel: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class MoveModeEnum(MatterIntEnum):
@@ -1174,7 +1174,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000008
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1196,7 +1196,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000008
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1218,7 +1218,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000008
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1242,7 +1242,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000008
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1260,7 +1260,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000008
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1282,7 +1282,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000008
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1304,7 +1304,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000008
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1328,7 +1328,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000008
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1346,7 +1346,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000008
             command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1707,18 +1707,18 @@ class BinaryInputBasic(Cluster):
     activeText: 'typing.Optional[str]' = None
     description: 'typing.Optional[str]' = None
     inactiveText: 'typing.Optional[str]' = None
-    outOfService: 'bool' = None
+    outOfService: 'bool' = False
     polarity: 'typing.Optional[uint]' = None
-    presentValue: 'bool' = None
+    presentValue: 'bool' = False
     reliability: 'typing.Optional[uint]' = None
-    statusFlags: 'uint' = None
+    statusFlags: 'uint' = 0
     applicationType: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -1978,12 +1978,12 @@ class PulseWidthModulation(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -2104,17 +2104,17 @@ class Descriptor(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    deviceTypeList: 'typing.List[Descriptor.Structs.DeviceTypeStruct]' = None
-    serverList: 'typing.List[uint]' = None
-    clientList: 'typing.List[uint]' = None
-    partsList: 'typing.List[uint]' = None
+    deviceTypeList: 'typing.List[Descriptor.Structs.DeviceTypeStruct]' = field(default_factory=lambda: [])
+    serverList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    clientList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    partsList: 'typing.List[uint]' = field(default_factory=lambda: [])
     tagList: 'typing.Optional[typing.List[Descriptor.Structs.SemanticTagStruct]]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -2346,13 +2346,13 @@ class Binding(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    binding: 'typing.List[Binding.Structs.TargetStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    binding: 'typing.List[Binding.Structs.TargetStruct]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Structs:
         @dataclass
@@ -2509,17 +2509,17 @@ class AccessControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    acl: 'typing.List[AccessControl.Structs.AccessControlEntryStruct]' = None
+    acl: 'typing.List[AccessControl.Structs.AccessControlEntryStruct]' = field(default_factory=lambda: [])
     extension: 'typing.Optional[typing.List[AccessControl.Structs.AccessControlExtensionStruct]]' = None
-    subjectsPerAccessControlEntry: 'uint' = None
-    targetsPerAccessControlEntry: 'uint' = None
-    accessControlEntriesPerFabric: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    subjectsPerAccessControlEntry: 'uint' = 0
+    targetsPerAccessControlEntry: 'uint' = 0
+    accessControlEntriesPerFabric: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class AccessControlEntryAuthModeEnum(MatterIntEnum):
@@ -2854,15 +2854,15 @@ class Actions(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    actionList: 'typing.List[Actions.Structs.ActionStruct]' = None
-    endpointLists: 'typing.List[Actions.Structs.EndpointListStruct]' = None
+    actionList: 'typing.List[Actions.Structs.ActionStruct]' = field(default_factory=lambda: [])
+    endpointLists: 'typing.List[Actions.Structs.EndpointListStruct]' = field(default_factory=lambda: [])
     setupURL: 'typing.Optional[str]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ActionErrorEnum(MatterIntEnum):
@@ -2969,7 +2969,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -2987,7 +2987,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3007,7 +3007,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3025,7 +3025,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3045,7 +3045,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3063,7 +3063,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3081,7 +3081,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3101,7 +3101,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3119,7 +3119,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3137,7 +3137,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3157,7 +3157,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3175,7 +3175,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000025
             command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3424,17 +3424,17 @@ class BasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    dataModelRevision: 'uint' = None
-    vendorName: 'str' = None
-    vendorID: 'uint' = None
-    productName: 'str' = None
-    productID: 'uint' = None
-    nodeLabel: 'str' = None
-    location: 'str' = None
-    hardwareVersion: 'uint' = None
-    hardwareVersionString: 'str' = None
-    softwareVersion: 'uint' = None
-    softwareVersionString: 'str' = None
+    dataModelRevision: 'uint' = 0
+    vendorName: 'str' = ""
+    vendorID: 'uint' = 0
+    productName: 'str' = ""
+    productID: 'uint' = 0
+    nodeLabel: 'str' = ""
+    location: 'str' = ""
+    hardwareVersion: 'uint' = 0
+    hardwareVersionString: 'str' = ""
+    softwareVersion: 'uint' = 0
+    softwareVersionString: 'str' = ""
     manufacturingDate: 'typing.Optional[str]' = None
     partNumber: 'typing.Optional[str]' = None
     productURL: 'typing.Optional[str]' = None
@@ -3443,16 +3443,16 @@ class BasicInformation(Cluster):
     localConfigDisabled: 'typing.Optional[bool]' = None
     reachable: 'typing.Optional[bool]' = None
     uniqueID: 'typing.Optional[str]' = None
-    capabilityMinima: 'BasicInformation.Structs.CapabilityMinimaStruct' = None
+    capabilityMinima: 'BasicInformation.Structs.CapabilityMinimaStruct' = field(default_factory=lambda: BasicInformation.Structs.CapabilityMinimaStruct())
     productAppearance: 'typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]' = None
-    specificationVersion: 'uint' = None
-    maxPathsPerInvoke: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    specificationVersion: 'uint' = 0
+    maxPathsPerInvoke: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ColorEnum(MatterIntEnum):
@@ -3529,7 +3529,7 @@ class BasicInformation(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000028
             command_id: typing.ClassVar[int] = 0x10020000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4093,12 +4093,12 @@ class OtaSoftwareUpdateProvider(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ApplyUpdateActionEnum(MatterIntEnum):
@@ -4169,7 +4169,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000029
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4217,7 +4217,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000029
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4235,7 +4235,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000029
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4366,16 +4366,16 @@ class OtaSoftwareUpdateRequestor(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    defaultOTAProviders: 'typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation]' = None
-    updatePossible: 'bool' = None
-    updateState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = None
-    updateStateProgress: 'typing.Union[Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    defaultOTAProviders: 'typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation]' = field(default_factory=lambda: [])
+    updatePossible: 'bool' = False
+    updateState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = 0
+    updateStateProgress: 'typing.Union[Nullable, uint]' = NullValue
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class AnnouncementReasonEnum(MatterIntEnum):
@@ -4438,7 +4438,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000002A
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4709,14 +4709,14 @@ class LocalizationConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    activeLocale: 'str' = None
-    supportedLocales: 'typing.List[str]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    activeLocale: 'str' = ""
+    supportedLocales: 'typing.List[str]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -4867,15 +4867,15 @@ class TimeFormatLocalization(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    hourFormat: 'TimeFormatLocalization.Enums.HourFormatEnum' = None
+    hourFormat: 'TimeFormatLocalization.Enums.HourFormatEnum' = 0
     activeCalendarType: 'typing.Optional[TimeFormatLocalization.Enums.CalendarTypeEnum]' = None
     supportedCalendarTypes: 'typing.Optional[typing.List[TimeFormatLocalization.Enums.CalendarTypeEnum]]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class CalendarTypeEnum(MatterIntEnum):
@@ -5076,12 +5076,12 @@ class UnitLocalization(Cluster):
             ])
 
     temperatureUnit: 'typing.Optional[UnitLocalization.Enums.TempUnitEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class TempUnitEnum(MatterIntEnum):
@@ -5229,13 +5229,13 @@ class PowerSourceConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    sources: 'typing.List[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    sources: 'typing.List[uint]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -5399,9 +5399,9 @@ class PowerSource(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    status: 'PowerSource.Enums.PowerSourceStatusEnum' = None
-    order: 'uint' = None
-    description: 'str' = None
+    status: 'PowerSource.Enums.PowerSourceStatusEnum' = 0
+    order: 'uint' = 0
+    description: 'str' = ""
     wiredAssessedInputVoltage: 'typing.Union[None, Nullable, uint]' = None
     wiredAssessedInputFrequency: 'typing.Union[None, Nullable, uint]' = None
     wiredCurrentType: 'typing.Optional[PowerSource.Enums.WiredCurrentTypeEnum]' = None
@@ -5430,13 +5430,13 @@ class PowerSource(Cluster):
     batFunctionalWhileCharging: 'typing.Optional[bool]' = None
     batChargingCurrent: 'typing.Union[None, Nullable, uint]' = None
     activeBatChargeFaults: 'typing.Optional[typing.List[PowerSource.Enums.BatChargeFaultEnum]]' = None
-    endpointList: 'typing.List[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    endpointList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class BatApprovedChemistryEnum(MatterIntEnum):
@@ -6399,17 +6399,17 @@ class GeneralCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    breadcrumb: 'uint' = None
-    basicCommissioningInfo: 'GeneralCommissioning.Structs.BasicCommissioningInfo' = None
-    regulatoryConfig: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = None
-    locationCapability: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = None
-    supportsConcurrentConnection: 'bool' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    breadcrumb: 'uint' = 0
+    basicCommissioningInfo: 'GeneralCommissioning.Structs.BasicCommissioningInfo' = field(default_factory=lambda: GeneralCommissioning.Structs.BasicCommissioningInfo())
+    regulatoryConfig: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = 0
+    locationCapability: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = 0
+    supportsConcurrentConnection: 'bool' = False
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class CommissioningErrorEnum(MatterIntEnum):
@@ -6472,7 +6472,7 @@ class GeneralCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000030
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6510,7 +6510,7 @@ class GeneralCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000030
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6541,7 +6541,7 @@ class GeneralCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000030
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6759,23 +6759,23 @@ class NetworkCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    maxNetworks: 'uint' = None
-    networks: 'typing.List[NetworkCommissioning.Structs.NetworkInfoStruct]' = None
+    maxNetworks: 'uint' = 0
+    networks: 'typing.List[NetworkCommissioning.Structs.NetworkInfoStruct]' = field(default_factory=lambda: [])
     scanMaxTimeSeconds: 'typing.Optional[uint]' = None
     connectMaxTimeSeconds: 'typing.Optional[uint]' = None
-    interfaceEnabled: 'bool' = None
-    lastNetworkingStatus: 'typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatusEnum]' = None
-    lastNetworkID: 'typing.Union[Nullable, bytes]' = None
-    lastConnectErrorValue: 'typing.Union[Nullable, int]' = None
+    interfaceEnabled: 'bool' = False
+    lastNetworkingStatus: 'typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatusEnum]' = NullValue
+    lastNetworkID: 'typing.Union[Nullable, bytes]' = NullValue
+    lastConnectErrorValue: 'typing.Union[Nullable, int]' = NullValue
     supportedWiFiBands: 'typing.Optional[typing.List[NetworkCommissioning.Enums.WiFiBandEnum]]' = None
     supportedThreadFeatures: 'typing.Optional[uint]' = None
     threadVersion: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class NetworkCommissioningStatusEnum(MatterIntEnum):
@@ -6921,7 +6921,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000031
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7005,7 +7005,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000031
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7047,7 +7047,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000031
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7105,7 +7105,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000031
             command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7408,12 +7408,12 @@ class DiagnosticLogs(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class IntentEnum(MatterIntEnum):
@@ -7473,7 +7473,7 @@ class DiagnosticLogs(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000032
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7613,21 +7613,21 @@ class GeneralDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    networkInterfaces: 'typing.List[GeneralDiagnostics.Structs.NetworkInterface]' = None
-    rebootCount: 'uint' = None
+    networkInterfaces: 'typing.List[GeneralDiagnostics.Structs.NetworkInterface]' = field(default_factory=lambda: [])
+    rebootCount: 'uint' = 0
     upTime: 'typing.Optional[uint]' = None
     totalOperationalHours: 'typing.Optional[uint]' = None
     bootReason: 'typing.Optional[GeneralDiagnostics.Enums.BootReasonEnum]' = None
     activeHardwareFaults: 'typing.Optional[typing.List[GeneralDiagnostics.Enums.HardwareFaultEnum]]' = None
     activeRadioFaults: 'typing.Optional[typing.List[GeneralDiagnostics.Enums.RadioFaultEnum]]' = None
     activeNetworkFaults: 'typing.Optional[typing.List[GeneralDiagnostics.Enums.NetworkFaultEnum]]' = None
-    testEventTriggersEnabled: 'bool' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    testEventTriggersEnabled: 'bool' = False
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class BootReasonEnum(MatterIntEnum):
@@ -7735,7 +7735,7 @@ class GeneralDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000033
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7766,7 +7766,7 @@ class GeneralDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000033
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7804,7 +7804,7 @@ class GeneralDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000033
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -8164,12 +8164,12 @@ class SoftwareDiagnostics(Cluster):
     currentHeapFree: 'typing.Optional[uint]' = None
     currentHeapUsed: 'typing.Optional[uint]' = None
     currentHeapHighWatermark: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -8201,7 +8201,7 @@ class SoftwareDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000034
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -8474,20 +8474,20 @@ class ThreadNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    channel: 'typing.Union[Nullable, uint]' = None
-    routingRole: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRoleEnum]' = None
-    networkName: 'typing.Union[Nullable, str]' = None
-    panId: 'typing.Union[Nullable, uint]' = None
-    extendedPanId: 'typing.Union[Nullable, uint]' = None
-    meshLocalPrefix: 'typing.Union[Nullable, bytes]' = None
+    channel: 'typing.Union[Nullable, uint]' = NullValue
+    routingRole: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRoleEnum]' = NullValue
+    networkName: 'typing.Union[Nullable, str]' = NullValue
+    panId: 'typing.Union[Nullable, uint]' = NullValue
+    extendedPanId: 'typing.Union[Nullable, uint]' = NullValue
+    meshLocalPrefix: 'typing.Union[Nullable, bytes]' = NullValue
     overrunCount: 'typing.Optional[uint]' = None
-    neighborTable: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTableStruct]' = None
-    routeTable: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTableStruct]' = None
-    partitionId: 'typing.Union[Nullable, uint]' = None
-    weighting: 'typing.Union[Nullable, uint]' = None
-    dataVersion: 'typing.Union[Nullable, uint]' = None
-    stableDataVersion: 'typing.Union[Nullable, uint]' = None
-    leaderRouterId: 'typing.Union[Nullable, uint]' = None
+    neighborTable: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTableStruct]' = field(default_factory=lambda: [])
+    routeTable: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTableStruct]' = field(default_factory=lambda: [])
+    partitionId: 'typing.Union[Nullable, uint]' = NullValue
+    weighting: 'typing.Union[Nullable, uint]' = NullValue
+    dataVersion: 'typing.Union[Nullable, uint]' = NullValue
+    stableDataVersion: 'typing.Union[Nullable, uint]' = NullValue
+    leaderRouterId: 'typing.Union[Nullable, uint]' = NullValue
     detachedRoleCount: 'typing.Optional[uint]' = None
     childRoleCount: 'typing.Optional[uint]' = None
     routerRoleCount: 'typing.Optional[uint]' = None
@@ -8533,16 +8533,16 @@ class ThreadNetworkDiagnostics(Cluster):
     activeTimestamp: 'typing.Union[None, Nullable, uint]' = None
     pendingTimestamp: 'typing.Union[None, Nullable, uint]' = None
     delay: 'typing.Union[None, Nullable, uint]' = None
-    securityPolicy: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.SecurityPolicy]' = None
-    channelPage0Mask: 'typing.Union[Nullable, bytes]' = None
-    operationalDatasetComponents: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]' = None
-    activeNetworkFaultsList: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    securityPolicy: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.SecurityPolicy]' = NullValue
+    channelPage0Mask: 'typing.Union[Nullable, bytes]' = NullValue
+    operationalDatasetComponents: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]' = NullValue
+    activeNetworkFaultsList: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ConnectionStatusEnum(MatterIntEnum):
@@ -8705,7 +8705,7 @@ class ThreadNetworkDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000035
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -9889,11 +9889,11 @@ class WiFiNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    bssid: 'typing.Union[Nullable, bytes]' = None
-    securityType: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityTypeEnum]' = None
-    wiFiVersion: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionEnum]' = None
-    channelNumber: 'typing.Union[Nullable, uint]' = None
-    rssi: 'typing.Union[Nullable, int]' = None
+    bssid: 'typing.Union[Nullable, bytes]' = NullValue
+    securityType: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityTypeEnum]' = NullValue
+    wiFiVersion: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionEnum]' = NullValue
+    channelNumber: 'typing.Union[Nullable, uint]' = NullValue
+    rssi: 'typing.Union[Nullable, int]' = NullValue
     beaconLostCount: 'typing.Union[None, Nullable, uint]' = None
     beaconRxCount: 'typing.Union[None, Nullable, uint]' = None
     packetMulticastRxCount: 'typing.Union[None, Nullable, uint]' = None
@@ -9902,12 +9902,12 @@ class WiFiNetworkDiagnostics(Cluster):
     packetUnicastTxCount: 'typing.Union[None, Nullable, uint]' = None
     currentMaxRate: 'typing.Union[None, Nullable, uint]' = None
     overrunCount: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class AssociationFailureCauseEnum(MatterIntEnum):
@@ -9968,7 +9968,7 @@ class WiFiNetworkDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000036
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10376,12 +10376,12 @@ class EthernetNetworkDiagnostics(Cluster):
     overrunCount: 'typing.Optional[uint]' = None
     carrierDetect: 'typing.Union[None, Nullable, bool]' = None
     timeSinceReset: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class PHYRateEnum(MatterIntEnum):
@@ -10412,7 +10412,7 @@ class EthernetNetworkDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000037
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10691,8 +10691,8 @@ class TimeSynchronization(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    UTCTime: 'typing.Union[Nullable, uint]' = None
-    granularity: 'TimeSynchronization.Enums.GranularityEnum' = None
+    UTCTime: 'typing.Union[Nullable, uint]' = NullValue
+    granularity: 'TimeSynchronization.Enums.GranularityEnum' = 0
     timeSource: 'typing.Optional[TimeSynchronization.Enums.TimeSourceEnum]' = None
     trustedTimeSource: 'typing.Union[None, Nullable, TimeSynchronization.Structs.TrustedTimeSourceStruct]' = None
     defaultNTP: 'typing.Union[None, Nullable, str]' = None
@@ -10704,12 +10704,12 @@ class TimeSynchronization(Cluster):
     timeZoneListMaxSize: 'typing.Optional[uint]' = None
     DSTOffsetListMaxSize: 'typing.Optional[uint]' = None
     supportsDNSResolve: 'typing.Optional[bool]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class GranularityEnum(MatterIntEnum):
@@ -10838,7 +10838,7 @@ class TimeSynchronization(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000038
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10858,7 +10858,7 @@ class TimeSynchronization(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000038
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10890,7 +10890,7 @@ class TimeSynchronization(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000038
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10906,7 +10906,7 @@ class TimeSynchronization(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000038
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10922,7 +10922,7 @@ class TimeSynchronization(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000038
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11373,15 +11373,15 @@ class BridgedDeviceBasicInformation(Cluster):
     productURL: 'typing.Optional[str]' = None
     productLabel: 'typing.Optional[str]' = None
     serialNumber: 'typing.Optional[str]' = None
-    reachable: 'bool' = None
+    reachable: 'bool' = False
     uniqueID: 'typing.Optional[str]' = None
     productAppearance: 'typing.Optional[BridgedDeviceBasicInformation.Structs.ProductAppearanceStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ColorEnum(MatterIntEnum):
@@ -11883,15 +11883,15 @@ class Switch(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    numberOfPositions: 'uint' = None
-    currentPosition: 'uint' = None
+    numberOfPositions: 'uint' = 0
+    currentPosition: 'uint' = 0
     multiPressMax: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -12205,15 +12205,15 @@ class AdministratorCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    windowStatus: 'AdministratorCommissioning.Enums.CommissioningWindowStatusEnum' = None
-    adminFabricIndex: 'typing.Union[Nullable, uint]' = None
-    adminVendorId: 'typing.Union[Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    windowStatus: 'AdministratorCommissioning.Enums.CommissioningWindowStatusEnum' = 0
+    adminFabricIndex: 'typing.Union[Nullable, uint]' = NullValue
+    adminVendorId: 'typing.Union[Nullable, uint]' = NullValue
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class CommissioningWindowStatusEnum(MatterIntEnum):
@@ -12246,7 +12246,7 @@ class AdministratorCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003C
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12274,7 +12274,7 @@ class AdministratorCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003C
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12294,7 +12294,7 @@ class AdministratorCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003C
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12474,18 +12474,18 @@ class OperationalCredentials(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    NOCs: 'typing.List[OperationalCredentials.Structs.NOCStruct]' = None
-    fabrics: 'typing.List[OperationalCredentials.Structs.FabricDescriptorStruct]' = None
-    supportedFabrics: 'uint' = None
-    commissionedFabrics: 'uint' = None
-    trustedRootCertificates: 'typing.List[bytes]' = None
-    currentFabricIndex: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    NOCs: 'typing.List[OperationalCredentials.Structs.NOCStruct]' = field(default_factory=lambda: [])
+    fabrics: 'typing.List[OperationalCredentials.Structs.FabricDescriptorStruct]' = field(default_factory=lambda: [])
+    supportedFabrics: 'uint' = 0
+    commissionedFabrics: 'uint' = 0
+    trustedRootCertificates: 'typing.List[bytes]' = field(default_factory=lambda: [])
+    currentFabricIndex: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class CertificateChainTypeEnum(MatterIntEnum):
@@ -12573,7 +12573,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12607,7 +12607,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12641,7 +12641,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12701,7 +12701,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12753,7 +12753,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12978,16 +12978,16 @@ class GroupKeyManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    groupKeyMap: 'typing.List[GroupKeyManagement.Structs.GroupKeyMapStruct]' = None
-    groupTable: 'typing.List[GroupKeyManagement.Structs.GroupInfoMapStruct]' = None
-    maxGroupsPerFabric: 'uint' = None
-    maxGroupKeysPerFabric: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    groupKeyMap: 'typing.List[GroupKeyManagement.Structs.GroupKeyMapStruct]' = field(default_factory=lambda: [])
+    groupTable: 'typing.List[GroupKeyManagement.Structs.GroupInfoMapStruct]' = field(default_factory=lambda: [])
+    maxGroupsPerFabric: 'uint' = 0
+    maxGroupKeysPerFabric: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class GroupKeySecurityPolicyEnum(MatterIntEnum):
@@ -13067,7 +13067,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003F
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13099,7 +13099,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003F
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13115,7 +13115,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003F
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13144,7 +13144,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000003F
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13334,13 +13334,13 @@ class FixedLabel(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    labelList: 'typing.List[FixedLabel.Structs.LabelStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    labelList: 'typing.List[FixedLabel.Structs.LabelStruct]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Structs:
         @dataclass
@@ -13487,13 +13487,13 @@ class UserLabel(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    labelList: 'typing.List[UserLabel.Structs.LabelStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    labelList: 'typing.List[UserLabel.Structs.LabelStruct]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Structs:
         @dataclass
@@ -13639,12 +13639,12 @@ class ProxyConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -13760,12 +13760,12 @@ class ProxyDiscovery(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -13881,12 +13881,12 @@ class ProxyValid(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -14003,13 +14003,13 @@ class BooleanState(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    stateValue: 'bool' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    stateValue: 'bool' = False
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -14170,21 +14170,21 @@ class IcdManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    idleModeDuration: 'uint' = None
-    activeModeDuration: 'uint' = None
-    activeModeThreshold: 'uint' = None
+    idleModeDuration: 'uint' = 0
+    activeModeDuration: 'uint' = 0
+    activeModeThreshold: 'uint' = 0
     registeredClients: 'typing.Optional[typing.List[IcdManagement.Structs.MonitoringRegistrationStruct]]' = None
     ICDCounter: 'typing.Optional[uint]' = None
     clientsSupportedPerFabric: 'typing.Optional[uint]' = None
     userActiveModeTriggerHint: 'typing.Optional[uint]' = None
     userActiveModeTriggerInstruction: 'typing.Optional[str]' = None
     operatingMode: 'typing.Optional[IcdManagement.Enums.OperatingModeEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class OperatingModeEnum(MatterIntEnum):
@@ -14265,7 +14265,7 @@ class IcdManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000046
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14281,7 +14281,7 @@ class IcdManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000046
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14315,7 +14315,7 @@ class IcdManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000046
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14587,15 +14587,15 @@ class Timer(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    setTime: 'uint' = None
-    timeRemaining: 'uint' = None
-    timerState: 'Timer.Enums.TimerStatusEnum' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    setTime: 'uint' = 0
+    timeRemaining: 'uint' = 0
+    timerState: 'Timer.Enums.TimerStatusEnum' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class TimerStatusEnum(MatterIntEnum):
@@ -14619,7 +14619,7 @@ class Timer(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000047
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14635,7 +14635,7 @@ class Timer(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000047
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14648,7 +14648,7 @@ class Timer(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000047
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14664,7 +14664,7 @@ class Timer(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000047
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14843,18 +14843,18 @@ class OvenCavityOperationalState(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    phaseList: 'typing.Union[Nullable, typing.List[str]]' = None
-    currentPhase: 'typing.Union[Nullable, uint]' = None
+    phaseList: 'typing.Union[Nullable, typing.List[str]]' = NullValue
+    currentPhase: 'typing.Union[Nullable, uint]' = NullValue
     countdownTime: 'typing.Union[None, Nullable, uint]' = None
-    operationalStateList: 'typing.List[OvenCavityOperationalState.Structs.OperationalStateStruct]' = None
-    operationalState: 'OvenCavityOperationalState.Enums.OperationalStateEnum' = None
-    operationalError: 'OvenCavityOperationalState.Structs.ErrorStateStruct' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    operationalStateList: 'typing.List[OvenCavityOperationalState.Structs.OperationalStateStruct]' = field(default_factory=lambda: [])
+    operationalState: 'OvenCavityOperationalState.Enums.OperationalStateEnum' = 0
+    operationalError: 'OvenCavityOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: OvenCavityOperationalState.Structs.ErrorStateStruct())
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ErrorStateEnum(MatterIntEnum):
@@ -14966,7 +14966,7 @@ class OvenCavityOperationalState(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000048
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -15234,16 +15234,16 @@ class OvenMode(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: 'typing.List[OvenMode.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
+    supportedModes: 'typing.List[OvenMode.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ModeTag(MatterIntEnum):
@@ -15317,7 +15317,7 @@ class OvenMode(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000049
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -15510,14 +15510,14 @@ class LaundryDryerControls(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedDrynessLevels: 'typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]' = None
-    selectedDrynessLevel: 'typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    supportedDrynessLevels: 'typing.List[LaundryDryerControls.Enums.DrynessLevelEnum]' = field(default_factory=lambda: [])
+    selectedDrynessLevel: 'typing.Union[Nullable, LaundryDryerControls.Enums.DrynessLevelEnum]' = NullValue
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class DrynessLevelEnum(MatterIntEnum):
@@ -15683,18 +15683,18 @@ class ModeSelect(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    description: 'str' = None
-    standardNamespace: 'typing.Union[Nullable, uint]' = None
-    supportedModes: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
+    description: 'str' = ""
+    standardNamespace: 'typing.Union[Nullable, uint]' = NullValue
+    supportedModes: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -15735,7 +15735,7 @@ class ModeSelect(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000050
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -15960,16 +15960,16 @@ class LaundryWasherMode(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: 'typing.List[LaundryWasherMode.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
+    supportedModes: 'typing.List[LaundryWasherMode.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ModeTag(MatterIntEnum):
@@ -16038,7 +16038,7 @@ class LaundryWasherMode(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000051
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -16233,16 +16233,16 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: 'typing.List[RefrigeratorAndTemperatureControlledCabinetMode.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
+    supportedModes: 'typing.List[RefrigeratorAndTemperatureControlledCabinetMode.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ModeTag(MatterIntEnum):
@@ -16309,7 +16309,7 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000052
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -16508,12 +16508,12 @@ class LaundryWasherControls(Cluster):
     spinSpeedCurrent: 'typing.Union[None, Nullable, uint]' = None
     numberOfRinses: 'typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]' = None
     supportedRinses: 'typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class NumberOfRinsesEnum(MatterIntEnum):
@@ -16712,14 +16712,14 @@ class RvcRunMode(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: 'typing.List[RvcRunMode.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    supportedModes: 'typing.List[RvcRunMode.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ModeTag(MatterIntEnum):
@@ -16802,7 +16802,7 @@ class RvcRunMode(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000054
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -16963,14 +16963,14 @@ class RvcCleanMode(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: 'typing.List[RvcCleanMode.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    supportedModes: 'typing.List[RvcCleanMode.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ModeTag(MatterIntEnum):
@@ -17046,7 +17046,7 @@ class RvcCleanMode(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000055
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -17217,12 +17217,12 @@ class TemperatureControl(Cluster):
     step: 'typing.Optional[int]' = None
     selectedTemperatureLevel: 'typing.Optional[uint]' = None
     supportedTemperatureLevels: 'typing.Optional[typing.List[str]]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -17236,7 +17236,7 @@ class TemperatureControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000056
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -17462,15 +17462,15 @@ class RefrigeratorAlarm(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    mask: 'uint' = None
-    state: 'uint' = None
-    supported: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    mask: 'uint' = 0
+    state: 'uint' = 0
+    supported: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class AlarmBitmap(IntFlag):
@@ -17668,16 +17668,16 @@ class DishwasherMode(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: 'typing.List[DishwasherMode.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
+    supportedModes: 'typing.List[DishwasherMode.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ModeTag(MatterIntEnum):
@@ -17745,7 +17745,7 @@ class DishwasherMode(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000059
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -17937,13 +17937,13 @@ class AirQuality(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    airQuality: 'AirQuality.Enums.AirQualityEnum' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    airQuality: 'AirQuality.Enums.AirQualityEnum' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class AirQualityEnum(MatterIntEnum):
@@ -18110,25 +18110,25 @@ class SmokeCoAlarm(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    expressedState: 'SmokeCoAlarm.Enums.ExpressedStateEnum' = None
+    expressedState: 'SmokeCoAlarm.Enums.ExpressedStateEnum' = 0
     smokeState: 'typing.Optional[SmokeCoAlarm.Enums.AlarmStateEnum]' = None
     COState: 'typing.Optional[SmokeCoAlarm.Enums.AlarmStateEnum]' = None
-    batteryAlert: 'SmokeCoAlarm.Enums.AlarmStateEnum' = None
+    batteryAlert: 'SmokeCoAlarm.Enums.AlarmStateEnum' = 0
     deviceMuted: 'typing.Optional[SmokeCoAlarm.Enums.MuteStateEnum]' = None
-    testInProgress: 'bool' = None
-    hardwareFaultAlert: 'bool' = None
-    endOfServiceAlert: 'SmokeCoAlarm.Enums.EndOfServiceEnum' = None
+    testInProgress: 'bool' = False
+    hardwareFaultAlert: 'bool' = False
+    endOfServiceAlert: 'SmokeCoAlarm.Enums.EndOfServiceEnum' = 0
     interconnectSmokeAlarm: 'typing.Optional[SmokeCoAlarm.Enums.AlarmStateEnum]' = None
     interconnectCOAlarm: 'typing.Optional[SmokeCoAlarm.Enums.AlarmStateEnum]' = None
     contaminationState: 'typing.Optional[SmokeCoAlarm.Enums.ContaminationStateEnum]' = None
     smokeSensitivityLevel: 'typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum]' = None
     expiryDate: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class AlarmStateEnum(MatterIntEnum):
@@ -18207,7 +18207,7 @@ class SmokeCoAlarm(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000005C
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18733,16 +18733,16 @@ class DishwasherAlarm(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    mask: 'uint' = None
+    mask: 'uint' = 0
     latch: 'typing.Optional[uint]' = None
-    state: 'uint' = None
-    supported: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    state: 'uint' = 0
+    supported: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class AlarmBitmap(IntFlag):
@@ -18762,7 +18762,7 @@ class DishwasherAlarm(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000005D
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18778,7 +18778,7 @@ class DishwasherAlarm(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000005D
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18995,14 +18995,14 @@ class MicrowaveOvenMode(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: 'typing.List[MicrowaveOvenMode.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    supportedModes: 'typing.List[MicrowaveOvenMode.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ModeTag(MatterIntEnum):
@@ -19202,8 +19202,8 @@ class MicrowaveOvenControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    cookTime: 'uint' = None
-    maxCookTime: 'uint' = None
+    cookTime: 'uint' = 0
+    maxCookTime: 'uint' = 0
     powerSetting: 'typing.Optional[uint]' = None
     minPower: 'typing.Optional[uint]' = None
     maxPower: 'typing.Optional[uint]' = None
@@ -19211,12 +19211,12 @@ class MicrowaveOvenControl(Cluster):
     supportedWatts: 'typing.Optional[typing.List[uint]]' = None
     selectedWattIndex: 'typing.Optional[uint]' = None
     wattRating: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -19230,7 +19230,7 @@ class MicrowaveOvenControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000005F
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -19254,7 +19254,7 @@ class MicrowaveOvenControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000005F
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -19529,18 +19529,18 @@ class OperationalState(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    phaseList: 'typing.Union[Nullable, typing.List[str]]' = None
-    currentPhase: 'typing.Union[Nullable, uint]' = None
+    phaseList: 'typing.Union[Nullable, typing.List[str]]' = NullValue
+    currentPhase: 'typing.Union[Nullable, uint]' = NullValue
     countdownTime: 'typing.Union[None, Nullable, uint]' = None
-    operationalStateList: 'typing.List[OperationalState.Structs.OperationalStateStruct]' = None
-    operationalState: 'OperationalState.Enums.OperationalStateEnum' = None
-    operationalError: 'OperationalState.Structs.ErrorStateStruct' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    operationalStateList: 'typing.List[OperationalState.Structs.OperationalStateStruct]' = field(default_factory=lambda: [])
+    operationalState: 'OperationalState.Enums.OperationalStateEnum' = 0
+    operationalError: 'OperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: OperationalState.Structs.ErrorStateStruct())
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ErrorStateEnum(MatterIntEnum):
@@ -19652,7 +19652,7 @@ class OperationalState(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000060
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -19922,18 +19922,18 @@ class RvcOperationalState(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    phaseList: 'typing.Union[Nullable, typing.List[str]]' = None
-    currentPhase: 'typing.Union[Nullable, uint]' = None
+    phaseList: 'typing.Union[Nullable, typing.List[str]]' = NullValue
+    currentPhase: 'typing.Union[Nullable, uint]' = NullValue
     countdownTime: 'typing.Union[None, Nullable, uint]' = None
-    operationalStateList: 'typing.List[RvcOperationalState.Structs.OperationalStateStruct]' = None
-    operationalState: 'uint' = None
-    operationalError: 'RvcOperationalState.Structs.ErrorStateStruct' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    operationalStateList: 'typing.List[RvcOperationalState.Structs.OperationalStateStruct]' = field(default_factory=lambda: [])
+    operationalState: 'uint' = 0
+    operationalError: 'RvcOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: RvcOperationalState.Structs.ErrorStateStruct())
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ErrorStateEnum(MatterIntEnum):
@@ -20022,7 +20022,7 @@ class RvcOperationalState(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000061
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20303,14 +20303,14 @@ class ScenesManagement(Cluster):
             ])
 
     lastConfiguredBy: 'typing.Union[None, Nullable, uint]' = None
-    sceneTableSize: 'uint' = None
-    fabricSceneInfo: 'typing.List[ScenesManagement.Structs.SceneInfoStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    sceneTableSize: 'uint' = 0
+    fabricSceneInfo: 'typing.List[ScenesManagement.Structs.SceneInfoStruct]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class CopyModeBitmap(IntFlag):
@@ -20397,7 +20397,7 @@ class ScenesManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000062
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20435,7 +20435,7 @@ class ScenesManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000062
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20479,7 +20479,7 @@ class ScenesManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000062
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20515,7 +20515,7 @@ class ScenesManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000062
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20551,7 +20551,7 @@ class ScenesManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000062
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20571,7 +20571,7 @@ class ScenesManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000062
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20607,7 +20607,7 @@ class ScenesManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000062
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20653,7 +20653,7 @@ class ScenesManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000062
             command_id: typing.ClassVar[int] = 0x00000040
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -20838,16 +20838,16 @@ class HepaFilterMonitoring(Cluster):
 
     condition: 'typing.Optional[uint]' = None
     degradationDirection: 'typing.Optional[HepaFilterMonitoring.Enums.DegradationDirectionEnum]' = None
-    changeIndication: 'HepaFilterMonitoring.Enums.ChangeIndicationEnum' = None
+    changeIndication: 'HepaFilterMonitoring.Enums.ChangeIndicationEnum' = 0
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
     replacementProductList: 'typing.Optional[typing.List[HepaFilterMonitoring.Structs.ReplacementProductStruct]]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ChangeIndicationEnum(MatterIntEnum):
@@ -20907,7 +20907,7 @@ class HepaFilterMonitoring(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000071
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21133,16 +21133,16 @@ class ActivatedCarbonFilterMonitoring(Cluster):
 
     condition: 'typing.Optional[uint]' = None
     degradationDirection: 'typing.Optional[ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum]' = None
-    changeIndication: 'ActivatedCarbonFilterMonitoring.Enums.ChangeIndicationEnum' = None
+    changeIndication: 'ActivatedCarbonFilterMonitoring.Enums.ChangeIndicationEnum' = 0
     inPlaceIndicator: 'typing.Optional[bool]' = None
     lastChangedTime: 'typing.Union[None, Nullable, uint]' = None
     replacementProductList: 'typing.Optional[typing.List[ActivatedCarbonFilterMonitoring.Structs.ReplacementProductStruct]]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ChangeIndicationEnum(MatterIntEnum):
@@ -21202,7 +21202,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000072
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21436,12 +21436,12 @@ class BooleanStateConfiguration(Cluster):
     alarmsEnabled: 'typing.Optional[uint]' = None
     alarmsSupported: 'typing.Optional[uint]' = None
     sensorFault: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class AlarmModeBitmap(IntFlag):
@@ -21463,7 +21463,7 @@ class BooleanStateConfiguration(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000080
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21479,7 +21479,7 @@ class BooleanStateConfiguration(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000080
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21784,23 +21784,23 @@ class ValveConfigurationAndControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    openDuration: 'typing.Union[Nullable, uint]' = None
-    defaultOpenDuration: 'typing.Union[Nullable, uint]' = None
+    openDuration: 'typing.Union[Nullable, uint]' = NullValue
+    defaultOpenDuration: 'typing.Union[Nullable, uint]' = NullValue
     autoCloseTime: 'typing.Union[None, Nullable, uint]' = None
-    remainingDuration: 'typing.Union[Nullable, uint]' = None
-    currentState: 'typing.Union[Nullable, ValveConfigurationAndControl.Enums.ValveStateEnum]' = None
-    targetState: 'typing.Union[Nullable, ValveConfigurationAndControl.Enums.ValveStateEnum]' = None
+    remainingDuration: 'typing.Union[Nullable, uint]' = NullValue
+    currentState: 'typing.Union[Nullable, ValveConfigurationAndControl.Enums.ValveStateEnum]' = NullValue
+    targetState: 'typing.Union[Nullable, ValveConfigurationAndControl.Enums.ValveStateEnum]' = NullValue
     currentLevel: 'typing.Union[None, Nullable, uint]' = None
     targetLevel: 'typing.Union[None, Nullable, uint]' = None
     defaultOpenLevel: 'typing.Optional[uint]' = None
     valveFault: 'typing.Optional[uint]' = None
     levelStep: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class StatusCodeEnum(MatterIntEnum):
@@ -21840,7 +21840,7 @@ class ValveConfigurationAndControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000081
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21858,7 +21858,7 @@ class ValveConfigurationAndControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000081
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22216,15 +22216,15 @@ class ElectricalPowerMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    powerMode: 'ElectricalPowerMeasurement.Enums.PowerModeEnum' = None
-    numberOfMeasurementTypes: 'uint' = None
-    accuracy: 'typing.List[ElectricalPowerMeasurement.Structs.MeasurementAccuracyStruct]' = None
+    powerMode: 'ElectricalPowerMeasurement.Enums.PowerModeEnum' = 0
+    numberOfMeasurementTypes: 'uint' = 0
+    accuracy: 'typing.List[ElectricalPowerMeasurement.Structs.MeasurementAccuracyStruct]' = field(default_factory=lambda: [])
     ranges: 'typing.Optional[typing.List[ElectricalPowerMeasurement.Structs.MeasurementRangeStruct]]' = None
     voltage: 'typing.Union[None, Nullable, int]' = None
     activeCurrent: 'typing.Union[None, Nullable, int]' = None
     reactiveCurrent: 'typing.Union[None, Nullable, int]' = None
     apparentCurrent: 'typing.Union[None, Nullable, int]' = None
-    activePower: 'typing.Union[Nullable, int]' = None
+    activePower: 'typing.Union[Nullable, int]' = NullValue
     reactivePower: 'typing.Union[None, Nullable, int]' = None
     apparentPower: 'typing.Union[None, Nullable, int]' = None
     RMSVoltage: 'typing.Union[None, Nullable, int]' = None
@@ -22235,12 +22235,12 @@ class ElectricalPowerMeasurement(Cluster):
     harmonicPhases: 'typing.Union[None, Nullable, typing.List[ElectricalPowerMeasurement.Structs.HarmonicMeasurementStruct]]' = None
     powerFactor: 'typing.Union[None, Nullable, int]' = None
     neutralCurrent: 'typing.Union[None, Nullable, int]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class MeasurementTypeEnum(MatterIntEnum):
@@ -22816,18 +22816,18 @@ class ElectricalEnergyMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    accuracy: 'ElectricalEnergyMeasurement.Structs.MeasurementAccuracyStruct' = None
+    accuracy: 'ElectricalEnergyMeasurement.Structs.MeasurementAccuracyStruct' = field(default_factory=lambda: ElectricalEnergyMeasurement.Structs.MeasurementAccuracyStruct())
     cumulativeEnergyImported: 'typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct]' = None
     cumulativeEnergyExported: 'typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct]' = None
     periodicEnergyImported: 'typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct]' = None
     periodicEnergyExported: 'typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct]' = None
     cumulativeEnergyReset: 'typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.CumulativeEnergyResetStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class MeasurementTypeEnum(MatterIntEnum):
@@ -23201,20 +23201,20 @@ class DemandResponseLoadControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    loadControlPrograms: 'typing.List[DemandResponseLoadControl.Structs.LoadControlProgramStruct]' = None
-    numberOfLoadControlPrograms: 'uint' = None
-    events: 'typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]' = None
-    activeEvents: 'typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]' = None
-    numberOfEventsPerProgram: 'uint' = None
-    numberOfTransitions: 'uint' = None
-    defaultRandomStart: 'uint' = None
-    defaultRandomDuration: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    loadControlPrograms: 'typing.List[DemandResponseLoadControl.Structs.LoadControlProgramStruct]' = field(default_factory=lambda: [])
+    numberOfLoadControlPrograms: 'uint' = 0
+    events: 'typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]' = field(default_factory=lambda: [])
+    activeEvents: 'typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]' = field(default_factory=lambda: [])
+    numberOfEventsPerProgram: 'uint' = 0
+    numberOfTransitions: 'uint' = 0
+    defaultRandomStart: 'uint' = 0
+    defaultRandomDuration: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class CriticalityLevelEnum(MatterIntEnum):
@@ -23447,7 +23447,7 @@ class DemandResponseLoadControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000096
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23463,7 +23463,7 @@ class DemandResponseLoadControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000096
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23479,7 +23479,7 @@ class DemandResponseLoadControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000096
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23495,7 +23495,7 @@ class DemandResponseLoadControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000096
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23513,7 +23513,7 @@ class DemandResponseLoadControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000096
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23803,14 +23803,14 @@ class Messages(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    messages: 'typing.List[Messages.Structs.MessageStruct]' = None
-    activeMessageIDs: 'typing.List[bytes]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    messages: 'typing.List[Messages.Structs.MessageStruct]' = field(default_factory=lambda: [])
+    activeMessageIDs: 'typing.List[bytes]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class FutureMessagePreferenceEnum(MatterIntEnum):
@@ -23893,7 +23893,7 @@ class Messages(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000097
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23921,7 +23921,7 @@ class Messages(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000097
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24150,20 +24150,20 @@ class DeviceEnergyManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    ESAType: 'DeviceEnergyManagement.Enums.ESATypeEnum' = None
-    ESACanGenerate: 'bool' = None
-    ESAState: 'DeviceEnergyManagement.Enums.ESAStateEnum' = None
-    absMinPower: 'int' = None
-    absMaxPower: 'int' = None
+    ESAType: 'DeviceEnergyManagement.Enums.ESATypeEnum' = 0
+    ESACanGenerate: 'bool' = False
+    ESAState: 'DeviceEnergyManagement.Enums.ESAStateEnum' = 0
+    absMinPower: 'int' = 0
+    absMaxPower: 'int' = 0
     powerAdjustmentCapability: 'typing.Union[None, Nullable, DeviceEnergyManagement.Structs.PowerAdjustCapabilityStruct]' = None
     forecast: 'typing.Union[None, Nullable, DeviceEnergyManagement.Structs.ForecastStruct]' = None
     optOutState: 'typing.Optional[DeviceEnergyManagement.Enums.OptOutStateEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class AdjustmentCauseEnum(MatterIntEnum):
@@ -24433,7 +24433,7 @@ class DeviceEnergyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000098
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24453,7 +24453,7 @@ class DeviceEnergyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000098
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24466,7 +24466,7 @@ class DeviceEnergyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000098
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24484,7 +24484,7 @@ class DeviceEnergyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000098
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24502,7 +24502,7 @@ class DeviceEnergyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000098
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24515,7 +24515,7 @@ class DeviceEnergyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000098
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24535,7 +24535,7 @@ class DeviceEnergyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000098
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24553,7 +24553,7 @@ class DeviceEnergyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000098
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24901,14 +24901,14 @@ class EnergyEvse(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    state: 'typing.Union[Nullable, EnergyEvse.Enums.StateEnum]' = None
-    supplyState: 'EnergyEvse.Enums.SupplyStateEnum' = None
-    faultState: 'EnergyEvse.Enums.FaultStateEnum' = None
-    chargingEnabledUntil: 'typing.Union[Nullable, uint]' = None
+    state: 'typing.Union[Nullable, EnergyEvse.Enums.StateEnum]' = NullValue
+    supplyState: 'EnergyEvse.Enums.SupplyStateEnum' = 0
+    faultState: 'EnergyEvse.Enums.FaultStateEnum' = 0
+    chargingEnabledUntil: 'typing.Union[Nullable, uint]' = NullValue
     dischargingEnabledUntil: 'typing.Union[None, Nullable, uint]' = None
-    circuitCapacity: 'int' = None
-    minimumChargeCurrent: 'int' = None
-    maximumChargeCurrent: 'int' = None
+    circuitCapacity: 'int' = 0
+    minimumChargeCurrent: 'int' = 0
+    maximumChargeCurrent: 'int' = 0
     maximumDischargeCurrent: 'typing.Optional[int]' = None
     userMaximumChargeCurrent: 'typing.Optional[int]' = None
     randomizationDelayWindow: 'typing.Optional[uint]' = None
@@ -24920,16 +24920,16 @@ class EnergyEvse(Cluster):
     stateOfCharge: 'typing.Union[None, Nullable, uint]' = None
     batteryCapacity: 'typing.Union[None, Nullable, int]' = None
     vehicleID: 'typing.Union[None, Nullable, str]' = None
-    sessionID: 'typing.Union[Nullable, uint]' = None
-    sessionDuration: 'typing.Union[Nullable, uint]' = None
-    sessionEnergyCharged: 'typing.Union[Nullable, int]' = None
+    sessionID: 'typing.Union[Nullable, uint]' = NullValue
+    sessionDuration: 'typing.Union[Nullable, uint]' = NullValue
+    sessionEnergyCharged: 'typing.Union[Nullable, int]' = NullValue
     sessionEnergyDischarged: 'typing.Union[None, Nullable, int]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class EnergyTransferStoppedReasonEnum(MatterIntEnum):
@@ -25044,7 +25044,7 @@ class EnergyEvse(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000099
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -25060,7 +25060,7 @@ class EnergyEvse(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000099
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -25077,7 +25077,7 @@ class EnergyEvse(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000099
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -25101,7 +25101,7 @@ class EnergyEvse(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000099
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -25123,7 +25123,7 @@ class EnergyEvse(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000099
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -25140,7 +25140,7 @@ class EnergyEvse(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000099
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -25177,7 +25177,7 @@ class EnergyEvse(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000099
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -25820,12 +25820,12 @@ class EnergyPreference(Cluster):
     energyPriorities: 'typing.Optional[typing.List[EnergyPreference.Enums.EnergyPriorityEnum]]' = None
     lowPowerModeSensitivities: 'typing.Optional[typing.List[EnergyPreference.Structs.BalanceStruct]]' = None
     currentLowPowerModeSensitivity: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class EnergyPriorityEnum(MatterIntEnum):
@@ -26056,12 +26056,12 @@ class PowerTopology(Cluster):
 
     availableEndpoints: 'typing.Optional[typing.List[uint]]' = None
     activeEndpoints: 'typing.Optional[typing.List[uint]]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -26220,16 +26220,16 @@ class EnergyEvseMode(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: 'typing.List[EnergyEvseMode.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
+    supportedModes: 'typing.List[EnergyEvseMode.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ModeTag(MatterIntEnum):
@@ -26297,7 +26297,7 @@ class EnergyEvseMode(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000009D
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -26492,16 +26492,16 @@ class DeviceEnergyManagementMode(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    supportedModes: 'typing.List[DeviceEnergyManagementMode.Structs.ModeOptionStruct]' = None
-    currentMode: 'uint' = None
+    supportedModes: 'typing.List[DeviceEnergyManagementMode.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+    currentMode: 'uint' = 0
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ModeTag(MatterIntEnum):
@@ -26570,7 +26570,7 @@ class DeviceEnergyManagementMode(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000009F
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -26806,9 +26806,9 @@ class DoorLock(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    lockState: 'typing.Union[Nullable, DoorLock.Enums.DlLockState]' = None
-    lockType: 'DoorLock.Enums.DlLockType' = None
-    actuatorEnabled: 'bool' = None
+    lockState: 'typing.Union[Nullable, DoorLock.Enums.DlLockState]' = NullValue
+    lockType: 'DoorLock.Enums.DlLockType' = 0
+    actuatorEnabled: 'bool' = False
     doorState: 'typing.Union[None, Nullable, DoorLock.Enums.DoorStateEnum]' = None
     doorOpenEvents: 'typing.Optional[uint]' = None
     doorClosedEvents: 'typing.Optional[uint]' = None
@@ -26829,8 +26829,8 @@ class DoorLock(Cluster):
     LEDSettings: 'typing.Optional[uint]' = None
     autoRelockTime: 'typing.Optional[uint]' = None
     soundVolume: 'typing.Optional[uint]' = None
-    operatingMode: 'DoorLock.Enums.OperatingModeEnum' = None
-    supportedOperatingModes: 'uint' = None
+    operatingMode: 'DoorLock.Enums.OperatingModeEnum' = 0
+    supportedOperatingModes: 'uint' = 0
     defaultConfigurationRegister: 'typing.Optional[uint]' = None
     enableLocalProgramming: 'typing.Optional[bool]' = None
     enableOneTouchLocking: 'typing.Optional[bool]' = None
@@ -26851,12 +26851,12 @@ class DoorLock(Cluster):
     aliroBLEAdvertisingVersion: 'typing.Optional[uint]' = None
     numberOfAliroCredentialIssuerKeysSupported: 'typing.Optional[uint]' = None
     numberOfAliroEndpointKeysSupported: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class AlarmCodeEnum(MatterIntEnum):
@@ -27289,7 +27289,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27309,7 +27309,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27329,7 +27329,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27351,7 +27351,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27397,7 +27397,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27427,7 +27427,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x0000000D
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27445,7 +27445,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x0000000E
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27485,7 +27485,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x0000000F
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27509,7 +27509,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000010
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27527,7 +27527,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000011
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27565,7 +27565,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000012
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27589,7 +27589,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000013
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27605,7 +27605,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x0000001A
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27653,7 +27653,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x0000001C
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27687,7 +27687,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x0000001D
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27737,7 +27737,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000023
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27773,7 +27773,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000025
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27797,7 +27797,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000026
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27817,7 +27817,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000027
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27837,7 +27837,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000028
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27863,7 +27863,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000101
             command_id: typing.ClassVar[int] = 0x00000029
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -28861,34 +28861,34 @@ class WindowCovering(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    type: 'WindowCovering.Enums.Type' = None
+    type: 'WindowCovering.Enums.Type' = 0
     physicalClosedLimitLift: 'typing.Optional[uint]' = None
     physicalClosedLimitTilt: 'typing.Optional[uint]' = None
     currentPositionLift: 'typing.Union[None, Nullable, uint]' = None
     currentPositionTilt: 'typing.Union[None, Nullable, uint]' = None
     numberOfActuationsLift: 'typing.Optional[uint]' = None
     numberOfActuationsTilt: 'typing.Optional[uint]' = None
-    configStatus: 'uint' = None
+    configStatus: 'uint' = 0
     currentPositionLiftPercentage: 'typing.Union[None, Nullable, uint]' = None
     currentPositionTiltPercentage: 'typing.Union[None, Nullable, uint]' = None
-    operationalStatus: 'uint' = None
+    operationalStatus: 'uint' = 0
     targetPositionLiftPercent100ths: 'typing.Union[None, Nullable, uint]' = None
     targetPositionTiltPercent100ths: 'typing.Union[None, Nullable, uint]' = None
-    endProductType: 'WindowCovering.Enums.EndProductType' = None
+    endProductType: 'WindowCovering.Enums.EndProductType' = 0
     currentPositionLiftPercent100ths: 'typing.Union[None, Nullable, uint]' = None
     currentPositionTiltPercent100ths: 'typing.Union[None, Nullable, uint]' = None
     installedOpenLimitLift: 'typing.Optional[uint]' = None
     installedClosedLimitLift: 'typing.Optional[uint]' = None
     installedOpenLimitTilt: 'typing.Optional[uint]' = None
     installedClosedLimitTilt: 'typing.Optional[uint]' = None
-    mode: 'uint' = None
+    mode: 'uint' = 0
     safetyStatus: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class EndProductType(MatterIntEnum):
@@ -28989,7 +28989,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000102
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29002,7 +29002,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000102
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29015,7 +29015,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000102
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29028,7 +29028,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000102
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29044,7 +29044,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000102
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29060,7 +29060,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000102
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29076,7 +29076,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000102
             command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29563,22 +29563,22 @@ class BarrierControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    barrierMovingState: 'uint' = None
-    barrierSafetyStatus: 'uint' = None
-    barrierCapabilities: 'uint' = None
+    barrierMovingState: 'uint' = 0
+    barrierSafetyStatus: 'uint' = 0
+    barrierCapabilities: 'uint' = 0
     barrierOpenEvents: 'typing.Optional[uint]' = None
     barrierCloseEvents: 'typing.Optional[uint]' = None
     barrierCommandOpenEvents: 'typing.Optional[uint]' = None
     barrierCommandCloseEvents: 'typing.Optional[uint]' = None
     barrierOpenPeriod: 'typing.Optional[uint]' = None
     barrierClosePeriod: 'typing.Optional[uint]' = None
-    barrierPosition: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    barrierPosition: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class BarrierControlCapabilities(IntFlag):
@@ -29596,7 +29596,7 @@ class BarrierControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000103
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29612,7 +29612,7 @@ class BarrierControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000103
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -30541,9 +30541,9 @@ class PumpConfigurationAndControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    maxPressure: 'typing.Union[Nullable, int]' = None
-    maxSpeed: 'typing.Union[Nullable, uint]' = None
-    maxFlow: 'typing.Union[Nullable, uint]' = None
+    maxPressure: 'typing.Union[Nullable, int]' = NullValue
+    maxSpeed: 'typing.Union[Nullable, uint]' = NullValue
+    maxFlow: 'typing.Union[Nullable, uint]' = NullValue
     minConstPressure: 'typing.Union[None, Nullable, int]' = None
     maxConstPressure: 'typing.Union[None, Nullable, int]' = None
     minCompPressure: 'typing.Union[None, Nullable, int]' = None
@@ -30555,21 +30555,21 @@ class PumpConfigurationAndControl(Cluster):
     minConstTemp: 'typing.Union[None, Nullable, int]' = None
     maxConstTemp: 'typing.Union[None, Nullable, int]' = None
     pumpStatus: 'typing.Optional[uint]' = None
-    effectiveOperationMode: 'PumpConfigurationAndControl.Enums.OperationModeEnum' = None
-    effectiveControlMode: 'PumpConfigurationAndControl.Enums.ControlModeEnum' = None
-    capacity: 'typing.Union[Nullable, int]' = None
+    effectiveOperationMode: 'PumpConfigurationAndControl.Enums.OperationModeEnum' = 0
+    effectiveControlMode: 'PumpConfigurationAndControl.Enums.ControlModeEnum' = 0
+    capacity: 'typing.Union[Nullable, int]' = NullValue
     speed: 'typing.Union[None, Nullable, uint]' = None
     lifetimeRunningHours: 'typing.Union[None, Nullable, uint]' = None
     power: 'typing.Union[None, Nullable, uint]' = None
     lifetimeEnergyConsumed: 'typing.Union[None, Nullable, uint]' = None
-    operationMode: 'PumpConfigurationAndControl.Enums.OperationModeEnum' = None
+    operationMode: 'PumpConfigurationAndControl.Enums.OperationModeEnum' = 0
     controlMode: 'typing.Optional[PumpConfigurationAndControl.Enums.ControlModeEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ControlModeEnum(MatterIntEnum):
@@ -31435,7 +31435,7 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    localTemperature: 'typing.Union[Nullable, int]' = None
+    localTemperature: 'typing.Union[Nullable, int]' = NullValue
     outdoorTemperature: 'typing.Union[None, Nullable, int]' = None
     occupancy: 'typing.Optional[uint]' = None
     absMinHeatSetpointLimit: 'typing.Optional[int]' = None
@@ -31456,8 +31456,8 @@ class Thermostat(Cluster):
     maxCoolSetpointLimit: 'typing.Optional[int]' = None
     minSetpointDeadBand: 'typing.Optional[int]' = None
     remoteSensing: 'typing.Optional[uint]' = None
-    controlSequenceOfOperation: 'Thermostat.Enums.ControlSequenceOfOperationEnum' = None
-    systemMode: 'Thermostat.Enums.SystemModeEnum' = None
+    controlSequenceOfOperation: 'Thermostat.Enums.ControlSequenceOfOperationEnum' = 0
+    systemMode: 'Thermostat.Enums.SystemModeEnum' = 0
     thermostatRunningMode: 'typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum]' = None
     startOfWeek: 'typing.Optional[Thermostat.Enums.StartOfWeekEnum]' = None
     numberOfWeeklyTransitions: 'typing.Optional[uint]' = None
@@ -31498,12 +31498,12 @@ class Thermostat(Cluster):
     temperatureSetpointHoldPolicy: 'typing.Optional[uint]' = None
     setpointHoldExpiryTimestamp: 'typing.Union[None, Nullable, uint]' = None
     queuedPreset: 'typing.Union[None, Nullable, Thermostat.Structs.QueuedPresetStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ACCapacityFormatEnum(MatterIntEnum):
@@ -31858,7 +31858,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -31876,7 +31876,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -31898,7 +31898,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -31938,7 +31938,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -31951,7 +31951,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -31967,7 +31967,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -31985,7 +31985,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -32001,7 +32001,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -32014,7 +32014,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -32027,7 +32027,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -32040,7 +32040,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -33185,10 +33185,10 @@ class FanControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    fanMode: 'FanControl.Enums.FanModeEnum' = None
-    fanModeSequence: 'FanControl.Enums.FanModeSequenceEnum' = None
-    percentSetting: 'typing.Union[Nullable, uint]' = None
-    percentCurrent: 'uint' = None
+    fanMode: 'FanControl.Enums.FanModeEnum' = 0
+    fanModeSequence: 'FanControl.Enums.FanModeSequenceEnum' = 0
+    percentSetting: 'typing.Union[Nullable, uint]' = NullValue
+    percentCurrent: 'uint' = 0
     speedMax: 'typing.Optional[uint]' = None
     speedSetting: 'typing.Union[None, Nullable, uint]' = None
     speedCurrent: 'typing.Optional[uint]' = None
@@ -33197,12 +33197,12 @@ class FanControl(Cluster):
     windSupport: 'typing.Optional[uint]' = None
     windSetting: 'typing.Optional[uint]' = None
     airflowDirection: 'typing.Optional[FanControl.Enums.AirflowDirectionEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class AirflowDirectionEnum(MatterIntEnum):
@@ -33274,7 +33274,7 @@ class FanControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000202
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -33598,15 +33598,15 @@ class ThermostatUserInterfaceConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    temperatureDisplayMode: 'ThermostatUserInterfaceConfiguration.Enums.TemperatureDisplayModeEnum' = None
-    keypadLockout: 'ThermostatUserInterfaceConfiguration.Enums.KeypadLockoutEnum' = None
+    temperatureDisplayMode: 'ThermostatUserInterfaceConfiguration.Enums.TemperatureDisplayModeEnum' = 0
+    keypadLockout: 'ThermostatUserInterfaceConfiguration.Enums.KeypadLockoutEnum' = 0
     scheduleProgrammingVisibility: 'typing.Optional[ThermostatUserInterfaceConfiguration.Enums.ScheduleProgrammingVisibilityEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class KeypadLockoutEnum(MatterIntEnum):
@@ -33862,9 +33862,9 @@ class ColorControl(Cluster):
     driftCompensation: 'typing.Optional[uint]' = None
     compensationText: 'typing.Optional[str]' = None
     colorTemperatureMireds: 'typing.Optional[uint]' = None
-    colorMode: 'uint' = None
-    options: 'uint' = None
-    numberOfPrimaries: 'typing.Union[Nullable, uint]' = None
+    colorMode: 'uint' = 0
+    options: 'uint' = 0
+    numberOfPrimaries: 'typing.Union[Nullable, uint]' = NullValue
     primary1X: 'typing.Optional[uint]' = None
     primary1Y: 'typing.Optional[uint]' = None
     primary1Intensity: 'typing.Union[None, Nullable, uint]' = None
@@ -33895,23 +33895,23 @@ class ColorControl(Cluster):
     colorPointBY: 'typing.Optional[uint]' = None
     colorPointBIntensity: 'typing.Union[None, Nullable, uint]' = None
     enhancedCurrentHue: 'typing.Optional[uint]' = None
-    enhancedColorMode: 'uint' = None
+    enhancedColorMode: 'uint' = 0
     colorLoopActive: 'typing.Optional[uint]' = None
     colorLoopDirection: 'typing.Optional[uint]' = None
     colorLoopTime: 'typing.Optional[uint]' = None
     colorLoopStartEnhancedHue: 'typing.Optional[uint]' = None
     colorLoopStoredEnhancedHue: 'typing.Optional[uint]' = None
-    colorCapabilities: 'uint' = None
+    colorCapabilities: 'uint' = 0
     colorTempPhysicalMinMireds: 'typing.Optional[uint]' = None
     colorTempPhysicalMaxMireds: 'typing.Optional[uint]' = None
     coupleColorTempToLevelMinMireds: 'typing.Optional[uint]' = None
     startUpColorTemperatureMireds: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ColorLoopAction(MatterIntEnum):
@@ -34019,7 +34019,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34043,7 +34043,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34065,7 +34065,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34089,7 +34089,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34111,7 +34111,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34133,7 +34133,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34157,7 +34157,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34181,7 +34181,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34205,7 +34205,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34227,7 +34227,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34251,7 +34251,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34273,7 +34273,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000040
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34297,7 +34297,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000041
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34319,7 +34319,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000042
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34343,7 +34343,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000043
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34367,7 +34367,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000044
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34395,7 +34395,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x00000047
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34413,7 +34413,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x0000004B
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -34439,7 +34439,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000300
             command_id: typing.ClassVar[int] = 0x0000004C
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -35422,26 +35422,26 @@ class BallastConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    physicalMinLevel: 'uint' = None
-    physicalMaxLevel: 'uint' = None
+    physicalMinLevel: 'uint' = 0
+    physicalMaxLevel: 'uint' = 0
     ballastStatus: 'typing.Optional[uint]' = None
-    minLevel: 'uint' = None
-    maxLevel: 'uint' = None
+    minLevel: 'uint' = 0
+    maxLevel: 'uint' = 0
     intrinsicBallastFactor: 'typing.Union[None, Nullable, uint]' = None
     ballastFactorAdjustment: 'typing.Union[None, Nullable, uint]' = None
-    lampQuantity: 'uint' = None
+    lampQuantity: 'uint' = 0
     lampType: 'typing.Optional[str]' = None
     lampManufacturer: 'typing.Optional[str]' = None
     lampRatedHours: 'typing.Union[None, Nullable, uint]' = None
     lampBurnHours: 'typing.Union[None, Nullable, uint]' = None
     lampAlarmMode: 'typing.Optional[uint]' = None
     lampBurnHoursTripPoint: 'typing.Union[None, Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class BallastStatusBitmap(IntFlag):
@@ -35794,17 +35794,17 @@ class IlluminanceMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    measuredValue: 'typing.Union[Nullable, uint]' = None
-    minMeasuredValue: 'typing.Union[Nullable, uint]' = None
-    maxMeasuredValue: 'typing.Union[Nullable, uint]' = None
+    measuredValue: 'typing.Union[Nullable, uint]' = NullValue
+    minMeasuredValue: 'typing.Union[Nullable, uint]' = NullValue
+    maxMeasuredValue: 'typing.Union[Nullable, uint]' = NullValue
     tolerance: 'typing.Optional[uint]' = None
     lightSensorType: 'typing.Union[None, Nullable, IlluminanceMeasurement.Enums.LightSensorTypeEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LightSensorTypeEnum(MatterIntEnum):
@@ -36014,16 +36014,16 @@ class TemperatureMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    measuredValue: 'typing.Union[Nullable, int]' = None
-    minMeasuredValue: 'typing.Union[Nullable, int]' = None
-    maxMeasuredValue: 'typing.Union[Nullable, int]' = None
+    measuredValue: 'typing.Union[Nullable, int]' = NullValue
+    minMeasuredValue: 'typing.Union[Nullable, int]' = NullValue
+    maxMeasuredValue: 'typing.Union[Nullable, int]' = NullValue
     tolerance: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -36212,21 +36212,21 @@ class PressureMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    measuredValue: 'typing.Union[Nullable, int]' = None
-    minMeasuredValue: 'typing.Union[Nullable, int]' = None
-    maxMeasuredValue: 'typing.Union[Nullable, int]' = None
+    measuredValue: 'typing.Union[Nullable, int]' = NullValue
+    minMeasuredValue: 'typing.Union[Nullable, int]' = NullValue
+    maxMeasuredValue: 'typing.Union[Nullable, int]' = NullValue
     tolerance: 'typing.Optional[uint]' = None
     scaledValue: 'typing.Union[None, Nullable, int]' = None
     minScaledValue: 'typing.Union[None, Nullable, int]' = None
     maxScaledValue: 'typing.Union[None, Nullable, int]' = None
     scaledTolerance: 'typing.Optional[uint]' = None
     scale: 'typing.Optional[int]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -36494,16 +36494,16 @@ class FlowMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    measuredValue: 'typing.Union[Nullable, uint]' = None
-    minMeasuredValue: 'typing.Union[Nullable, uint]' = None
-    maxMeasuredValue: 'typing.Union[Nullable, uint]' = None
+    measuredValue: 'typing.Union[Nullable, uint]' = NullValue
+    minMeasuredValue: 'typing.Union[Nullable, uint]' = NullValue
+    maxMeasuredValue: 'typing.Union[Nullable, uint]' = NullValue
     tolerance: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -36687,16 +36687,16 @@ class RelativeHumidityMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    measuredValue: 'typing.Union[Nullable, uint]' = None
-    minMeasuredValue: 'typing.Union[Nullable, uint]' = None
-    maxMeasuredValue: 'typing.Union[Nullable, uint]' = None
+    measuredValue: 'typing.Union[Nullable, uint]' = NullValue
+    minMeasuredValue: 'typing.Union[Nullable, uint]' = NullValue
+    maxMeasuredValue: 'typing.Union[Nullable, uint]' = NullValue
     tolerance: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -36888,9 +36888,9 @@ class OccupancySensing(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    occupancy: 'uint' = None
-    occupancySensorType: 'OccupancySensing.Enums.OccupancySensorTypeEnum' = None
-    occupancySensorTypeBitmap: 'uint' = None
+    occupancy: 'uint' = 0
+    occupancySensorType: 'OccupancySensing.Enums.OccupancySensorTypeEnum' = 0
+    occupancySensorTypeBitmap: 'uint' = 0
     PIROccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
     PIRUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
     PIRUnoccupiedToOccupiedThreshold: 'typing.Optional[uint]' = None
@@ -36900,12 +36900,12 @@ class OccupancySensing(Cluster):
     physicalContactOccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
     physicalContactUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
     physicalContactUnoccupiedToOccupiedThreshold: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class OccupancySensorTypeEnum(MatterIntEnum):
@@ -37256,12 +37256,12 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[CarbonMonoxideConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -37622,12 +37622,12 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[CarbonDioxideConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -37988,12 +37988,12 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[NitrogenDioxideConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -38354,12 +38354,12 @@ class OzoneConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[OzoneConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[OzoneConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[OzoneConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -38720,12 +38720,12 @@ class Pm25ConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[Pm25ConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[Pm25ConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[Pm25ConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -39086,12 +39086,12 @@ class FormaldehydeConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[FormaldehydeConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[FormaldehydeConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[FormaldehydeConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -39452,12 +39452,12 @@ class Pm1ConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[Pm1ConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[Pm1ConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[Pm1ConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -39818,12 +39818,12 @@ class Pm10ConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[Pm10ConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[Pm10ConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[Pm10ConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -40184,12 +40184,12 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[TotalVolatileOrganicCompoundsConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -40550,12 +40550,12 @@ class RadonConcentrationMeasurement(Cluster):
     measurementUnit: 'typing.Optional[RadonConcentrationMeasurement.Enums.MeasurementUnitEnum]' = None
     measurementMedium: 'typing.Optional[RadonConcentrationMeasurement.Enums.MeasurementMediumEnum]' = None
     levelValue: 'typing.Optional[RadonConcentrationMeasurement.Enums.LevelValueEnum]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class LevelValueEnum(MatterIntEnum):
@@ -40895,13 +40895,13 @@ class WiFiNetworkManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    ssid: 'typing.Union[Nullable, bytes]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    ssid: 'typing.Union[Nullable, bytes]' = NullValue
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -40922,7 +40922,7 @@ class WiFiNetworkManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000451
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -41068,17 +41068,17 @@ class ThreadBorderRouterManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    borderRouterName: 'str' = None
-    borderAgentID: 'bytes' = None
-    threadVersion: 'uint' = None
-    interfaceEnabled: 'bool' = None
-    activeDatasetTimestamp: 'typing.Union[Nullable, uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    borderRouterName: 'str' = ""
+    borderAgentID: 'bytes' = b""
+    threadVersion: 'uint' = 0
+    interfaceEnabled: 'bool' = False
+    activeDatasetTimestamp: 'typing.Union[Nullable, uint]' = NullValue
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -41116,7 +41116,7 @@ class ThreadBorderRouterManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000452
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -41132,7 +41132,7 @@ class ThreadBorderRouterManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000452
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -41150,7 +41150,7 @@ class ThreadBorderRouterManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000452
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -41358,15 +41358,15 @@ class ThreadNetworkDirectory(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    preferredExtendedPanID: 'typing.Union[Nullable, uint]' = None
-    threadNetworks: 'typing.List[ThreadNetworkDirectory.Structs.ThreadNetworkStruct]' = None
-    threadNetworkTableSize: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    preferredExtendedPanID: 'typing.Union[Nullable, uint]' = NullValue
+    threadNetworks: 'typing.List[ThreadNetworkDirectory.Structs.ThreadNetworkStruct]' = field(default_factory=lambda: [])
+    threadNetworkTableSize: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Structs:
         @dataclass
@@ -41390,7 +41390,7 @@ class ThreadNetworkDirectory(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000453
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -41410,7 +41410,7 @@ class ThreadNetworkDirectory(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000453
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -41450,7 +41450,7 @@ class ThreadNetworkDirectory(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000453
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -41647,12 +41647,12 @@ class WakeOnLan(Cluster):
 
     MACAddress: 'typing.Optional[str]' = None
     linkLocalAddress: 'typing.Optional[bytes]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -41806,12 +41806,12 @@ class Channel(Cluster):
     channelList: 'typing.Optional[typing.List[Channel.Structs.ChannelInfoStruct]]' = None
     lineup: 'typing.Union[None, Nullable, Channel.Structs.LineupInfoStruct]' = None
     currentChannel: 'typing.Union[None, Nullable, Channel.Structs.ChannelInfoStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ChannelTypeEnum(MatterIntEnum):
@@ -42045,7 +42045,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000504
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42063,7 +42063,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000504
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42081,7 +42081,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000504
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42125,7 +42125,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000504
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42143,7 +42143,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000504
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42165,7 +42165,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000504
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42346,14 +42346,14 @@ class TargetNavigator(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    targetList: 'typing.List[TargetNavigator.Structs.TargetInfoStruct]' = None
+    targetList: 'typing.List[TargetNavigator.Structs.TargetInfoStruct]' = field(default_factory=lambda: [])
     currentTarget: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class StatusEnum(MatterIntEnum):
@@ -42404,7 +42404,7 @@ class TargetNavigator(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000505
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42598,7 +42598,7 @@ class MediaPlayback(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    currentState: 'MediaPlayback.Enums.PlaybackStateEnum' = None
+    currentState: 'MediaPlayback.Enums.PlaybackStateEnum' = 0
     startTime: 'typing.Union[None, Nullable, uint]' = None
     duration: 'typing.Union[None, Nullable, uint]' = None
     sampledPosition: 'typing.Union[None, Nullable, MediaPlayback.Structs.PlaybackPositionStruct]' = None
@@ -42609,12 +42609,12 @@ class MediaPlayback(Cluster):
     availableAudioTracks: 'typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]]' = None
     activeTextTrack: 'typing.Union[None, Nullable, MediaPlayback.Structs.TrackStruct]' = None
     availableTextTracks: 'typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class CharacteristicEnum(MatterIntEnum):
@@ -42862,7 +42862,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000506
             command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42896,7 +42896,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000506
             command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42914,7 +42914,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000506
             command_id: typing.ClassVar[int] = 0x0000000D
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -42930,7 +42930,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000506
             command_id: typing.ClassVar[int] = 0x0000000E
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -43266,14 +43266,14 @@ class MediaInput(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    inputList: 'typing.List[MediaInput.Structs.InputInfoStruct]' = None
-    currentInput: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    inputList: 'typing.List[MediaInput.Structs.InputInfoStruct]' = field(default_factory=lambda: [])
+    currentInput: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class InputTypeEnum(MatterIntEnum):
@@ -43323,7 +43323,7 @@ class MediaInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000507
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -43339,7 +43339,7 @@ class MediaInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000507
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -43352,7 +43352,7 @@ class MediaInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000507
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -43365,7 +43365,7 @@ class MediaInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000507
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -43524,12 +43524,12 @@ class LowPower(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -43537,7 +43537,7 @@ class LowPower(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000508
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -43659,12 +43659,12 @@ class KeypadInput(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class CECKeyCodeEnum(MatterIntEnum):
@@ -43798,7 +43798,7 @@ class KeypadInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000509
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -43927,12 +43927,12 @@ class ContentLauncher(Cluster):
 
     acceptHeader: 'typing.Optional[typing.List[str]]' = None
     supportedStreamingProtocols: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class CharacteristicEnum(MatterIntEnum):
@@ -44188,7 +44188,7 @@ class ContentLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050A
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -44349,14 +44349,14 @@ class AudioOutput(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    outputList: 'typing.List[AudioOutput.Structs.OutputInfoStruct]' = None
-    currentOutput: 'uint' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    outputList: 'typing.List[AudioOutput.Structs.OutputInfoStruct]' = field(default_factory=lambda: [])
+    currentOutput: 'uint' = 0
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class OutputTypeEnum(MatterIntEnum):
@@ -44398,7 +44398,7 @@ class AudioOutput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050B
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -44414,7 +44414,7 @@ class AudioOutput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050B
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -44577,12 +44577,12 @@ class ApplicationLauncher(Cluster):
 
     catalogList: 'typing.Optional[typing.List[uint]]' = None
     currentApp: 'typing.Union[None, Nullable, ApplicationLauncher.Structs.ApplicationEPStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class StatusEnum(MatterIntEnum):
@@ -44682,7 +44682,7 @@ class ApplicationLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050C
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -44851,18 +44851,18 @@ class ApplicationBasic(Cluster):
 
     vendorName: 'typing.Optional[str]' = None
     vendorID: 'typing.Optional[uint]' = None
-    applicationName: 'str' = None
+    applicationName: 'str' = ""
     productID: 'typing.Optional[uint]' = None
-    application: 'ApplicationBasic.Structs.ApplicationStruct' = None
-    status: 'ApplicationBasic.Enums.ApplicationStatusEnum' = None
-    applicationVersion: 'str' = None
-    allowedVendorList: 'typing.List[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    application: 'ApplicationBasic.Structs.ApplicationStruct' = field(default_factory=lambda: ApplicationBasic.Structs.ApplicationStruct())
+    status: 'ApplicationBasic.Enums.ApplicationStatusEnum' = 0
+    applicationVersion: 'str' = ""
+    allowedVendorList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class ApplicationStatusEnum(MatterIntEnum):
@@ -45132,12 +45132,12 @@ class AccountLogin(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -45165,7 +45165,7 @@ class AccountLogin(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050E
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45181,7 +45181,7 @@ class AccountLogin(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050E
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45205,7 +45205,7 @@ class AccountLogin(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050E
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45362,20 +45362,20 @@ class ContentControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    enabled: 'bool' = None
+    enabled: 'bool' = False
     onDemandRatings: 'typing.Optional[typing.List[ContentControl.Structs.RatingNameStruct]]' = None
     onDemandRatingThreshold: 'typing.Optional[str]' = None
     scheduledContentRatings: 'typing.Optional[typing.List[ContentControl.Structs.RatingNameStruct]]' = None
     scheduledContentRatingThreshold: 'typing.Optional[str]' = None
     screenDailyTime: 'typing.Optional[uint]' = None
     remainingScreenTime: 'typing.Optional[uint]' = None
-    blockUnrated: 'bool' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    blockUnrated: 'bool' = False
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -45405,7 +45405,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45436,7 +45436,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45452,7 +45452,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45465,7 +45465,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45478,7 +45478,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45496,7 +45496,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45512,7 +45512,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45525,7 +45525,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45538,7 +45538,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45554,7 +45554,7 @@ class ContentControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0000050F
             command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -45824,12 +45824,12 @@ class ContentAppObserver(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class StatusEnum(MatterIntEnum):
@@ -45865,7 +45865,7 @@ class ContentAppObserver(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000510
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -46250,12 +46250,12 @@ class ElectricalMeasurement(Cluster):
     rmsExtremeUnderVoltagePeriodPhaseC: 'typing.Optional[uint]' = None
     rmsVoltageSagPeriodPhaseC: 'typing.Optional[uint]' = None
     rmsVoltageSwellPeriodPhaseC: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -46263,7 +46263,7 @@ class ElectricalMeasurement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000B04
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -46285,7 +46285,7 @@ class ElectricalMeasurement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000B04
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -46298,7 +46298,7 @@ class ElectricalMeasurement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000B04
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -46324,7 +46324,7 @@ class ElectricalMeasurement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000B04
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -48584,95 +48584,95 @@ class UnitTesting(Cluster):
                 ClusterObjectFieldDescriptor(Label="meiInt8u", Tag=0xFFF24F01, Type=uint),
             ])
 
-    boolean: 'bool' = None
-    bitmap8: 'uint' = None
-    bitmap16: 'uint' = None
-    bitmap32: 'uint' = None
-    bitmap64: 'uint' = None
-    int8u: 'uint' = None
-    int16u: 'uint' = None
-    int24u: 'uint' = None
-    int32u: 'uint' = None
-    int40u: 'uint' = None
-    int48u: 'uint' = None
-    int56u: 'uint' = None
-    int64u: 'uint' = None
-    int8s: 'int' = None
-    int16s: 'int' = None
-    int24s: 'int' = None
-    int32s: 'int' = None
-    int40s: 'int' = None
-    int48s: 'int' = None
-    int56s: 'int' = None
-    int64s: 'int' = None
-    enum8: 'uint' = None
-    enum16: 'uint' = None
-    floatSingle: 'float32' = None
-    floatDouble: 'float' = None
-    octetString: 'bytes' = None
-    listInt8u: 'typing.List[uint]' = None
-    listOctetString: 'typing.List[bytes]' = None
-    listStructOctetString: 'typing.List[UnitTesting.Structs.TestListStructOctet]' = None
-    longOctetString: 'bytes' = None
-    charString: 'str' = None
-    longCharString: 'str' = None
-    epochUs: 'uint' = None
-    epochS: 'uint' = None
-    vendorId: 'uint' = None
-    listNullablesAndOptionalsStruct: 'typing.List[UnitTesting.Structs.NullablesAndOptionalsStruct]' = None
-    enumAttr: 'UnitTesting.Enums.SimpleEnum' = None
-    structAttr: 'UnitTesting.Structs.SimpleStruct' = None
-    rangeRestrictedInt8u: 'uint' = None
-    rangeRestrictedInt8s: 'int' = None
-    rangeRestrictedInt16u: 'uint' = None
-    rangeRestrictedInt16s: 'int' = None
-    listLongOctetString: 'typing.List[bytes]' = None
-    listFabricScoped: 'typing.List[UnitTesting.Structs.TestFabricScoped]' = None
-    timedWriteBoolean: 'bool' = None
-    generalErrorBoolean: 'bool' = None
-    clusterErrorBoolean: 'bool' = None
+    boolean: 'bool' = False
+    bitmap8: 'uint' = 0
+    bitmap16: 'uint' = 0
+    bitmap32: 'uint' = 0
+    bitmap64: 'uint' = 0
+    int8u: 'uint' = 0
+    int16u: 'uint' = 0
+    int24u: 'uint' = 0
+    int32u: 'uint' = 0
+    int40u: 'uint' = 0
+    int48u: 'uint' = 0
+    int56u: 'uint' = 0
+    int64u: 'uint' = 0
+    int8s: 'int' = 0
+    int16s: 'int' = 0
+    int24s: 'int' = 0
+    int32s: 'int' = 0
+    int40s: 'int' = 0
+    int48s: 'int' = 0
+    int56s: 'int' = 0
+    int64s: 'int' = 0
+    enum8: 'uint' = 0
+    enum16: 'uint' = 0
+    floatSingle: 'float32' = 0.0
+    floatDouble: 'float' = 0.0
+    octetString: 'bytes' = b""
+    listInt8u: 'typing.List[uint]' = field(default_factory=lambda: [])
+    listOctetString: 'typing.List[bytes]' = field(default_factory=lambda: [])
+    listStructOctetString: 'typing.List[UnitTesting.Structs.TestListStructOctet]' = field(default_factory=lambda: [])
+    longOctetString: 'bytes' = b""
+    charString: 'str' = ""
+    longCharString: 'str' = ""
+    epochUs: 'uint' = 0
+    epochS: 'uint' = 0
+    vendorId: 'uint' = 0
+    listNullablesAndOptionalsStruct: 'typing.List[UnitTesting.Structs.NullablesAndOptionalsStruct]' = field(default_factory=lambda: [])
+    enumAttr: 'UnitTesting.Enums.SimpleEnum' = 0
+    structAttr: 'UnitTesting.Structs.SimpleStruct' = field(default_factory=lambda: UnitTesting.Structs.SimpleStruct())
+    rangeRestrictedInt8u: 'uint' = 0
+    rangeRestrictedInt8s: 'int' = 0
+    rangeRestrictedInt16u: 'uint' = 0
+    rangeRestrictedInt16s: 'int' = 0
+    listLongOctetString: 'typing.List[bytes]' = field(default_factory=lambda: [])
+    listFabricScoped: 'typing.List[UnitTesting.Structs.TestFabricScoped]' = field(default_factory=lambda: [])
+    timedWriteBoolean: 'bool' = False
+    generalErrorBoolean: 'bool' = False
+    clusterErrorBoolean: 'bool' = False
     unsupported: 'typing.Optional[bool]' = None
-    nullableBoolean: 'typing.Union[Nullable, bool]' = None
-    nullableBitmap8: 'typing.Union[Nullable, uint]' = None
-    nullableBitmap16: 'typing.Union[Nullable, uint]' = None
-    nullableBitmap32: 'typing.Union[Nullable, uint]' = None
-    nullableBitmap64: 'typing.Union[Nullable, uint]' = None
-    nullableInt8u: 'typing.Union[Nullable, uint]' = None
-    nullableInt16u: 'typing.Union[Nullable, uint]' = None
-    nullableInt24u: 'typing.Union[Nullable, uint]' = None
-    nullableInt32u: 'typing.Union[Nullable, uint]' = None
-    nullableInt40u: 'typing.Union[Nullable, uint]' = None
-    nullableInt48u: 'typing.Union[Nullable, uint]' = None
-    nullableInt56u: 'typing.Union[Nullable, uint]' = None
-    nullableInt64u: 'typing.Union[Nullable, uint]' = None
-    nullableInt8s: 'typing.Union[Nullable, int]' = None
-    nullableInt16s: 'typing.Union[Nullable, int]' = None
-    nullableInt24s: 'typing.Union[Nullable, int]' = None
-    nullableInt32s: 'typing.Union[Nullable, int]' = None
-    nullableInt40s: 'typing.Union[Nullable, int]' = None
-    nullableInt48s: 'typing.Union[Nullable, int]' = None
-    nullableInt56s: 'typing.Union[Nullable, int]' = None
-    nullableInt64s: 'typing.Union[Nullable, int]' = None
-    nullableEnum8: 'typing.Union[Nullable, uint]' = None
-    nullableEnum16: 'typing.Union[Nullable, uint]' = None
-    nullableFloatSingle: 'typing.Union[Nullable, float32]' = None
-    nullableFloatDouble: 'typing.Union[Nullable, float]' = None
-    nullableOctetString: 'typing.Union[Nullable, bytes]' = None
-    nullableCharString: 'typing.Union[Nullable, str]' = None
-    nullableEnumAttr: 'typing.Union[Nullable, UnitTesting.Enums.SimpleEnum]' = None
-    nullableStruct: 'typing.Union[Nullable, UnitTesting.Structs.SimpleStruct]' = None
-    nullableRangeRestrictedInt8u: 'typing.Union[Nullable, uint]' = None
-    nullableRangeRestrictedInt8s: 'typing.Union[Nullable, int]' = None
-    nullableRangeRestrictedInt16u: 'typing.Union[Nullable, uint]' = None
-    nullableRangeRestrictedInt16s: 'typing.Union[Nullable, int]' = None
+    nullableBoolean: 'typing.Union[Nullable, bool]' = NullValue
+    nullableBitmap8: 'typing.Union[Nullable, uint]' = NullValue
+    nullableBitmap16: 'typing.Union[Nullable, uint]' = NullValue
+    nullableBitmap32: 'typing.Union[Nullable, uint]' = NullValue
+    nullableBitmap64: 'typing.Union[Nullable, uint]' = NullValue
+    nullableInt8u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableInt16u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableInt24u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableInt32u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableInt40u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableInt48u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableInt56u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableInt64u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableInt8s: 'typing.Union[Nullable, int]' = NullValue
+    nullableInt16s: 'typing.Union[Nullable, int]' = NullValue
+    nullableInt24s: 'typing.Union[Nullable, int]' = NullValue
+    nullableInt32s: 'typing.Union[Nullable, int]' = NullValue
+    nullableInt40s: 'typing.Union[Nullable, int]' = NullValue
+    nullableInt48s: 'typing.Union[Nullable, int]' = NullValue
+    nullableInt56s: 'typing.Union[Nullable, int]' = NullValue
+    nullableInt64s: 'typing.Union[Nullable, int]' = NullValue
+    nullableEnum8: 'typing.Union[Nullable, uint]' = NullValue
+    nullableEnum16: 'typing.Union[Nullable, uint]' = NullValue
+    nullableFloatSingle: 'typing.Union[Nullable, float32]' = NullValue
+    nullableFloatDouble: 'typing.Union[Nullable, float]' = NullValue
+    nullableOctetString: 'typing.Union[Nullable, bytes]' = NullValue
+    nullableCharString: 'typing.Union[Nullable, str]' = NullValue
+    nullableEnumAttr: 'typing.Union[Nullable, UnitTesting.Enums.SimpleEnum]' = NullValue
+    nullableStruct: 'typing.Union[Nullable, UnitTesting.Structs.SimpleStruct]' = NullValue
+    nullableRangeRestrictedInt8u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableRangeRestrictedInt8s: 'typing.Union[Nullable, int]' = NullValue
+    nullableRangeRestrictedInt16u: 'typing.Union[Nullable, uint]' = NullValue
+    nullableRangeRestrictedInt16s: 'typing.Union[Nullable, int]' = NullValue
     writeOnlyInt8u: 'typing.Optional[uint]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
-    meiInt8u: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
+    meiInt8u: 'uint' = 0
 
     class Enums:
         class SimpleEnum(MatterIntEnum):
@@ -48868,7 +48868,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -48881,7 +48881,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -48897,7 +48897,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -48910,7 +48910,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -48939,7 +48939,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000002
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -48955,7 +48955,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -48968,7 +48968,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49012,7 +49012,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49044,7 +49044,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49088,7 +49088,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000006
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49126,7 +49126,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000007
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49212,7 +49212,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000008
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49244,7 +49244,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49276,7 +49276,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49308,7 +49308,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49340,7 +49340,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49460,7 +49460,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000012
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49477,7 +49477,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x00000013
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49585,7 +49585,7 @@ class UnitTesting(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0xFFF200BB
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -51112,12 +51112,12 @@ class FaultInjection(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Enums:
         class FaultType(MatterIntEnum):
@@ -51138,7 +51138,7 @@ class FaultInjection(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC06
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -51162,7 +51162,7 @@ class FaultInjection(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC06
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -51292,13 +51292,13 @@ class SampleMei(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    flipFlop: 'bool' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
+    flipFlop: 'bool' = False
+    generatedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    acceptedCommandList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    eventList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    attributeList: 'typing.List[uint]' = field(default_factory=lambda: [])
+    featureMap: 'uint' = 0
+    clusterRevision: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -51306,7 +51306,7 @@ class SampleMei(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC20
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -51319,7 +51319,7 @@ class SampleMei(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC20
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
