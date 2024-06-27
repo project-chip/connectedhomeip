@@ -22,7 +22,7 @@
  *          on the Beken platform.
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <core/CHIPConfig.h>
 #include <support/logging/Constants.h>

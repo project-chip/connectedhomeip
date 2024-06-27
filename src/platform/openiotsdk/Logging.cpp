@@ -22,7 +22,7 @@
  *          for Open IOT SDK platform.
  */
 
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/CHIPLogging.h>

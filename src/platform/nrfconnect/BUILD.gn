@@ -60,7 +60,7 @@ static_library("nrfconnect") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [ "${chip_root}/src/platform:logging_header" ]
 
   if (chip_enable_factory_data) {
     sources += [
@@ -135,8 +135,8 @@ static_library("nrfconnect") {
 
 source_set("logging") {
   deps = [
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
   ]
   sources = [ "../Zephyr/Logging.cpp" ]
 }

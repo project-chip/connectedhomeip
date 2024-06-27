@@ -101,7 +101,7 @@ static_library("Darwin") {
     ":logging",
     ":tracing",
     "${chip_root}/src/lib/dnssd:platform_header",
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/tracing",
   ]
@@ -158,7 +158,7 @@ static_library("logging") {
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:logging_constants",
     "${chip_root}/src/lib/support:span",
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/platform:logging_header",
   ]
 
   configs += [ "${chip_root}/src:includes" ]

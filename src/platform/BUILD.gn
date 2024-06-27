@@ -615,3 +615,7 @@ if (chip_device_platform != "none") {
 source_set("syscalls_stub") {
   sources = [ "SyscallStubs.cpp" ]
 }
+
+source_set("logging_header") {
+  public = [ "../include/platform/LogV.h" ]
+}

@@ -22,8 +22,8 @@ group("nxp") {
 
 source_set("logging") {
   public_deps = [
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/platform:platform",
-    "${chip_root}/src/platform/logging:headers",
   ]
 
   if (nxp_platform == "k32w/k32w0" || nxp_platform == "k32w/k32w1") {

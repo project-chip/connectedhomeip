@@ -105,7 +105,7 @@ static_library("nxp_platform") {
     }
   }
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [ "${chip_root}/src/platform:logging_header" ]
 
   public_deps = [
     "${chip_root}/src/app:test-event-trigger",

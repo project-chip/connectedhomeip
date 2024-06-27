@@ -22,7 +22,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/Base64.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <string>
 #include <vector>

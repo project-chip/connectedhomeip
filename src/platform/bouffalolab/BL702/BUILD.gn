@@ -58,7 +58,7 @@ static_library("BL702") {
     ]
   }
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [ "${chip_root}/src/platform:logging_header" ]
 
   defines =
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]

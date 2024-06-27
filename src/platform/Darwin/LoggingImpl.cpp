@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 namespace chip {
 namespace Logging {

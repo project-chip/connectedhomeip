@@ -83,20 +83,15 @@ source_set("default") {
   }
 }
 
-source_set("headers") {
-  public = [ "LogV.h" ]
-}
-
 if (current_os == "android") {
   static_library("android") {
     sources = [ "impl/android/Logging.cpp" ]
     deps = [
-      ":headers",
       "${chip_root}/src/lib/core:chip_config_header",
       "${chip_root}/src/lib/support:attributes",
       "${chip_root}/src/lib/support:logging_constants",
+      "${chip_root}/src/platform:logging_header",
       "${chip_root}/src/platform:platform_config_header",
-      "${chip_root}/src/platform/logging:headers",
     ]
 
     libs = [ "log" ]
@@ -112,12 +107,11 @@ source_set("stdio") {
   sources = [ "impl/stdio/Logging.cpp" ]
 
   deps = [
-    ":headers",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:logging_constants",
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/platform:platform_config_header",
-    "${chip_root}/src/platform/logging:headers",
   ]
 
   # Ensure we end up with the expected output file name

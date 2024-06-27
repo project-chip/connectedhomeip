@@ -127,7 +127,7 @@ source_set("text_only_logging") {
   deps = [
     ":memory",
     "${chip_root}/src/lib/core:chip_config_header",
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/platform:logging_header",
   ]
 }
 

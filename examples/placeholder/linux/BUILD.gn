@@ -41,7 +41,7 @@ executable("chip-${chip_tests_zap_config}") {
     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:test_utils",
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/third_party/jsoncpp",
   ]
 

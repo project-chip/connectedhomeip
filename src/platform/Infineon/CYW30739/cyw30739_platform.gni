@@ -51,8 +51,8 @@ template("cyw30739_platform") {
     configs += [ "${matter_wpan_sdk_build_root}:${board}-config" ]
 
     deps = [
+      "${chip_root}/src/platform:logging_header",
       "${chip_root}/src/platform:platform",
-      "${chip_root}/src/platform/logging:headers",
     ]
 
     if (chip_enable_openthread) {

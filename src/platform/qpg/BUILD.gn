@@ -49,7 +49,7 @@ static_library("qpg") {
     "qpgConfig.h",
   ]
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [ "${chip_root}/src/platform:logging_header" ]
 
   public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 
@@ -92,8 +92,8 @@ static_library("qpg") {
 
 source_set("logging") {
   deps = [
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
   ]
   sources = [ "Logging.cpp" ]
 }

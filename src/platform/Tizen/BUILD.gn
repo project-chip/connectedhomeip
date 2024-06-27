@@ -68,8 +68,8 @@ static_library("Tizen") {
   deps = [ "${chip_root}/src/setup_payload" ]
 
   public_deps = [
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
     "${tizen_root}:tizen",
   ]
 
@@ -115,8 +115,8 @@ static_library("Tizen") {
 
 source_set("logging") {
   deps = [
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
     "${tizen_root}:tizen",
   ]
   sources = [ "Logging.cpp" ]

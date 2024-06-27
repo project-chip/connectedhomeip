@@ -158,8 +158,8 @@ static_library("Linux") {
 
 source_set("logging") {
   deps = [
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
   ]
 
   if (chip_use_pw_logging) {

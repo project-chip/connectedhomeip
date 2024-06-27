@@ -51,7 +51,7 @@ static_library("Beken") {
 
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/setup_payload",
   ]
 
@@ -63,8 +63,8 @@ static_library("Beken") {
 
 source_set("logging") {
   deps = [
+    "${chip_root}/src/platform:logging_header",
     "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
   ]
   sources = [ "Logging.cpp" ]
 }

@@ -84,7 +84,7 @@ static_library("fabric-admin-utils") {
 
   sources += [ "commands/interactive/InteractiveCommands.cpp" ]
   deps += [
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/platform:logging_header",
     "${editline_root}:editline",
   ]
 
