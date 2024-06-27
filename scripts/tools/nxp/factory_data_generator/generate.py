@@ -27,6 +27,7 @@ from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVe
                     ProductPrimaryColor, ProductURL, Salt, SerialNum, SetupPasscode, StrArgument, UniqueId, VendorId, VendorName,
                     Verifier)
 from default import InputArgument
+from crc import Calculator, Crc16
 
 # Global variable for hash ID
 hash_id = "CE47BA5E"
@@ -133,6 +134,14 @@ class KlvGenerator:
 
                 size = len(fullContent)
 
+                if (self.args.hw_params):
+                    calculator = Calculator(Crc16.XMODEM)
+                    crc_sum = calculator.checksum(fullContent)
+
+                    fullContent = bytearray(b"APP_FACT_DATA:  ") + size.to_bytes(4,'little') + fullContent + crc_sum.to_bytes(2,'little')
+
+                    size = len(fullContent)
+
                 logging.info("Size of final generated binary is: {} bytes".format(size))
                 file.write(fullContent)
             else:
@@ -235,6 +244,8 @@ def main():
                           help="[str] Visible finish of the product")
     optional.add_argument("--product_primary_color", type=ProductPrimaryColor, metavar=ProductPrimaryColor.VALUES,
                           help="[str] Representative color of the visible parts of the product")
+    optional.add_argument("--hw_params", action='store_true',
+                          help="[bool] If present, store factory data in HWParameters APP section")
 
     args = parser.parse_args()
 
