@@ -24,7 +24,6 @@ openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 config("openthread_k32w1_config") {
   include_dirs = [ "${openthread_nxp_root}/src/k32w1/k32w1" ]
-  include_dirs += [ "${chip_root}/examples/platform/nxp/k32w/k32w1" ]
 
   defines = [
     "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
@@ -33,6 +32,15 @@ config("openthread_k32w1_config") {
     "MBEDTLS_THREADING_C=1",
     "MBEDTLS_THREADING_ALT=1",
   ]
+
+  if (chip_mdns == "platform") {
+    defines += [
+      "OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE=1",
+      "OPENTHREAD_CONFIG_ECDSA_ENABLE=1",
+      "OPENTHREAD_CONFIG_DNS_CLIENT_SERVICE_DISCOVERY_ENABLE=1",
+      "OPENTHREAD_CONFIG_DNS_CLIENT_ENABLE=1",
+    ]
+  }
 
   if (use_smu2_dynamic) {
     defines += [
@@ -49,10 +57,7 @@ source_set("openthread_core_config_k32w1") {
   ]
 
   public_configs = [ ":openthread_k32w1_config" ]
-}
-
-source_set("openthread_mbedtls_config_k32w1") {
-  sources = [ "${openthread_nxp_root}/src/k32w1/k32w1/k32w1-mbedtls-config.h" ]
+  public_deps = [ nxp_sdk_target ]
 }
 
 source_set("libopenthread-k32w1") {
@@ -86,9 +91,8 @@ source_set("libopenthread-k32w1") {
   }
 
   public_deps = [
-    ":openthread_core_config_k32w1",
-    "${nxp_sdk_build_root}:nxp_sdk",
-    "${openthread_root}/src/core:libopenthread_core_headers",
+    nxp_sdk_target,
+    "${nxp_sdk_build_root}:nxp_mbedtls",
     "../../..:libopenthread-platform",
     "../../..:libopenthread-platform-utils",
   ]
