@@ -78,7 +78,9 @@ public:
     virtual CHIP_ERROR CommitActiveDataset() = 0;
 
     // The Delegate implementation should restore the backup active dataset in this function.
-    // Once RevertActiveDataset is called the ActivateDatasetCallback of previous SetActiveDataset should never be called.
+    // If RevertActiveDataset is called before the ActivateDatasetCallback that would result from a
+    // previous SetActiveDataset, the delegate must ensure that the ActivateDatasetCallback
+    // for that previous SetActiveDataset call will not happen.
     virtual CHIP_ERROR RevertActiveDataset() = 0;
 
     virtual CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) = 0;
