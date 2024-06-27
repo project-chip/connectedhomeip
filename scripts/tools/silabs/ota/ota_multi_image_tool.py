@@ -270,7 +270,7 @@ def create_image(args: object):
 
 def main():
     """
-    This function is a modified version of ota_multi_image_tool.py main function.
+    This function is a modified version of ota_image_tool.py main function.
 
     The wrapper version defines a new set of args, which are used to generate
     TLV data that will be embedded in the final OTA payload.
