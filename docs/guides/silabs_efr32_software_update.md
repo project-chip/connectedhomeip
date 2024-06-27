@@ -101,8 +101,8 @@ OTA Software Update process the Software Version parameter that the .ota file
 was built with must be greater than the
 CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION parameter set in the application's
 `CHIPProjectConfig.h` file. The Software Version parameter is set by the `-vn`
-parameter passed to the `ota_multi_image_tool.py create` command. For example, if the
-application's running image was built with
+parameter passed to the `ota_multi_image_tool.py create` command. For example,
+if the application's running image was built with
 CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION set to 1 and if the `.ota` file is
 built with `-vn 2` then the Provider will serve the update image when requested.
 
