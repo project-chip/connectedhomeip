@@ -61,6 +61,10 @@ class TC_PWRTL_2_1(MatterBaseTest):
                 asserts.assert_less_equal(len(available_endpoints), 21,
                                           "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
 
+        else: 
+            logging.info('Skipping test as available endpoints attribute ID not in attribute list on DUT')
+            return
+
         self.print_step(3, "Read ActiveEndpoints attribute")
         if act_endpoints_attr_id in attribute_list:
             active_endpoints = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.PowerTopology,  attribute=attributes.ActiveEndpoints)
@@ -70,6 +74,9 @@ class TC_PWRTL_2_1(MatterBaseTest):
                 asserts.assert_true(active_endpoints == NullValue or active_endpoints == [],
                                     "ActiveEndpoints should be null when AvailableEndpoints is null: %s" % active_endpoints)
 
+        else: 
+            logging.info('Skipping test as active endpoints attribute ID not in attribute list on DUT')
+            return
 
 if __name__ == "__main__":
     default_matter_test_main()
