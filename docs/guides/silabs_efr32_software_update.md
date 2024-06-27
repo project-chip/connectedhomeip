@@ -37,7 +37,7 @@ all of the EFR32 example applications.
 
 -   Create the Matter OTA file from the bootable image file:
 
-           ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota
+           ./src/app/ota_multi_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota
 
 -   In a terminal start the Provider app passing to it the path to the Matter
     OTA file created in the previous step:
@@ -101,7 +101,7 @@ OTA Software Update process the Software Version parameter that the .ota file
 was built with must be greater than the
 CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION parameter set in the application's
 `CHIPProjectConfig.h` file. The Software Version parameter is set by the `-vn`
-parameter passed to the `ota_image_tool.py create` command. For example, if the
+parameter passed to the `ota_multi_image_tool.py create` command. For example, if the
 application's running image was built with
 CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION set to 1 and if the `.ota` file is
 built with `-vn 2` then the Provider will serve the update image when requested.
