@@ -67,7 +67,7 @@ public:
 
     void RemoveSyncedDevice(chip::NodeId nodeId);
 
-    void HanldeAttributeChange(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
+    void HandleAttributeChange(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
 
     void OnDeviceRemoved(chip::NodeId deviceId, CHIP_ERROR err) override;
 
@@ -80,6 +80,7 @@ private:
     chip::NodeId mRemoteBridgeNodeId = chip::kUndefinedNodeId;
     std::set<Device> mSyncedDevices;
     bool mAutoSyncEnabled = false;
+    bool mInitialized     = false;
 
     Device * FindDeviceByEndpoint(chip::EndpointId endpointId);
     Device * FindDeviceByNode(chip::NodeId nodeId);
@@ -93,5 +94,9 @@ private:
  */
 inline DeviceManager & DeviceMgr()
 {
+    if (!DeviceManager::sInstance.mInitialized)
+    {
+        DeviceManager::sInstance.Init();
+    }
     return DeviceManager::sInstance;
 }

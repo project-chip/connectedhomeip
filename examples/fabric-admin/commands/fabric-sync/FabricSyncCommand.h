@@ -36,6 +36,7 @@ public:
     FabricSyncAddBridgeCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("add-bridge", credIssuerCommands)
     {
         AddArgument("nodeid", 0, UINT64_MAX, &mNodeId);
+        AddArgument("device-remote-ip", &mRemoteAddr);
     }
 
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR err) override;
@@ -48,6 +49,7 @@ public:
 private:
     chip::NodeId mNodeId;
     chip::NodeId mBridgeNodeId;
+    chip::ByteSpan mRemoteAddr;
 
     CHIP_ERROR RunCommand(NodeId remoteId);
 };

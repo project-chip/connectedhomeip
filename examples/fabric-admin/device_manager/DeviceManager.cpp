@@ -26,19 +26,12 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-namespace {
-
-// Constants
-constexpr uint32_t kSyncPrepareTimeMs = 1000;
-
-} // namespace
-
 // Define the static member
 DeviceManager DeviceManager::sInstance;
 
 void DeviceManager::Init()
 {
-    // TODO: Init mLastUsedNodeId from chip config file
+    // TODO: (#34113) Init mLastUsedNodeId from chip config file
     mLastUsedNodeId = 1;
 }
 
@@ -93,19 +86,18 @@ Device * DeviceManager::FindDeviceByNode(NodeId nodeId)
 void DeviceManager::RemoveSyncedDevice(NodeId nodeId)
 {
     Device * device = FindDeviceByNode(nodeId);
-    if (device != nullptr)
-    {
-        mSyncedDevices.erase(*device);
-        ChipLogProgress(NotSpecified, "Removed synced device: NodeId:" ChipLogFormatX64 ", EndpointId %u",
-                        ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
-    }
-    else
+    if (device == nullptr)
     {
         ChipLogProgress(NotSpecified, "No device found with NodeId:" ChipLogFormatX64, ChipLogValueX64(nodeId));
+        return;
     }
+
+    mSyncedDevices.erase(*device);
+    ChipLogProgress(NotSpecified, "Removed synced device: NodeId:" ChipLogFormatX64 ", EndpointId %u",
+                    ChipLogValueX64(device->GetNodeId()), device->GetEndpointId());
 }
 
-void DeviceManager::HanldeAttributeChange(const app::ConcreteDataAttributePath & path, TLV::TLVReader * data)
+void DeviceManager::HandleAttributeChange(const app::ConcreteDataAttributePath & path, TLV::TLVReader * data)
 {
     if (path.mClusterId != Descriptor::Id || path.mAttributeId != Descriptor::Attributes::PartsList::Id)
     {
@@ -140,9 +132,14 @@ void DeviceManager::HanldeAttributeChange(const app::ConcreteDataAttributePath &
         return;
     }
 
-    // Compare newEndpoints with mSyncedEndpoints to determine added and removed endpoints
+    // Compare newEndpoints with mSyncedDevices to determine added and removed endpoints
     std::vector<EndpointId> addedEndpoints;
     std::vector<EndpointId> removedEndpoints;
+
+    // Note: We're using vectors and manual searches instead of set operations
+    // because we need to work with the Device objects in mSyncedDevices,
+    // not just their EndpointIds. This approach allows us to access the full
+    // Device information when processing changes.
 
     // Find added endpoints
     for (const auto & endpoint : newEndpoints)
@@ -172,8 +169,6 @@ void DeviceManager::HanldeAttributeChange(const app::ConcreteDataAttributePath &
         {
             char command[64];
             snprintf(command, sizeof(command), "fabricsync sync-device %d", endpoint);
-
-            usleep(kSyncPrepareTimeMs * 1000);
             PushCommand(command);
         }
     }
@@ -205,8 +200,6 @@ void DeviceManager::HanldeAttributeChange(const app::ConcreteDataAttributePath &
             }
 
             pairingCommand->RegisterPairingDelegate(this);
-
-            usleep(kSyncPrepareTimeMs * 1000);
             PushCommand(command);
         }
     }

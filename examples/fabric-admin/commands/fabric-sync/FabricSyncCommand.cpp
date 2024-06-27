@@ -37,6 +37,7 @@ constexpr uint32_t kCommissionPrepareTimeMs = 500;
 constexpr uint16_t kMaxManaulCodeLength     = 21;
 constexpr uint16_t kSubscribeMinInterval    = 0;
 constexpr uint16_t kSubscribeMaxInterval    = 60;
+constexpr uint16_t kRemoteBridgePort        = 5540;
 
 } // namespace
 
@@ -80,14 +81,15 @@ CHIP_ERROR FabricSyncAddBridgeCommand::RunCommand(NodeId remoteId)
     }
 
     char command[kMaxCommandSize];
-    snprintf(command, sizeof(command), "pairing onnetwork %ld %d", remoteId, kSetupPinCode);
+    snprintf(command, sizeof(command), "pairing already-discovered %ld %d %s %d", remoteId, kSetupPinCode,
+             reinterpret_cast<const char *>(mRemoteAddr.data()), kRemoteBridgePort);
 
-    PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "onnetwork"));
+    PairingCommand * pairingCommand = static_cast<PairingCommand *>(CommandMgr().GetCommandByName("pairing", "already-discovered"));
 
     if (pairingCommand == nullptr)
     {
         ChipLogError(NotSpecified, "Pairing onnetwork command is not available");
-        return CHIP_ERROR_UNINITIALIZED;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     pairingCommand->RegisterCommissioningDelegate(this);
@@ -128,7 +130,7 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
     if (bridgeNodeId == kUndefinedNodeId)
     {
         // print to console
-        fprintf(stderr, "Remote Fabric Bridge is not configured yet.");
+        fprintf(stderr, "Remote Fabric Bridge is not configured yet, nothing to remove.");
         return CHIP_NO_ERROR;
     }
 
@@ -142,7 +144,7 @@ CHIP_ERROR FabricSyncRemoveBridgeCommand::RunCommand()
     if (pairingCommand == nullptr)
     {
         ChipLogError(NotSpecified, "Pairing code command is not available");
-        return CHIP_ERROR_UNINITIALIZED;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     pairingCommand->RegisterPairingDelegate(this);
@@ -231,7 +233,7 @@ CHIP_ERROR FabricSyncDeviceCommand::RunCommand(EndpointId remoteId)
 
     if (openCommand == nullptr)
     {
-        return CHIP_ERROR_UNINITIALIZED;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     openCommand->RegisterDelegate(this);
