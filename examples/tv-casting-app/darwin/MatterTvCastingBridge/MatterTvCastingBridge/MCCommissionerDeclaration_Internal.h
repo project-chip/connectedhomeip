@@ -1,7 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,22 +15,18 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of logging support
- *          for Open IOT SDK platform.
- */
+#import "MCCommissionerDeclaration.h"
+#import "core/Types.h"
 
-#pragma once
+#import <Foundation/Foundation.h>
 
-#include <lib/support/logging/Constants.h>
+#ifndef MCCommissionerDeclaration_Internal_h
+#define MCCommissionerDeclaration_Internal_h
 
-namespace chip {
-namespace Logging {
-namespace Platform {
+@interface MCCommissionerDeclaration ()
 
-void ois_logging_init(void);
+- (instancetype _Nonnull)initWithCppCommissionerDeclaration:(std::shared_ptr<chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration>)cppCommissionerDeclaration;
 
-} // namespace Platform
-} // namespace Logging
-} // namespace chip
+@end
+
+#endif /*  MCCommissionerDeclaration_Internal_h */

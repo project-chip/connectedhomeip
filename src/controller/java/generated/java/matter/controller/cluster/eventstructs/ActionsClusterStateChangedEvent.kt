@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class ActionsClusterStateChangedEvent(
   val actionID: UShort,
   val invokeID: UInt,
-  val newState: UByte
+  val newState: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterStateChangedEvent {\n")

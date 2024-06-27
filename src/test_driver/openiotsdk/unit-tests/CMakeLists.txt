@@ -28,6 +28,7 @@ set(CONFIG_CHIP_DETAIL_LOGGING NO)
 set(CONFIG_CHIP_PROGRESS_LOGGING NO)
 set(CONFIG_CHIP_AUTOMATION_LOGGING YES)
 set(CONFIG_CHIP_ERROR_LOGGING NO)
+set(CONFIG_CHIP_FORCE_LOGGING_STDIO YES)
 
 # Toolchain files need to exist before first call to project
 include(toolchain)

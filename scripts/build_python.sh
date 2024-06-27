@@ -222,10 +222,10 @@ if [ -n "$install_virtual_env" ]; then
     if [ "$clean_virtual_env" = "yes" ]; then
         # Create a virtual environment that has access to the built python tools
         echo_blue "Creating a clear VirtualEnv in '$ENVIRONMENT_ROOT' ..."
-        virtualenv --clear "$ENVIRONMENT_ROOT"
+        python -m venv --clear "$ENVIRONMENT_ROOT"
     elif [ ! -f "$ENVIRONMENT_ROOT"/bin/activate ]; then
         echo_blue "Creating a new VirtualEnv in '$ENVIRONMENT_ROOT' ..."
-        virtualenv "$ENVIRONMENT_ROOT"
+        python -m venv "$ENVIRONMENT_ROOT"
     fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
