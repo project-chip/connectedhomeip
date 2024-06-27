@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <!--
 Copyright (c) 2023 Project CHIP Authors
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,18 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="Energy"/>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0096"/>
-    <field name="TemperatureOffset" mask="0x1"/>
-    <field name="TemperatureSetpoint" mask="0x2"/>
-    <field name="LoadAdjustment" mask="0x4"/>
-    <field name="DutyCycle" mask="0x08"/>
-    <field name="PowerSavings" mask="0x10"/>
-    <field name="HeatingSource" mask="0x20"/>
-  </bitmap>
-
+  <domain name="Energy Management"/>
   <bitmap name="EventControlBitmap" type="bitmap16">
     <cluster code="0x0096"/>
     <field name="RandomStart" mask="0x01"/>
@@ -84,20 +76,20 @@ limitations under the License.
   <struct name="TemperatureControlStruct">
     <cluster code="0x0096"/>
     <!-- Note: No TemperatureDifference type available yet in ZAP XML -->
-    <item fieldId="0" name="CoolingTempOffset" type="int16u" isNullable="true" optional="true" />
-    <item fieldId="1" name="HeatingtTempOffset" type="int16u" isNullable="true" optional="true" />
-    <item fieldId="2" name="CoolingTempSetpoint" type="temperature" isNullable="true" optional="true" />
-    <item fieldId="3" name="HeatingTempSetpoint" type="temperature" isNullable="true" optional="true" />
+    <item fieldId="0" name="CoolingTempOffset" type="int16s" isNullable="true" optional="true"/>
+    <item fieldId="1" name="HeatingTempOffset" type="int16s" isNullable="true" optional="true"/>
+    <item fieldId="2" name="CoolingTempSetpoint" type="temperature" isNullable="true" optional="true"/>
+    <item fieldId="3" name="HeatingTempSetpoint" type="temperature" isNullable="true" optional="true"/>
   </struct>
 
   <struct name="AverageLoadControlStruct">
     <cluster code="0x0096"/>
-    <item fieldId="0" name="LoadAdjustment" type="int8s" min="-100" max="100" />
+    <item fieldId="0" name="LoadAdjustment" type="int8s" min="-100" max="100"/>
   </struct>
 
   <struct name="DutyCycleControlStruct">
     <cluster code="0x0096"/>
-    <item fieldId="0" name="DutyCycle" type="percent" />
+    <item fieldId="0" name="DutyCycle" type="percent"/>
   </struct>
 
   <struct name="PowerSavingsControlStruct">
@@ -107,13 +99,13 @@ limitations under the License.
 
   <struct name="HeatingSourceControlStruct">
     <cluster code="0x0096"/>
-    <item fieldId="0" name="HeatingSource" type="HeatingSourceEnum"/>
+    <item fieldId="0" name="HeatingSource" type="HeatingSourceEnum" min="0x00" max="0x02"/>
   </struct>
 
   <struct name="LoadControlEventTransitionStruct">
     <cluster code="0x0096"/>
-    <item fieldId="0" name="Duration" type="int16u" max="1440"/>
-    <item fieldId="1" name="Control" type="EventTransitionControlBitmap"/>
+    <item fieldId="0" name="Duration" type="int16u" max="1440" default="0"/>
+    <item fieldId="1" name="Control" type="EventTransitionControlBitmap" default="0x0000" min="0x0000" max="0x0003"/>
     <item fieldId="2" name="TemperatureControl" type="TemperatureControlStruct" optional="true"/>
     <item fieldId="3" name="AverageLoadControl" type="AverageLoadControlStruct" optional="true"/>
     <item fieldId="4" name="DutyCycleControl" type="DutyCycleControlStruct" optional="true"/>
@@ -121,111 +113,121 @@ limitations under the License.
     <item fieldId="6" name="HeatingSourceControl" type="HeatingSourceControlStruct" optional="true"/>
   </struct>
 
-  <struct name="LoadControlEventStruct">
+  <!-- This does not quite match the spec, which has LoadControlEventStruct as a
+       fabric-scoped struct with some fabric-sensitive fields, but that doesn't
+       really make sense in all the places where the struct is used, and the spec
+       does not really define other things in a way that would work with that at
+       the moment. -->
+  <struct name="LoadControlEventStruct" isFabricScoped="true">
     <cluster code="0x0096"/>
-    <item fieldId="0" name="EventID" type="octet_string" length="16"/>
-    <item fieldId="1" name="ProgramID" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="2" name="Status" type="LoadControlEventStatusEnum" defaut="0" />
-    <item fieldId="3" name="Control" type="EventControlBitmap" />
-    <item fieldId="4" name="Criticality" type="CriticalityLevelEnum" defaut="0" />
-    <item fieldId="5" name="StartTime" type="epoch_s" isNullable="true" />
-    <item fieldId="6" name="Transitions" array="true" type="LoadControlEventTransitionStruct" />
+    <item fieldId="0" name="EventID" type="octet_string" length="16" default="0" minLength="16"/>
+    <item fieldId="1" name="ProgramID" type="octet_string" length="16" isNullable="true" isFabricSensitive="true" minLength="16"/>
+    <item fieldId="2" name="Status" type="LoadControlEventStatusEnum" optional="true" isFabricSensitive="true" min="0x00" max="0x0C"/>
+    <item fieldId="3" name="Control" type="EventControlBitmap" isFabricSensitive="true" default="0x0001" min="0x0000" max="0x0001"/>
+    <item fieldId="4" name="Criticality" type="CriticalityLevelEnum" isFabricSensitive="true" default="0x00" min="0x00" max="0x06"/>
+    <item fieldId="5" name="StartTime" type="epoch_s" defaut="0" isNullable="true" isFabricSensitive="true"/>
+    <item fieldId="6" name="Transitions" type="LoadControlEventTransitionStruct" array="true" isFabricSensitive="true"/>
   </struct>
 
-  <struct name="LoadControlProgramStruct">
+  <struct name="LoadControlProgramStruct" isFabricScoped="true">
     <cluster code="0x0096"/>
-    <item fieldId="0" name="ProgramID" type="octet_string" length="16"/>
-    <item fieldId="1" name="Name" type="long_char_string" length="32"/>
-    <item fieldId="2" name="RandomStartMinutes" type="int8u" isNullable="true" min="0x00" max="0x3C"/>
-    <item fieldId="3" name="RandomDurationMinutes" type="int8u" isNullable="true" min="0x00" max="0x3C"/>
+    <item fieldId="0" name="ProgramID" type="octet_string" length="16" default="0" minLength="16"/>
+    <item fieldId="1" name="Name" type="char_string" length="32"/>
+    <item fieldId="2" name="RandomStartMinutes" type="int8u" isNullable="true" max="60"/>
+    <item fieldId="3" name="RandomDurationMinutes" type="int8u" isNullable="true" max="0x3C"/>
   </struct>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <name>Demand Response Load Control</name>
-    <domain>Energy</domain>
+    <domain>General</domain>
     <description>This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control.</description>
     <code>0x0096</code>
     <define>DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
-
     <features>
-      <feature bit="0" code="TEMPO" name="TemperatureOffset" summary="Supports temperature offsets">
+      <feature bit="0" code="ENRLG" name="Enrollment Groups" summary="Supports enrollment groups">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="TEMPO" name="TemperatureOffset" summary="Supports temperature offsets">
         <optionalConform choice="a" more="true"/>
       </feature>
-      <feature bit="1" code="TEMPS" name="TemperatureSetpoint" summary="Supports temperature setpoints">
+      <feature bit="2" code="TEMPS" name="TemperatureSetpoint" summary="Supports temperature setpoints">
         <optionalConform choice="a" more="true"/>
       </feature>
-      <feature bit="2" code="LOADA" name="LoadAdjustment" summary="Supports average load adjustment percentage">
+      <feature bit="3" code="LOADA" name="LoadAdjustment" summary="Supports average load adjustment percentage">
         <optionalConform choice="a" more="true"/>
       </feature>
-      <feature bit="3" code="DUTYC" name="DutyCycle" summary="Supports duty cycle adjustment">
+      <feature bit="4" code="DUTYC" name="DutyCycle" summary="Supports duty cycle adjustment">
         <optionalConform choice="a" more="true"/>
       </feature>
-      <feature bit="4" code="PWRSV" name="PowerSavings" summary="Supports power savings">
+      <feature bit="5" code="PWRSV" name="PowerSavings" summary="Supports power savings">
         <optionalConform choice="a" more="true"/>
       </feature>
-      <feature bit="5" code="HEATS" name="HeatingSource" summary="Supports selecting heating source">
+      <feature bit="6" code="HEATS" name="HeatingSource" summary="Supports selecting heating source">
         <optionalConform choice="a" more="true"/>
       </feature>
     </features>
-
-    <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="ARRAY" entryType="LoadControlProgramStruct" writable="false">LoadControlPrograms</attribute>
-    <attribute side="server" code="0x0001" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" writable="false" default="5">NumberOfLoadControlPrograms</attribute>
-    <attribute side="server" code="0x0002" define="LOAD_CONTROL_EVENTS" type="ARRAY" entryType="LoadControlEventStruct" writable="false">Events</attribute>
-    <attribute side="server" code="0x0003" define="LOAD_CONTROL_ACTIVE_EVENTS" type="ARRAY" entryType="LoadControlEventStruct" writable="false">ActiveEvents</attribute>
-    <attribute side="server" code="0x0004" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" writable="false" default="10">NumberOfEventsPerProgram</attribute>
-    <attribute side="server" code="0x0005" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" writable="false" default="3">NumberOfTransitions</attribute>
-    <attribute side="server" code="0x0006" define="DEFAULT_RANDOM_START" type="int8u" min="0" max="0x3C" default="0x1E" writable="true">
+    <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="array" entryType="LoadControlProgramStruct">LoadControlPrograms</attribute>
+    <attribute side="server" code="0x0001" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" default="5">NumberOfLoadControlPrograms</attribute>
+    <attribute side="server" code="0x0002" define="LOAD_CONTROL_EVENTS" type="array" entryType="LoadControlEventStruct">Events</attribute>
+    <attribute side="server" code="0x0003" define="LOAD_CONTROL_ACTIVE_EVENTS" type="array" entryType="octet_string">ActiveEvents</attribute>
+    <attribute side="server" code="0x0004" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" default="10">NumberOfEventsPerProgram</attribute>
+    <attribute side="server" code="0x0005" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" default="3">NumberOfTransitions</attribute>
+    <attribute side="server" code="0x0006" define="DEFAULT_RANDOM_START" type="int8u" max="0x3C" default="0x1E" writable="true">
       <description>DefaultRandomStart</description>
-      <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0007" define="DEFAULT_RANDOM_DURATION" type="int8u" min="0" max="0x3C" default="0" writable="true">
+    <attribute side="server" code="0x0007" define="DEFAULT_RANDOM_DURATION" type="int8u" max="0x3C" default="0" writable="true">
       <description>DefaultRandomDuration</description>
-      <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-
     <command source="client" code="0x00" name="RegisterLoadControlProgramRequest" optional="false">
       <description>
         Upon receipt, this SHALL insert a new LoadControlProgramStruct into LoadControlPrograms, or if the ProgramID matches an existing LoadControlProgramStruct, then the provider SHALL be updated with the provided values.
       </description>
-      <arg name="LoadControlProgram" type="LoadControlProgramStruct"/>
+      <arg id="0" name="LoadControlProgram" type="LoadControlProgramStruct"/>
     </command>
+
     <command source="client" code="0x01" name="UnregisterLoadControlProgramRequest" optional="false">
       <description>
         Upon receipt, this SHALL remove a the LoadControlProgramStruct from LoadControlPrograms with the matching ProgramID.
       </description>
-      <arg name="LoadControlProgramID" type="octet_string" length="16"/>
+      <arg id="0" name="LoadControlProgramID" type="octet_string" length="16" minLength="16"/>
     </command>
+
     <command source="client" code="0x02" name="AddLoadControlEventRequest" optional="false">
       <description>
         On receipt of the AddLoadControlEventsRequest command, the server SHALL add a load control event.
       </description>
-      <arg name="Event" type="LoadControlEventStruct"/>
+      <arg id="0" name="Event" type="LoadControlEventStruct"/>
     </command>
+
     <command source="client" code="0x03" name="RemoveLoadControlEventRequest" optional="false">
       <description>
         Upon receipt, this SHALL remove the LoadControlEventStruct with the matching EventID from LoadEventPrograms.
       </description>
-      <arg name="EventID" type="octet_string" length="16"/>
-      <arg name="CancelControl" type="CancelControlBitmap"/>
+      <arg id="0" name="EventID" type="octet_string" length="16" minLength="16"/>
+      <arg id="1" name="CancelControl" type="CancelControlBitmap" default="0x0000" min="0x0000" max="0x0001"/>
     </command>
 
-    <event side="server" code="0x00" name="LoadControlEventStatusChange" priority="info" optional="false">
+    <event side="server" code="0x00" name="LoadControlEventStatusChange" priority="info" isFabricSensitive="true">
       <description>This event SHALL be generated when the status of a LoadControlEventStruct changes.</description>
-      <field id="0" name="EventID" type="octet_string" length="16"/>
-      <field id="1" name="TransitionIndex" type="int8u" isNullable="true"/>
-      <field id="2" name="Status" type="LoadControlEventStatusEnum"/>
-      <field id="3" name="Criticality" type="CriticalityLevelEnum"/>
-      <field id="4" name="Control" type="EventControlBitmap"/>
-      <field id="5" name="TemperatureControl" type="TemperatureControlStruct" isNullable="true" optional="true" />
-      <field id="6" name="AverageLoadControl" type="AverageLoadControlStruct" isNullable="true" optional="true" />
-      <field id="7" name="DutyCycleControl" type="DutyCycleControlStruct" isNullable="true" optional="true" />
-      <field id="8" name="PowerSavingsControl" type="PowerSavingsControlStruct" isNullable="true" optional="true" />
-      <field id="9" name="HeatingSourceControl" type="HeatingSourceControlStruct" isNullable="true" optional="true" />
+      <field id="0" name="EventID" type="octet_string" length="16" minLength="16"/>
+      <field id="1" name="TransitionIndex" type="int8u"/>
+      <field id="2" name="Status" type="LoadControlEventStatusEnum" min="0x00" max="0x0C"/>
+      <field id="3" name="Criticality" type="CriticalityLevelEnum" min="0x00" max="0x06"/>
+      <field id="4" name="Control" type="EventControlBitmap" default="0x0000" min="0x0000" max="0x0001"/>
+      <field id="5" name="TemperatureControl" type="TemperatureControlStruct" isNullable="true" optional="true"/>
+      <field id="6" name="AverageLoadControl" type="AverageLoadControlStruct" isNullable="true" optional="true"/>
+      <field id="7" name="DutyCycleControl" type="DutyCycleControlStruct" isNullable="true" optional="true"/>
+      <field id="8" name="PowerSavingsControl" type="PowerSavingsControlStruct" isNullable="true" optional="true"/>
+      <field id="9" name="HeatingSourceControl" type="HeatingSourceControlStruct" isNullable="true" optional="true"/>
+      <!-- Spec has an invalid field ID that cannot be used, so not enabling the Signature field for now.  See
+           https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/8515 -->
+      <!-- <field id="0xFF" name="Signature" type="octet_string" length="48" isNullable="true"/> -->
     </event>
+
   </cluster>
 </configurator>
