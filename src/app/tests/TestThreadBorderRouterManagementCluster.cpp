@@ -95,7 +95,7 @@ public:
             dataset.Init(ByteSpan(mActiveDataset, mActiveDatasetLen));
             return CHIP_NO_ERROR;
         }
-        else if (type == DatasetType::kPending && mPendingDatasetLen)
+        if (type == DatasetType::kPending && mPendingDatasetLen)
         {
             dataset.Init(ByteSpan(mPendingDataset, mPendingDatasetLen));
             return CHIP_NO_ERROR;
