@@ -119,7 +119,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::GetDataset(Thread::OperationalData
 }
 
 CHIP_ERROR GenericThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
-                                                               ActivateDatasetCallback * callback)
+                                                               uint32_t randomNumber, ActivateDatasetCallback * callback)
 {
     CHIP_ERROR err = BackupActiveDataset();
     if (err == CHIP_NO_ERROR)
@@ -128,7 +128,8 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::SetActiveDataset(const Thread::Ope
     }
     if (err == CHIP_NO_ERROR)
     {
-        mCallback = callback;
+        mRandomNumber = randomNumber;
+        mCallback     = callback;
     }
     return err;
 }
@@ -141,7 +142,7 @@ void GenericThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer
         if (event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange &&
             event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established)
         {
-            delegate->mCallback->OnActivateDatasetComplete(CHIP_NO_ERROR);
+            delegate->mCallback->OnActivateDatasetComplete(delegate->mRandomNumber, CHIP_NO_ERROR);
             // Delete Failsafe Keys after activating dataset is completed
             DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadDatasetTlvsKey);
             delegate->mCallback = nullptr;
