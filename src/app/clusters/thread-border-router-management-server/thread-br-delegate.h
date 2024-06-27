@@ -77,7 +77,7 @@ public:
     // The Delegate implementation should remove the backup active dataset in this function.
     virtual CHIP_ERROR CommitActiveDataset() = 0;
 
-    // The Delegate implement should restore the backup active dataset in this function.
+    // The Delegate implementation should restore the backup active dataset in this function.
     // Once RevertActiveDataset is called the ActivateDatasetCallback of previous SetActiveDataset should never be called.
     virtual CHIP_ERROR RevertActiveDataset() = 0;
 
