@@ -545,6 +545,7 @@ struct ChipDeviceEvent final
             uint8_t FabricIndex;
             uint8_t SecureSessionType;
             uint8_t TransportType;
+            uint16_t LocalSessionId;
         } SecureSessionEstablished;
     };
 
