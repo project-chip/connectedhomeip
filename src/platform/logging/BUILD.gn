@@ -83,21 +83,6 @@ source_set("default") {
   }
 }
 
-if (current_os == "android") {
-  static_library("android") {
-    sources = [ "impl/android/Logging.cpp" ]
-    deps = [
-      "${chip_root}/src/lib/core:chip_config_header",
-      "${chip_root}/src/lib/support:attributes",
-      "${chip_root}/src/lib/support:logging_constants",
-      "${chip_root}/src/platform:logging_header",
-      "${chip_root}/src/platform:platform_config_header",
-    ]
-
-    libs = [ "log" ]
-  }
-}
-
 # We need to reference the output file of ":stdio" at build time,
 # but get_target_outputs() does not work for binary targets. As a
 # workaround, define a reasonable path and make the target use it.
