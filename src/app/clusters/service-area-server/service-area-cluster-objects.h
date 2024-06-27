@@ -26,6 +26,7 @@ namespace app {
 namespace Clusters {
 namespace ServiceArea {
 
+// These limits are defined in the spec.
 inline constexpr size_t kLocationNameMaxSize = 128u;
 inline constexpr size_t kMapNameMaxSize      = 64u;
 
@@ -312,7 +313,7 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
     }
 
     /**
-     * @brief Set all fields of the mop object. All values are deep copied.
+     * @brief Set all fields of the map object. All values are deep copied.
      * @param[in] aMapId The identifier of this map.
      * @param[in] aMapName A human readable name (should not be empty string).
      *
