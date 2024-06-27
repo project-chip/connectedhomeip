@@ -41,7 +41,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
         attributes = Clusters.PowerTopology.Attributes
 
         endpoint = 1
-        
+
         powertop_attr_list = Clusters.Objects.PowerTopology.Attributes.AttributeList
         powertop_cluster = Clusters.Objects.PowerTopology
         attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=powertop_cluster, attribute=powertop_attr_list)
@@ -59,7 +59,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             else:
                 logging.info("AvailableEndpoints: %s" % (available_endpoints))
                 asserts.assert_less_equal(len(available_endpoints), 21,
-                                        "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
+                                          "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
 
         self.print_step(3, "Read ActiveEndpoints attribute")
         if act_endpoints_attr_id in attribute_list:
