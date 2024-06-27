@@ -689,7 +689,7 @@ static sl_status_t wfx_rsi_do_join(void)
     status           = sl_wifi_connect(SL_WIFI_CLIENT_INTERFACE, &ap, timeout_ms);
     // sl_wifi_connect returns SL_STATUS_IN_PROGRESS if join is in progress
     // after the initial scan is done, the scan does not check for SSID
-    VerifyOrReturnError((status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS), status);
+    ReturnErrorCodeIf((status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS), status);
 
     // failure only happens when the firmware returns an error
     ChipLogError(DeviceLayer, "wfx_rsi_do_join: sl_wifi_connect failed: 0x%lx", status);
