@@ -45,10 +45,10 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         # Time sync is required to be on endpoint 0 if it is present
         endpoint = 0
 
-        time_cluster = Clusters.Objects.TimeSynchronization
-        timesync_attr_list = Clusters.Objects.TimeSynchronization.Attributes.AttributeList
+        time_cluster = Clusters.TimeSynchronization
+        timesync_attr_list = time_cluster.Attributes.AttributeList
         attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=time_cluster, attribute=timesync_attr_list)
-        timesource_attr_id = Clusters.Objects.TimeSynchronization.Attributes.TimeSource.attribute_id
+        timesource_attr_id = time_cluster.Attributes.TimeSource.attribute_id
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
