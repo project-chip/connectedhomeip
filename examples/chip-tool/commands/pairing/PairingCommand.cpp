@@ -212,7 +212,12 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+    VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
+    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode.value()).SetPeerAddress(address);
+    if (mDiscriminator.has_value())
+    {
+        params.SetDiscriminator(mDiscriminator.value());
+    }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))
@@ -232,9 +237,11 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t in
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
     VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
 
+    VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
+
     RendezvousParameters params;
     ReturnErrorOnFailure(GetDeviceScanner().Get(index, params));
-    params.SetSetupPINCode(mSetupPINCode);
+    params.SetSetupPINCode(mSetupPINCode.value());
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))
@@ -254,6 +261,10 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t in
 
 CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uint16_t index)
 {
+    // We might or might not have a setup code.  We don't know yet, but if we
+    // do, we'll emplace it at that point.
+    mSetupPINCode.reset();
+
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
     VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -277,7 +288,7 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uin
             VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        mSetupPINCode = payload.setUpPINCode;
+        mSetupPINCode.emplace(payload.setUpPINCode);
         return PairWithMdnsOrBleByIndex(remoteId, index);
     }
 
