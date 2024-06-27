@@ -53,7 +53,6 @@ static_library("Tizen") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
     "PlatformManagerImpl.cpp",
@@ -66,13 +65,11 @@ static_library("Tizen") {
     "SystemTimeSupport.cpp",
   ]
 
-  deps = [
-    "${chip_root}/src/platform/logging:headers",
-    "${chip_root}/src/setup_payload",
-  ]
+  deps = [ "${chip_root}/src/setup_payload" ]
 
   public_deps = [
     "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
     "${tizen_root}:tizen",
   ]
 
@@ -114,4 +111,13 @@ static_library("Tizen") {
   }
 
   cflags = [ "-Wconversion" ]
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+    "${tizen_root}:tizen",
+  ]
+  sources = [ "Logging.cpp" ]
 }

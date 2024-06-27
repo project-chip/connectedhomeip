@@ -284,7 +284,7 @@ class JinjaCodegenTarget():
             for name in paths:
                 logging.info("    %s" % name)
 
-            VERSION = "0.44"
+            VERSION = "0.51"
             JAR_NAME = f"ktfmt-{VERSION}-jar-with-dependencies.jar"
             jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
 

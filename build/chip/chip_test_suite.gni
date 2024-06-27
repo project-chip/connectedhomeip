@@ -94,9 +94,12 @@ template("chip_test_suite") {
 
     deps = [ dir_pw_unit_test ]
 
-    if (current_os != "zephyr" && current_os != "mbed") {
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "efr32") {
       # Depend on stdio logging, and have it take precedence over the default platform backend
-      public_deps += [ "${chip_root}/src/platform/logging:force_stdio" ]
+      public_deps += [ "${chip_root}/src/platform/logging:stdio" ]
+    } else {
+      public_deps += [ "${chip_root}/src/platform/logging:default" ]
     }
   }
   if (chip_link_tests) {
