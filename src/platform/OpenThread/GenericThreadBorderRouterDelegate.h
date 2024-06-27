@@ -65,7 +65,8 @@ public:
 
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
 
-    CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCallback * callback) override;
+    CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t randomNumber,
+                                ActivateDatasetCallback * callback) override;
 
     CHIP_ERROR RevertActiveDataset() override;
 
@@ -79,6 +80,7 @@ private:
     CHIP_ERROR BackupActiveDataset();
     ActivateDatasetCallback * mCallback        = nullptr;
     Thread::OperationalDataset mStagingDataset = {};
+    uint32_t mRandomNumber;
 };
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters

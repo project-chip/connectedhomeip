@@ -103,7 +103,8 @@ public:
         return CHIP_IM_GLOBAL_STATUS(NotFound);
     }
 
-    CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCallback * callback) override
+    CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t randomNumber,
+                                ActivateDatasetCallback * callback) override
     {
         memcpy(mActiveDataset, activeDataset.AsByteSpan().data(), activeDataset.AsByteSpan().size());
         mActiveDatasetLen = activeDataset.AsByteSpan().size();
