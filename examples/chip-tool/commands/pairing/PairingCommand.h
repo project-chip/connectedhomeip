@@ -26,6 +26,8 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
+#include <optional>
+
 enum class PairingMode
 {
     None,
@@ -107,32 +109,32 @@ public:
             break;
         case PairingMode::Ble:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::SoftAP:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::AlreadyDiscovered:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::AlreadyDiscoveredByIndex:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
@@ -252,8 +254,14 @@ private:
         mComplex_DSTOffsets;
 
     uint16_t mRemotePort;
-    uint16_t mDiscriminator;
-    uint32_t mSetupPINCode;
+    // mDiscriminator is only used for some situations, but in those situations
+    // it's mandatory.  Track whether we're actually using it; the cases that do
+    // will emplace this optional.
+    std::optional<uint16_t> mDiscriminator;
+    // mSetupPINCode is only used for some situations, but in those situations
+    // it's mandatory.  Track whether we're actually using it; the cases that do
+    // will emplace this optional.
+    std::optional<uint32_t> mSetupPINCode;
     uint16_t mIndex;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
