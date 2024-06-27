@@ -809,9 +809,6 @@ template("siwx917_sdk") {
       ]
     }
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-      "${examples_plat_dir}:siwx917-common-config",
-    ]
+    public_configs = [ ":${sdk_target_name}_config" ]
   }
 }
