@@ -1,9 +1,12 @@
 # CHIP NXP Zephyr All-clusters Application
 
-The all-clusters example implements a server which can be accessed by a CHIP controller and can accept basic cluster commands.
+The all-clusters example implements a server which can be accessed by a CHIP
+controller and can accept basic cluster commands.
 
-The example is based on [Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP Zephyr SDK,
-and provides a prototype application that demonstrates device commissioning and different cluster control.
+The example is based on
+[Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP
+Zephyr SDK, and provides a prototype application that demonstrates device
+commissioning and different cluster control.
 
 <hr>
 
@@ -22,14 +25,17 @@ and provides a prototype application that demonstrates device commissioning and 
 
 ## Introduction
 
-The Zephyr application provides a working demonstration of supported board integration from Zephyr,
-built using the Project CHIP codebase and the NXP/Zephyr SDK.
+The Zephyr application provides a working demonstration of supported board
+integration from Zephyr, built using the Project CHIP codebase and the
+NXP/Zephyr SDK.
 
 The example supports:
-- Matter over Wi-Fi
+
+-   Matter over Wi-Fi
 
 The supported boards are:
-- `rd_rw612_bga`
+
+-   `rd_rw612_bga`
 
 <a name="building"></a>
 
@@ -39,37 +45,49 @@ In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
 Prerequisites:
-- Follow instruction from [BUILDING.md](../../../../docs/guides/BUILDING.md) to setup the Matter environment
-- Follow instruction from [Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html) to setup a Zephyr workspace,
-  however, the west init command to use is as follows:
+
+-   Follow instruction from [BUILDING.md](../../../../docs/guides/BUILDING.md)
+    to setup the Matter environment
+-   Follow instruction from
+    [Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
+    to setup a Zephyr workspace, however, the west init command to use is as
+    follows:
 
 ```shell
 $ west init zephyrproject -m https://github.com/nxp-zephyr-ear/zephyr.git --mr zephyr_rw61x_v3.6_RFP
 ```
 
-
->**Note**: Currently, supported NXP platforms in Zephyr targetting Matter are not available in the official Zephyr repo,
-> you'll have to use the NXP fork `https://github.com/nxp-zephyr-ear/zephyr` github repo. Reach to your NXP contact for more details.
+> **Note**: Currently, supported NXP platforms in Zephyr targetting Matter are
+> not available in the official Zephyr repo, you'll have to use the NXP fork
+> `https://github.com/nxp-zephyr-ear/zephyr` github repo. Reach to your NXP
+> contact for more details.
 
 Steps to build the example, targetting `rd_rw612_bga` board:
 
 1. Activate your Matter env:
+
 ```shell
 source <path to CHIP workspace>/scripts/activate.sh
 ```
+
 2. Source zephyr-env.sh:
+
 ```shell
 source <path to zephyr repo>/zephyr-env.sh
 ```
+
 3. Run west build command:
+
 ```shell
 west build -b rd_rw612_bga -p  <path to example folder>
 ```
 
-By default, a folder `build` will be created in the same folder you run the command from.
-The binaries will be created in `build/zephyr` with the name `zephyr.elf` and `zephyr.bin`.
+By default, a folder `build` will be created in the same folder you run the
+command from. The binaries will be created in `build/zephyr` with the name
+`zephyr.elf` and `zephyr.bin`.
 
-You can get more details on `west build` with [Zephyr's building guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#building-west-build)
+You can get more details on `west build` with
+[Zephyr's building guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#building-west-build)
 
 <a name="flashdebug"></a>
 
@@ -78,32 +96,41 @@ You can get more details on `west build` with [Zephyr's building guide](https://
 ### Flashing without debugging
 
 `west` can be used to flash a target, as an example for `rd_rw612_bga` board:
+
 ```shell
 west flash -i <J-Link serial number>
 ```
 
-You can get more details on `west flash` with [Zephyr's flashing guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#flashing-west-flash)
+You can get more details on `west flash` with
+[Zephyr's flashing guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#flashing-west-flash)
 
->**Note**: `west flash` will not start a debug session, it will only flash and reset the device
+> **Note**: `west flash` will not start a debug session, it will only flash and
+> reset the device
 
 ### Flash and debug
 
 To debug a Matter with Zephyr application, you could use several methods:
-- [MCUXpresso IDE (version >= 11.6.0)](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE)
-- `west debug` [Zephyr's debugging guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#id29)
 
->**Note**: As the build provides an elf file, any compatible debugging tool can be used.
+-   [MCUXpresso IDE (version >= 11.6.0)](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE)
+-   `west debug`
+    [Zephyr's debugging guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#id29)
+
+> **Note**: As the build provides an elf file, any compatible debugging tool can
+> be used.
 
 <a name="factorydata"></a>
 
 ## Factory data
 
-NXP Zephyr examples are not using factory data support by default.
-Please refer the the section below to build with factory data.
+NXP Zephyr examples are not using factory data support by default. Please refer
+the the section below to build with factory data.
 
-You may refer to `src/platform/nxp/zephyr/boards/<board>/<board>.overlay` file to obtain the memory region used by this partition.
+You may refer to `src/platform/nxp/zephyr/boards/<board>/<board>.overlay` file
+to obtain the memory region used by this partition.
 
-For example, the factory data partition on rd_rw612_bga is reserved in the last sector of the flexspi flash of RD BGA board, at `0x1BFFF000`.
+For example, the factory data partition on rd_rw612_bga is reserved in the last
+sector of the flexspi flash of RD BGA board, at `0x1BFFF000`.
+
 ```
 &flexspi {
   status = "okay";
@@ -118,74 +145,92 @@ For example, the factory data partition on rd_rw612_bga is reserved in the last 
 };
 ```
 
->**Note**: You may also refer to `src/platform/nxp/zephyr/boards/<board>/<board>.overlay` file to check other memory partitions used by the platform, such as the file system partition mentioned with the `storage` label.
+> **Note**: You may also refer to
+> `src/platform/nxp/zephyr/boards/<board>/<board>.overlay` file to check other
+> memory partitions used by the platform, such as the file system partition
+> mentioned with the `storage` label.
 
 ### Build with factory data support
 
-To build the example with factory data support, you can add `-DFILE_SUFFIX=fdata` in the
-west build command line.
+To build the example with factory data support, you can add
+`-DFILE_SUFFIX=fdata` in the west build command line.
 
 Example:
+
 ```bash
 west build -b rd_rw612_bga -p  <path to example folder> -- -DFILE_SUFFIX=fdata
 ```
 
-`prj_fdata.conf` configuration file will enable `CONFIG_CHIP_FACTORY_DATA` Kconfig so the application will load the
-factory data at boot.
+`prj_fdata.conf` configuration file will enable `CONFIG_CHIP_FACTORY_DATA`
+Kconfig so the application will load the factory data at boot.
 
 ### Generate factory data
 
 #### Automatically (recommended)
 
-The factory data can be generated automatically during the build of the application.
-To do so, you can uncomment the `CONFIG_CHIP_FACTORY_DATA_BUILD=y` in `prj_fdata.conf`.
+The factory data can be generated automatically during the build of the
+application. To do so, you can uncomment the `CONFIG_CHIP_FACTORY_DATA_BUILD=y`
+in `prj_fdata.conf`.
 
-You will have to specify the source of the certificates to be used for the factory data.
-Please refer to `CHIP_FACTORY_DATA_CERT_SOURCE` Kconfig for more info.
+You will have to specify the source of the certificates to be used for the
+factory data. Please refer to `CHIP_FACTORY_DATA_CERT_SOURCE` Kconfig for more
+info.
 
->**Note**: The application demonstrates the usage of encrypted Matter factory data storage.
-> Matter factory data should be encrypted using an AES 128 software key before flashing them to the device flash.
-> You can encrypt the factory data automatically during the build by enabling `CHIP_ENCRYPTED_FACTORY_DATA` Kconfig.
-> See also `CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY` Kconfig if you want to use a specific key.
+> **Note**: The application demonstrates the usage of encrypted Matter factory
+> data storage. Matter factory data should be encrypted using an AES 128
+> software key before flashing them to the device flash. You can encrypt the
+> factory data automatically during the build by enabling
+> `CHIP_ENCRYPTED_FACTORY_DATA` Kconfig. See also
+> `CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY` Kconfig if you want to use a specific
+> key.
 
-The resulting factory data will be provided along `zephyr.bin` as a binary file named `factory_data.bin`.
-In order to flash it to your device, you need to know the partition address: please refer to `factory_partition` defined in `src/platform/nxp/zephyr/boards/<board>/<board>.overlay`.
+The resulting factory data will be provided along `zephyr.bin` as a binary file
+named `factory_data.bin`. In order to flash it to your device, you need to know
+the partition address: please refer to `factory_partition` defined in
+`src/platform/nxp/zephyr/boards/<board>/<board>.overlay`.
 
 #### Manually
 
-See [Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp/nxp_manufacturing_flow.md)
+See
+[Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp/nxp_manufacturing_flow.md)
 
 <a name="ota-software-update"></a>
 
 ## OTA Software Update
 
-See [Guide for OTA Software Update on NXP devices using Zephyr SDK](../../../../docs/guides/nxp/nxp_zephyr_ota_software_update.md)
+See
+[Guide for OTA Software Update on NXP devices using Zephyr SDK](../../../../docs/guides/nxp/nxp_zephyr_ota_software_update.md)
 
 <a name="testing-the-example"></a>
 
 ## Testing the example
 
-To know how to commission a device over BLE, follow the instructions from [chip-tool's README.md 'Commission a device over BLE'](../../../chip-tool/README.md#commission-a-device-over-ble).
+To know how to commission a device over BLE, follow the instructions from
+[chip-tool's README.md 'Commission a device over BLE'](../../../chip-tool/README.md#commission-a-device-over-ble).
 
 <a name="matter-cli"></a>
 
 ## Using Matter CLI in NXP Zephyr examples
 
-Some Matter examples for the development kits from NXP include
-a command-line interface that allows access to application logs and
+Some Matter examples for the development kits from NXP include a command-line
+interface that allows access to application logs and
 [Zephyr shell](https://docs.zephyrproject.org/1.13.0/subsystems/shell.html).
 
-Depending on the platform, the CLI console and the logs can be split on two different interfaces.
+Depending on the platform, the CLI console and the logs can be split on two
+different interfaces.
 
-You may refer to `boards/<board name>.overlay` file to check how the board is configured for the example.
-The binding `zephyr,console` is used to print the logs, while the binding `zephyr,shell-uart` is used for the CLI.
-If the logs and the CLI are split among two serial interfaces, you will have to open both ports.
+You may refer to `boards/<board name>.overlay` file to check how the board is
+configured for the example. The binding `zephyr,console` is used to print the
+logs, while the binding `zephyr,shell-uart` is used for the CLI. If the logs and
+the CLI are split among two serial interfaces, you will have to open both ports.
 
-As an example, the Matter CLI on `rd_rw612_bga` is configured to be output on `flexcomm3` with a baudrate of `115200`.
-The logs are configured to be output on `flexcomm0` with a baudrate of `115200`.
+As an example, the Matter CLI on `rd_rw612_bga` is configured to be output on
+`flexcomm3` with a baudrate of `115200`. The logs are configured to be output on
+`flexcomm0` with a baudrate of `115200`.
 
->**Note**: `flexcomm3` is wired to the USB FTDI port of the RD BGA board by default.
-> `flexcomm0` is wired to `GPIO2` (RX) and `GPIO3` (TX). Those pins are accessible on `HD2` pin header.
+> **Note**: `flexcomm3` is wired to the USB FTDI port of the RD BGA board by
+> default. `flexcomm0` is wired to `GPIO2` (RX) and `GPIO3` (TX). Those pins are
+> accessible on `HD2` pin header.
 
 To access the CLI console, use a serial terminal emulator of your choice, like
 Minicom or GNU Screen. Use the baud rate set to `115200`.
@@ -255,6 +300,7 @@ Pressing the Tab key with a command entered in the command line cycles through
 available options for the given command.
 
 You can also run the `help` command:
+
 ```shell
 uart:~$ help
 Please press the <Tab> button to see all available commands.
@@ -287,9 +333,9 @@ Available commands:
 
 #### `reboot` subcommand
 
-Performs either a warm or cold reset.
-Difference between warm and cold resets may vary from a platform to another, but on default Cortex-M architectures,
-both methods are the same, so use either one if nothing is specific to your platform.
+Performs either a warm or cold reset. Difference between warm and cold resets
+may vary from a platform to another, but on default Cortex-M architectures, both
+methods are the same, so use either one if nothing is specific to your platform.
 
 ```shell
 uart:~$ kernel reboot cold|warm
@@ -358,7 +404,8 @@ MT:W0GU2OTB00KA0648G00
 
 #### `none qrcodeurl` subcommand
 
-Prints the URL to view the device onboarding QR code in a web browser. Takes no arguments.
+Prints the URL to view the device onboarding QR code in a web browser. Takes no
+arguments.
 
 ```shell
 uart:~$ matter onboardingcodes none qrcodeurl
