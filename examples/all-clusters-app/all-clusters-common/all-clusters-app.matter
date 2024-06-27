@@ -4363,8 +4363,8 @@ cluster EnergyEvse = 153 {
   }
 
   struct ChargingTargetScheduleStruct {
-    optional TargetDayOfWeekBitmap dayOfWeekForSequence = 0;
-    optional ChargingTargetStruct chargingTargets[] = 1;
+    TargetDayOfWeekBitmap dayOfWeekForSequence = 0;
+    ChargingTargetStruct chargingTargets[] = 1;
   }
 
   info event EVConnected = 0 {

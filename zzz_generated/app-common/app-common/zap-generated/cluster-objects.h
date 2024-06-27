@@ -22985,8 +22985,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<chip::BitMask<TargetDayOfWeekBitmap>> dayOfWeekForSequence;
-    Optional<DataModel::List<const Structs::ChargingTargetStruct::Type>> chargingTargets;
+    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
+    DataModel::List<const Structs::ChargingTargetStruct::Type> chargingTargets;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -22996,8 +22996,8 @@ public:
 struct DecodableType
 {
 public:
-    Optional<chip::BitMask<TargetDayOfWeekBitmap>> dayOfWeekForSequence;
-    Optional<DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType>> chargingTargets;
+    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
+    DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> chargingTargets;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

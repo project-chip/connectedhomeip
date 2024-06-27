@@ -1379,8 +1379,8 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTREnergyEVSEClusterChargingTargetScheduleStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable dayOfWeekForSequence MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nullable chargingTargets MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeekForSequence MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull chargingTargets MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

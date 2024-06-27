@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -25,8 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class EnergyEvseClusterChargingTargetScheduleStruct(
-  val dayOfWeekForSequence: Optional<UByte>,
-  val chargingTargets: Optional<List<EnergyEvseClusterChargingTargetStruct>>,
+  val dayOfWeekForSequence: UByte,
+  val chargingTargets: List<EnergyEvseClusterChargingTargetStruct>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterChargingTargetScheduleStruct {\n")
@@ -38,18 +37,12 @@ class EnergyEvseClusterChargingTargetScheduleStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      if (dayOfWeekForSequence.isPresent) {
-        val optdayOfWeekForSequence = dayOfWeekForSequence.get()
-        put(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE), optdayOfWeekForSequence)
+      put(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE), dayOfWeekForSequence)
+      startArray(ContextSpecificTag(TAG_CHARGING_TARGETS))
+      for (item in chargingTargets.iterator()) {
+        item.toTlv(AnonymousTag, this)
       }
-      if (chargingTargets.isPresent) {
-        val optchargingTargets = chargingTargets.get()
-        startArray(ContextSpecificTag(TAG_CHARGING_TARGETS))
-        for (item in optchargingTargets.iterator()) {
-          item.toTlv(AnonymousTag, this)
-        }
-        endArray()
-      }
+      endArray()
       endStructure()
     }
   }
@@ -61,24 +54,14 @@ class EnergyEvseClusterChargingTargetScheduleStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterChargingTargetScheduleStruct {
       tlvReader.enterStructure(tlvTag)
       val dayOfWeekForSequence =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE)))
-        } else {
-          Optional.empty()
-        }
+        tlvReader.getUByte(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE))
       val chargingTargets =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHARGING_TARGETS))) {
-          Optional.of(
-            buildList<EnergyEvseClusterChargingTargetStruct> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_CHARGING_TARGETS))
-              while (!tlvReader.isEndOfContainer()) {
-                add(EnergyEvseClusterChargingTargetStruct.fromTlv(AnonymousTag, tlvReader))
-              }
-              tlvReader.exitContainer()
-            }
-          )
-        } else {
-          Optional.empty()
+        buildList<EnergyEvseClusterChargingTargetStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_CHARGING_TARGETS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(EnergyEvseClusterChargingTargetStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
         }
 
       tlvReader.exitContainer()

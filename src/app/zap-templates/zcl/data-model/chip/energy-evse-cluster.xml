@@ -82,8 +82,8 @@ limitations under the License.
 
   <struct name="ChargingTargetScheduleStruct" apiMaturity="provisional">
     <cluster code="0x0099"/>
-    <item fieldId="0" name="DayOfWeekForSequence" type="TargetDayOfWeekBitmap" min="0x00" max="0x7F" optional="true"/>
-    <item fieldId="1" name="ChargingTargets" array="true" type="ChargingTargetStruct" length="10" optional="true"/>
+    <item fieldId="0" name="DayOfWeekForSequence" type="TargetDayOfWeekBitmap" min="0x00" max="0x7F"/>
+    <item fieldId="1" name="ChargingTargets" array="true" type="ChargingTargetStruct" length="10"/>
   </struct>
 
   <cluster>
