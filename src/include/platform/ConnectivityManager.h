@@ -179,7 +179,8 @@ public:
 
     typedef void (*OnConnectionCompleteFunct)(void * appState);
     typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
-    CHIP_ERROR WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError);
+    CHIP_ERROR WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+                              OnConnectionErrorFunct onError);
     CHIP_ERROR WiFiPAFSend(System::PacketBufferHandle && msgBuf);
     Transport::WiFiPAFBase * GetWiFiPAF();
     void SetWiFiPAF(Transport::WiFiPAFBase * pmWiFiPAF);
@@ -426,8 +427,8 @@ inline CHIP_ERROR ConnectivityManager::SetWiFiPAFAdvertisingEnabled(bool val)
     return static_cast<ImplClass *>(this)->_SetWiFiPAFAdvertisingEnabled(val);
 }
 
-inline CHIP_ERROR ConnectivityManager::WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
-                                                      OnConnectionErrorFunct onError)
+inline CHIP_ERROR ConnectivityManager::WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState,
+                                                      OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
 {
     return static_cast<ImplClass *>(this)->_WiFiPAFConnect(connDiscriminator, appState, onSuccess, onError);
 }

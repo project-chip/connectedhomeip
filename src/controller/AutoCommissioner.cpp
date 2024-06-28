@@ -596,8 +596,9 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    mNeedsNetworkSetup = mNeedsNetworkSetup || (mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
-            Transport::Type::kWiFiPAF);
+    mNeedsNetworkSetup = mNeedsNetworkSetup ||
+        (mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
+         Transport::Type::kWiFiPAF);
 #endif
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(mCommissioneeDeviceProxy, nextStage));

@@ -24,11 +24,11 @@
 
 #pragma once
 
-#include <utility>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/Base.h>
+#include <utility>
 
 namespace chip {
 namespace Transport {

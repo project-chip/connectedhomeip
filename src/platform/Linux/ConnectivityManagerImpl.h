@@ -141,7 +141,8 @@ public:
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    CHIP_ERROR _WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError);
+    CHIP_ERROR _WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
+                               OnConnectionErrorFunct onError);
     void OnDiscoveryResult(gboolean success, GVariant * obj);
     void OnNanReceive(GVariant * obj);
 
@@ -245,12 +246,12 @@ private:
     struct wpa_dbus_nanrx_info mpaf_nanrx_info;
 
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
-	OnConnectionErrorFunct mOnPafSubscribeError;
+    OnConnectionErrorFunct mOnPafSubscribeError;
     Transport::WiFiPAFBase * pmWiFiPAF;
     void * mAppState;
     CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool val);
-	CHIP_ERROR _WiFiPAFPublish();
-	CHIP_ERROR _WiFiPAFCancelPublish();
+    CHIP_ERROR _WiFiPAFPublish();
+    CHIP_ERROR _WiFiPAFCancelPublish();
 #endif
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
