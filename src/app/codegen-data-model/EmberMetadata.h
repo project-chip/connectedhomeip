@@ -16,21 +16,25 @@
  */
 #pragma once
 
-#include <lib/support/Span.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/util/af-types.h>
+#include <lib/core/CHIPError.h>
 
 #include <variant>
 
 namespace chip {
-namespace Test {
+namespace app {
+namespace Ember {
 
-/// specify what the next `emAfReadOrWriteAttribute` will contain
+/// Fetch the source for the given attribute path: either a cluster (for global ones) or attribute
+/// path.
 ///
-/// It may return a value with success or some error. The byte span WILL BE COPIED.
-void SetEmberReadOutput(std::variant<chip::ByteSpan, chip::Protocols::InteractionModel::Status> what);
+/// if returning a CHIP_ERROR, it will NEVER be CHIP_NO_ERROR.
+std::variant<const EmberAfCluster *,           // global attribute, data from a cluster
+             const EmberAfAttributeMetadata *, // a specific attribute stored by ember
+             CHIP_ERROR                        // error, this will NEVER be CHIP_NO_ERROR
+             >
+FindAttributeMetadata(const ConcreteAttributePath & aPath);
 
-/// Grab the data currently in the buffer
-chip::ByteSpan GetEmberBuffer();
-
-} // namespace Test
+} // namespace Ember
+} // namespace app
 } // namespace chip

@@ -231,13 +231,6 @@ bool CodegenDataModel::EmberCommandListIterator::Exists(const CommandId * list, 
     return (*mCurrentHint == toCheck);
 }
 
-CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttributeRequest & request,
-                                            AttributeValueDecoder & decoder)
-{
-    // TODO: this needs an implementation
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR CodegenDataModel::Invoke(const InteractionModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                     InteractionModel::InvokeReply & reply)
 {
