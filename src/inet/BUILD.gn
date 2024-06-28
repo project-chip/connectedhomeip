@@ -162,6 +162,15 @@ static_library("inet") {
       "UDPEndPointImpl${chip_system_config_inet}.h",
       "UDPEndPointImpl.h",
     ]
+<<<<<<< HEAD
+=======
+
+    if (chip_system_config_inet == "Sockets") {
+      # TODO: dependency on this one is not clear as it is only ever
+      #       enabled through CMakeLists.txt. Added here for completeness
+      sources += [ "ZephyrSocket.h" ]
+    }
+>>>>>>> parent of f283940c03 (Remove ZephyrSocket)
   }
 
   if (chip_with_nlfaultinjection) {

@@ -110,11 +110,6 @@ BootReasonType DetermineBootReason()
 
 } // namespace
 
-DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
-{
-    return DiagnosticDataProviderImpl::GetDefaultInstance();
-}
-
 DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 {
     static DiagnosticDataProviderImpl sInstance;
