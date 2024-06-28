@@ -28,8 +28,13 @@ env:
   CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+  await-fast-ci:
+    name: Await Fast CI
+    uses: ./.github/workflows/await-fast-ci.yaml
+
   nuttx:
     name: NuttX
+    needs: await-fast-ci
 
     runs-on: ubuntu-latest
     if: github.actor != 'restyled-io[bot]'
