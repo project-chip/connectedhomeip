@@ -439,6 +439,15 @@ using CHIP_ERROR = ::chip::ChipError;
     CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus,                                                                    \
                    ::chip::to_underlying(::chip::Protocols::InteractionModel::Status::type))
 
+// Defines a runtime-value for a chip-error.
+#if CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status_value)                                                                            \
+    ::chip::ChipError(::chip::ChipError::SdkPart::kIMGlobalStatus, ::chip::to_underlying(status_value), __FILE__, __LINE__)
+#else
+#define CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status_value)                                                                            \
+    ::chip::ChipError(::chip::ChipError::SdkPart::kIMGlobalStatus, ::chip::to_underlying(status_value))
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
 //
 // type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
 //
