@@ -30,10 +30,11 @@
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
