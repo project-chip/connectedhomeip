@@ -67,19 +67,19 @@ protected:
     // Command handling support
 
     /**
-     * @brief can the selected locations be set by the client in the current operating mode?
+     * @brief Can the selected locations be set by the client in the current operating mode?
      * @param[out] statusText text describing why selected locations cannot be set (if return is false).
      * @return true if the current device state allows selected locations to be set by user.
      *
      * @note The statusText field SHOULD indicate why the request is not allowed, given the current mode
      *       of the device, which may involve other clusters.
      */
-    virtual bool IsSetSelectedLocationsAllowed(char * statusText) = 0;
+    virtual bool IsSetSelectedLocationsAllowed(MutableCharSpan statusText) = 0;
 
     /**
      * Given a set of locations to be set to the SelectedLocations attribute, this method should check that:
-     *  - There are no duplicates in the list. If there are duplicates, the locationStatus should be set to
-     *     DuplicatedLocations and the statusText should be an empty string.
+     *  - There are no duplicates in the list. If there are duplicates, the locationStatus SHALL be set to
+     *     DuplicatedLocations and the statusText SHALL be an empty string.
      *  - The set of locations as a whole is valid and reachable by the device. If the set of locations is invalid,
      *     the locationStatus should be set to InvalidSet and the statusText SHALL include a vendor-defined error description.
      *
@@ -89,14 +89,13 @@ protected:
      * @param[out] locationStatus Success if all checks pass, error code if failure.
      * @param[out] statusText text describing failure (see description above), size kMaxSizeStatusText + 1 byte for terminating
      * character.
-     * @param[out] useStatusText if true, the statusText value should be returned in the command response.
      * @return true if success.
      *
      * @note If the SelectLocations command is allowed when the device is operating and the selected locations change to none, the
      * device must stop.
      */
     virtual bool IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
-                                           SelectLocationsStatus & locationStatus, char * statusText, bool & useStatusText) = 0;
+                                           SelectLocationsStatus & locationStatus, MutableCharSpan statusText) = 0;
 
     /**
      * @brief The server instance ensures that the SelectedLocations and CurrentLocation attributes are not null before
@@ -124,10 +123,10 @@ protected:
      * InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed, given the current mode of the device,
      * which may involve other clusters.
      */
-    virtual bool HandleSkipCurrentLocation(char * skipStatusText)
+    virtual bool HandleSkipCurrentLocation(MutableCharSpan skipStatusText)
     {
         // device support of this command is optional
-        strncat(skipStatusText, "Skip Current Location command not supported by device", kMaxSizeStatusText);
+        chip::CopyCharSpanToMutableCharSpan("Skip Current Location command not supported by device"_span, skipStatusText);
         return false;
     }
 

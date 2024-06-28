@@ -18,6 +18,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <rvc-service-area-delegate.h>
 
+using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ServiceArea;
 
@@ -74,14 +75,13 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 //*************************************************************************
 // command support
 
-bool RvcServiceAreaDelegate::IsSetSelectedLocationsAllowed(char * statusText)
+bool RvcServiceAreaDelegate::IsSetSelectedLocationsAllowed(MutableCharSpan statusText)
 {
     return true; // TODO IMPLEMENT
 };
 
 bool RvcServiceAreaDelegate::IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
-                                                       SelectLocationsStatus & locationStatus, char * statusText,
-                                                       bool & useStatusText)
+                                                       SelectLocationsStatus & locationStatus, MutableCharSpan statusText)
 {
     bool ret_value = false;
 
@@ -90,7 +90,7 @@ bool RvcServiceAreaDelegate::IsValidSelectLocationsSet(const Commands::SelectLoc
     return ret_value;
 };
 
-bool RvcServiceAreaDelegate::HandleSkipCurrentLocation(char * skipStatusText)
+bool RvcServiceAreaDelegate::HandleSkipCurrentLocation(MutableCharSpan skipStatusText)
 {
     bool ret_value = false;
 
@@ -177,23 +177,20 @@ bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper
 
 bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation)
 {
-    bool ret_value = false;
-
     // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
     // etc.
 
     // Double-check that locationID's match.
-    VerifyOrExit((modifiedLocation.locationID == mSupportedLocations[listIndex].locationID),
-                 ChipLogError(Zcl, "ModifySupportedLocation - new locationID %u does not match existing locationID %u",
-                              modifiedLocation.locationID, mSupportedLocations[listIndex].locationID));
+    if (modifiedLocation.locationID != mSupportedLocations[listIndex].locationID)
+    {
+        ChipLogError(Zcl, "ModifySupportedLocation - locationID's do not match, new locationID %u, existing locationID %u",
+                     modifiedLocation.locationID, mSupportedLocations[listIndex].locationID);
+        return false;
+    }
 
     // checks passed, update the attribute
     mSupportedLocations[listIndex] = modifiedLocation;
-    ret_value                      = true;
-
-exit:
-
-    return ret_value;
+    return true;
 }
 
 bool RvcServiceAreaDelegate::ClearSupportedLocations()
@@ -285,22 +282,19 @@ bool RvcServiceAreaDelegate::AddSupportedMap(const MapStructureWrapper & newMap,
 
 bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper & modifiedMap)
 {
-    bool ret_value = false;
-
     // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
     // etc.
 
     // Double-check that mapID's match.
-    VerifyOrExit((modifiedMap.mapID == mSupportedMaps[listIndex].mapID),
-                 ChipLogError(Zcl, "ModifySupportedMap - mapID's do not match, new mapID %u, existing mapID %u", modifiedMap.mapID,
-                              mSupportedMaps[listIndex].mapID));
+    if (modifiedMap.mapID != mSupportedMaps[listIndex].mapID) {
+        ChipLogError(Zcl, "ModifySupportedMap - mapID's do not match, new mapID %u, existing mapID %u", modifiedMap.mapID,
+                     mSupportedMaps[listIndex].mapID);
+        return false;
+    }
 
     // save modified map
     mSupportedMaps[listIndex] = modifiedMap;
-    ret_value                 = true;
-
-exit:
-    return ret_value;
+    return true;
 }
 
 bool RvcServiceAreaDelegate::ClearSupportedMaps()

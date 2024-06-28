@@ -44,13 +44,12 @@ public:
     CHIP_ERROR Init() override;
 
     // command support
-    bool IsSetSelectedLocationsAllowed(char * statusText) override;
+    bool IsSetSelectedLocationsAllowed(MutableCharSpan statusText) override;
 
     bool IsValidSelectLocationsSet(const ServiceArea::Commands::SelectLocations::DecodableType & req,
-                                   ServiceArea::SelectLocationsStatus & locationStatus, char * statusText,
-                                   bool & useStatusText) override;
+                                   ServiceArea::SelectLocationsStatus & locationStatus, MutableCharSpan statusText) override;
 
-    bool HandleSkipCurrentLocation(char * skipStatusText) override;
+    bool HandleSkipCurrentLocation(MutableCharSpan skipStatusText) override;
 
     //*************************************************************************
     // Supported Locations accessors
