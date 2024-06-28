@@ -18,18 +18,15 @@
 
 /**
  *    @file
- *      This file implements the CHIP Connection object that maintains a BLE connection.
+ *      This file implements the Matter Connection object that maintains a Wi-Fi PAF connection
  *
  */
 
-// #include <transport/raw/BLE.h>
 #include <transport/raw/WiFiPAF.h>
-
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <transport/raw/MessageHeader.h>
-
 #include <inttypes.h>
 
 using namespace chip::System;
@@ -54,18 +51,37 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
     DeviceLayer::ConnectivityMgr().SetWiFiPAF(this);
     mState = State::kInitialized;
 
+    if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted()) {
+        ChipLogError(Inet, "Wi-Fi Management has not started, do it now.");
+        static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
+        static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
+        DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+        {
+            for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
+            {
+                if (DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+                {
+                    break;
+                }
+                usleep(kWiFiStartCheckTimeUsec);
+            }
+        }
+        if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+        {
+            ChipLogError(Inet, "Wi-Fi Management taking too long to start - device configuration will be reset.");
+            return CHIP_ERROR_INTERNAL;
+        }
+        ChipLogProgress(NotSpecified, "Wi-Fi Management is started");
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
-    ChipLogProgress(NotSpecified, "=====> WiFiPAFBase::SendMessage()");
     ReturnErrorCodeIf(address.GetTransportType() != Type::kWiFiPAF, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-
     DeviceLayer::ConnectivityMgr().WiFiPAFSend(std::move(msgBuf));
 
-    ChipLogProgress(NotSpecified, "<===== WiFiPAFBase::SendMessage()");
     return CHIP_NO_ERROR;
 }
 

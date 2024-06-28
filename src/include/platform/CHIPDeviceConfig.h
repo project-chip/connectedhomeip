@@ -428,7 +428,7 @@
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
  *
- * Name of the WiFi PAF/DNAN-USD
+ * Name of the WiFiPAF commission function
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0

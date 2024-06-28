@@ -262,7 +262,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
 
 CHIP_ERROR SetUpCodePairer::StopConnectOverWiFiPAF()
 {
-    mWaitingForDiscovery[kWiFiPAF] = false;
+    mWaitingForDiscovery[kWiFiPAFTransport] = false;
     return CHIP_NO_ERROR;
 }
 #endif

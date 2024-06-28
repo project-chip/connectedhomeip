@@ -154,9 +154,7 @@ private:
         kBLETransport = 0,
         kIPTransport,
         kSoftAPTransport,
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        kWiFiPAF,
-#endif
+        kWiFiPAFTransport,
         kTransportTypeCount,
     };
 
