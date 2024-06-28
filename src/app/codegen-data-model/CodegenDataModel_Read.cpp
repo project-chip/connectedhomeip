@@ -159,6 +159,8 @@ std::optional<OUT> ExtractEmberString(ByteSpan data)
 {
     typename ENCODING::LengthType len;
 
+    // Ember storage format for pascal-prefix data is specifically "native byte order",
+    // hence the use of memcpy.
     VerifyOrDie(sizeof(len) <= data.size());
     memcpy(&len, data.data(), sizeof(len));
 
