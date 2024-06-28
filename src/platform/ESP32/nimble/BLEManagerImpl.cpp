@@ -659,7 +659,13 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
         return false;
     }
 
-    rc = ble_gattc_write_flat(conId, chr->chr.val_handle, pBuf->Start(), pBuf->DataLength(), OnWriteComplete, this);
+    if (pBuf->DataLength() > UINT16_MAX)
+    {
+        ChipLogError(Ble, "Buffer data Length is too long");
+        return false;
+    }
+    rc = ble_gattc_write_flat(conId, chr->chr.val_handle, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()), OnWriteComplete,
+                              this);
     if (rc != 0)
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
