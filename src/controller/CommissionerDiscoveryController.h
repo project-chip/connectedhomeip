@@ -38,6 +38,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+using chip::CharSpan;
 using chip::NodeId;
 using chip::OperationalSessionSetup;
 using chip::Protocols::UserDirectedCommissioning::UDCClientState;
@@ -451,6 +452,8 @@ protected:
     uint16_t mProductId = 0;
     NodeId mNodeId      = 0;
     uint32_t mPasscode  = 0;
+    CharSpan mTempAccountIdentifier;
+    CharSpan mCommissionerSetupPin;
 
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;

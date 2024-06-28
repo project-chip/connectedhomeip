@@ -39,13 +39,6 @@
 namespace chip {
 namespace AppPlatform {
 
-using CommandHandlerInterface    = chip::app::CommandHandlerInterface;
-using LaunchResponseType         = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
-using PlaybackResponseType       = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
-using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
-using GetSetupPINResponseType    = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
-using Status                     = chip::Protocols::InteractionModel::Status;
-
 const std::string FAILURE_KEY        = "PlatformError";
 const std::string FAILURE_STATUS_KEY = "Status";
 
@@ -107,6 +100,7 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
 Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clusterId, CommandId commandId, std::string payload,
                                                 bool & commandHandled, Json::Value & value)
 {
+    // Q1: It seems like this InvokeCommand *never* returns success status.
     if (epId >= FIXED_ENDPOINT_COUNT)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -153,6 +147,7 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
             return chip::Protocols::InteractionModel::Status::Failure;
         }
 
+        // Q: It would seem that this is the successfull return case (?)
         return chip::Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
     else
@@ -231,20 +226,30 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
     }
 
     case app::Clusters::AccountLogin::Id: {
-        if (app::Clusters::AccountLogin::Commands::GetSetupPIN::Id != handlerContext.mRequestPath.mCommandId)
-        {
-            // No response for other commands in this cluster
-            break;
-        }
-        Status status;
-        GetSetupPINResponseType getSetupPINresponse = FormatGetSetupPINResponse(value, status);
-        if (status != chip::Protocols::InteractionModel::Status::Success)
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
-        }
-        else
-        {
-            handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, getSetupPINresponse);
+        switch (handlerContext.mRequestPath.mCommandId) {
+            case app::Clusters::AccountLogin::Commands::GetSetupPIN::Id: {
+                Status status;
+                GetSetupPINResponseType getSetupPINresponse = FormatGetSetupPINResponse(value, status);
+                if (status != chip::Protocols::InteractionModel::Status::Success)
+                {
+                    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
+                }
+                else
+                {
+                    handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, getSetupPINresponse);
+                }
+                break;
+            }
+            case app::Clusters::AccountLogin::Commands::Login::Id: {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, FormatStatusResponse(value));
+                break;
+            }
+            case app::Clusters::AccountLogin::Commands::Logout::Id: {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, FormatStatusResponse(value));
+                break;
+            }
+            default:
+                break;
         }
         break;
     }
@@ -340,6 +345,17 @@ GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(Jso
         getSetupPINresponse.setupPIN = "";
     }
     return getSetupPINresponse;
+}
+
+Status ContentAppCommandDelegate::FormatStatusResponse(Json::Value value)
+{
+    if (value.isUInt()) {
+        return static_cast<Protocols::InteractionModel::Status>(value.asUInt());
+    }
+    else
+    {
+        return chip::Protocols::InteractionModel::Status::Failure;
+    }
 }
 
 } // namespace AppPlatform

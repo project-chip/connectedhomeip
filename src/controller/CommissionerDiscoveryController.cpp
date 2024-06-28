@@ -28,6 +28,7 @@
 #include <controller/CommissionerDiscoveryController.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
+#include <app/app-platform/ContentAppPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
@@ -405,6 +406,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
     ValidateSession();
     uint32_t passcode = mPasscode;
 
+    // Q: Seems like getting rotating ID is done twice - once here and once in InternalOk. Is this necessary or could it be cached?
     if (mUdcServer == nullptr)
     {
         ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: no udc server");
@@ -440,6 +442,9 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
             }
             CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
+            // Store rotating ID as tempAccountIdentifier to use in AccountLogin::Login payload later.
+            mTempAccountIdentifier = rotatingIdSpan;
+
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
             // generate a passcode
@@ -455,6 +460,10 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
                     cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
                 return;
             }
+            // Store commissioner passcode as setup PIN (string/charspan).
+            // If this PIN is not empty it signals that user prompt was shown to enter PIN and AccountLogin::Login command has to be sent.
+            mCommissionerSetupPin = CharSpan::fromCharString(std::to_string(passcode));
+
             client->SetCachedCommissionerPasscode(passcode);
             client->SetUDCClientProcessingState(UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
 
@@ -606,6 +615,23 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     mVendorId  = vendorId;
     mProductId = productId;
     mNodeId    = nodeId;
+
+    // Send AccountLogin::Login command if user was prompted to enter setup PIN manually.
+    // Q: Is this the correct place to have this logic?
+    // Q: Is there an easier way call AccountLoginDelegate from here?
+    if (!mCommissionerSetupPIN.empty()) {
+        ChipLogProgress(AppServer, "UX ComissioningSucceeded with setupPIN prompt flow");
+        auto app = ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId);
+        if (app == nullptr) {
+            ChipLogError(AppServer, "UX ComissioningSucceeded with setupPIN prompt flow: Failed to get ContentApp");
+            // Q: Any action to take?
+        } else {
+            auto status = app->GetAccountLoginDelegate()->HandleLogin(mTempAccountIdentifier, mCommissionerSetupPin, {mNodeId});
+            ChipLogProgress(AppServer, "UX ComissioningSucceeded with setupPIN prompt flow: HandleLogin response status: %d", status);
+            // Q: Any action to take here if status is true/false?
+        }
+    }
+
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
