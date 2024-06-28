@@ -784,9 +784,9 @@ CHIP_ERROR UDPEndPointImplSockets::IPv4JoinLeaveMulticastGroupImpl(InterfaceId a
 #if INET_CONFIG_UDP_SOCKET_MREQN
     struct ip_mreqn lMulticastRequest;
     memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
-    lMulticastRequest.imr_ifindex   = aInterfaceId.GetPlatformInterface();  /* Network interface index */
-    lMulticastRequest.imr_address   = interfaceAddr;                        /* IP address of local interface */
-    lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();                    /* IP multicast group address*/
+    lMulticastRequest.imr_ifindex   = aInterfaceId.GetPlatformInterface(); /* Network interface index */
+    lMulticastRequest.imr_address   = interfaceAddr;                       /* IP address of local interface */
+    lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();                   /* IP multicast group address*/
 
 #else
 
