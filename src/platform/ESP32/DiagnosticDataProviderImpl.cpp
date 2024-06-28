@@ -38,6 +38,7 @@
 #else
 #include "esp_spi_flash.h"
 #endif
+#include "esp_mac.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 
@@ -222,6 +223,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             ifp->type          = GetInterfaceType(esp_netif_get_desc(ifa));
             ifp->offPremiseServicesReachableIPv4.SetNull();
             ifp->offPremiseServicesReachableIPv6.SetNull();
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
             if (esp_netif_get_mac(ifa, ifp->MacAddress) != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "Failed to get network hardware address");
@@ -230,6 +232,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
+#else
+            if (esp_read_mac(ifp->MacAddress, ESP_MAC_IEEE802154) != ESP_OK)
+            {
+                ChipLogError(DeviceLayer, "Failed to get network hardware address");
+            }
+            else
+            {
+                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 8);
+            }
+#endif
+
 #ifndef CONFIG_DISABLE_IPV4
             if (esp_netif_get_ip_info(ifa, &ipv4_info) == ESP_OK)
             {
