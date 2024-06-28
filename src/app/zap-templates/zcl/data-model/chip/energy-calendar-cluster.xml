@@ -13,14 +13,6 @@ limitations under the License.
 -->
 <configurator>
   <domain name="Energy Management"/>
-  <enum name="PeakPeriodSeverityEnum" type="enum8">
-    <cluster code="0x009A"/>
-    <item name="Unused" value="0x00"/>
-    <item name="Low" value="0x01"/>
-    <item name="Medium" value="0x02"/>
-    <item name="High" value="0x03"/>
-  </enum>
-
   <bitmap name="AuxiliaryLoadBitmap" type="bitmap8">
     <cluster code="0x009A"/>
     <field name="AuxiliarySwitch1" mask="0x01"/>
@@ -44,19 +36,13 @@ limitations under the License.
     <field name="Saturday" mask="0x40"/>
   </bitmap>
 
-  <struct name="CalendarPeriodStruct">
+  <enum name="PeakPeriodSeverityEnum" type="enum8">
     <cluster code="0x009A"/>
-    <item fieldId="0" name="StartDate" type="epoch_s" isNullable="true"/>
-    <item fieldId="1" name="Days" type="DayStruct" array="true" length="7" minLength="1"/>
-  </struct>
-
-  <struct name="DayStruct">
-    <cluster code="0x009A"/>
-    <item fieldId="0" name="Date" type="date" optional="true"/>
-    <item fieldId="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap" optional="true" min="0x00" max="0x7F"/>
-    <item fieldId="2" name="Transitions" type="TransitionStruct" array="true" length="48" minLength="1"/>
-    <item fieldId="3" name="CalendarID" type="int32u" optional="true"/>
-  </struct>
+    <item name="Unused" value="0x00"/>
+    <item name="Low" value="0x01"/>
+    <item name="Medium" value="0x02"/>
+    <item name="High" value="0x03"/>
+  </enum>
 
   <struct name="PeakPeriodStruct">
     <cluster code="0x009A"/>
@@ -72,6 +58,20 @@ limitations under the License.
     <item fieldId="1" name="PriceTier" type="int32u" optional="true"/>
     <item fieldId="2" name="FriendlyCredit" type="boolean" optional="true"/>
     <item fieldId="3" name="AuxiliaryLoad" type="AuxiliaryLoadBitmap" optional="true" min="0x00" max="0xFF"/>
+  </struct>
+
+  <struct name="DayStruct">
+    <cluster code="0x009A"/>
+    <item fieldId="0" name="Date" type="date" optional="true"/>
+    <item fieldId="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap" optional="true" min="0x00" max="0x7F"/>
+    <item fieldId="2" name="Transitions" type="TransitionStruct" array="true" length="48" minLength="1"/>
+    <item fieldId="3" name="CalendarID" type="int32u" optional="true"/>
+  </struct>
+
+  <struct name="CalendarPeriodStruct">
+    <cluster code="0x009A"/>
+    <item fieldId="0" name="StartDate" type="epoch_s" isNullable="true"/>
+    <item fieldId="1" name="Days" type="DayStruct" array="true" length="7" minLength="1"/>
   </struct>
 
   <cluster>
