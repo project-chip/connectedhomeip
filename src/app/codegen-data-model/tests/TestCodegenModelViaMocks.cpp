@@ -19,22 +19,21 @@
 #include <app/codegen-data-model/tests/AttributeReportIBEncodeDecode.h>
 #include <app/codegen-data-model/tests/EmberReadWriteOverride.h>
 
-#include <lib/support/Span.h>
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeEncodeState.h>
 #include <app/AttributeValueDecoder.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/GlobalAttributes.h>
+#include <app/MessageDef/ReportDataMessage.h>
+#include <app/data-model-interface/OperationTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/Nullable.h>
-#include <app/GlobalAttributes.h>
-#include <app/data-model-interface/OperationTypes.h>
-#include <app/MessageDef/ReportDataMessage.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/ember-io-storage.h>
@@ -728,7 +727,6 @@ void TestEmberScalarNullWrite()
     memcpy(&storage, writtenData.data(), sizeof(storage));
     ASSERT_TRUE(Traits::IsNullValue(storage));
 }
-
 
 } // namespace
 
