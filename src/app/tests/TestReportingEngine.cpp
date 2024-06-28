@@ -39,8 +39,6 @@
 #include <messaging/Flags.h>
 #include <pw_unit_test/framework.h>
 
-using TestContext = chip::Test::AppContext;
-
 namespace chip {
 
 constexpr ClusterId kTestClusterId        = 6;
@@ -51,26 +49,9 @@ constexpr chip::AttributeId kTestFieldId2 = 2;
 namespace app {
 namespace reporting {
 
-std::unique_ptr<TestContext> mpTestContext;
-
-class TestReportingEngine : public ::testing::Test
+class TestReportingEngine : public chip::Test::AppContext
 {
 public:
-    static void SetUpTestSuite()
-    {
-
-        mpTestContext = std::make_unique<TestContext>();
-        ASSERT_NE(mpTestContext, nullptr);
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        mpTestContext.reset();
-    }
-    void SetUp() { mpTestContext->SetUp(); }
-    void TearDown() { mpTestContext->TearDown(); }
-
     template <typename... Args>
     static bool VerifyDirtySetContent(const Args &... args);
     static bool InsertToDirtySet(const AttributePathParams & aPath);
@@ -161,11 +142,11 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     ReadRequestMessage::Builder readRequestBuilder;
     DummyDelegate dummy;
 
-    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
                                                           app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
     TestExchangeDelegate delegate;
-    Messaging::ExchangeContext * exchangeCtx = mpTestContext->NewExchangeToAlice(&delegate);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(&delegate);
 
     writer.Init(std::move(readRequestbuf));
     EXPECT_EQ(readRequestBuilder.Init(&writer), CHIP_NO_ERROR);
@@ -193,12 +174,12 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),
               CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 }
 
 TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeOverlappedAttributePath)
 {
-    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
                                                           app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 
@@ -253,7 +234,7 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeOverlappedAttributePath)
 
 TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeAttributePathWhenDirtySetPoolExhausted)
 {
-    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
                                                           app::reporting::GetDefaultReportScheduler()),
               CHIP_NO_ERROR);
 

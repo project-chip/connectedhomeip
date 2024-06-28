@@ -31,7 +31,6 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-using TestContext = chip::Test::AppContext;
 using namespace chip::app;
 using namespace chip;
 
@@ -65,39 +64,7 @@ struct ValidationInstruction
 
 using InstructionListType = std::vector<ValidationInstruction>;
 
-class TestBufferedReadCallback : public ::testing::Test
-{
-public:
-    static void SetUpTestSuite()
-    {
-        mpTestContext = new TestContext;
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        if (mpTestContext != nullptr)
-        {
-            delete mpTestContext;
-        }
-    }
-    void SetUp() override
-    {
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->SetUp();
-        }
-    }
-    void TearDown() override
-    {
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->TearDown();
-        }
-    }
-    static TestContext * mpTestContext;
-};
-TestContext * TestBufferedReadCallback::mpTestContext = nullptr;
+using TestBufferedReadCallback = chip::Test::AppContext;
 
 class DataSeriesValidator : public BufferedReadCallback::Callback
 {

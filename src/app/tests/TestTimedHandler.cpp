@@ -29,8 +29,6 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
 
-using TestContext = chip::Test::AppContext;
-
 namespace chip {
 namespace app {
 
@@ -39,32 +37,13 @@ using namespace Protocols::InteractionModel;
 
 namespace {
 
-class TestTimedHandler : public ::testing::Test
+class TestTimedHandler : public chip::Test::AppContext
 {
 public:
-    static void SetUpTestSuite()
-    {
-
-        mpTestContext = new TestContext;
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        delete mpTestContext;
-    }
-
-    void SetUp() override { mpTestContext->SetUp(); }
-    void TearDown() override { mpTestContext->TearDown(); }
-
-    static TestContext * mpTestContext;
-
-    static void TestFollowingMessageFastEnough(MsgType aMsgType);
-    static void TestFollowingMessageTooSlow(MsgType aMsgType);
-    static void GenerateTimedRequest(uint16_t aTimeoutValue, System::PacketBufferHandle & aPayload);
+    void TestFollowingMessageFastEnough(MsgType aMsgType);
+    void TestFollowingMessageTooSlow(MsgType aMsgType);
+    void GenerateTimedRequest(uint16_t aTimeoutValue, System::PacketBufferHandle & aPayload);
 };
-
-TestContext * TestTimedHandler::mpTestContext = nullptr;
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
@@ -124,7 +103,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
     GenerateTimedRequest(500, payload);
 
     TestExchangeDelegate delegate;
-    ExchangeContext * exchange = mpTestContext->NewExchangeToAlice(&delegate);
+    ExchangeContext * exchange = NewExchangeToAlice(&delegate);
     ASSERT_NE(exchange, nullptr);
 
     EXPECT_FALSE(delegate.mNewMessageReceived);
@@ -133,7 +112,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
 
     EXPECT_EQ(exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
     EXPECT_TRUE(delegate.mLastMessageWasStatus);
     EXPECT_EQ(delegate.mError, CHIP_NO_ERROR);
@@ -148,7 +127,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
 
     EXPECT_EQ(exchange->SendMessage(aMsgType, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
     EXPECT_TRUE(delegate.mLastMessageWasStatus);
     EXPECT_NE(StatusIB(delegate.mError).mStatus, Status::UnsupportedAccess);
@@ -156,7 +135,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
 
 TEST_F(TestTimedHandler, TestInvokeFastEnough)
 {
-    TestTimedHandler::TestFollowingMessageFastEnough(MsgType::InvokeCommandRequest);
+    TestFollowingMessageFastEnough(MsgType::InvokeCommandRequest);
 }
 
 TEST_F(TestTimedHandler, TestWriteFastEnough)
@@ -171,7 +150,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(MsgType aMsgType)
     GenerateTimedRequest(50, payload);
 
     TestExchangeDelegate delegate;
-    ExchangeContext * exchange = mpTestContext->NewExchangeToAlice(&delegate);
+    ExchangeContext * exchange = NewExchangeToAlice(&delegate);
     ASSERT_NE(exchange, nullptr);
 
     EXPECT_FALSE(delegate.mNewMessageReceived);
@@ -180,7 +159,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(MsgType aMsgType)
 
     EXPECT_EQ(exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
     EXPECT_TRUE(delegate.mLastMessageWasStatus);
     EXPECT_EQ(delegate.mError, CHIP_NO_ERROR);
@@ -198,7 +177,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(MsgType aMsgType)
 
     EXPECT_EQ(exchange->SendMessage(aMsgType, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
     EXPECT_TRUE(delegate.mLastMessageWasStatus);
     EXPECT_EQ(StatusIB(delegate.mError).mStatus, Status::UnsupportedAccess);
@@ -222,14 +201,14 @@ TEST_F(TestTimedHandler, TestInvokeNeverComes)
     GenerateTimedRequest(50, payload);
 
     TestExchangeDelegate delegate;
-    ExchangeContext * exchange = mpTestContext->NewExchangeToAlice(&delegate);
+    ExchangeContext * exchange = NewExchangeToAlice(&delegate);
     ASSERT_NE(exchange, nullptr);
 
     EXPECT_FALSE(delegate.mNewMessageReceived);
 
     EXPECT_EQ(exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
     EXPECT_TRUE(delegate.mLastMessageWasStatus);
     EXPECT_EQ(delegate.mError, CHIP_NO_ERROR);

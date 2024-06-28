@@ -17,7 +17,7 @@
 #include <errno.h>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
@@ -43,10 +43,8 @@ using namespace chip::Messaging;
 
 class MockExchangeDelegate;
 
-struct TestExchange : public Test::LoopbackMessagingContext, public ::testing::Test
+struct TestExchange : public Test::LoopbackMessagingContext
 {
-    // TODO Add TearDown function when changing test framework to Pigweed to make it more clear how it works.
-    // Currently, the TearDown function is from LoopbackMessagingContext
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
@@ -54,12 +52,6 @@ struct TestExchange : public Test::LoopbackMessagingContext, public ::testing::T
 #endif
         chip::Test::LoopbackMessagingContext::SetUp();
     }
-
-    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
-
-    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
-
-    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
 
     template <typename AfterRequestChecker, typename AfterResponseChecker>
     void DoRoundTripTest(MockExchangeDelegate & delegate1, MockExchangeDelegate & delegate2, uint8_t requestMessageType,

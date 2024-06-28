@@ -26,7 +26,6 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <errno.h>
-#include <gtest/gtest.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/DataModelTypes.h>
@@ -39,6 +38,7 @@
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
+#include <pw_unit_test/framework.h>
 #include <stdarg.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
@@ -56,7 +56,7 @@ using namespace chip::Crypto;
 namespace chip {
 class TestCASESecurePairingDelegate;
 
-class TestCASESession : public Test::LoopbackMessagingContext, public ::testing::Test
+class TestCASESession : public Test::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
@@ -69,8 +69,6 @@ public:
         ConfigInitializeNodes(false);
         chip::Test::LoopbackMessagingContext::SetUp();
     }
-
-    virtual void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
 
     void ServiceEvents();
     void SecurePairingHandshakeTestCommon(SessionManager & sessionManager, CASESession & pairingCommissioner,
