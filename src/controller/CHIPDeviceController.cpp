@@ -825,7 +825,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                 ExitNow(CHIP_ERROR_INTERNAL);
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), this, OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
+            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), this, OnWiFiPAFSubscribeComplete,
+                                                          OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
         }
     }
@@ -922,7 +923,8 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
-        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(), err.Format());
+        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
+                     err.Format());
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         if (self->mPairingDelegate != nullptr)

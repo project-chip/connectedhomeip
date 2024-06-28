@@ -22,12 +22,12 @@
  *
  */
 
-#include <transport/raw/WiFiPAF.h>
+#include <inttypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <transport/raw/MessageHeader.h>
-#include <inttypes.h>
+#include <transport/raw/WiFiPAF.h>
 
 using namespace chip::System;
 
@@ -51,7 +51,8 @@ CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
     DeviceLayer::ConnectivityMgr().SetWiFiPAF(this);
     mState = State::kInitialized;
 
-    if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted()) {
+    if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+    {
         ChipLogError(Inet, "Wi-Fi Management has not started, do it now.");
         static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
         static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;

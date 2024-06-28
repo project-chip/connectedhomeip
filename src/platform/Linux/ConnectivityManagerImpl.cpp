@@ -862,7 +862,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish()
     }
     strcat(args, NAN_PUBLISH_SSI_TAG);
     ret = Encoding::BytesToUppercaseHexString((uint8_t *) &PafPublish_ssi, sizeof(PafPublish_ssi), &args[strlen(args)],
-                                                    MAX_PAF_PUBLISH_SSI_BUFLEN - strlen(args));
+                                              MAX_PAF_PUBLISH_SSI_BUFLEN - strlen(args));
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish: [%s]", args);
     wpa_fi_w1_wpa_supplicant1_interface_call_nanpublish_sync(mWpaSupplicant.iface, args, &publish_id, nullptr, &err.GetReceiver());
@@ -887,12 +887,14 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish()
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool val)
 {
-    if (val == true) {
+    if (val == true)
+    {
         return _WiFiPAFPublish();
-    } else {
+    }
+    else
+    {
         return _WiFiPAFCancelPublish();
     }
 }
@@ -1355,7 +1357,8 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
         return;
     }
 
-    if (success == true) {
+    if (success == true)
+    {
         GAutoPtr<GVariant> dataValue(g_variant_lookup_value(discov_info, "discov_info", G_VARIANT_TYPE_BYTESTRING));
         size_t bufferLen;
         auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
@@ -1374,7 +1377,9 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
         ChipDeviceEvent event;
         event.Type = DeviceEventType::kCHIPoWiFiPAFConnected;
         PlatformMgr().PostEventOrDie(&event);
-    } else {
+    }
+    else
+    {
         GetWiFiPAF()->SetWiFiPAFState(Transport::WiFiPAFBase::State::kInitialized);
         if (mOnPafSubscribeError != nullptr)
         {
@@ -1421,8 +1426,8 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     return;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
-                                                    OnConnectionErrorFunct onError)
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState,
+                                                    OnConnectionCompleteFunct onSuccess, OnConnectionErrorFunct onError)
 {
     ChipLogProgress(Controller, "WiFi-PAF: Try to subscribe the NAN-USD devices");
     gchar args[MAX_PAF_SUBSCRIBE_SSI_BUFLEN];
@@ -1434,9 +1439,9 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
     VerifyOrReturnError(
         (strlen(args) + strlen(NAN_PUBLISH_SSI_TAG) + (sizeof(struct PAFPublishSSI) * 2) < MAX_PAF_PUBLISH_SSI_BUFLEN),
         CHIP_ERROR_BUFFER_TOO_SMALL);
-    mAppState = appState;
+    mAppState                = appState;
     PafPublish_ssi.DevOpCode = 0;
-    PafPublish_ssi.DevInfo = connDiscriminator.GetLongValue();
+    PafPublish_ssi.DevInfo   = connDiscriminator.GetLongValue();
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(PafPublish_ssi.ProductId) != CHIP_NO_ERROR)
     {
         PafPublish_ssi.ProductId = 0;
@@ -1447,7 +1452,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
     }
     strcat(args, NAN_PUBLISH_SSI_TAG);
     ret = Encoding::BytesToUppercaseHexString((uint8_t *) &PafPublish_ssi, sizeof(PafPublish_ssi), &args[strlen(args)],
-                                                    MAX_PAF_PUBLISH_SSI_BUFLEN - strlen(args));
+                                              MAX_PAF_PUBLISH_SSI_BUFLEN - strlen(args));
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe: [%s]", args);
 
@@ -1457,7 +1462,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & c
             +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) { return; }),
         &err.GetReceiver());
     mOnPafSubscribeComplete = onSuccess;
-    mOnPafSubscribeError = onError;
+    mOnPafSubscribeError    = onError;
     g_signal_connect(mWpaSupplicant.iface, "discovery-result",
                      G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, gboolean success, GVariant * obj,
                                     ConnectivityManagerImpl * self) { return self->OnDiscoveryResult(success, obj); }),
