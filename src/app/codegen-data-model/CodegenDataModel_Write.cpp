@@ -42,8 +42,7 @@ using namespace chip::app::Compatibility::Internal;
 
 /// Attempts to write via an attribute access interface (AAI)
 ///
-/// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success):
-///    - in particular, CHIP_ERROR_ACCESS_DENIED will be used for UnsupportedRead AII returns
+/// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success)
 ///
 /// If it returns std::nullopt, then there is no AAI to handle the given path
 /// and processing should figure out the value otherwise (generally from other ember data)
