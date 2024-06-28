@@ -1910,7 +1910,8 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
     TestWriteRequest test(kAdminSubjectDescriptor,
                           ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
                                                 MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
-    AttributeValueDecoder decoder = test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::MakeNullable("text"_span));
+    AttributeValueDecoder decoder =
+        test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::MakeNullable("text"_span));
 
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
@@ -1932,7 +1933,8 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
     TestWriteRequest test(kAdminSubjectDescriptor,
                           ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
                                                 MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
-    AttributeValueDecoder decoder = test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::Nullable<CharSpan>());
+    AttributeValueDecoder decoder =
+        test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::Nullable<CharSpan>());
 
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
