@@ -57,6 +57,10 @@
 #define INADDR_ANY 0
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+#include "ZephyrSocket.h"
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+
 /*
  * Some systems define both IPV6_{ADD,DROP}_MEMBERSHIP and
  * IPV6_{JOIN,LEAVE}_GROUP while others only define
