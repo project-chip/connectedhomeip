@@ -30,8 +30,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     mbedos:
         name: Mbed OS examples building
+        needs: await-fast-ci
 
         env:
             PLATFORM_NAME: mbed
