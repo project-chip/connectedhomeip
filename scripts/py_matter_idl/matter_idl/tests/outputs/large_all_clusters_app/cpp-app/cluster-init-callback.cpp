@@ -64,6 +64,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::DoorLock::Id:
         emberAfDoorLockClusterInitCallback(endpoint);
         break;
+    case app::Clusters::EnergyCalendar::Id:
+        emberAfEnergyCalendarClusterInitCallback(endpoint);
+        break;
     case app::Clusters::ElectricalMeasurement::Id:
         emberAfElectricalMeasurementClusterInitCallback(endpoint);
         break;
@@ -120,6 +123,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::MediaPlayback::Id:
         emberAfMediaPlaybackClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::MeterIdentification::Id:
+        emberAfMeterIdentificationClusterInitCallback(endpoint);
         break;
     case app::Clusters::ModeSelect::Id:
         emberAfModeSelectClusterInitCallback(endpoint);
