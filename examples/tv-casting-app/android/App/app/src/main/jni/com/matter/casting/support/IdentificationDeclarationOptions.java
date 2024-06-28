@@ -31,15 +31,6 @@ public class IdentificationDeclarationOptions {
   public IdentificationDeclarationOptions() {}
 
   /**
-   * Constructor to set only the commissionerPasscode.
-   *
-   * @param commissionerPasscode the commissioner passcode flag.
-   */
-  public IdentificationDeclarationOptions(boolean commissionerPasscode) {
-    this.commissionerPasscode = commissionerPasscode;
-  }
-
-  /**
    * Constructor to set all fields.
    *
    * @param noPasscode the no passcode flag.

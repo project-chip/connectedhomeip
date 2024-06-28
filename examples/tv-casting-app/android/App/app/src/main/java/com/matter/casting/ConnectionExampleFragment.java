@@ -128,12 +128,13 @@ public class ConnectionExampleFragment extends Fragment {
             () -> {
               Log.d(TAG, "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection()");
 
-              IdentificationDeclarationOptions idOptions = new IdentificationDeclarationOptions();
+              IdentificationDeclarationOptions idOptions;
               TargetAppInfo targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID);
 
               if (useCommissionerGeneratedPasscode) {
-                // Constructor to set only the commissionerPasscode.
-                idOptions = new IdentificationDeclarationOptions(true);
+                // Set commissionerPasscode to true for CastingPlayer/Commissioner-Generated
+                // passcode commissioning.
+                idOptions = new IdentificationDeclarationOptions(false, false, true, false, false);
                 targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW);
                 Log.d(
                     TAG,
@@ -142,6 +143,7 @@ public class ConnectionExampleFragment extends Fragment {
                         + ", useCommissionerGeneratedPasscode: "
                         + useCommissionerGeneratedPasscode);
               } else {
+                idOptions = new IdentificationDeclarationOptions();
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "

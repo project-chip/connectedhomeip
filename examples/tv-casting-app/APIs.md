@@ -249,7 +249,7 @@ client's lifecycle:
           return commissionableData;
         }
 
-        // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature commissioning flow:
+        // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature:
         public void updateCommissionableDataSetupPasscode(long setupPasscode, int discriminator) {
             commissionableData.setSetupPasscode(setupPasscode);
             commissionableData.setDiscriminator(discriminator);
@@ -281,7 +281,7 @@ client's lifecycle:
         return commissionableData
     }
 
-    // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature commissioning flow:
+    // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature:
     func update(_ newCommissionableData: MCCommissionableData) {
         self.commissionableData = newCommissionableData
     }
@@ -842,7 +842,7 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
     }
 }
 
-// If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature commissioning flow:
+// If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature:
 // Define a callback to handle CastingPlayer’s CommissionerDeclaration messages.
 void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source,
                                      chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
@@ -889,7 +889,7 @@ CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
 matter::casting::core::ConnectionCallbacks connectionCallbacks;
 connectionCallbacks.mOnConnectionComplete = ConnectionHandler;
 
-// If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature commissioning flow:
+// If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature:
 // Set the IdentificationDeclaration CommissionerPasscode flag to instruct the CastingPlayer /
 // Commissioner to use the Commissioner-generated Passcode for commissioning. Set the
 // CommissionerDeclarationCallback in ConnectionCallbacks.
@@ -921,7 +921,7 @@ IdentificationDeclarationOptions idOptions = new IdentificationDeclarationOption
 TargetAppInfo targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID);
 idOptions.addTargetAppInfo(targetAppInfo);
 
-// If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature commissioning flow.
+// If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature.
 // Set the IdentificationDeclaration CommissionerPasscode flag to instruct the CastingPlayer /
 // Commissioner to use the Commissioner-generated Passcode for commissioning.
 idOptions = new IdentificationDeclarationOptions(commissionerPasscode:true);
@@ -959,7 +959,7 @@ ConnectionCallbacks connectionCallbacks =
                     });
         }
         },
-        // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature commissioning flow.
+        // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature.
         // Define a callback to handle CastingPlayer’s CommissionerDeclaration messages.
         // This can be null if using Casting Client / Commissionee generated passcode commissioning.
         new MatterCallback<CommissionerDeclaration>() {
@@ -1044,7 +1044,7 @@ func connect(selectedCastingPlayer: MCCastingPlayer?) {
         }
     }
 
-    // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature commissioning flow.
+    // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature.
     // Define a callback to handle CastingPlayer’s CommissionerDeclaration messages.
     let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { commissionerDeclarationMessage in
         DispatchQueue.main.async {
@@ -1119,7 +1119,7 @@ func connect(selectedCastingPlayer: MCCastingPlayer?) {
     )
     identificationDeclarationOptions.addTargetAppInfo(targetAppInfo)
 
-    // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature commissioning flow.
+    // If using the alternate CastingPlayer / Commissioner-Generated Passcode UDC feature.
     // Set the IdentificationDeclaration CommissionerPasscode flag to instruct the CastingPlayer /
     // Commissioner to use the Commissioner-generated Passcode for commissioning. Set the
     // CommissionerDeclarationCallback in MCConnectionCallbacks.
