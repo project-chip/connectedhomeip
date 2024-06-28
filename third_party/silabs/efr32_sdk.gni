@@ -484,9 +484,7 @@ template("efr32_sdk") {
 
         # This is kept due to the warning on the LWIP when on demand timer is added
         # TODO: remove this flag once the warning is fixed in SiSDK MATTER-3946
-        cflags += [
-          "-Wno-error"
-        ]
+        cflags += [ "-Wno-error" ]
       }
     }
 
