@@ -120,7 +120,7 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
         ReturnErrorOnFailure(decoder.Decode(workingValue));
     }
 
-    typename ENCODING::LengthType len = workingValue.size();
+    typename ENCODING::LengthType len = static_cast<typename ENCODING::LengthType>(workingValue.size());
     VerifyOrReturnError(out.size() >= sizeof(len) + len, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(out.data(), &len, sizeof(len));
@@ -325,9 +325,9 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     record.clusterId   = request.path.mClusterId;
     record.attributeId = request.path.mAttributeId;
 
-    Protocols::InteractionModel::Status status =
-        emAfReadOrWriteAttribute(&record, attributeMetadata, gEmberAttributeIOBufferSpan.data(), gEmberAttributeIOBufferSpan.size(),
-                                 /* write = */ true);
+    Protocols::InteractionModel::Status status = emAfReadOrWriteAttribute(
+        &record, attributeMetadata, gEmberAttributeIOBufferSpan.data(), static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
+        /* write = */ true);
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
