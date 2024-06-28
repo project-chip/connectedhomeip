@@ -22,9 +22,9 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr size_t kMaxTesetIoSize = 128;
+constexpr size_t kMaxTestIoSize = 128;
 
-uint8_t gEmberIoBuffer[kMaxTesetIoSize];
+uint8_t gEmberIoBuffer[kMaxTestIoSize];
 size_t gEmberIoBufferFill;
 Status gEmberStatusCode = Status::InvalidAction;
 
