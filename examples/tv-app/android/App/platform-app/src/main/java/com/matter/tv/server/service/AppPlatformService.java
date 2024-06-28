@@ -25,6 +25,7 @@ import android.content.IntentFilter;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import com.matter.tv.app.api.SupportedCluster;
+import com.matter.tv.server.handlers.ApplicationLauncherManagerImpl;
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
@@ -194,6 +195,7 @@ public class AppPlatformService {
       Log.e(TAG, "Could not add content app as endpoint. App Name " + app.getAppName());
     }
   }
+
 
   private Collection<ContentAppSupportedCluster> mapSupportedClusters(
       Collection<SupportedCluster> supportedClusters) {

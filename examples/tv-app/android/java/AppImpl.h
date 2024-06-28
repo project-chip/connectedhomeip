@@ -35,11 +35,11 @@
 
 #include "../include/account-login/AccountLoginManager.h"
 #include "../include/application-basic/ApplicationBasicManager.h"
-#include "../include/application-launcher/ApplicationLauncherManager.h"
 #include "../include/content-control/ContentController.h"
 #include "../include/content-launcher/AppContentLauncherManager.h"
 #include "../include/media-playback/AppMediaPlaybackManager.h"
 #include "../include/target-navigator/TargetNavigatorManager.h"
+#include "application-launcher/ApplicationLauncherManager.h"
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
 #include "ContentAppAttributeDelegate.h"
