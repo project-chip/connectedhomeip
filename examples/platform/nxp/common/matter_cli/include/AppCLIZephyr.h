@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,25 +15,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <credentials/DeviceAttestationCredsProvider.h>
+#include "AppCLIBase.h"
 
 namespace chip {
-namespace Credentials {
-namespace Silabs {
+namespace NXP {
+namespace App {
 
-/**
- * @brief Get implementation of a sample DAC provider to validate device
- *        attestation procedure.
- *
- * @returns a singleton DeviceAttestationCredentialsProvider that relies on no
- *          storage abstractions.
- */
-DeviceAttestationCredentialsProvider * GetSilabsDacProvider();
+class AppCLIZephyr : public AppCLIBase
+{
+public:
+    virtual ~AppCLIZephyr() = default;
 
-void SilabsDacProviderMigration(void);
+    virtual CHIP_ERROR Init(void) override;
 
-} // namespace Silabs
-} // namespace Credentials
+    virtual void ResetCmdHandle(void) override;
+
+    static AppCLIZephyr & GetDefaultInstance();
+
+private:
+    bool isShellInitialized = false;
+};
+AppCLIBase & GetAppCLI();
+} // namespace App
+} // namespace NXP
 } // namespace chip

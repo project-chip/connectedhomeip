@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class RvcOperationalStateClusterOperationalStateStruct(
   val operationalStateID: UByte,
-  val operationalStateLabel: Optional<String>
+  val operationalStateLabel: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("RvcOperationalStateClusterOperationalStateStruct {\n")
@@ -52,7 +52,7 @@ class RvcOperationalStateClusterOperationalStateStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): RvcOperationalStateClusterOperationalStateStruct {
       tlvReader.enterStructure(tlvTag)
       val operationalStateID = tlvReader.getUByte(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D))
@@ -67,7 +67,7 @@ class RvcOperationalStateClusterOperationalStateStruct(
 
       return RvcOperationalStateClusterOperationalStateStruct(
         operationalStateID,
-        operationalStateLabel
+        operationalStateLabel,
       )
     }
   }
