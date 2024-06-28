@@ -583,7 +583,7 @@ struct TestWriteRequest
         //   - END_STRUCT
         TLV::TLVType outerContainerType;
         VerifyOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
-        VerifyOrDie(DataModel::Encode(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
+        VerifyOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
         VerifyOrDie(writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
         VerifyOrDie(writer.Finalize() == CHIP_NO_ERROR);
 
@@ -711,7 +711,7 @@ void TestEmberScalarNullWrite()
                           ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZclType)));
 
     using NumericType             = NumericAttributeTraits<T>;
-    using NullableType            = DataModel::Nullable<typename NumericType::WorkingType>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
     AttributeValueDecoder decoder = test.DecoderFor<NullableType>(NullableType());
 
     // write should succeed
@@ -1910,7 +1910,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
     TestWriteRequest test(kAdminSubjectDescriptor,
                           ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
                                                 MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
-    AttributeValueDecoder decoder = test.DecoderFor<DataModel::Nullable<CharSpan>>(DataModel::MakeNullable("text"_span));
+    AttributeValueDecoder decoder = test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::MakeNullable("text"_span));
 
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
@@ -1932,7 +1932,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
     TestWriteRequest test(kAdminSubjectDescriptor,
                           ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
                                                 MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
-    AttributeValueDecoder decoder = test.DecoderFor<DataModel::Nullable<CharSpan>>(DataModel::Nullable<CharSpan>());
+    AttributeValueDecoder decoder = test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::Nullable<CharSpan>());
 
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
