@@ -394,6 +394,10 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         targetCastingPlayer = castingPlayers.at(index);
 
         gCommissionerGeneratedPasscodeFlowRunning = false;
+
+        // Specify the TargetApp that the client wants to interact with after commissioning. If this value is passed in,
+        // VerifyOrEstablishConnection() will force UDC, in case the desired TargetApp is not found in the on-device
+        // CastingStore
         matter::casting::core::IdentificationDeclarationOptions idOptions;
         chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
         targetAppInfo.vendorId = kDesiredEndpointVendorId;
@@ -474,6 +478,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                 ChipLogError(AppServer,
                              "CommandHandler() setcommissionerpasscode InitCommissionableDataProvider() err %" CHIP_ERROR_FORMAT,
                              err.Format());
+                return err;
             }
             // Update the CommissionableDataProvider stored in this CastingApp's AppParameters and the CommissionableDataProvider to
             // be used for the commissioning session.
@@ -483,14 +488,27 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                 ChipLogError(AppServer,
                              "CommandHandler() setcommissionerpasscode InitCommissionableDataProvider() err %" CHIP_ERROR_FORMAT,
                              err.Format());
+                return err;
             }
 
             // Continue Connecting to the target CastingPlayer with the user entered Commissioner-generated Passcode.
             err = targetCastingPlayer->ContinueConnecting();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "CommandHandler() setcommissionerpasscode ContinueConnecting() err %" CHIP_ERROR_FORMAT,
+                ChipLogError(AppServer,
+                             "CommandHandler() setcommissionerpasscode ContinueConnecting() failed due to err %" CHIP_ERROR_FORMAT,
                              err.Format());
+                // Since continueConnecting() failed, Attempt to cancel the connection attempt with
+                // the CastingPlayer/Commissioner by calling StopConnecting().
+                err = targetCastingPlayer->StopConnecting();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer,
+                                 "CommandHandler() setcommissionerpasscode, ContinueConnecting() failed and then StopConnecting "
+                                 "failed due to err %" CHIP_ERROR_FORMAT,
+                                 err.Format());
+                }
+                return err;
             }
         }
         else
@@ -498,6 +516,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             ChipLogError(
                 AppServer,
                 "CommandHandler() setcommissionerpasscode, no Commissioner-Generated passcode input expected at this time.");
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
     if (strcmp(argv[0], "stop-connecting") == 0)
@@ -507,6 +526,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "CommandHandler() stop-connecting, err %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
         }
     }
     if (strcmp(argv[0], "print-bindings") == 0)

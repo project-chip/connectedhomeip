@@ -166,7 +166,7 @@ public class IdentificationDeclarationOptions {
     sb.append("IdentificationDeclarationOptions::targetAppInfos list: \n");
 
     for (TargetAppInfo targetAppInfo : targetAppInfos) {
-      sb.append("\t\t").append(targetAppInfo.toString()).append("\n");
+      sb.append("\t\t").append(targetAppInfo).append("\n");
     }
 
     return sb.toString();

@@ -41,7 +41,6 @@ public class TargetAppInfo {
    */
   public TargetAppInfo(Integer vendorId) {
     this.vendorId = vendorId;
-    this.productId = null; // product ID unspecified
   }
 
   /**
@@ -60,15 +59,6 @@ public class TargetAppInfo {
    */
   public Integer getProductId() {
     return productId;
-  }
-
-  /**
-   * Returns both vendorId and productId as an array.
-   *
-   * @return an array with vendorId and productId.
-   */
-  public Integer[] getVendorAndProductId() {
-    return new Integer[] {vendorId, productId};
   }
 
   /**
