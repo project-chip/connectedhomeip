@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.JsonReader;
 import android.util.JsonWriter;
+import android.util.Log;
+
 import com.matter.tv.server.model.ContentApp;
 import java.io.IOException;
 import java.io.StringReader;
@@ -49,6 +51,7 @@ public class EndpointsDataStore {
   }
 
   public void persistContentAppEndpoint(ContentApp app) {
+    Log.i( EndpointsDataStore.class.toString(), "Persist Content App Endpoint " + app.getAppName());
     persistedContentApps.put(app.getAppName(), app);
     discoveredEndpoints.edit().putString(app.getAppName(), serializeContentApp(app)).apply();
   }

@@ -11,6 +11,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.matter.tv.server.fragments.ContentAppFragment;
 import com.matter.tv.server.fragments.QrCodeFragment;
 import com.matter.tv.server.fragments.TerminalFragment;
+import com.matter.tv.server.utils.InstallationObserver;
+
 import java.util.LinkedHashMap;
 
 public class MainActivity extends AppCompatActivity {
