@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChannelClusterSeriesInfoStruct(val season: String, val episode: String) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ChannelClusterSeriesInfoStruct (
+    val season: String,
+    val episode: String) {
+  override fun toString(): String  = buildString {
     append("ChannelClusterSeriesInfoStruct {\n")
     append("\tseason : $season\n")
     append("\tepisode : $episode\n")
@@ -43,11 +49,11 @@ class ChannelClusterSeriesInfoStruct(val season: String, val episode: String) {
     private const val TAG_SEASON = 0
     private const val TAG_EPISODE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterSeriesInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChannelClusterSeriesInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val season = tlvReader.getString(ContextSpecificTag(TAG_SEASON))
       val episode = tlvReader.getString(ContextSpecificTag(TAG_EPISODE))
-
+      
       tlvReader.exitContainer()
 
       return ChannelClusterSeriesInfoStruct(season, episode)

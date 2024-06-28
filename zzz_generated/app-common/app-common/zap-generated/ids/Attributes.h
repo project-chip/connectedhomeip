@@ -5090,10 +5090,6 @@ namespace SetpointHoldExpiryTimestamp {
 static constexpr AttributeId Id = 0x00000054;
 } // namespace SetpointHoldExpiryTimestamp
 
-namespace QueuedPreset {
-static constexpr AttributeId Id = 0x00000055;
-} // namespace QueuedPreset
-
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

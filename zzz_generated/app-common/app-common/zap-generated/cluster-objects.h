@@ -20370,9 +20370,9 @@ namespace HarmonicCurrents {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
-                    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
+        const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
     using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-           chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
         chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>> &;
 
@@ -20385,9 +20385,9 @@ namespace HarmonicPhases {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
-                    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
+        const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
     using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-           chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
         chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>> &;
 
@@ -28674,29 +28674,6 @@ public:
 using DecodableType = Type;
 
 } // namespace PresetTypeStruct
-namespace QueuedPresetStruct {
-enum class Fields : uint8_t
-{
-    kPresetHandle        = 0,
-    kTransitionTimestamp = 1,
-};
-
-struct Type
-{
-public:
-    DataModel::Nullable<chip::ByteSpan> presetHandle;
-    DataModel::Nullable<uint32_t> transitionTimestamp;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace QueuedPresetStruct
 namespace ScheduleTypeStruct {
 enum class Fields : uint8_t
 {
@@ -28801,11 +28778,6 @@ namespace CommitPresetsSchedulesRequest {
 struct Type;
 struct DecodableType;
 } // namespace CommitPresetsSchedulesRequest
-
-namespace CancelSetActivePresetRequest {
-struct Type;
-struct DecodableType;
-} // namespace CancelSetActivePresetRequest
 
 namespace SetTemperatureSetpointHoldPolicy {
 struct Type;
@@ -29031,7 +29003,6 @@ namespace SetActivePresetRequest {
 enum class Fields : uint8_t
 {
     kPresetHandle = 0,
-    kDelayMinutes = 1,
 };
 
 struct Type
@@ -29042,7 +29013,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     chip::ByteSpan presetHandle;
-    Optional<uint16_t> delayMinutes;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -29058,7 +29028,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     chip::ByteSpan presetHandle;
-    Optional<uint16_t> delayMinutes;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetActivePresetRequest
@@ -29150,34 +29119,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CommitPresetsSchedulesRequest
-namespace CancelSetActivePresetRequest {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::CancelSetActivePresetRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::CancelSetActivePresetRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace CancelSetActivePresetRequest
 namespace SetTemperatureSetpointHoldPolicy {
 enum class Fields : uint8_t
 {
@@ -29970,20 +29911,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SetpointHoldExpiryTimestamp
-namespace QueuedPreset {
-struct TypeInfo
-{
-    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::QueuedPreset::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace QueuedPreset
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -30106,7 +30033,6 @@ struct TypeInfo
         Attributes::TemperatureSetpointHoldPolicy::TypeInfo::DecodableType temperatureSetpointHoldPolicy =
             static_cast<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>(0);
         Attributes::SetpointHoldExpiryTimestamp::TypeInfo::DecodableType setpointHoldExpiryTimestamp;
-        Attributes::QueuedPreset::TypeInfo::DecodableType queuedPreset;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

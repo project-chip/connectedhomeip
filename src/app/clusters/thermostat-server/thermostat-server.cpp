@@ -122,10 +122,6 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     }
     break;
-    case QueuedPreset::Id: {
-        DataModel::Nullable<Structs::QueuedPresetStruct::Type> value;
-        return aEncoder.Encode(value);
-    }
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
         break;
     }
@@ -163,10 +159,6 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     break;
 
     case Schedules::Id: {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    break;
-    case QueuedPreset::Id: {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
@@ -527,14 +519,6 @@ bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
 bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterCancelSetActivePresetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::DecodableType & commandData)
 {
     // TODO
     return false;
