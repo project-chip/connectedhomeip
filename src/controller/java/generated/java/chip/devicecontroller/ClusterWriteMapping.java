@@ -1312,6 +1312,8 @@ public class ClusterWriteMapping {
     );
     writeEnergyEvseInteractionInfo.put("writeApproximateEVEfficiencyAttribute", writeEnergyEvseApproximateEVEfficiencyAttributeInteractionInfo);
     writeAttributeMap.put("energyEvse", writeEnergyEvseInteractionInfo);
+    Map<String, InteractionInfo> writeEnergyCalendarInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("energyCalendar", writeEnergyCalendarInteractionInfo);
     Map<String, InteractionInfo> writeEnergyPreferenceInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeEnergyPreferenceCurrentEnergyBalanceCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo energyPreferencecurrentEnergyBalanceCommandParameterInfo =
@@ -3872,6 +3874,8 @@ public class ClusterWriteMapping {
     );
     writeElectricalMeasurementInteractionInfo.put("writeAcOverloadAlarmsMaskAttribute", writeElectricalMeasurementAcOverloadAlarmsMaskAttributeInteractionInfo);
     writeAttributeMap.put("electricalMeasurement", writeElectricalMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeMeterIdentificationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("meterIdentification", writeMeterIdentificationInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingbooleanCommandParameterInfo =

@@ -17104,6 +17104,256 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Events
 
 } // namespace EnergyEvse
+namespace EnergyCalendar {
+namespace Structs {
+
+namespace TransitionStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
+    encoder.Encode(to_underlying(Fields::kPriceTier), priceTier);
+    encoder.Encode(to_underlying(Fields::kFriendlyCredit), friendlyCredit);
+    encoder.Encode(to_underlying(Fields::kAuxiliaryLoad), auxiliaryLoad);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kTransitionTime))
+        {
+            err = DataModel::Decode(reader, transitionTime);
+        }
+        else if (__context_tag == to_underlying(Fields::kPriceTier))
+        {
+            err = DataModel::Decode(reader, priceTier);
+        }
+        else if (__context_tag == to_underlying(Fields::kFriendlyCredit))
+        {
+            err = DataModel::Decode(reader, friendlyCredit);
+        }
+        else if (__context_tag == to_underlying(Fields::kAuxiliaryLoad))
+        {
+            err = DataModel::Decode(reader, auxiliaryLoad);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace TransitionStruct
+
+namespace DayStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kDate), date);
+    encoder.Encode(to_underlying(Fields::kDaysOfWeek), daysOfWeek);
+    encoder.Encode(to_underlying(Fields::kTransitions), transitions);
+    encoder.Encode(to_underlying(Fields::kCalendarID), calendarID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kDate))
+        {
+            err = DataModel::Decode(reader, date);
+        }
+        else if (__context_tag == to_underlying(Fields::kDaysOfWeek))
+        {
+            err = DataModel::Decode(reader, daysOfWeek);
+        }
+        else if (__context_tag == to_underlying(Fields::kTransitions))
+        {
+            err = DataModel::Decode(reader, transitions);
+        }
+        else if (__context_tag == to_underlying(Fields::kCalendarID))
+        {
+            err = DataModel::Decode(reader, calendarID);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace DayStruct
+
+namespace CalendarPeriodStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStartDate), startDate);
+    encoder.Encode(to_underlying(Fields::kDays), days);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStartDate))
+        {
+            err = DataModel::Decode(reader, startDate);
+        }
+        else if (__context_tag == to_underlying(Fields::kDays))
+        {
+            err = DataModel::Decode(reader, days);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace CalendarPeriodStruct
+
+namespace PeakPeriodStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSeverity), severity);
+    encoder.Encode(to_underlying(Fields::kPeakPeriod), peakPeriod);
+    encoder.Encode(to_underlying(Fields::kStartTime), startTime);
+    encoder.Encode(to_underlying(Fields::kEndTime), endTime);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSeverity))
+        {
+            err = DataModel::Decode(reader, severity);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeakPeriod))
+        {
+            err = DataModel::Decode(reader, peakPeriod);
+        }
+        else if (__context_tag == to_underlying(Fields::kStartTime))
+        {
+            err = DataModel::Decode(reader, startTime);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndTime))
+        {
+            err = DataModel::Decode(reader, endTime);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PeakPeriodStruct
+} // namespace Structs
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::CalendarID::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, calendarID);
+    case Attributes::Name::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, name);
+    case Attributes::ProviderID::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, providerID);
+    case Attributes::EventID::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventID);
+    case Attributes::StartDate::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, startDate);
+    case Attributes::CalendarPeriods::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, calendarPeriods);
+    case Attributes::SpecialDays::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, specialDays);
+    case Attributes::CurrentDay::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentDay);
+    case Attributes::NextDay::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, nextDay);
+    case Attributes::CurrentTransition::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentTransition);
+    case Attributes::CurrentPeakPeriod::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentPeakPeriod);
+    case Attributes::NextPeakPeriod::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, nextPeakPeriod);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace EnergyCalendar
 namespace EnergyPreference {
 namespace Structs {
 
@@ -28187,6 +28437,46 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace ElectricalMeasurement
+namespace MeterIdentification {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeterType::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, meterType);
+    case Attributes::UtilityName::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, utilityName);
+    case Attributes::PointOfDelivery::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, pointOfDelivery);
+    case Attributes::PowerThreshold::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, powerThreshold);
+    case Attributes::PowerThresholdSource::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, powerThresholdSource);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace MeterIdentification
 namespace UnitTesting {
 namespace Structs {
 

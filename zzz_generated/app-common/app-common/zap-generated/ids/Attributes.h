@@ -4085,6 +4085,84 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace EnergyEvse
 
+namespace EnergyCalendar {
+namespace Attributes {
+
+namespace CalendarID {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace CalendarID
+
+namespace Name {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Name
+
+namespace ProviderID {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ProviderID
+
+namespace EventID {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace EventID
+
+namespace StartDate {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace StartDate
+
+namespace CalendarPeriods {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CalendarPeriods
+
+namespace SpecialDays {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace SpecialDays
+
+namespace CurrentDay {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace CurrentDay
+
+namespace NextDay {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace NextDay
+
+namespace CurrentTransition {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace CurrentTransition
+
+namespace CurrentPeakPeriod {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace CurrentPeakPeriod
+
+namespace NextPeakPeriod {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace NextPeakPeriod
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EnergyCalendar
+
 namespace EnergyPreference {
 namespace Attributes {
 
@@ -7892,6 +7970,56 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace ElectricalMeasurement
+
+namespace MeterIdentification {
+namespace Attributes {
+
+namespace MeterType {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeterType
+
+namespace UtilityName {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace UtilityName
+
+namespace PointOfDelivery {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace PointOfDelivery
+
+namespace PowerThreshold {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PowerThreshold
+
+namespace PowerThresholdSource {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PowerThresholdSource
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MeterIdentification
 
 namespace UnitTesting {
 namespace Attributes {

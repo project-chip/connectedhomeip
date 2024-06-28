@@ -4999,6 +4999,91 @@ cluster EnergyEvse = 153 {
   timed command ClearTargets(): DefaultSuccess = 7;
 }
 
+/**  */
+cluster EnergyCalendar = 154 {
+  revision 3;
+
+  enum PeakPeriodSeverityEnum : enum8 {
+    kUnused = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+  }
+
+  bitmap AuxiliaryLoadBitmap : bitmap8 {
+    kAuxiliarySwitch1 = 0x1;
+    kAuxiliarySwitch2 = 0x2;
+    kAuxiliarySwitch3 = 0x4;
+    kAuxiliarySwitch4 = 0x8;
+    kAuxiliarySwitch5 = 0x10;
+    kAuxiliarySwitch6 = 0x20;
+    kAuxiliarySwitch7 = 0x40;
+    kAuxiliarySwitch8 = 0x80;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPricingTier = 0x1;
+    kFriendlyCredit = 0x2;
+    kAuxiliaryLoad = 0x4;
+    kPeakPeriod = 0x8;
+  }
+
+  bitmap TransitionDayOfWeekBitmap : bitmap8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
+  struct TransitionStruct {
+    int16u transitionTime = 0;
+    optional int32u priceTier = 1;
+    optional boolean friendlyCredit = 2;
+    optional AuxiliaryLoadBitmap auxiliaryLoad = 3;
+  }
+
+  struct DayStruct {
+    optional date date = 0;
+    optional TransitionDayOfWeekBitmap daysOfWeek = 1;
+    TransitionStruct transitions[] = 2;
+    optional int32u calendarID = 3;
+  }
+
+  struct CalendarPeriodStruct {
+    nullable epoch_s startDate = 0;
+    DayStruct days[] = 1;
+  }
+
+  struct PeakPeriodStruct {
+    PeakPeriodSeverityEnum severity = 0;
+    int16u peakPeriod = 1;
+    nullable epoch_s startTime = 2;
+    nullable epoch_s endTime = 3;
+  }
+
+  readonly attribute nullable int32u calendarID = 0;
+  readonly attribute nullable char_string<12> name = 1;
+  readonly attribute nullable int32u providerID = 2;
+  readonly attribute nullable int32u eventID = 3;
+  readonly attribute nullable epoch_s startDate = 4;
+  readonly attribute nullable CalendarPeriodStruct calendarPeriods[] = 5;
+  readonly attribute nullable DayStruct specialDays[] = 6;
+  readonly attribute nullable DayStruct currentDay = 7;
+  readonly attribute nullable DayStruct nextDay = 8;
+  readonly attribute nullable TransitionStruct currentTransition = 9;
+  readonly attribute optional nullable PeakPeriodStruct currentPeakPeriod = 10;
+  readonly attribute optional nullable PeakPeriodStruct nextPeakPeriod = 11;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster provides an interface to specify preferences for how devices should consume energy. */
 provisional cluster EnergyPreference = 155 {
   revision 1;
@@ -9273,6 +9358,39 @@ deprecated cluster ElectricalMeasurement = 2820 {
   command GetProfileInfoCommand(): DefaultSuccess = 0;
   /** A function which retrieves an electricity measurement profile from the electricity measurement server for a specific attribute Id requested. */
   command GetMeasurementProfileCommand(GetMeasurementProfileCommandRequest): DefaultSuccess = 1;
+}
+
+/**  */
+cluster MeterIdentification = 2822 {
+  revision 1;
+
+  enum MeterTypeEnum : enum8 {
+    kUtility = 0;
+    kPrivate = 1;
+    kGeneric = 2;
+  }
+
+  enum PowerThresholdSourceEnum : enum8 {
+    kContract = 0;
+    kRegulator = 1;
+    kEquipment = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPowerThreshold = 0x1;
+  }
+
+  readonly attribute nullable MeterTypeEnum meterType = 0;
+  readonly attribute nullable char_string<16> utilityName = 1;
+  readonly attribute nullable char_string<16> pointOfDelivery = 2;
+  readonly attribute optional nullable power_mw powerThreshold = 3;
+  readonly attribute optional nullable PowerThresholdSourceEnum powerThresholdSource = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** The Test Cluster is meant to validate the generated code */

@@ -2557,6 +2557,178 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 } // namespace Attributes
 } // namespace EnergyEvse
 
+namespace EnergyCalendar {
+namespace Attributes {
+
+namespace CalendarID {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace CalendarID
+
+namespace Name {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        DataModel::Nullable<chip::MutableCharSpan> & value); // char_string
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace Name
+
+namespace ProviderID {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace ProviderID
+
+namespace EventID {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace EventID
+
+namespace StartDate {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace StartDate
+
+namespace CurrentDay {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type> & value); // DayStruct
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint, chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type> & value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type> & value,
+    MarkAttributeDirty markDirty);
+} // namespace CurrentDay
+
+namespace NextDay {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type> & value); // DayStruct
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint, chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type> & value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type> & value,
+    MarkAttributeDirty markDirty);
+} // namespace NextDay
+
+namespace CurrentTransition {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type> & value); // TransitionStruct
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type value,
+                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type> & value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type> & value,
+    MarkAttributeDirty markDirty);
+} // namespace CurrentTransition
+
+namespace CurrentPeakPeriod {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type> & value); // PeakPeriodStruct
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type value,
+                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type> & value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type> & value,
+    MarkAttributeDirty markDirty);
+} // namespace CurrentPeakPeriod
+
+namespace NextPeakPeriod {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type> & value); // PeakPeriodStruct
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type value,
+                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type> & value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type> & value,
+    MarkAttributeDirty markDirty);
+} // namespace NextPeakPeriod
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EnergyCalendar
+
 namespace EnergyPreference {
 namespace Attributes {
 
@@ -6673,6 +6845,97 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 } // namespace Attributes
 } // namespace ElectricalMeasurement
+
+namespace MeterIdentification {
+namespace Attributes {
+
+namespace MeterType {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum> & value); // MeterTypeEnum
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::MeterIdentification::MeterTypeEnum value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::MeterIdentification::MeterTypeEnum value,
+                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum> & value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum> & value,
+    MarkAttributeDirty markDirty);
+} // namespace MeterType
+
+namespace UtilityName {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        DataModel::Nullable<chip::MutableCharSpan> & value); // char_string
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace UtilityName
+
+namespace PointOfDelivery {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        DataModel::Nullable<chip::MutableCharSpan> & value); // char_string
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace PointOfDelivery
+
+namespace PowerThreshold {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & value); // power_mw
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value,
+                                        MarkAttributeDirty markDirty);
+} // namespace PowerThreshold
+
+namespace PowerThresholdSource {
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum> & value); // PowerThresholdSourceEnum
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum value,
+                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum> & value);
+Protocols::InteractionModel::Status
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum> & value,
+    MarkAttributeDirty markDirty);
+} // namespace PowerThresholdSource
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MeterIdentification
 
 namespace UnitTesting {
 namespace Attributes {

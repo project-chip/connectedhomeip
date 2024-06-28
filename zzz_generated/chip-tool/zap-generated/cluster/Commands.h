@@ -106,6 +106,7 @@
 | Messages                                                            | 0x0097 |
 | DeviceEnergyManagement                                              | 0x0098 |
 | EnergyEvse                                                          | 0x0099 |
+| EnergyCalendar                                                      | 0x009A |
 | EnergyPreference                                                    | 0x009B |
 | PowerTopology                                                       | 0x009C |
 | EnergyEvseMode                                                      | 0x009D |
@@ -154,6 +155,7 @@
 | ContentControl                                                      | 0x050F |
 | ContentAppObserver                                                  | 0x0510 |
 | ElectricalMeasurement                                               | 0x0B04 |
+| MeterIdentification                                                 | 0x0B06 |
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
 | SampleMei                                                           | 0xFFF1FC20|
@@ -7585,6 +7587,34 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster EnergyCalendar                                              | 0x009A |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * CalendarID                                                        | 0x0000 |
+| * Name                                                              | 0x0001 |
+| * ProviderID                                                        | 0x0002 |
+| * EventID                                                           | 0x0003 |
+| * StartDate                                                         | 0x0004 |
+| * CalendarPeriods                                                   | 0x0005 |
+| * SpecialDays                                                       | 0x0006 |
+| * CurrentDay                                                        | 0x0007 |
+| * NextDay                                                           | 0x0008 |
+| * CurrentTransition                                                 | 0x0009 |
+| * CurrentPeakPeriod                                                 | 0x000A |
+| * NextPeakPeriod                                                    | 0x000B |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
 | Cluster EnergyPreference                                            | 0x009B |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -13873,6 +13903,27 @@ public:
 private:
     chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type mRequest;
 };
+
+/*----------------------------------------------------------------------------*\
+| Cluster MeterIdentification                                         | 0x0B06 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeterType                                                         | 0x0000 |
+| * UtilityName                                                       | 0x0001 |
+| * PointOfDelivery                                                   | 0x0002 |
+| * PowerThreshold                                                    | 0x0003 |
+| * PowerThresholdSource                                              | 0x0004 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
 | Cluster UnitTesting                                                 | 0xFFF1FC05 |
@@ -21324,6 +21375,112 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterEnergyCalendar(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::EnergyCalendar;
+
+    const char * clusterName = "EnergyCalendar";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "calendar-id", Attributes::CalendarID::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "name", Attributes::Name::Id, credsIssuerConfig),                                   //
+        make_unique<ReadAttribute>(Id, "provider-id", Attributes::ProviderID::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "event-id", Attributes::EventID::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "start-date", Attributes::StartDate::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "calendar-periods", Attributes::CalendarPeriods::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "special-days", Attributes::SpecialDays::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "current-day", Attributes::CurrentDay::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "next-day", Attributes::NextDay::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "current-transition", Attributes::CurrentTransition::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "current-peak-period", Attributes::CurrentPeakPeriod::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "next-peak-period", Attributes::NextPeakPeriod::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
+            Id, "calendar-id", 0, UINT32_MAX, Attributes::CalendarID::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(
+            Id, "name", Attributes::Name::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
+            Id, "provider-id", 0, UINT32_MAX, Attributes::ProviderID::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
+            Id, "event-id", 0, UINT32_MAX, Attributes::EventID::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
+            Id, "start-date", 0, UINT32_MAX, Attributes::StartDate::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::Type>>>>(
+            Id, "calendar-periods", Attributes::CalendarPeriods::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>>>>(
+            Id, "special-days", Attributes::SpecialDays::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>>>(
+            Id, "current-day", Attributes::CurrentDay::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type>>>(
+            Id, "next-day", Attributes::NextDay::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type>>>(
+            Id, "current-transition", Attributes::CurrentTransition::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type>>>(
+            Id, "current-peak-period", Attributes::CurrentPeakPeriod::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type>>>(
+            Id, "next-peak-period", Attributes::NextPeakPeriod::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "calendar-id", Attributes::CalendarID::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "name", Attributes::Name::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "provider-id", Attributes::ProviderID::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "event-id", Attributes::EventID::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "start-date", Attributes::StartDate::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "calendar-periods", Attributes::CalendarPeriods::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "special-days", Attributes::SpecialDays::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "current-day", Attributes::CurrentDay::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "next-day", Attributes::NextDay::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "current-transition", Attributes::CurrentTransition::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "current-peak-period", Attributes::CurrentPeakPeriod::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "next-peak-period", Attributes::NextPeakPeriod::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterEnergyPreference(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::EnergyPreference;
@@ -26936,6 +27093,80 @@ void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerC
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterMeterIdentification(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::MeterIdentification;
+
+    const char * clusterName = "MeterIdentification";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "meter-type", Attributes::MeterType::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "utility-name", Attributes::UtilityName::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "point-of-delivery", Attributes::PointOfDelivery::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "power-threshold", Attributes::PowerThreshold::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "power-threshold-source", Attributes::PowerThresholdSource::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum>>>(
+            Id, "meter-type", 0, UINT8_MAX, Attributes::MeterType::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(
+            Id, "utility-name", Attributes::UtilityName::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(
+            Id, "point-of-delivery", Attributes::PointOfDelivery::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "power-threshold", INT64_MIN, INT64_MAX,
+                                                                             Attributes::PowerThreshold::Id,
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::PowerThresholdSourceEnum>>>(
+            Id, "power-threshold-source", 0, UINT8_MAX, Attributes::PowerThresholdSource::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "meter-type", Attributes::MeterType::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "utility-name", Attributes::UtilityName::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "point-of-delivery", Attributes::PointOfDelivery::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "power-threshold", Attributes::PowerThreshold::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "power-threshold-source", Attributes::PowerThresholdSource::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::UnitTesting;
@@ -27600,6 +27831,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterMessages(commands, credsIssuerConfig);
     registerClusterDeviceEnergyManagement(commands, credsIssuerConfig);
     registerClusterEnergyEvse(commands, credsIssuerConfig);
+    registerClusterEnergyCalendar(commands, credsIssuerConfig);
     registerClusterEnergyPreference(commands, credsIssuerConfig);
     registerClusterPowerTopology(commands, credsIssuerConfig);
     registerClusterEnergyEvseMode(commands, credsIssuerConfig);
@@ -27648,6 +27880,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterContentControl(commands, credsIssuerConfig);
     registerClusterContentAppObserver(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
+    registerClusterMeterIdentification(commands, credsIssuerConfig);
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
     registerClusterSampleMei(commands, credsIssuerConfig);
