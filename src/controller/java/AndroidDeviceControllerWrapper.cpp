@@ -527,7 +527,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     jbyteArray jSymmetricKey = static_cast<jbyteArray>(env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod));
 
     jmethodID getClientTypeMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getClientType", "()Ljava/lang/Short",
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getClientType", "()Ljava/lang/Integer;",
                                                         &getClientTypeMethod);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     jobject jClientType = env->CallObjectMethod(icdRegistrationInfo, getClientTypeMethod);
@@ -566,7 +566,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     if (jClientType != nullptr)
     {
         clientType = static_cast<chip::app::Clusters::IcdManagement::ClientTypeEnum>(
-            chip::JniReferences::GetInstance().ShortToPrimitive(jClientType));
+            chip::JniReferences::GetInstance().IntegerToPrimitive(jClientType));
     }
     params.SetICDClientType(clientType);
 

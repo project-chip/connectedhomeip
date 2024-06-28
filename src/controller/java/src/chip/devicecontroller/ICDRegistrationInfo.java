@@ -24,7 +24,7 @@ public class ICDRegistrationInfo {
   @Nullable private final Long checkInNodeId;
   @Nullable private final Long monitoredSubject;
   @Nullable private final byte[] symmetricKey;
-  @Nullable private final Short clientType;
+  @Nullable private final Integer clientType;
 
   private ICDRegistrationInfo(Builder builder) {
     this.checkInNodeId = builder.checkInNodeId;
@@ -48,7 +48,7 @@ public class ICDRegistrationInfo {
     return symmetricKey;
   }
 
-  public Short getClientType() {
+  public Integer getClientType() {
     return clientType;
   }
 
