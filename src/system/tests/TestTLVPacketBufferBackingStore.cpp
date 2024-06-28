@@ -162,17 +162,17 @@ TEST_F(TestTLVPacketBufferBackingStore, MultiBufferEncode)
     // Third entry is 1 control byte, 2 length bytes, 2000 bytes of data,
     // for a total of 2009 bytes.
     constexpr size_t totalSize = 2009;
-    EXPECT_TRUE(buffer->HasChainedBuffer());
     EXPECT_EQ(buffer->TotalLength(), totalSize);
     EXPECT_EQ(buffer->DataLength(), static_cast<size_t>(2));
+    ASSERT_TRUE(buffer->HasChainedBuffer());
     auto nextBuffer = buffer->Next();
-    EXPECT_TRUE(nextBuffer->HasChainedBuffer());
     EXPECT_EQ(nextBuffer->TotalLength(), totalSize - 2);
     EXPECT_EQ(nextBuffer->DataLength(), PacketBuffer::kMaxSizeWithoutReserve);
+    ASSERT_TRUE(nextBuffer->HasChainedBuffer());
     nextBuffer = nextBuffer->Next();
-    EXPECT_FALSE(nextBuffer->HasChainedBuffer());
     EXPECT_EQ(nextBuffer->TotalLength(), nextBuffer->DataLength());
     EXPECT_EQ(nextBuffer->DataLength(), totalSize - 2 - PacketBuffer::kMaxSizeWithoutReserve);
+    ASSERT_FALSE(nextBuffer->HasChainedBuffer());
 
     // PacketBufferTLVReader cannot handle non-contiguous buffers, and our
     // buffers are too big to stick into a single packet buffer.
