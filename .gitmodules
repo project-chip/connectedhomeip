@@ -325,3 +325,15 @@
 	url = https://github.com/Infineon/optiga-trust-m.git
 	branch = matter_support
 	platforms = infineon
+[submodule "third_party/abseil-cpp/src"]
+	path = third_party/abseil-cpp/src
+	url = https://github.com/abseil/abseil-cpp.git
+[submodule "third_party/fuzztest"]
+	path = third_party/fuzztest
+	url = https://github.com/google/fuzztest.git
+[submodule "third_party/googletest"]
+	path = third_party/googletest
+	url = https://github.com/google/googletest
+[submodule "third_party/re2/src"]
+	path = third_party/re2/src
+	url = https://github.com/google/re2.git

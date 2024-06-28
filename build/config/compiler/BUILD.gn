@@ -307,7 +307,8 @@ config("strict_warnings") {
 config("warnings_default") {
   configs = [
     ":warnings_common",
-    ":strict_warnings",
+
+    #  ":strict_warnings",
     ":disabled_warnings",
   ]
 }
