@@ -52,4 +52,7 @@
 
 #ifndef CHIP_CONFIG_MAX_FABRICS
 #define CHIP_CONFIG_MAX_FABRICS 5
+
+#define SOCKET_ENABLE_MREQN
+
 #endif
