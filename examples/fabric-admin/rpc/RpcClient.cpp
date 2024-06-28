@@ -41,6 +41,7 @@ constexpr uint32_t kDefaultChannelId = 1;
 // Fabric Bridge Client
 rpc::pw_rpc::nanopb::FabricBridge::Client fabricBridgeClient(rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
 pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> addSynchronizedDeviceCall;
+pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> removeSynchronizedDeviceCall;
 
 // Callback function to be called when the RPC response is received
 void OnAddDeviceResponseCompleted(const pw_protobuf_Empty & response, pw::Status status)
@@ -52,6 +53,19 @@ void OnAddDeviceResponseCompleted(const pw_protobuf_Empty & response, pw::Status
     else
     {
         ChipLogProgress(NotSpecified, "AddSynchronizedDevice RPC call failed with status: %d\n", status.code());
+    }
+}
+
+// Callback function to be called when the RPC response is received
+void OnRemoveDeviceResponseCompleted(const pw_protobuf_Empty & response, pw::Status status)
+{
+    if (status.ok())
+    {
+        ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice RPC call succeeded!");
+    }
+    else
+    {
+        ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice RPC call failed with status: %d\n", status.code());
     }
 }
 
@@ -80,6 +94,30 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
     addSynchronizedDeviceCall = fabricBridgeClient.AddSynchronizedDevice(device, OnAddDeviceResponseCompleted);
 
     if (!addSynchronizedDeviceCall.active())
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
+{
+    ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice");
+
+    if (removeSynchronizedDeviceCall.active())
+    {
+        ChipLogError(NotSpecified, "Remove Synchronized Device operation is in progress\n");
+        return CHIP_ERROR_BUSY;
+    }
+
+    chip_rpc_SynchronizedDevice device;
+    device.node_id = nodeId;
+
+    // The RPC will remain active as long as `removeSynchronizedDeviceCall` is alive.
+    removeSynchronizedDeviceCall = fabricBridgeClient.RemoveSynchronizedDevice(device, OnRemoveDeviceResponseCompleted);
+
+    if (!removeSynchronizedDeviceCall.active())
     {
         return CHIP_ERROR_INTERNAL;
     }
