@@ -66,11 +66,11 @@ public:
 
     Protocols::InteractionModel::Status SetSpecialDays(DataModel::DecodableList<Structs::DayStruct::Type> SpecialDays);
 
-    Protocols::InteractionModel::Status SetCurrentAndNextDays(DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
-        DataModel::Nullable<Structs::DayStruct::Type> &NextDay);
+    Protocols::InteractionModel::Status SetCurrentAndNextDays(DataModel::Nullable<Structs::DayStruct::Type> CurrentDay,
+        DataModel::Nullable<Structs::DayStruct::Type> NextDay);
     
-    Protocols::InteractionModel::Status SetPeakPeriods(DataModel::Nullable<Structs::PeakPeriodStruct::Type> &CurrentPeakPeriod,
-        DataModel::Nullable<Structs::PeakPeriodStruct::Type> &NextPeakPeriod);
+    Protocols::InteractionModel::Status SetPeakPeriods(DataModel::Nullable<Structs::PeakPeriodStruct::Type> CurrentPeakPeriod,
+        DataModel::Nullable<Structs::PeakPeriodStruct::Type> NextPeakPeriod);
 
     Protocols::InteractionModel::Status UpdateDays(void);
 

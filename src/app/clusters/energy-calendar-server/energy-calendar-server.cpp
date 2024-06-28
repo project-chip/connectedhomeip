@@ -137,8 +137,8 @@ Status CalendarProvider::SetSpecialDays(DataModel::DecodableList<Structs::DayStr
 }
 
 Status CalendarProvider::SetCurrentAndNextDays(
-        DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
-        DataModel::Nullable<Structs::DayStruct::Type> &NextDay)
+        DataModel::Nullable<Structs::DayStruct::Type> CurrentDay,
+        DataModel::Nullable<Structs::DayStruct::Type> NextDay)
 {
     bool change;
 
@@ -163,8 +163,8 @@ Status CalendarProvider::SetCurrentAndNextDays(
 }
     
 Status CalendarProvider::SetPeakPeriods(
-        DataModel::Nullable<Structs::PeakPeriodStruct::Type> &CurrentPeakPeriod,
-        DataModel::Nullable<Structs::PeakPeriodStruct::Type> &NextPeakPeriod)
+        DataModel::Nullable<Structs::PeakPeriodStruct::Type> CurrentPeakPeriod,
+        DataModel::Nullable<Structs::PeakPeriodStruct::Type> NextPeakPeriod)
 {
     bool change;
     LockThreadTask();
