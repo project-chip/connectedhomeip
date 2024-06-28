@@ -998,9 +998,8 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
     EmberAfPluginDoorLockUserInfo user;
     if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
     {
-        ChipLogError(Zcl,
-                     "[SetWeekDaySchedule] Unable to get the user - internal error [endpointId=%d,userIndex=%d]",
-                     endpointId, userIndex);
+        ChipLogError(Zcl, "[SetWeekDaySchedule] Unable to get the user - internal error [endpointId=%d,userIndex=%d]", endpointId,
+                     userIndex);
         commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
@@ -1078,13 +1077,11 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
                     endpointId, weekDayIndex, userIndex, daysMask.Raw(), startHour, startMinute, endHour, endMinute);
 
     // Update LastModifiedFabricIndex of user
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, fabricIdx, user.userName,
-                                      user.userUniqueId, user.userStatus, user.userType, user.credentialRule,
-                                      user.credentials.data(), user.credentials.size()))
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, fabricIdx, user.userName, user.userUniqueId,
+                                      user.userStatus, user.userType, user.credentialRule, user.credentials.data(),
+                                      user.credentials.size()))
     {
-        ChipLogError(
-                     Zcl,
-                     "[SetWeekDaySchedule] Unable to update user - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
+        ChipLogError(Zcl, "[SetWeekDaySchedule] Unable to update user - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
                      endpointId, fabricIdx, userIndex);
     }
 
@@ -1255,9 +1252,8 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
     EmberAfPluginDoorLockUserInfo user;
     if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
     {
-        ChipLogError(Zcl,
-                     "[SetYearDaySchedule] Unable to get the user - internal error [endpointId=%d,userIndex=%d]",
-                     endpointId, userIndex);
+        ChipLogError(Zcl, "[SetYearDaySchedule] Unable to get the user - internal error [endpointId=%d,userIndex=%d]", endpointId,
+                     userIndex);
         commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
@@ -1311,13 +1307,11 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
                     endpointId, yearDayIndex, userIndex, localStartTime, localEndTime);
 
     // Update LastModifiedFabricIndex of user
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, fabricIdx, user.userName,
-                                      user.userUniqueId, user.userStatus, user.userType, user.credentialRule,
-                                      user.credentials.data(), user.credentials.size()))
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, fabricIdx, user.userName, user.userUniqueId,
+                                      user.userStatus, user.userType, user.credentialRule, user.credentials.data(),
+                                      user.credentials.size()))
     {
-        ChipLogError(
-                     Zcl,
-                     "[SetYearDaySchedule] Unable to update user - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
+        ChipLogError(Zcl, "[SetYearDaySchedule] Unable to update user - internal error [endpointId=%d,fabricIndex=%d,userIndex=%d]",
                      endpointId, fabricIdx, userIndex);
     }
 
