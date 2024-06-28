@@ -156,21 +156,21 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
             if (aLocationName.empty())
             {
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, 0);
-                mLocationNameBuffer[0] = '\0';
+                mLocationNameBuffer[0]                         = '\0';
             }
             else if (aLocationName.size() > sizeof(mLocationNameBuffer))
             {
                 // Save the truncated name that fits into available size.
                 memcpy(mLocationNameBuffer, aLocationName.data(), sizeof(mLocationNameBuffer));
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, sizeof(mLocationNameBuffer));
-                mLocationNameBuffer[kLocationNameMaxSize] = '\0';
+                mLocationNameBuffer[kLocationNameMaxSize]      = '\0';
             }
             else
             {
                 // Save full name.
                 memcpy(mLocationNameBuffer, aLocationName.data(), aLocationName.size());
                 locationInfo.locationInfo.Value().locationName = CharSpan(mLocationNameBuffer, aLocationName.size());
-                mLocationNameBuffer[aLocationName.size()] = '\0';
+                mLocationNameBuffer[aLocationName.size()]      = '\0';
             }
         }
     }
@@ -333,21 +333,21 @@ struct MapStructureWrapper : public chip::app::Clusters::ServiceArea::Structs::M
 
         if (aMapName.empty())
         {
-            name = CharSpan(mMapNameBuffer, 0);
+            name              = CharSpan(mMapNameBuffer, 0);
             mMapNameBuffer[0] = '\0';
         }
         else if (aMapName.size() > sizeof(mMapNameBuffer))
         {
             // Save the truncated name that fits into available size.
             memcpy(mMapNameBuffer, aMapName.data(), sizeof(mMapNameBuffer));
-            name = CharSpan(mMapNameBuffer, sizeof(mMapNameBuffer));
+            name                            = CharSpan(mMapNameBuffer, sizeof(mMapNameBuffer));
             mMapNameBuffer[kMapNameMaxSize] = '\0';
         }
         else
         {
             // Save full name.
             memcpy(mMapNameBuffer, aMapName.data(), aMapName.size());
-            name = CharSpan(mMapNameBuffer, aMapName.size());
+            name                            = CharSpan(mMapNameBuffer, aMapName.size());
             mMapNameBuffer[aMapName.size()] = '\0';
         }
     }

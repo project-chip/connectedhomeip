@@ -286,7 +286,8 @@ bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStr
     // etc.
 
     // Double-check that mapID's match.
-    if (modifiedMap.mapID != mSupportedMaps[listIndex].mapID) {
+    if (modifiedMap.mapID != mSupportedMaps[listIndex].mapID)
+    {
         ChipLogError(Zcl, "ModifySupportedMap - mapID's do not match, new mapID %u, existing mapID %u", modifiedMap.mapID,
                      mSupportedMaps[listIndex].mapID);
         return false;
