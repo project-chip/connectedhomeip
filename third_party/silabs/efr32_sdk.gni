@@ -133,6 +133,7 @@ template("efr32_sdk") {
   sdk_target_name = target_name
 
   config("${sdk_target_name}_config") {
+    cflags = []
     include_dirs = []
     libs = []
     if (defined(invoker.include_dirs)) {
@@ -480,6 +481,12 @@ template("efr32_sdk") {
           # TODO: Remove this flag, once the communication is fixed
           "WIFI_DEBUG_ENABLED=1",
         ]
+
+        # This is kept due to the warning on the LWIP when on demand timer is added
+        # TODO: remove this flag once the warning is fixed in SiSDK MATTER-3946
+        cflags += [
+          "-Wno-error"
+        ]
       }
     }
 
@@ -605,7 +612,6 @@ template("efr32_sdk") {
       ]
     }
 
-    cflags = []
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
