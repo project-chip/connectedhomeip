@@ -28,8 +28,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
     
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     cc13xx_26xx:
         name: cc13xx_26xx
+        needs: await-fast-ci
 
         env:
             BUILD_TYPE: gn_cc13xx_26xx
