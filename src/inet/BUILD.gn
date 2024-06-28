@@ -100,7 +100,7 @@ static_library("inet") {
     "Inet.h",
     "InetArgParser.cpp",
     "InetArgParser.h",
-    "InetError.cpp", 
+    "InetError.cpp",
     "InetError.h",
     "InetInterface.cpp",
     "InetInterface.h",
@@ -162,8 +162,6 @@ static_library("inet") {
       "UDPEndPointImpl${chip_system_config_inet}.h",
       "UDPEndPointImpl.h",
     ]
-
-
   }
 
   if (chip_with_nlfaultinjection) {
