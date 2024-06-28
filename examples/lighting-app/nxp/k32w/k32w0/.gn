@@ -26,6 +26,10 @@ default_args = {
 
   import("//args.gni")
 
+  pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]
+  pw_build_PIP_REQUIREMENTS =
+      [ "${chip_root}/scripts/setup/requirements.build.txt" ]
+
   # Import default platform configs
   import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 }

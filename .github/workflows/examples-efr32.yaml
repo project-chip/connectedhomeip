@@ -38,14 +38,14 @@ jobs:
     needs: await-fast-ci
 
     env:
-      SILABS_BOARD: BRD4161A
+      SILABS_BOARD: BRD4187C
       BUILD_TYPE: gn_efr32
 
     runs-on: ubuntu-latest
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-efr32:54
+      image: ghcr.io/project-chip/chip-build-efr32:56
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:

@@ -79,11 +79,6 @@ static_library("NuttX") {
     "${chip_root}/src/setup_payload",
   ]
 
-  if (!chip_use_external_logging) {
-    sources += [ "Logging.cpp" ]
-    deps += [ "${chip_root}/src/platform/logging:headers" ]
-  }
-
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
   }
@@ -144,10 +139,6 @@ static_library("NuttX") {
     public_deps += [ "dbus/openthread" ]
   }
 
-  if (chip_use_pw_logging) {
-    deps += [ "$dir_pw_log" ]
-  }
-
   if (chip_enable_wifi) {
     sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
 
@@ -157,4 +148,17 @@ static_library("NuttX") {
   if (chip_enable_ble) {
     public_deps += [ "dbus/bluez" ]
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
+  if (chip_use_pw_logging) {
+    deps += [ "$dir_pw_log" ]
+  }
+
+  sources = [ "Logging.cpp" ]
 }

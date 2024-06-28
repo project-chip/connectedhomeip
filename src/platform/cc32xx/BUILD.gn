@@ -34,8 +34,6 @@ static_library("cc32xx") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-
-    #"Logging.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
 
@@ -55,4 +53,10 @@ static_library("cc32xx") {
       "BLEManagerImpl.h",
     ]
   }
+}
+
+source_set("logging") {
+  sources = [
+    #"Logging.cpp"
+  ]
 }
