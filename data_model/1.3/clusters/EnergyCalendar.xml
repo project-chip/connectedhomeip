@@ -82,20 +82,6 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <enum name="PeakPeriodSeverityEnum">
-      <item value="0" name="Unused" summary="Unused">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Low" summary="Low">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Medium" summary="Medium">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="High" summary="High">
-        <mandatoryConform/>
-      </item>
-    </enum>
     <bitmap name="AuxiliaryLoadBitmap">
       <bitfield name="AuxiliarySwitch1" bit="0" summary="Auxiliary Switch 1">
         <mandatoryConform/>
@@ -145,35 +131,20 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <struct name="CalendarPeriodStruct">
-      <field id="0" name="StartDate" type="epoch-s">
-        <quality nullable="true"/>
+    <enum name="PeakPeriodSeverityEnum">
+      <item value="0" name="Unused" summary="Unused">
         <mandatoryConform/>
-        <constraint type="min" value="StartDate Attribute"/>
-      </field>
-      <field id="1" name="Days" type="list">
-        <entry type="DayStruct"/>
+      </item>
+      <item value="1" name="Low" summary="Low">
         <mandatoryConform/>
-        <constraint type="countBetween" from="1" to="7"/>
-      </field>
-    </struct>
-    <struct name="DayStruct">
-      <field id="0" name="Date" type="date">
-        <optionalConform choice="a"/>
-      </field>
-      <field id="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap">
-        <optionalConform choice="a"/>
-        <constraint type="desc"/>
-      </field>
-      <field id="2" name="Transitions" type="list">
-        <entry type="TransitionStruct"/>
+      </item>
+      <item value="2" name="Medium" summary="Medium">
         <mandatoryConform/>
-        <constraint type="countBetween" from="1" to="48"/>
-      </field>
-      <field id="3" name="CalendarID" type="uint32">
-        <optionalConform/>
-      </field>
-    </struct>
+      </item>
+      <item value="3" name="High" summary="High">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <struct name="PeakPeriodStruct">
       <field id="0" name="Severity" type="PeakPeriodSeverityEnum">
         <mandatoryConform/>
@@ -209,6 +180,35 @@ Davis, CA 95616, USA
         <optionalConform choice="a" more="true">
           <feature name="AUXLD"/>
         </optionalConform>
+      </field>
+    </struct>
+    <struct name="DayStruct">
+      <field id="0" name="Date" type="date">
+        <optionalConform choice="a"/>
+      </field>
+      <field id="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap">
+        <optionalConform choice="a"/>
+        <constraint type="desc"/>
+      </field>
+      <field id="2" name="Transitions" type="list">
+        <entry type="TransitionStruct"/>
+        <mandatoryConform/>
+        <constraint type="countBetween" from="1" to="48"/>
+      </field>
+      <field id="3" name="CalendarID" type="uint32">
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="CalendarPeriodStruct">
+      <field id="0" name="StartDate" type="epoch-s">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="min" value="StartDate Attribute"/>
+      </field>
+      <field id="1" name="Days" type="list">
+        <entry type="DayStruct"/>
+        <mandatoryConform/>
+        <constraint type="countBetween" from="1" to="7"/>
       </field>
     </struct>
   </dataTypes>
