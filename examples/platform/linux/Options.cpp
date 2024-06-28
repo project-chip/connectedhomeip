@@ -107,7 +107,7 @@ enum
     kDeviceOption_FaultInjection,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    kDeviceOption_WiFi_PAF = 0x1028,
+    kDeviceOption_WiFi_PAF,
 #endif
 };
 
