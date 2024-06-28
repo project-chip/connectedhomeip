@@ -57,10 +57,6 @@
 #define INADDR_ANY 0
 #endif
 
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
-#include "ZephyrSocket.h"
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
-
 /*
  * Some systems define both IPV6_{ADD,DROP}_MEMBERSHIP and
  * IPV6_{JOIN,LEAVE}_GROUP while others only define
@@ -785,10 +781,21 @@ CHIP_ERROR UDPEndPointImplSockets::IPv4JoinLeaveMulticastGroupImpl(InterfaceId a
         interfaceAddr.s_addr = htonl(INADDR_ANY);
     }
 
+#ifdef SOCKET_ENABLE_MREQN
+    struct ip_mreqn lMulticastRequest;
+    memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
+    lMulticastRequest.imr_ifindex = -1; /* Network interface index */
+    lMulticastRequest.imr_address = interfaceAddr; /* IP address of local interface */
+    lMulticastRequest.imr_multiaddr = aAddress.ToIPv4(); /* IP multicast group address*/
+
+#else
+
     struct ip_mreq lMulticastRequest;
     memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));
     lMulticastRequest.imr_interface = interfaceAddr;
     lMulticastRequest.imr_multiaddr = aAddress.ToIPv4();
+
+#endif
 
     const int command = join ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP;
     if (setsockopt(mSocket, IPPROTO_IP, command, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
