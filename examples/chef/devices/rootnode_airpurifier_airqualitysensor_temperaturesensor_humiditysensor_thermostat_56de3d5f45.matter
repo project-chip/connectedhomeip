@@ -2799,9 +2799,9 @@ endpoint 4 {
   }
 
   server cluster RelativeHumidityMeasurement {
-    ram      attribute measuredValue default = 46;
+    ram      attribute measuredValue default = 4600;
     ram      attribute minMeasuredValue default = 0;
-    ram      attribute maxMeasuredValue default = 100;
+    ram      attribute maxMeasuredValue default = 10000;
     ram      attribute tolerance default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
