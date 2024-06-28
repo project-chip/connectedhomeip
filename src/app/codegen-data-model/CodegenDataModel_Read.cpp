@@ -362,7 +362,7 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(status), __FILE__, __LINE__);
+        return CHIP_SDK_ERROR(ChipError::SdkPart::kIMGlobalStatus, to_underlying(status));
     }
 
     return EncodeEmberValue(gEmberAttributeIOBufferSpan, attributeMetadata, encoder);
