@@ -100,7 +100,7 @@ static_library("inet") {
     "Inet.h",
     "InetArgParser.cpp",
     "InetArgParser.h",
-    "InetError.cpp",
+    "InetError.cpp", 
     "InetError.h",
     "InetInterface.cpp",
     "InetInterface.h",
@@ -163,11 +163,7 @@ static_library("inet") {
       "UDPEndPointImpl.h",
     ]
 
-    if (chip_system_config_inet == "Sockets") {
-      # TODO: dependency on this one is not clear as it is only ever
-      #       enabled through CMakeLists.txt. Added here for completeness
-      sources += [ "ZephyrSocket.h" ]
-    }
+
   }
 
   if (chip_with_nlfaultinjection) {
