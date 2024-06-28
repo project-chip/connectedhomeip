@@ -26,6 +26,7 @@ using chip::Protocols::InteractionModel::Status;
 
 // TODO: most of the functions here are part of EmberCompatibilityFunctions and is NOT decoupled
 //       from IM current, but it SHOULD be
+//       Open issue https://github.com/project-chip/connectedhomeip/issues/34137 for this work.
 namespace chip {
 namespace app {
 
