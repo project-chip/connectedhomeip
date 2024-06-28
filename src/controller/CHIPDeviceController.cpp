@@ -820,29 +820,15 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != Transport::WiFiPAFBase::State::kConnected)
         {
             ChipLogProgress(Controller, "WiFi-PAF: Subscribing the NAN-USD devices");
-            static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
-            static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
-
-            DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-            {
-                for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
-                {
-                    if (DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-                    {
-                        break;
-                    }
-                    usleep(kWiFiStartCheckTimeUsec);
-                }
-            }
             if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
             {
-                ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
+                ChipLogError(Controller, "Wi-Fi Management should have be started now.");
+                ExitNow(CHIP_ERROR_INTERNAL);
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(this, OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
+            DeviceLayer::ConnectivityMgr().WiFiPAFConnect(params.GetSetupDiscriminator().value(), this, OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
         }
-        ChipLogProgress(Controller, "WiFi-PAF: Request to subscribe the NAN-USD device complete");
     }
 #endif
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), params.GetMRPConfig());
@@ -918,16 +904,14 @@ void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
     auto self   = static_cast<DeviceCommissioner *>(appState);
     auto device = self->mDeviceInPASEEstablishment;
 
-    ChipLogProgress(Controller, "WiFi-PAF: Subscription Completed!");
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
+        ChipLogProgress(Controller, "WiFi-PAF: Subscription Completed, dev_id = %lu", device->GetDeviceId());
         auto remoteId = device->GetDeviceId();
         auto params   = self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
 
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         self->ReleaseCommissioneeDevice(device);
-        DeviceLayer::ConnectivityMgr().GetWiFiPAF()->SetWiFiPAFState(Transport::WiFiPAFBase::State::kConnected);
-        chip::DeviceLayer::StackLock stackLock;
         LogErrorOnFailure(self->EstablishPASEConnection(remoteId, params));
     }
 }
@@ -937,9 +921,9 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
     auto self   = static_cast<DeviceCommissioner *>(appState);
     auto device = self->mDeviceInPASEEstablishment;
 
-    ChipLogProgress(Controller, "WiFi-PAF: Subscription Error!");
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
+        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(), err.Format());
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
         if (self->mPairingDelegate != nullptr)

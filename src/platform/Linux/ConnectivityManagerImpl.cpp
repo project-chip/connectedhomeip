@@ -160,8 +160,15 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoWiFiPAFWriteReceived:
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: kCHIPoWiFiPAFWriteReceived");
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFWriteReceived");
         _GetWiFiPAF()->OnWiFiPAFMessageReceived(System::PacketBufferHandle::Adopt(event->CHIPoWiFiPAFWriteReceived.Data));
+        break;
+    case DeviceEventType::kCHIPoWiFiPAFConnected:
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFConnected");
+        if (mOnPafSubscribeComplete != nullptr)
+        {
+            mOnPafSubscribeComplete(mAppState);
+        }
         break;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -830,8 +837,7 @@ struct PAFPublishSSI
     uint16_t VendorId;
 };
 #pragma pack(pop)
-
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool val)
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish()
 {
     CHIP_ERROR ret;
     GAutoPtr<GError> err;
@@ -855,10 +861,10 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool val)
         PafPublish_ssi.VendorId = 0;
     }
     strcat(args, NAN_PUBLISH_SSI_TAG);
-    ret = chip::Encoding::BytesToUppercaseHexString((uint8_t *) &PafPublish_ssi, sizeof(PafPublish_ssi), &args[strlen(args)],
+    ret = Encoding::BytesToUppercaseHexString((uint8_t *) &PafPublish_ssi, sizeof(PafPublish_ssi), &args[strlen(args)],
                                                     MAX_PAF_PUBLISH_SSI_BUFLEN - strlen(args));
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: SetWiFiPAFAdvertisingEnabled(%d)", val);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: publish: [%s]", args);
     wpa_fi_w1_wpa_supplicant1_interface_call_nanpublish_sync(mWpaSupplicant.iface, args, &publish_id, nullptr, &err.GetReceiver());
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %d ! ", publish_id);
 
@@ -868,6 +874,27 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool val)
                      }),
                      this);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish()
+{
+    GAutoPtr<GError> err;
+    gchar args[MAX_PAF_PUBLISH_SSI_BUFLEN];
+
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", mpaf_info.peer_publish_id);
+    snprintf(args, sizeof(args), "publish_id=%d", mpaf_info.peer_publish_id);
+    wpa_fi_w1_wpa_supplicant1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
+    return CHIP_NO_ERROR;
+}
+
+
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool val)
+{
+    if (val == true) {
+        return _WiFiPAFPublish();
+    } else {
+        return _WiFiPAFCancelPublish();
+    }
 }
 
 Transport::WiFiPAFBase * ConnectivityManagerImpl::_GetWiFiPAF()
@@ -1328,23 +1355,31 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
         return;
     }
 
-    GAutoPtr<GVariant> dataValue(g_variant_lookup_value(discov_info, "discov_info", G_VARIANT_TYPE_BYTESTRING));
-    size_t bufferLen;
-    auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    if (success == true) {
+        GAutoPtr<GVariant> dataValue(g_variant_lookup_value(discov_info, "discov_info", G_VARIANT_TYPE_BYTESTRING));
+        size_t bufferLen;
+        auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+        if (((struct wpa_dbus_discov_info *) buffer)->subscribe_id == mpaf_info.subscribe_id)
+        {
+            return;
+        }
+        memcpy(&mpaf_info, buffer, sizeof(struct wpa_dbus_discov_info));
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: %u", mpaf_info.subscribe_id);
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_publish_id: %u", mpaf_info.peer_publish_id);
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", mpaf_info.peer_addr[0],
+                        mpaf_info.peer_addr[1], mpaf_info.peer_addr[2], mpaf_info.peer_addr[3], mpaf_info.peer_addr[4],
+                        mpaf_info.peer_addr[5]);
+        GetWiFiPAF()->SetWiFiPAFState(Transport::WiFiPAFBase::State::kConnected);
 
-    if (((struct wpa_dbus_discov_info *) buffer)->subscribe_id == mpaf_info.subscribe_id)
-    {
-        return;
-    }
-    memcpy(&mpaf_info, buffer, sizeof(struct wpa_dbus_discov_info));
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: %u", mpaf_info.subscribe_id);
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_publish_id: %u", mpaf_info.peer_publish_id);
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: peer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", mpaf_info.peer_addr[0],
-                    mpaf_info.peer_addr[1], mpaf_info.peer_addr[2], mpaf_info.peer_addr[3], mpaf_info.peer_addr[4],
-                    mpaf_info.peer_addr[5]);
-    if (mOnPafSubscribeComplete != nullptr)
-    {
-        mOnPafSubscribeComplete(mAppState);
+        ChipDeviceEvent event;
+        event.Type = DeviceEventType::kCHIPoWiFiPAFConnected;
+        PlatformMgr().PostEventOrDie(&event);
+    } else {
+        GetWiFiPAF()->SetWiFiPAFState(Transport::WiFiPAFBase::State::kInitialized);
+        if (mOnPafSubscribeError != nullptr)
+        {
+            mOnPafSubscribeError(mAppState, CHIP_ERROR_TIMEOUT);
+        }
     }
 
     return;
@@ -1352,55 +1387,69 @@ void ConnectivityManagerImpl::OnDiscoveryResult(gboolean success, GVariant * dis
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
 {
-    ChipLogProgress(Controller, "WiFi-PAF: OnNanReceive");
-
     if (g_variant_n_children(obj) == 0)
     {
         return;
     }
-    {
-        GAutoPtr<GVariant> dataValue(g_variant_lookup_value(obj, "nanrx_info", G_VARIANT_TYPE_BYTESTRING));
-        size_t bufferLen;
-        auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    // Read the rx_info
+    GAutoPtr<GVariant> dataValueInfo(g_variant_lookup_value(obj, "nanrx_info", G_VARIANT_TYPE_BYTESTRING));
+    size_t infoBufferLen;
+    auto infoBuffer = g_variant_get_fixed_array(dataValueInfo.get(), &infoBufferLen, sizeof(uint8_t));
 
-        memcpy(&mpaf_nanrx_info, buffer, sizeof(struct wpa_dbus_nanrx_info));
-        mpaf_info.subscribe_id    = mpaf_nanrx_info.id;
-        mpaf_info.peer_publish_id = mpaf_nanrx_info.peer_id;
-        memcpy(mpaf_info.peer_addr, mpaf_nanrx_info.peer_addr, 6);
-    }
-    if (mpaf_nanrx_info.ssi_len > 0)
+    memcpy(&mpaf_nanrx_info, infoBuffer, sizeof(struct wpa_dbus_nanrx_info));
+    mpaf_info.subscribe_id    = mpaf_nanrx_info.id;
+    mpaf_info.peer_publish_id = mpaf_nanrx_info.peer_id;
+    memcpy(mpaf_info.peer_addr, mpaf_nanrx_info.peer_addr, 6);
+    if (mpaf_nanrx_info.ssi_len == 0)
     {
-        GAutoPtr<GVariant> dataValue(g_variant_lookup_value(obj, "ssi", G_VARIANT_TYPE_BYTESTRING));
-        size_t bufferLen;
-        System::PacketBufferHandle buf;
-        auto rxbuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: wpa_supplicant:nan-rx: [buflen: %lu], preparing rxbuf", bufferLen);
-        buf = System::PacketBufferHandle::NewWithData(rxbuf, bufferLen);
+        return;
+    }
+    // Read the rx_data
+    GAutoPtr<GVariant> dataValue(g_variant_lookup_value(obj, "ssi", G_VARIANT_TYPE_BYTESTRING));
+    size_t bufferLen;
+    System::PacketBufferHandle buf;
+    auto rxbuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: wpa_supplicant: nan-rx: [len: %lu]", bufferLen);
+    buf = System::PacketBufferHandle::NewWithData(rxbuf, bufferLen);
 
-        // Post an event to the Chip queue to deliver the data into the Chip stack.
-        {
-            ChipDeviceEvent event;
-            event.Type                           = DeviceEventType::kCHIPoWiFiPAFWriteReceived;
-            event.CHIPoWiFiPAFWriteReceived.Data = std::move(buf).UnsafeRelease();
-            PlatformMgr().PostEventOrDie(&event);
-        }
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: Skip, ssi length = %u", mpaf_nanrx_info.ssi_len);
-    }
+    // Post an event to the Chip queue to deliver the data into the Chip stack.
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kCHIPoWiFiPAFWriteReceived;
+    event.CHIPoWiFiPAFWriteReceived.Data = std::move(buf).UnsafeRelease();
+    PlatformMgr().PostEventOrDie(&event);
 
     return;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(void * appState, OnConnectionCompleteFunct onSuccess,
+CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(const SetupDiscriminator & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                                     OnConnectionErrorFunct onError)
 {
     ChipLogProgress(Controller, "WiFi-PAF: Try to subscribe the NAN-USD devices");
     gchar args[MAX_PAF_SUBSCRIBE_SSI_BUFLEN];
     snprintf(args, sizeof(args), "service_name=%s srv_proto_type=%u ttl=%u ", srv_name, NAN_SRV_PROTO_MATTER, NAM_SUBSCRIBE_PERIOD);
-    mAppState = appState;
     GAutoPtr<GError> err;
+    CHIP_ERROR ret;
+    struct PAFPublishSSI PafPublish_ssi;
+
+    VerifyOrReturnError(
+        (strlen(args) + strlen(NAN_PUBLISH_SSI_TAG) + (sizeof(struct PAFPublishSSI) * 2) < MAX_PAF_PUBLISH_SSI_BUFLEN),
+        CHIP_ERROR_BUFFER_TOO_SMALL);
+    mAppState = appState;
+    PafPublish_ssi.DevOpCode = 0;
+    PafPublish_ssi.DevInfo = connDiscriminator.GetLongValue();
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(PafPublish_ssi.ProductId) != CHIP_NO_ERROR)
+    {
+        PafPublish_ssi.ProductId = 0;
+    }
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(PafPublish_ssi.VendorId) != CHIP_NO_ERROR)
+    {
+        PafPublish_ssi.VendorId = 0;
+    }
+    strcat(args, NAN_PUBLISH_SSI_TAG);
+    ret = Encoding::BytesToUppercaseHexString((uint8_t *) &PafPublish_ssi, sizeof(PafPublish_ssi), &args[strlen(args)],
+                                                    MAX_PAF_PUBLISH_SSI_BUFLEN - strlen(args));
+    VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe: [%s]", args);
 
     wpa_fi_w1_wpa_supplicant1_interface_call_nansubscribe(
         mWpaSupplicant.iface, args, nullptr,
@@ -1408,9 +1457,16 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFConnect(void * appState, OnConnectio
             +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) { return; }),
         &err.GetReceiver());
     mOnPafSubscribeComplete = onSuccess;
+    mOnPafSubscribeError = onError;
     g_signal_connect(mWpaSupplicant.iface, "discovery-result",
                      G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, gboolean success, GVariant * obj,
                                     ConnectivityManagerImpl * self) { return self->OnDiscoveryResult(success, obj); }),
+                     this);
+
+    g_signal_connect(mWpaSupplicant.iface, "nan-receive",
+                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+                         return self->OnNanReceive(obj);
+                     }),
                      this);
 
     return CHIP_NO_ERROR;
@@ -1457,15 +1513,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(System::PacketBufferHandle && m
                                                     MAX_PAF_TX_SSI_BUFLEN - strlen(args));
     VerifyOrReturnError(ret == CHIP_NO_ERROR, ret);
     ChipLogProgress(DeviceLayer, "WiFi-PAF: ssi: [%s]", args);
-
     wpa_fi_w1_wpa_supplicant1_interface_call_nantransmit_sync(mWpaSupplicant.iface, args, nullptr, &err.GetReceiver());
-
-    g_signal_connect(mWpaSupplicant.iface, "nan-receive",
-                     G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnNanReceive(obj);
-                     }),
-                     this);
-
     ChipLogProgress(Controller, "WiFi-PAF: Outbound message (%lu) done", msgBuf->DataLength());
     return ret;
 }

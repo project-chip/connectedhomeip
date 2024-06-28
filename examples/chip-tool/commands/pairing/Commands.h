@@ -186,7 +186,7 @@ class PairWiFiPAF : public PairingCommand
 {
 public:
     PairWiFiPAF(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("wifi-paf", PairingMode::WiFiPAF, PairingNetworkType::WiFi, credsIssuerConfig)
+        PairingCommand("wifipaf-wifi", PairingMode::WiFiPAF, PairingNetworkType::WiFi, credsIssuerConfig)
     {}
 };
 #endif

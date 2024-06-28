@@ -58,9 +58,15 @@
         </method>
         <method name="NANPublish">
             <arg name="nan_args" type="s" direction="in" />
-	    <arg name="publish_id" type="i" direction="out" />
+	        <arg name="publish_id" type="i" direction="out" />
+        </method>
+        <method name="NANCancelPublish">
+            <arg name="nan_args" type="s" direction="in" />
         </method>
         <method name="NANSubscribe">
+            <arg name="nan_args" type="s" direction="in" />
+        </method>
+        <method name="NANCancelSubscribe">
             <arg name="nan_args" type="s" direction="in" />
         </method>
         <method name="NANTransmit">

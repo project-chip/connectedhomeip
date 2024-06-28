@@ -366,14 +366,15 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
-#elif CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kWiFiPAF;
 #else  // CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #ifdef CONFIG_RENDEZVOUS_MODE
     rendezvousFlags = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
 #endif
 
     err = Platform::MemoryInit();

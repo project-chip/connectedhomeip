@@ -18,14 +18,13 @@
 
 /**
  *    @file
- *      This file defines the CHIP Connection object that maintains a Wi-Fi PAF connection.
+ *      This file defines the Matter Connection object that maintains a Wi-Fi PAF connection.
  *
  */
 
 #pragma once
 
 #include <utility>
-
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
 #include <system/SystemPacketBuffer.h>

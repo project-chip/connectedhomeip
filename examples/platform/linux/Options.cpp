@@ -121,7 +121,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "wifi", kNoArgument, kDeviceOption_WiFi },
     { "wifi-supports-5g", kNoArgument, kDeviceOption_WiFiSupports5g },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    { "wifi-paf", kNoArgument, kDeviceOption_WiFi_PAF },
+    { "wifipaf", kNoArgument, kDeviceOption_WiFi_PAF },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_ENABLE_OPENTHREAD
@@ -195,11 +195,11 @@ const char * sDeviceOptionHelp =
     "  --wifi-supports-5g\n"
     "       Indicate that local Wi-Fi hardware should report 5GHz support.\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     "\n"
-    "  --wifi-paf\n"
+    "  --wifipaf\n"
     "       Enable Wi-Fi PAF via wpa_supplicant.\n"
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #if CHIP_ENABLE_OPENTHREAD
     "\n"
     "  --thread\n"

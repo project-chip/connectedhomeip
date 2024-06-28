@@ -282,9 +282,8 @@ enum InternalEventTypes
      */
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm,
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     kCHIPoWiFiPAFWriteReceived,
-#endif
+    kCHIPoWiFiPAFConnected,
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
