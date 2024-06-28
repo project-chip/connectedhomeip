@@ -59,11 +59,6 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteAttributePath
 
     CHIP_ERROR err = aai->Write(path, decoder);
 
-    // explict translate UnsupportedRead to Access denied. This is to allow callers to determine a
-    // translation for this: usually wildcard subscriptions MAY just ignore these where as direct reads
-    // MUST translate them to UnsupportedAccess
-    ReturnErrorCodeIf(err == CHIP_IM_GLOBAL_STATUS(UnsupportedWrite), CHIP_ERROR_ACCESS_DENIED);
-
     if (err != CHIP_NO_ERROR)
     {
         return std::make_optional(err);
@@ -74,6 +69,7 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteAttributePath
     //   - if no encode, say that processing must continue
     return decoder.TriedDecode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
 }
+
 /// Metadata of what a ember/pascal short string means (prepended by a u8 length)
 struct ShortPascalString
 {
