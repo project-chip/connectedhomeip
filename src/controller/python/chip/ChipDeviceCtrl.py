@@ -205,8 +205,7 @@ async def WaitForCheckIn(scopedNodeId: ScopedNodeId, timeoutSeconds: float):
     RegisterOnActiveCallback(scopedNodeId, OnCheckInCallback)
 
     try:
-        async with asyncio.timeout(timeoutSeconds):
-            await future
+        asyncio.wait_for(future, timeout=timeoutSeconds)
     finally:
         UnregisterOnActiveCallback(scopedNodeId, OnCheckInCallback)
 
