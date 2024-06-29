@@ -85,7 +85,8 @@ public class MatterServant {
     // then start ChipAppServer
     // then TvApp.postServerInit to init app platform
     //
-    // TODO: Move all of the bellow KeypadInputManager...LevelManagerStub to PlatformAppCommandDelegate
+    // TODO: Move all of the bellow KeypadInputManager...LevelManagerStub to
+    // PlatformAppCommandDelegate
     // There is no need for this complicated logic
     mTvApp =
         new TvApp(
