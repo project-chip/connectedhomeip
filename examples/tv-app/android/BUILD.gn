@@ -39,8 +39,6 @@ shared_library("jni") {
     "include/media-playback/AppMediaPlaybackManager.h",
     "include/target-navigator/TargetNavigatorManager.cpp",
     "include/target-navigator/TargetNavigatorManager.h",
-    "java/application-launcher/ApplicationLauncherManager.cpp",
-    "java/application-launcher/ApplicationLauncherManager.h",
     "java/AppImpl.cpp",
     "java/AppImpl.h",
     "java/AppPlatform-JNI.cpp",
@@ -80,6 +78,8 @@ shared_library("jni") {
     "java/TVApp-JNI.cpp",
     "java/WakeOnLanManager.cpp",
     "java/WakeOnLanManager.h",
+    "java/application-launcher/ApplicationLauncherManager.cpp",
+    "java/application-launcher/ApplicationLauncherManager.h",
   ]
 
   deps = [
@@ -113,10 +113,10 @@ android_library("java") {
   ]
 
   sources = [
-    "java/src/com/matter/tv/server/tvapp/Application.java",
-    "java/src/com/matter/tv/server/tvapp/ApplicationLauncherManager.java",
     "java/src/com/matter/tv/server/tvapp/AppPlatform.java",
     "java/src/com/matter/tv/server/tvapp/AppPlatformShellCommands.java",
+    "java/src/com/matter/tv/server/tvapp/Application.java",
+    "java/src/com/matter/tv/server/tvapp/ApplicationLauncherManager.java",
     "java/src/com/matter/tv/server/tvapp/ChannelInfo.java",
     "java/src/com/matter/tv/server/tvapp/ChannelLineupInfo.java",
     "java/src/com/matter/tv/server/tvapp/ChannelManager.java",
