@@ -38,12 +38,6 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
     registerSelf(context);
   }
 
-  // Add list of apps with latest install statuses - DONE
-  // Add list of installed apps - DONE
-  // Add list of installed apps that support Matter
-  // Store all of the list using Shared pref
-  // Load the stored lists, by asking shared pref
-
   private final Observer<InstallationObserver.InstallState> installStateObserver = state -> {
     lastReceivedInstallationStatus.put(state.getAppPackageName(), state.getStatus());
     switch (state.getStatus()) {
@@ -111,7 +105,10 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
       Log.i(TAG, "Matter enabled app is not installed, but app is installed. Launching app's install page");
       status = LauncherResponse.STATUS_PENDING;
       responseData = "App is installed, try updating";
-      // TODO: Launch App Install Page
+
+      //
+      // Add code to launch App Install Page
+      //
 
     } else if (!matterAppEnabledIsInstalled && !appIsInstalled) {
       Log.i(TAG, "Matter enabled app is not installed and app is not installed. Launching app's install page");
@@ -124,12 +121,18 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
           responseData = "App install failed. Try again";
         }
       }
-      // TODO: Launch App Install Page
+
+      //
+      // Add code to launch App Install Page
+      //
 
     } else if (matterAppEnabledIsInstalled && appIsInstalled) {
       Log.i(TAG, "Launching the app");
       status = LauncherResponse.STATUS_SUCCESS;
-      // TODO: Launch App
+
+      //
+      // Add code to launch an app
+      //
     }
 
     return new LauncherResponse(status, responseData);
