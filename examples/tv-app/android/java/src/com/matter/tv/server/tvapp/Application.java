@@ -22,25 +22,17 @@ public class Application {
   public int catalogVendorId;
   public String applicationId;
 
-  public Application(
-      int catalogVendorId,
-      String applicationId) {
+  public Application(int catalogVendorId, String applicationId) {
     this.catalogVendorId = catalogVendorId;
     this.applicationId = applicationId;
   }
 
-  public Application createApplication(int catalogVendorId,
-                                       String applicationId) {
+  public Application createApplication(int catalogVendorId, String applicationId) {
     return new Application(catalogVendorId, applicationId);
   }
 
   @Override
   public String toString() {
-    return "Application{"
-        + "catalogVendorId="
-        + catalogVendorId
-        + ", applicationId='"
-        + '\''
-        + '}';
+    return "Application{" + "catalogVendorId=" + catalogVendorId + ", applicationId='" + '\'' + '}';
   }
 }

@@ -60,7 +60,7 @@ public class EndpointsDataStore {
   }
 
   public void persistContentAppEndpoint(ContentApp app) {
-    Log.i( EndpointsDataStore.class.toString(), "Persist Content App Endpoint " + app.getAppName());
+    Log.i(EndpointsDataStore.class.toString(), "Persist Content App Endpoint " + app.getAppName());
     persistedContentApps.put(app.getAppName(), app);
     discoveredEndpoints.edit().putString(app.getAppName(), serializeContentApp(app)).apply();
   }

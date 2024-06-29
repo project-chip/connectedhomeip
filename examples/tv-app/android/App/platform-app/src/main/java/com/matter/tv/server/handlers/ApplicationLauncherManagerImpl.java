@@ -3,16 +3,13 @@ package com.matter.tv.server.handlers;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-
 import com.matter.tv.server.tvapp.Application;
 import com.matter.tv.server.tvapp.ApplicationLauncherManager;
 import com.matter.tv.server.tvapp.LauncherResponse;
 import com.matter.tv.server.utils.EndpointsDataStore;
 import com.matter.tv.server.utils.InstallationObserver;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -25,10 +22,9 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
   private PackageManager packageManager;
   private EndpointsDataStore endpointsDataStore;
 
-  /**
-   * Hash Map of packageName & Install Status
-   */
-  private Map<String, InstallationObserver.InstallStatus> lastReceivedInstallationStatus = new HashMap<>();
+  /** Hash Map of packageName & Install Status */
+  private Map<String, InstallationObserver.InstallStatus> lastReceivedInstallationStatus =
+      new HashMap<>();
 
   private LiveData<InstallationObserver.InstallState> installStateLiveData;
 
@@ -38,24 +34,24 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
     registerSelf(context);
   }
 
-  private final Observer<InstallationObserver.InstallState> installStateObserver = state -> {
-    lastReceivedInstallationStatus.put(state.getAppPackageName(), state.getStatus());
-    switch (state.getStatus()) {
-
-      case IN_PROGRESS:
-        // Installation is in progress
-        Log.d(TAG, "Installation of " + state.getAppPackageName() + " in progress");
-        break;
-      case SUCCEEDED:
-        // Installation succeeded
-        Log.d(TAG, "Installation of " + state.getAppPackageName() + " succeeded");
-        break;
-      case FAILED:
-        // Installation failed
-        Log.d(TAG, "Installation of " + state.getAppPackageName() + " failed");
-        break;
-    }
-  };
+  private final Observer<InstallationObserver.InstallState> installStateObserver =
+      state -> {
+        lastReceivedInstallationStatus.put(state.getAppPackageName(), state.getStatus());
+        switch (state.getStatus()) {
+          case IN_PROGRESS:
+            // Installation is in progress
+            Log.d(TAG, "Installation of " + state.getAppPackageName() + " in progress");
+            break;
+          case SUCCEEDED:
+            // Installation succeeded
+            Log.d(TAG, "Installation of " + state.getAppPackageName() + " succeeded");
+            break;
+          case FAILED:
+            // Installation failed
+            Log.d(TAG, "Installation of " + state.getAppPackageName() + " failed");
+            break;
+        }
+      };
 
   private void stopObservingInstallations() {
     if (installStateLiveData != null) {
@@ -90,19 +86,30 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
 
   @Override
   public LauncherResponse launchApp(Application app, String data) {
-    Log.i(TAG, "Launch app id:" + app.applicationId + " cid:" + app.catalogVendorId + " data:" + data);
+    Log.i(
+        TAG,
+        "Launch app id:" + app.applicationId + " cid:" + app.catalogVendorId + " data:" + data);
 
     int status = 0;
     String responseData = "";
 
-    boolean matterAppEnabledIsInstalled = endpointsDataStore.getAllPersistedContentApps().containsKey(app.applicationId);
-    boolean appIsInstalled = InstallationObserver.getInstalledPackages(packageManager).contains(app.applicationId);
-    boolean isAppInstalling = Objects.equals(lastReceivedInstallationStatus.get(app.applicationId), InstallationObserver.InstallStatus.IN_PROGRESS);
-    boolean appInstallFailed = Objects.equals(lastReceivedInstallationStatus.get(app.applicationId), InstallationObserver.InstallStatus.FAILED);
-
+    boolean matterAppEnabledIsInstalled =
+        endpointsDataStore.getAllPersistedContentApps().containsKey(app.applicationId);
+    boolean appIsInstalled =
+        InstallationObserver.getInstalledPackages(packageManager).contains(app.applicationId);
+    boolean isAppInstalling =
+        Objects.equals(
+            lastReceivedInstallationStatus.get(app.applicationId),
+            InstallationObserver.InstallStatus.IN_PROGRESS);
+    boolean appInstallFailed =
+        Objects.equals(
+            lastReceivedInstallationStatus.get(app.applicationId),
+            InstallationObserver.InstallStatus.FAILED);
 
     if (!matterAppEnabledIsInstalled && appIsInstalled) {
-      Log.i(TAG, "Matter enabled app is not installed, but app is installed. Launching app's install page");
+      Log.i(
+          TAG,
+          "Matter enabled app is not installed, but app is installed. Launching app's install page");
       status = LauncherResponse.STATUS_PENDING;
       responseData = "App is installed, try updating";
 
@@ -111,7 +118,9 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
       //
 
     } else if (!matterAppEnabledIsInstalled && !appIsInstalled) {
-      Log.i(TAG, "Matter enabled app is not installed and app is not installed. Launching app's install page");
+      Log.i(
+          TAG,
+          "Matter enabled app is not installed and app is not installed. Launching app's install page");
       if (isAppInstalling) {
         Log.i(TAG, "App is installing");
         status = LauncherResponse.STATUS_INSTALLING;
