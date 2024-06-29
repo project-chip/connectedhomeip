@@ -159,7 +159,19 @@ void sl_button_on_change(const sl_button_t * handle)
     }
 }
 }
-#endif
+
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    const sl_button_t * handle = SL_SIMPLE_BUTTON_INSTANCE(button);
+    return nullptr == handle ? 0 : sl_button_get_state(handle);
+}
+
+#else
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    return 0;
+}
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 } // namespace Silabs
 } // namespace DeviceLayer

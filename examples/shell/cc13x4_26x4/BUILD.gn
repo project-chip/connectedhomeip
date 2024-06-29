@@ -75,6 +75,7 @@ ti_simplelink_executable("shell_app") {
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell:shell",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread:openthread",
   ]

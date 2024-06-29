@@ -39,8 +39,6 @@
 #include "openthread-system.h"
 #include "ot_platform_common.h"
 
-extern "C" CHIP_ERROR AppMatterCli_RegisterCommands(void);
-
 /*
  * Empty content for otPlatCliUartProcess, as the openthread CLI
  * is managed by the matter cli if enabled.
@@ -65,12 +63,6 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
      * it can schedule events
      */
     otPlatAlarmInit();
-
-    /* Make sure to initialize the Matter CLI which will include the ot-cli first.
-     * In fact it is mandatory to enable first the ot-cli before initializing the Matter openthread layer
-     * which would modify some contexts of the openthread instance.
-     */
-    AppMatterCli_RegisterCommands();
 
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();

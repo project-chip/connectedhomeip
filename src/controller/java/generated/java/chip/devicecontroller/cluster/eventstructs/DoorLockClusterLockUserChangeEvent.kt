@@ -29,7 +29,7 @@ class DoorLockClusterLockUserChangeEvent(
   val userIndex: UInt?,
   val fabricIndex: UInt?,
   val sourceNode: ULong?,
-  val dataIndex: UInt?
+  val dataIndex: UInt?,
 ) {
   override fun toString(): String = buildString {
     append("DoorLockClusterLockUserChangeEvent {\n")
@@ -125,7 +125,7 @@ class DoorLockClusterLockUserChangeEvent(
         userIndex,
         fabricIndex,
         sourceNode,
-        dataIndex
+        dataIndex,
       )
     }
   }

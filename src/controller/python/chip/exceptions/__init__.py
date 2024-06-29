@@ -15,6 +15,8 @@
 #    limitations under the License.
 #
 
+from __future__ import annotations
+
 __all__ = [
     "ChipStackException",
     "ChipStackError",
@@ -26,15 +28,32 @@ __all__ = [
     "UnknownCommand",
 ]
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from chip.native import PyChipError
+
 
 class ChipStackException(Exception):
     pass
 
 
 class ChipStackError(ChipStackException):
-    def __init__(self, err, msg=None):
-        self.err = err
-        self.msg = msg if msg else "Chip Stack Error %d" % err
+    def __init__(self, chip_error: PyChipError, msg=None):
+        self._chip_error = chip_error
+        self.msg = msg if msg else "Chip Stack Error %d" % chip_error.code
+
+    @classmethod
+    def from_chip_error(cls, chip_error: PyChipError) -> ChipStackError:
+        return cls(chip_error, str(chip_error))
+
+    @property
+    def chip_error(self) -> PyChipError | None:
+        return self._chip_error
+
+    @property
+    def err(self) -> int:
+        return self._chip_error.code
 
     def __str__(self):
         return self.msg

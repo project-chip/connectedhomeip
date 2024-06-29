@@ -596,6 +596,12 @@ void Server::Shutdown()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Shut down any remaining sessions (and hence exchanges) before we do any
+    // futher teardown.  CASE handshakes have been shut down already via
+    // shutting down mCASESessionManager and mCASEServer above; shutting
+    // down mCommissioningWindowManager will shut down any PASE handshakes we
+    // have going on.
+    mSessions.ExpireAllSecureSessions();
     mCommissioningWindowManager.Shutdown();
     mMessageCounterManager.Shutdown();
     mExchangeMgr.Shutdown();

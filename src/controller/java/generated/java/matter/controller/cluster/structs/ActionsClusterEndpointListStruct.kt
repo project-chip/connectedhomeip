@@ -27,7 +27,7 @@ class ActionsClusterEndpointListStruct(
   val endpointListID: UShort,
   val name: String,
   val type: UByte,
-  val endpoints: List<UShort>
+  val endpoints: List<UShort>,
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterEndpointListStruct {\n")

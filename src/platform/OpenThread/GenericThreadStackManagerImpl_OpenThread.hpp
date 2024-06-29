@@ -1131,6 +1131,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     memset(&mSrpClient, 0, sizeof(mSrpClient));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
     if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(otInst))
     {
@@ -1143,6 +1144,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
     }
+#endif
 
     initNetworkCommissioningThreadDriver();
 

@@ -146,7 +146,7 @@ namespace Platform {
 /**
  * CHIP log output function.
  */
-void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     (void) module;
     (void) category;

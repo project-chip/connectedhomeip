@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
@@ -30,11 +29,9 @@ if (matter_enable_tracing_support &&
     ]
 
     public_deps = [
-      "${chip_root}/src/lib/support:testing_nlunit",
       "${chip_root}/src/platform",
       "${chip_root}/src/tracing",
       "${chip_root}/src/tracing:macros",
-      "${nlunit_test_root}:nlunit-test",
     ]
   }
 }

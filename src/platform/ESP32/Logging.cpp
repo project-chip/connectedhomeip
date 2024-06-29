@@ -3,7 +3,6 @@
 #include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
-#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 
 #include <stdio.h>
@@ -19,7 +18,7 @@ namespace chip {
 namespace Logging {
 namespace Platform {
 
-void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     char tag[11];
 

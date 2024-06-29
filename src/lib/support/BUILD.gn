@@ -16,7 +16,6 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
-import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/target_types.gni")
@@ -355,25 +354,5 @@ pw_static_library("pw_tests_wrapper") {
   sources = [
     "UnitTest.cpp",
     "UnitTest.h",
-  ]
-}
-
-static_library("testing_nlunit") {
-  output_name = "libSupportTesting"
-  output_dir = "${root_out_dir}/lib"
-
-  sources = [
-    "UnitTestContext.h",
-    "UnitTestExtendedAssertions.h",
-    "UnitTestRegistration.cpp",
-    "UnitTestRegistration.h",
-  ]
-
-  public_deps = [
-    ":support",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/platform",
-    "${nlassert_root}:nlassert",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

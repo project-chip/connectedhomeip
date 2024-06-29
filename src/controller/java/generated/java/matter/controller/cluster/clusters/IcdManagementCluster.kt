@@ -43,7 +43,7 @@ import matter.tlv.TlvWriter
 
 class IcdManagementCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class RegisterClientResponse(val ICDCounter: UInt)
 
@@ -107,7 +107,7 @@ class IcdManagementCluster(
     monitoredSubject: ULong,
     key: ByteArray,
     verificationKey: ByteArray?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): RegisterClientResponse {
     val commandId: UInt = 0u
 
@@ -133,7 +133,7 @@ class IcdManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -166,7 +166,7 @@ class IcdManagementCluster(
   suspend fun unregisterClient(
     checkInNodeID: ULong,
     verificationKey: ByteArray?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 2u
 
@@ -186,7 +186,7 @@ class IcdManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -195,7 +195,7 @@ class IcdManagementCluster(
 
   suspend fun stayActiveRequest(
     stayActiveDuration: UInt,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): StayActiveResponse {
     val commandId: UInt = 3u
 
@@ -210,7 +210,7 @@ class IcdManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -273,7 +273,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeIdleModeDurationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -286,7 +286,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -356,7 +356,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeActiveModeDurationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -369,7 +369,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -439,7 +439,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeActiveModeThresholdAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -452,7 +452,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -533,7 +533,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeRegisteredClientsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<RegisteredClientsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -546,7 +546,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -580,7 +580,7 @@ class IcdManagementCluster(
                   add(
                     IcdManagementClusterMonitoringRegistrationStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader
+                      tlvReader,
                     )
                   )
                 }
@@ -637,7 +637,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeICDCounterAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -650,7 +650,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -728,7 +728,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeClientsSupportedPerFabricAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -741,7 +741,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -821,7 +821,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeUserActiveModeTriggerHintAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -834,7 +834,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -916,7 +916,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeUserActiveModeTriggerInstructionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<StringSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -929,7 +929,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1009,7 +1009,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeOperatingModeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -1022,7 +1022,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1102,7 +1102,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -1115,7 +1115,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1199,7 +1199,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -1212,7 +1212,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1296,7 +1296,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -1309,7 +1309,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1391,7 +1391,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1404,7 +1404,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1479,7 +1479,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1492,7 +1492,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1560,7 +1560,7 @@ class IcdManagementCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1573,7 +1573,7 @@ class IcdManagementCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

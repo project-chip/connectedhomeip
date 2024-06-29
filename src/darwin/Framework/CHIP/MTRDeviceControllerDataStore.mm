@@ -479,7 +479,7 @@ static NSString * sAttributeCacheClusterIndexKeyPrefix = @"attrCacheClusterIndex
 
 - (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
 {
-    return [sAttributeCacheClusterIndexKeyPrefix stringByAppendingFormat:@":0x%016llX:%0x04X", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue];
+    return [sAttributeCacheClusterIndexKeyPrefix stringByAppendingFormat:@":0x%016llX:0x%04X", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue];
 }
 
 - (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID

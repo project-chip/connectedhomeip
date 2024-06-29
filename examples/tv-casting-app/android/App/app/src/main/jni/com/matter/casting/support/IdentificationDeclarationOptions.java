@@ -19,8 +19,8 @@ import java.util.List;
 
 /**
  * This class contains the optional parameters used in the IdentificationDeclaration Message, sent
- * by the Commissionee to the Commissioner. The options specify information relating to the
- * requested UDC commissioning session.
+ * by the Commissionee (CastingApp) to the Commissioner (CastingPlayer). The options specify
+ * information relating to the requested UDC commissioning session.
  */
 public class IdentificationDeclarationOptions {
   private final String TAG = IdentificationDeclarationOptions.class.getSimpleName();

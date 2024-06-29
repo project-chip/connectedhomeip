@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("constants") {

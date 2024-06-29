@@ -30,7 +30,7 @@ class UnitTestingClusterSimpleStruct(
   val e: String,
   val f: UInt,
   val g: Float,
-  val h: Double
+  val h: Double,
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterSimpleStruct {\n")

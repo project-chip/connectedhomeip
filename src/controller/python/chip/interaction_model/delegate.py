@@ -330,7 +330,7 @@ def InitIMDelegate():
         setter.Set("pychip_InteractionModelDelegate_SetCommandResponseErrorCallback", None, [
                    _OnCommandResponseFunct])
         setter.Set("pychip_InteractionModel_GetCommandSenderHandle",
-                   c_uint32, [ctypes.POINTER(c_uint64)])
+                   chip.native.PyChipError, [ctypes.POINTER(c_uint64)])
         setter.Set("pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback", None, [
                    _OnWriteResponseStatusFunct])
 
@@ -389,10 +389,8 @@ def WaitCommandIndexStatus(commandHandle: int, commandIndex: int):
 def GetCommandSenderHandle() -> int:
     handle = chip.native.GetLibraryHandle()
     resPointer = c_uint64()
-    res = handle.pychip_InteractionModel_GetCommandSenderHandle(
-        ctypes.pointer(resPointer))
-    if res != 0:
-        raise chip.exceptions.ChipStackError(res)
+    handle.pychip_InteractionModel_GetCommandSenderHandle(
+        ctypes.pointer(resPointer)).raise_on_error()
     ClearCommandStatus(resPointer.value)
     return resPointer.value
 

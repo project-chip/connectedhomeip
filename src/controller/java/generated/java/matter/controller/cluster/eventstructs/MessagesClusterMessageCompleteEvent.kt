@@ -27,7 +27,7 @@ class MessagesClusterMessageCompleteEvent(
   val messageID: ByteArray,
   val responseID: Optional<UInt>?,
   val reply: Optional<String>?,
-  val futureMessagesPreference: UByte?
+  val futureMessagesPreference: UByte?,
 ) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageCompleteEvent {\n")
@@ -112,7 +112,7 @@ class MessagesClusterMessageCompleteEvent(
         messageID,
         responseID,
         reply,
-        futureMessagesPreference
+        futureMessagesPreference,
       )
     }
   }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -120,14 +120,16 @@ private:
     CHIP_ERROR HandleBleConnectionClosed(const ChipDeviceEvent * event);
 
     /*
-        @todo WORKAROUND: Due to abscense of non-cuncurrent mode in Matter
+        WORKAROUND: Due to abscense of non-cuncurrent mode in Matter
         we are emulating connection to Thread with this events and manually
         disconnect BLE ass soon as OperationalNetworkEnabled occures.
         This functionality shall be removed as soon as non-cuncurrent mode
         would be implemented
      */
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     CHIP_ERROR HandleThreadStateChange(const ChipDeviceEvent * event);
     CHIP_ERROR HandleOperationalNetworkEnabled(const ChipDeviceEvent * event);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     InternalScanCallback * mInternalScanCallback;
 
@@ -164,8 +166,10 @@ public:
     static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
 #endif
 
-    /* Switch to IEEE802154 interface. @todo: remove to other module? */
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    // Switch context from BLE to Thread
     void SwitchToIeee802154(void);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     CHIP_ERROR StartAdvertisingProcess(void);
 };

@@ -28,7 +28,7 @@ class GroupKeyManagementClusterGroupInfoMapStruct(
   val groupId: UInt,
   val endpoints: List<UInt>,
   val groupName: Optional<String>,
-  val fabricIndex: UInt
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupInfoMapStruct {\n")

@@ -41,7 +41,7 @@ import matter.tlv.TlvWriter
 
 class LaundryWasherControlsCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class SpinSpeedsAttribute(val value: List<String>?)
 
@@ -157,7 +157,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeSpinSpeedsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<SpinSpeedsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -170,7 +170,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -270,10 +270,10 @@ class LaundryWasherControlsCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -299,7 +299,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeSpinSpeedCurrentAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<SpinSpeedCurrentAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -312,7 +312,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -408,10 +408,10 @@ class LaundryWasherControlsCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -437,7 +437,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeNumberOfRinsesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -450,7 +450,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -536,7 +536,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeSupportedRinsesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<SupportedRinsesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -549,7 +549,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -637,7 +637,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -650,7 +650,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -734,7 +734,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -747,7 +747,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -831,7 +831,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -844,7 +844,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -926,7 +926,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -939,7 +939,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1014,7 +1014,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1027,7 +1027,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1095,7 +1095,7 @@ class LaundryWasherControlsCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1108,7 +1108,7 @@ class LaundryWasherControlsCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

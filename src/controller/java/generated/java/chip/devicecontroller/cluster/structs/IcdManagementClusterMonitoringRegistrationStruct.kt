@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class IcdManagementClusterMonitoringRegistrationStruct(
   val checkInNodeID: ULong,
   val monitoredSubject: ULong,
-  val fabricIndex: UInt
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("IcdManagementClusterMonitoringRegistrationStruct {\n")
@@ -52,7 +52,7 @@ class IcdManagementClusterMonitoringRegistrationStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): IcdManagementClusterMonitoringRegistrationStruct {
       tlvReader.enterStructure(tlvTag)
       val checkInNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D))
@@ -64,7 +64,7 @@ class IcdManagementClusterMonitoringRegistrationStruct(
       return IcdManagementClusterMonitoringRegistrationStruct(
         checkInNodeID,
         monitoredSubject,
-        fabricIndex
+        fabricIndex,
       )
     }
   }

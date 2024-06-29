@@ -610,7 +610,8 @@ exit:
 }
 
 JNI_METHOD(void, commissionDevice)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials,
+ jobject icdRegistrationInfo)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -624,6 +625,10 @@ JNI_METHOD(void, commissionDevice)
         err = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
     }
+
+    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());

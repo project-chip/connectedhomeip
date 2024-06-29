@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class UnitTestingClusterNestedStruct(
   val a: UByte,
   val b: Boolean,
-  val c: UnitTestingClusterSimpleStruct
+  val c: UnitTestingClusterSimpleStruct,
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterNestedStruct {\n")

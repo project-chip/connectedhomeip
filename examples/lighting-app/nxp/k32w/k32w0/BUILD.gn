@@ -115,6 +115,7 @@ k32w0_executable("light_app") {
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform:syscalls_stub",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
   ]

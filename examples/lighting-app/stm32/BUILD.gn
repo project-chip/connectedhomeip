@@ -84,6 +84,8 @@ stm32_sdk("sdk") {
 }
 
 stm32_executable("lighting_app") {
+  deps = []
+
   if (stm32_board == "STM32WB5MM-DK") {
     output_name = "chip-stm32-lighting-example.elf"
     include_dirs = [
@@ -117,6 +119,8 @@ stm32_executable("lighting_app") {
       "${chip_root}/src/setup_payload",
     ]
   }
+
+  deps += [ "${chip_root}/src/platform/logging:default" ]
 
   # Add the startup file to the target
   sources += [ "${examples_plat_dir}/startup_files/startup_${stm32_mcu}.s" ]

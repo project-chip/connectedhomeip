@@ -28,7 +28,7 @@ class AccessControlClusterAccessControlEntryStruct(
   val authMode: UInt,
   val subjects: List<ULong>?,
   val targets: List<AccessControlClusterAccessControlTargetStruct>?,
-  val fabricIndex: UInt
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAccessControlEntryStruct {\n")
@@ -114,7 +114,7 @@ class AccessControlClusterAccessControlEntryStruct(
         authMode,
         subjects,
         targets,
-        fabricIndex
+        fabricIndex,
       )
     }
   }

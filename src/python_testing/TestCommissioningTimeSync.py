@@ -56,12 +56,11 @@ class TestCommissioningTimeSync(MatterBaseTest):
         return super().teardown_test()
 
     async def commission_and_base_checks(self):
-        params = self.default_controller.OpenCommissioningWindow(
+        params = await self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
-        errcode = self.commissioner.CommissionOnNetwork(
+        await self.commissioner.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
-        asserts.assert_true(errcode.is_success, 'Commissioning did not complete successfully')
         self.commissioned = True
 
         # Check the feature map - if we have a time cluster, we want UTC time to be set

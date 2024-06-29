@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 #include <gtest/gtest.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <tracing/backend.h>
 #include <tracing/metric_event.h>
 

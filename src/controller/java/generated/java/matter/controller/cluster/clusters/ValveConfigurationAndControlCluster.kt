@@ -45,7 +45,7 @@ import matter.tlv.TlvWriter
 
 class ValveConfigurationAndControlCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class OpenDurationAttribute(val value: UInt?)
 
@@ -184,7 +184,7 @@ class ValveConfigurationAndControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -202,7 +202,7 @@ class ValveConfigurationAndControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -248,7 +248,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeOpenDurationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<OpenDurationAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -261,7 +261,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -352,10 +352,10 @@ class ValveConfigurationAndControlCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -381,7 +381,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeDefaultOpenDurationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<DefaultOpenDurationAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -394,7 +394,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -480,7 +480,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeAutoCloseTimeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AutoCloseTimeAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -493,7 +493,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -577,7 +577,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeRemainingDurationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<RemainingDurationAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -590,7 +590,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -672,7 +672,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeCurrentStateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<CurrentStateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -685,7 +685,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -765,7 +765,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeTargetStateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<TargetStateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -778,7 +778,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -862,7 +862,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeCurrentLevelAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<CurrentLevelAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -875,7 +875,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -963,7 +963,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeTargetLevelAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<TargetLevelAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -976,7 +976,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1070,10 +1070,10 @@ class ValveConfigurationAndControlCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1099,7 +1099,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeDefaultOpenLevelAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -1112,7 +1112,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1192,7 +1192,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeValveFaultAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
@@ -1205,7 +1205,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1283,7 +1283,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeLevelStepAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
@@ -1296,7 +1296,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1376,7 +1376,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -1389,7 +1389,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1473,7 +1473,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -1486,7 +1486,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1570,7 +1570,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -1583,7 +1583,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1665,7 +1665,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -1678,7 +1678,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1753,7 +1753,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1766,7 +1766,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1834,7 +1834,7 @@ class ValveConfigurationAndControlCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1847,7 +1847,7 @@ class ValveConfigurationAndControlCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

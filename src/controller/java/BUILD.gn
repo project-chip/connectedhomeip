@@ -154,6 +154,7 @@ shared_library("jni") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
   ]
 
   if (chip_build_controller_dynamic_server) {
@@ -616,6 +617,7 @@ android_library("java") {
     "src/chip/devicecontroller/CSRInfo.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
+    "src/chip/devicecontroller/CommissionParameters.java",
     "src/chip/devicecontroller/CommissioningWindowStatus.java",
     "src/chip/devicecontroller/ConnectionFailureException.java",
     "src/chip/devicecontroller/ControllerParams.java",

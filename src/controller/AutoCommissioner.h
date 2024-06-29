@@ -94,6 +94,22 @@ private:
                  mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId));
     };
 
+    // Helper function to Determine whether secondary network interface is supported.
+    // Only true if information is provided for both networks, and the target has endpoint
+    // for wifi and thread.
+    bool IsSecondaryNetworkSupported() const
+    {
+        return ((mParams.GetSupportsConcurrentConnection().ValueOr(false) && mParams.GetWiFiCredentials().HasValue() &&
+                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId) &&
+                mParams.GetThreadOperationalDataset().HasValue() &&
+                mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId);
+    }
+
+    void TrySecondaryNetwork() { mTryingSecondaryNetwork = true; }
+    bool TryingSecondaryNetwork() const { return mTryingSecondaryNetwork; }
+    void ResetTryingSecondaryNetwork() { mTryingSecondaryNetwork = false; }
+    bool mTryingSecondaryNetwork = false;
+
     bool mStopCommissioning = false;
 
     DeviceCommissioner * mCommissioner                               = nullptr;

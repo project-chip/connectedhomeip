@@ -167,7 +167,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
 
     csrForAddNOC = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32)))
 
-    chainForAddNOC = newFabricDevCtrl.IssueNOCChain(csrForAddNOC, newNodeId)
+    chainForAddNOC = await newFabricDevCtrl.IssueNOCChain(csrForAddNOC, newNodeId)
     if (chainForAddNOC.rcacBytes is None or
             chainForAddNOC.icacBytes is None or
             chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None):
@@ -225,7 +225,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
         return False
     csrForUpdateNOC = await devCtrl.SendCommand(
         existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32), isForUpdateNOC=True))
-    chainForUpdateNOC = devCtrl.IssueNOCChain(csrForUpdateNOC, newNodeId)
+    chainForUpdateNOC = await devCtrl.IssueNOCChain(csrForUpdateNOC, newNodeId)
     if (chainForUpdateNOC.rcacBytes is None or
             chainForUpdateNOC.icacBytes is None or
             chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None):

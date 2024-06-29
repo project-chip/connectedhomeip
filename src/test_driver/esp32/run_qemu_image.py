@@ -150,6 +150,7 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
             # make sure output is visible in stdout
             print("========== TEST OUTPUT BEGIN ============")
             print(output)
+            print(status.stderr.decode('ascii'))
             print("========== TEST OUTPUT END   ============")
             raise
 

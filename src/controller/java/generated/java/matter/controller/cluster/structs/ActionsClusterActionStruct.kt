@@ -28,7 +28,7 @@ class ActionsClusterActionStruct(
   val type: UByte,
   val endpointListID: UShort,
   val supportedCommands: UShort,
-  val state: UByte
+  val state: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterActionStruct {\n")
@@ -79,7 +79,7 @@ class ActionsClusterActionStruct(
         type,
         endpointListID,
         supportedCommands,
-        state
+        state,
       )
     }
   }

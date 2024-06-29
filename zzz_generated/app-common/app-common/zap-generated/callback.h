@@ -426,6 +426,11 @@ void emberAfBarrierControlClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfServiceAreaClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfPumpConfigurationAndControlClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -3652,6 +3657,45 @@ MatterBarrierControlClusterServerPreAttributeChangedCallback(const chip::app::Co
 void emberAfBarrierControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Service Area Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfServiceAreaClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterServiceAreaClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfServiceAreaClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterServiceAreaClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterServiceAreaClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfServiceAreaClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Pump Configuration and Control Cluster
 //
 
@@ -6059,6 +6103,18 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
 bool emberAfBarrierControlClusterBarrierControlStopCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::DecodableType & commandData);
+/**
+ * @brief Service Area Cluster SelectLocations Command callback (from client)
+ */
+bool emberAfServiceAreaClusterSelectLocationsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ServiceArea::Commands::SelectLocations::DecodableType & commandData);
+/**
+ * @brief Service Area Cluster SkipCurrentLocation Command callback (from client)
+ */
+bool emberAfServiceAreaClusterSkipCurrentLocationCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */

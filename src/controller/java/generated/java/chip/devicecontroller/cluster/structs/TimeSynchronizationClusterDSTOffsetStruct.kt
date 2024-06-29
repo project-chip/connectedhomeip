@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class TimeSynchronizationClusterDSTOffsetStruct(
   val offset: Long,
   val validStarting: ULong,
-  val validUntil: ULong?
+  val validUntil: ULong?,
 ) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterDSTOffsetStruct {\n")

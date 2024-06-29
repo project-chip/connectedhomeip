@@ -236,8 +236,7 @@ def FindAddressAsync(fabricid: int, nodeid: int, callback, timeout_ms=1000):
     )
 
     res = _GetDiscoveryLibraryHandle().pychip_discovery_resolve(fabricid, nodeid)
-    if res != 0:
-        raise Exception("Failed to start node resolution")
+    res.raise_on_error()
 
 
 class _SyncAddressFinder:

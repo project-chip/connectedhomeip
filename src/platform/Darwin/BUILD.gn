@@ -65,7 +65,6 @@ static_library("Darwin") {
     "DnssdImpl.h",
     "DnssdType.cpp",
     "InetPlatformConfig.h",
-    "LoggingImpl.cpp",
     "MdnsError.cpp",
     "MdnsError.h",
     "NetworkCommissioningDriver.h",
@@ -152,12 +151,14 @@ static_library("logging") {
   sources = [
     "Logging.h",
     "Logging.mm",
+    "LoggingImpl.cpp",
   ]
 
   deps = [
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:logging_constants",
     "${chip_root}/src/lib/support:span",
+    "${chip_root}/src/platform/logging:headers",
   ]
 
   configs += [ "${chip_root}/src:includes" ]

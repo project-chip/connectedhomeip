@@ -35,6 +35,7 @@ import com.matter.tv.server.utils.EndpointsDataStore;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -200,6 +201,7 @@ public class AppPlatformService {
       Collection<SupportedCluster> supportedClusters) {
     return supportedClusters
         .stream()
+        .filter(Objects::nonNull)
         .map(AppPlatformService::mapSupportedCluster)
         .collect(Collectors.toList());
   }

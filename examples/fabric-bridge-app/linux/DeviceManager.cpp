@@ -161,6 +161,7 @@ int DeviceManager::AddDeviceEndpoint(Device * dev, chip::EndpointId parentEndpoi
                 }
                 if (err != CHIP_ERROR_ENDPOINT_EXISTS)
                 {
+                    mDevices[index] = nullptr;
                     return -1; // Return error as endpoint addition failed due to an error other than endpoint already exists
                 }
                 // Increment the endpoint ID and handle wrap condition
@@ -171,6 +172,7 @@ int DeviceManager::AddDeviceEndpoint(Device * dev, chip::EndpointId parentEndpoi
                 retryCount++;
             }
             ChipLogError(NotSpecified, "Failed to add dynamic endpoint after %d retries", kMaxRetries);
+            mDevices[index] = nullptr;
             return -1; // Return error as all retries are exhausted
         }
         index++;

@@ -42,7 +42,7 @@ class BridgedDeviceBasicInformationClusterStartUpEvent(val softwareVersion: ULon
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): BridgedDeviceBasicInformationClusterStartUpEvent {
       tlvReader.enterStructure(tlvTag)
       val softwareVersion = tlvReader.getULong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
