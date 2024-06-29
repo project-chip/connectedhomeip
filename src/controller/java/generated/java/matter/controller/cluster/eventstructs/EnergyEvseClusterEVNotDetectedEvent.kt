@@ -18,6 +18,7 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -62,28 +63,21 @@ class EnergyEvseClusterEVNotDetectedEvent(
     private const val TAG_SESSION_ENERGY_CHARGED = 3
     private const val TAG_SESSION_ENERGY_DISCHARGED = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEVNotDetectedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyEvseClusterEVNotDetectedEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_I_D))
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val sessionDuration = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_DURATION))
       val sessionEnergyCharged = tlvReader.getLong(ContextSpecificTag(TAG_SESSION_ENERGY_CHARGED))
-      val sessionEnergyDischarged =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SESSION_ENERGY_DISCHARGED))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_SESSION_ENERGY_DISCHARGED)))
-        } else {
-          Optional.empty()
-        }
-
+      val sessionEnergyDischarged = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SESSION_ENERGY_DISCHARGED))) {
+        Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_SESSION_ENERGY_DISCHARGED)))
+      } else {
+        Optional.empty()
+      }
+      
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterEVNotDetectedEvent(
-        sessionID,
-        state,
-        sessionDuration,
-        sessionEnergyCharged,
-        sessionEnergyDischarged
-      )
+      return EnergyEvseClusterEVNotDetectedEvent(sessionID, state, sessionDuration, sessionEnergyCharged, sessionEnergyDischarged)
     }
   }
 }

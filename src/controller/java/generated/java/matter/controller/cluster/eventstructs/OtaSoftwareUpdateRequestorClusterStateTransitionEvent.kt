@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -58,30 +60,21 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
     private const val TAG_REASON = 2
     private const val TAG_TARGET_SOFTWARE_VERSION = 3
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
       tlvReader.enterStructure(tlvTag)
       val previousState = tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_STATE))
       val newState = tlvReader.getUByte(ContextSpecificTag(TAG_NEW_STATE))
       val reason = tlvReader.getUByte(ContextSpecificTag(TAG_REASON))
-      val targetSoftwareVersion =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
-          null
-        }
-
+      val targetSoftwareVersion = if (!tlvReader.isNull()) {
+        tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
+      } else {
+        tlvReader.getNull(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))
+        null
+      }
+      
       tlvReader.exitContainer()
 
-      return OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
-        previousState,
-        newState,
-        reason,
-        targetSoftwareVersion
-      )
+      return OtaSoftwareUpdateRequestorClusterStateTransitionEvent(previousState, newState, reason, targetSoftwareVersion)
     }
   }
 }

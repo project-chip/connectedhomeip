@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class TargetNavigatorClusterTargetInfoStruct(val identifier: UByte, val name: String) {
+class TargetNavigatorClusterTargetInfoStruct(
+  val identifier: UByte,
+  val name: String
+) {
   override fun toString(): String = buildString {
     append("TargetNavigatorClusterTargetInfoStruct {\n")
     append("\tidentifier : $identifier\n")
@@ -47,7 +52,7 @@ class TargetNavigatorClusterTargetInfoStruct(val identifier: UByte, val name: St
       tlvReader.enterStructure(tlvTag)
       val identifier = tlvReader.getUByte(ContextSpecificTag(TAG_IDENTIFIER))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-
+      
       tlvReader.exitContainer()
 
       return TargetNavigatorClusterTargetInfoStruct(identifier, name)

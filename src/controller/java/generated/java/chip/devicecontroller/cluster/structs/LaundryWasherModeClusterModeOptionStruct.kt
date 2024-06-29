@@ -20,15 +20,17 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class LaundryWasherModeClusterModeOptionStruct(
-  val label: String,
-  val mode: UInt,
-  val modeTags: List<LaundryWasherModeClusterModeTagStruct>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class LaundryWasherModeClusterModeOptionStruct (
+    val label: String,
+    val mode: UInt,
+    val modeTags: List<LaundryWasherModeClusterModeTagStruct>) {
+  override fun toString(): String  = buildString {
     append("LaundryWasherModeClusterModeOptionStruct {\n")
     append("\tlabel : $label\n")
     append("\tmode : $mode\n")
@@ -55,19 +57,18 @@ class LaundryWasherModeClusterModeOptionStruct(
     private const val TAG_MODE = 1
     private const val TAG_MODE_TAGS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): LaundryWasherModeClusterModeOptionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : LaundryWasherModeClusterModeOptionStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
-      val modeTags =
-        buildList<LaundryWasherModeClusterModeTagStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(LaundryWasherModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val modeTags = buildList<LaundryWasherModeClusterModeTagStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(LaundryWasherModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return LaundryWasherModeClusterModeOptionStruct(label, mode, modeTags)

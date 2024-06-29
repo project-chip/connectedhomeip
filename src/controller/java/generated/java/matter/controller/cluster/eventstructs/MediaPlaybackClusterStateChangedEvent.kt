@@ -18,6 +18,7 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -78,40 +79,25 @@ class MediaPlaybackClusterStateChangedEvent(
     private const val TAG_DATA = 7
     private const val TAG_AUDIO_ADVANCE_UNMUTED = 8
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterStateChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MediaPlaybackClusterStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val currentState = tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_STATE))
       val startTime = tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
       val duration = tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
-      val sampledPosition =
-        matter.controller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct.fromTlv(
-          ContextSpecificTag(TAG_SAMPLED_POSITION),
-          tlvReader
-        )
+      val sampledPosition = matter.controller.cluster.structs.MediaPlaybackClusterPlaybackPositionStruct.fromTlv(ContextSpecificTag(TAG_SAMPLED_POSITION), tlvReader)
       val playbackSpeed = tlvReader.getFloat(ContextSpecificTag(TAG_PLAYBACK_SPEED))
       val seekRangeEnd = tlvReader.getULong(ContextSpecificTag(TAG_SEEK_RANGE_END))
       val seekRangeStart = tlvReader.getULong(ContextSpecificTag(TAG_SEEK_RANGE_START))
-      val data =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DATA))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_DATA)))
-        } else {
-          Optional.empty()
-        }
+      val data = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DATA))) {
+        Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_DATA)))
+      } else {
+        Optional.empty()
+      }
       val audioAdvanceUnmuted = tlvReader.getBoolean(ContextSpecificTag(TAG_AUDIO_ADVANCE_UNMUTED))
-
+      
       tlvReader.exitContainer()
 
-      return MediaPlaybackClusterStateChangedEvent(
-        currentState,
-        startTime,
-        duration,
-        sampledPosition,
-        playbackSpeed,
-        seekRangeEnd,
-        seekRangeStart,
-        data,
-        audioAdvanceUnmuted
-      )
+      return MediaPlaybackClusterStateChangedEvent(currentState, startTime, duration, sampledPosition, playbackSpeed, seekRangeEnd, seekRangeStart, data, audioAdvanceUnmuted)
     }
   }
 }

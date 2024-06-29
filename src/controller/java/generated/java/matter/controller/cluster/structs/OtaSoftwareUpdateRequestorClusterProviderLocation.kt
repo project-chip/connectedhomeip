@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -50,22 +52,15 @@ class OtaSoftwareUpdateRequestorClusterProviderLocation(
     private const val TAG_ENDPOINT = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): OtaSoftwareUpdateRequestorClusterProviderLocation {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OtaSoftwareUpdateRequestorClusterProviderLocation {
       tlvReader.enterStructure(tlvTag)
       val providerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PROVIDER_NODE_I_D))
       val endpoint = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return OtaSoftwareUpdateRequestorClusterProviderLocation(
-        providerNodeID,
-        endpoint,
-        fabricIndex
-      )
+      return OtaSoftwareUpdateRequestorClusterProviderLocation(providerNodeID, endpoint, fabricIndex)
     }
   }
 }

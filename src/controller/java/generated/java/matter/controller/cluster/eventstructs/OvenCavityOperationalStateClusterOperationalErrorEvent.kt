@@ -16,15 +16,16 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class OvenCavityOperationalStateClusterOperationalErrorEvent(
-  val errorState:
-    matter.controller.cluster.structs.OvenCavityOperationalStateClusterErrorStateStruct
+  val errorState: matter.controller.cluster.structs.OvenCavityOperationalStateClusterErrorStateStruct
 ) {
   override fun toString(): String = buildString {
     append("OvenCavityOperationalStateClusterOperationalErrorEvent {\n")
@@ -43,17 +44,10 @@ class OvenCavityOperationalStateClusterOperationalErrorEvent(
   companion object {
     private const val TAG_ERROR_STATE = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): OvenCavityOperationalStateClusterOperationalErrorEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OvenCavityOperationalStateClusterOperationalErrorEvent {
       tlvReader.enterStructure(tlvTag)
-      val errorState =
-        matter.controller.cluster.structs.OvenCavityOperationalStateClusterErrorStateStruct.fromTlv(
-          ContextSpecificTag(TAG_ERROR_STATE),
-          tlvReader
-        )
-
+      val errorState = matter.controller.cluster.structs.OvenCavityOperationalStateClusterErrorStateStruct.fromTlv(ContextSpecificTag(TAG_ERROR_STATE), tlvReader)
+      
       tlvReader.exitContainer()
 
       return OvenCavityOperationalStateClusterOperationalErrorEvent(errorState)

@@ -20,19 +20,21 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class UnitTestingClusterNestedStructList(
-  val a: UInt,
-  val b: Boolean,
-  val c: UnitTestingClusterSimpleStruct,
-  val d: List<UnitTestingClusterSimpleStruct>,
-  val e: List<ULong>,
-  val f: List<ByteArray>,
-  val g: List<UInt>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class UnitTestingClusterNestedStructList (
+    val a: UInt,
+    val b: Boolean,
+    val c: UnitTestingClusterSimpleStruct,
+    val d: List<UnitTestingClusterSimpleStruct>,
+    val e: List<ULong>,
+    val f: List<ByteArray>,
+    val g: List<UInt>) {
+  override fun toString(): String  = buildString {
     append("UnitTestingClusterNestedStructList {\n")
     append("\ta : $a\n")
     append("\tb : $b\n")
@@ -83,44 +85,40 @@ class UnitTestingClusterNestedStructList(
     private const val TAG_F = 5
     private const val TAG_G = 6
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterNestedStructList {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : UnitTestingClusterNestedStructList {
       tlvReader.enterStructure(tlvTag)
       val a = tlvReader.getUInt(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
       val c = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
-      val d =
-        buildList<UnitTestingClusterSimpleStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_D))
-          while (!tlvReader.isEndOfContainer()) {
-            add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-      val e =
-        buildList<ULong> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_E))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getULong(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      val f =
-        buildList<ByteArray> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_F))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getByteArray(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      val g =
-        buildList<UInt> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_G))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val d = buildList<UnitTestingClusterSimpleStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_D))
+      while(!tlvReader.isEndOfContainer()) {
+        add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      val e = buildList<ULong> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_E))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getULong(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      val f = buildList<ByteArray> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_F))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getByteArray(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      val g = buildList<UInt> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_G))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUInt(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return UnitTestingClusterNestedStructList(a, b, c, d, e, f, g)

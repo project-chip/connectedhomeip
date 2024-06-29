@@ -18,6 +18,7 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -57,22 +58,20 @@ class SoftwareDiagnosticsClusterSoftwareFaultEvent(
     private const val TAG_NAME = 1
     private const val TAG_FAULT_RECORDING = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SoftwareDiagnosticsClusterSoftwareFaultEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SoftwareDiagnosticsClusterSoftwareFaultEvent {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getULong(ContextSpecificTag(TAG_ID))
-      val name =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-        } else {
-          Optional.empty()
-        }
-      val faultRecording =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_FAULT_RECORDING))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_FAULT_RECORDING)))
-        } else {
-          Optional.empty()
-        }
-
+      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+        Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+      } else {
+        Optional.empty()
+      }
+      val faultRecording = if (tlvReader.isNextTag(ContextSpecificTag(TAG_FAULT_RECORDING))) {
+        Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_FAULT_RECORDING)))
+      } else {
+        Optional.empty()
+      }
+      
       tlvReader.exitContainer()
 
       return SoftwareDiagnosticsClusterSoftwareFaultEvent(id, name, faultRecording)

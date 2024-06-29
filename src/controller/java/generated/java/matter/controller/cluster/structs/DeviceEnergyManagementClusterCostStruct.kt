@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -63,13 +64,12 @@ class DeviceEnergyManagementClusterCostStruct(
       val costType = tlvReader.getUByte(ContextSpecificTag(TAG_COST_TYPE))
       val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
       val decimalPoints = tlvReader.getUByte(ContextSpecificTag(TAG_DECIMAL_POINTS))
-      val currency =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENCY))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_CURRENCY)))
-        } else {
-          Optional.empty()
-        }
-
+      val currency = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENCY))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_CURRENCY)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return DeviceEnergyManagementClusterCostStruct(costType, value, decimalPoints, currency)

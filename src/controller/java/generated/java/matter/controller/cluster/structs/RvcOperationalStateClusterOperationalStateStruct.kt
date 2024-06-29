@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -50,25 +51,18 @@ class RvcOperationalStateClusterOperationalStateStruct(
     private const val TAG_OPERATIONAL_STATE_I_D = 0
     private const val TAG_OPERATIONAL_STATE_LABEL = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): RvcOperationalStateClusterOperationalStateStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterOperationalStateStruct {
       tlvReader.enterStructure(tlvTag)
       val operationalStateID = tlvReader.getUByte(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D))
-      val operationalStateLabel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))
-        } else {
-          Optional.empty()
-        }
-
+      val operationalStateLabel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return RvcOperationalStateClusterOperationalStateStruct(
-        operationalStateID,
-        operationalStateLabel
-      )
+      return RvcOperationalStateClusterOperationalStateStruct(operationalStateID, operationalStateLabel)
     }
   }
 }

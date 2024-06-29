@@ -17,21 +17,23 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ContentLauncherClusterBrandingInformationStruct(
-  val providerName: String,
-  val background: Optional<ContentLauncherClusterStyleInformationStruct>,
-  val logo: Optional<ContentLauncherClusterStyleInformationStruct>,
-  val progressBar: Optional<ContentLauncherClusterStyleInformationStruct>,
-  val splash: Optional<ContentLauncherClusterStyleInformationStruct>,
-  val waterMark: Optional<ContentLauncherClusterStyleInformationStruct>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ContentLauncherClusterBrandingInformationStruct (
+    val providerName: String,
+    val background: Optional<ContentLauncherClusterStyleInformationStruct>,
+    val logo: Optional<ContentLauncherClusterStyleInformationStruct>,
+    val progressBar: Optional<ContentLauncherClusterStyleInformationStruct>,
+    val splash: Optional<ContentLauncherClusterStyleInformationStruct>,
+    val waterMark: Optional<ContentLauncherClusterStyleInformationStruct>) {
+  override fun toString(): String  = buildString {
     append("ContentLauncherClusterBrandingInformationStruct {\n")
     append("\tproviderName : $providerName\n")
     append("\tbackground : $background\n")
@@ -47,25 +49,25 @@ class ContentLauncherClusterBrandingInformationStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PROVIDER_NAME), providerName)
       if (background.isPresent) {
-        val optbackground = background.get()
-        optbackground.toTlv(ContextSpecificTag(TAG_BACKGROUND), this)
-      }
+      val optbackground = background.get()
+      optbackground.toTlv(ContextSpecificTag(TAG_BACKGROUND), this)
+    }
       if (logo.isPresent) {
-        val optlogo = logo.get()
-        optlogo.toTlv(ContextSpecificTag(TAG_LOGO), this)
-      }
+      val optlogo = logo.get()
+      optlogo.toTlv(ContextSpecificTag(TAG_LOGO), this)
+    }
       if (progressBar.isPresent) {
-        val optprogressBar = progressBar.get()
-        optprogressBar.toTlv(ContextSpecificTag(TAG_PROGRESS_BAR), this)
-      }
+      val optprogressBar = progressBar.get()
+      optprogressBar.toTlv(ContextSpecificTag(TAG_PROGRESS_BAR), this)
+    }
       if (splash.isPresent) {
-        val optsplash = splash.get()
-        optsplash.toTlv(ContextSpecificTag(TAG_SPLASH), this)
-      }
+      val optsplash = splash.get()
+      optsplash.toTlv(ContextSpecificTag(TAG_SPLASH), this)
+    }
       if (waterMark.isPresent) {
-        val optwaterMark = waterMark.get()
-        optwaterMark.toTlv(ContextSpecificTag(TAG_WATER_MARK), this)
-      }
+      val optwaterMark = waterMark.get()
+      optwaterMark.toTlv(ContextSpecificTag(TAG_WATER_MARK), this)
+    }
       endStructure()
     }
   }
@@ -78,78 +80,38 @@ class ContentLauncherClusterBrandingInformationStruct(
     private const val TAG_SPLASH = 4
     private const val TAG_WATER_MARK = 5
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): ContentLauncherClusterBrandingInformationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentLauncherClusterBrandingInformationStruct {
       tlvReader.enterStructure(tlvTag)
       val providerName = tlvReader.getString(ContextSpecificTag(TAG_PROVIDER_NAME))
-      val background =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BACKGROUND))) {
-          Optional.of(
-            ContentLauncherClusterStyleInformationStruct.fromTlv(
-              ContextSpecificTag(TAG_BACKGROUND),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val logo =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LOGO))) {
-          Optional.of(
-            ContentLauncherClusterStyleInformationStruct.fromTlv(
-              ContextSpecificTag(TAG_LOGO),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val progressBar =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PROGRESS_BAR))) {
-          Optional.of(
-            ContentLauncherClusterStyleInformationStruct.fromTlv(
-              ContextSpecificTag(TAG_PROGRESS_BAR),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val splash =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SPLASH))) {
-          Optional.of(
-            ContentLauncherClusterStyleInformationStruct.fromTlv(
-              ContextSpecificTag(TAG_SPLASH),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val waterMark =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATER_MARK))) {
-          Optional.of(
-            ContentLauncherClusterStyleInformationStruct.fromTlv(
-              ContextSpecificTag(TAG_WATER_MARK),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-
+      val background = if (tlvReader.isNextTag(ContextSpecificTag(TAG_BACKGROUND))) {
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_BACKGROUND), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val logo = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LOGO))) {
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_LOGO), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val progressBar = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PROGRESS_BAR))) {
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_PROGRESS_BAR), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val splash = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SPLASH))) {
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_SPLASH), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val waterMark = if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATER_MARK))) {
+      Optional.of(ContentLauncherClusterStyleInformationStruct.fromTlv(ContextSpecificTag(TAG_WATER_MARK), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return ContentLauncherClusterBrandingInformationStruct(
-        providerName,
-        background,
-        logo,
-        progressBar,
-        splash,
-        waterMark
-      )
+      return ContentLauncherClusterBrandingInformationStruct(providerName, background, logo, progressBar, splash, waterMark)
     }
   }
 }

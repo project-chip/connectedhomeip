@@ -16,13 +16,17 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThreadNetworkDirectoryClusterNetworkChangedEvent(val extendedPanID: ULong) {
+class ThreadNetworkDirectoryClusterNetworkChangedEvent(
+  val extendedPanID: ULong
+) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDirectoryClusterNetworkChangedEvent {\n")
     append("\textendedPanID : $extendedPanID\n")
@@ -40,13 +44,10 @@ class ThreadNetworkDirectoryClusterNetworkChangedEvent(val extendedPanID: ULong)
   companion object {
     private const val TAG_EXTENDED_PAN_I_D = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): ThreadNetworkDirectoryClusterNetworkChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThreadNetworkDirectoryClusterNetworkChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val extendedPanID = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))
-
+      
       tlvReader.exitContainer()
 
       return ThreadNetworkDirectoryClusterNetworkChangedEvent(extendedPanID)

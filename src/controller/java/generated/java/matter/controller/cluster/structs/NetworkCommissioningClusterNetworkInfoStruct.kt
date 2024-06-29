@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -45,17 +46,17 @@ class NetworkCommissioningClusterNetworkInfoStruct(
       put(ContextSpecificTag(TAG_CONNECTED), connected)
       if (networkIdentifier != null) {
         if (networkIdentifier.isPresent) {
-          val optnetworkIdentifier = networkIdentifier.get()
-          put(ContextSpecificTag(TAG_NETWORK_IDENTIFIER), optnetworkIdentifier)
-        }
+        val optnetworkIdentifier = networkIdentifier.get()
+        put(ContextSpecificTag(TAG_NETWORK_IDENTIFIER), optnetworkIdentifier)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_NETWORK_IDENTIFIER))
       }
       if (clientIdentifier != null) {
         if (clientIdentifier.isPresent) {
-          val optclientIdentifier = clientIdentifier.get()
-          put(ContextSpecificTag(TAG_CLIENT_IDENTIFIER), optclientIdentifier)
-        }
+        val optclientIdentifier = clientIdentifier.get()
+        put(ContextSpecificTag(TAG_CLIENT_IDENTIFIER), optclientIdentifier)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_CLIENT_IDENTIFIER))
       }
@@ -73,37 +74,30 @@ class NetworkCommissioningClusterNetworkInfoStruct(
       tlvReader.enterStructure(tlvTag)
       val networkID = tlvReader.getByteArray(ContextSpecificTag(TAG_NETWORK_I_D))
       val connected = tlvReader.getBoolean(ContextSpecificTag(TAG_CONNECTED))
-      val networkIdentifier =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_IDENTIFIER))) {
-            Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_NETWORK_IDENTIFIER)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_NETWORK_IDENTIFIER))
-          null
-        }
-      val clientIdentifier =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTIFIER))) {
-            Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTIFIER)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CLIENT_IDENTIFIER))
-          null
-        }
-
+      val networkIdentifier = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_IDENTIFIER))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_NETWORK_IDENTIFIER)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_NETWORK_IDENTIFIER))
+      null
+    }
+      val clientIdentifier = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTIFIER))) {
+      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTIFIER)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_CLIENT_IDENTIFIER))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return NetworkCommissioningClusterNetworkInfoStruct(
-        networkID,
-        connected,
-        networkIdentifier,
-        clientIdentifier
-      )
+      return NetworkCommissioningClusterNetworkInfoStruct(networkID, connected, networkIdentifier, clientIdentifier)
     }
   }
 }

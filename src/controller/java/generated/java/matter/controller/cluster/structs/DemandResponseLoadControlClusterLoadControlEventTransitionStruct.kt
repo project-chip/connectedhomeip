@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -82,80 +83,39 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
     private const val TAG_POWER_SAVINGS_CONTROL = 5
     private const val TAG_HEATING_SOURCE_CONTROL = 6
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DemandResponseLoadControlClusterLoadControlEventTransitionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandResponseLoadControlClusterLoadControlEventTransitionStruct {
       tlvReader.enterStructure(tlvTag)
       val duration = tlvReader.getUShort(ContextSpecificTag(TAG_DURATION))
       val control = tlvReader.getUShort(ContextSpecificTag(TAG_CONTROL))
-      val temperatureControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPERATURE_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterTemperatureControlStruct.fromTlv(
-              ContextSpecificTag(TAG_TEMPERATURE_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val averageLoadControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterAverageLoadControlStruct.fromTlv(
-              ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val dutyCycleControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterDutyCycleControlStruct.fromTlv(
-              ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val powerSavingsControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterPowerSavingsControlStruct.fromTlv(
-              ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val heatingSourceControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL))) {
-          Optional.of(
-            DemandResponseLoadControlClusterHeatingSourceControlStruct.fromTlv(
-              ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL),
-              tlvReader
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-
+      val temperatureControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPERATURE_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterTemperatureControlStruct.fromTlv(ContextSpecificTag(TAG_TEMPERATURE_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val averageLoadControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterAverageLoadControlStruct.fromTlv(ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val dutyCycleControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterDutyCycleControlStruct.fromTlv(ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val powerSavingsControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterPowerSavingsControlStruct.fromTlv(ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val heatingSourceControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL))) {
+      Optional.of(DemandResponseLoadControlClusterHeatingSourceControlStruct.fromTlv(ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
-        duration,
-        control,
-        temperatureControl,
-        averageLoadControl,
-        dutyCycleControl,
-        powerSavingsControl,
-        heatingSourceControl
-      )
+      return DemandResponseLoadControlClusterLoadControlEventTransitionStruct(duration, control, temperatureControl, averageLoadControl, dutyCycleControl, powerSavingsControl, heatingSourceControl)
     }
   }
 }

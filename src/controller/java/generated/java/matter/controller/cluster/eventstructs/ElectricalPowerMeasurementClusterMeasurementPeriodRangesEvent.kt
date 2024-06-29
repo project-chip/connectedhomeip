@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -24,8 +25,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent(
-  val ranges:
-    List<matter.controller.cluster.structs.ElectricalPowerMeasurementClusterMeasurementRangeStruct>
+  val ranges: List<matter.controller.cluster.structs.ElectricalPowerMeasurementClusterMeasurementRangeStruct>
 ) {
   override fun toString(): String = buildString {
     append("ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent {\n")
@@ -48,26 +48,16 @@ class ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent(
   companion object {
     private const val TAG_RANGES = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent {
       tlvReader.enterStructure(tlvTag)
-      val ranges =
-        buildList<
-          matter.controller.cluster.structs.ElectricalPowerMeasurementClusterMeasurementRangeStruct
-        > {
-          tlvReader.enterArray(ContextSpecificTag(TAG_RANGES))
-          while (!tlvReader.isEndOfContainer()) {
-            this.add(
-              matter.controller.cluster.structs
-                .ElectricalPowerMeasurementClusterMeasurementRangeStruct
-                .fromTlv(AnonymousTag, tlvReader)
-            )
-          }
-          tlvReader.exitContainer()
+      val ranges = buildList <matter.controller.cluster.structs.ElectricalPowerMeasurementClusterMeasurementRangeStruct> {
+        tlvReader.enterArray(ContextSpecificTag(TAG_RANGES))
+        while(!tlvReader.isEndOfContainer()) {
+          this.add(matter.controller.cluster.structs.ElectricalPowerMeasurementClusterMeasurementRangeStruct.fromTlv(AnonymousTag, tlvReader))
         }
-
+        tlvReader.exitContainer()
+      }
+      
       tlvReader.exitContainer()
 
       return ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent(ranges)

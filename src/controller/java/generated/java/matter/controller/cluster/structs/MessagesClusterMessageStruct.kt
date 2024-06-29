@@ -65,10 +65,10 @@ class MessagesClusterMessageStruct(
       if (responses.isPresent) {
         val optresponses = responses.get()
         startArray(ContextSpecificTag(TAG_RESPONSES))
-        for (item in optresponses.iterator()) {
-          item.toTlv(AnonymousTag, this)
-        }
-        endArray()
+      for (item in optresponses.iterator()) {
+        item.toTlv(AnonymousTag, this)
+      }
+      endArray()
       }
       endStructure()
     }
@@ -88,47 +88,34 @@ class MessagesClusterMessageStruct(
       val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_I_D))
       val priority = tlvReader.getUByte(ContextSpecificTag(TAG_PRIORITY))
       val messageControl = tlvReader.getUByte(ContextSpecificTag(TAG_MESSAGE_CONTROL))
-      val startTime =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_START_TIME))
-          null
-        }
-      val duration =
-        if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_DURATION))
-          null
-        }
+      val startTime = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_START_TIME))
+      null
+    }
+      val duration = if (!tlvReader.isNull()) {
+      tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_DURATION))
+      null
+    }
       val messageText = tlvReader.getString(ContextSpecificTag(TAG_MESSAGE_TEXT))
-      val responses =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RESPONSES))) {
-          Optional.of(
-            buildList<MessagesClusterMessageResponseOptionStruct> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_RESPONSES))
-              while (!tlvReader.isEndOfContainer()) {
-                add(MessagesClusterMessageResponseOptionStruct.fromTlv(AnonymousTag, tlvReader))
-              }
-              tlvReader.exitContainer()
-            }
-          )
-        } else {
-          Optional.empty()
-        }
-
+      val responses = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RESPONSES))) {
+      Optional.of(buildList<MessagesClusterMessageResponseOptionStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_RESPONSES))
+      while(!tlvReader.isEndOfContainer()) {
+        add(MessagesClusterMessageResponseOptionStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    })
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return MessagesClusterMessageStruct(
-        messageID,
-        priority,
-        messageControl,
-        startTime,
-        duration,
-        messageText,
-        responses
-      )
+      return MessagesClusterMessageStruct(messageID, priority, messageControl, startTime, duration, messageText, responses)
     }
   }
 }

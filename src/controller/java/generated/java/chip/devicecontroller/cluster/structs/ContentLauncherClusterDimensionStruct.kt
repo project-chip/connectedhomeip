@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ContentLauncherClusterDimensionStruct(
-  val width: Double,
-  val height: Double,
-  val metric: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ContentLauncherClusterDimensionStruct (
+    val width: Double,
+    val height: Double,
+    val metric: UInt) {
+  override fun toString(): String  = buildString {
     append("ContentLauncherClusterDimensionStruct {\n")
     append("\twidth : $width\n")
     append("\theight : $height\n")
@@ -50,12 +53,12 @@ class ContentLauncherClusterDimensionStruct(
     private const val TAG_HEIGHT = 1
     private const val TAG_METRIC = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterDimensionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentLauncherClusterDimensionStruct {
       tlvReader.enterStructure(tlvTag)
       val width = tlvReader.getDouble(ContextSpecificTag(TAG_WIDTH))
       val height = tlvReader.getDouble(ContextSpecificTag(TAG_HEIGHT))
       val metric = tlvReader.getUInt(ContextSpecificTag(TAG_METRIC))
-
+      
       tlvReader.exitContainer()
 
       return ContentLauncherClusterDimensionStruct(width, height, metric)
