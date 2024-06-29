@@ -13,7 +13,6 @@ public class CommandResponseHolder {
   private Map<Long, Map<Long, String>> responseValues = new HashMap<>();
   private static final String TAG = "CommandResponseHolder";
   private static final Long DEFAULT_COMMAND = -1L;
-  private ContentResolver contentResolver;
 
   private static CommandResponseHolder instance = new CommandResponseHolder();
 
@@ -35,7 +34,6 @@ public class CommandResponseHolder {
         Clusters.AccountLogin.Id,
         Clusters.AccountLogin.Commands.GetSetupPIN.ID,
         "{\"0\":\"20202021\"}");
-//    "{\"0\":\""+ Settings.Secure.getInt(contentResolver, "matter_pin_code", 20202021) +"\"}");
   };
 
   public static CommandResponseHolder getInstance() {
