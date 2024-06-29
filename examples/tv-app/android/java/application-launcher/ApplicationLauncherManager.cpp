@@ -36,7 +36,8 @@ using namespace chip::Uint8;
 void emberAfApplicationLauncherClusterInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Android App: ApplicationLauncher::PostClusterInit");
-    if (endpoint > kLocalVideoPlayerEndpointId) {
+    if (endpoint > kLocalVideoPlayerEndpointId)
+    {
         ChipLogProgress(Zcl, "TV Android App: ignore setting the delegate for endpoints larger than 1");
         return;
     }
@@ -45,7 +46,8 @@ void emberAfApplicationLauncherClusterInitCallback(chip::EndpointId endpoint)
 
 void ApplicationLauncherManager::NewManager(jint endpoint, jobject manager)
 {
-    if (endpoint > kLocalVideoPlayerEndpointId) {
+    if (endpoint > kLocalVideoPlayerEndpointId)
+    {
         ChipLogProgress(Zcl, "TV Android App: ignore setting the delegate for endpoints larger than 1");
         return;
     }
@@ -118,16 +120,17 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
 
     {
         // UtfString accepts const char * data
-        chip::UtfString jByteData(env, reinterpret_cast<const char*>(data.data()));
+        chip::UtfString jByteData(env, reinterpret_cast<const char *>(data.data()));
 
         chip::UtfString jappId(env, application.applicationID);
 
         // Create an instance of Application
-        jobject appObject = env->NewObject(mApplicationClass, mCreateApplicationMethod, static_cast<jint>(application.catalogVendorID), jappId.jniValue());
+        jobject appObject = env->NewObject(mApplicationClass, mCreateApplicationMethod,
+                                           static_cast<jint>(application.catalogVendorID), jappId.jniValue());
         VerifyOrReturn(appObject != nullptr, ChipLogError(Zcl, "Failed to create Application object"));
 
-        jobject resp = env->CallObjectMethod(mApplicationLauncherManagerObject.ObjectRef(), mLaunchAppMethod, appObject,
-                                             jByteData.jniValue());
+        jobject resp =
+            env->CallObjectMethod(mApplicationLauncherManagerObject.ObjectRef(), mLaunchAppMethod, appObject, jByteData.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ApplicationLauncherManager::LaunchApp");
@@ -181,7 +184,8 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
         chip::UtfString jappId(env, application.applicationID);
 
         // Create an instance of Application
-        jobject appObject = env->NewObject(mApplicationClass, mCreateApplicationMethod, static_cast<jint>(application.catalogVendorID), jappId.jniValue());
+        jobject appObject = env->NewObject(mApplicationClass, mCreateApplicationMethod,
+                                           static_cast<jint>(application.catalogVendorID), jappId.jniValue());
         VerifyOrReturn(appObject != nullptr, ChipLogError(Zcl, "Failed to create Application object"));
 
         jobject resp = env->CallObjectMethod(mApplicationLauncherManagerObject.ObjectRef(), mStopAppMethod, appObject);
@@ -238,7 +242,8 @@ void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherRes
         chip::UtfString jappId(env, application.applicationID);
 
         // Create an instance of Application
-        jobject appObject = env->NewObject(mApplicationClass, mCreateApplicationMethod, static_cast<jint>(application.catalogVendorID), jappId.jniValue());
+        jobject appObject = env->NewObject(mApplicationClass, mCreateApplicationMethod,
+                                           static_cast<jint>(application.catalogVendorID), jappId.jniValue());
         VerifyOrReturn(appObject != nullptr, ChipLogError(Zcl, "Failed to create Application object"));
 
         jobject resp = env->CallObjectMethod(mApplicationLauncherManagerObject.ObjectRef(), mHideAppMethod, appObject);
@@ -293,7 +298,8 @@ void ApplicationLauncherManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mLaunchAppMethod = env->GetMethodID(applicationLauncherClass, "launchApp", "(Lcom/matter/tv/server/tvapp/"
+    mLaunchAppMethod = env->GetMethodID(applicationLauncherClass, "launchApp",
+                                        "(Lcom/matter/tv/server/tvapp/"
                                         "Application;Ljava/lang/String;)Lcom/matter/tv/server/tvapp/LauncherResponse;");
     if (mLaunchAppMethod == nullptr)
     {
@@ -301,16 +307,18 @@ void ApplicationLauncherManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mStopAppMethod = env->GetMethodID(applicationLauncherClass, "stopApp", "(Lcom/matter/tv/server/tvapp/"
-                                        "Application;)Lcom/matter/tv/server/tvapp/LauncherResponse;");
+    mStopAppMethod = env->GetMethodID(applicationLauncherClass, "stopApp",
+                                      "(Lcom/matter/tv/server/tvapp/"
+                                      "Application;)Lcom/matter/tv/server/tvapp/LauncherResponse;");
     if (mStopAppMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ApplicationLauncherManager 'stopApp' method");
         env->ExceptionClear();
     }
 
-    mHideAppMethod = env->GetMethodID(applicationLauncherClass, "hideApp", "(Lcom/matter/tv/server/tvapp/"
-                                        "Application;)Lcom/matter/tv/server/tvapp/LauncherResponse;");
+    mHideAppMethod = env->GetMethodID(applicationLauncherClass, "hideApp",
+                                      "(Lcom/matter/tv/server/tvapp/"
+                                      "Application;)Lcom/matter/tv/server/tvapp/LauncherResponse;");
     if (mHideAppMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ApplicationLauncherManager 'hideApp' method");

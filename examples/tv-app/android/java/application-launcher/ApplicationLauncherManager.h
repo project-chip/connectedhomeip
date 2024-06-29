@@ -46,10 +46,10 @@ public:
     void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const ApplicationType & application) override;
 
     chip::JniGlobalReference mApplicationLauncherManagerObject;
-    jmethodID mGetCatalogListMethod               = nullptr;
-    jmethodID mLaunchAppMethod                    = nullptr;
-    jmethodID mStopAppMethod                      = nullptr;
-    jmethodID mHideAppMethod                      = nullptr;
-    jmethodID mCreateApplicationMethod            = nullptr;
-    jclass mApplicationClass                      = nullptr;
+    jmethodID mGetCatalogListMethod    = nullptr;
+    jmethodID mLaunchAppMethod         = nullptr;
+    jmethodID mStopAppMethod           = nullptr;
+    jmethodID mHideAppMethod           = nullptr;
+    jmethodID mCreateApplicationMethod = nullptr;
+    jclass mApplicationClass           = nullptr;
 };
