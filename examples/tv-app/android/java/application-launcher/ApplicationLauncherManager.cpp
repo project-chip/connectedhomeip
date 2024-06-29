@@ -116,7 +116,7 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
 
     env->ExceptionClear();
 
-    {   
+    {
         // UtfString accepts const char * data
         chip::UtfString jByteData(env, reinterpret_cast<const char*>(data.data()));
 
@@ -126,7 +126,7 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
         jobject appObject = env->NewObject(mApplicationClass, mCreateApplicationMethod, static_cast<jint>(application.catalogVendorID), jappId.jniValue());
         VerifyOrReturn(appObject != nullptr, ChipLogError(Zcl, "Failed to create Application object"));
 
-        jobject resp = env->CallObjectMethod(mApplicationLauncherManagerObject.ObjectRef(), mLaunchAppMethod, appObject, 
+        jobject resp = env->CallObjectMethod(mApplicationLauncherManagerObject.ObjectRef(), mLaunchAppMethod, appObject,
                                              jByteData.jniValue());
         if (env->ExceptionCheck())
         {
@@ -177,7 +177,7 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
 
     env->ExceptionClear();
 
-    {   
+    {
         chip::UtfString jappId(env, application.applicationID);
 
         // Create an instance of Application
@@ -234,7 +234,7 @@ void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherRes
 
     env->ExceptionClear();
 
-    {   
+    {
         chip::UtfString jappId(env, application.applicationID);
 
         // Create an instance of Application
