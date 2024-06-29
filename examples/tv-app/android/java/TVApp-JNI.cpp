@@ -17,7 +17,6 @@
  */
 
 #include "TvApp-JNI.h"
-#include "application-launcher/ApplicationLauncherManager.h"
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
 #include "ContentLauncherManager.h"
@@ -32,6 +31,7 @@
 #include "MyUserPrompter-JNI.h"
 #include "OnOffManager.h"
 #include "WakeOnLanManager.h"
+#include "application-launcher/ApplicationLauncherManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>

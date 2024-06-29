@@ -39,12 +39,12 @@
 #include "../include/content-launcher/AppContentLauncherManager.h"
 #include "../include/media-playback/AppMediaPlaybackManager.h"
 #include "../include/target-navigator/TargetNavigatorManager.h"
-#include "application-launcher/ApplicationLauncherManager.h"
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
 #include "ContentAppAttributeDelegate.h"
 #include "ContentAppCommandDelegate.h"
 #include "KeypadInputManager.h"
+#include "application-launcher/ApplicationLauncherManager.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
