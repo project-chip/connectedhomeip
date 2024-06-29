@@ -47,7 +47,8 @@ public class TvApp {
 
   public native void setKeypadInputManager(int endpoint, KeypadInputManager manager);
 
-  public native void setApplicationLauncherManager(int endpoint, ApplicationLauncherManager manager);
+  public native void setApplicationLauncherManager(
+      int endpoint, ApplicationLauncherManager manager);
 
   public native void setWakeOnLanManager(int endpoint, WakeOnLanManager manager);
 

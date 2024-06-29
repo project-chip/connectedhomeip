@@ -195,7 +195,6 @@ public class AppPlatformService {
     }
   }
 
-
   private Collection<ContentAppSupportedCluster> mapSupportedClusters(
       Collection<SupportedCluster> supportedClusters) {
     return supportedClusters

@@ -1,8 +1,5 @@
 package com.example.contentapp;
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.provider.Settings;
 import android.util.Log;
 import com.matter.tv.app.api.Clusters;
 import java.util.HashMap;
