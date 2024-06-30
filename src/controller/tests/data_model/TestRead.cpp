@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 #include "system/SystemClock.h"
 #include "transport/SecureSession.h"
