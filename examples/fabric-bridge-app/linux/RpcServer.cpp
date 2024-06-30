@@ -70,8 +70,8 @@ pw::Status FabricBridge::RemoveSynchronizedDevice(const chip_rpc_SynchronizedDev
     NodeId nodeId = request.node_id;
     ChipLogProgress(NotSpecified, "Received RemoveSynchronizedDevice: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
-    int result = DeviceMgr().RemoveDeviceByNodeId(nodeId);
-    if (result == -1)
+    int removed_idx = DeviceMgr().RemoveDeviceByNodeId(nodeId);
+    if (removed_idx < 0)
     {
         ChipLogError(NotSpecified, "Failed to remove device with nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
         return pw::Status::NotFound();
