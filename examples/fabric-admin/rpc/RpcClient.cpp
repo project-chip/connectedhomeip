@@ -65,7 +65,7 @@ void OnRemoveDeviceResponseCompleted(const pw_protobuf_Empty & response, pw::Sta
     }
     else
     {
-        ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice RPC call failed with status: %d\n", status.code());
+        ChipLogProgress(NotSpecified, "RemoveSynchronizedDevice RPC call failed with status: %d", status.code());
     }
 }
 
