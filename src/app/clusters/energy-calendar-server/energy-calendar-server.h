@@ -62,9 +62,9 @@ public:
         DataModel::Nullable<uint32_t> EventID);
 
     Protocols::InteractionModel::Status SetCalendarPeriod(DataModel::Nullable<uint32_t> StartDate,
-        DataModel::DecodableList<Structs::CalendarPeriodStruct::Type> CalendarPeriods);
+        DataModel::List<Structs::CalendarPeriodStruct::Type> CalendarPeriods);
 
-    Protocols::InteractionModel::Status SetSpecialDays(DataModel::DecodableList<Structs::DayStruct::Type> SpecialDays);
+    Protocols::InteractionModel::Status SetSpecialDays(DataModel::List<Structs::DayStruct::Type> SpecialDays);
 
     Protocols::InteractionModel::Status SetCurrentAndNextDays(DataModel::Nullable<Structs::DayStruct::Type> CurrentDay,
         DataModel::Nullable<Structs::DayStruct::Type> NextDay);
@@ -74,7 +74,7 @@ public:
 
     Protocols::InteractionModel::Status UpdateDays(void);
 
-    virtual Protocols::InteractionModel::Status GetDays(EndpointId ep, DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
+    virtual CHIP_ERROR GetDays(EndpointId ep, DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
         DataModel::Nullable<Structs::DayStruct::Type> &NextDay) = 0;
 
     DataModel::Nullable<uint32_t> GetCalendarID(void) { return calendarID; }
@@ -82,8 +82,8 @@ public:
     DataModel::Nullable<uint32_t> GetProviderID(void) { return providerID; }
     DataModel::Nullable<uint32_t> GetEventID(void) { return eventID; }
     DataModel::Nullable<uint32_t> GetStartDate(void) { return startDate; }
-    DataModel::DecodableList<Structs::CalendarPeriodStruct::Type> GetCalendarPeriods(void) { return calendarPeriods; }
-    DataModel::DecodableList<Structs::DayStruct::Type> GetSpecialDays(void) { return specialDays; }
+    DataModel::List<Structs::CalendarPeriodStruct::Type> GetCalendarPeriods(void) { return calendarPeriods; }
+    DataModel::List<Structs::DayStruct::Type> GetSpecialDays(void) { return specialDays; }
     DataModel::Nullable<Structs::DayStruct::Type> GetCurrentDay(void) { return currentDay; }
     DataModel::Nullable<Structs::DayStruct::Type> GetNextDay(void) { return nextDay; }
     //DataModel::Nullable<Structs::TransitionStruct::Type> GetCurrentTransition(void);
@@ -98,8 +98,8 @@ private:
     DataModel::Nullable<uint32_t> providerID;
     DataModel::Nullable<uint32_t> eventID;
     DataModel::Nullable<uint32_t> startDate;
-    DataModel::DecodableList<Structs::CalendarPeriodStruct::Type> calendarPeriods;
-    DataModel::DecodableList<Structs::DayStruct::Type> specialDays;
+    DataModel::List<Structs::CalendarPeriodStruct::Type> calendarPeriods;
+    DataModel::List<Structs::DayStruct::Type> specialDays;
     DataModel::Nullable<Structs::DayStruct::Type> currentDay;
     DataModel::Nullable<Structs::DayStruct::Type> nextDay;
     //Structs::TransitionStruct::Type currentTransition;

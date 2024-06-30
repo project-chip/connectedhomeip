@@ -35,6 +35,7 @@
 #include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
+#include "energy-calendar-instance.h"
 
 #include <string>
 
@@ -189,6 +190,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         std::string device    = self->mJsonValue["Device"].asString();
         std::string operation = self->mJsonValue["Operation"].asString();
         self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
+    }
+    else if (name == "EnergyCalendar")
+    {
+        self->OnEnergyCalendarHandler(self->mJsonValue);
     }
     else
     {
@@ -493,6 +498,12 @@ void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, 
         ChipLogDetail(NotSpecified, "Invalid operation : %s", operation.c_str());
         return;
     }
+}
+
+void AllClustersAppCommandHandler::OnEnergyCalendarHandler(Json::Value param)
+{
+    EnergyCalendar::CalendarProviderInstance *provider = EnergyCalendar::GetProvider();
+    provider->LoadJson(param);
 }
 
 void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)

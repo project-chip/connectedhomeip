@@ -27,7 +27,6 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 #include <app/clusters/energy-calendar-server/energy-calendar-server.h>
 #include <json/value.h>
@@ -45,7 +44,7 @@ class CalendarProviderInstance : public CalendarProvider
 public:
    CalendarProviderInstance() : CalendarProvider(1) {}
    CalendarProviderInstance(EndpointId ep) : CalendarProvider(ep) {}
-   ~CalendarProviderInstance() { }
+   ~CalendarProviderInstance();
 
    void Init(void);
 
@@ -53,24 +52,41 @@ public:
 
    CHIP_ERROR LoadJson(Json::Value & root);
 
-   void UpdateDays(uint32_t time);
-   void MoveToNextDay(void);
-   void UpdatePeak(uint32_t time);
-   void MoveToNextPeak(void);
-
     /* owerride */
-    Protocols::InteractionModel::Status GetDays(EndpointId ep, DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
+    CHIP_ERROR GetDays(EndpointId ep, DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
         DataModel::Nullable<Structs::DayStruct::Type> &NextDay) override;
 
 private:
-    uint32_t date;
+    uint32_t mDate;
     uint32_t time;
 
+    // Attributes contaners allocated memory
+    DataModel::List<Structs::CalendarPeriodStruct::Type> mCalendarPeriods;
+    DataModel::List<Structs::DayStruct::Type> mSpecialDays;
+    Structs::DayStruct::Type mCurrentDay;
+    Structs::DayStruct::Type mNextDay;
+
+
     DataModel::Nullable<Structs::DayStruct::Type> GetDay(uint32_t date);
-    bool CheckPeriods(DataModel::DecodableList<Structs::CalendarPeriodStruct::Type> periods);
-    bool CheckSpecialDays(DataModel::DecodableList<Structs::DayStruct::Type> days);
+    bool CheckSpecialDays();
     bool CheckDay(const Structs::DayStruct::Type &day);
+    bool CheckPeriods();
+
+    void JsonToCalendarPeriodStruct(Json::Value & root, Structs::CalendarPeriodStruct::Type &value);
+    void JsonToDayStruct(Json::Value & root, Structs::DayStruct::Type &value);
+    void JsonToPeakPeriodStruct(Json::Value & root, Structs::PeakPeriodStruct::Type &value);
+
+    void JsonToCalendarPeriodStructList(Json::Value & root, DataModel::List<Structs::CalendarPeriodStruct::Type> &value);
+    void JsonToDayStructList(Json::Value & root, DataModel::List<Structs::DayStruct::Type> &value);
+    void JsonToTransitionStructList(Json::Value & root, DataModel::List<Structs::TransitionStruct::Type> &value);
+
+    void FreeMemoryDayStruct(Structs::DayStruct::Type &value);
+    void FreeMemoryDayStructList(DataModel::List<Structs::DayStruct::Type> &value);
+    void FreeMemoryCalendarPeriodStruct(Structs::CalendarPeriodStruct::Type &value);
+    void FreeMemoryCalendarPeriodStructList(DataModel::List<Structs::CalendarPeriodStruct::Type> &value);
 };
+
+CalendarProviderInstance *GetProvider();
 
 } // namespace EnergyCalendar
 } // namespace Clusters
