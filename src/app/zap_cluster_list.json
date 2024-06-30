@@ -225,8 +225,12 @@
         "DISHWASHER_MODE_CLUSTER": [
             "mode-base-server"
         ],
-        "ENERGY_CALENDAR_CLUSTER": [],
-        "METER_IDENTIFICATION_CLUSTER": [],
+        "ENERGY_CALENDAR_CLUSTER": [
+            "energy-calendar-server"
+        ],
+        "METER_IDENTIFICATION_CLUSTER": [
+            "meter-identification-server"
+        ],
         "MICROWAVE_OVEN_MODE_CLUSTER": [
             "mode-base-server"
         ],

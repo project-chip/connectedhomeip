@@ -680,6 +680,13 @@
             "NeutralCurrent",
             "FeatureMap"
         ],
+        "Energy Calendar": [
+            "CurrentDay",
+            "NextDay",
+            "CurrentTransition",
+            "CurrentPeakPeriod",
+            "NextPeakPeriod"
+        ],
         "Power Topology": [
             "FeatureMap"
         ],
