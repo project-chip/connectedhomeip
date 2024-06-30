@@ -331,7 +331,10 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
         uint32_t messageSize = LittleEndian::Get32(messageSizeBuf);
         if (messageSize >= kMaxTCPMessageSize)
         {
-            // This message is too long for upper layers.
+            // Message is too big for this node to process. Disconnect from peer.
+            ChipLogError(Inet, "Received TCP message of length %" PRIu32 " exceeds limit.", messageSize);
+            CloseConnectionInternal(state, CHIP_ERROR_MESSAGE_TOO_LONG, SuppressCallback::No);
+
             return CHIP_ERROR_MESSAGE_TOO_LONG;
         }
         // The subtraction will not underflow because we successfully read kPacketSizeBytes.

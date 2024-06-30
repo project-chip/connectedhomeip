@@ -33,8 +33,8 @@ assert(chip_build_tests)
 #   ]
 #
 #   test_sources = [
-#     "TestFoo.cpp",    # Files are parsed for `CHIP_REGISTER_TEST_SUITE(...)`
-#     "TestBar.cpp",    # and a driver is created automatically
+#     "TestFoo.cpp",
+#     "TestBar.cpp",
 #   ]
 #
 #   public_deps = [
@@ -94,9 +94,12 @@ template("chip_test_suite") {
 
     deps = [ dir_pw_unit_test ]
 
-    if (current_os != "zephyr" && current_os != "mbed") {
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "efr32") {
       # Depend on stdio logging, and have it take precedence over the default platform backend
-      public_deps += [ "${chip_root}/src/platform/logging:force_stdio" ]
+      public_deps += [ "${chip_root}/src/platform/logging:stdio" ]
+    } else {
+      public_deps += [ "${chip_root}/src/platform/logging:default" ]
     }
   }
   if (chip_link_tests) {
@@ -149,103 +152,6 @@ template("chip_test_suite") {
             "${_test}Driver.cpp",
           ]
           output_dir = _test_output_dir
-        }
-        tests += [ _test ]
-      }
-    }
-
-    group(_suite_name) {
-      deps = []
-      foreach(_test, tests) {
-        deps += [ ":${_test}" ]
-      }
-    }
-
-    if (chip_pw_run_tests) {
-      group("${_suite_name}_run") {
-        deps = []
-        foreach(_test, tests) {
-          deps += [ ":${_test}.run" ]
-        }
-      }
-    }
-  } else {
-    group(_suite_name) {
-      deps = [ ":${_suite_name}.lib" ]
-    }
-  }
-}
-
-# TODO [PW_MIGRATION]: remove this once transition away from nlunit-test is completed
-template("chip_test_suite_using_nltest") {
-  _suite_name = target_name
-
-  # Ensures that the common library has sources containing both common
-  # and individual unit tests.
-  if (!defined(invoker.sources)) {
-    invoker.sources = []
-  }
-
-  if (defined(invoker.test_sources)) {
-    invoker.sources += invoker.test_sources
-  }
-
-  if (chip_build_test_static_libraries) {
-    _target_type = "static_library"
-  } else {
-    _target_type = "source_set"
-  }
-  target(_target_type, "${_suite_name}.lib") {
-    forward_variables_from(invoker, "*", [ "tests" ])
-
-    output_dir = "${root_out_dir}/lib"
-
-    if (!defined(invoker.public_deps)) {
-      public_deps = []
-    }
-
-    if (current_os != "zephyr" && current_os != "mbed") {
-      # Depend on stdio logging, and have it take precedence over the default platform backend
-      public_deps += [ "${chip_root}/src/platform/logging:force_stdio" ]
-    }
-  }
-  if (chip_link_tests) {
-    tests = []
-
-    if (defined(invoker.test_sources)) {
-      foreach(_test, invoker.test_sources) {
-        _test_name = string_replace(_test, ".cpp", "")
-
-        _driver_name = "${root_gen_dir}/${_test_name}.driver.cpp"
-
-        action("${_test_name}_generate_driver") {
-          script = "${chip_root}/scripts/gen_test_driver.py"
-
-          inputs = [ _test ]
-          outputs = [ _driver_name ]
-          args = [
-            "--input_file=" + rebase_path(_test, root_build_dir),
-            "--output_file=" + rebase_path(_driver_name, root_build_dir),
-          ]
-        }
-
-        chip_test(_test_name) {
-          sources = [ _driver_name ]
-          public_deps = [
-            ":${_suite_name}.lib",
-            ":${_test_name}_generate_driver",
-          ]
-        }
-        tests += [ _test_name ]
-      }
-    }
-
-    if (defined(invoker.tests)) {
-      foreach(_test, invoker.tests) {
-        chip_test(_test) {
-          sources = [ "${_test}Driver.cpp" ]
-
-          public_deps = [ ":${_suite_name}.lib" ]
         }
         tests += [ _test ]
       }

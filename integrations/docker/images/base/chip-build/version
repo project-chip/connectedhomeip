@@ -1,1 +1,1 @@
-54 : [Telink] Update Docker image (Zephyr update)
+62 : Fix ESP32 qemu build

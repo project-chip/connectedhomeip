@@ -25,7 +25,15 @@
 class DeviceManager
 {
 public:
-    DeviceManager();
+    DeviceManager() = default;
+
+    /**
+     * @brief Initializes the DeviceManager.
+     *
+     * This function sets up the initial state of the DeviceManager, clearing
+     * any existing devices and setting the starting dynamic endpoint ID.
+     */
+    void Init();
 
     /**
      * @brief Adds a device to a dynamic endpoint.
@@ -36,15 +44,10 @@ public:
      * dynamic endpoint; otherwise, it returns -1.
      *
      * @param dev A pointer to the device to be added.
-     * @param ep A pointer to the endpoint type.
-     * @param deviceTypeList A span containing the list of device types.
-     * @param dataVersionStorage A span containing the data version storage.
      * @param parentEndpointId The parent endpoint ID. Defaults to an invalid endpoint ID.
      * @return int The index of the dynamic endpoint if successful, -1 otherwise.
      */
-    int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const chip::Span<const EmberAfDeviceType> & deviceTypeList,
-                          const chip::Span<chip::DataVersion> & dataVersionStorage,
-                          chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
+    int AddDeviceEndpoint(Device * dev, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
 
     /**
      * @brief Removes a device from a dynamic endpoint.
@@ -59,10 +62,58 @@ public:
      */
     int RemoveDeviceEndpoint(Device * dev);
 
-    Device * GetDevice(uint16_t index) const;
+    /**
+     * @brief Gets a device from its endpoint ID.
+     *
+     * This function iterates through the available devices and returns the device that matches the
+     * specified endpoint ID. If no device matches the endpoint ID, it returns nullptr.
+     *
+     * @param endpointId The endpoint ID of the device to be retrieved.
+     * @return Device* A pointer to the device if found, nullptr otherwise.
+     */
+    Device * GetDevice(chip::EndpointId endpointId) const;
+
+    /**
+     * @brief Gets a device from its NodeId.
+     *
+     * This function iterates through the available devices and returns the device that matches the
+     * specified NodeId. If no device matches the NodeId, it returns nullptr.
+     *
+     * @param nodeId The NodeId of the device to be retrieved.
+     * @return Device* A pointer to the device if found, nullptr otherwise.
+     */
+    Device * GetDeviceByNodeId(chip::NodeId nodeId) const;
+
+    /**
+     * @brief Removes a device from a dynamic endpoint by its NodeId.
+     *
+     * This function attempts to remove a device from a dynamic endpoint by iterating through the
+     * available endpoints and checking if the device matches the specified NodeId. If the device is
+     * found, it clears the dynamic endpoint, logs the removal, and returns the index of the removed
+     * endpoint. If the device is not found, it returns -1.
+     *
+     * @param nodeId The NodeId of the device to be removed.
+     * @return int The index of the removed dynamic endpoint if successful, -1 otherwise.
+     */
+    int RemoveDeviceByNodeId(chip::NodeId nodeId);
 
 private:
+    friend DeviceManager & DeviceMgr();
+
+    static DeviceManager sInstance;
+
     chip::EndpointId mCurrentEndpointId;
     chip::EndpointId mFirstDynamicEndpointId;
     Device * mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 };
+
+/**
+ * Returns the public interface of the DeviceManager singleton object.
+ *
+ * Applications should use this to access features of the DeviceManager
+ * object.
+ */
+inline DeviceManager & DeviceMgr()
+{
+    return DeviceManager::sInstance;
+}

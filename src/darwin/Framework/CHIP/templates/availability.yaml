@@ -9690,5 +9690,12 @@
   provisional:
       clusters:
           # Targeting Fall 2024
+          - ServiceArea
+          - ThreadBorderRouterManagement
           - ThreadNetworkDirectory
           - WiFiNetworkManagement
+      bitmap values:
+          Switch:
+              Feature:
+                  # Targeting Fall 2024
+                  - ActionSwitch

@@ -682,7 +682,9 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     EXPECT_EQ(err, CHIP_ERROR_MESSAGE_TOO_LONG);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 0);
 
-    gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+    // The receipt of a message exceeding the allowed size should have
+    // closed the connection.
+    EXPECT_EQ(TestAccess::GetEndpoint(state), nullptr);
 }
 
 } // namespace

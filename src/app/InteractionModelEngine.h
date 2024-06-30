@@ -31,7 +31,7 @@
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
-#include <app/CommandHandler.h>
+#include <app/CommandHandlerImpl.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
@@ -87,7 +87,7 @@ namespace app {
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandResponseSender::Callback,
-                               public CommandHandler::Callback,
+                               public CommandHandlerImpl::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
@@ -419,7 +419,7 @@ private:
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandResponseSender & apResponderObj) override;
-    void OnDone(CommandHandler & apCommandObj) override;
+    void OnDone(CommandHandlerImpl & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
     void TryToResumeSubscriptions();
@@ -499,7 +499,7 @@ private:
     Status OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                    System::PacketBufferHandle && aPayload);
 
-    void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+    void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 

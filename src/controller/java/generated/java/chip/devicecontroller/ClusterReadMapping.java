@@ -9619,17 +9619,6 @@ public class ClusterReadMapping {
           readDeviceEnergyManagementAbsMaxPowerCommandParams
         );
         result.put("readAbsMaxPowerAttribute", readDeviceEnergyManagementAbsMaxPowerAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readDeviceEnergyManagementPowerAdjustmentCapabilityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readDeviceEnergyManagementPowerAdjustmentCapabilityAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.DeviceEnergyManagementCluster) cluster).readPowerAdjustmentCapabilityAttribute(
-              (ChipClusters.DeviceEnergyManagementCluster.PowerAdjustmentCapabilityAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedDeviceEnergyManagementClusterPowerAdjustmentCapabilityAttributeCallback(),
-          readDeviceEnergyManagementPowerAdjustmentCapabilityCommandParams
-        );
-        result.put("readPowerAdjustmentCapabilityAttribute", readDeviceEnergyManagementPowerAdjustmentCapabilityAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readDeviceEnergyManagementOptOutStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDeviceEnergyManagementOptOutStateAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -11532,6 +11521,142 @@ public class ClusterReadMapping {
           readBarrierControlClusterRevisionCommandParams
         );
         result.put("readClusterRevisionAttribute", readBarrierControlClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
+    private static Map<String, InteractionInfo> readServiceAreaInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readServiceAreaSupportedLocationsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaSupportedLocationsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readSupportedLocationsAttribute(
+              (ChipClusters.ServiceAreaCluster.SupportedLocationsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterSupportedLocationsAttributeCallback(),
+          readServiceAreaSupportedLocationsCommandParams
+        );
+        result.put("readSupportedLocationsAttribute", readServiceAreaSupportedLocationsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaSupportedMapsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaSupportedMapsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readSupportedMapsAttribute(
+              (ChipClusters.ServiceAreaCluster.SupportedMapsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterSupportedMapsAttributeCallback(),
+          readServiceAreaSupportedMapsCommandParams
+        );
+        result.put("readSupportedMapsAttribute", readServiceAreaSupportedMapsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaSelectedLocationsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaSelectedLocationsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readSelectedLocationsAttribute(
+              (ChipClusters.ServiceAreaCluster.SelectedLocationsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterSelectedLocationsAttributeCallback(),
+          readServiceAreaSelectedLocationsCommandParams
+        );
+        result.put("readSelectedLocationsAttribute", readServiceAreaSelectedLocationsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaCurrentLocationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaCurrentLocationAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readCurrentLocationAttribute(
+              (ChipClusters.ServiceAreaCluster.CurrentLocationAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterCurrentLocationAttributeCallback(),
+          readServiceAreaCurrentLocationCommandParams
+        );
+        result.put("readCurrentLocationAttribute", readServiceAreaCurrentLocationAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaEstimatedEndTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaEstimatedEndTimeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readEstimatedEndTimeAttribute(
+              (ChipClusters.ServiceAreaCluster.EstimatedEndTimeAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterEstimatedEndTimeAttributeCallback(),
+          readServiceAreaEstimatedEndTimeCommandParams
+        );
+        result.put("readEstimatedEndTimeAttribute", readServiceAreaEstimatedEndTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaProgressCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaProgressAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readProgressAttribute(
+              (ChipClusters.ServiceAreaCluster.ProgressAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterProgressAttributeCallback(),
+          readServiceAreaProgressCommandParams
+        );
+        result.put("readProgressAttribute", readServiceAreaProgressAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ServiceAreaCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterGeneratedCommandListAttributeCallback(),
+          readServiceAreaGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readServiceAreaGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ServiceAreaCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterAcceptedCommandListAttributeCallback(),
+          readServiceAreaAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readServiceAreaAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readEventListAttribute(
+              (ChipClusters.ServiceAreaCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterEventListAttributeCallback(),
+          readServiceAreaEventListCommandParams
+        );
+        result.put("readEventListAttribute", readServiceAreaEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ServiceAreaCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedServiceAreaClusterAttributeListAttributeCallback(),
+          readServiceAreaAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readServiceAreaAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readServiceAreaFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readServiceAreaFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readServiceAreaClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readServiceAreaClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ServiceAreaCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readServiceAreaClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readServiceAreaClusterRevisionAttributeInteractionInfo);
      
        return result;
     }
@@ -16610,6 +16735,131 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readThreadBorderRouterManagementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readThreadBorderRouterManagementBorderRouterNameCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementBorderRouterNameAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readBorderRouterNameAttribute(
+              (ChipClusters.CharStringAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+          readThreadBorderRouterManagementBorderRouterNameCommandParams
+        );
+        result.put("readBorderRouterNameAttribute", readThreadBorderRouterManagementBorderRouterNameAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementBorderAgentIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementBorderAgentIDAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readBorderAgentIDAttribute(
+              (ChipClusters.OctetStringAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
+          readThreadBorderRouterManagementBorderAgentIDCommandParams
+        );
+        result.put("readBorderAgentIDAttribute", readThreadBorderRouterManagementBorderAgentIDAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementThreadVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementThreadVersionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readThreadVersionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readThreadBorderRouterManagementThreadVersionCommandParams
+        );
+        result.put("readThreadVersionAttribute", readThreadBorderRouterManagementThreadVersionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementInterfaceEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementInterfaceEnabledAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readInterfaceEnabledAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readThreadBorderRouterManagementInterfaceEnabledCommandParams
+        );
+        result.put("readInterfaceEnabledAttribute", readThreadBorderRouterManagementInterfaceEnabledAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementActiveDatasetTimestampCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementActiveDatasetTimestampAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readActiveDatasetTimestampAttribute(
+              (ChipClusters.ThreadBorderRouterManagementCluster.ActiveDatasetTimestampAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadBorderRouterManagementClusterActiveDatasetTimestampAttributeCallback(),
+          readThreadBorderRouterManagementActiveDatasetTimestampCommandParams
+        );
+        result.put("readActiveDatasetTimestampAttribute", readThreadBorderRouterManagementActiveDatasetTimestampAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ThreadBorderRouterManagementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadBorderRouterManagementClusterGeneratedCommandListAttributeCallback(),
+          readThreadBorderRouterManagementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readThreadBorderRouterManagementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ThreadBorderRouterManagementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadBorderRouterManagementClusterAcceptedCommandListAttributeCallback(),
+          readThreadBorderRouterManagementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readThreadBorderRouterManagementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readEventListAttribute(
+              (ChipClusters.ThreadBorderRouterManagementCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadBorderRouterManagementClusterEventListAttributeCallback(),
+          readThreadBorderRouterManagementEventListCommandParams
+        );
+        result.put("readEventListAttribute", readThreadBorderRouterManagementEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ThreadBorderRouterManagementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadBorderRouterManagementClusterAttributeListAttributeCallback(),
+          readThreadBorderRouterManagementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readThreadBorderRouterManagementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readThreadBorderRouterManagementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readThreadBorderRouterManagementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadBorderRouterManagementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadBorderRouterManagementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadBorderRouterManagementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readThreadBorderRouterManagementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readThreadBorderRouterManagementClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readThreadNetworkDirectoryInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readThreadNetworkDirectoryPreferredExtendedPanIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThreadNetworkDirectoryPreferredExtendedPanIDAttributeInteractionInfo = new InteractionInfo(
@@ -20750,6 +21000,7 @@ public class ClusterReadMapping {
             put("doorLock", readDoorLockInteractionInfo());
             put("windowCovering", readWindowCoveringInteractionInfo());
             put("barrierControl", readBarrierControlInteractionInfo());
+            put("serviceArea", readServiceAreaInteractionInfo());
             put("pumpConfigurationAndControl", readPumpConfigurationAndControlInteractionInfo());
             put("thermostat", readThermostatInteractionInfo());
             put("fanControl", readFanControlInteractionInfo());
@@ -20773,6 +21024,7 @@ public class ClusterReadMapping {
             put("totalVolatileOrganicCompoundsConcentrationMeasurement", readTotalVolatileOrganicCompoundsConcentrationMeasurementInteractionInfo());
             put("radonConcentrationMeasurement", readRadonConcentrationMeasurementInteractionInfo());
             put("wiFiNetworkManagement", readWiFiNetworkManagementInteractionInfo());
+            put("threadBorderRouterManagement", readThreadBorderRouterManagementInteractionInfo());
             put("threadNetworkDirectory", readThreadNetworkDirectoryInteractionInfo());
             put("wakeOnLan", readWakeOnLanInteractionInfo());
             put("channel", readChannelInteractionInfo());
