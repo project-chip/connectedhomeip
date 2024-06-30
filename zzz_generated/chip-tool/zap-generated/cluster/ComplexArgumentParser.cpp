@@ -2066,6 +2066,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("checkInNodeID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MonitoringRegistrationStruct.monitoredSubject",
                                                                   "monitoredSubject", value.isMember("monitoredSubject")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MonitoringRegistrationStruct.clientType", "clientType",
+                                                                  value.isMember("clientType")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "checkInNodeID");
@@ -2075,6 +2077,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "monitoredSubject");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.monitoredSubject, value["monitoredSubject"]));
     valueCopy.removeMember("monitoredSubject");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clientType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clientType, value["clientType"]));
+    valueCopy.removeMember("clientType");
 
     if (value.isMember("fabricIndex"))
     {
@@ -2090,6 +2096,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::IcdManagement::Structs
 {
     ComplexArgumentParser::Finalize(request.checkInNodeID);
     ComplexArgumentParser::Finalize(request.monitoredSubject);
+    ComplexArgumentParser::Finalize(request.clientType);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
