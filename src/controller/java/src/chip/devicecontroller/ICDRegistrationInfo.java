@@ -61,7 +61,7 @@ public class ICDRegistrationInfo {
     @Nullable private Long checkInNodeId = null;
     @Nullable private Long monitoredSubject = null;
     @Nullable private byte[] symmetricKey = null;
-    @Nullable private Short clientType = null;
+    @Nullable private Integer clientType = null;
 
     private Builder() {}
 
@@ -88,7 +88,7 @@ public class ICDRegistrationInfo {
       return this;
     }
 
-    public Builder setClientType(Short clientType) {
+    public Builder setClientType(Integer clientType) {
       this.clientType = clientType;
       return this;
     }
