@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -65,14 +64,15 @@ class ActionsClusterEndpointListStruct(
       val endpointListID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
-      val endpoints = buildList<UShort> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUShort(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val endpoints =
+        buildList<UShort> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUShort(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return ActionsClusterEndpointListStruct(endpointListID, name, type, endpoints)

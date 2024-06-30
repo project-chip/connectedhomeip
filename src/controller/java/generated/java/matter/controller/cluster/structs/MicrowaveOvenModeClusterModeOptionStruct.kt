@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -60,14 +59,15 @@ class MicrowaveOvenModeClusterModeOptionStruct(
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUByte(ContextSpecificTag(TAG_MODE))
-      val modeTags = buildList<MicrowaveOvenModeClusterModeTagStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(MicrowaveOvenModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val modeTags =
+        buildList<MicrowaveOvenModeClusterModeTagStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(MicrowaveOvenModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return MicrowaveOvenModeClusterModeOptionStruct(label, mode, modeTags)

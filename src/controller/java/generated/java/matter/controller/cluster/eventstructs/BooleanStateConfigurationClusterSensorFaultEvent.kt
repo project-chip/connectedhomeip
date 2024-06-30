@@ -16,17 +16,13 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BooleanStateConfigurationClusterSensorFaultEvent(
-  val sensorFault: UShort
-) {
+class BooleanStateConfigurationClusterSensorFaultEvent(val sensorFault: UShort) {
   override fun toString(): String = buildString {
     append("BooleanStateConfigurationClusterSensorFaultEvent {\n")
     append("\tsensorFault : $sensorFault\n")
@@ -44,10 +40,13 @@ class BooleanStateConfigurationClusterSensorFaultEvent(
   companion object {
     private const val TAG_SENSOR_FAULT = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BooleanStateConfigurationClusterSensorFaultEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): BooleanStateConfigurationClusterSensorFaultEvent {
       tlvReader.enterStructure(tlvTag)
       val sensorFault = tlvReader.getUShort(ContextSpecificTag(TAG_SENSOR_FAULT))
-      
+
       tlvReader.exitContainer()
 
       return BooleanStateConfigurationClusterSensorFaultEvent(sensorFault)

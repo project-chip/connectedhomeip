@@ -17,19 +17,14 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class EnergyPreferenceClusterBalanceStruct (
-    val step: UInt,
-    val label: Optional<String>) {
-  override fun toString(): String  = buildString {
+class EnergyPreferenceClusterBalanceStruct(val step: UInt, val label: Optional<String>) {
+  override fun toString(): String = buildString {
     append("EnergyPreferenceClusterBalanceStruct {\n")
     append("\tstep : $step\n")
     append("\tlabel : $label\n")
@@ -41,9 +36,9 @@ class EnergyPreferenceClusterBalanceStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_STEP), step)
       if (label.isPresent) {
-      val optlabel = label.get()
-      put(ContextSpecificTag(TAG_LABEL), optlabel)
-    }
+        val optlabel = label.get()
+        put(ContextSpecificTag(TAG_LABEL), optlabel)
+      }
       endStructure()
     }
   }
@@ -52,15 +47,16 @@ class EnergyPreferenceClusterBalanceStruct (
     private const val TAG_STEP = 0
     private const val TAG_LABEL = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyPreferenceClusterBalanceStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyPreferenceClusterBalanceStruct {
       tlvReader.enterStructure(tlvTag)
       val step = tlvReader.getUInt(ContextSpecificTag(TAG_STEP))
-      val label = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-    } else {
-      Optional.empty()
-    }
-      
+      val label =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return EnergyPreferenceClusterBalanceStruct(step, label)

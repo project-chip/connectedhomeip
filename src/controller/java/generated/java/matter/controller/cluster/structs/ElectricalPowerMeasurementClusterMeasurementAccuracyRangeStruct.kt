@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -90,44 +89,62 @@ class ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct(
     private const val TAG_FIXED_MIN = 6
     private const val TAG_FIXED_TYPICAL = 7
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct {
       tlvReader.enterStructure(tlvTag)
       val rangeMin = tlvReader.getLong(ContextSpecificTag(TAG_RANGE_MIN))
       val rangeMax = tlvReader.getLong(ContextSpecificTag(TAG_RANGE_MAX))
-      val percentMax = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PERCENT_MAX))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PERCENT_MAX)))
-    } else {
-      Optional.empty()
-    }
-      val percentMin = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PERCENT_MIN))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PERCENT_MIN)))
-    } else {
-      Optional.empty()
-    }
-      val percentTypical = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PERCENT_TYPICAL))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PERCENT_TYPICAL)))
-    } else {
-      Optional.empty()
-    }
-      val fixedMax = if (tlvReader.isNextTag(ContextSpecificTag(TAG_FIXED_MAX))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_FIXED_MAX)))
-    } else {
-      Optional.empty()
-    }
-      val fixedMin = if (tlvReader.isNextTag(ContextSpecificTag(TAG_FIXED_MIN))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_FIXED_MIN)))
-    } else {
-      Optional.empty()
-    }
-      val fixedTypical = if (tlvReader.isNextTag(ContextSpecificTag(TAG_FIXED_TYPICAL))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_FIXED_TYPICAL)))
-    } else {
-      Optional.empty()
-    }
-      
+      val percentMax =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PERCENT_MAX))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PERCENT_MAX)))
+        } else {
+          Optional.empty()
+        }
+      val percentMin =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PERCENT_MIN))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PERCENT_MIN)))
+        } else {
+          Optional.empty()
+        }
+      val percentTypical =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PERCENT_TYPICAL))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_PERCENT_TYPICAL)))
+        } else {
+          Optional.empty()
+        }
+      val fixedMax =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_FIXED_MAX))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_FIXED_MAX)))
+        } else {
+          Optional.empty()
+        }
+      val fixedMin =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_FIXED_MIN))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_FIXED_MIN)))
+        } else {
+          Optional.empty()
+        }
+      val fixedTypical =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_FIXED_TYPICAL))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_FIXED_TYPICAL)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct(rangeMin, rangeMax, percentMax, percentMin, percentTypical, fixedMax, fixedMin, fixedTypical)
+      return ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct(
+        rangeMin,
+        rangeMax,
+        percentMax,
+        percentMin,
+        percentTypical,
+        fixedMax,
+        fixedMin,
+        fixedTypical
+      )
     }
   }
 }

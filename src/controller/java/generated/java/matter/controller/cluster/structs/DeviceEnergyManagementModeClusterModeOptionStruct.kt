@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -56,18 +55,22 @@ class DeviceEnergyManagementModeClusterModeOptionStruct(
     private const val TAG_MODE = 1
     private const val TAG_MODE_TAGS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementModeClusterModeOptionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DeviceEnergyManagementModeClusterModeOptionStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUByte(ContextSpecificTag(TAG_MODE))
-      val modeTags = buildList<DeviceEnergyManagementModeClusterModeTagStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(DeviceEnergyManagementModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val modeTags =
+        buildList<DeviceEnergyManagementModeClusterModeTagStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(DeviceEnergyManagementModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return DeviceEnergyManagementModeClusterModeOptionStruct(label, mode, modeTags)

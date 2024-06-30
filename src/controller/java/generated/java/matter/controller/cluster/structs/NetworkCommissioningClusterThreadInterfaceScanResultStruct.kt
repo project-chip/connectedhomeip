@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -72,7 +70,10 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
     private const val TAG_RSSI = 6
     private const val TAG_LQI = 7
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): NetworkCommissioningClusterThreadInterfaceScanResultStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): NetworkCommissioningClusterThreadInterfaceScanResultStruct {
       tlvReader.enterStructure(tlvTag)
       val panId = tlvReader.getUShort(ContextSpecificTag(TAG_PAN_ID))
       val extendedPanId = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
@@ -82,10 +83,19 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
       val extendedAddress = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_ADDRESS))
       val rssi = tlvReader.getByte(ContextSpecificTag(TAG_RSSI))
       val lqi = tlvReader.getUByte(ContextSpecificTag(TAG_LQI))
-      
+
       tlvReader.exitContainer()
 
-      return NetworkCommissioningClusterThreadInterfaceScanResultStruct(panId, extendedPanId, networkName, channel, version, extendedAddress, rssi, lqi)
+      return NetworkCommissioningClusterThreadInterfaceScanResultStruct(
+        panId,
+        extendedPanId,
+        networkName,
+        channel,
+        version,
+        extendedAddress,
+        rssi,
+        lqi
+      )
     }
   }
 }

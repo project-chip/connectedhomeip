@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -52,12 +50,12 @@ class ActionsClusterStateChangedEvent(
     private const val TAG_INVOKE_I_D = 1
     private const val TAG_NEW_STATE = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ActionsClusterStateChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val actionID = tlvReader.getUShort(ContextSpecificTag(TAG_ACTION_I_D))
       val invokeID = tlvReader.getUInt(ContextSpecificTag(TAG_INVOKE_I_D))
       val newState = tlvReader.getUByte(ContextSpecificTag(TAG_NEW_STATE))
-      
+
       tlvReader.exitContainer()
 
       return ActionsClusterStateChangedEvent(actionID, invokeID, newState)
