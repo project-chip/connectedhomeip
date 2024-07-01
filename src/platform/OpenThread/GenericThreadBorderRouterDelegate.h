@@ -29,14 +29,14 @@ namespace Clusters {
 
 namespace ThreadBorderRouterManagement {
 
-class GenericThreadBorderRouterDelegate : public Delegate
+class GenericOpenThreadBorderRouterDelegate : public Delegate
 {
 public:
-    static constexpr char kThreadBorderRourterName[]      = "Espressif-ThreadBR";
+    static constexpr char kThreadBorderRourterName[]      = "OpenThread-ThreadBR";
     static constexpr char kFailsafeThreadDatasetTlvsKey[] = "g/fs/td";
 
-    GenericThreadBorderRouterDelegate()  = default;
-    ~GenericThreadBorderRouterDelegate() = default;
+    GenericOpenThreadBorderRouterDelegate()  = default;
+    ~GenericOpenThreadBorderRouterDelegate() = default;
 
     CHIP_ERROR Init() override;
 
