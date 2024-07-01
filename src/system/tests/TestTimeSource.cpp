@@ -21,9 +21,10 @@
  *    the ability to compile and use the test implementation of the time source.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemConfig.h>
 #include <system/TimeSource.h>
