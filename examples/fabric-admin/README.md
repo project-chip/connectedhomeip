@@ -1,6 +1,6 @@
 # Matter Fabric Administrator Example
 
-An example application that which supports synchronization of devices between
+An example application that supports synchronization of devices across fabrics
 fabrics.
 
 ---
