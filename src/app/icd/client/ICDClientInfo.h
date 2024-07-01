@@ -19,6 +19,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/ClusterEnums.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CodeUtils.h>
@@ -30,11 +31,12 @@ namespace app {
 struct ICDClientInfo
 {
     ScopedNodeId peer_node;
-    uint32_t start_icd_counter               = 0;
-    uint32_t offset                          = 0;
-    uint64_t monitored_subject               = static_cast<uint64_t>(0);
-    Crypto::Aes128KeyHandle aes_key_handle   = Crypto::Aes128KeyHandle();
-    Crypto::Hmac128KeyHandle hmac_key_handle = Crypto::Hmac128KeyHandle();
+    uint32_t start_icd_counter                          = 0;
+    uint32_t offset                                     = 0;
+    Clusters::IcdManagement::ClientTypeEnum client_type = Clusters::IcdManagement::ClientTypeEnum::kPermanent;
+    uint64_t monitored_subject                          = static_cast<uint64_t>(0);
+    Crypto::Aes128KeyHandle aes_key_handle              = Crypto::Aes128KeyHandle();
+    Crypto::Hmac128KeyHandle hmac_key_handle            = Crypto::Hmac128KeyHandle();
 
     ICDClientInfo() {}
     ICDClientInfo(const ICDClientInfo & other) { *this = other; }
@@ -44,6 +46,7 @@ struct ICDClientInfo
         peer_node         = other.peer_node;
         start_icd_counter = other.start_icd_counter;
         offset            = other.offset;
+        client_type       = other.client_type;
         monitored_subject = other.monitored_subject;
         ByteSpan aes_buf(other.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
         memcpy(aes_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), aes_buf.data(),

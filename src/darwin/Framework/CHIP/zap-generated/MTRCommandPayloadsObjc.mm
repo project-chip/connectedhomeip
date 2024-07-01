@@ -9524,6 +9524,8 @@ NS_ASSUME_NONNULL_BEGIN
         _key = [NSData data];
 
         _verificationKey = nil;
+
+        _clientType = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -9538,6 +9540,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.monitoredSubject = self.monitoredSubject;
     other.key = self.key;
     other.verificationKey = self.verificationKey;
+    other.clientType = self.clientType;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -9546,7 +9549,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; key:%@; verificationKey:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, [_key base64EncodedStringWithOptions:0], [_verificationKey base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; key:%@; verificationKey:%@; clientType:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, [_key base64EncodedStringWithOptions:0], [_verificationKey base64EncodedStringWithOptions:0], _clientType];
     return descriptionString;
 }
 
@@ -9572,6 +9575,9 @@ NS_ASSUME_NONNULL_BEGIN
             auto & definedValue_0 = encodableStruct.verificationKey.Emplace();
             definedValue_0 = AsByteSpan(self.verificationKey);
         }
+    }
+    {
+        encodableStruct.clientType = static_cast<std::remove_reference_t<decltype(encodableStruct.clientType)>>(self.clientType.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
