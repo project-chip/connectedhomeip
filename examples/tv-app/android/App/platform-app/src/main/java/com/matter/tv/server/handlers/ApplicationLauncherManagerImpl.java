@@ -81,7 +81,7 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
   @Override
   public int[] getCatalogList() {
     Log.i(TAG, "Get Catalog List");
-    return new int[0];
+    return new int[]{65521, 8891, 3191};
   }
 
   @Override

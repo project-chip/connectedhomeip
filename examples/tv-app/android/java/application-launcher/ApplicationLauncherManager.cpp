@@ -62,7 +62,6 @@ CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncode
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    std::list<std::string> acceptedHeadersList;
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     chip::JniLocalReferenceScope scope(env);
 
@@ -73,8 +72,8 @@ CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncode
     env->ExceptionClear();
 
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
-        jobjectArray jCatalogList =
-            (jobjectArray) env->CallObjectMethod(mApplicationLauncherManagerObject.ObjectRef(), mGetCatalogListMethod);
+        jintArray jCatalogList =
+            (jintArray) env->CallObjectMethod(mApplicationLauncherManagerObject.ObjectRef(), mGetCatalogListMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ApplicationLauncherManager::GetCatalogList");
@@ -84,9 +83,10 @@ CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncode
         }
 
         jint size = env->GetArrayLength(jCatalogList);
+        jint *elements = env->GetIntArrayElements(jCatalogList, 0);
         for (int i = 0; i < size; i++)
         {
-            jint jCatalogVendorId = (jint) env->GetObjectArrayElement(jCatalogList, i);
+            jint jCatalogVendorId = elements[i];
             ReturnErrorOnFailure(encoder.Encode(static_cast<uint16_t>(jCatalogVendorId)));
         }
 
