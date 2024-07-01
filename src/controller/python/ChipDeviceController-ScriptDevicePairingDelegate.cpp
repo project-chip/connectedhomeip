@@ -191,6 +191,7 @@ void ScriptDevicePairingDelegate::OnICDRegistrationComplete(ScopedNodeId nodeId,
     clientInfo.peer_node         = nodeId;
     clientInfo.monitored_subject = sCommissioningParameters.GetICDMonitoredSubject().Value();
     clientInfo.start_icd_counter = icdCounter;
+    clientInfo.client_type       = sCommissioningParameters.GetICDClientType().Value();
 
     CHIP_ERROR err = sICDClientStorage.SetKey(clientInfo, ByteSpan(sICDSymmetricKey));
     if (err == CHIP_NO_ERROR)

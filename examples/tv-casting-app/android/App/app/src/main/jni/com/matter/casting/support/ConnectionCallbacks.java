@@ -13,23 +13,40 @@
  */
 package com.matter.casting.support;
 
-/** @brief A container struct for User Directed Commissioning (UDC) callbacks. */
+/** @brief A container class for User Directed Commissioning (UDC) callbacks. */
 public class ConnectionCallbacks {
 
-  /** (Required) The callback called when the connection is established successfully. */
+  /** The callback called when the connection is established successfully. */
   public final MatterCallback<Void> onSuccess;
 
-  /** (Required) The callback called with MatterError when the connection is fails to establish. */
+  /** The callback called with MatterError when the connection is fails to establish. */
   public final MatterCallback<MatterError> onFailure;
 
   /**
-   * (Optional) The callback called when the Client/Commissionee receives a CommissionerDeclaration
-   * message from the CastingPlayer/Commissioner. This callback is needed to support UDC features
-   * where a reply from the Commissioner is expected. It provides information indicating the
-   * Commissioner’s pre-commissioning state.
+   * The callback called when the Client/Commissionee receives a CommissionerDeclaration message
+   * from the CastingPlayer/Commissioner. This callback is needed to support UDC features where a
+   * reply from the Commissioner is expected. It provides information indicating the Commissioner’s
+   * pre-commissioning state.
    */
   public MatterCallback<CommissionerDeclaration> onCommissionerDeclaration;
 
+  /**
+   * The constructor for ConnectionCallbacks, the container class for User Directed Commissioning
+   * (UDC) callbacks.
+   *
+   * @param onSuccess (Required) The callback called when the connection is established
+   *     successfully.
+   * @param onFailure (Required) The callback called with MatterError when the connection is fails
+   *     to establish.
+   * @param onCommissionerDeclaration (Optional) The callback called when the Client/Commissionee
+   *     receives a CommissionerDeclaration message from the CastingPlayer/Commissioner. This
+   *     callback is needed to support UDC features where a reply from the Commissioner is expected.
+   *     It provides information indicating the Commissioner’s pre-commissioning state.
+   *     <p>For example: During CastingPlayer/Commissioner-Generated passcode commissioning, the
+   *     Commissioner replies with a CommissionerDeclaration message with PasscodeDialogDisplayed
+   *     and CommissionerPasscode set to true. Given these Commissioner state details, the client is
+   *     expected to perform some actions and responf accrdingly.
+   */
   public ConnectionCallbacks(
       MatterCallback<Void> onSuccess,
       MatterCallback<MatterError> onFailure,

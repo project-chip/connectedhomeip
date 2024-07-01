@@ -48,7 +48,7 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
   val heatingSourceControl:
     Optional<
       matter.controller.cluster.structs.DemandResponseLoadControlClusterHeatingSourceControlStruct
-    >?
+    >?,
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent {\n")
@@ -135,7 +135,7 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val eventID = tlvReader.getByteArray(ContextSpecificTag(TAG_EVENT_I_D))
@@ -237,7 +237,7 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
         averageLoadControl,
         dutyCycleControl,
         powerSavingsControl,
-        heatingSourceControl
+        heatingSourceControl,
       )
     }
   }

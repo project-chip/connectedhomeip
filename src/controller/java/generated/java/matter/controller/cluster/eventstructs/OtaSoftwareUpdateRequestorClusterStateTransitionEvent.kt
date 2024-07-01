@@ -26,7 +26,7 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
   val previousState: UByte,
   val newState: UByte,
   val reason: UByte,
-  val targetSoftwareVersion: UInt?
+  val targetSoftwareVersion: UInt?,
 ) {
   override fun toString(): String = buildString {
     append("OtaSoftwareUpdateRequestorClusterStateTransitionEvent {\n")
@@ -60,7 +60,7 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
       tlvReader.enterStructure(tlvTag)
       val previousState = tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_STATE))
@@ -80,7 +80,7 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
         previousState,
         newState,
         reason,
-        targetSoftwareVersion
+        targetSoftwareVersion,
       )
     }
   }

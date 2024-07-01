@@ -20,7 +20,10 @@ executable("persistent_storage") {
     "main.cpp",
   ]
 
-  deps = [ "${chip_root}/src/lib" ]
+  deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
+  ]
 
   cflags = [ "-Wconversion" ]
 

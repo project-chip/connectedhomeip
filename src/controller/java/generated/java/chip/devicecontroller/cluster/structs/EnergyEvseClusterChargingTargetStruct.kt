@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class EnergyEvseClusterChargingTargetStruct(
   val targetTimeMinutesPastMidnight: UInt,
   val targetSoC: Optional<UInt>,
-  val addedEnergy: Optional<Long>
+  val addedEnergy: Optional<Long>,
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterChargingTargetStruct {\n")
@@ -79,7 +79,7 @@ class EnergyEvseClusterChargingTargetStruct(
       return EnergyEvseClusterChargingTargetStruct(
         targetTimeMinutesPastMidnight,
         targetSoC,
-        addedEnergy
+        addedEnergy,
       )
     }
   }

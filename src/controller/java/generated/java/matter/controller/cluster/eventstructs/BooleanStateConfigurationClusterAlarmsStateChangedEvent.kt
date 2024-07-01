@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class BooleanStateConfigurationClusterAlarmsStateChangedEvent(
   val alarmsActive: UByte,
-  val alarmsSuppressed: Optional<UByte>
+  val alarmsSuppressed: Optional<UByte>,
 ) {
   override fun toString(): String = buildString {
     append("BooleanStateConfigurationClusterAlarmsStateChangedEvent {\n")
@@ -52,7 +52,7 @@ class BooleanStateConfigurationClusterAlarmsStateChangedEvent(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): BooleanStateConfigurationClusterAlarmsStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val alarmsActive = tlvReader.getUByte(ContextSpecificTag(TAG_ALARMS_ACTIVE))

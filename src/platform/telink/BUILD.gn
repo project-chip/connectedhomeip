@@ -45,8 +45,6 @@ static_library("telink") {
     "ConnectivityManagerImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
-    "NFCManagerImpl.cpp",
-    "NFCManagerImpl.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
   ]
@@ -83,7 +81,7 @@ static_library("telink") {
       "ThreadStackManagerImpl.h",
     ]
 
-    if (chip_mdns == "platform") {
+    if (chip_mdns_platform) {
       sources += [
         "../OpenThread/DnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.cpp",
@@ -104,10 +102,25 @@ static_library("telink") {
     ]
   }
 
+  if (chip_enable_nfc) {
+    sources += [
+      "NFCManagerImpl.cpp",
+      "NFCManagerImpl.h",
+    ]
+  }
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
   }
+}
+
+source_set("logging") {
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../Zephyr/Logging.cpp" ]
 }

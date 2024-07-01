@@ -12,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-chip_device_platform = "telink"
-
-chip_inet_config_enable_ipv4 = false
-
 declare_args() {
   # Enable factory data support
   chip_enable_factory_data = false

@@ -259,6 +259,9 @@ static constexpr ClusterId Id = 0x00000102;
 namespace BarrierControl {
 static constexpr ClusterId Id = 0x00000103;
 } // namespace BarrierControl
+namespace ServiceArea {
+static constexpr ClusterId Id = 0x00000150;
+} // namespace ServiceArea
 namespace PumpConfigurationAndControl {
 static constexpr ClusterId Id = 0x00000200;
 } // namespace PumpConfigurationAndControl

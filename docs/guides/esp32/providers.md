@@ -15,8 +15,6 @@ Below are the providers that have been implemented:
 -   [Device Info Provider](https://github.com/project-chip/connectedhomeip/blob/master/src/platform/ESP32/ESP32DeviceInfoProvider.h#L31)
     This provider provides fixed labels, supported calendar types, and supported
     locales from the factory partition.
--   [Supported Modes](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/esp32/mode-support/static-supported-modes-manager.h#L28)
-    This provider offers the supported modes for the mode-select cluster.
 
 More information can be found in the [factory data guide](factory_data.md).
 

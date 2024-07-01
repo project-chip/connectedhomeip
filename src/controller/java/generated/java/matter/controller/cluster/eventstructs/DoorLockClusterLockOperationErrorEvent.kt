@@ -32,7 +32,7 @@ class DoorLockClusterLockOperationErrorEvent(
   val fabricIndex: UByte?,
   val sourceNode: ULong?,
   val credentials:
-    Optional<List<matter.controller.cluster.structs.DoorLockClusterCredentialStruct>>?
+    Optional<List<matter.controller.cluster.structs.DoorLockClusterCredentialStruct>>?,
 ) {
   override fun toString(): String = buildString {
     append("DoorLockClusterLockOperationErrorEvent {\n")
@@ -128,7 +128,7 @@ class DoorLockClusterLockOperationErrorEvent(
                   this.add(
                     matter.controller.cluster.structs.DoorLockClusterCredentialStruct.fromTlv(
                       AnonymousTag,
-                      tlvReader
+                      tlvReader,
                     )
                   )
                 }
@@ -152,7 +152,7 @@ class DoorLockClusterLockOperationErrorEvent(
         userIndex,
         fabricIndex,
         sourceNode,
-        credentials
+        credentials,
       )
     }
   }

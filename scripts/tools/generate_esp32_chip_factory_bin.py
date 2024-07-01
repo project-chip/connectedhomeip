@@ -159,39 +159,6 @@ def ishex(s):
     except ValueError:
         return False
 
-# get_supported_modes_dict() converts the list of strings to per endpoint dictionaries.
-# example with semantic tags
-# input  : ['0/label1/1/"1\0x8000, 2\0x8000" 1/label2/1/"1\0x8000, 2\0x8000"']
-# output : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}]}
-
-# example without semantic tags
-# input  : ['0/label1/1 1/label2/1']
-# output : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': []}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': []}]}
-
-
-def get_supported_modes_dict(supported_modes):
-    output_dict = {}
-
-    for mode_str in supported_modes:
-        mode_label_strs = mode_str.split('/')
-        mode = mode_label_strs[0]
-        label = mode_label_strs[1]
-        ep = mode_label_strs[2]
-
-        semantic_tags = ''
-        if (len(mode_label_strs) == 4):
-            semantic_tag_strs = mode_label_strs[3].split(', ')
-            semantic_tags = [{"value": int(v.split('\\')[0]), "mfgCode": int(v.split('\\')[1], 16)} for v in semantic_tag_strs]
-
-        mode_dict = {"Label": label, "Mode": int(mode), "Semantic_Tag": semantic_tags}
-
-        if ep in output_dict:
-            output_dict[ep].append(mode_dict)
-        else:
-            output_dict[ep] = [mode_dict]
-
-    return output_dict
-
 
 def check_str_range(s, min_len, max_len, name):
     if s and ((len(s) < min_len) or (len(s) > max_len)):
@@ -301,60 +268,6 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['hardware-ver']['value'] = args.hw_ver
     if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
-
-    # SupportedModes are stored as multiple entries
-    #  - sm-sz/<ep>                 : number of supported modes for the endpoint
-    #  - sm-label/<ep>/<index>      : supported modes label key for the endpoint and index
-    #  - sm-mode/<ep>/<index>       : supported modes mode key for the endpoint and index
-    #  - sm-st-sz/<ep>/<index>      : supported modes SemanticTag key for the endpoint and index
-    #  - st-v/<ep>/<index>/<ind>    : semantic tag value key for the endpoint and index and ind
-    #  - st-mfg/<ep>/<index>/<ind>  : semantic tag mfg code key for the endpoint and index and ind
-    if (args.supported_modes is not None):
-        dictionary = get_supported_modes_dict(args.supported_modes)
-        for ep in dictionary.keys():
-            _sz = {
-                'type': 'data',
-                'encoding': 'u32',
-                'value': len(dictionary[ep])
-            }
-            FACTORY_DATA.update({'sm-sz/{:x}'.format(int(ep)): _sz})
-            for i in range(len(dictionary[ep])):
-                item = dictionary[ep][i]
-                _label = {
-                    'type': 'data',
-                    'encoding': 'string',
-                    'value': item["Label"]
-                }
-                _mode = {
-                    'type': 'data',
-                    'encoding': 'u32',
-                    'value': item["Mode"]
-                }
-                _st_sz = {
-                    'type': 'data',
-                    'encoding': 'u32',
-                    'value': len(item["Semantic_Tag"])
-                }
-                FACTORY_DATA.update({'sm-label/{:x}/{:x}'.format(int(ep), i): _label})
-                FACTORY_DATA.update({'sm-mode/{:x}/{:x}'.format(int(ep), i): _mode})
-                FACTORY_DATA.update({'sm-st-sz/{:x}/{:x}'.format(int(ep), i): _st_sz})
-
-                for j in range(len(item["Semantic_Tag"])):
-                    entry = item["Semantic_Tag"][j]
-
-                    _value = {
-                        'type': 'data',
-                        'encoding': 'u32',
-                        'value': entry["value"]
-                    }
-                    _mfg_code = {
-                        'type': 'data',
-                        'encoding': 'u32',
-                        'value': entry["mfgCode"]
-                    }
-
-                    FACTORY_DATA.update({'st-v/{:x}/{:x}/{:x}'.format(int(ep), i, j): _value})
-                    FACTORY_DATA.update({'st-mfg/{:x}/{:x}/{:x}'.format(int(ep), i, j): _mfg_code})
 
 
 def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
@@ -468,9 +381,6 @@ def get_args():
                         help=('128-bit unique identifier for generating rotating device identifier, '
                               'provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"'))
 
-    parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
-                        help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
-
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
     parser.add_argument('--target', default='esp32',
@@ -509,7 +419,8 @@ def set_up_factory_data(args):
 def generate_factory_partiton_binary(args):
     generate_nvs_csv(args.output_dir, FACTORY_PARTITION_CSV)
     if args.generate_bin:
-        generate_nvs_bin(args.encrypt, args.size, FACTORY_PARTITION_CSV, FACTORY_PARTITION_BIN, args.output_dir)
+        csv_file = os.path.join(args.output_dir, FACTORY_PARTITION_CSV)
+        generate_nvs_bin(args.encrypt, args.size, csv_file, FACTORY_PARTITION_BIN, args.output_dir)
         print_flashing_help(args.encrypt, args.output_dir, FACTORY_PARTITION_BIN)
     clean_up()
 

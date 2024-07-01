@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class BasicInformationClusterCapabilityMinimaStruct(
   val caseSessionsPerFabric: UInt,
-  val subscriptionsPerFabric: UInt
+  val subscriptionsPerFabric: UInt,
 ) {
   override fun toString(): String = buildString {
     append("BasicInformationClusterCapabilityMinimaStruct {\n")
@@ -57,7 +57,7 @@ class BasicInformationClusterCapabilityMinimaStruct(
 
       return BasicInformationClusterCapabilityMinimaStruct(
         caseSessionsPerFabric,
-        subscriptionsPerFabric
+        subscriptionsPerFabric,
       )
     }
   }

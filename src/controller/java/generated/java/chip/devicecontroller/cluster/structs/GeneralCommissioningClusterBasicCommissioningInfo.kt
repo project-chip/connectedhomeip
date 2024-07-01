@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class GeneralCommissioningClusterBasicCommissioningInfo(
   val failSafeExpiryLengthSeconds: UInt,
-  val maxCumulativeFailsafeSeconds: UInt
+  val maxCumulativeFailsafeSeconds: UInt,
 ) {
   override fun toString(): String = buildString {
     append("GeneralCommissioningClusterBasicCommissioningInfo {\n")
@@ -48,7 +48,7 @@ class GeneralCommissioningClusterBasicCommissioningInfo(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): GeneralCommissioningClusterBasicCommissioningInfo {
       tlvReader.enterStructure(tlvTag)
       val failSafeExpiryLengthSeconds =
@@ -60,7 +60,7 @@ class GeneralCommissioningClusterBasicCommissioningInfo(
 
       return GeneralCommissioningClusterBasicCommissioningInfo(
         failSafeExpiryLengthSeconds,
-        maxCumulativeFailsafeSeconds
+        maxCumulativeFailsafeSeconds,
       )
     }
   }

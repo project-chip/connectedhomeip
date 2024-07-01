@@ -79,6 +79,9 @@ enum CommissioningStage : uint8_t
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
     /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
+    kPrimaryOperationalNetworkFailed, ///< Indicate that the primary operational network (on root endpoint) failed, should disable
+                                      ///< the primary network interface later.
+    kDisablePrimaryNetworkInterface,  ///< Send InterfaceEnabled write request to the device to disable network interface.
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -555,6 +558,13 @@ public:
         return *this;
     }
 
+    Optional<app::Clusters::IcdManagement::ClientTypeEnum> GetICDClientType() const { return mICDClientType; }
+    CommissioningParameters & SetICDClientType(app::Clusters::IcdManagement::ClientTypeEnum icdClientType)
+    {
+        mICDClientType = MakeOptional(icdClientType);
+        return *this;
+    }
+
     Optional<uint32_t> GetICDStayActiveDurationMsec() const { return mICDStayActiveDurationMsec; }
     CommissioningParameters & SetICDStayActiveDurationMsec(uint32_t stayActiveDurationMsec)
     {
@@ -629,6 +639,7 @@ private:
     Optional<NodeId> mICDCheckInNodeId;
     Optional<uint64_t> mICDMonitoredSubject;
     Optional<ByteSpan> mICDSymmetricKey;
+    Optional<app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
     Optional<uint32_t> mICDStayActiveDurationMsec;
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;

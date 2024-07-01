@@ -7,6 +7,7 @@
 		/delete-node/ partition@88000;
 		/delete-node/ partition@f0000;
 		/delete-node/ partition@f4000;
+		/delete-node/ partition@fe000;
 		boot_partition: partition@0 {
 			label = "mcuboot";
 			reg = <0x00000000 0x20000>;
@@ -27,7 +28,7 @@
 			label = "image-1";
 			reg = <0x118000 0xe8000>;
 		};
-		reserved_partition: partition@200000 {
+		vendor_partition: partition@200000 {
 			label = "vendor-data";
 			reg = <0x200000 0x100000>;
 		};

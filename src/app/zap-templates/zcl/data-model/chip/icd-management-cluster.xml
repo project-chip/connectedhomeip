@@ -39,17 +39,24 @@ limitations under the License.
         <field name="AppDefinedButton" mask="0x10000"/>
     </bitmap>
 
+    <enum name="ClientTypeEnum" type="enum8">
+        <cluster code="0x0046"/>
+        <item value="0" name="Permanent"/>
+        <item value="1" name="Ephemeral"/>
+    </enum>
+
     <struct name = "MonitoringRegistrationStruct" isFabricScoped="true">
         <cluster code="0x0046"/>
         <item fieldId="1" name="CheckInNodeID" type="node_id" isFabricSensitive="true"/>
         <item fieldId="2" name="MonitoredSubject" type="int64u" isFabricSensitive="true"/>
         <!-- RESERVED = 0x03 -->
+        <item fieldId="4" name="ClientType" type="ClientTypeEnum" isFabricSensitive="true" default="0"/>
     </struct>
 
     <enum name="OperatingModeEnum" type="enum8">
-    <cluster code="0x0046" />
-    <item value="0" name="SIT" />
-    <item value="1" name="LIT" />
+        <cluster code="0x0046" />
+        <item value="0" name="SIT" />
+        <item value="1" name="LIT" />
     </enum>
 
     <cluster>
@@ -113,6 +120,7 @@ limitations under the License.
             <arg name="MonitoredSubject" type="int64u" optional="false"/>
             <arg name="Key" type="octet_string" length="16" optional="false"/>
             <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
+            <arg name="ClientType" type="ClientTypeEnum" optional="false"/>
             <access op="invoke" privilege="manage"/>
         </command>
 

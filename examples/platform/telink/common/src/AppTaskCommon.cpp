@@ -24,7 +24,12 @@
 #include "LEDManager.h"
 #include "PWMManager.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include "ThreadUtil.h"
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/Zephyr/InetUtils.h>
+#include <platform/telink/wifi/TelinkWiFiDriver.h>
+#endif
 
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -74,7 +79,7 @@ uint8_t sFactoryResetCntr = 0;
 bool sIsCommissioningFailed = false;
 bool sIsNetworkProvisioned  = false;
 bool sIsNetworkEnabled      = false;
-bool sIsThreadAttached      = false;
+bool sIsNetworkAttached     = false;
 bool sHaveBLEConnections    = false;
 
 #if APP_SET_DEVICE_INFO_PROVIDER
@@ -213,13 +218,16 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 
     AppEvent event = {};
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     StartThreadButtonEventHandler();
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    StartWiFiButtonEventHandler();
 #endif
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
 
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
-        !chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
+    if (!sIsNetworkProvisioned)
     {
         LOG_INF("Confirm image.");
         OtaConfirmNewImage();
@@ -359,9 +367,13 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
     case kButtonId_FactoryReset:
         FactoryResetButtonEventHandler();
         break;
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case kButtonId_StartThread:
         StartThreadButtonEventHandler();
+        break;
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    case kButtonId_StartWiFi:
+        StartWiFiButtonEventHandler();
         break;
 #endif
     case kButtonId_StartBleAdv:
@@ -433,8 +445,10 @@ void AppTaskCommon::LinkButtons(ButtonManager & buttonManager)
     buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
     buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
     buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     buttonManager.addCallback(StartThreadButtonEventHandler, 3, true);
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    buttonManager.addCallback(StartWiFiButtonEventHandler, 3, true);
 #endif
 }
 
@@ -442,7 +456,7 @@ void AppTaskCommon::UpdateStatusLED()
 {
     if (sIsNetworkProvisioned && sIsNetworkEnabled)
     {
-        if (sIsThreadAttached)
+        if (sIsNetworkAttached)
         {
             LedManager::getInstance().setLed(LedManager::EAppLed_Status, 950, 50);
         }
@@ -506,8 +520,8 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
 {
     LOG_INF("StartBleAdvHandler");
 
-    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
-    if (ConnectivityMgr().IsThreadProvisioned())
+    // Disable manual Matter service BLE advertising after device provisioning.
+    if (sIsNetworkProvisioned)
     {
         LOG_INF("Device already commissioned");
         return;
@@ -578,7 +592,7 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
     AppEvent event;
@@ -592,7 +606,7 @@ void AppTaskCommon::StartThreadButtonEventHandler(void)
 void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
 {
     LOG_INF("StartThreadHandler");
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    if (!sIsNetworkProvisioned)
     {
         // Switch context from BLE to Thread
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -603,6 +617,37 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
         ThreadStackMgrImpl().SetThreadEnabled(true);
 #endif
         StartDefaultThreadNetwork();
+    }
+    else
+    {
+        LOG_INF("Device already commissioned");
+    }
+}
+
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+void AppTaskCommon::StartWiFiButtonEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = StartWiFiHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::StartWiFiHandler(AppEvent * aEvent)
+{
+    LOG_INF("StartWiFiHandler");
+
+    if (!strlen(CONFIG_DEFAULT_WIFI_SSID) || !strlen(CONFIG_DEFAULT_WIFI_PASSWORD))
+    {
+        LOG_ERR("default WiFi SSID/Password are not set");
+    }
+
+    if (!sIsNetworkProvisioned)
+    {
+        net_if_up(InetUtils::GetWiFiInterface());
+        NetworkCommissioning::TelinkWiFiDriver().StartDefaultWiFiNetwork();
     }
     else
     {
@@ -673,11 +718,12 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     case DeviceEventType::kThreadStateChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
-        sIsThreadAttached     = ConnectivityMgr().IsThreadAttached();
+        sIsNetworkAttached    = ConnectivityMgr().IsThreadAttached();
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+        sIsNetworkAttached    = ConnectivityMgr().IsWiFiStationConnected();
 #if CONFIG_CHIP_OTA_REQUESTOR
         if (event->WiFiConnectivityChange.Result == kConnectivity_Established)
         {

@@ -40,12 +40,14 @@ public:
     CHIP_ERROR ProcessBlock(ByteSpan & aBlock) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
+    void SetRebootDelaySec(uint16_t rebootDelay);
 
 private:
     CHIP_ERROR PrepareDownloadImpl();
     CHIP_ERROR ProcessHeader(ByteSpan & aBlock);
 
-    OTADownloader * mDownloader = nullptr;
+    uint16_t mDelayBeforeRebootSec = 0;
+    OTADownloader * mDownloader    = nullptr;
     OTAImageHeaderParser mHeaderParser;
     uint8_t mBuffer[kBufferSize];
 };

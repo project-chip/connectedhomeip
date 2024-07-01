@@ -69,6 +69,14 @@ public:
     {}
 };
 
+class PairCodeWiFiThread : public PairingCommand
+{
+public:
+    PairCodeWiFiThread(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-wifi-thread", PairingMode::Code, PairingNetworkType::WiFiOrThread, credsIssuerConfig)
+    {}
+};
+
 class PairOnNetwork : public PairingCommand
 {
 public:
@@ -231,6 +239,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairCodePase>(credsIssuerConfig),
         make_unique<PairCodeWifi>(credsIssuerConfig),
         make_unique<PairCodeThread>(credsIssuerConfig),
+        make_unique<PairCodeWiFiThread>(credsIssuerConfig),
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),

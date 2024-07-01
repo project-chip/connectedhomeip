@@ -35,7 +35,6 @@ static_library("cc13x4_26x4") {
     "../DiagnosticDataProviderImpl.cpp",
     "../DiagnosticDataProviderImpl.h",
     "../KeyValueStoreManagerImpl.cpp",
-    "../Logging.cpp",
     "../PlatformManagerImpl.cpp",
     "../Random.c",
     "BlePlatformConfig.h",
@@ -103,4 +102,13 @@ static_library("cc13x4_26x4") {
       ]
     }
   }
+}
+
+source_set("logging") {
+  deps = [
+    ":cc13x4_26x4",  # TODO: is this necessary?
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "../Logging.cpp" ]
 }

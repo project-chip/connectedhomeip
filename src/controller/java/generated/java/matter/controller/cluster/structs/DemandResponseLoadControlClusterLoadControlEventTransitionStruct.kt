@@ -30,7 +30,7 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
   val averageLoadControl: Optional<DemandResponseLoadControlClusterAverageLoadControlStruct>,
   val dutyCycleControl: Optional<DemandResponseLoadControlClusterDutyCycleControlStruct>,
   val powerSavingsControl: Optional<DemandResponseLoadControlClusterPowerSavingsControlStruct>,
-  val heatingSourceControl: Optional<DemandResponseLoadControlClusterHeatingSourceControlStruct>
+  val heatingSourceControl: Optional<DemandResponseLoadControlClusterHeatingSourceControlStruct>,
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterLoadControlEventTransitionStruct {\n")
@@ -84,7 +84,7 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): DemandResponseLoadControlClusterLoadControlEventTransitionStruct {
       tlvReader.enterStructure(tlvTag)
       val duration = tlvReader.getUShort(ContextSpecificTag(TAG_DURATION))
@@ -94,7 +94,7 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
           Optional.of(
             DemandResponseLoadControlClusterTemperatureControlStruct.fromTlv(
               ContextSpecificTag(TAG_TEMPERATURE_CONTROL),
-              tlvReader
+              tlvReader,
             )
           )
         } else {
@@ -105,7 +105,7 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
           Optional.of(
             DemandResponseLoadControlClusterAverageLoadControlStruct.fromTlv(
               ContextSpecificTag(TAG_AVERAGE_LOAD_CONTROL),
-              tlvReader
+              tlvReader,
             )
           )
         } else {
@@ -116,7 +116,7 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
           Optional.of(
             DemandResponseLoadControlClusterDutyCycleControlStruct.fromTlv(
               ContextSpecificTag(TAG_DUTY_CYCLE_CONTROL),
-              tlvReader
+              tlvReader,
             )
           )
         } else {
@@ -127,7 +127,7 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
           Optional.of(
             DemandResponseLoadControlClusterPowerSavingsControlStruct.fromTlv(
               ContextSpecificTag(TAG_POWER_SAVINGS_CONTROL),
-              tlvReader
+              tlvReader,
             )
           )
         } else {
@@ -138,7 +138,7 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
           Optional.of(
             DemandResponseLoadControlClusterHeatingSourceControlStruct.fromTlv(
               ContextSpecificTag(TAG_HEATING_SOURCE_CONTROL),
-              tlvReader
+              tlvReader,
             )
           )
         } else {
@@ -154,7 +154,7 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
         averageLoadControl,
         dutyCycleControl,
         powerSavingsControl,
-        heatingSourceControl
+        heatingSourceControl,
       )
     }
   }

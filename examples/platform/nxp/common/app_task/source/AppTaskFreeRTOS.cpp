@@ -22,7 +22,6 @@
 #include <lib/dnssd/Advertiser.h>
 
 #include "AppMatterButton.h"
-#include "AppMatterCli.h"
 
 #include "CHIPDeviceManager.h"
 #include <app/server/Server.h>
@@ -30,6 +29,10 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/nxp/common/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+#ifdef ENABLE_CHIP_SHELL
+#include "AppCLIBase.h"
+#endif
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -69,14 +72,11 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     /* Register Matter CLI cmds */
-    err = AppMatterCli_RegisterCommands();
+#ifdef ENABLE_CHIP_SHELL
+    err = chip::NXP::App::GetAppCLI().Init();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Error during CLI init"));
     AppMatter_RegisterCustomCliCommands();
-    AppMatterCli_StartTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Error during AppMatterCli_RegisterCommands");
-        return err;
-    }
+#endif
     /* Register Matter buttons */
     err = AppMatterButton_registerButtons();
     if (err != CHIP_NO_ERROR)
@@ -161,80 +161,4 @@ void chip::NXP::App::AppTaskFreeRTOS::DispatchEvent(const AppEvent & event)
     {
         ChipLogProgress(DeviceLayer, "Event received with no handler. Dropping event.");
     }
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::StartCommissioning(intptr_t arg)
-{
-    /* Check the status of the commissioning */
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        ChipLogProgress(DeviceLayer, "Device already commissioned");
-    }
-    else if (chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
-    {
-        ChipLogProgress(DeviceLayer, "Commissioning window already opened");
-    }
-    else
-    {
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    }
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::StopCommissioning(intptr_t arg)
-{
-    /* Check the status of the commissioning */
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        ChipLogProgress(DeviceLayer, "Device already commissioned");
-    }
-    else if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
-    {
-        ChipLogProgress(DeviceLayer, "Commissioning window not opened");
-    }
-    else
-    {
-        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-    }
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::SwitchCommissioningState(intptr_t arg)
-{
-    /* Check the status of the commissioning */
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        ChipLogProgress(DeviceLayer, "Device already commissioned");
-    }
-    else if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
-    {
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    }
-    else
-    {
-        chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-    }
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::StartCommissioningHandler(void)
-{
-    /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
-    PlatformMgr().ScheduleWork(StartCommissioning, 0);
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::StopCommissioningHandler(void)
-{
-    /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
-    PlatformMgr().ScheduleWork(StopCommissioning, 0);
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::SwitchCommissioningStateHandler(void)
-{
-    /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
-    PlatformMgr().ScheduleWork(SwitchCommissioningState, 0);
-}
-
-void chip::NXP::App::AppTaskFreeRTOS::FactoryResetHandler(void)
-{
-    /* Emit the ShutDown event before factory reset */
-    chip::Server::GetInstance().GenerateShutDownEvent();
-    chip::Server::GetInstance().ScheduleFactoryReset();
 }

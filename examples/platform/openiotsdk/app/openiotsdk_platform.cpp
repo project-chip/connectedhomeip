@@ -35,7 +35,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/openiotsdk/Logging.h>
+#include <lib/support/logging/Constants.h>
 #include <platform/openiotsdk/OpenIoTSDKArchUtils.h>
 
 #include <lib/core/CHIPConfig.h>
@@ -59,7 +59,7 @@
 using namespace ::chip;
 using namespace ::chip::Platform;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::Logging::Platform;
+using namespace ::chip::Logging;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -172,7 +172,9 @@ int openiotsdk_platform_init(void)
 {
     int ret;
 
-    ois_logging_init();
+#if defined(NDEBUG) && CHIP_CONFIG_TEST == 0
+    SetLogFilter(LogCategory::kLogCategory_Progress);
+#endif
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)

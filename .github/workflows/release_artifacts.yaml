@@ -58,13 +58,13 @@ jobs:
     efr32:
         name: EFR32
         env:
-            SILABS_BOARD: BRD4161A
-            BUILD_DIRECTORY: out/lock_app_debug/BRD4161A
+            SILABS_BOARD: BRD4187C
+            BUILD_DIRECTORY: out/lock_app_debug/BRD4187C
 
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-efr32:54
+            image: ghcr.io/project-chip/chip-build-efr32:56
         steps:
             - name: Checkout
               uses: actions/checkout@v4

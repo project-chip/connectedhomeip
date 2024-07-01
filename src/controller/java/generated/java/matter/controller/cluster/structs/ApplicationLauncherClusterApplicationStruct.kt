@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class ApplicationLauncherClusterApplicationStruct(
   val catalogVendorID: UShort,
-  val applicationID: String
+  val applicationID: String,
 ) {
   override fun toString(): String = buildString {
     append("ApplicationLauncherClusterApplicationStruct {\n")

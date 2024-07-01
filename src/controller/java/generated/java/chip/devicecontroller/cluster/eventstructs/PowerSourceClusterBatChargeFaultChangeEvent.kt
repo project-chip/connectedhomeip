@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class PowerSourceClusterBatChargeFaultChangeEvent(
   val current: List<UInt>,
-  val previous: List<UInt>
+  val previous: List<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("PowerSourceClusterBatChargeFaultChangeEvent {\n")

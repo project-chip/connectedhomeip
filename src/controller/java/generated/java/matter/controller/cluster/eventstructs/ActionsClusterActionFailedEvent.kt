@@ -26,7 +26,7 @@ class ActionsClusterActionFailedEvent(
   val actionID: UShort,
   val invokeID: UInt,
   val newState: UByte,
-  val error: UByte
+  val error: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterActionFailedEvent {\n")

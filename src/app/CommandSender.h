@@ -136,7 +136,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] commandSender   The command sender object that initiated the command transaction.
          * @param[in] aResponseData   Information pertaining to the response.
          */
         virtual void OnResponse(CommandSender * commandSender, const ResponseData & aResponseData) {}
@@ -149,7 +149,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param apCommandSender The CommandSender object that initiated the transaction.
+         * @param commandSender   The CommandSender object that initiated the transaction.
          * @param aNoResponseData Details about the request without a response.
          */
         virtual void OnNoResponse(CommandSender * commandSender, const NoResponseData & aNoResponseData) {}

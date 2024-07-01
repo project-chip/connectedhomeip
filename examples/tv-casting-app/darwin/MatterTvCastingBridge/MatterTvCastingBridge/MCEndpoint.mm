@@ -154,4 +154,10 @@
 
     return result;
 }
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MCEndpoint: identifier=%@, vendorId=%@, productId=%@>", [self identifier], [self vendorId], [self productId]];
+}
+
 @end

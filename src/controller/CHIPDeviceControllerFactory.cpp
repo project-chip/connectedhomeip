@@ -476,6 +476,15 @@ void DeviceControllerSystemState::Shutdown()
         mCASESessionManager = nullptr;
     }
 
+    // The above took care of CASE handshakes, and shutting down all the
+    // controllers should have taken care of the PASE handshakes.  Clean up any
+    // outstanding secure sessions (shouldn't really be any, since controllers
+    // should have handled that, but just in case).
+    if (mSessionMgr != nullptr)
+    {
+        mSessionMgr->ExpireAllSecureSessions();
+    }
+
     // mCASEClientPool and mSessionSetupPool must be deallocated
     // after mCASESessionManager, which uses them.
 

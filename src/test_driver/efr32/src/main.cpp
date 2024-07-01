@@ -22,9 +22,9 @@
 #include <FreeRTOS.h>
 #include <PigweedLogger.h>
 #include <PigweedLoggerMutex.h>
+#include <ProvisionManager.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <cstring>
-#include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/UnitTest.h>
@@ -38,7 +38,8 @@
 #include <sl_system_kernel.h>
 #include <task.h>
 
-#include "SilabsDeviceDataProvider.h"
+using namespace chip;
+using namespace chip::DeviceLayer;
 
 extern "C" int printf(const char * format, ...)
 {
@@ -91,16 +92,18 @@ void RunRpcService(void *)
 int main(void)
 {
     sl_system_init();
-    chip::DeviceLayer::Silabs::GetPlatform().Init();
+    Silabs::GetPlatform().Init();
     PigweedLogger::init();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
-    chip::Platform::MemoryInit();
+    Platform::MemoryInit();
+    PlatformMgr().InitChipStack();
 
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    // required for inits tied to the event loop
-    chip::DeviceLayer::SetDeviceInstanceInfoProvider(&chip::DeviceLayer::Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
-    chip::DeviceLayer::SetCommissionableDataProvider(&chip::DeviceLayer::Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+    // Init Provision Manager and provider instanaces. Required for inits tied to the event loop
+    Silabs::Provision::Manager & provision = Silabs::Provision::Manager::GetInstance();
+    provision.Init();
+    SetDeviceInstanceInfoProvider(&provision.GetStorage());
+    SetCommissionableDataProvider(&provision.GetStorage());
 
     SILABS_LOG("***** CHIP EFR32 device tests *****\r\n");
 

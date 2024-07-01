@@ -58,8 +58,6 @@ static_library("openiotsdk") {
     "KVPsaPsStore.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
-    "Logging.h",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
     "OpenIoTSDKArchUtils.c",
@@ -86,4 +84,13 @@ static_library("openiotsdk") {
   }
 
   cflags = [ "-Wconversion" ]
+}
+
+source_set("logging") {
+  public_deps = [
+    ":openiotsdk",
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "${chip_root}/src/platform/openiotsdk/Logging.cpp" ]
 }
