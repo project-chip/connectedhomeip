@@ -89,6 +89,10 @@ private:
     uint32_t mRandomNumber;
 };
 
+bool IsFailSafeArmed(FabricIndex accessingFabricIndex);
+
+void DisarmFailSafeTimer();
+
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters
 } // namespace app
