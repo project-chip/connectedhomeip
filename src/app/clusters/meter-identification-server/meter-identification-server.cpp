@@ -110,3 +110,8 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// -----------------------------------------------------------------------------
+// Plugin initialization
+
+void MatterMeterIdentificationPluginServerInitCallback() {}

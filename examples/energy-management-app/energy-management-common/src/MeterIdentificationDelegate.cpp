@@ -46,33 +46,77 @@ void MeterIdentificationInstance::Shutdown()
 CHIP_ERROR MeterIdentificationDelegate::LoadJson(Json::Value & root)
 {
     Json::Value value = root.get("MeterType", Json::Value());
-#if 0
-    if (!value.empty() && value.isInt())
+    if (!value.empty())
     {
-        mMeterType.SetNonNull(value.asInt());
+        if(value.isInt())
+        {
+            mMeterType.SetNonNull(static_cast<MeterTypeEnum>(value.asInt()));
+        }
+        else
+        {
+            mMeterType.SetNull();
+        }
     }
 
-    value = root.get("Name", Json::Value());
-    if (!mName.IsNull())
+    value = root.get("UtilityName", Json::Value());
+    if (!value.empty())
     {
-        chip::Platform::MemoryFree((void*)mName.Value().data());
-        mName.SetNull();
-    }
-    if (!value.empty() && value.isString())
-    {
-        size_t len = value.asString().size()+1;
-        char *str = (char*)chip::Platform::MemoryAlloc(len);
-        memcpy(str, value.asCString(), len);
-        CharSpan nameString(str, len);
-        mName = MakeNullable(static_cast<CharSpan>(nameString));
+        chip::Platform::MemoryFree((void*)mUtilityName.data());
+        if(value.isString())
+        {
+            size_t len = value.asString().size()+1;
+            char *str = (char*)chip::Platform::MemoryAlloc(len);
+            memcpy(str, value.asCString(), len);
+            mUtilityName = CharSpan(str, len);
+        }
+        else
+        {
+            mUtilityName = CharSpan();
+        }
     }
 
-    value = root.get("ProviderID", Json::Value());
-    if (!value.empty() && value.isInt())
+    value = root.get("PointOfDelivery", Json::Value());
+    if (!value.empty())
     {
-        providerID.SetNonNull(value.asInt());
+        chip::Platform::MemoryFree((void*)mPointOfDelivery.data());
+        if(value.isString())
+        {
+            size_t len = value.asString().size()+1;
+            char *str = (char*)chip::Platform::MemoryAlloc(len);
+            memcpy(str, value.asCString(), len);
+            mPointOfDelivery = CharSpan(str, len);
+        }
+        else
+        {
+            mPointOfDelivery = CharSpan();
+        }
     }
-#endif
+
+    value = root.get("PowerThreshold", Json::Value());
+    if (!value.empty())
+    {
+        if(value.isInt())
+        {
+            mPowerThreshold.SetNonNull(value.asInt());
+        }
+        else
+        {
+            mPowerThreshold.SetNull();
+        }
+    }
+
+    value = root.get("PowerThresholdSource", Json::Value());
+    if (!value.empty())
+    {
+        if(value.isInt())
+        {
+            mPowerThresholdSource.SetNonNull(static_cast<PowerThresholdSourceEnum>(value.asInt()));
+        }
+        else
+        {
+            mPowerThresholdSource.SetNull();
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
