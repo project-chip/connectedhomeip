@@ -83,20 +83,18 @@ TEST_F(TestConfigurationMgr, SerialNumber)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     char buf[64];
-    const char * serialNumber = "89051AAZZ236";
-    chip::Span<const char> serial_number(serialNumber.Value().c_str(), serialNumber.Value().size());
+    CharSpan serialNumber = "89051AAZZ236"_span;
 
-    err = ConfigurationMgr().StoreSerialNumber(serial_number);
+    err = ConfigurationMgr().StoreSerialNumber(serialNumber);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = GetDeviceInstanceInfoProvider()->GetSerialNumber(buf, 64);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EXPECT_EQ(strlen(buf), 12u);
-    EXPECT_STREQ(buf, serialNumber);
+    EXPECT_STREQ(buf, serialNumber.data());
 
-    chip::Span<const char> serial_number(serialNumber.Value().c_str(), 5);
-    err = ConfigurationMgr().StoreSerialNumber(serial_number);
+    err = ConfigurationMgr().StoreSerialNumber(serialNumber.SubSpan(5));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = GetDeviceInstanceInfoProvider()->GetSerialNumber(buf, 64);

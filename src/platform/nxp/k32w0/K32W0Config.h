@@ -75,6 +75,11 @@ public:
     static const Key kConfigKey_SoftwareVersion;
     static const Key kConfigKey_SoftwareUpdateCompleted;
 
+    static const Key kConfigKey_VendorName;
+    static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_HardwareVersionString;
+    static const Key kConfigKey_SoftwareVersionString;
+
     // CHIP Counter Keys
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_UpTime;
