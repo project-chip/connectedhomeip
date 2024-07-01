@@ -1,4 +1,4 @@
-# Configuring Intermittently Connected Devices on TI CC13x4 Platforms
+# Configuring Intermittently Connected Devices on TI SimpleLink CC13x4_CC26x4 Platforms
 
 ## Overview
 
@@ -6,7 +6,7 @@ Intermittently Connected Devices are devices in a network that do not always
 need to be active. Matter has defined a cluster that helps capture this
 behavior; this configuration is ideal for devices that need to operate with low
 power consumption or do not have a need to always be on the network. Matter
-examples on the TI CC13x4 platform can be configured to act as ICDs.
+examples on the TI CC13x4_CC26x4 platform can be configured to act as ICDs.
 
 ## Platform Code Changes
 
