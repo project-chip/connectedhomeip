@@ -132,11 +132,11 @@ public:
     virtual CHIP_ERROR SetFailSafeArmed(bool val)                                      = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
-    virtual CHIP_ERROR StoreSerialNumber(chip::Span<const char> serialNumber)                              = 0;
-    virtual CHIP_ERROR StoreVendorName(chip::Span<const char> vendorName)                                  = 0;
-    virtual CHIP_ERROR StoreProductName(chip::Span<const char> productName)                                = 0;
-    virtual CHIP_ERROR StoreHardwareVersionString(chip::Span<const char> hardwareVersionString)            = 0;
-    virtual CHIP_ERROR StoreSoftwareVersionString(chip::Span<const char> softwareVersionString)            = 0;
+    virtual CHIP_ERROR StoreSerialNumber(CharSpan serialNumber)                                            = 0;
+    virtual CHIP_ERROR StoreVendorName(CharSpan vendorName)                                                = 0;
+    virtual CHIP_ERROR StoreProductName(CharSpan productName)                                              = 0;
+    virtual CHIP_ERROR StoreHardwareVersionString(CharSpan hardwareVersionString)                          = 0;
+    virtual CHIP_ERROR StoreSoftwareVersionString(CharSpan softwareVersionString)                          = 0;
 
 #if CHIP_CONFIG_TEST
     virtual void RunUnitTests() = 0;
