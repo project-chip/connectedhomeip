@@ -129,7 +129,6 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
             }
             VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err || CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err, err);
         }
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         if (searchOverAll || payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kWiFiPAF))
         {
             ChipLogProgress(Controller, "WiFi-PAF: has RendezvousInformationFlag::kWiFiPAF");
@@ -139,7 +138,6 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
             }
             VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err || CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err, err);
         }
-#endif
     }
 
     // We always want to search on network because any node that has already been commissioned will use on-network regardless of the
@@ -254,7 +252,6 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -265,7 +262,6 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverWiFiPAF()
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
     return CHIP_NO_ERROR;
 }
-#endif
 
 bool SetUpCodePairer::ConnectToDiscoveredDevice()
 {
