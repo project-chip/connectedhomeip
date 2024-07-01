@@ -18,7 +18,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/thread-border-router-management-server/thread-br-mgmt-server.h>
-#include <app/server/Server.h>
 #include <cstdint>
 #include <cstring>
 #include <lib/core/CHIPError.h>
@@ -38,6 +37,13 @@ void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb) {}
 } // namespace GeneralCommissioning
 
 namespace ThreadBorderRouterManagement {
+// Mock functions
+bool IsFailSafeArmed(FabricIndex accessingFabricIndex)
+{
+    return true;
+}
+
+void DisarmFailSafeTimer() {}
 
 class TestDelegate : public Delegate
 {

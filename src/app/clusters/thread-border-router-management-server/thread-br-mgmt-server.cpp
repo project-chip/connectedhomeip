@@ -29,7 +29,6 @@
 #include "app/MessageDef/StatusIB.h"
 #include "app/clusters/general-commissioning-server/general-commissioning-server.h"
 #include "app/data-model/Nullable.h"
-#include "app/server/Server.h"
 #include "crypto/RandUtils.h"
 #include "lib/core/CHIPError.h"
 #include "lib/support/CodeUtils.h"
@@ -51,12 +50,6 @@ static bool IsOverCASESession(CommandHandlerInterface::HandlerContext & ctx)
     Messaging::ExchangeContext * exchangeCtx = ctx.mCommandHandler.GetExchangeContext();
     return exchangeCtx && exchangeCtx->HasSessionHandle() && exchangeCtx->GetSessionHandle()->IsSecureSession() &&
         exchangeCtx->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() == Transport::SecureSession::Type::kCASE;
-}
-
-static bool IsFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
-{
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
-    return failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex());
 }
 
 Status ServerInstance::HandleGetDatasetRequest(bool isOverCASESession, Delegate::DatasetType type,
@@ -165,7 +158,7 @@ void ServerInstance::InvokeCommand(HandlerContext & ctxt)
                 mPath               = ctx.mRequestPath;
                 mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
                 ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
-                Status status = HandleSetActiveDatasetRequest(IsFailSafeArmed(ctx), req);
+                Status status = HandleSetActiveDatasetRequest(IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()), req);
                 if (status != Status::Success)
                 {
                     OnActivateDatasetComplete(mRandomNumber, ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(status)));
@@ -341,8 +334,7 @@ void ServerInstance::OnActivateDatasetComplete(uint32_t randomNumber, CHIP_ERROR
     if (error == CHIP_NO_ERROR)
     {
         // The successful completion of the activation process SHALL disarm the fail-safe timer.
-        auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
-        failSafeContext.DisarmFailSafe();
+        DisarmFailSafeTimer();
         CommitSavedBreadcrumb();
     }
     else
