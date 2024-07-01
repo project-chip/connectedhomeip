@@ -125,7 +125,7 @@ CHIP_ERROR CalendarProvider::SetCalendarPeriod(DataModel::Nullable<uint32_t> Sta
     UnlockThreadTask();
     return CHIP_NO_ERROR;
 }
- 
+
 CHIP_ERROR CalendarProvider::SetSpecialDays(DataModel::List<Structs::DayStruct::Type> SpecialDays)
 {
     LockThreadTask();
@@ -162,7 +162,7 @@ CHIP_ERROR CalendarProvider::SetCurrentAndNextDays(
     UnlockThreadTask();
     return CHIP_NO_ERROR;
 }
-    
+
 CHIP_ERROR CalendarProvider::SetPeakPeriods(
         DataModel::Nullable<Structs::PeakPeriodStruct::Type> CurrentPeakPeriod,
         DataModel::Nullable<Structs::PeakPeriodStruct::Type> NextPeakPeriod)
@@ -266,7 +266,7 @@ DataModel::Nullable<Structs::TransitionStruct::Type> EnergyCalendarServer::GetTr
     uint32_t next_tr_time = kSecInOneDay;
 
     const Structs::TransitionStruct::Type *current = nullptr;
-    
+
     while(transition != currentDay.transitions.end())
     {
         auto tr_time = transition->transitionTime;
@@ -329,7 +329,7 @@ CHIP_ERROR EnergyCalendarServer::Write(const ConcreteDataAttributePath & aPath, 
     {
     default:
         // Unknown attribute; return error.  None of the other attributes for
-        // this cluster are writable, so should not be ending up in this code to         
+        // this cluster are writable, so should not be ending up in this code to
         // start with.
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }

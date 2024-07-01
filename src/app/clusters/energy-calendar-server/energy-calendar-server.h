@@ -66,7 +66,7 @@ public:
 
     CHIP_ERROR SetCurrentAndNextDays(DataModel::Nullable<Structs::DayStruct::Type> CurrentDay,
         DataModel::Nullable<Structs::DayStruct::Type> NextDay);
-    
+
     CHIP_ERROR SetPeakPeriods(DataModel::Nullable<Structs::PeakPeriodStruct::Type> CurrentPeakPeriod,
         DataModel::Nullable<Structs::PeakPeriodStruct::Type> NextPeakPeriod);
 

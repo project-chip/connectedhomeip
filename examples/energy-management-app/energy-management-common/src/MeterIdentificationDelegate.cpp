@@ -73,8 +73,8 @@ CHIP_ERROR MeterIdentificationDelegate::LoadJson(Json::Value & root)
         providerID.SetNonNull(value.asInt());
     }
     #endif
-    
-    return CHIP_NO_ERROR;    
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MeterIdentificationDelegate::SetMeterType(DataModel::Nullable<MeterTypeEnum> newValue)

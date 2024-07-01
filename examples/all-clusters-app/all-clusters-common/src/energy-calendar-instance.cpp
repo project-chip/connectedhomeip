@@ -72,7 +72,7 @@ void CalendarProviderInstance::SetDefault(void)
     uint32_t time = date % kOneDay;
     date -= time;
 
-    Structs::DayStruct::Type day = { .date = {}, 
+    Structs::DayStruct::Type day = { .date = {},
         .transitions = {
 //            { .transitionTime = 0, .PriceTier = 10},
 //            { .transitionTime = 1000, .PriceTier = 20}
@@ -370,7 +370,7 @@ void CalendarProviderInstance::JsonToCalendarPeriodStruct(Json::Value & root, St
     {
         value.startDate.SetNonNull(t.asInt());
     }
-    
+
     t = root.get("days", Json::Value());
     if (!t.empty() && t.isArray())
     {
@@ -386,7 +386,7 @@ void CalendarProviderInstance::JsonToDayStruct(Json::Value & root, Structs::DayS
     {
         value.date.SetValue(t.asInt());
     }
-    
+
     t = root.get("daysOfWeek", Json::Value());
     if (!t.empty() && t.isInt())
     {
@@ -414,7 +414,7 @@ void CalendarProviderInstance::JsonToPeakPeriodStruct(Json::Value & root, Struct
     {
         value.severity = static_cast<PeakPeriodSeverityEnum>(t.asInt());
     }
-    
+
     t = root.get("peakPeriod", Json::Value());
     if (!t.empty() && t.isInt())
     {
@@ -426,7 +426,7 @@ void CalendarProviderInstance::JsonToPeakPeriodStruct(Json::Value & root, Struct
     {
         value.startTime.SetNonNull(t.asInt());
     }
-    
+
     t = root.get("endTime", Json::Value());
     if (!t.empty() && t.isInt())
     {
@@ -477,19 +477,19 @@ void CalendarProviderInstance::JsonToTransitionStructList(Json::Value & root,
         {
             value[i].transitionTime = static_cast<uint16_t>(t.asInt());
         }
- 
+
         t = v.get("priceTier", Json::Value());
         if (!t.empty() && t.isInt())
         {
             value[i].priceTier.SetValue(t.asInt());
         }
-        
+
         t = v.get("friendlyCredit", Json::Value());
         if (!t.empty() && t.isBool())
         {
             value[i].friendlyCredit.SetValue(t.asBool());
         }
- 
+
         t = v.get("auxiliaryLoad", Json::Value());
         if (!t.empty() && t.isInt())
         {
@@ -522,7 +522,7 @@ void CalendarProviderInstance::FreeMemoryCalendarPeriodStruct(Structs::CalendarP
         Structs::DayStruct::Type* day = (Structs::DayStruct::Type*)&item;
         FreeMemoryDayStruct(*day);
     }
-    
+
     DataModel::List<const Structs::DayStruct::Type> tmp;
     std::swap(tmp, value.days);
     chip::Platform::MemoryFree((void*)tmp.data());
@@ -551,7 +551,7 @@ void emberAfEnergyCalendarClusterInitCallback(chip::EndpointId endpointId)
     if (gMIDelegate)
     {
         gMIDelegate->Init();
-        
+
         gMIInstance = std::make_unique<EnergyCalendarServer>(BitMask<Feature, uint32_t>(
             Feature::kPricingTier, Feature::kFriendlyCredit, Feature::kAuxiliaryLoad, Feature::kPeakPeriod));
 
