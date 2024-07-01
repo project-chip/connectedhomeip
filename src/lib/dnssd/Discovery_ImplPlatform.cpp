@@ -419,7 +419,12 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
     VerifyOrReturnError(mState == State::kUninitialized, CHIP_NO_ERROR);
     mState = State::kInitializing;
 
-    ReturnErrorOnFailure(ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this));
+    CHIP_ERROR err = ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        mState = State::kUninitialized;
+        return err;
+    }
     UpdateCommissionableInstanceName();
 
     return CHIP_NO_ERROR;

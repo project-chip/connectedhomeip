@@ -128,24 +128,26 @@ public class ConnectionExampleFragment extends Fragment {
             () -> {
               Log.d(TAG, "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection()");
 
-              IdentificationDeclarationOptions idOptions = new IdentificationDeclarationOptions();
-              TargetAppInfo targetAppInfo = new TargetAppInfo();
-              targetAppInfo.vendorId = DESIRED_TARGET_APP_VENDOR_ID;
+              IdentificationDeclarationOptions idOptions;
+              TargetAppInfo targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID);
 
               if (useCommissionerGeneratedPasscode) {
-                idOptions.commissionerPasscode = true;
-                targetAppInfo.vendorId = DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW;
+                // Set commissionerPasscode to true for CastingPlayer/Commissioner-Generated
+                // passcode commissioning.
+                idOptions = new IdentificationDeclarationOptions(false, false, true, false, false);
+                targetAppInfo = new TargetAppInfo(DESIRED_TARGET_APP_VENDOR_ID_FOR_CGP_FLOW);
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "
-                        + targetAppInfo.vendorId
+                        + targetAppInfo.getVendorId()
                         + ", useCommissionerGeneratedPasscode: "
                         + useCommissionerGeneratedPasscode);
               } else {
+                idOptions = new IdentificationDeclarationOptions();
                 Log.d(
                     TAG,
                     "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection() Target Content Application Vendor ID: "
-                        + targetAppInfo.vendorId);
+                        + targetAppInfo.getVendorId());
               }
 
               idOptions.addTargetAppInfo(targetAppInfo);
@@ -242,21 +244,21 @@ public class ConnectionExampleFragment extends Fragment {
         new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            String passcode = input.getText().toString();
+            String userEnteredPasscode = input.getText().toString();
             Log.i(
                 TAG,
-                "displayPasscodeInputDialog() User entered CastingPlayer/Commissioner-Generated passcode: "
-                    + passcode);
+                "displayPasscodeInputDialog() user-entered CastingPlayer/Commissioner-Generated passcode: "
+                    + userEnteredPasscode);
 
             // Display the user entered passcode on the screen
             connectionFragmentStatusTextView.setText(
-                "Continue Connecting with user entered CastingPlayer/Commissioner-Generated passcode: "
-                    + passcode
+                "Continue Connecting with user-entered CastingPlayer/Commissioner-Generated passcode: "
+                    + userEnteredPasscode
                     + "\n\n");
 
             long passcodeLongValue = DEFAULT_COMMISSIONER_GENERATED_PASSCODE;
             try {
-              passcodeLongValue = Long.parseLong(passcode);
+              passcodeLongValue = Long.parseLong(userEnteredPasscode);
               Log.i(
                   TAG,
                   "displayPasscodeInputDialog() User entered CastingPlayer/Commissioner-Generated passcode: "
@@ -268,12 +270,12 @@ public class ConnectionExampleFragment extends Fragment {
                       + nfe);
               connectionFragmentStatusTextView.setText(
                   "User entered CastingPlayer/Commissioner-Generated passcode is not a valid integer: "
-                      + passcode
+                      + userEnteredPasscode
                       + "\n\n");
             }
 
-            // Update the CommissionableData DataProvider with the user entered
-            // CastingPlayer/Commissioner-Generated setup passcode. This is mandatory for
+            // Update the CommissionableData DataProvider with the user-entered
+            // CastingPlayer / Commissioner-Generated setup passcode. This is mandatory for
             // Commissioner-Generated passcode commissioning since the commissioning session's PAKE
             // verifier needs to be updated with the entered passcode.
             InitializationExample.commissionableDataProvider.updateCommissionableDataSetupPasscode(

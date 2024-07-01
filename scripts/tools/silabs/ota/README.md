@@ -21,7 +21,7 @@ This is a wrapper over standard `ota_image_tool.py`, so the options for `create`
 are also available here:
 
 ```
-python3 ./scripts/tools/silabs/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256
+python3 ./scripts/tools/silabs/ota/ota_multi_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256
 ```
 
 followed by \*_custom options_- and a positional argument (should be last) that

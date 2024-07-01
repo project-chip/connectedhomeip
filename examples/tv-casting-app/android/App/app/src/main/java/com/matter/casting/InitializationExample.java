@@ -28,10 +28,6 @@ import com.matter.casting.support.MatterError;
 
 public class InitializationExample {
   private static final String TAG = InitializationExample.class.getSimpleName();
-  // Dummy values for commissioning demonstration only. These are hard coded in the example tv-app:
-  // connectedhomeip/examples/tv-app/tv-common/src/AppTv.cpp
-  private static final long DUMMY_SETUP_PASSCODE = 20202021;
-  private static final int DUMMY_DISCRIMINATOR = 3874;
 
   /**
    * DataProvider implementation for the Unique ID that is used by the SDK to generate the Rotating
@@ -53,6 +49,12 @@ public class InitializationExample {
    * through commissioning
    */
   public static class CommissionableDataProvider implements DataProvider<CommissionableData> {
+    // Dummy values for commissioning demonstration only. These are hard coded in the example
+    // tv-app:
+    // connectedhomeip/examples/tv-app/tv-common/src/AppTv.cpp
+    private static final long DUMMY_SETUP_PASSCODE = 20202021;
+    private static final int DUMMY_DISCRIMINATOR = 3874;
+
     CommissionableData commissionableData =
         new CommissionableData(DUMMY_SETUP_PASSCODE, DUMMY_DISCRIMINATOR);
 

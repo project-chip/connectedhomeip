@@ -581,7 +581,8 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 
     if (lAllocSize > PacketBuffer::kMaxAllocSize)
     {
-        ChipLogError(chipSystemLayer, "PacketBuffer: allocation exceeding buffer capacity limits.");
+        ChipLogError(chipSystemLayer, "PacketBuffer: allocation exceeding buffer capacity limits: %lu > %lu",
+                     static_cast<unsigned long>(lAllocSize), static_cast<unsigned long>(PacketBuffer::kMaxAllocSize));
         return PacketBufferHandle();
     }
 
