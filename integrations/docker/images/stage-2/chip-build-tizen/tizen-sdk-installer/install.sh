@@ -21,7 +21,7 @@ set -e
 # Default settings options
 TIZEN_SDK_ROOT=/opt/tizen-sdk
 TIZEN_SDK_DATA_PATH=$HOME/tizen-sdk-data
-TIZEN_VERSION=7.0
+TIZEN_VERSION=8.0
 SECRET_TOOL=false
 
 SCRIPT_NAME=$(basename -- "$(readlink -f "${BASH_SOURCE:?}")")
@@ -133,7 +133,7 @@ function install_tizen_sdk() {
 
     info "Tizen SDK installation directory: $TIZEN_SDK_ROOT"
 
-    TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core"
+    TIZEN_SDK_SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
 
     cd "$TMP_DIR" || return
 
@@ -167,8 +167,8 @@ function install_tizen_sdk() {
     # Different versions of Tizen have different rootstrap versions
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     PKG_ARR=(
-        "mobile-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
-        "mobile-$TIZEN_VERSION-rs-device.core_*_ubuntu-64.zip")
+        "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
+        "tizen-$TIZEN_VERSION-rs-device.core_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
 
     # Base packages
@@ -232,13 +232,8 @@ function install_tizen_sdk() {
         'capi-system-peripheral-io-*.armv7l.rpm'
         'capi-system-peripheral-io-devel-*.armv7l.rpm'
         'capi-system-resource-1*.armv7l.rpm'
-        'libnsd-dns-sd-*.armv7l.rpm')
-    download "$URL" "${PKG_ARR[@]}"
-
-    # Tizen Developer Platform Certificate
-    URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
-    PKG_ARR=(
-        "$TIZEN_VERSION-iot-things-add-ons_*_ubuntu-64.zip")
+        'libnsd-dns-sd-*.armv7l.rpm'
+        'sensord-*.armv7l.rpm')
     download "$URL" "${PKG_ARR[@]}"
 
     # Install all
@@ -262,16 +257,12 @@ function install_tizen_sdk() {
     echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>"$TIZEN_SDK_ROOT/sdk.info"
     ln -sf "$TIZEN_SDK_DATA_PATH/.tizen-cli-config" "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
 
-    # Use Tizen developer platform certificate as default
-    cp "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/sdk-platform/* \
-        "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/
-
     # Make symbolic links relative
     find "$TIZEN_SDK_SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do
         ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
     done
     ln -sf ../../lib/libcap.so.2 "$TIZEN_SDK_SYSROOT/usr/lib/libcap.so"
-    ln -sf openssl1.1.pc "$TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc"
+    ln -sf openssl3.pc "$TIZEN_SDK_SYSROOT/usr/lib/pkgconfig/openssl.pc"
 
     info "Done."
     echo
@@ -282,39 +273,39 @@ function install_tizen_sdk() {
     echo "export TIZEN_VERSION=\"$TIZEN_VERSION\""
     echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
     echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2\""
-    echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core\""
+    echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core\""
     echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
     echo -n "$COLOR_NONE"
 }
 
 while (($#)); do
     case $1 in
-        -h | --help)
-            show_help
-            exit 0
-            ;;
-        --tizen-sdk-path)
-            TIZEN_SDK_ROOT="$2"
-            shift
-            ;;
-        --tizen-sdk-data-path)
-            TIZEN_SDK_DATA_PATH="$2"
-            shift
-            ;;
-        --tizen-version)
-            TIZEN_VERSION=$2
-            shift
-            ;;
-        --install-dependencies)
-            INSTALL_DEPENDENCIES=true
-            ;;
-        --override-secret-tool)
-            SECRET_TOOL=true
-            ;;
-        *)
-            error "Wrong options usage!"
-            exit 1
-            ;;
+    -h | --help)
+        show_help
+        exit 0
+        ;;
+    --tizen-sdk-path)
+        TIZEN_SDK_ROOT="$2"
+        shift
+        ;;
+    --tizen-sdk-data-path)
+        TIZEN_SDK_DATA_PATH="$2"
+        shift
+        ;;
+    --tizen-version)
+        TIZEN_VERSION=$2
+        shift
+        ;;
+    --install-dependencies)
+        INSTALL_DEPENDENCIES=true
+        ;;
+    --override-secret-tool)
+        SECRET_TOOL=true
+        ;;
+    *)
+        error "Wrong options usage!"
+        exit 1
+        ;;
     esac
     shift
 done
