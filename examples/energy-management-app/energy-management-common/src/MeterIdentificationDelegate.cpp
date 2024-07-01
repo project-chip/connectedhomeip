@@ -43,6 +43,40 @@ void MeterIdentificationInstance::Shutdown()
 
 // --------------- Internal Attribute Set APIs
 
+CHIP_ERROR MeterIdentificationDelegate::LoadJson(Json::Value & root)
+{
+    Json::Value value = root.get("MeterType", Json::Value());
+    #if 0
+    if (!value.empty() && value.isInt())
+    {
+        mMeterType.SetNonNull(value.asInt());
+    }
+
+    value = root.get("Name", Json::Value());
+    if (!mName.IsNull())
+    {
+        chip::Platform::MemoryFree((void*)mName.Value().data());
+        mName.SetNull();
+    }
+    if (!value.empty() && value.isString())
+    {
+        size_t len = value.asString().size()+1;
+        char *str = (char*)chip::Platform::MemoryAlloc(len);
+        memcpy(str, value.asCString(), len);
+        CharSpan nameString(str, len);
+        mName = MakeNullable(static_cast<CharSpan>(nameString));
+    }
+
+    value = root.get("ProviderID", Json::Value());
+    if (!value.empty() && value.isInt())
+    {
+        providerID.SetNonNull(value.asInt());
+    }
+    #endif
+    
+    return CHIP_NO_ERROR;    
+}
+
 CHIP_ERROR MeterIdentificationDelegate::SetMeterType(DataModel::Nullable<MeterTypeEnum> newValue)
 {
     //DataModel::Nullable<MeterTypeEnum> oldValue = mMeterType;

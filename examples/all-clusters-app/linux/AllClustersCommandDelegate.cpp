@@ -36,6 +36,7 @@
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
 #include "energy-calendar-instance.h"
+#include <MeterIdentificationDelegate.h>
 
 #include <string>
 
@@ -194,6 +195,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "EnergyCalendar")
     {
         self->OnEnergyCalendarHandler(self->mJsonValue);
+    }
+    else if (name == "MeterIdentification")
+    {
+        self->OnMeterIdentificationHandler(self->mJsonValue);
     }
     else
     {
@@ -504,6 +509,12 @@ void AllClustersAppCommandHandler::OnEnergyCalendarHandler(Json::Value param)
 {
     EnergyCalendar::CalendarProviderInstance *provider = EnergyCalendar::GetProvider();
     provider->LoadJson(param);
+}
+
+void AllClustersAppCommandHandler::OnMeterIdentificationHandler(Json::Value param)
+{
+    MeterIdentification::MeterIdentificationDelegate *delegate = MeterIdentification::GetDelegate();
+    delegate->LoadJson(param);
 }
 
 void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)

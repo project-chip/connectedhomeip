@@ -20,6 +20,7 @@
 #include <app/clusters/meter-identification-server/meter-identification-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
+#include <json/value.h>
 
 namespace chip {
 namespace app {
@@ -30,6 +31,8 @@ class MeterIdentificationDelegate : public MeterIdentification::Delegate
 {
 public:
     ~MeterIdentificationDelegate() = default;
+
+    CHIP_ERROR LoadJson(Json::Value & root);
 
     // Attribute Accessors
 
@@ -77,6 +80,9 @@ public:
 private:
     MeterIdentificationDelegate * mDelegate;
 };
+
+MeterIdentificationDelegate *GetDelegate();
+
 
 } // namespace MeterIdentification
 } // namespace Clusters

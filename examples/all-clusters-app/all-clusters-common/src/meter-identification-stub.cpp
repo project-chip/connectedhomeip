@@ -40,3 +40,8 @@ void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpointId)
         gMIInstance->Init();
     }
 }
+
+MeterIdentificationDelegate *chip::app::Clusters::MeterIdentification::GetDelegate()
+{
+    return &(*gMIDelegate);
+}
