@@ -75,30 +75,31 @@ target_compile_definitions(app PUBLIC
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE
-                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
-                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorZephyr.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorZephyr.cpp
     )
     target_include_directories(app PRIVATE
-                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/include/
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/include/
     )
 endif()
 
 chip_configure_data_model(app
-    ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/../../laundry-washer-app/nxp/zap/laundry-washer-app.zap
+    INCLUDE_SERVER
+    ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/../../laundry-washer-app/nxp/zap/laundry-washer-app-wifi-noicd.zap
 )
 
 if(CONFIG_CHIP_LIB_SHELL)
     target_compile_definitions(app PRIVATE ENABLE_CHIP_SHELL)
-    target_include_directories(app PRIVATE 
-                               ${CHIP_ROOT}/examples/shell/shell_common/include
-                               ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/include
+    target_include_directories(app PRIVATE
+        ${CHIP_ROOT}/examples/shell/shell_common/include
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/include
     )
     target_sources(app PRIVATE
-                   ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/AppCLIBase.cpp
-                   ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/AppCLIZephyr.cpp
-                   ${CHIP_ROOT}/examples/shell/shell_common/cmd_misc.cpp
-                   ${CHIP_ROOT}/examples/shell/shell_common/cmd_otcli.cpp
-                   ${CHIP_ROOT}/examples/shell/shell_common/cmd_server.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/AppCLIBase.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/AppCLIZephyr.cpp
+        ${CHIP_ROOT}/examples/shell/shell_common/cmd_misc.cpp
+        ${CHIP_ROOT}/examples/shell/shell_common/cmd_otcli.cpp
+        ${CHIP_ROOT}/examples/shell/shell_common/cmd_server.cpp
     )
 endif()
 
