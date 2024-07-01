@@ -198,6 +198,8 @@ public:
 
     void setContentAppCommandDelegate(ContentAppCommandDelegate * commandDelegate);
 
+    void LogInstalledApps();
+
 protected:
     // TODO: Update to use unique_ptr instead of raw pointers
     std::vector<ContentAppImpl *> mContentApps;

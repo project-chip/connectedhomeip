@@ -503,6 +503,16 @@ EndpointId ContentAppFactoryImpl::RemoveContentApp(EndpointId epId)
     return kInvalidEndpointId;
 }
 
+void ContentAppFactoryImpl::LogInstalledApps()
+{
+    for (auto & contentApp : mContentApps)
+    {
+        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d is on ep=%d",
+                        contentApp->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                        contentApp->GetApplicationBasicDelegate()->HandleGetProductId(), contentApp->GetEndpointId());
+    }
+}
+
 void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
 {
     mAdminVendorIds.push_back(vendorId);
