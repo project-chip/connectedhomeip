@@ -82,8 +82,8 @@ CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncode
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        jint size = env->GetArrayLength(jCatalogList);
-        jint *elements = env->GetIntArrayElements(jCatalogList, 0);
+        jint size       = env->GetArrayLength(jCatalogList);
+        jint * elements = env->GetIntArrayElements(jCatalogList, 0);
         for (int i = 0; i < size; i++)
         {
             jint jCatalogVendorId = elements[i];
