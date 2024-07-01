@@ -109,11 +109,7 @@ if (current_os == "android") {
 stdio_archive = "$root_out_dir/liblogging-stdio.a"
 
 source_set("stdio") {
-  if (chip_device_platform == "darwin") {
-    sources = [ "impl/stdio/darwin/Logging.cpp" ]
-  } else {
-    sources = [ "impl/stdio/Logging.cpp" ]
-  }
+  sources = [ "impl/stdio/Logging.cpp" ]
 
   deps = [
     ":headers",
