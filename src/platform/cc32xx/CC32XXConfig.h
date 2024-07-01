@@ -57,6 +57,11 @@ public:
     static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_UniqueId;
 
+    static const Key kConfigKey_VendorName;
+    static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_HardwareVersionString;
+    static const Key kConfigKey_SoftwareVersionString;
+
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;

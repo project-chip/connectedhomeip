@@ -64,6 +64,11 @@ const K32WConfig::Key K32WConfig::kConfigKey_UniqueId{ &K32WConfig::sConfigStora
 const K32WConfig::Key K32WConfig::kConfigKey_SoftwareVersion{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0B };
 const K32WConfig::Key K32WConfig::kConfigKey_SoftwareUpdateCompleted{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0C };
 
+const K32WConfig::Key K32WConfig::kConfigKey_VendorName{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0D };
+const K32WConfig::Key K32WConfig::kConfigKey_ProductName{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0E };
+const K32WConfig::Key K32WConfig::kConfigKey_HardwareVersionString{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0F };
+const K32WConfig::Key K32WConfig::kConfigKey_SoftwareVersionString{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x10 };
+
 const K32WConfig::Key K32WConfig::kCounterKey_RebootCount{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x00 };
 const K32WConfig::Key K32WConfig::kCounterKey_UpTime{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x01 };
 const K32WConfig::Key K32WConfig::kCounterKey_TotalOperationalHours{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x02 };
