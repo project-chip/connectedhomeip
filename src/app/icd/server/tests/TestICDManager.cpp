@@ -25,12 +25,12 @@
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <app/icd/server/tests/ICDConfigurationDataTestAccess.h>
-#include <app/tests/AppTestContext.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/TimeUtils.h>
+#include <messaging/tests/MessagingContext.h>
 #include <system/SystemLayerImpl.h>
 
 using namespace chip;
@@ -131,7 +131,7 @@ System::Clock::ClockBase * pRealClock           = nullptr;
 namespace chip {
 namespace app {
 
-class TestICDManager : public Test::AppContext
+class TestICDManager : public Test::LoopbackMessagingContext
 {
 public:
     /*
@@ -156,8 +156,10 @@ public:
             ASSERT_NE(pMockClock, nullptr);
         }
 
-        AppContext::SetUpTestSuite();
+        LoopbackMessagingContext::SetUpTestSuite();
         VerifyOrReturn(!HasFailure());
+
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
         DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
         pRealClock = &SystemClock();
@@ -170,7 +172,9 @@ public:
         Clock::Internal::SetSystemClockForTesting(pRealClock);
         DeviceLayer::SetSystemLayerForTesting(nullptr);
 
-        AppContext::TearDownTestSuite();
+        DeviceLayer::PlatformMgr().Shutdown();
+
+        LoopbackMessagingContext::TearDownTestSuite();
 
         if (pMockClock != nullptr)
         {
@@ -184,7 +188,7 @@ public:
     // Performs setup for each individual test in the test suite
     void SetUp() override
     {
-        AppContext::SetUp();
+        LoopbackMessagingContext::SetUp();
         VerifyOrReturn(!HasFailure());
 
         mICDStateObserver.ResetAll();
@@ -196,7 +200,7 @@ public:
     void TearDown() override
     {
         mICDManager.Shutdown();
-        AppContext::TearDown();
+        LoopbackMessagingContext::TearDown();
     }
 
     TestSessionKeystoreImpl mKeystore;
