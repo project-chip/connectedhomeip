@@ -310,6 +310,7 @@ TEST_F(TestTLVPacketBufferBackingStore, TestWriterReserveUnreserveDoesNotOverflo
     EXPECT_EQ(error, CHIP_ERROR_INCORRECT_STATE);
 }
 
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
 TEST_F(TestTLVPacketBufferBackingStore, TestWriterReserve)
 {
     // Start with a too-small buffer.
@@ -333,3 +334,4 @@ TEST_F(TestTLVPacketBufferBackingStore, TestWriterReserve)
     error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
     EXPECT_EQ(error, CHIP_NO_ERROR);
 }
+#endif
