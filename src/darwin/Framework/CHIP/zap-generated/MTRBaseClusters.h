@@ -17756,6 +17756,11 @@ typedef NS_OPTIONS(uint32_t, MTRGroupKeyManagementFeature) {
     MTRGroupKeyManagementFeatureCacheAndSync MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRICDManagementClientType) {
+    MTRICDManagementClientTypePermanent MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRICDManagementClientTypeEphemeral MTR_PROVISIONALLY_AVAILABLE = 0x01,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRICDManagementOperatingMode) {
     MTRICDManagementOperatingModeSIT MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRICDManagementOperatingModeLIT MTR_PROVISIONALLY_AVAILABLE = 0x01,

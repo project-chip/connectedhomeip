@@ -13130,6 +13130,7 @@ enum class Fields : uint8_t
 {
     kCheckInNodeID    = 1,
     kMonitoredSubject = 2,
+    kClientType       = 4,
     kFabricIndex      = 254,
 };
 
@@ -13138,6 +13139,7 @@ struct Type
 public:
     chip::NodeId checkInNodeID    = static_cast<chip::NodeId>(0);
     uint64_t monitoredSubject     = static_cast<uint64_t>(0);
+    ClientTypeEnum clientType     = static_cast<ClientTypeEnum>(0);
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -13198,6 +13200,7 @@ enum class Fields : uint8_t
     kMonitoredSubject = 1,
     kKey              = 2,
     kVerificationKey  = 3,
+    kClientType       = 4,
 };
 
 struct Type
@@ -13211,6 +13214,7 @@ public:
     uint64_t monitoredSubject  = static_cast<uint64_t>(0);
     chip::ByteSpan key;
     Optional<chip::ByteSpan> verificationKey;
+    ClientTypeEnum clientType = static_cast<ClientTypeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -13229,6 +13233,7 @@ public:
     uint64_t monitoredSubject  = static_cast<uint64_t>(0);
     chip::ByteSpan key;
     Optional<chip::ByteSpan> verificationKey;
+    ClientTypeEnum clientType = static_cast<ClientTypeEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RegisterClient

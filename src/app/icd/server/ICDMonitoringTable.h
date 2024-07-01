@@ -20,6 +20,7 @@
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/ClusterEnums.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentData.h>
@@ -101,14 +102,15 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
      */
     bool IsKeyEquivalent(ByteSpan keyData);
 
-    chip::FabricIndex fabricIndex                 = kUndefinedFabricIndex;
-    chip::NodeId checkInNodeID                    = kUndefinedNodeId;
-    uint64_t monitoredSubject                     = static_cast<uint64_t>(0);
-    Crypto::Aes128KeyHandle aesKeyHandle          = Crypto::Aes128KeyHandle();
-    Crypto::Hmac128KeyHandle hmacKeyHandle        = Crypto::Hmac128KeyHandle();
-    bool keyHandleValid                           = false;
-    uint16_t index                                = 0;
-    Crypto::SymmetricKeystore * symmetricKeystore = nullptr;
+    chip::FabricIndex fabricIndex                           = kUndefinedFabricIndex;
+    chip::NodeId checkInNodeID                              = kUndefinedNodeId;
+    uint64_t monitoredSubject                               = static_cast<uint64_t>(0);
+    app::Clusters::IcdManagement::ClientTypeEnum clientType = app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
+    Crypto::Aes128KeyHandle aesKeyHandle                    = Crypto::Aes128KeyHandle();
+    Crypto::Hmac128KeyHandle hmacKeyHandle                  = Crypto::Hmac128KeyHandle();
+    bool keyHandleValid                                     = false;
+    uint16_t index                                          = 0;
+    Crypto::SymmetricKeystore * symmetricKeystore           = nullptr;
 };
 
 /**

@@ -23986,6 +23986,9 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo icdManagementregisterClientverificationKeyCommandParameterInfo = new CommandParameterInfo("verificationKey", Optional.class, byte[].class);
     icdManagementregisterClientCommandParams.put("verificationKey",icdManagementregisterClientverificationKeyCommandParameterInfo);
+
+    CommandParameterInfo icdManagementregisterClientclientTypeCommandParameterInfo = new CommandParameterInfo("clientType", Integer.class, Integer.class);
+    icdManagementregisterClientCommandParams.put("clientType",icdManagementregisterClientclientTypeCommandParameterInfo);
     InteractionInfo icdManagementregisterClientInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.IcdManagementCluster) cluster)
@@ -24001,6 +24004,9 @@ public class ClusterInfoMapping {
 
            , (Optional<byte[]>)
              commandArguments.get("verificationKey")
+
+           , (Integer)
+             commandArguments.get("clientType")
 
             );
         },

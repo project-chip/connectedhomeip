@@ -558,6 +558,13 @@ public:
         return *this;
     }
 
+    Optional<app::Clusters::IcdManagement::ClientTypeEnum> GetICDClientType() const { return mICDClientType; }
+    CommissioningParameters & SetICDClientType(app::Clusters::IcdManagement::ClientTypeEnum icdClientType)
+    {
+        mICDClientType = MakeOptional(icdClientType);
+        return *this;
+    }
+
     Optional<uint32_t> GetICDStayActiveDurationMsec() const { return mICDStayActiveDurationMsec; }
     CommissioningParameters & SetICDStayActiveDurationMsec(uint32_t stayActiveDurationMsec)
     {
@@ -632,6 +639,7 @@ private:
     Optional<NodeId> mICDCheckInNodeId;
     Optional<uint64_t> mICDMonitoredSubject;
     Optional<ByteSpan> mICDSymmetricKey;
+    Optional<app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
     Optional<uint32_t> mICDStayActiveDurationMsec;
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;

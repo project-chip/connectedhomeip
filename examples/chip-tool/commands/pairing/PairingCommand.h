@@ -74,6 +74,8 @@ public:
                     "The check-in node id for the ICD, default: node id of the commissioner.");
         AddArgument("icd-monitored-subject", 0, UINT64_MAX, &mICDMonitoredSubject,
                     "The monitored subject of the ICD, default: The node id used for icd-check-in-nodeid.");
+        AddArgument("icd-client-type", 0, 1, &mICDClientType,
+                    "The ClientType of the client registering, default: Permanent client - 0");
         AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
         AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
@@ -245,6 +247,7 @@ private:
     chip::Optional<NodeId> mICDCheckInNodeId;
     chip::Optional<chip::ByteSpan> mICDSymmetricKey;
     chip::Optional<uint64_t> mICDMonitoredSubject;
+    chip::Optional<chip::app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
     chip::Optional<uint32_t> mICDStayActiveDurationMsec;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>

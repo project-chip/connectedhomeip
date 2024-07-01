@@ -4064,6 +4064,7 @@ class ChipClusters:
                     "monitoredSubject": "int",
                     "key": "bytes",
                     "verificationKey": "bytes",
+                    "clientType": "int",
                 },
             },
             0x00000002: {

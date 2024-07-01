@@ -18618,11 +18618,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey) {
-      registerClient(callback, checkInNodeID, monitoredSubject, key, verificationKey, 0);
+    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey, Integer clientType) {
+      registerClient(callback, checkInNodeID, monitoredSubject, key, verificationKey, clientType, 0);
     }
 
-    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey, int timedInvokeTimeoutMs) {
+    public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey, Integer clientType, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -18641,6 +18641,10 @@ public class ChipClusters {
       final long verificationKeyFieldID = 3L;
       BaseTLVType verificationKeytlvValue = verificationKey.<BaseTLVType>map((nonOptionalverificationKey) -> new ByteArrayType(nonOptionalverificationKey)).orElse(new EmptyType());
       elements.add(new StructElement(verificationKeyFieldID, verificationKeytlvValue));
+
+      final long clientTypeFieldID = 4L;
+      BaseTLVType clientTypetlvValue = new UIntType(clientType);
+      elements.add(new StructElement(clientTypeFieldID, clientTypetlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
