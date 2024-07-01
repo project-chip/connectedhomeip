@@ -90,11 +90,14 @@ CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId)
     chip_rpc_SynchronizedDevice device;
     device.node_id = nodeId;
 
-    // The RPC will remain active as long as `addSynchronizedDeviceCall` is alive.
+    // By assigning the returned call to the global 'addSynchronizedDeviceCall', the RPC
+    // call is kept alive until it completes. When a response is received, it
+    // will be logged by the handler function and the call will complete.
     addSynchronizedDeviceCall = fabricBridgeClient.AddSynchronizedDevice(device, OnAddDeviceResponseCompleted);
 
     if (!addSynchronizedDeviceCall.active())
     {
+        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -114,11 +117,14 @@ CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId)
     chip_rpc_SynchronizedDevice device;
     device.node_id = nodeId;
 
-    // The RPC will remain active as long as `removeSynchronizedDeviceCall` is alive.
+    // By assigning the returned call to the global 'removeSynchronizedDeviceCall', the RPC
+    // call is kept alive until it completes. When a response is received, it
+    // will be logged by the handler function and the call will complete.
     removeSynchronizedDeviceCall = fabricBridgeClient.RemoveSynchronizedDevice(device, OnRemoveDeviceResponseCompleted);
 
     if (!removeSynchronizedDeviceCall.active())
     {
+        // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
         return CHIP_ERROR_INTERNAL;
     }
 
