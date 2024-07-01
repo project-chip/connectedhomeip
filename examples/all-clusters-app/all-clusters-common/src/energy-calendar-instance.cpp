@@ -28,7 +28,6 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyCalendar;
 using namespace chip::app::Clusters::EnergyCalendar::Attributes;
-using chip::Protocols::InteractionModel::Status;
 
 constexpr uint32_t kOneDay = 24 * 60 * 60;
 
@@ -55,6 +54,11 @@ chip::app::Clusters::EnergyCalendar::CalendarProviderInstance::~CalendarProvider
     FreeMemoryDayStructList(mSpecialDays);
     FreeMemoryDayStruct(mCurrentDay);
     FreeMemoryDayStruct(mNextDay);
+    if (!mName.IsNull())
+    {
+        chip::Platform::MemoryFree((void*)mName.Value().data());
+        mName.SetNull();
+    }
 }
 
 void CalendarProviderInstance::Init(void)
@@ -85,12 +89,17 @@ void CalendarProviderInstance::SetDefault(void)
 
     Structs::PeakPeriodStruct::Type peak = { .severity = PeakPeriodSeverityEnum::kHigh, .peakPeriod = 100, .startTime = 2000, .endTime = 2200 };
 
-    DataModel::List<Structs::CalendarPeriodStruct::Type> calendarPeriods = {};
-    DataModel::List<Structs::DayStruct::Type> specialDays = {};
+    //DataModel::List<Structs::CalendarPeriodStruct::Type> calendarPeriods = {};
+    //DataModel::List<Structs::DayStruct::Type> specialDays = {};
 
-    SetCommonAttributes(1, "Test", 123, 1);
-    SetCalendarPeriod(date, calendarPeriods);
-    SetSpecialDays(specialDays);
+    char *str = (char*)chip::Platform::MemoryAlloc(5);
+    memcpy(str, "Test", 5);
+    CharSpan nameString(str, 5);
+    mName = MakeNullable(static_cast<CharSpan>(nameString));
+
+    SetCommonAttributes(1, mName, 123, 1);
+    SetCalendarPeriod(date, mCalendarPeriods);
+    SetSpecialDays(mSpecialDays);
     SetCurrentAndNextDays(DataModel::MakeNullable(day), DataModel::MakeNullable(day));
     SetPeakPeriods(DataModel::MakeNullable(peak), DataModel::MakeNullable(peak));
 }
@@ -98,46 +107,54 @@ void CalendarProviderInstance::SetDefault(void)
 CHIP_ERROR CalendarProviderInstance::LoadJson(Json::Value & root)
 {
     DataModel::Nullable<uint32_t> calendarID;
-    DataModel::Nullable<std::string> name;
     DataModel::Nullable<uint32_t> providerID;
     DataModel::Nullable<uint32_t> eventID;
     DataModel::Nullable<uint32_t> startDate;
     Structs::PeakPeriodStruct::Type currentPeak;
     Structs::PeakPeriodStruct::Type nextPeak;
 
-    auto value = root.get("CalendarID", Json::Value());
+    Json::Value value = root.get("CalendarID", Json::Value());
     if (!value.empty() && value.isInt())
     {
         calendarID.SetNonNull(value.asInt());
     }
 
-    auto value = root.get("Name", Json::Value());
+    value = root.get("Name", Json::Value());
+    if (!mName.IsNull())
+    {
+        chip::Platform::MemoryFree((void*)mName.Value().data());
+        mName.SetNull();
+    }
     if (!value.empty() && value.isString())
     {
-        name.SetNonNull(value.asString());
+        size_t len = value.asString().size()+1;
+        char *str = (char*)chip::Platform::MemoryAlloc(len);
+        memcpy(str, value.asCString(), len);
+        CharSpan nameString(str, len);
+        mName = MakeNullable(static_cast<CharSpan>(nameString));
     }
 
-    auto value = root.get("ProviderID", Json::Value());
+    value = root.get("ProviderID", Json::Value());
     if (!value.empty() && value.isInt())
     {
         providerID.SetNonNull(value.asInt());
     }
 
-    auto value = root.get("EventID", Json::Value());
+    value = root.get("EventID", Json::Value());
     if (!value.empty() && value.isInt())
     {
         eventID.SetNonNull(value.asInt());
     }
 
-    SetCommonAttributes(calendarID, name, providerID, eventID);
+    SetCommonAttributes(calendarID, mName, providerID, eventID);
 
-    auto value = root.get("StartDate", Json::Value());
+    value = root.get("StartDate", Json::Value());
     if (!value.empty() && value.isInt())
     {
         startDate.SetNonNull(value.asInt());
     }
 
-    auto value = root.get("CalendarPeriods", Json::Value());
+    value = root.get("CalendarPeriods", Json::Value());
     FreeMemoryCalendarPeriodStructList(mCalendarPeriods);
     if (!value.empty() && value.isArray())
     {
@@ -145,7 +162,7 @@ CHIP_ERROR CalendarProviderInstance::LoadJson(Json::Value & root)
     }
     SetCalendarPeriod(startDate, mCalendarPeriods);
 
-    auto value = root.get("SpecialDays", Json::Value());
+    value = root.get("SpecialDays", Json::Value());
     FreeMemoryDayStructList(mSpecialDays);
     if (!value.empty() && value.isArray())
     {
@@ -153,14 +170,14 @@ CHIP_ERROR CalendarProviderInstance::LoadJson(Json::Value & root)
     }
     SetSpecialDays(mSpecialDays);
 
-    auto value = root.get("CurrentDay", Json::Value());
+    value = root.get("CurrentDay", Json::Value());
     FreeMemoryDayStruct(mCurrentDay);
     if (!value.empty())
     {
         JsonToDayStruct(value, mCurrentDay);
     }
 
-    auto value = root.get("NextDay", Json::Value());
+    value = root.get("NextDay", Json::Value());
     FreeMemoryDayStruct(mNextDay);
     if (!value.empty())
     {
@@ -169,13 +186,13 @@ CHIP_ERROR CalendarProviderInstance::LoadJson(Json::Value & root)
 
     SetCurrentAndNextDays(mCurrentDay, mNextDay);
 
-    auto value = root.get("CurrentPeak", Json::Value());
+    value = root.get("CurrentPeak", Json::Value());
     if (!value.empty())
     {
         JsonToPeakPeriodStruct(value, currentPeak);
     }
 
-    auto value = root.get("NextPeak", Json::Value());
+    value = root.get("NextPeak", Json::Value());
     if (!value.empty())
     {
         JsonToPeakPeriodStruct(value, nextPeak);
@@ -348,13 +365,13 @@ bool CalendarProviderInstance::CheckDay(const Structs::DayStruct::Type &day)
 
 void CalendarProviderInstance::JsonToCalendarPeriodStruct(Json::Value & root, Structs::CalendarPeriodStruct::Type & value)
 {
-    auto t = root.get("startDate", Json::Value());
+    Json::Value t = root.get("startDate", Json::Value());
     if (!t.empty() && t.isInt())
     {
         value.startDate.SetNonNull(t.asInt());
     }
     
-    auto t = root.get("days", Json::Value());
+    t = root.get("days", Json::Value());
     if (!t.empty() && t.isArray())
     {
         DataModel::List<Structs::DayStruct::Type> *days = (DataModel::List<Structs::DayStruct::Type>*)&value.days;
@@ -364,26 +381,26 @@ void CalendarProviderInstance::JsonToCalendarPeriodStruct(Json::Value & root, St
 
 void CalendarProviderInstance::JsonToDayStruct(Json::Value & root, Structs::DayStruct::Type & value)
 {
-    auto t = root.get("date", Json::Value());
+    Json::Value t = root.get("date", Json::Value());
     if (!t.empty() && t.isInt())
     {
         value.date.SetValue(t.asInt());
     }
     
-    auto t = root.get("daysOfWeek", Json::Value());
+    t = root.get("daysOfWeek", Json::Value());
     if (!t.empty() && t.isInt())
     {
-        value.daysOfWeek.SetValue((chip::BitMask<TransitionDayOfWeekBitmap>)(t.asInt()));
+        value.daysOfWeek.SetValue(chip::BitMask<TransitionDayOfWeekBitmap>((uint8_t)t.asInt()));
     }
 
-    auto t = root.get("transitions", Json::Value());
+    t = root.get("transitions", Json::Value());
     if (!t.empty() && t.isArray())
     {
         DataModel::List<Structs::TransitionStruct::Type> *transitions = (DataModel::List<Structs::TransitionStruct::Type>*)&value.transitions;
         JsonToTransitionStructList(t, *transitions);
     }
 
-    auto t = root.get("calendarID", Json::Value());
+    t = root.get("calendarID", Json::Value());
     if (!t.empty() && t.isInt())
     {
         value.calendarID.SetValue(t.asInt());
@@ -392,25 +409,25 @@ void CalendarProviderInstance::JsonToDayStruct(Json::Value & root, Structs::DayS
 
 void CalendarProviderInstance::JsonToPeakPeriodStruct(Json::Value & root, Structs::PeakPeriodStruct::Type & value)
 {
-    auto t = root.get("severity", Json::Value());
+    Json::Value t = root.get("severity", Json::Value());
     if (!t.empty() && t.isInt())
     {
         value.severity = static_cast<PeakPeriodSeverityEnum>(t.asInt());
     }
     
-    auto t = root.get("peakPeriod", Json::Value());
+    t = root.get("peakPeriod", Json::Value());
     if (!t.empty() && t.isInt())
     {
         value.peakPeriod = static_cast<uint16_t>(t.asInt());
     }
 
-    auto t = root.get("startTime", Json::Value());
+    t = root.get("startTime", Json::Value());
     if (!t.empty() && t.isInt())
     {
         value.startTime.SetNonNull(t.asInt());
     }
     
-    auto t = root.get("endTime", Json::Value());
+    t = root.get("endTime", Json::Value());
     if (!t.empty() && t.isInt())
     {
         value.endTime.SetNonNull(t.asInt());
@@ -455,28 +472,28 @@ void CalendarProviderInstance::JsonToTransitionStructList(Json::Value & root,
     {
         Json::Value v = root[i];
 
-        auto t = v.get("transitionTime", Json::Value());
+        Json::Value t = v.get("transitionTime", Json::Value());
         if (!t.empty() && t.isInt())
         {
-            value[i].transitionTime = t.asInt();
+            value[i].transitionTime = static_cast<uint16_t>(t.asInt());
         }
  
-        auto t = v.get("priceTier", Json::Value());
+        t = v.get("priceTier", Json::Value());
         if (!t.empty() && t.isInt())
         {
             value[i].priceTier.SetValue(t.asInt());
         }
         
-        auto t = v.get("friendlyCredit", Json::Value());
+        t = v.get("friendlyCredit", Json::Value());
         if (!t.empty() && t.isBool())
         {
             value[i].friendlyCredit.SetValue(t.asBool());
         }
  
-        auto t = v.get("auxiliaryLoad", Json::Value());
+        t = v.get("auxiliaryLoad", Json::Value());
         if (!t.empty() && t.isInt())
         {
-            value[i].auxiliaryLoad.SetValue((chip::BitMask<AuxiliaryLoadBitmap>)(t.asInt()));
+            value[i].auxiliaryLoad.SetValue(chip::BitMask<AuxiliaryLoadBitmap>((uint8_t)t.asInt()));
         }
     }
 }

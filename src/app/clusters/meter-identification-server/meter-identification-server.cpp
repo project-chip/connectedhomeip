@@ -55,11 +55,11 @@ bool Instance::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
-static CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
-{
-    ReturnErrorOnFailure(status);
-    return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
-}
+//static CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
+//{
+//    ReturnErrorOnFailure(status);
+//    return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
+//}
 
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)

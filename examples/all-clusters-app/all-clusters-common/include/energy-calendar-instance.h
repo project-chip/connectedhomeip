@@ -58,9 +58,10 @@ public:
 
 private:
     uint32_t mDate;
-    uint32_t time;
+    uint32_t mTime;
 
     // Attributes contaners allocated memory
+    DataModel::Nullable<CharSpan> mName;
     DataModel::List<Structs::CalendarPeriodStruct::Type> mCalendarPeriods;
     DataModel::List<Structs::DayStruct::Type> mSpecialDays;
     Structs::DayStruct::Type mCurrentDay;

@@ -27,11 +27,9 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 #include <list>
 #include <string>
-#include <StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -44,7 +42,7 @@ constexpr uint32_t kMinimumCalendarPeriodsLength = 1;
 constexpr uint32_t kMaximumCalendarPeriodsLength = 4;
 constexpr uint32_t kMaximumSpecialDaysLength = 50;
 
-constexpr uint32_t kNumSupportedEndpoints = 1;
+constexpr int kNumSupportedEndpoints = 1;
 
 /** @brief
  * CalendarProvider is interface of the Calendar Provider
@@ -53,58 +51,58 @@ class CalendarProvider
 {
 public:
     CalendarProvider(EndpointId ep) : _endpoint(ep) {}
-    ~CalendarProvider() = default;
+    virtual ~CalendarProvider() = default;
 
     EndpointId endpoint() const { return _endpoint; };
 
-    Protocols::InteractionModel::Status SetCommonAttributes(DataModel::Nullable<uint32_t> CalendarID,
-        DataModel::Nullable<std::string> Name, DataModel::Nullable<uint32_t> ProviderID,
+    CHIP_ERROR SetCommonAttributes(DataModel::Nullable<uint32_t> CalendarID,
+        DataModel::Nullable<CharSpan> Name, DataModel::Nullable<uint32_t> ProviderID,
         DataModel::Nullable<uint32_t> EventID);
 
-    Protocols::InteractionModel::Status SetCalendarPeriod(DataModel::Nullable<uint32_t> StartDate,
-        DataModel::List<Structs::CalendarPeriodStruct::Type> CalendarPeriods);
+    CHIP_ERROR SetCalendarPeriod(DataModel::Nullable<uint32_t> StartDate,
+                                 DataModel::List<Structs::CalendarPeriodStruct::Type> CalendarPeriods);
 
-    Protocols::InteractionModel::Status SetSpecialDays(DataModel::List<Structs::DayStruct::Type> SpecialDays);
+    CHIP_ERROR SetSpecialDays(DataModel::List<Structs::DayStruct::Type> SpecialDays);
 
-    Protocols::InteractionModel::Status SetCurrentAndNextDays(DataModel::Nullable<Structs::DayStruct::Type> CurrentDay,
+    CHIP_ERROR SetCurrentAndNextDays(DataModel::Nullable<Structs::DayStruct::Type> CurrentDay,
         DataModel::Nullable<Structs::DayStruct::Type> NextDay);
     
-    Protocols::InteractionModel::Status SetPeakPeriods(DataModel::Nullable<Structs::PeakPeriodStruct::Type> CurrentPeakPeriod,
+    CHIP_ERROR SetPeakPeriods(DataModel::Nullable<Structs::PeakPeriodStruct::Type> CurrentPeakPeriod,
         DataModel::Nullable<Structs::PeakPeriodStruct::Type> NextPeakPeriod);
 
-    Protocols::InteractionModel::Status UpdateDays(void);
+    CHIP_ERROR UpdateDays(void);
 
     virtual CHIP_ERROR GetDays(EndpointId ep, DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
         DataModel::Nullable<Structs::DayStruct::Type> &NextDay) = 0;
 
-    DataModel::Nullable<uint32_t> GetCalendarID(void) { return calendarID; }
-    DataModel::Nullable<std::string> GetName(void) { return name; }
-    DataModel::Nullable<uint32_t> GetProviderID(void) { return providerID; }
-    DataModel::Nullable<uint32_t> GetEventID(void) { return eventID; }
-    DataModel::Nullable<uint32_t> GetStartDate(void) { return startDate; }
-    DataModel::List<Structs::CalendarPeriodStruct::Type> GetCalendarPeriods(void) { return calendarPeriods; }
-    DataModel::List<Structs::DayStruct::Type> GetSpecialDays(void) { return specialDays; }
-    DataModel::Nullable<Structs::DayStruct::Type> GetCurrentDay(void) { return currentDay; }
-    DataModel::Nullable<Structs::DayStruct::Type> GetNextDay(void) { return nextDay; }
-    //DataModel::Nullable<Structs::TransitionStruct::Type> GetCurrentTransition(void);
-    DataModel::Nullable<Structs::PeakPeriodStruct::Type> GetCurrentPeakPeriod(void) { return currentPeakPeriod; }
-    DataModel::Nullable<Structs::PeakPeriodStruct::Type> GetNextPeakPeriod(void) { return nextPeakPeriod; }
+    DataModel::Nullable<uint32_t> GetCalendarID(void) { return _calendarID; }
+    DataModel::Nullable<CharSpan> GetName(void) { return _name; }
+    DataModel::Nullable<uint32_t> GetProviderID(void) { return _providerID; }
+    DataModel::Nullable<uint32_t> GetEventID(void) { return _eventID; }
+    DataModel::Nullable<uint32_t> GetStartDate(void) { return _startDate; }
+    DataModel::List<Structs::CalendarPeriodStruct::Type> GetCalendarPeriods(void) { return _calendarPeriods; }
+    DataModel::List<Structs::DayStruct::Type> GetSpecialDays(void) { return _specialDays; }
+    DataModel::Nullable<Structs::DayStruct::Type> GetCurrentDay(void) { return _currentDay; }
+    DataModel::Nullable<Structs::DayStruct::Type> GetNextDay(void) { return _nextDay; }
+    //DataModel::Nullable<Structs::TransitionStruct::Type> GetCurrentTransition(_void);
+    DataModel::Nullable<Structs::PeakPeriodStruct::Type> GetCurrentPeakPeriod(void) { return _currentPeakPeriod; }
+    DataModel::Nullable<Structs::PeakPeriodStruct::Type> GetNextPeakPeriod(void) { return _nextPeakPeriod; }
 
 private:
     EndpointId _endpoint;
 
-    DataModel::Nullable<uint32_t> calendarID;
-    DataModel::Nullable<std::string> name;
-    DataModel::Nullable<uint32_t> providerID;
-    DataModel::Nullable<uint32_t> eventID;
-    DataModel::Nullable<uint32_t> startDate;
-    DataModel::List<Structs::CalendarPeriodStruct::Type> calendarPeriods;
-    DataModel::List<Structs::DayStruct::Type> specialDays;
-    DataModel::Nullable<Structs::DayStruct::Type> currentDay;
-    DataModel::Nullable<Structs::DayStruct::Type> nextDay;
-    //Structs::TransitionStruct::Type currentTransition;
-    DataModel::Nullable<Structs::PeakPeriodStruct::Type> currentPeakPeriod;
-    DataModel::Nullable<Structs::PeakPeriodStruct::Type> nextPeakPeriod;
+    DataModel::Nullable<uint32_t> _calendarID;
+    DataModel::Nullable<CharSpan> _name;
+    DataModel::Nullable<uint32_t> _providerID;
+    DataModel::Nullable<uint32_t> _eventID;
+    DataModel::Nullable<uint32_t> _startDate;
+    DataModel::List<Structs::CalendarPeriodStruct::Type> _calendarPeriods;
+    DataModel::List<Structs::DayStruct::Type> _specialDays;
+    DataModel::Nullable<Structs::DayStruct::Type> _currentDay;
+    DataModel::Nullable<Structs::DayStruct::Type> _nextDay;
+    //Structs::TransitionStruct::Type _currentTransition;
+    DataModel::Nullable<Structs::PeakPeriodStruct::Type> _currentPeakPeriod;
+    DataModel::Nullable<Structs::PeakPeriodStruct::Type> _nextPeakPeriod;
 };
 
 /** @brief
@@ -118,7 +116,7 @@ public:
 
     bool HasFeature(Feature aFeature) const;
 
-    Protocols::InteractionModel::Status AddCalendarProvider(CalendarProvider *provider);
+    CHIP_ERROR AddCalendarProvider(CalendarProvider *provider);
 
     //(...)
     // Attributes
@@ -130,7 +128,7 @@ public:
 
 private:
     BitMask<Feature> feature;
-    CalendarProvider *calendars[kNumSupportedEndpoints];
+    CalendarProvider *calendars[kNumSupportedEndpoints] = {0};
 
     void UpdateCurrentAttrs(void);
     CalendarProvider *GetProvider(EndpointId ep);

@@ -49,8 +49,6 @@ public:
     virtual DataModel::Nullable<uint64_t> GetPowerThreshold()                       = 0;
     virtual DataModel::Nullable<PowerThresholdSourceEnum> GetPowerThresholdSource() = 0;
 
-    virtual CHIP_ERROR SetCustomerName(CharSpan & value) = 0;
-
 protected:
     EndpointId mEndpointId = 0;
 };

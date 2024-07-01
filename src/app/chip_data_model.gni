@@ -215,6 +215,7 @@ template("chip_data_model") {
       ]
     }
 
+    print(invoker.zap_file)
     if (defined(invoker.zap_file)) {
       _zap_file = rebase_path(invoker.zap_file, root_build_dir)
       _script_args = [
