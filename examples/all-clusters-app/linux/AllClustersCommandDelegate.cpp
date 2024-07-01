@@ -28,6 +28,8 @@
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
+#include "energy-calendar-instance.h"
+#include <MeterIdentificationDelegate.h>
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
@@ -35,8 +37,6 @@
 #include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
-#include "energy-calendar-instance.h"
-#include <MeterIdentificationDelegate.h>
 
 #include <string>
 
@@ -507,13 +507,13 @@ void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, 
 
 void AllClustersAppCommandHandler::OnEnergyCalendarHandler(Json::Value param)
 {
-    EnergyCalendar::CalendarProviderInstance *provider = EnergyCalendar::GetProvider();
+    EnergyCalendar::CalendarProviderInstance * provider = EnergyCalendar::GetProvider();
     provider->LoadJson(param);
 }
 
 void AllClustersAppCommandHandler::OnMeterIdentificationHandler(Json::Value param)
 {
-    MeterIdentification::MeterIdentificationDelegate *delegate = MeterIdentification::GetDelegate();
+    MeterIdentification::MeterIdentificationDelegate * delegate = MeterIdentification::GetDelegate();
     delegate->LoadJson(param);
 }
 

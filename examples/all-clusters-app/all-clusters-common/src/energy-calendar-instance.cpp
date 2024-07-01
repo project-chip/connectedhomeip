@@ -36,14 +36,14 @@ static TransitionDayOfWeekBitmap GetWeekDate(uint32_t date)
     tm calendarTime{};
     time_t dt = date;
     localtime_r(&dt, &calendarTime);
-    return (TransitionDayOfWeekBitmap)(calendarTime.tm_wday);
+    return (TransitionDayOfWeekBitmap) (calendarTime.tm_wday);
 }
 
 static uint32_t GetCurrentDateTime(void)
 {
     System::Clock::Timestamp time = System::SystemClock().GetMonotonicTimestamp();
-    using cast = std::chrono::duration<std::uint64_t>;
-    uint64_t msec = std::chrono::duration_cast< cast >(time).count();
+    using cast                    = std::chrono::duration<std::uint64_t>;
+    uint64_t msec                 = std::chrono::duration_cast<cast>(time).count();
 
     return static_cast<uint32_t>(msec / 1000);
 }
@@ -56,7 +56,7 @@ chip::app::Clusters::EnergyCalendar::CalendarProviderInstance::~CalendarProvider
     FreeMemoryDayStruct(mNextDay);
     if (!mName.IsNull())
     {
-        chip::Platform::MemoryFree((void*)mName.Value().data());
+        chip::Platform::MemoryFree((void *) mName.Value().data());
         mName.SetNull();
     }
 }
@@ -79,20 +79,23 @@ void CalendarProviderInstance::SetDefault(void)
         },
         .calendarID = chip::Optional<uint32_t>(123) };
 
-    Structs::TransitionStruct::Type *buffer = (Structs::TransitionStruct::Type*)chip::Platform::MemoryCalloc(2, sizeof(Structs::TransitionStruct::Type));
+    Structs::TransitionStruct::Type * buffer =
+        (Structs::TransitionStruct::Type *) chip::Platform::MemoryCalloc(2, sizeof(Structs::TransitionStruct::Type));
 
-    day.transitions = Span<Structs::TransitionStruct::Type>(buffer, 2);
+    day.transitions          = Span<Structs::TransitionStruct::Type>(buffer, 2);
     buffer[0].transitionTime = 0;
     buffer[0].priceTier.SetValue(10);
     buffer[1].transitionTime = 1000;
     buffer[1].priceTier.SetValue(20);
 
-    Structs::PeakPeriodStruct::Type peak = { .severity = PeakPeriodSeverityEnum::kHigh, .peakPeriod = 100, .startTime = 2000, .endTime = 2200 };
+    Structs::PeakPeriodStruct::Type peak = {
+        .severity = PeakPeriodSeverityEnum::kHigh, .peakPeriod = 100, .startTime = 2000, .endTime = 2200
+    };
 
-    //DataModel::List<Structs::CalendarPeriodStruct::Type> calendarPeriods = {};
-    //DataModel::List<Structs::DayStruct::Type> specialDays = {};
+    // DataModel::List<Structs::CalendarPeriodStruct::Type> calendarPeriods = {};
+    // DataModel::List<Structs::DayStruct::Type> specialDays = {};
 
-    char *str = (char*)chip::Platform::MemoryAlloc(5);
+    char * str = (char *) chip::Platform::MemoryAlloc(5);
     memcpy(str, "Test", 5);
     CharSpan nameString(str, 5);
     mName = MakeNullable(static_cast<CharSpan>(nameString));
@@ -122,13 +125,13 @@ CHIP_ERROR CalendarProviderInstance::LoadJson(Json::Value & root)
     value = root.get("Name", Json::Value());
     if (!mName.IsNull())
     {
-        chip::Platform::MemoryFree((void*)mName.Value().data());
+        chip::Platform::MemoryFree((void *) mName.Value().data());
         mName.SetNull();
     }
     if (!value.empty() && value.isString())
     {
-        size_t len = value.asString().size()+1;
-        char *str = (char*)chip::Platform::MemoryAlloc(len);
+        size_t len = value.asString().size() + 1;
+        char * str = (char *) chip::Platform::MemoryAlloc(len);
         memcpy(str, value.asCString(), len);
         CharSpan nameString(str, len);
         mName = MakeNullable(static_cast<CharSpan>(nameString));
@@ -203,11 +206,11 @@ CHIP_ERROR CalendarProviderInstance::LoadJson(Json::Value & root)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CalendarProviderInstance::GetDays(EndpointId ep, DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
-        DataModel::Nullable<Structs::DayStruct::Type> &NextDay)
+CHIP_ERROR CalendarProviderInstance::GetDays(EndpointId ep, DataModel::Nullable<Structs::DayStruct::Type> & CurrentDay,
+                                             DataModel::Nullable<Structs::DayStruct::Type> & NextDay)
 {
     CurrentDay = mCurrentDay;
-    NextDay = mNextDay;
+    NextDay    = mNextDay;
 
     return CHIP_NO_ERROR;
 }
@@ -327,7 +330,8 @@ bool CalendarProviderInstance::CheckSpecialDays()
     uint32_t date = 0;
     for (auto & day : mSpecialDays)
     {
-        if (!day.daysOfWeek.HasValue() || !day.calendarID.HasValue() || !CheckDay(day) || day.date.HasValue() || day.date.Value() > date)
+        if (!day.daysOfWeek.HasValue() || !day.calendarID.HasValue() || !CheckDay(day) || day.date.HasValue() ||
+            day.date.Value() > date)
         {
             return false;
         }
@@ -337,14 +341,14 @@ bool CalendarProviderInstance::CheckSpecialDays()
     return true;
 }
 
-bool CalendarProviderInstance::CheckDay(const Structs::DayStruct::Type &day)
+bool CalendarProviderInstance::CheckDay(const Structs::DayStruct::Type & day)
 {
     if ((day.daysOfWeek.HasValue() && day.date.HasValue()) || (!day.daysOfWeek.HasValue() && !day.date.HasValue()))
     {
         return false;
     }
 
-    if (day.transitions.size()== 0)
+    if (day.transitions.size() == 0)
     {
         return false;
     }
@@ -374,7 +378,7 @@ void CalendarProviderInstance::JsonToCalendarPeriodStruct(Json::Value & root, St
     t = root.get("days", Json::Value());
     if (!t.empty() && t.isArray())
     {
-        DataModel::List<Structs::DayStruct::Type> *days = (DataModel::List<Structs::DayStruct::Type>*)&value.days;
+        DataModel::List<Structs::DayStruct::Type> * days = (DataModel::List<Structs::DayStruct::Type> *) &value.days;
         JsonToDayStructList(t, *days);
     }
 }
@@ -390,13 +394,14 @@ void CalendarProviderInstance::JsonToDayStruct(Json::Value & root, Structs::DayS
     t = root.get("daysOfWeek", Json::Value());
     if (!t.empty() && t.isInt())
     {
-        value.daysOfWeek.SetValue(chip::BitMask<TransitionDayOfWeekBitmap>((uint8_t)t.asInt()));
+        value.daysOfWeek.SetValue(chip::BitMask<TransitionDayOfWeekBitmap>((uint8_t) t.asInt()));
     }
 
     t = root.get("transitions", Json::Value());
     if (!t.empty() && t.isArray())
     {
-        DataModel::List<Structs::TransitionStruct::Type> *transitions = (DataModel::List<Structs::TransitionStruct::Type>*)&value.transitions;
+        DataModel::List<Structs::TransitionStruct::Type> * transitions =
+            (DataModel::List<Structs::TransitionStruct::Type> *) &value.transitions;
         JsonToTransitionStructList(t, *transitions);
     }
 
@@ -437,7 +442,8 @@ void CalendarProviderInstance::JsonToPeakPeriodStruct(Json::Value & root, Struct
 void CalendarProviderInstance::JsonToCalendarPeriodStructList(Json::Value & root,
                                                               DataModel::List<Structs::CalendarPeriodStruct::Type> & value)
 {
-    Structs::CalendarPeriodStruct::Type *buffer = (Structs::CalendarPeriodStruct::Type*)chip::Platform::MemoryCalloc(root.size(), sizeof(Structs::CalendarPeriodStruct::Type));
+    Structs::CalendarPeriodStruct::Type * buffer = (Structs::CalendarPeriodStruct::Type *) chip::Platform::MemoryCalloc(
+        root.size(), sizeof(Structs::CalendarPeriodStruct::Type));
 
     value = Span<Structs::CalendarPeriodStruct::Type>(buffer, root.size());
 
@@ -450,7 +456,8 @@ void CalendarProviderInstance::JsonToCalendarPeriodStructList(Json::Value & root
 
 void CalendarProviderInstance::JsonToDayStructList(Json::Value & root, DataModel::List<Structs::DayStruct::Type> & value)
 {
-    Structs::DayStruct::Type *buffer = (Structs::DayStruct::Type*)chip::Platform::MemoryCalloc(root.size(), sizeof(Structs::DayStruct::Type));
+    Structs::DayStruct::Type * buffer =
+        (Structs::DayStruct::Type *) chip::Platform::MemoryCalloc(root.size(), sizeof(Structs::DayStruct::Type));
 
     value = Span<Structs::DayStruct::Type>(buffer, root.size());
 
@@ -464,7 +471,8 @@ void CalendarProviderInstance::JsonToDayStructList(Json::Value & root, DataModel
 void CalendarProviderInstance::JsonToTransitionStructList(Json::Value & root,
                                                           DataModel::List<Structs::TransitionStruct::Type> & value)
 {
-    Structs::TransitionStruct::Type *buffer = (Structs::TransitionStruct::Type*)chip::Platform::MemoryCalloc(root.size(), sizeof(Structs::TransitionStruct::Type));
+    Structs::TransitionStruct::Type * buffer =
+        (Structs::TransitionStruct::Type *) chip::Platform::MemoryCalloc(root.size(), sizeof(Structs::TransitionStruct::Type));
 
     value = Span<Structs::TransitionStruct::Type>(buffer, root.size());
 
@@ -493,7 +501,7 @@ void CalendarProviderInstance::JsonToTransitionStructList(Json::Value & root,
         t = v.get("auxiliaryLoad", Json::Value());
         if (!t.empty() && t.isInt())
         {
-            value[i].auxiliaryLoad.SetValue(chip::BitMask<AuxiliaryLoadBitmap>((uint8_t)t.asInt()));
+            value[i].auxiliaryLoad.SetValue(chip::BitMask<AuxiliaryLoadBitmap>((uint8_t) t.asInt()));
         }
     }
 }
@@ -502,7 +510,7 @@ void CalendarProviderInstance::FreeMemoryDayStruct(Structs::DayStruct::Type & va
 {
     DataModel::List<const Structs::TransitionStruct::Type> tmp;
     std::swap(tmp, value.transitions);
-    chip::Platform::MemoryFree((void*)tmp.data());
+    chip::Platform::MemoryFree((void *) tmp.data());
 }
 
 void CalendarProviderInstance::FreeMemoryDayStructList(DataModel::List<Structs::DayStruct::Type> & value)
@@ -519,13 +527,13 @@ void CalendarProviderInstance::FreeMemoryCalendarPeriodStruct(Structs::CalendarP
 {
     for (auto & item : value.days)
     {
-        Structs::DayStruct::Type* day = (Structs::DayStruct::Type*)&item;
+        Structs::DayStruct::Type * day = (Structs::DayStruct::Type *) &item;
         FreeMemoryDayStruct(*day);
     }
 
     DataModel::List<const Structs::DayStruct::Type> tmp;
     std::swap(tmp, value.days);
-    chip::Platform::MemoryFree((void*)tmp.data());
+    chip::Platform::MemoryFree((void *) tmp.data());
 }
 
 void CalendarProviderInstance::FreeMemoryCalendarPeriodStructList(DataModel::List<Structs::CalendarPeriodStruct::Type> & value)
@@ -537,7 +545,6 @@ void CalendarProviderInstance::FreeMemoryCalendarPeriodStructList(DataModel::Lis
     chip::Platform::MemoryFree(value.data());
     value = Span<Structs::CalendarPeriodStruct::Type>();
 }
-
 
 static std::unique_ptr<CalendarProviderInstance> gMIDelegate;
 static std::unique_ptr<EnergyCalendarServer> gMIInstance;

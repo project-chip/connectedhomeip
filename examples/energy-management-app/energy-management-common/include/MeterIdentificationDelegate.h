@@ -19,8 +19,8 @@
 
 #include <app/clusters/meter-identification-server/meter-identification-server.h>
 #include <app/util/af-types.h>
-#include <lib/core/CHIPError.h>
 #include <json/value.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace app {
@@ -81,8 +81,7 @@ private:
     MeterIdentificationDelegate * mDelegate;
 };
 
-MeterIdentificationDelegate *GetDelegate();
-
+MeterIdentificationDelegate * GetDelegate();
 
 } // namespace MeterIdentification
 } // namespace Clusters

@@ -37,10 +37,10 @@ namespace Clusters {
 namespace EnergyCalendar {
 
 // Spec-defined constants
-constexpr uint32_t kMaximumNameLenght         = 12;
+constexpr uint32_t kMaximumNameLenght            = 12;
 constexpr uint32_t kMinimumCalendarPeriodsLength = 1;
 constexpr uint32_t kMaximumCalendarPeriodsLength = 4;
-constexpr uint32_t kMaximumSpecialDaysLength = 50;
+constexpr uint32_t kMaximumSpecialDaysLength     = 50;
 
 constexpr int kNumSupportedEndpoints = 1;
 
@@ -55,9 +55,8 @@ public:
 
     EndpointId endpoint() const { return _endpoint; };
 
-    CHIP_ERROR SetCommonAttributes(DataModel::Nullable<uint32_t> CalendarID,
-        DataModel::Nullable<CharSpan> Name, DataModel::Nullable<uint32_t> ProviderID,
-        DataModel::Nullable<uint32_t> EventID);
+    CHIP_ERROR SetCommonAttributes(DataModel::Nullable<uint32_t> CalendarID, DataModel::Nullable<CharSpan> Name,
+                                   DataModel::Nullable<uint32_t> ProviderID, DataModel::Nullable<uint32_t> EventID);
 
     CHIP_ERROR SetCalendarPeriod(DataModel::Nullable<uint32_t> StartDate,
                                  DataModel::List<Structs::CalendarPeriodStruct::Type> CalendarPeriods);
@@ -65,15 +64,15 @@ public:
     CHIP_ERROR SetSpecialDays(DataModel::List<Structs::DayStruct::Type> SpecialDays);
 
     CHIP_ERROR SetCurrentAndNextDays(DataModel::Nullable<Structs::DayStruct::Type> CurrentDay,
-        DataModel::Nullable<Structs::DayStruct::Type> NextDay);
+                                     DataModel::Nullable<Structs::DayStruct::Type> NextDay);
 
     CHIP_ERROR SetPeakPeriods(DataModel::Nullable<Structs::PeakPeriodStruct::Type> CurrentPeakPeriod,
-        DataModel::Nullable<Structs::PeakPeriodStruct::Type> NextPeakPeriod);
+                              DataModel::Nullable<Structs::PeakPeriodStruct::Type> NextPeakPeriod);
 
     CHIP_ERROR UpdateDays(void);
 
-    virtual CHIP_ERROR GetDays(EndpointId ep, DataModel::Nullable<Structs::DayStruct::Type> &CurrentDay,
-        DataModel::Nullable<Structs::DayStruct::Type> &NextDay) = 0;
+    virtual CHIP_ERROR GetDays(EndpointId ep, DataModel::Nullable<Structs::DayStruct::Type> & CurrentDay,
+                               DataModel::Nullable<Structs::DayStruct::Type> & NextDay) = 0;
 
     DataModel::Nullable<uint32_t> GetCalendarID(void) { return _calendarID; }
     DataModel::Nullable<CharSpan> GetName(void) { return _name; }
@@ -84,7 +83,7 @@ public:
     DataModel::List<Structs::DayStruct::Type> GetSpecialDays(void) { return _specialDays; }
     DataModel::Nullable<Structs::DayStruct::Type> GetCurrentDay(void) { return _currentDay; }
     DataModel::Nullable<Structs::DayStruct::Type> GetNextDay(void) { return _nextDay; }
-    //DataModel::Nullable<Structs::TransitionStruct::Type> GetCurrentTransition(_void);
+    // DataModel::Nullable<Structs::TransitionStruct::Type> GetCurrentTransition(_void);
     DataModel::Nullable<Structs::PeakPeriodStruct::Type> GetCurrentPeakPeriod(void) { return _currentPeakPeriod; }
     DataModel::Nullable<Structs::PeakPeriodStruct::Type> GetNextPeakPeriod(void) { return _nextPeakPeriod; }
 
@@ -100,7 +99,7 @@ private:
     DataModel::List<Structs::DayStruct::Type> _specialDays;
     DataModel::Nullable<Structs::DayStruct::Type> _currentDay;
     DataModel::Nullable<Structs::DayStruct::Type> _nextDay;
-    //Structs::TransitionStruct::Type _currentTransition;
+    // Structs::TransitionStruct::Type _currentTransition;
     DataModel::Nullable<Structs::PeakPeriodStruct::Type> _currentPeakPeriod;
     DataModel::Nullable<Structs::PeakPeriodStruct::Type> _nextPeakPeriod;
 };
@@ -116,7 +115,7 @@ public:
 
     bool HasFeature(Feature aFeature) const;
 
-    CHIP_ERROR AddCalendarProvider(CalendarProvider *provider);
+    CHIP_ERROR AddCalendarProvider(CalendarProvider * provider);
 
     //(...)
     // Attributes
@@ -124,14 +123,14 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // Commands
-    //void InvokeCommand(HandlerContext & ctx) override;
+    // void InvokeCommand(HandlerContext & ctx) override;
 
 private:
     BitMask<Feature> feature;
-    CalendarProvider *calendars[kNumSupportedEndpoints] = {0};
+    CalendarProvider * calendars[kNumSupportedEndpoints] = { 0 };
 
     void UpdateCurrentAttrs(void);
-    CalendarProvider *GetProvider(EndpointId ep);
+    CalendarProvider * GetProvider(EndpointId ep);
     DataModel::Nullable<Structs::TransitionStruct::Type> GetTransition(EndpointId ep);
 
     static void MidnightTimerCallback(chip::System::Layer *, void * callbackContext);

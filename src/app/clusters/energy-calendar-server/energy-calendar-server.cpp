@@ -35,7 +35,7 @@ namespace app {
 namespace Clusters {
 namespace EnergyCalendar {
 
-constexpr uint32_t kSecInOneDay = 60*60*24;
+constexpr uint32_t kSecInOneDay = 60 * 60 * 24;
 
 #if 0
 static TransitionDayOfWeekBitmap GetWeekDate(uint32_t date)
@@ -50,8 +50,8 @@ static TransitionDayOfWeekBitmap GetWeekDate(uint32_t date)
 static uint32_t GetCurrentTime(void)
 {
     System::Clock::Timestamp time = System::SystemClock().GetMonotonicTimestamp();
-    using cast = std::chrono::duration<std::uint64_t>;
-    uint64_t msec = std::chrono::duration_cast< cast >(time).count();
+    using cast                    = std::chrono::duration<std::uint64_t>;
+    uint64_t msec                 = std::chrono::duration_cast<cast>(time).count();
 
     uint32_t sec = static_cast<uint32_t>((msec / 1000) % kSecInOneDay);
     return sec;
@@ -67,10 +67,8 @@ void UnlockThreadTask(void)
     chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
 }
 
-CHIP_ERROR CalendarProvider::SetCommonAttributes(DataModel::Nullable<uint32_t> CalendarID,
-        DataModel::Nullable<CharSpan> Name,
-        DataModel::Nullable<uint32_t> ProviderID,
-        DataModel::Nullable<uint32_t> EventID)
+CHIP_ERROR CalendarProvider::SetCommonAttributes(DataModel::Nullable<uint32_t> CalendarID, DataModel::Nullable<CharSpan> Name,
+                                                 DataModel::Nullable<uint32_t> ProviderID, DataModel::Nullable<uint32_t> EventID)
 {
     bool change;
 
@@ -78,35 +76,35 @@ CHIP_ERROR CalendarProvider::SetCommonAttributes(DataModel::Nullable<uint32_t> C
     if (change)
     {
         _calendarID.SetNonNull(*CalendarID);
-        //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, CalendarID::Id);
+        // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, CalendarID::Id);
     }
 
     change = true; // Name != _name;
     if (change)
     {
         _name.SetNonNull(*Name);
-        //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, Name::Id);
+        // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, Name::Id);
     }
 
     change = ProviderID != _providerID;
     if (change)
     {
         _providerID.SetNonNull(*ProviderID);
-        //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, ProviderID::Id);
+        // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, ProviderID::Id);
     }
 
     change = EventID != _eventID;
     if (change)
     {
         _eventID.SetNonNull(*EventID);
-        //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, EventID::Id);
+        // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, EventID::Id);
     }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CalendarProvider::SetCalendarPeriod(DataModel::Nullable<uint32_t> StartDate,
-        DataModel::List<Structs::CalendarPeriodStruct::Type> CalendarPeriods)
+                                               DataModel::List<Structs::CalendarPeriodStruct::Type> CalendarPeriods)
 {
     bool change;
 
@@ -116,11 +114,11 @@ CHIP_ERROR CalendarProvider::SetCalendarPeriod(DataModel::Nullable<uint32_t> Sta
     if (change)
     {
         _startDate.SetNonNull(*StartDate);
-        //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, StartDate::Id);
+        // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, StartDate::Id);
     }
 
     _calendarPeriods = CalendarPeriods;
-    //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, CalendarPeriods::Id);
+    // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, CalendarPeriods::Id);
 
     UnlockThreadTask();
     return CHIP_NO_ERROR;
@@ -131,57 +129,55 @@ CHIP_ERROR CalendarProvider::SetSpecialDays(DataModel::List<Structs::DayStruct::
     LockThreadTask();
 
     _specialDays = SpecialDays;
-    //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, SpecialDays::Id);
+    // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, SpecialDays::Id);
 
     UnlockThreadTask();
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CalendarProvider::SetCurrentAndNextDays(
-        DataModel::Nullable<Structs::DayStruct::Type> CurrentDay,
-        DataModel::Nullable<Structs::DayStruct::Type> NextDay)
+CHIP_ERROR CalendarProvider::SetCurrentAndNextDays(DataModel::Nullable<Structs::DayStruct::Type> CurrentDay,
+                                                   DataModel::Nullable<Structs::DayStruct::Type> NextDay)
 {
     bool change;
 
     LockThreadTask();
 
-    change = true;// *CurrentDay != *_currentDay;
+    change = true; // *CurrentDay != *_currentDay;
     if (change)
     {
         _currentDay.SetNonNull(*CurrentDay);
-        //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, CurrentDay::Id);
+        // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, CurrentDay::Id);
     }
 
-    change = true;// *NextDay != *_nextDay;
+    change = true; // *NextDay != *_nextDay;
     if (change)
     {
         _nextDay.SetNonNull(*NextDay);
-        //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, NextDay::Id);
+        // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, NextDay::Id);
     }
 
     UnlockThreadTask();
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CalendarProvider::SetPeakPeriods(
-        DataModel::Nullable<Structs::PeakPeriodStruct::Type> CurrentPeakPeriod,
-        DataModel::Nullable<Structs::PeakPeriodStruct::Type> NextPeakPeriod)
+CHIP_ERROR CalendarProvider::SetPeakPeriods(DataModel::Nullable<Structs::PeakPeriodStruct::Type> CurrentPeakPeriod,
+                                            DataModel::Nullable<Structs::PeakPeriodStruct::Type> NextPeakPeriod)
 {
     bool change;
     LockThreadTask();
 
-    change = true; //CurrentPeakPeriod != _currentPeakPeriod;
+    change = true; // CurrentPeakPeriod != _currentPeakPeriod;
     if (change)
     {
         _currentPeakPeriod.SetNonNull(*CurrentPeakPeriod);
-        //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, CurrentPeakPeriod::Id);
+        // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, CurrentPeakPeriod::Id);
     }
 
-    change = true;// NextPeakPeriod != _nextPeakPeriod;
+    change = true; // NextPeakPeriod != _nextPeakPeriod;
     if (change)
     {
         _nextPeakPeriod.SetNonNull(*NextPeakPeriod);
-        //MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, NextPeakPeriod::Id);
+        // MatterReportingAttributeChangeCallback(_endpoint, EnergyCalendar::Id, NextPeakPeriod::Id);
     }
 
     UnlockThreadTask();
@@ -203,11 +199,9 @@ CHIP_ERROR CalendarProvider::UpdateDays(void)
     return status;
 }
 
-
-EnergyCalendarServer::EnergyCalendarServer() :
-    AttributeAccessInterface(NullOptional, EnergyCalendar::Id), feature(0)
+EnergyCalendarServer::EnergyCalendarServer() : AttributeAccessInterface(NullOptional, EnergyCalendar::Id), feature(0)
 {
-   uint32_t time = GetCurrentTime();
+    uint32_t time = GetCurrentTime();
 
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(kSecInOneDay - time), MidnightTimerCallback, this);
 }
@@ -225,7 +219,7 @@ bool EnergyCalendarServer::HasFeature(Feature aFeature) const
     return feature.Has(aFeature);
 }
 
-CHIP_ERROR EnergyCalendarServer::AddCalendarProvider(CalendarProvider *provider)
+CHIP_ERROR EnergyCalendarServer::AddCalendarProvider(CalendarProvider * provider)
 {
     for (auto i = 0; i < kNumSupportedEndpoints; ++i)
     {
@@ -238,7 +232,7 @@ CHIP_ERROR EnergyCalendarServer::AddCalendarProvider(CalendarProvider *provider)
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CalendarProvider *EnergyCalendarServer::GetProvider(EndpointId ep)
+CalendarProvider * EnergyCalendarServer::GetProvider(EndpointId ep)
 {
     for (auto i = 0; i < kNumSupportedEndpoints; ++i)
     {
@@ -252,7 +246,7 @@ CalendarProvider *EnergyCalendarServer::GetProvider(EndpointId ep)
 
 DataModel::Nullable<Structs::TransitionStruct::Type> EnergyCalendarServer::GetTransition(EndpointId ep)
 {
-    CalendarProvider *provider = GetProvider(ep);
+    CalendarProvider * provider = GetProvider(ep);
     if (provider == nullptr || provider->GetCurrentDay().IsNull())
     {
         return DataModel::Nullable<Structs::TransitionStruct::Type>();
@@ -262,12 +256,12 @@ DataModel::Nullable<Structs::TransitionStruct::Type> EnergyCalendarServer::GetTr
 
     uint32_t time = GetCurrentTime();
 
-    auto transition = currentDay.transitions.begin();
+    auto transition       = currentDay.transitions.begin();
     uint32_t next_tr_time = kSecInOneDay;
 
-    const Structs::TransitionStruct::Type *current = nullptr;
+    const Structs::TransitionStruct::Type * current = nullptr;
 
-    while(transition != currentDay.transitions.end())
+    while (transition != currentDay.transitions.end())
     {
         auto tr_time = transition->transitionTime;
         if (tr_time <= time && (current == nullptr || current->transitionTime < tr_time))
@@ -285,35 +279,35 @@ DataModel::Nullable<Structs::TransitionStruct::Type> EnergyCalendarServer::GetTr
 // AttributeAccessInterface
 CHIP_ERROR EnergyCalendarServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    CalendarProvider *provider = GetProvider(aPath.mEndpointId);
+    CalendarProvider * provider = GetProvider(aPath.mEndpointId);
     switch (aPath.mAttributeId)
     {
     case CalendarID::Id:
         return aEncoder.Encode(provider->GetCalendarID());
     case Name::Id:
         return aEncoder.Encode(provider->GetName());
-/*    case ProviderID::Id:
-        return aEncoder.Encode(provider->GetProviderID());
-    case EventID::Id:
-        return aEncoder.Encode(provider->GetEventID());
-    case StartDate::Id:
-        return aEncoder.Encode(provider->GetStartDate());
-    case CalendarPeriods::Id:
-        return aEncoder.Encode(provider->GetCalendarPeriods());
-    case SpecialDays::Id:
-        return aEncoder.Encode(provider->GetSpecialDays());
-*/    /* Date relative attributes */
-/*    case CurrentDay::Id:
-        return aEncoder.Encode(provider->GetCurrentDay());
-    case NextDay::Id:
-        return aEncoder.Encode(provider->GetNextDay());
-    case CurrentTransition::Id:
-        return aEncoder.Encode(GetTransition(aPath.mEndpointId));
-    case CurrentPeakPeriod::Id:
-        return aEncoder.Encode(provider->GetCurrentPeakPeriod());
-    case NextPeakPeriod::Id:
-        return aEncoder.Encode(provider->GetNextPeakPeriod());
-*/
+        /*    case ProviderID::Id:
+                return aEncoder.Encode(provider->GetProviderID());
+            case EventID::Id:
+                return aEncoder.Encode(provider->GetEventID());
+            case StartDate::Id:
+                return aEncoder.Encode(provider->GetStartDate());
+            case CalendarPeriods::Id:
+                return aEncoder.Encode(provider->GetCalendarPeriods());
+            case SpecialDays::Id:
+                return aEncoder.Encode(provider->GetSpecialDays());
+        */    /* Date relative attributes */
+        /*    case CurrentDay::Id:
+                return aEncoder.Encode(provider->GetCurrentDay());
+            case NextDay::Id:
+                return aEncoder.Encode(provider->GetNextDay());
+            case CurrentTransition::Id:
+                return aEncoder.Encode(GetTransition(aPath.mEndpointId));
+            case CurrentPeakPeriod::Id:
+                return aEncoder.Encode(provider->GetCurrentPeakPeriod());
+            case NextPeakPeriod::Id:
+                return aEncoder.Encode(provider->GetNextPeakPeriod());
+        */
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return aEncoder.Encode(feature);
@@ -335,19 +329,19 @@ CHIP_ERROR EnergyCalendarServer::Write(const ConcreteDataAttributePath & aPath, 
     }
 }
 
-//void EnergyCalendarServer::InvokeCommand(HandlerContext & handlerContext)
+// void EnergyCalendarServer::InvokeCommand(HandlerContext & handlerContext)
 //{
-//    //using namespace Commands;
+//     //using namespace Commands;
 //
-//    //switch (handlerContext.mRequestPath.mCommandId)
-//    //{
-//    //}
-//    return;
-//}
+//     //switch (handlerContext.mRequestPath.mCommandId)
+//     //{
+//     //}
+//     return;
+// }
 
 void EnergyCalendarServer::MidnightTimerCallback(chip::System::Layer *, void * callbackContext)
 {
-    EnergyCalendarServer *instance = (EnergyCalendarServer*)callbackContext;
+    EnergyCalendarServer * instance = (EnergyCalendarServer *) callbackContext;
 
     for (int i = 0; i < kNumSupportedEndpoints; ++i)
     {
@@ -358,7 +352,8 @@ void EnergyCalendarServer::MidnightTimerCallback(chip::System::Layer *, void * c
     }
 
     uint32_t time = GetCurrentTime();
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(kSecInOneDay - time), MidnightTimerCallback, callbackContext);
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(kSecInOneDay - time), MidnightTimerCallback,
+                                                callbackContext);
 }
 
 } // namespace EnergyCalendar

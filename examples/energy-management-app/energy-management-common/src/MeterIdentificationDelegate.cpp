@@ -46,7 +46,7 @@ void MeterIdentificationInstance::Shutdown()
 CHIP_ERROR MeterIdentificationDelegate::LoadJson(Json::Value & root)
 {
     Json::Value value = root.get("MeterType", Json::Value());
-    #if 0
+#if 0
     if (!value.empty() && value.isInt())
     {
         mMeterType.SetNonNull(value.asInt());
@@ -72,72 +72,72 @@ CHIP_ERROR MeterIdentificationDelegate::LoadJson(Json::Value & root)
     {
         providerID.SetNonNull(value.asInt());
     }
-    #endif
+#endif
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MeterIdentificationDelegate::SetMeterType(DataModel::Nullable<MeterTypeEnum> newValue)
 {
-    //DataModel::Nullable<MeterTypeEnum> oldValue = mMeterType;
+    // DataModel::Nullable<MeterTypeEnum> oldValue = mMeterType;
 
     mMeterType = newValue;
-    //if (oldValue != newValue)
+    // if (oldValue != newValue)
     //{
-    //    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, MeterType::Id);
-    //}
+    //     MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, MeterType::Id);
+    // }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MeterIdentificationDelegate::SetUtilityName(CharSpan & newValue)
 {
-    //CharSpan oldValue = mUtilityName;
+    // CharSpan oldValue = mUtilityName;
 
     mUtilityName = newValue;
-    //if (!oldValue.data_equal(newValue))
+    // if (!oldValue.data_equal(newValue))
     //{
-    //    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, UtilityName::Id);
-    //}
+    //     MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, UtilityName::Id);
+    // }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MeterIdentificationDelegate::SetPointOfDelivery(CharSpan & newValue)
 {
-    //CharSpan oldValue = mPointOfDelivery;
+    // CharSpan oldValue = mPointOfDelivery;
 
     mPointOfDelivery = newValue;
-    //if (!oldValue.data_equal(newValue))
+    // if (!oldValue.data_equal(newValue))
     //{
-    //    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PointOfDelivery::Id);
-    //}
+    //     MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PointOfDelivery::Id);
+    // }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MeterIdentificationDelegate::SetPowerThreshold(DataModel::Nullable<uint64_t> newValue)
 {
-    //DataModel::Nullable<uint64_t> oldValue = mPowerThreshold;
+    // DataModel::Nullable<uint64_t> oldValue = mPowerThreshold;
 
     mPowerThreshold = newValue;
-    //if (oldValue != newValue)
+    // if (oldValue != newValue)
     //{
-    //    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PowerThreshold::Id);
-    //}
+    //     MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PowerThreshold::Id);
+    // }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MeterIdentificationDelegate::SetPowerThresholdSource(DataModel::Nullable<PowerThresholdSourceEnum> newValue)
 {
-    //DataModel::Nullable<PowerThresholdSourceEnum> oldValue = mPowerThresholdSource;
+    // DataModel::Nullable<PowerThresholdSourceEnum> oldValue = mPowerThresholdSource;
 
     mPowerThresholdSource = newValue;
-    //if (oldValue != newValue)
+    // if (oldValue != newValue)
     //{
-    //    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PowerThresholdSource::Id);
-    //}
+    //     MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PowerThresholdSource::Id);
+    // }
 
     return CHIP_NO_ERROR;
 }

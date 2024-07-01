@@ -55,11 +55,11 @@ bool Instance::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
-//static CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
+// static CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
 //{
-//    ReturnErrorOnFailure(status);
-//    return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
-//}
+//     ReturnErrorOnFailure(status);
+//     return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
+// }
 
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -94,15 +94,15 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
 CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-/*
+    /*
 
-    switch (aPath.mAttributeId)
-    {
+        switch (aPath.mAttributeId)
+        {
 
-    default:
-        break;
-    }
-*/
+        default:
+            break;
+        }
+    */
     return CHIP_NO_ERROR;
 }
 
