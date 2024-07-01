@@ -52,7 +52,7 @@ public:
     ~ScopedThreadLock() { DeviceLayer::ThreadStackMgr().UnlockThreadStack(); }
 };
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::Init()
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::Init()
 {
     mCallback = nullptr;
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
@@ -60,7 +60,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSpan & borderAgentIdSpan)
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSpan & borderAgentIdSpan)
 {
     otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
@@ -80,13 +80,13 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSpan &
     return CHIP_ERROR_INTERNAL;
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::GetThreadVersion(uint16_t & threadVersion)
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetThreadVersion(uint16_t & threadVersion)
 {
     threadVersion = otThreadGetVersion();
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::GetInterfaceEnabled(bool & interfaceEnabled)
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetInterfaceEnabled(bool & interfaceEnabled)
 {
     otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
@@ -95,7 +95,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::GetInterfaceEnabled(bool & interfa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::GetDataset(Thread::OperationalDataset & dataset, DatasetType type)
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetDataset(Thread::OperationalDataset & dataset, DatasetType type)
 {
     otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
@@ -118,7 +118,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::GetDataset(Thread::OperationalData
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
                                                                uint32_t randomNumber, ActivateDatasetCallback * callback)
 {
     CHIP_ERROR err = BackupActiveDataset();
@@ -134,9 +134,9 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::SetActiveDataset(const Thread::Ope
     return err;
 }
 
-void GenericThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    GenericThreadBorderRouterDelegate * delegate = reinterpret_cast<GenericThreadBorderRouterDelegate *>(arg);
+    GenericOpenThreadBorderRouterDelegate * delegate = reinterpret_cast<GenericOpenThreadBorderRouterDelegate *>(arg);
     if (delegate && delegate->mCallback)
     {
         if (event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange &&
@@ -150,7 +150,7 @@ void GenericThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer
     }
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::BackupActiveDataset()
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::BackupActiveDataset()
 {
     // If active dataset is already backed up, return with no error
     CHIP_ERROR err = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadDatasetTlvsKey, nullptr, 0);
@@ -163,14 +163,14 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::BackupActiveDataset()
     return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFailsafeThreadDatasetTlvsKey, dataset.data(), dataset.size());
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::CommitActiveDataset()
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::CommitActiveDataset()
 {
     // Delete Failsafe Key when committing.
     DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFailsafeThreadDatasetTlvsKey);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::RevertActiveDataset()
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
 {
     // The FailSafe Timer is triggered and the previous command request should be handled, so reset the callback.
     mCallback = nullptr;
@@ -195,7 +195,7 @@ CHIP_ERROR GenericThreadBorderRouterDelegate::RevertActiveDataset()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericThreadBorderRouterDelegate::SetPendingDataset(const Thread::OperationalDataset & pendingDataset)
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SetPendingDataset(const Thread::OperationalDataset & pendingDataset)
 {
     otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
