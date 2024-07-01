@@ -119,7 +119,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetDataset(Thread::Operational
 }
 
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
-                                                               uint32_t randomNumber, ActivateDatasetCallback * callback)
+                                                                   uint32_t randomNumber, ActivateDatasetCallback * callback)
 {
     CHIP_ERROR err = BackupActiveDataset();
     if (err == CHIP_NO_ERROR)
