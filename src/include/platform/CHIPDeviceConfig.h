@@ -428,7 +428,7 @@
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
  *
- * Name of the WiFiPAF commission function
+ * Enable support for the WiFiPAF commissioning function
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
