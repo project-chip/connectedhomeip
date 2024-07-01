@@ -250,6 +250,11 @@ enum PublicEventTypes
      * Signals that BLE is deinitialized.
      */
     kBLEDeinitialized,
+
+    /**
+     * Signals that secure session is established.
+     */
+    kSecureSessionEstablished,
 };
 
 /**
@@ -533,6 +538,15 @@ struct ChipDeviceEvent final
         {
             OtaState newState;
         } OtaStateChanged;
+
+        struct
+        {
+            uint64_t PeerNodeId;
+            uint8_t FabricIndex;
+            uint8_t SecureSessionType;
+            uint8_t TransportType;
+            uint16_t LocalSessionId;
+        } SecureSessionEstablished;
     };
 
     bool IsPublic() const { return DeviceEventType::IsPublic(Type); }
