@@ -80,5 +80,8 @@ limitations under the License.
     <item name="Success" value="0x00"/>
     <item name="AppNotAvailable" value="0x01"/>
     <item name="SystemBusy" value="0x02"/>
+    <item name="PendingUserApproval" value="0x03"/>
+    <item name="Downloading" value="0x04"/>
+    <item name="Installing" value="0x05"/>
   </enum>
 </configurator>

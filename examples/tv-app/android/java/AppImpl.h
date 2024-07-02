@@ -35,7 +35,6 @@
 
 #include "../include/account-login/AccountLoginManager.h"
 #include "../include/application-basic/ApplicationBasicManager.h"
-#include "../include/application-launcher/ApplicationLauncherManager.h"
 #include "../include/content-control/ContentController.h"
 #include "../include/content-launcher/AppContentLauncherManager.h"
 #include "../include/media-playback/AppMediaPlaybackManager.h"
@@ -45,6 +44,7 @@
 #include "ContentAppAttributeDelegate.h"
 #include "ContentAppCommandDelegate.h"
 #include "KeypadInputManager.h"
+#include "application-launcher/ApplicationLauncherManager.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
@@ -197,6 +197,8 @@ public:
     void setContentAppAttributeDelegate(ContentAppAttributeDelegate * attributeDelegate);
 
     void setContentAppCommandDelegate(ContentAppCommandDelegate * commandDelegate);
+
+    void LogInstalledApps();
 
 protected:
     // TODO: Update to use unique_ptr instead of raw pointers

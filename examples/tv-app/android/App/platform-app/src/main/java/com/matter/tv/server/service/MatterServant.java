@@ -30,6 +30,8 @@ import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import com.matter.tv.server.MatterCommissioningPrompter;
+import com.matter.tv.server.handlers.ApplicationLauncherManagerImpl;
+import com.matter.tv.server.tvapp.ApplicationLauncherManager;
 import com.matter.tv.server.tvapp.ChannelManagerStub;
 import com.matter.tv.server.tvapp.Clusters;
 import com.matter.tv.server.tvapp.ContentLaunchManagerStub;
@@ -55,6 +57,8 @@ public class MatterServant {
   private boolean mIsOn = true;
   private int mOnOffEndpoint;
   private int mLevelEndpoint;
+  private MatterCommissioningPrompter matterCommissioningPrompter;
+  private ApplicationLauncherManager applicationLauncherManager;
 
   private MatterServant() {}
 
@@ -72,17 +76,25 @@ public class MatterServant {
 
     this.context = context;
 
+    this.applicationLauncherManager = new ApplicationLauncherManagerImpl(context);
+
     // The order is important, must
     // first new TvApp to load dynamic library
     // then chipPlatform to prepare platform
     // then TvApp.preServerInit to initialize any server configuration
     // then start ChipAppServer
     // then TvApp.postServerInit to init app platform
+    //
+    // TODO: Move all of the bellow KeypadInputManager...LevelManagerStub to
+    // PlatformAppCommandDelegate
+    // There is no need for this complicated logic
     mTvApp =
         new TvApp(
             (app, clusterId, endpoint) -> {
               if (clusterId == Clusters.ClusterId_KeypadInput) {
                 app.setKeypadInputManager(endpoint, new KeypadInputManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_ApplicationLauncher) {
+                app.setApplicationLauncherManager(endpoint, applicationLauncherManager);
               } else if (clusterId == Clusters.ClusterId_WakeOnLan) {
                 app.setWakeOnLanManager(endpoint, new WakeOnLanManagerStub(endpoint));
               } else if (clusterId == Clusters.ClusterId_MediaInput) {
