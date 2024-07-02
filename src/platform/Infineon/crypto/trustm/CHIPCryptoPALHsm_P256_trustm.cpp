@@ -252,15 +252,16 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     return_status = trustm_ecdh_derive_secret(OPTIGA_KEY_ID_E100, (uint8_t *) remote_key, (uint16_t) rem_pubKeyLen + 3,
                                               out_secret.Bytes(), (uint8_t) secret_length);
-
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    out_secret.SetLength(secret_length);
+    error = CHIP_NO_ERROR;
 
-exit:
+ exit:
     if (error != CHIP_NO_ERROR)
     {
         trustm_close();
     }
-    return out_secret.SetLength(secret_length);
+    return error;
 #endif
 }
 

@@ -426,8 +426,9 @@ optiga_lib_status_t deriveKey_HKDF(const uint8_t * salt, uint16_t salt_length, c
             break;
         }
 
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+        while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
+
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             // optiga_crypt_hkdf failed
@@ -539,8 +540,9 @@ optiga_lib_status_t hmac_sha256(optiga_hmac_type_t type, const uint8_t * input_d
             break;
         }
 
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+        while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
+
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             // optiga_crypt_hkdf failed
@@ -578,8 +580,9 @@ optiga_lib_status_t optiga_crypt_rng(uint8_t * random_data, uint16_t random_data
             break;
         }
 
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+        while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
+
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             // optiga_crypt_random failed
@@ -626,7 +629,7 @@ optiga_lib_status_t trustm_ecc_keygen(uint16_t optiga_key_id, uint8_t key_type, 
             break;
         }
 
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+        while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
 
     } while (0);
@@ -696,8 +699,10 @@ optiga_lib_status_t trustm_hash(uint8_t * msg, uint16_t msg_length, uint8_t * di
             optiga_lib_print_message("optiga_crypt_hash api returns error !!!", OPTIGA_UTIL_SERVICE, OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+
+        while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
+
     } while (0);
 
     if (p_local_crypt)
@@ -729,7 +734,8 @@ optiga_lib_status_t trustm_ecdsa_sign(optiga_key_id_t optiga_key_id, uint8_t * d
                                      OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+
+        while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
 
         for (i = (*signature_length - 1); i >= 0; i--)
@@ -803,8 +809,10 @@ optiga_lib_status_t trustm_ecdsa_verify(uint8_t * digest, uint8_t digest_length,
                                      OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+
+        while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
+
     } while (0);
 
     if (p_local_crypt)
@@ -896,8 +904,10 @@ optiga_lib_status_t trustm_ecdh_derive_secret(optiga_key_id_t optiga_key_id, uin
             optiga_lib_print_message("optiga_crypt_ecdh api returns error !!!", OPTIGA_UTIL_SERVICE, OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+
+        while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
+
     } while (0);
 
     if (p_local_crypt)
@@ -957,9 +967,9 @@ optiga_lib_status_t trustm_PBKDF2_HMAC(const unsigned char * salt, size_t slen, 
             }
         }
 
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+        while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
-
+            
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
 
         {
