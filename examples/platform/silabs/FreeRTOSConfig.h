@@ -106,6 +106,7 @@ extern "C" {
 #include <CHIPProjectConfig.h>
 
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "si91x_device.h"
