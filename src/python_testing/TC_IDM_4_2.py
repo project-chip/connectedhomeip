@@ -123,7 +123,7 @@ class TC_IDM_4_2(MatterBaseTest):
     @staticmethod
     def get_typed_attribute_path(attribute, ep=ROOT_NODE_ENDPOINT_ID):
         return TypedAttributePath(
-            Path=AttributePath(
+            Path=AttributePath.from_attribute(
                 EndpointId=ep,
                 Attribute=attribute
             )
