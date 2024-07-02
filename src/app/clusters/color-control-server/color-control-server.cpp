@@ -2693,11 +2693,16 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
         return true;
     }
 
+    // Per spec, colorTemperatureMinimumMireds field is limited to ColorTempPhysicalMinMireds and
+    // when colorTemperatureMinimumMireds field is 0, ColorTempPhysicalMinMireds shall be used (always >= to 0)
     if (colorTemperatureMinimum < tempPhysicalMin)
     {
         colorTemperatureMinimum = tempPhysicalMin;
     }
-    if (colorTemperatureMaximum > tempPhysicalMax)
+
+    // Per spec, colorTemperatureMaximumMireds field is limited to ColorTempPhysicalMaxMireds and
+    // when colorTemperatureMaximumMireds field is 0, ColorTempPhysicalMaxMireds shall be used
+    if ((colorTemperatureMaximum == 0) || (colorTemperatureMaximum > tempPhysicalMax))
     {
         colorTemperatureMaximum = tempPhysicalMax;
     }
@@ -2804,11 +2809,16 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
+    // Per spec, colorTemperatureMinimumMireds field is limited to ColorTempPhysicalMinMireds and
+    // when colorTemperatureMinimumMireds field is 0, ColorTempPhysicalMinMireds shall be used (always >= to 0)
     if (colorTemperatureMinimum < tempPhysicalMin)
     {
         colorTemperatureMinimum = tempPhysicalMin;
     }
-    if (colorTemperatureMaximum > tempPhysicalMax)
+
+    // Per spec, colorTemperatureMaximumMireds field is limited to ColorTempPhysicalMaxMireds and
+    // when colorTemperatureMaximumMireds field is 0, ColorTempPhysicalMaxMireds shall be used
+    if ((colorTemperatureMaximum == 0) || (colorTemperatureMaximum > tempPhysicalMax))
     {
         colorTemperatureMaximum = tempPhysicalMax;
     }

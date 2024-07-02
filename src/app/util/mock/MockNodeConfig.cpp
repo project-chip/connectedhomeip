@@ -54,9 +54,12 @@ const T * findById(const std::vector<T> & vector, decltype(std::declval<T>().id)
 } // namespace
 
 MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes,
-                                     std::initializer_list<MockEventConfig> aEvents) :
+                                     std::initializer_list<MockEventConfig> aEvents,
+                                     std::initializer_list<CommandId> aAcceptedCommands,
+                                     std::initializer_list<CommandId> aGeneratedCommands) :
     id(aId),
-    attributes(aAttributes), events(aEvents), mEmberCluster{}
+    attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
+    mGeneratedCommands(aGeneratedCommands)
 {
     VerifyOrDie(aAttributes.size() < UINT16_MAX);
 
@@ -71,6 +74,18 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
     mEmberCluster.eventCount     = static_cast<uint16_t>(mEmberEventList.size());
     mEmberCluster.eventList      = mEmberEventList.data();
 
+    if (!mAcceptedCommands.empty())
+    {
+        mAcceptedCommands.push_back(kInvalidCommandId);
+        mEmberCluster.acceptedCommandList = mAcceptedCommands.data();
+    }
+
+    if (!mGeneratedCommands.empty())
+    {
+        mGeneratedCommands.push_back(kInvalidCommandId);
+        mEmberCluster.generatedCommandList = mGeneratedCommands.data();
+    }
+
     for (auto & attr : attributes)
     {
         mAttributeMetaData.push_back(attr.attributeMetaData);
@@ -82,10 +97,19 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
 
 MockClusterConfig::MockClusterConfig(const MockClusterConfig & other) :
     id(other.id), attributes(other.attributes), events(other.events), mEmberCluster(other.mEmberCluster),
-    mEmberEventList(other.mEmberEventList), mAttributeMetaData(other.mAttributeMetaData)
+    mEmberEventList(other.mEmberEventList), mAttributeMetaData(other.mAttributeMetaData),
+    mAcceptedCommands(other.mAcceptedCommands), mGeneratedCommands(other.mGeneratedCommands)
 {
     // Fix self-referencial dependencies after data copy
     mEmberCluster.attributes = mAttributeMetaData.data();
+    if (!mAcceptedCommands.empty())
+    {
+        mEmberCluster.acceptedCommandList = mAcceptedCommands.data();
+    }
+    if (!mGeneratedCommands.empty())
+    {
+        mEmberCluster.generatedCommandList = mGeneratedCommands.data();
+    }
 }
 
 const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attributeId, ptrdiff_t * outIndex) const

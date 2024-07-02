@@ -64,3 +64,5 @@ private:
     char * GetCommand(char * command);
     std::string GetHistoryFilePath() const;
 };
+
+void PushCommand(const std::string & command);

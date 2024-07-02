@@ -6638,6 +6638,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::ServiceArea::Id: {
+        using namespace app::Clusters::ServiceArea;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::PumpConfigurationAndControl::Id: {
         using namespace app::Clusters::PumpConfigurationAndControl;
         switch (aPath.mEventId)
@@ -7393,6 +7403,64 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::WiFiNetworkManagement;
         switch (aPath.mEventId)
         {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ThreadBorderRouterManagement::Id: {
+        using namespace app::Clusters::ThreadBorderRouterManagement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ThreadNetworkDirectory::Id: {
+        using namespace app::Clusters::ThreadNetworkDirectory;
+        switch (aPath.mEventId)
+        {
+        case Events::NetworkChanged::Id: {
+            Events::NetworkChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_extendedPanID;
+            std::string value_extendedPanIDClassName     = "java/lang/Long";
+            std::string value_extendedPanIDCtorSignature = "(J)V";
+            jlong jnivalue_extendedPanID                 = static_cast<jlong>(cppValue.extendedPanID);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_extendedPanIDClassName.c_str(),
+                                                                        value_extendedPanIDCtorSignature.c_str(),
+                                                                        jnivalue_extendedPanID, value_extendedPanID);
+
+            jclass networkChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ThreadNetworkDirectoryClusterNetworkChangedEvent",
+                networkChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ThreadNetworkDirectoryClusterNetworkChangedEvent");
+                return nullptr;
+            }
+
+            jmethodID networkChangedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, networkChangedStructClass, "<init>", "(Ljava/lang/Long;)V",
+                                                                &networkChangedStructCtor);
+            if (err != CHIP_NO_ERROR || networkChangedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ThreadNetworkDirectoryClusterNetworkChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(networkChangedStructClass, networkChangedStructCtor, value_extendedPanID);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

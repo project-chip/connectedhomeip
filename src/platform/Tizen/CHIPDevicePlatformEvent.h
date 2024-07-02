@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -67,23 +68,19 @@ struct ChipDevicePlatformEvent
     {
         struct
         {
-            bool mIsSuccess;
-            void * mpAppstate;
+            CHIP_ERROR mError;
         } BLEPeripheralGATTServerRegisterComplete;
         struct
         {
-            bool mIsSuccess;
-            void * mpAppstate;
+            CHIP_ERROR mError;
         } BLEPeripheralAdvConfiguredComplete;
         struct
         {
-            bool mIsSuccess;
-            void * mpAppstate;
+            CHIP_ERROR mError;
         } BLEPeripheralAdvStartComplete;
         struct
         {
-            bool mIsSuccess;
-            void * mpAppstate;
+            CHIP_ERROR mError;
         } BLEPeripheralAdvStopComplete;
         struct
         {

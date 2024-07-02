@@ -344,7 +344,7 @@ void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source
     {
         ChipLogProgress(AppServer, "---- Awaiting user input ----");
         ChipLogProgress(AppServer, "Input the Commissioner-Generated passcode displayed on the CastingPlayer UX.");
-        ChipLogProgress(AppServer, "Input 1245678 to use the default passcode.");
+        ChipLogProgress(AppServer, "Input 12345678 to use the default passcode.");
         ChipLogProgress(AppServer, "Example:     cast setcommissionerpasscode 12345678");
         ChipLogProgress(AppServer, "---- Awaiting user input ----");
         gAwaitingCommissionerPasscodeInput = true;
@@ -389,11 +389,15 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         unsigned long index = static_cast<unsigned long>(strtol(argv[1], &eptr, 10));
         std::vector<matter::casting::memory::Strong<matter::casting::core::CastingPlayer>> castingPlayers =
             matter::casting::core::CastingPlayerDiscovery::GetInstance()->GetCastingPlayers();
-        VerifyOrReturnValue(0 <= index && index < castingPlayers.size(), CHIP_ERROR_INVALID_ARGUMENT,
+        VerifyOrReturnValue(index < castingPlayers.size(), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(AppServer, "Invalid casting player index provided: %lu", index));
         targetCastingPlayer = castingPlayers.at(index);
 
         gCommissionerGeneratedPasscodeFlowRunning = false;
+
+        // Specify the TargetApp that the client wants to interact with after commissioning. If this value is passed in,
+        // VerifyOrEstablishConnection() will force UDC, in case the desired TargetApp is not found in the on-device
+        // CastingStore
         matter::casting::core::IdentificationDeclarationOptions idOptions;
         chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
         targetAppInfo.vendorId = kDesiredEndpointVendorId;
@@ -455,17 +459,17 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
             return PrintAllCommands();
         }
         char * eptr;
-        uint32_t passcode = (uint32_t) strtol(argv[1], &eptr, 10);
+        uint32_t userEnteredPasscode = (uint32_t) strtol(argv[1], &eptr, 10);
         if (gAwaitingCommissionerPasscodeInput)
         {
-            ChipLogProgress(AppServer, "CommandHandler() setcommissionerpasscode user enterd passcode: %d", passcode);
+            ChipLogProgress(AppServer, "CommandHandler() setcommissionerpasscode user-entered passcode: %d", userEnteredPasscode);
             gAwaitingCommissionerPasscodeInput = false;
 
             // Per connectedhomeip/examples/platform/linux/LinuxCommissionableDataProvider.h: We don't support overriding the
-            // passcode post-init (it is deprecated!). Therefore we need to initiate a new provider with the user entered
+            // passcode post-init (it is deprecated!). Therefore we need to initiate a new provider with the user-entered
             // Commissioner-generated passcode, and then update the CastigApp's AppParameters to update the commissioning session's
             // passcode.
-            LinuxDeviceOptions::GetInstance().payload.setUpPINCode = passcode;
+            LinuxDeviceOptions::GetInstance().payload.setUpPINCode = userEnteredPasscode;
             LinuxCommissionableDataProvider gCommissionableDataProvider;
             CHIP_ERROR err = CHIP_NO_ERROR;
             err            = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
@@ -474,6 +478,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                 ChipLogError(AppServer,
                              "CommandHandler() setcommissionerpasscode InitCommissionableDataProvider() err %" CHIP_ERROR_FORMAT,
                              err.Format());
+                return err;
             }
             // Update the CommissionableDataProvider stored in this CastingApp's AppParameters and the CommissionableDataProvider to
             // be used for the commissioning session.
@@ -483,16 +488,45 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                 ChipLogError(AppServer,
                              "CommandHandler() setcommissionerpasscode InitCommissionableDataProvider() err %" CHIP_ERROR_FORMAT,
                              err.Format());
+                return err;
             }
 
             // Continue Connecting to the target CastingPlayer with the user entered Commissioner-generated Passcode.
-            targetCastingPlayer->ContinueConnecting();
+            err = targetCastingPlayer->ContinueConnecting();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "CommandHandler() setcommissionerpasscode ContinueConnecting() failed due to err %" CHIP_ERROR_FORMAT,
+                             err.Format());
+                // Since continueConnecting() failed, Attempt to cancel the connection attempt with
+                // the CastingPlayer/Commissioner by calling StopConnecting().
+                err = targetCastingPlayer->StopConnecting();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer,
+                                 "CommandHandler() setcommissionerpasscode, ContinueConnecting() failed and then StopConnecting "
+                                 "failed due to err %" CHIP_ERROR_FORMAT,
+                                 err.Format());
+                }
+                return err;
+            }
         }
         else
         {
             ChipLogError(
                 AppServer,
                 "CommandHandler() setcommissionerpasscode, no Commissioner-Generated passcode input expected at this time.");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+    if (strcmp(argv[0], "stop-connecting") == 0)
+    {
+        ChipLogProgress(AppServer, "CommandHandler() stop-connecting");
+        CHIP_ERROR err = targetCastingPlayer->StopConnecting();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CommandHandler() stop-connecting, err %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
         }
     }
     if (strcmp(argv[0], "print-bindings") == 0)
@@ -536,6 +570,9 @@ CHIP_ERROR PrintAllCommands()
                     "  setcommissionerpasscode <passcode>               Set the commissioning session's passcode to the "
                     "Commissioner-Generated passcode. Used for the the Commissioner-Generated passcode commissioning flow. Usage: "
                     "cast setcommissionerpasscode 12345678\r\n");
+    streamer_printf(sout,
+                    "  stop-connecting                                  Stop connecting to Casting Player upon "
+                    "Commissioner-Generated passcode commissioning flow passcode input request. Usage: cast stop-connecting\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;

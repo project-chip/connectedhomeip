@@ -85,6 +85,16 @@ public:
 
     std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> getTargetAppInfoList() const { return mTargetAppInfos; }
 
+    void resetState()
+    {
+        mNoPasscode                = false;
+        mCdUponPasscodeDialog      = false;
+        mCommissionerPasscode      = false;
+        mCommissionerPasscodeReady = false;
+        mCancelPasscode            = false;
+        mTargetAppInfos.clear();
+    }
+
     /**
      * @brief Builds an IdentificationDeclaration message to be sent to a CastingPlayer, given the options state specified in this
      * object.
@@ -107,7 +117,6 @@ public:
         {
             id.SetCommissionerPasscodeReady(true);
             id.SetInstanceName(mCommissioneeInstanceName);
-            mCommissionerPasscodeReady = false;
         }
         else
         {
@@ -136,7 +145,7 @@ public:
 
     void LogDetail()
     {
-        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::LogDetail()");
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::LogDetail() - cpp");
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mNoPasscode:                %s",
                       mNoPasscode ? "true" : "false");
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCdUponPasscodeDialog:      %s",
@@ -148,6 +157,14 @@ public:
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCancelPasscode:            %s",
                       mCancelPasscode ? "true" : "false");
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::mCommissioneeInstanceName:  %s", mCommissioneeInstanceName);
+
+        ChipLogDetail(AppServer, "IdentificationDeclarationOptions::TargetAppInfos list:");
+        for (size_t i = 0; i < mTargetAppInfos.size(); i++)
+        {
+            const chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info = mTargetAppInfos[i];
+            ChipLogDetail(AppServer, "\t\tTargetAppInfo %d, Vendor ID: %u, Product ID: %u", int(i + 1), info.vendorId,
+                          info.productId);
+        }
     }
 
 private:

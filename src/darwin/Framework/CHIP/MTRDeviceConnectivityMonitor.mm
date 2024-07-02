@@ -258,7 +258,7 @@ static void ResolveCallback(
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kSharedConnectionLingerIntervalSeconds * NSEC_PER_SEC), sSharedResolverQueue, ^{
                 std::lock_guard lock(sConnectivityMonitorLock);
 
-                if (!sConnectivityMonitorCount) {
+                if (!sConnectivityMonitorCount && sSharedResolverConnection) {
                     MTR_LOG("MTRDeviceConnectivityMonitor: Closing shared resolver connection");
                     DNSServiceRefDeallocate(sSharedResolverConnection);
                     sSharedResolverConnection = NULL;
@@ -271,9 +271,14 @@ static void ResolveCallback(
 
 - (void)stopMonitoring
 {
+    MTR_LOG("%@ stop connectivity monitoring for %@", self, self->_instanceName);
+    std::lock_guard lock(sConnectivityMonitorLock);
+    if (!sSharedResolverConnection || !sSharedResolverQueue) {
+        MTR_LOG("%@ shared resolver connection already stopped - nothing to do", self);
+    }
+
     // DNSServiceRefDeallocate must be called on the same queue set on the shared connection.
     dispatch_async(sSharedResolverQueue, ^{
-        MTR_LOG("%@ stop connectivity monitoring for %@", self, self->_instanceName);
         std::lock_guard lock(sConnectivityMonitorLock);
         [self _stopMonitoring];
     });

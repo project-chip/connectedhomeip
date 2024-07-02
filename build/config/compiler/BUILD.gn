@@ -356,6 +356,7 @@ config("runtime_default") {
   }
   if (current_os == "linux" || current_os == "tizen" || current_os == "webos") {
     libs = [
+      "atomic",
       "dl",
       "pthread",
       "rt",

@@ -19,7 +19,7 @@ RUN set -x \
     && tar xzf gcc-13.1.0.tar.gz \
     && cd gcc-13.1.0 \
     && ./configure --prefix=/opt/nuttx/gcc-13 --disable-multilib \
-    && make -j8 \
+    && make -j$(nproc) \
     && make install-strip \
     && rm -rf ../../gcc_build \
     && : # last line

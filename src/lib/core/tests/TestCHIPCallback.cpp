@@ -201,7 +201,7 @@ TEST_F(TestCHIPCallback, NotifierTest)
 {
     int n = 1;
     Callback<Notifier::NotifyFn> cb(reinterpret_cast<Notifier::NotifyFn>(increment_by), &n);
-    Callback<Notifier::NotifyFn> cancelcb(reinterpret_cast<Notifier::NotifyFn>(canceler), cb.Cancel());
+    Callback<Notifier::NotifyFn> cancelcb([](void * call, int) { canceler(reinterpret_cast<Cancelable *>(call)); }, cb.Cancel());
 
     // safe to call anytime
     cb.Cancel();

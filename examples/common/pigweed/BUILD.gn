@@ -80,6 +80,20 @@ pw_proto_library("button_service") {
   prefix = "button_service"
 }
 
+pw_proto_library("fabric_admin_service") {
+  sources = [ "protos/fabric_admin_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "fabric_admin_service"
+}
+
+pw_proto_library("fabric_bridge_service") {
+  sources = [ "protos/fabric_bridge_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "fabric_bridge_service"
+}
+
 pw_proto_library("lighting_service") {
   sources = [ "protos/lighting_service.proto" ]
   deps = [ "$dir_pw_protobuf:common_protos" ]

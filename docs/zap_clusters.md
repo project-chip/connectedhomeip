@@ -90,6 +90,7 @@ Generally regenerate using one of:
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        259 |      0x103 | BarrierControl                                          |
+|        336 |      0x150 | ServiceArea                                             |
 |        512 |      0x200 | PumpConfigurationAndControl                             |
 |        513 |      0x201 | Thermostat                                              |
 |        514 |      0x202 | FanControl                                              |
@@ -113,6 +114,8 @@ Generally regenerate using one of:
 |       1070 |      0x42E | TotalVolatileOrganicCompoundsConcentrationMeasurement   |
 |       1071 |      0x42F | RadonConcentrationMeasurement                           |
 |       1105 |      0x451 | WiFiNetworkManagement                                   |
+|       1106 |      0x452 | ThreadBorderRouterManagement                            |
+|       1107 |      0x453 | ThreadNetworkDirectory                                  |
 |       1283 |      0x503 | WakeOnLan                                               |
 |       1284 |      0x504 | Channel                                                 |
 |       1285 |      0x505 | TargetNavigator                                         |

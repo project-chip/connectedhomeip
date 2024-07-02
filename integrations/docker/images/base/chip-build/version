@@ -1,1 +1,1 @@
-53 : [Tizen] Add libatomic.so to QEMU Docker image
+62 : Fix ESP32 qemu build

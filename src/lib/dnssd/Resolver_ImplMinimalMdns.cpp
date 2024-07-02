@@ -424,11 +424,9 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             {
             case IncrementalResolver::ServiceNameType::kCommissioner:
                 discoveredNodeIsRelevant = mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionerNode);
-                mActiveResolves.CompleteCommissioner(nodeData);
                 break;
             case IncrementalResolver::ServiceNameType::kCommissionable:
                 discoveredNodeIsRelevant = mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionableNode);
-                mActiveResolves.CompleteCommissionable(nodeData);
                 break;
             default:
                 ChipLogError(Discovery, "Unexpected type for browse data parsing");

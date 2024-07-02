@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
     {{>init_struct_member label=label type=type cluster=parent.parent.name}}
 {{/zcl_command_arguments}}
 {{#if (or (isStrEqual source "client")
-          (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+          (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
     _timedInvokeTimeoutMs = nil;
 {{/if}}
 {{#if (isStrEqual source "client")}}
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
   other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
   {{/zcl_command_arguments}}
 {{#if (or (isStrEqual source "client")
-          (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+          (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
   other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 {{/if}}
 {{#if (isStrEqual source "client")}}
@@ -210,7 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isStrEqual source "client")}}
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
-{{else if (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)}}
+{{else if (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" cluster command=command)}}
 @dynamic timedInvokeTimeoutMs;
 {{/if}}
 @end
