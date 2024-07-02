@@ -22455,10 +22455,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -22552,10 +22552,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.rate = self.rate.unsignedCharValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -22655,10 +22655,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedCharValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -22752,10 +22752,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -22849,10 +22849,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.rate = self.rate.unsignedCharValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -22952,10 +22952,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedCharValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23055,10 +23055,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23158,10 +23158,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23255,10 +23255,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.rateY = self.rateY.shortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23358,10 +23358,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23455,10 +23455,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23570,10 +23570,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23667,10 +23667,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.rate = self.rate.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23770,10 +23770,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23873,10 +23873,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -23988,10 +23988,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.startHue = self.startHue.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -24073,10 +24073,10 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -24182,10 +24182,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.colorTemperatureMaximumMireds = self.colorTemperatureMaximumMireds.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -24297,10 +24297,10 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.colorTemperatureMaximumMireds = self.colorTemperatureMaximumMireds.unsignedShortValue;
     }
     {
-        encodableStruct.optionsMask = self.optionsMask.unsignedCharValue;
+        encodableStruct.optionsMask = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsMask)>>(self.optionsMask.unsignedCharValue);
     }
     {
-        encodableStruct.optionsOverride = self.optionsOverride.unsignedCharValue;
+        encodableStruct.optionsOverride = static_cast<std::remove_reference_t<decltype(encodableStruct.optionsOverride)>>(self.optionsOverride.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

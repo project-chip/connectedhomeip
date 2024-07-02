@@ -103,7 +103,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         switch (attributePath.mAttributeId)
         {
         case Clusters::ColorControl::Attributes::ColorMode::Id:
-            sDBusInterface.SetColorMode(static_cast<Clusters::ColorControl::ColorMode>(*value));
+            sDBusInterface.SetColorMode(static_cast<Clusters::ColorControl::ColorModeEnum>(*value));
             break;
         case Clusters::ColorControl::Attributes::ColorTemperatureMireds::Id:
             VerifyOrDie(size == sizeof(uint16_t));
@@ -123,7 +123,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 void emberAfColorControlClusterInitCallback(EndpointId endpoint)
 {
     // Set the color mode to color temperature.
-    Clusters::ColorControl::Attributes::ColorMode::Set(endpoint, ColorControlServer::EnhancedColorMode::kColorTemperature);
+    Clusters::ColorControl::Attributes::ColorMode::Set(endpoint, Clusters::ColorControl::ColorModeEnum::kColorTemperatureMireds);
     // Preserve the state of the color temperature attribute across reboots.
     Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::SetNull(endpoint);
 }

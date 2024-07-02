@@ -4202,8 +4202,8 @@ enum class TemperatureDisplayModeEnum : uint8_t
 
 namespace ColorControl {
 
-// Enum for ColorLoopAction
-enum class ColorLoopAction : uint8_t
+// Enum for ColorLoopActionEnum
+enum class ColorLoopActionEnum : uint8_t
 {
     kDeactivate                            = 0x00,
     kActivateFromColorLoopStartEnhancedHue = 0x01,
@@ -4215,11 +4215,11 @@ enum class ColorLoopAction : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for ColorLoopDirection
-enum class ColorLoopDirection : uint8_t
+// Enum for ColorLoopDirectionEnum
+enum class ColorLoopDirectionEnum : uint8_t
 {
-    kDecrementHue = 0x00,
-    kIncrementHue = 0x01,
+    kDecrement = 0x00,
+    kIncrement = 0x01,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -4227,12 +4227,12 @@ enum class ColorLoopDirection : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for ColorMode
-enum class ColorMode : uint8_t
+// Enum for ColorModeEnum
+enum class ColorModeEnum : uint8_t
 {
     kCurrentHueAndCurrentSaturation = 0x00,
     kCurrentXAndCurrentY            = 0x01,
-    kColorTemperature               = 0x02,
+    kColorTemperatureMireds         = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -4240,13 +4240,13 @@ enum class ColorMode : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for HueDirection
-enum class HueDirection : uint8_t
+// Enum for DirectionEnum
+enum class DirectionEnum : uint8_t
 {
-    kShortestDistance = 0x00,
-    kLongestDistance  = 0x01,
-    kUp               = 0x02,
-    kDown             = 0x03,
+    kShortest = 0x00,
+    kLongest  = 0x01,
+    kUp       = 0x02,
+    kDown     = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -4254,8 +4254,37 @@ enum class HueDirection : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for HueMoveMode
-enum class HueMoveMode : uint8_t
+// Enum for DriftCompensationEnum
+enum class DriftCompensationEnum : uint8_t
+{
+    kNone                                  = 0x00,
+    kOtherOrUnknown                        = 0x01,
+    kTemperaturemonitoring                 = 0x02,
+    kOpticalLuminanceMonitoringAndFeedback = 0x03,
+    kOpticalColorMonitoringAndFeedback     = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for EnhancedColorModeEnum
+enum class EnhancedColorModeEnum : uint8_t
+{
+    kCurrentHueAndCurrentSaturation         = 0x00,
+    kCurrentXAndCurrentY                    = 0x01,
+    kColorTemperatureMireds                 = 0x02,
+    kEnhancedCurrentHueAndCurrentSaturation = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for MoveModeEnum
+enum class MoveModeEnum : uint8_t
 {
     kStop = 0x00,
     kUp   = 0x01,
@@ -4267,8 +4296,8 @@ enum class HueMoveMode : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for HueStepMode
-enum class HueStepMode : uint8_t
+// Enum for StepModeEnum
+enum class StepModeEnum : uint8_t
 {
     kUp   = 0x01,
     kDown = 0x03,
@@ -4279,48 +4308,14 @@ enum class HueStepMode : uint8_t
     kUnknownEnumValue = 0,
 };
 
-// Enum for SaturationMoveMode
-enum class SaturationMoveMode : uint8_t
+// Bitmap for ColorCapabilitiesBitmap
+enum class ColorCapabilitiesBitmap : uint16_t
 {
-    kStop = 0x00,
-    kUp   = 0x01,
-    kDown = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-
-// Enum for SaturationStepMode
-enum class SaturationStepMode : uint8_t
-{
-    kUp   = 0x01,
-    kDown = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-
-// Bitmap for ColorCapabilities
-enum class ColorCapabilities : uint16_t
-{
-    kHueSaturationSupported    = 0x1,
-    kEnhancedHueSupported      = 0x2,
-    kColorLoopSupported        = 0x4,
-    kXYAttributesSupported     = 0x8,
-    kColorTemperatureSupported = 0x10,
-};
-
-// Bitmap for ColorLoopUpdateFlags
-enum class ColorLoopUpdateFlags : uint8_t
-{
-    kUpdateAction    = 0x1,
-    kUpdateDirection = 0x2,
-    kUpdateTime      = 0x4,
-    kUpdateStartHue  = 0x8,
+    kHueSaturation    = 0x1,
+    kEnhancedHue      = 0x2,
+    kColorLoop        = 0x4,
+    kXy               = 0x8,
+    kColorTemperature = 0x10,
 };
 
 // Bitmap for Feature
@@ -4331,6 +4326,21 @@ enum class Feature : uint32_t
     kColorLoop        = 0x4,
     kXy               = 0x8,
     kColorTemperature = 0x10,
+};
+
+// Bitmap for OptionsBitmap
+enum class OptionsBitmap : uint8_t
+{
+    kExecuteIfOff = 0x1,
+};
+
+// Bitmap for UpdateFlagsBitmap
+enum class UpdateFlagsBitmap : uint8_t
+{
+    kUpdateAction    = 0x1,
+    kUpdateDirection = 0x2,
+    kUpdateTime      = 0x4,
+    kUpdateStartHue  = 0x8,
 };
 } // namespace ColorControl
 
