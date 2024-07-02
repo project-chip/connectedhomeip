@@ -327,6 +327,7 @@ jobs:
 
     test_suites_darwin:
         name: Test Suites - Darwin
+        needs: await-fast-ci
 
         strategy:
             matrix:
@@ -440,6 +441,7 @@ jobs:
 
     repl_tests_linux:
         name: REPL Tests - Linux
+        needs: await-fast-ci
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
@@ -604,6 +606,7 @@ jobs:
 
     repl_tests_darwin:
         name: REPL Tests - Darwin
+        needs: await-fast-ci
 
         strategy:
             matrix:
