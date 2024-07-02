@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/Constants.h>

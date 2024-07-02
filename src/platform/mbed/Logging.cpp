@@ -21,7 +21,7 @@
  *          Logging implementation for Mbed platform
  */
 
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <stdio.h>
 #include <string.h>
