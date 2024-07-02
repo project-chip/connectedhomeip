@@ -83,6 +83,7 @@ using OnReadErrorCallback               = void (*)(PyObject * appContext, PyChip
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
 using OnReportBeginCallback             = void (*)(PyObject * appContext);
 using OnReportEndCallback               = void (*)(PyObject * appContext);
+using OnNotifySubscriptionStillActiveCallback               = void (*)(PyObject * appContext);
 
 OnReadAttributeDataCallback gOnReadAttributeDataCallback             = nullptr;
 OnReadEventDataCallback gOnReadEventDataCallback                     = nullptr;
@@ -92,6 +93,7 @@ OnReadErrorCallback gOnReadErrorCallback                             = nullptr;
 OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
 OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
 OnReportBeginCallback gOnReportEndCallback                           = nullptr;
+OnNotifySubscriptionStillActiveCallback gOnNotifySubscriptionStillActiveCallback = nullptr;
 
 void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
 {
@@ -225,6 +227,11 @@ public:
 
     void OnReportEnd() override { gOnReportEndCallback(mAppContext); }
 
+    void NotifySubscriptionStillActive(const ReadClient & apReadClient) override
+    {
+        gOnNotifySubscriptionStillActiveCallback(mAppContext);
+    }
+
     void OnDone(ReadClient *) override
     {
         gOnReadDoneCallback(mAppContext);
@@ -326,16 +333,18 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
                                      OnSubscriptionEstablishedCallback onSubscriptionEstablishedCallback,
                                      OnResubscriptionAttemptedCallback onResubscriptionAttemptedCallback,
                                      OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback,
-                                     OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback)
+                                     OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback,
+                                     OnNotifySubscriptionStillActiveCallback onNotifySubscriptionStillActiveCallback)
 {
-    gOnReadAttributeDataCallback       = onReadAttributeDataCallback;
-    gOnReadEventDataCallback           = onReadEventDataCallback;
-    gOnSubscriptionEstablishedCallback = onSubscriptionEstablishedCallback;
-    gOnResubscriptionAttemptedCallback = onResubscriptionAttemptedCallback;
-    gOnReadErrorCallback               = onReadErrorCallback;
-    gOnReadDoneCallback                = onReadDoneCallback;
-    gOnReportBeginCallback             = onReportBeginCallback;
-    gOnReportEndCallback               = onReportEndCallback;
+    gOnReadAttributeDataCallback                = onReadAttributeDataCallback;
+    gOnReadEventDataCallback                    = onReadEventDataCallback;
+    gOnSubscriptionEstablishedCallback          = onSubscriptionEstablishedCallback;
+    gOnResubscriptionAttemptedCallback          = onResubscriptionAttemptedCallback;
+    gOnReadErrorCallback                        = onReadErrorCallback;
+    gOnReadDoneCallback                         = onReadDoneCallback;
+    gOnReportBeginCallback                      = onReportBeginCallback;
+    gOnReportEndCallback                        = onReportEndCallback;
+    gOnNotifySubscriptionStillActiveCallback    = onNotifySubscriptionStillActiveCallback;
 }
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
