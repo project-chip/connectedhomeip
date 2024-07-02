@@ -104,7 +104,7 @@ class TestRunnerHooks():
         """
         pass
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         """
         This method is called when the runner starts running a single test.
 
@@ -118,6 +118,9 @@ class TestRunnerHooks():
 
         count: int
             The number of steps from the test that will be run.
+
+        steps: list[str]
+            The computed test step names
         """
         pass
 
