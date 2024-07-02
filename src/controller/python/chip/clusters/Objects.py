@@ -49381,6 +49381,22 @@ class UnitTesting(Cluster):
             arg1: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
+        class StringEchoResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0x0000000D
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="payload", Tag=0, Type=bytes),
+                    ])
+
+            payload: 'bytes' = b""
+
+        @dataclass
         class TestEnumsRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000000E
@@ -49576,6 +49592,22 @@ class UnitTesting(Cluster):
             sleepBeforeResponseTimeMs: 'uint' = 0
             sizeOfResponseBuffer: 'uint' = 0
             fillCharacter: 'uint' = 0
+
+        @dataclass
+        class StringEchoRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0x00000018
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'StringEchoResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="payload", Tag=0, Type=bytes),
+                    ])
+
+            payload: 'bytes' = b""
 
         @dataclass
         class TestDifferentVendorMeiRequest(ClusterCommand):

@@ -9623,6 +9623,10 @@ internal cluster UnitTesting = 4294048773 {
     int8u arg1[] = 0;
   }
 
+  response struct StringEchoResponse = 13 {
+    octet_string payload = 0;
+  }
+
   request struct TestEnumsRequestRequest {
     vendor_id arg1 = 0;
     SimpleEnum arg2 = 1;
@@ -9675,6 +9679,10 @@ internal cluster UnitTesting = 4294048773 {
     int16u sleepBeforeResponseTimeMs = 0;
     int16u sizeOfResponseBuffer = 1;
     int8u fillCharacter = 2;
+  }
+
+  request struct StringEchoRequestRequest {
+    octet_string payload = 0;
   }
 
   request struct TestDifferentVendorMeiRequestRequest {
@@ -9756,6 +9764,10 @@ internal cluster UnitTesting = 4294048773 {
   command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
   /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
   command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
+  /** Command that takes an argument which is an octet string.  The response echoes
+        the string back. If the string is large then it would require a session that
+        supports large payloads. */
+  command StringEchoRequest(StringEchoRequestRequest): StringEchoResponse = 24;
   /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
   command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }

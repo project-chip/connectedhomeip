@@ -20285,6 +20285,28 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedUnitTestingClusterStringEchoResponseCallback implements ChipClusters.UnitTestingCluster.StringEchoResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] payload) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo payloadResponseValue = new CommandResponseInfo("payload", "byte[]");
+      responseValues.put(payloadResponseValue, payload);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedUnitTestingClusterTestDifferentVendorMeiResponseCallback implements ChipClusters.UnitTestingCluster.TestDifferentVendorMeiResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -28736,6 +28758,24 @@ public class ClusterInfoMapping {
         unitTestingtestSecondBatchHelperRequestCommandParams
       );
     unitTestingClusterInteractionInfoMap.put("testSecondBatchHelperRequest", unitTestingtestSecondBatchHelperRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> unitTestingstringEchoRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo unitTestingstringEchoRequestpayloadCommandParameterInfo = new CommandParameterInfo("payload", byte[].class, byte[].class);
+    unitTestingstringEchoRequestCommandParams.put("payload",unitTestingstringEchoRequestpayloadCommandParameterInfo);
+    InteractionInfo unitTestingstringEchoRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster)
+          .stringEchoRequest((ChipClusters.UnitTestingCluster.StringEchoResponseCallback) callback
+           , (byte[])
+             commandArguments.get("payload")
+
+            );
+        },
+        () -> new DelegatedUnitTestingClusterStringEchoResponseCallback(),
+        unitTestingstringEchoRequestCommandParams
+      );
+    unitTestingClusterInteractionInfoMap.put("stringEchoRequest", unitTestingstringEchoRequestInteractionInfo);
 
     Map<String, CommandParameterInfo> unitTestingtestDifferentVendorMeiRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

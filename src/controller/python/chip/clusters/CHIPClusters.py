@@ -14114,6 +14114,13 @@ class ChipClusters:
                     "fillCharacter": "int",
                 },
             },
+            0x00000018: {
+                "commandId": 0x00000018,
+                "commandName": "StringEchoRequest",
+                "args": {
+                    "payload": "bytes",
+                },
+            },
             0xFFF200AA: {
                 "commandId": 0xFFF200AA,
                 "commandName": "TestDifferentVendorMeiRequest",

@@ -52,7 +52,7 @@ tests:
       attribute: "GeneratedCommandList"
       response:
           constraints:
-              contains: [0, 1, 4, 5, 6, 8, 9, 10, 11, 12, 4294049979]
+              contains: [0, 1, 4, 5, 6, 8, 9, 10, 11, 12, 13, 4294049979]
 
     - label: "Validate presence of MEI attribute"
       command: "readAttribute"

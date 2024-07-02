@@ -121,6 +121,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   class TestBatchHelperResponse(val buffer: ByteArray)
 
+  class StringEchoResponse(val payload: ByteArray)
+
   class TestDifferentVendorMeiResponse(val arg1: UByte, val eventNumber: ULong)
 
   class ListInt8uAttribute(val value: List<UByte>)
@@ -2335,6 +2337,53 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     tlvReader.exitContainer()
 
     return TestBatchHelperResponse(buffer_decoded)
+  }
+
+  suspend fun stringEchoRequest(
+    payload: ByteArray,
+    timedInvokeTimeout: Duration? = null,
+  ): StringEchoResponse {
+    val commandId: UInt = 24u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_PAYLOAD_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_PAYLOAD_REQ), payload)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_PAYLOAD: Int = 0
+    var payload_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_PAYLOAD)) {
+        payload_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (payload_decoded == null) {
+      throw IllegalStateException("payload not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return StringEchoResponse(payload_decoded)
   }
 
   suspend fun testDifferentVendorMeiRequest(
