@@ -391,6 +391,11 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
     mWiFiStationMode              = kWiFiStationMode_Disabled;
     mWiFiStationState             = kWiFiStationState_NotConnected;
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
+    if (!NetworkCommissioning::ESPWiFiDriver::GetInstance().GetEnabled())
+    {
+        // If InterfaceEnabled is false, set mode to ApplicationControlled in order not to connect Wi-Fi automatically.
+        mWiFiStationMode = kWiFiStationMode_ApplicationControlled;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     mLastAPDemandTime  = System::Clock::kZero;
