@@ -89,9 +89,8 @@ CCFG.enableCodeGeneration = false;
 
 /* NVS */
 NVS1.$name                      = "CONFIG_NVSINTERNAL";
-NVS1.internalFlash.regionBase = 0xFB800;
-NVS1.internalFlash.regionSize = 0x2800;
-
+NVS1.internalFlash.regionBase = 0xF8800;
+NVS1.internalFlash.regionSize = 0x6000;
 
 NVS2.$name                                 = "CONFIG_NVSEXTERNAL";
 NVS2.nvsType                               = "External"; // NVS Region Type
