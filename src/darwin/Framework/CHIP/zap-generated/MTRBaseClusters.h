@@ -21061,8 +21061,9 @@ typedef NS_ENUM(uint8_t, MTRApplicationLauncherStatus) {
     MTRApplicationLauncherStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRApplicationLauncherStatusAppNotAvailable MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRApplicationLauncherStatusSystemBusy MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRApplicationLauncherStatusStatusPending MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRApplicationLauncherStatusStatusInstalling MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRApplicationLauncherStatusPending MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRApplicationLauncherStatusDownloading MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRApplicationLauncherStatusInstalling MTR_PROVISIONALLY_AVAILABLE = 0x05,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRApplicationLauncherFeature) {
