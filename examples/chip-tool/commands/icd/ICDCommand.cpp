@@ -21,6 +21,7 @@
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <string>
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -36,31 +37,32 @@ CHIP_ERROR ICDListCommand::RunCommand()
         return CHIP_ERROR_NO_MEMORY;
     }
     app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
-    fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
-    fprintf(stderr, "  | %-75s |\n", "Known ICDs:");
-    fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
-    fprintf(stderr, "  | %20s | %15s | %15s | %16s |\n", "Fabric Index:Node ID", "Start Counter", "Counter Offset",
-            "MonitoredSubject");
+    fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
+    fprintf(stderr, "  | %-88s |\n", "Known ICDs:");
+    fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
+    fprintf(stderr, "  | %20s | %15s | %15s | %16s | %10s |\n", "Fabric Index:Node ID", "Start Counter", "Counter Offset",
+            "MonitoredSubject", "ClientType");
 
     while (iter->Next(info))
     {
-        fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
-        fprintf(stderr, "  | %3" PRIu32 ":" ChipLogFormatX64 " | %15" PRIu32 " | %15" PRIu32 " | " ChipLogFormatX64 " |\n",
+        fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
+        fprintf(stderr, "  | %3" PRIu32 ":" ChipLogFormatX64 " | %15" PRIu32 " | %15" PRIu32 " | " ChipLogFormatX64 " | %10u |\n",
                 static_cast<uint32_t>(info.peer_node.GetFabricIndex()), ChipLogValueX64(info.peer_node.GetNodeId()),
-                info.start_icd_counter, info.offset, ChipLogValueX64(info.monitored_subject));
+                info.start_icd_counter, info.offset, ChipLogValueX64(info.monitored_subject),
+                static_cast<uint8_t>(info.client_type));
 
         static_assert(std::is_same<decltype(CHIPCommand::sSessionKeystore), Crypto::RawKeySessionKeystore>::value,
                       "The following BytesToHex can copy/encode the key bytes from sharedKey to hexadecimal format, which only "
                       "works for RawKeySessionKeystore");
         Encoding::BytesToHex(info.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kAES_CCM128_Key_Length,
                              icdAesKeyHex, sizeof(icdAesKeyHex), chip::Encoding::HexFlags::kNullTerminate);
-        fprintf(stderr, "  | aes key: %60s |\n", icdAesKeyHex);
+        fprintf(stderr, "  | aes key:  %60s                   |\n", icdAesKeyHex);
         Encoding::BytesToHex(info.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kHMAC_CCM128_Key_Length,
                              icdHmacKeyHex, sizeof(icdHmacKeyHex), chip::Encoding::HexFlags::kNullTerminate);
-        fprintf(stderr, "  | hmac key: %60s |\n", icdHmacKeyHex);
+        fprintf(stderr, "  | hmac key: %60s                   |\n", icdHmacKeyHex);
     }
 
-    fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
+    fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
 }

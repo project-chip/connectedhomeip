@@ -350,6 +350,7 @@ pw_static_library("pw_tests_wrapper") {
     "$dir_pw_log:impl",
     "$dir_pw_unit_test",
     "$dir_pw_unit_test:logging",
+    "${chip_root}/src/lib/core:string-builder-adapters",
   ]
   sources = [
     "UnitTest.cpp",

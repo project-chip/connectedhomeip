@@ -91,6 +91,11 @@ CHIP_ERROR AutoCommissioner::VerifyICDRegistrationInfo(const CommissioningParame
         ChipLogError(Controller, "Missing ICD monitored subject!");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    if (!params.GetICDClientType().HasValue())
+    {
+        ChipLogError(Controller, "Missing ICD Client Type!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -270,6 +275,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetICDSymmetricKey(ByteSpan(mICDSymmetricKey));
         mParams.SetICDCheckInNodeId(params.GetICDCheckInNodeId().Value());
         mParams.SetICDMonitoredSubject(params.GetICDMonitoredSubject().Value());
+        mParams.SetICDClientType(params.GetICDClientType().Value());
     }
 
     return CHIP_NO_ERROR;

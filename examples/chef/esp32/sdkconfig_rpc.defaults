@@ -36,6 +36,9 @@ CONFIG_LWIP_IPV6_AUTOCONFIG=y
 # disable IPV4
 # CONFIG_DISABLE_IPV4 is not set
 
+# lwip configuration
+CONFIG_LWIP_IPV4=y
+
 # Use a custom partition table
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
