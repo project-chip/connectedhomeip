@@ -29,9 +29,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
     
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
 
     qemu-esp32:
         name: ESP32
+        needs: await-fast-ci
 
         env:
             BUILD_TYPE: esp32-qemu
