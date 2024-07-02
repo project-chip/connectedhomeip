@@ -367,6 +367,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #ifdef CONFIG_RENDEZVOUS_MODE
     rendezvousFlags = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    rendezvousFlags.Set(RendezvousInformationFlag::kWiFiPAF);
+#endif
 
     err = Platform::MemoryInit();
     SuccessOrExit(err);
@@ -465,6 +468,17 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(NotSpecified, "WiFi-PAF: initialzing");
+    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    {
+        if (EnsureWiFiIsStarted())
+        {
+            ChipLogProgress(NotSpecified, "Wi-Fi Management started");
+            DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(LinuxDeviceOptions::GetInstance().mWiFiPAF);
+        }
+    }
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
     if (LinuxDeviceOptions::GetInstance().mThread)

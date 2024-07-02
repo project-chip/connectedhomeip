@@ -72,6 +72,9 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         // If in NonConcurrentConnection, this will already have been completed
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(false);
+#endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {

@@ -128,6 +128,13 @@ static CHIP_ERROR RendezvousStringToFlag(char * str, chip::RendezvousInformation
         *aRendezvousFlags = chip::RendezvousInformationFlag::kOnNetwork;
         return CHIP_NO_ERROR;
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (strcmp(str, "wifipaf") == 0)
+    {
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kWiFiPAF;
+        return CHIP_NO_ERROR;
+    }
+#endif
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 

@@ -145,6 +145,9 @@ struct FactoryInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    Transport::WiFiPAFLayer * wifipaf_layer = nullptr;
+#endif
 
     //
     // Controls enabling server cluster interactions on a controller. This in turn

@@ -111,6 +111,8 @@ private:
     CHIP_ERROR StopConnectOverIP();
     CHIP_ERROR StartDiscoverOverSoftAP(SetupPayload & payload);
     CHIP_ERROR StopConnectOverSoftAP();
+    CHIP_ERROR StartDiscoverOverWiFiPAF(SetupPayload & payload);
+    CHIP_ERROR StopConnectOverWiFiPAF();
 
     // Returns whether we have kicked off a new connection attempt.
     bool ConnectToDiscoveredDevice();
@@ -150,6 +152,7 @@ private:
         kBLETransport = 0,
         kIPTransport,
         kSoftAPTransport,
+        kWiFiPAFTransport,
         kTransportTypeCount,
     };
 

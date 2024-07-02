@@ -140,6 +140,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=${chip_use_transitional_commissionable_data_provider}",
       "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=${chip_use_transitional_device_instance_info_provider}",
       "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
+      "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
     ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
