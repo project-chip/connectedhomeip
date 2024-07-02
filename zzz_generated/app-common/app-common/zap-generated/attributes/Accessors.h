@@ -5173,17 +5173,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace HoldTime
 
-namespace HoldTimeLimits {
-Protocols::InteractionModel::Status
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type * value); // HoldTimeLimitsStruct
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type value,
-                                        MarkAttributeDirty markDirty);
-} // namespace HoldTimeLimits
-
 namespace PIROccupiedToUnoccupiedDelay {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value);

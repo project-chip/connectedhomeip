@@ -33846,57 +33846,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 } // namespace HoldTime
 
-#error Attribute "HoldTimeLimits" in cluster "Occupancy Sensing" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace HoldTimeLimits {
-
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
-                                        chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type * value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL__ATTRIBUTE_TYPE, markDirty);
-}
-
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-} // namespace HoldTimeLimits
-
 namespace PIROccupiedToUnoccupiedDelay {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value)
