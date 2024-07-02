@@ -55,6 +55,7 @@ jobs:
 
     minimal-network-manager:
         name: Linux / configure build of network-manager-app
+        needs: await-fast-ci
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
