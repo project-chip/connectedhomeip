@@ -111,7 +111,8 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
         ]
 
     if not runs:
-        raise Exception("No valid runs were found. Make sure you add runs to your file, see docs/testing/python_test_arguments.txt document for reference/example.")
+        raise Exception(
+            "No valid runs were found. Make sure you add runs to your file, see docs/testing/python_test_arguments.txt document for reference/example.")
 
     for run in runs:
         print(f"Executing {run.py_script_path.split('/')[-1]} {run.run}")
