@@ -27,8 +27,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
     
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     android:
         name: Smoke Run - Android
+        needs: await-fast-ci
 
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
