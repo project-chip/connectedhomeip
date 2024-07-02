@@ -3160,7 +3160,8 @@ TEST_F(TestRead, TestReadHandler_DataVersionFiltersTruncated)
         EXPECT_GE(loopbackDelegate.requestSize, lastRequestSize);
         if (loopbackDelegate.requestSize == lastRequestSize)
         {
-            ChipLogProgress(DataManagement, "Data Version truncation detected after %zu elements", count - 1);
+            ChipLogProgress(DataManagement, "Data Version truncation detected after %llu elements",
+                            static_cast<unsigned long long>(count - 1));
             // With the parameters used in this test and current encoding rules we can fit 68 data versions
             // into a packet. If we're seeing substantially less then something is likely gone wrong.
             EXPECT_GE(count, 60u);
