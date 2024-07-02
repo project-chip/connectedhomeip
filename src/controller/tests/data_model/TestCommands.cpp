@@ -22,7 +22,8 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 #include "app/data-model/NullObject.h"
 #include <app-common/zap-generated/cluster-objects.h>
