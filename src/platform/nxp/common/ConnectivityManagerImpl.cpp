@@ -153,6 +153,11 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             free(event->Platform.pNetworkDataEvent);
         }
     }
+    else if (event->Type == kPlatformNxpScanWiFiNetworkDoneEvent)
+    {
+        NetworkCommissioning::NXPWiFiDriver::GetInstance().ScanWiFINetworkDoneFromMatterTaskContext(
+            event->Platform.ScanWiFiNetworkCount);
+    }
 #endif
 }
 

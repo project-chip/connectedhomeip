@@ -92,7 +92,8 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork(Status commissioningError, CharSpan debugText, int32_t connectStatus);
-    static int OnScanWiFiNetworkDone(unsigned int count);
+    int ScanWiFINetworkDoneFromMatterTaskContext(unsigned int count);
+    static int _OnScanWiFiNetworkDoneCallBack(unsigned int count);
     static NXPWiFiDriver & GetInstance()
     {
         static NXPWiFiDriver instance;

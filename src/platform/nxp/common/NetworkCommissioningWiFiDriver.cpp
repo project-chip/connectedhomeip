@@ -270,7 +270,7 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     ChipLogProgress(DeviceLayer, "Scan for WiFi network(s) requested");
 
     (void) memset(&wlan_scan_param, 0, sizeof(wlan_scan_params_v2_t));
-    wlan_scan_param.cb = &NXPWiFiDriver::OnScanWiFiNetworkDone;
+    wlan_scan_param.cb = &NXPWiFiDriver::_OnScanWiFiNetworkDoneCallBack;
 
     if ((ssid.size() > 0) && (ssid.size() < MLAN_MAX_SSID_LENGTH))
     {
@@ -291,8 +291,23 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     return CHIP_NO_ERROR;
 }
 
-// TODO should be modified to do it in the context of the Matter stack
-int NXPWiFiDriver::OnScanWiFiNetworkDone(unsigned int count)
+int NXPWiFiDriver::_OnScanWiFiNetworkDoneCallBack(unsigned int count)
+{
+    ChipDeviceEvent event;
+    event.Type                          = DeviceEventType::kPlatformNxpScanWiFiNetworkDoneEvent;
+    event.Platform.ScanWiFiNetworkCount = count;
+    CHIP_ERROR err                      = PlatformMgr().PostEvent(&event);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
+        return WM_FAIL;
+    }
+    return WM_SUCCESS;
+}
+
+// The processing of the scan callback should be done in the context of the Matter stack, as the scan callback will call Matter
+// stack APIs
+int NXPWiFiDriver::ScanWiFINetworkDoneFromMatterTaskContext(unsigned int count)
 {
     ChipLogProgress(DeviceLayer, "Scan for WiFi network(s) done, found: %u", count);
 
