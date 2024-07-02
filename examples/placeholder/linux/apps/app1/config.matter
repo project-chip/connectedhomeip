@@ -7895,8 +7895,9 @@ cluster ApplicationLauncher = 1292 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
-    kStatusPending = 3;
-    kStatusInstalling = 4;
+    kPending = 3;
+    kDownloading = 4;
+    kInstalling = 5;
   }
 
   bitmap Feature : bitmap32 {
@@ -7956,8 +7957,9 @@ cluster ApplicationLauncher = 1292 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
-    kStatusPending = 3;
-    kStatusInstalling = 4;
+    kPending = 3;
+    kDownloading = 4;
+    kInstalling = 5;
   }
 
   bitmap Feature : bitmap32 {
