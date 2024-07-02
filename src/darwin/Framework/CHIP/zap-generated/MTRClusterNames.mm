@@ -6437,6 +6437,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"OccupancySensorTypeBitmap";
             break;
 
+        case MTRAttributeIDTypeClusterOccupancySensingAttributeHoldTimeID:
+            result = @"HoldTime";
+            break;
+
+        case MTRAttributeIDTypeClusterOccupancySensingAttributeHoldTimeLimitsID:
+            result = @"HoldTimeLimits";
+            break;
+
         case MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID:
             result = @"PIROccupiedToUnoccupiedDelay";
             break;

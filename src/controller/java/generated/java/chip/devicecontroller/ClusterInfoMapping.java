@@ -15583,6 +15583,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedOccupancySensingClusterHoldTimeLimitsAttributeCallback implements ChipClusters.OccupancySensingCluster.HoldTimeLimitsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.OccupancySensingClusterHoldTimeLimitsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.OccupancySensingClusterHoldTimeLimitsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedOccupancySensingClusterGeneratedCommandListAttributeCallback implements ChipClusters.OccupancySensingCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override

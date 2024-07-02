@@ -10428,6 +10428,19 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000003: {
+                "attributeName": "HoldTime",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000004: {
+                "attributeName": "HoldTimeLimits",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
             0x00000010: {
                 "attributeName": "PIROccupiedToUnoccupiedDelay",
                 "attributeId": 0x00000010,
