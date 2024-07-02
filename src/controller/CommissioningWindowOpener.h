@@ -42,6 +42,21 @@ typedef void (*OnOpenBasicCommissioningWindow)(void * context, NodeId deviceId, 
 class CommissioningWindowOpener
 {
 public:
+    struct CommissioningWindowParams
+    {
+        NodeId deviceId;                  // The device Id of the node.
+        EndpointId endpointId;            // The endpoint Id of the node.
+        System::Clock::Seconds16 timeout; // The duration for which the commissioning window should remain open.
+        uint32_t iteration;          // The PAKE iteration count associated with the PAKE Passcode ID and ephemeral PAKE passcode
+                                     // verifier to be used for this commissioning.
+        uint16_t discriminator;      // The long discriminator for the DNS-SD advertisement.
+        Optional<uint32_t> setupPIN; // The setup PIN to use, or NullOptional to use a randomly-generated one.
+        Optional<ByteSpan> salt; // The salt to use, or NullOptional to use a randomly-generated one. If provided, must be at least
+                                 // kSpake2p_Min_PBKDF_Salt_Length bytes and at most kSpake2p_Max_PBKDF_Salt_Length bytes in length.
+        Callback::Callback<OnOpenCommissioningWindow> *
+            callback; // The function to be called on success or failure of opening the commissioning window.
+    };
+
     CommissioningWindowOpener(DeviceController * controller) :
         mController(controller), mDeviceConnected(&OnDeviceConnectedCallback, this),
         mDeviceConnectionFailure(&OnDeviceConnectionFailureCallback, this)
@@ -107,6 +122,18 @@ public:
                                        Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload,
                                        bool readVIDPIDAttributes = false);
 
+    /**
+     * @brief
+     *   This method sends an OpenCommissioningWindow command with the given parameters
+     *   to the specified endpoint of the given node.
+     *
+     * @param[in] params         The parameters required to open the commissioning window.
+     * @param[out] payload       The generated setup payload.
+     *
+     * @return CHIP_ERROR        Returns a CHIP_ERROR indicating the status of the operation.
+     */
+    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowParams & params, SetupPayload & payload);
+
 private:
     enum class Step : uint8_t
     {
@@ -120,6 +147,8 @@ private:
         kOpenCommissioningWindow,
     };
 
+    CHIP_ERROR OpenCommissioningWindowImpl(const CommissioningWindowParams & params, SetupPayload & payload,
+                                           bool readVIDPIDAttributes);
     CHIP_ERROR OpenCommissioningWindowInternal(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnPIDReadResponse(void * context, uint16_t value);
     static void OnVIDReadResponse(void * context, VendorId value);
@@ -137,6 +166,7 @@ private:
     Callback::Callback<OnOpenBasicCommissioningWindow> * mBasicCommissioningWindowCallback = nullptr;
     SetupPayload mSetupPayload;
     NodeId mNodeId                                       = kUndefinedNodeId;
+    EndpointId mTargetEndpointId                         = kInvalidEndpointId;
     System::Clock::Seconds16 mCommissioningWindowTimeout = System::Clock::kZero;
     CommissioningWindowOption mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
     Crypto::Spake2pVerifier mVerifier; // Used for non-basic commissioning.

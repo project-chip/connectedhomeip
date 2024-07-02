@@ -91,6 +91,8 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & iterations         = commandData.iterations;
     auto & salt               = commandData.salt;
 
+    EndpointId endpointId = commandPath.mEndpointId;
+
     Optional<StatusCode> status           = Optional<StatusCode>::Missing();
     InteractionModel::Status globalStatus = InteractionModel::Status::Success;
     Spake2pVerifier verifier;
@@ -106,6 +108,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCode::kBusy));
 
     VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCode::kBusy));
+    VerifyOrExit(endpointId == kRootEndpointId, status.Emplace(StatusCode::kPAKEParameterError));
     VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations, status.Emplace(StatusCode::kPAKEParameterError));
     VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, status.Emplace(StatusCode::kPAKEParameterError));
     VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, status.Emplace(StatusCode::kPAKEParameterError));
