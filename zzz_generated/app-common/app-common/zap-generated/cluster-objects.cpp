@@ -9622,6 +9622,10 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     {
         encoder.Encode(to_underlying(Fields::kMonitoredSubject), monitoredSubject);
     }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kClientType), clientType);
+    }
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -9652,6 +9656,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, monitoredSubject);
         }
+        else if (__context_tag == to_underlying(Fields::kClientType))
+        {
+            err = DataModel::Decode(reader, clientType);
+        }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
             err = DataModel::Decode(reader, fabricIndex);
@@ -9676,6 +9684,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kMonitoredSubject), monitoredSubject);
     encoder.Encode(to_underlying(Fields::kKey), key);
     encoder.Encode(to_underlying(Fields::kVerificationKey), verificationKey);
+    encoder.Encode(to_underlying(Fields::kClientType), clientType);
     return encoder.Finalize();
 }
 
@@ -9708,6 +9717,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kVerificationKey))
         {
             err = DataModel::Decode(reader, verificationKey);
+        }
+        else if (__context_tag == to_underlying(Fields::kClientType))
+        {
+            err = DataModel::Decode(reader, clientType);
         }
         else
         {

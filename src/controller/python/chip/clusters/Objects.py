@@ -14187,6 +14187,15 @@ class IcdManagement(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
+        class ClientTypeEnum(MatterIntEnum):
+            kPermanent = 0x00
+            kEphemeral = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 2,
+
         class OperatingModeEnum(MatterIntEnum):
             kSit = 0x00
             kLit = 0x01
@@ -14230,11 +14239,13 @@ class IcdManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="checkInNodeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="monitoredSubject", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="clientType", Tag=4, Type=IcdManagement.Enums.ClientTypeEnum),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             checkInNodeID: 'uint' = 0
             monitoredSubject: 'uint' = 0
+            clientType: 'IcdManagement.Enums.ClientTypeEnum' = 0
             fabricIndex: 'uint' = 0
 
     class Commands:
@@ -14253,12 +14264,14 @@ class IcdManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="monitoredSubject", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="verificationKey", Tag=3, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="clientType", Tag=4, Type=IcdManagement.Enums.ClientTypeEnum),
                     ])
 
             checkInNodeID: 'uint' = 0
             monitoredSubject: 'uint' = 0
             key: 'bytes' = b""
             verificationKey: 'typing.Optional[bytes]' = None
+            clientType: 'IcdManagement.Enums.ClientTypeEnum' = 0
 
         @dataclass
         class RegisterClientResponse(ClusterCommand):
