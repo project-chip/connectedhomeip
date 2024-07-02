@@ -47,7 +47,10 @@ using namespace chip::app::Clusters::AdministratorCommissioning;
 namespace {
 
 constexpr uint16_t kPollIntervalMs = 100;
+
+#if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 constexpr uint16_t kRetryIntervalS = 3;
+#endif
 
 bool KeyboardHit()
 {

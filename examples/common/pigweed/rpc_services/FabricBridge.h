@@ -38,6 +38,11 @@ public:
     {
         return pw::Status::Unimplemented();
     }
+
+    virtual pw::Status RemoveSynchronizedDevice(const chip_rpc_SynchronizedDevice & request, pw_protobuf_Empty & response)
+    {
+        return pw::Status::Unimplemented();
+    }
 };
 
 } // namespace rpc

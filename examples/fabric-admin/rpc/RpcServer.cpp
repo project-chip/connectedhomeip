@@ -27,15 +27,17 @@
 #include "pigweed/rpc_services/FabricAdmin.h"
 #endif
 
+using namespace ::chip;
+
 namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
-class FabricAdmin final : public chip::rpc::FabricAdmin
+class FabricAdmin final : public rpc::FabricAdmin
 {
 public:
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceInfo & request, chip_rpc_OperationStatus & response) override
     {
-        chip::NodeId nodeId = request.node_id;
+        NodeId nodeId = request.node_id;
         ChipLogProgress(NotSpecified, "Received OpenCommissioningWindow request: 0x%lx", nodeId);
         response.success = false;
 

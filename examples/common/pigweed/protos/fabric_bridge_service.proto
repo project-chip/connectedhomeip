@@ -11,5 +11,6 @@ message SynchronizedDevice {
 
 service FabricBridge {
   rpc AddSynchronizedDevice(SynchronizedDevice) returns (pw.protobuf.Empty){}
+  rpc RemoveSynchronizedDevice(SynchronizedDevice) returns (pw.protobuf.Empty){}  
 }
 
