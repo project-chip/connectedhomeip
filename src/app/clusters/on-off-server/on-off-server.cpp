@@ -452,12 +452,12 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
                 ChipLogProgress(Zcl, "ERR: writing on/off %x", to_underlying(status));
                 return status;
             }
+        }
 
-            if (SupportsLightingApplications(endpoint))
-            {
-                ChipLogProgress(Zcl, "Off completed. reset OnTime to  0");
-                Attributes::OnTime::Set(endpoint, 0); // Reset onTime
-            }
+        if (SupportsLightingApplications(endpoint))
+        {
+            ChipLogProgress(Zcl, "Off completed. reset OnTime to  0");
+            Attributes::OnTime::Set(endpoint, 0); // Reset onTime
         }
     }
 
