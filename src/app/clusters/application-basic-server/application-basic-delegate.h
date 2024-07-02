@@ -58,10 +58,7 @@ public:
         Platform::CopyString(applicationId, sizeof(applicationId), appId);
     }
 
-    const char * GetApplicationId()
-    {
-        return applicationId;
-    }
+    const char * GetApplicationId() { return applicationId; }
 
     static const int kApplicationIdSize = 32;
     char applicationId[kApplicationIdSize];

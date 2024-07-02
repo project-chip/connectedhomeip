@@ -510,7 +510,8 @@ void ContentAppFactoryImpl::LogInstalledApps()
         ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d id=%s is on ep=%d",
                         contentApp->GetApplicationBasicDelegate()->HandleGetVendorId(),
                         contentApp->GetApplicationBasicDelegate()->HandleGetProductId(),
-                        contentApp->GetApplicationBasicDelegate()->GetCatalogVendorApp()->GetApplicationId(), contentApp->GetEndpointId());
+                        contentApp->GetApplicationBasicDelegate()->GetCatalogVendorApp()->GetApplicationId(),
+                        contentApp->GetEndpointId());
     }
 }
 
