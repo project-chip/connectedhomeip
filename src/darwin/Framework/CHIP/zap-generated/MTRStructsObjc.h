@@ -1427,6 +1427,36 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyCalendarClusterTransitionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable priceTier MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable friendlyCredit MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable auxiliaryLoad MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyCalendarClusterDayStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable date MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable daysOfWeek MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull transitions MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable calendarID MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyCalendarClusterCalendarPeriodStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable startDate MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull days MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyCalendarClusterPeakPeriodStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull severity MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull peakPeriod MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable startTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable endTime MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTREnergyPreferenceClusterBalanceStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull step MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable label MTR_PROVISIONALLY_AVAILABLE;

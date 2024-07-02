@@ -415,6 +415,26 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyEvse::Str
 
 static void Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::EnergyCalendar::Structs::TransitionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::EnergyCalendar::Structs::DayStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::EnergyCalendar::Structs::CalendarPeriodStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::EnergyCalendar::Structs::PeakPeriodStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & request,
                         Json::Value & value);
 
