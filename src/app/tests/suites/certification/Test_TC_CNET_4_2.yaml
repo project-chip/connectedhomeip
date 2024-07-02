@@ -56,7 +56,7 @@ tests:
           [1698660637.937911][6429:6431] CHIP:IN: Clearing BLE pending packets.
           [1698660637.938582][6429:6431] CHIP:BLE: Auto-closing end point's BLE connection.
           [1698660637.938645][6429:6431] CHIP:DL: Closing BLE GATT connection (con 0xffff9c034bb0)
-          [1698660637.938805][6429:6430] CHIP:DL: BluezDisconnect peer=F7:D4:24:D2:4A:1F
+          [1698660637.938805][6429:6430] CHIP:DL: Close BLE connection: peer=F7:D4:24:D2:4A:1F
           [1698660638.365208][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: MarkForEviction Type:1 LSID:62220
           [1698660638.365311][6429:6431] CHIP:SC: SecureSession[0xffff9400f900, LSID:62220]: State change 'kActive' --> 'kPendingEviction'
           [1698660638.365440][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: Released - Type:1 LSID:62220

@@ -59,7 +59,7 @@ public:
     }
 
     CHIP_ERROR Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params);
-    void Shutdown() {}
+    void Shutdown();
 
     /**
      * Find an existing session for the given node ID, or trigger a new session

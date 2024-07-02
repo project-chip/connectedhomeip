@@ -23,6 +23,7 @@
 #import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 
+#import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRServerAttribute.h>
 
 #include <app/reporting/reporting.h>
@@ -57,6 +58,20 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
+    if (attrId == MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
+        // Some sanity checks: value should be an unsigned-integer NSNumber, and
+        // requiredReadPrivilege should be View.
+        if (requiredReadPrivilege != MTRAccessControlEntryPrivilegeView) {
+            MTR_LOG_ERROR("MTRServerAttribute for FeatureMap provided with invalid read privilege %d", requiredReadPrivilege);
+            return nil;
+        }
+
+        if (![MTRUnsignedIntegerValueType isEqual:value[MTRTypeKey]]) {
+            MTR_LOG_ERROR("MTRServerAttribute for FeatureMap provided with value that is not an unsigned integer: %@", value);
+            return nil;
+        }
+    }
+
     return [self initWithAttributeID:[attributeID copy] value:[value copy] requiredReadPrivilege:requiredReadPrivilege writable:writable];
 }
 
@@ -80,7 +95,8 @@ MTR_DIRECT_MEMBERS
     _writable = writable;
     _parentCluster = app::ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 
-    // Now call setValue to store the value and its serialization.
+    // Now store the value and its serialization. This will also check that the
+    // value is serializable to TLV.
     if ([self setValueInternal:value logIfNotAssociated:NO] == NO) {
         return nil;
     }
@@ -91,6 +107,16 @@ MTR_DIRECT_MEMBERS
 - (BOOL)setValue:(NSDictionary<NSString *, id> *)value
 {
     return [self setValueInternal:value logIfNotAssociated:YES];
+}
+
++ (MTRServerAttribute *)newFeatureMapAttributeWithInitialValue:(NSNumber *)value
+{
+    return [[MTRServerAttribute alloc] initReadonlyAttributeWithID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)
+                                                      initialValue:@{
+                                                          MTRTypeKey : MTRUnsignedIntegerValueType,
+                                                          MTRValueKey : value,
+                                                      }
+                                                 requiredPrivilege:MTRAccessControlEntryPrivilegeView];
 }
 
 - (BOOL)setValueInternal:(NSDictionary<NSString *, id> *)value logIfNotAssociated:(BOOL)logIfNotAssociated

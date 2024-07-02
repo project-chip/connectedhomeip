@@ -17,6 +17,8 @@
  */
 package com.matter.tv.server.tvapp;
 
+import java.util.Collection;
+
 /*
  *   This class is provides the JNI interface to the linux layer of the ContentAppPlatform
  */
@@ -37,6 +39,7 @@ public class AppPlatform {
       String appName,
       int productId,
       String appVersion,
+      Collection<ContentAppSupportedCluster> supportedClusters,
       ContentAppEndpointManager manager);
 
   // Method to add a content app at an existing endpoint after restart of the matter server
@@ -46,6 +49,7 @@ public class AppPlatform {
       String appName,
       int productId,
       String appVersion,
+      Collection<ContentAppSupportedCluster> supportedClusters,
       int endpointId,
       ContentAppEndpointManager manager);
 

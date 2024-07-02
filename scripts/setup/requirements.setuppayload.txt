@@ -1,0 +1,4 @@
+bitarray>=2.8.1
+click>=8.1.3
+construct>=2.10.68
+python_stdnum==1.18

@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <app/util/config.h>
+
 #include "on-off-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -299,15 +301,16 @@ OnOffServer & OnOffServer::Instance()
     return instance;
 }
 
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 chip::scenes::SceneHandler * OnOffServer::GetSceneHandler()
 {
-
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sOnOffSceneHandler;
 #else
     return nullptr;
-#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
+#endif // ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 bool OnOffServer::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
@@ -619,12 +622,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
         if (globalSceneControl)
         {
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-            GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
-            if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
-            {
-                groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
-            }
-            ScenesManagement::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint, groupId,
+            ScenesManagement::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID,
                                                                          ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
@@ -680,13 +678,8 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     }
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
-    if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
-    {
-        groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
-    }
-
-    ScenesManagement::ScenesServer::Instance().RecallScene(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+    ScenesManagement::ScenesServer::Instance().RecallScene(fabric, endpoint, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID,
+                                                           ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
     OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);

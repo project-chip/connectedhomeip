@@ -258,7 +258,7 @@ private:
      *                              is no other data).
      * @param[in]     messageSize   Size of the single message.
      */
-    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, ActiveTCPConnectionState * state, uint16_t messageSize);
+    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, ActiveTCPConnectionState * state, size_t messageSize);
 
     /**
      * Initiate a connection to the given peer. On connection completion,
@@ -305,10 +305,6 @@ private:
     // The configured timeout for the connection attempt to the peer, before
     // giving up.
     uint32_t mConnectTimeout = CHIP_CONFIG_TCP_CONNECT_TIMEOUT_MSECS;
-
-    // The max payload size of data over a TCP connection that is transmissible
-    // at a time.
-    uint32_t mMaxTCPPayloadSize = CHIP_CONFIG_MAX_TCP_PAYLOAD_SIZE_BYTES;
 
     // Number of active and 'pending connection' endpoints
     size_t mUsedEndPointCount = 0;

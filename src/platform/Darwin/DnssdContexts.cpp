@@ -350,7 +350,17 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
 
 void BrowseContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
+    if (err == CHIP_ERROR_CANCELLED && dispatchedSuccessOnce)
+    {
+        // We've been canceled after finding some devices.  Treat this as a
+        // success, because maybe (common case, in fact) those were the devices
+        // our consumer was looking for.
+        ChipLogProgress(Discovery, "Mdns: Browse canceled");
+    }
+    else
+    {
+        ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
+    }
     callback(context, nullptr, 0, true, err);
     MdnsContexts::GetInstance().Remove(this);
 }
@@ -376,6 +386,8 @@ void BrowseContext::DispatchPartialSuccess()
     sDispatchedServices        = nullptr;
     sContextDispatchingSuccess = nullptr;
     services.clear();
+
+    dispatchedSuccessOnce = true;
 }
 
 void BrowseContext::OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain, uint32_t interfaceId)
@@ -607,7 +619,16 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     {
         auto delegate = static_cast<DiscoverNodeDelegate *>(context);
         DiscoveredNodeData nodeData;
-        service.ToDiscoveredNodeData(addresses, nodeData);
+
+        // Check whether mType (service name) exactly matches with operational service name
+        if (strcmp(service.mType, kOperationalServiceName) == 0)
+        {
+            service.ToDiscoveredOperationalNodeBrowseData(nodeData);
+        }
+        else
+        {
+            service.ToDiscoveredCommissionNodeData(addresses, nodeData);
+        }
         delegate->OnNodeDiscovered(nodeData);
     }
     else

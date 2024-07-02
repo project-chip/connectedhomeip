@@ -166,10 +166,15 @@ void SessionManager::Shutdown()
     // Ensure that we don't create new sessions as we iterate our session table.
     mState = State::kNotReady;
 
-    mSecureSessions.ForEachSession([&](auto session) {
-        session->MarkForEviction();
-        return Loop::Continue;
-    });
+    // Just in case some consumer forgot to do it, expire all our secure
+    // sessions.  Note that this stands a good chance of crashing with a
+    // null-deref if there are in fact any secure sessions left, since they will
+    // try to notify their exchanges, which will then try to operate on
+    // partially-shut-down objects.
+    ExpireAllSecureSessions();
+
+    // We don't have a safe way to check or affect the state of our
+    // mUnauthenticatedSessions.  We can only hope they got shut down properly.
 
     mMessageCounterManager = nullptr;
 
@@ -199,6 +204,15 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     if (isControlMsg)
     {
         packetHeader.SetSecureSessionControlMsg(true);
+    }
+
+    if (sessionHandle->AllowsLargePayload())
+    {
+        VerifyOrReturnError(message->TotalLength() <= kMaxLargeAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
+    }
+    else
+    {
+        VerifyOrReturnError(message->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
     }
 
 #if CHIP_PROGRESS_LOGGING
@@ -529,6 +543,14 @@ void SessionManager::ExpireAllPASESessions()
         {
             session->MarkForEviction();
         }
+        return Loop::Continue;
+    });
+}
+
+void SessionManager::ExpireAllSecureSessions()
+{
+    mSecureSessions.ForEachSession([&](auto session) {
+        session->MarkForEviction();
         return Loop::Continue;
     });
 }

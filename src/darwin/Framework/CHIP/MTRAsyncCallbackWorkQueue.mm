@@ -77,7 +77,7 @@
     std::lock_guard lock(_lock);
 
     return [NSString
-        stringWithFormat:@"MTRAsyncCallbackWorkQueue context: %@ items count: %lu", self.context, (unsigned long) self.items.count];
+        stringWithFormat:@"MTRAsyncCallbackWorkQueue context: %@ items count: %lu", self.context, static_cast<unsigned long>(self.items.count)];
 }
 
 - (void)enqueueWorkItem:(MTRAsyncCallbackQueueWorkItem *)item

@@ -23,7 +23,7 @@ limitations under the License.
     <item value="0x4001" name="Defrost"/>
   </enum>
 
-  <cluster  apiMaturity="provisional">
+  <cluster>
     <domain>General</domain>
     <name>Microwave Oven Mode</name>
     <code>0x005E</code>

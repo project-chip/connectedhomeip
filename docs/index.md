@@ -22,6 +22,7 @@ BUG_REPORT
 code_generation
 zap_clusters
 spec_clusters
+upgrading
 ERROR_CODES
 
 ```

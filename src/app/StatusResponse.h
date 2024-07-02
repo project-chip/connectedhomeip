@@ -26,7 +26,8 @@
 
 namespace chip {
 namespace app {
-static constexpr size_t kMaxSecureSduLengthBytes = kMaxAppMessageLen + kMaxTagLen;
+static constexpr size_t kMaxSecureSduLengthBytes      = kMaxAppMessageLen + kMaxTagLen;
+static constexpr size_t kMaxLargeSecureSduLengthBytes = kMaxLargeAppMessageLen + kMaxTagLen;
 
 class StatusResponse
 {

@@ -58,7 +58,7 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    if (sInitializeNodes)
+    if (mInitializeNodes)
     {
         ReturnErrorOnFailure(CreateAliceFabric());
         ReturnErrorOnFailure(CreateBobFabric());
@@ -111,8 +111,6 @@ using namespace System::Clock::Literals;
 
 constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveIdleRetransTimeout;
 constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveActiveRetransTimeout;
-
-bool MessagingContext::sInitializeNodes = true;
 
 void MessagingContext::SetMRPMode(MRPMode mode)
 {

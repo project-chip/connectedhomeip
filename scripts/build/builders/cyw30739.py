@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -102,8 +103,9 @@ class Cyw30739Builder(GnBuilder):
         return args
 
     def build_outputs(self):
-        items = {}
-        for extension in ["elf", "elf.map"]:
-            name = "%s-%s.%s" % (self.app.AppNamePrefix(), self.board.GnArgName(), extension)
-            items[name] = os.path.join(self.output_dir, name)
-        return items
+        extensions = ["elf"]
+        if self.options.enable_link_map_file:
+            extensions.append("elf.map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix()}-{self.board.GnArgName()}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)

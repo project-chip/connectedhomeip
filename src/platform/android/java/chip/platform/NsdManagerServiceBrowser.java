@@ -172,7 +172,11 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
     @Override
     public void onDiscoveryStopped(String serviceType) {
       Log.w(TAG, "Successfully stopped discovery service '" + serviceType);
-      this.handleServiceBrowse(chipMdnsCallback);
+      new Handler(Looper.getMainLooper())
+          .post(
+              () -> {
+                this.handleServiceBrowse(chipMdnsCallback);
+              });
     }
 
     public void handleServiceBrowse(ChipMdnsCallback chipMdnsCallback) {
