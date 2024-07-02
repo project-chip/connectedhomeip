@@ -42,7 +42,7 @@ class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: U
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionStatus = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_STATUS))

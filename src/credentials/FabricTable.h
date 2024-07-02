@@ -1003,6 +1003,13 @@ public:
      */
     CHIP_ERROR PeekFabricIndexForNextAddition(FabricIndex & outIndex);
 
+    /**
+     * Set the fabric index that will be used fo the next fabric added.
+     *
+     * Returns an error if the |fabricIndex| is already in use.
+     */
+    CHIP_ERROR SetFabricIndexForNextAddition(FabricIndex fabricIndex);
+
 private:
     enum class StateFlags : uint16_t
     {

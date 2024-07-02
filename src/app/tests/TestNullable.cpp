@@ -21,10 +21,11 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
+
 #include <app/data-model/Nullable.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::app::DataModel;
@@ -79,7 +80,7 @@ int CtorDtorCounter::destroyed = 0;
 
 } // namespace
 
-static void TestBasic(nlTestSuite * inSuite, void * inContext)
+TEST(TestNullable, TestBasic)
 {
     // Set up our test CtorDtorCounter objects, which will mess with counts, before we reset the
     // counts.
@@ -89,109 +90,109 @@ static void TestBasic(nlTestSuite * inSuite, void * inContext)
 
     {
         auto testNullable = MakeNullable<CtorDtorCounter>(100);
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 0);
-        NL_TEST_ASSERT(inSuite, !testNullable.IsNull() && testNullable.Value().m == 100);
-        NL_TEST_ASSERT(inSuite, testNullable == c100);
-        NL_TEST_ASSERT(inSuite, testNullable != c101);
-        NL_TEST_ASSERT(inSuite, testNullable != c102);
+        EXPECT_TRUE(CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 0);
+        EXPECT_TRUE(!testNullable.IsNull() && testNullable.Value().m == 100);
+        EXPECT_EQ(testNullable, c100);
+        EXPECT_NE(testNullable, c101);
+        EXPECT_NE(testNullable, c102);
 
         testNullable.SetNull();
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 1);
-        NL_TEST_ASSERT(inSuite, !!testNullable.IsNull());
-        NL_TEST_ASSERT(inSuite, testNullable != c100);
-        NL_TEST_ASSERT(inSuite, testNullable != c101);
-        NL_TEST_ASSERT(inSuite, testNullable != c102);
+        EXPECT_TRUE(CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 1);
+        EXPECT_TRUE(testNullable.IsNull());
+        EXPECT_NE(testNullable, c100);
+        EXPECT_NE(testNullable, c101);
+        EXPECT_NE(testNullable, c102);
 
         testNullable.SetNonNull(CtorDtorCounter(101));
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 3 && CtorDtorCounter::destroyed == 2);
-        NL_TEST_ASSERT(inSuite, !testNullable.IsNull() && testNullable.Value().m == 101);
-        NL_TEST_ASSERT(inSuite, testNullable != c100);
-        NL_TEST_ASSERT(inSuite, testNullable == c101);
-        NL_TEST_ASSERT(inSuite, testNullable != c102);
+        EXPECT_TRUE(CtorDtorCounter::created == 3 && CtorDtorCounter::destroyed == 2);
+        EXPECT_TRUE(!testNullable.IsNull() && testNullable.Value().m == 101);
+        EXPECT_NE(testNullable, c100);
+        EXPECT_EQ(testNullable, c101);
+        EXPECT_NE(testNullable, c102);
 
         testNullable.SetNonNull(102);
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 4 && CtorDtorCounter::destroyed == 3);
-        NL_TEST_ASSERT(inSuite, !testNullable.IsNull() && testNullable.Value().m == 102);
-        NL_TEST_ASSERT(inSuite, testNullable != c100);
-        NL_TEST_ASSERT(inSuite, testNullable != c101);
-        NL_TEST_ASSERT(inSuite, testNullable == c102);
+        EXPECT_TRUE(CtorDtorCounter::created == 4 && CtorDtorCounter::destroyed == 3);
+        EXPECT_TRUE(!testNullable.IsNull() && testNullable.Value().m == 102);
+        EXPECT_NE(testNullable, c100);
+        EXPECT_NE(testNullable, c101);
+        EXPECT_EQ(testNullable, c102);
     }
 
     // Our test CtorDtorCounter objects are still in scope here.
-    NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 4 && CtorDtorCounter::destroyed == 4);
+    EXPECT_TRUE(CtorDtorCounter::created == 4 && CtorDtorCounter::destroyed == 4);
 }
 
-static void TestMake(nlTestSuite * inSuite, void * inContext)
+TEST(TestNullable, TestMake)
 {
     CtorDtorCounter::ResetCounter();
 
     {
         auto testNullable = MakeNullable<CtorDtorCounter>(200);
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 0);
-        NL_TEST_ASSERT(inSuite, !testNullable.IsNull() && testNullable.Value().m == 200);
+        EXPECT_TRUE(CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 0);
+        EXPECT_TRUE(!testNullable.IsNull() && testNullable.Value().m == 200);
     }
 
-    NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 1);
+    EXPECT_TRUE(CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 1);
 }
 
-static void TestCopy(nlTestSuite * inSuite, void * inContext)
+TEST(TestNullable, TestCopy)
 {
     CtorDtorCounter::ResetCounter();
 
     {
         auto testSrc = MakeNullable<CtorDtorCounter>(300);
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 0);
-        NL_TEST_ASSERT(inSuite, !testSrc.IsNull() && testSrc.Value().m == 300);
+        EXPECT_TRUE(CtorDtorCounter::created == 1 && CtorDtorCounter::destroyed == 0);
+        EXPECT_TRUE(!testSrc.IsNull() && testSrc.Value().m == 300);
 
         {
             Nullable<CtorDtorCounter> testDst(testSrc);
-            NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
-            NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 300);
+            EXPECT_TRUE(CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
+            EXPECT_TRUE(!testDst.IsNull() && testDst.Value().m == 300);
         }
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 1);
+        EXPECT_TRUE(CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 1);
 
         {
             Nullable<CtorDtorCounter> testDst;
-            NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 1);
-            NL_TEST_ASSERT(inSuite, !!testDst.IsNull());
+            EXPECT_TRUE(CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 1);
+            EXPECT_TRUE(testDst.IsNull());
 
             testDst = testSrc;
-            NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 3 && CtorDtorCounter::destroyed == 1);
-            NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 300);
+            EXPECT_TRUE(CtorDtorCounter::created == 3 && CtorDtorCounter::destroyed == 1);
+            EXPECT_TRUE(!testDst.IsNull() && testDst.Value().m == 300);
         }
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 3 && CtorDtorCounter::destroyed == 2);
+        EXPECT_TRUE(CtorDtorCounter::created == 3 && CtorDtorCounter::destroyed == 2);
     }
-    NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 3 && CtorDtorCounter::destroyed == 3);
+    EXPECT_TRUE(CtorDtorCounter::created == 3 && CtorDtorCounter::destroyed == 3);
 }
 
-static void TestMove(nlTestSuite * inSuite, void * inContext)
+TEST(TestNullable, TestMove)
 {
     CtorDtorCounter::ResetCounter();
 
     {
         auto testSrc = MakeNullable<MovableCtorDtorCounter>(400);     // construct
         Nullable<MovableCtorDtorCounter> testDst(std::move(testSrc)); // move construct
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
-        NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 400);
+        EXPECT_TRUE(CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
+        EXPECT_TRUE(!testDst.IsNull() && testDst.Value().m == 400);
         // destroy both testsSrc and testDst
     }
-    NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 2);
+    EXPECT_TRUE(CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 2);
 
     CtorDtorCounter::ResetCounter();
     {
         Nullable<MovableCtorDtorCounter> testDst; // no object construction
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 0 && CtorDtorCounter::destroyed == 0);
-        NL_TEST_ASSERT(inSuite, !!testDst.IsNull());
+        EXPECT_TRUE(CtorDtorCounter::created == 0 && CtorDtorCounter::destroyed == 0);
+        EXPECT_TRUE(testDst.IsNull());
 
         auto testSrc = MakeNullable<MovableCtorDtorCounter>(401); // construct object
         testDst      = std::move(testSrc);                        // construct a copy
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
-        NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 401);
+        EXPECT_TRUE(CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
+        EXPECT_TRUE(!testDst.IsNull() && testDst.Value().m == 401);
     }
-    NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 2);
+    EXPECT_TRUE(CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 2);
 }
 
-static void TestUpdate(nlTestSuite * inSuite, void * inContext)
+TEST(TestNullable, TestUpdate)
 {
     using SmallArray = std::array<uint8_t, 3>;
     // Arrays
@@ -199,19 +200,19 @@ static void TestUpdate(nlTestSuite * inSuite, void * inContext)
         auto nullable1 = MakeNullable<SmallArray>({ 1, 2, 3 });
         auto nullable2 = MakeNullable<SmallArray>({ 1, 2, 3 });
 
-        NL_TEST_ASSERT(inSuite, !nullable1.IsNull());
-        NL_TEST_ASSERT(inSuite, !nullable2.IsNull());
-        NL_TEST_ASSERT(inSuite, nullable1 == nullable2);
+        EXPECT_FALSE(nullable1.IsNull());
+        EXPECT_FALSE(nullable2.IsNull());
+        EXPECT_EQ(nullable1, nullable2);
 
         // No-op on change to same.
-        NL_TEST_ASSERT(inSuite, nullable1.Update(nullable2) == false);
-        NL_TEST_ASSERT(inSuite, nullable1 == nullable2);
+        EXPECT_FALSE(nullable1.Update(nullable2));
+        EXPECT_EQ(nullable1, nullable2);
 
         nullable1.Value()[0] = 100;
 
-        NL_TEST_ASSERT(inSuite, nullable1 != nullable2);
-        NL_TEST_ASSERT(inSuite, nullable2.Update(nullable1) == true);
-        NL_TEST_ASSERT(inSuite, nullable1 == nullable2);
+        EXPECT_NE(nullable1, nullable2);
+        EXPECT_TRUE(nullable2.Update(nullable1));
+        EXPECT_EQ(nullable1, nullable2);
     }
 
     // Structs
@@ -227,83 +228,52 @@ static void TestUpdate(nlTestSuite * inSuite, void * inContext)
         auto nullable1 = MakeNullable<SomeObject>({ 1, 2 });
         auto nullable2 = MakeNullable<SomeObject>({ 1, 2 });
 
-        NL_TEST_ASSERT(inSuite, !nullable1.IsNull());
-        NL_TEST_ASSERT(inSuite, !nullable2.IsNull());
-        NL_TEST_ASSERT(inSuite, nullable1 == nullable2);
+        EXPECT_FALSE(nullable1.IsNull());
+        EXPECT_FALSE(nullable2.IsNull());
+        EXPECT_EQ(nullable1, nullable2);
 
         // No-op on change to same.
-        NL_TEST_ASSERT(inSuite, nullable1.Update(nullable2) == false);
-        NL_TEST_ASSERT(inSuite, nullable1 == nullable2);
+        EXPECT_FALSE(nullable1.Update(nullable2));
+        EXPECT_EQ(nullable1, nullable2);
 
         nullable1.Value().a = 100;
 
-        NL_TEST_ASSERT(inSuite, nullable1 != nullable2);
-        NL_TEST_ASSERT(inSuite, nullable2.Update(nullable1) == true);
-        NL_TEST_ASSERT(inSuite, nullable1 == nullable2);
+        EXPECT_NE(nullable1, nullable2);
+        EXPECT_TRUE(nullable2.Update(nullable1));
+        EXPECT_EQ(nullable1, nullable2);
     }
 
     // Scalar cases
     {
         auto nullable1 = MakeNullable(static_cast<uint8_t>(1));
 
-        NL_TEST_ASSERT(inSuite, !nullable1.IsNull());
+        EXPECT_FALSE(nullable1.IsNull());
 
         // Non-null to non-null same value
-        NL_TEST_ASSERT(inSuite, nullable1.Update(nullable1) == false);
-        NL_TEST_ASSERT(inSuite, !nullable1.IsNull());
+        EXPECT_FALSE(nullable1.Update(nullable1));
+        EXPECT_FALSE(nullable1.IsNull());
 
         // Non-null to null
-        NL_TEST_ASSERT(inSuite, nullable1.Update(NullNullable) == true);
-        NL_TEST_ASSERT(inSuite, nullable1.IsNull());
+        EXPECT_TRUE(nullable1.Update(NullNullable));
+        EXPECT_TRUE(nullable1.IsNull());
 
         // Null to null
-        NL_TEST_ASSERT(inSuite, nullable1.Update(NullNullable) == false);
-        NL_TEST_ASSERT(inSuite, nullable1.IsNull());
+        EXPECT_FALSE(nullable1.Update(NullNullable));
+        EXPECT_TRUE(nullable1.IsNull());
 
         // Null to non-null
-        NL_TEST_ASSERT(inSuite, nullable1.Update(MakeNullable(static_cast<uint8_t>(1))) == true);
-        NL_TEST_ASSERT(inSuite, !nullable1.IsNull());
-        NL_TEST_ASSERT(inSuite, nullable1.Value() == 1);
+        EXPECT_TRUE(nullable1.Update(MakeNullable(static_cast<uint8_t>(1))));
+        EXPECT_FALSE(nullable1.IsNull());
+        EXPECT_EQ(nullable1.Value(), 1);
 
         // Non-null to non-null different value
-        NL_TEST_ASSERT(inSuite, nullable1.Update(MakeNullable(static_cast<uint8_t>(2))) == true);
-        NL_TEST_ASSERT(inSuite, !nullable1.IsNull());
-        NL_TEST_ASSERT(inSuite, nullable1.Value() == 2);
+        EXPECT_TRUE(nullable1.Update(MakeNullable(static_cast<uint8_t>(2))));
+        EXPECT_FALSE(nullable1.IsNull());
+        EXPECT_EQ(nullable1.Value(), 2);
 
         // Non-null to extent of range --> changes to "invalid" value in range.
-        NL_TEST_ASSERT(inSuite, nullable1.Update(MakeNullable(static_cast<uint8_t>(255))) == true);
-        NL_TEST_ASSERT(inSuite, !nullable1.IsNull());
-        NL_TEST_ASSERT(inSuite, nullable1.Value() == 255);
+        EXPECT_TRUE(nullable1.Update(MakeNullable(static_cast<uint8_t>(255))));
+        EXPECT_FALSE(nullable1.IsNull());
+        EXPECT_EQ(nullable1.Value(), 255);
     }
 }
-
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("NullableBasic", TestBasic),
-    NL_TEST_DEF("NullableMake", TestMake),
-    NL_TEST_DEF("NullableCopy", TestCopy),
-    NL_TEST_DEF("NullableMove", TestMove),
-    NL_TEST_DEF("Nullable Update operation", TestUpdate),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-int TestNullable()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-    {
-        "Test for Nullable abstraction",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestNullable)

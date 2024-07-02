@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/SystemPacketBuffer.h>
 

@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Electrical Power Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <code>0x0090</code>
@@ -82,18 +82,18 @@ limitations under the License.
     <!--Conformance feature [POLY] - for now optional-->
     <attribute code="0x0011" side="server" define="POWER_FACTOR" type="int64s" isNullable="true" min="-10000" max="10000" optional="true">PowerFactor</attribute>
     <attribute code="0x0012" side="server" type="amperage_ma" define="NEUTRAL_CURRENT" isNullable="true" min="-4611686018427387904" max="4611686018427387904" optional="true">NeutralCurrent</attribute>
-    <event code="0x00" side="server" name="MeasurementPeriodRanges" priority="info" apiMaturity="provisional" optional="true">
+    <event code="0x00" side="server" name="MeasurementPeriodRanges" priority="info" optional="true">
       <description>MeasurementPeriodRanges</description>
       <field id="0" name="Ranges" array="true" type="MeasurementRangeStruct"/>
     </event>
   </cluster>
-  <enum name="PowerModeEnum" type="enum8" apiMaturity="provisional">
+  <enum name="PowerModeEnum" type="enum8">
     <cluster code="0x0090"/>
     <item name="Unknown" value="0x00"/>
     <item name="DC" value="0x01"/>
     <item name="AC" value="0x02"/>
   </enum>
-  <struct name="MeasurementRangeStruct" apiMaturity="provisional">
+  <struct name="MeasurementRangeStruct">
     <cluster code="0x0090"/>
     <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" min="0x0000" max="0x000E"/>
     <item fieldId="1" name="Min" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
@@ -107,7 +107,7 @@ limitations under the License.
     <item fieldId="9" name="MinSystime" type="systime_ms" optional="true"/>
     <item fieldId="10" name="MaxSystime" type="systime_ms" optional="true"/>
   </struct>
-  <struct name="HarmonicMeasurementStruct" apiMaturity="provisional">
+  <struct name="HarmonicMeasurementStruct">
     <cluster code="0x0090"/>
     <item fieldId="0" name="Order" type="int8u" min="1" default="1"/>
     <item fieldId="1" name="Measurement" type="int64s" min="-4611686018427387904" max="4611686018427387904" isNullable="true"/>

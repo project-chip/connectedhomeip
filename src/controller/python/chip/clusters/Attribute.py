@@ -54,61 +54,42 @@ class EventPriority(Enum):
     CRITICAL = 2
 
 
-@dataclass
+@dataclass(frozen=True)
 class AttributePath:
     EndpointId: int = None
     ClusterId: int = None
     AttributeId: int = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, Attribute=None, ClusterId=None, AttributeId=None):
-        self.EndpointId = EndpointId
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (Attribute is not None) or (ClusterId is not None) or (AttributeId is not None):
-                raise Warning(
-                    "Attribute, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-            return
-        if Attribute is not None:
-            if (ClusterId is not None) or (AttributeId is not None):
-                raise Warning(
-                    "ClusterId and AttributeId is ignored when Attribute is specified")
-            self.ClusterId = Attribute.cluster_id
-            self.AttributeId = Attribute.attribute_id
-            return
-        self.ClusterId = ClusterId
-        self.AttributeId = AttributeId
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster) -> AttributePath:
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return AttributePath(EndpointId=EndpointId, ClusterId=Cluster.id)
+
+    @staticmethod
+    def from_attribute(EndpointId: int, Attribute: ClusterAttributeDescriptor) -> AttributePath:
+        if Attribute is None:
+            raise ValueError("Attribute cannot be None")
+        return AttributePath(EndpointId=EndpointId, ClusterId=Attribute.cluster_id, AttributeId=Attribute.attribute_id)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.AttributeId}"
 
-    def __hash__(self):
-        return str(self).__hash__()
 
-
-@dataclass
+@dataclass(frozen=True)
 class DataVersionFilter:
     EndpointId: int = None
     ClusterId: int = None
     DataVersion: int = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, ClusterId=None, DataVersion=None):
-        self.EndpointId = EndpointId
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (ClusterId is not None):
-                raise Warning(
-                    "Attribute, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-        else:
-            self.ClusterId = ClusterId
-        self.DataVersion = DataVersion
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster, DataVersion: int = None) -> AttributePath:
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return DataVersionFilter(EndpointId=EndpointId, ClusterId=Cluster.id, DataVersion=DataVersion)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.DataVersion}"
-
-    def __hash__(self):
-        return str(self).__hash__()
 
 
 @dataclass
@@ -165,43 +146,27 @@ class TypedAttributePath:
         self.AttributeId = self.AttributeType.attribute_id
 
 
-@dataclass
+@dataclass(frozen=True)
 class EventPath:
     EndpointId: int = None
     ClusterId: int = None
     EventId: int = None
     Urgent: int = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None, Urgent=None):
-        self.EndpointId = EndpointId
-        self.Urgent = Urgent
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (Event is not None) or (ClusterId is not None) or (EventId is not None):
-                raise Warning(
-                    "Event, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-            return
-        if Event is not None:
-            if (ClusterId is not None) or (EventId is not None):
-                raise Warning(
-                    "ClusterId and EventId is ignored when Event is specified")
-            self.ClusterId = Event.cluster_id
-            self.EventId = Event.event_id
-            return
-        self.ClusterId = ClusterId
-        self.EventId = EventId
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster, EventId: int = None, Urgent: int = None) -> "EventPath":
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return EventPath(EndpointId=EndpointId, ClusterId=Cluster.id, EventId=EventId, Urgent=Urgent)
+
+    @staticmethod
+    def from_event(EndpointId: int, Event: ClusterEvent, Urgent: int = None) -> "EventPath":
+        if Event is None:
+            raise ValueError("Event cannot be None")
+        return EventPath(EndpointId=EndpointId, ClusterId=Event.cluster_id, EventId=Event.event_id, Urgent=Urgent)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/{self.Urgent}"
-
-    def __hash__(self):
-        return str(self).__hash__()
-
-
-@dataclass
-class AttributePathWithListIndex(AttributePath):
-    ListIndex: int = None
 
 
 @dataclass
@@ -500,6 +465,13 @@ class SubscriptionTransaction:
             lambda: handle.pychip_ReadClient_OverrideLivenessTimeout(self._readTransaction._pReadClient, timeoutMs)
         )
 
+    async def TriggerResubscribeIfScheduled(self, reason: str):
+        handle = chip.native.GetLibraryHandle()
+        await builtins.chipStack.CallAsync(
+            lambda: handle.pychip_ReadClient_TriggerResubscribeIfScheduled(
+                self._readTransaction._pReadClient, reason.encode("utf-8"))
+        )
+
     def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
         '''
         Retrieve the reporting intervals associated with an active subscription.
@@ -679,7 +651,7 @@ class AsyncReadTransaction:
         self._changedPathSet = set()
         self._pReadClient = None
         self._pReadCallback = None
-        self._resultError = None
+        self._resultError: Optional[PyChipError] = None
 
     def SetClientObjPointers(self, pReadClient, pReadCallback):
         self._pReadClient = pReadClient
@@ -688,7 +660,7 @@ class AsyncReadTransaction:
     def GetAllEventValues(self):
         return self._events
 
-    def handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
+    def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
         try:
             imStatus = chip.interaction_model.Status(status)
 
@@ -746,7 +718,7 @@ class AsyncReadTransaction:
             logging.exception(ex)
 
     def handleError(self, chipError: PyChipError):
-        self._resultError = chipError.code
+        self._resultError = chipError
 
     def _handleSubscriptionEstablished(self, subscriptionId):
         if not self._future.done():
@@ -805,11 +777,11 @@ class AsyncReadTransaction:
         # move on, possibly invalidating the provided _event_loop.
         #
         if not self._future.done():
-            if self._resultError:
+            if self._resultError is not None:
                 if self._subscription_handler:
-                    self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
+                    self._subscription_handler.OnErrorCb(self._resultError.code, self._subscription_handler)
                 else:
-                    self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
+                    self._future.set_exception(self._resultError.to_exception())
             else:
                 self._future.set_result(AsyncReadTransaction.ReadResponse(
                     attributes=self._cache.attributeCache, events=self._events, tlvAttributes=self._cache.attributeTLVCache))
@@ -837,7 +809,7 @@ class AsyncWriteTransaction:
         self._event_loop = eventLoop
         self._future = future
         self._resultData = []
-        self._resultError = None
+        self._resultError: Optional[PyChipError] = None
 
     def handleResponse(self, path: AttributePath, status: int):
         try:

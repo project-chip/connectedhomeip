@@ -107,7 +107,7 @@ void PlatformManagerImpl::_Shutdown()
 
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 
-    esp_event_loop_delete_default();
+    esp_event_handler_unregister(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent);
 }
 
 void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData)
@@ -119,6 +119,7 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
     event.Platform.ESPSystemEvent.Id   = eventId;
     if (eventBase == IP_EVENT)
     {
+        ChipLogProgress(DeviceLayer, "Posting ESPSystemEvent: IP Event with eventId : %ld", eventId);
         switch (eventId)
         {
         case IP_EVENT_STA_GOT_IP:
@@ -138,6 +139,7 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     else if (eventBase == WIFI_EVENT)
     {
+        ChipLogProgress(DeviceLayer, "Posting ESPSystemEvent: Wifi Event with eventId : %ld", eventId);
         switch (eventId)
         {
         case WIFI_EVENT_SCAN_DONE:
@@ -181,7 +183,10 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
+    else
+    {
+        ChipLogProgress(DeviceLayer, "Posting ESPSystemEvent with eventId : %ld", eventId);
+    }
     sInstance.PostEventOrDie(&event);
 }
 

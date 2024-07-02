@@ -183,6 +183,18 @@ static CHIP_ERROR LoadTestFabric_Node02_01(FabricTable & fabricTable, bool doCom
     return err;
 }
 
+const FabricInfo * FindFabric(FabricTable & fabricTable, ByteSpan rootPublicKey, FabricId fabricId)
+{
+    Crypto::P256PublicKey key;
+    EXPECT_GE(key.Length(), rootPublicKey.size());
+    if (key.Length() < rootPublicKey.size())
+    {
+        return nullptr;
+    }
+    memcpy(key.Bytes(), rootPublicKey.data(), rootPublicKey.size());
+    return fabricTable.FindFabric(key, fabricId);
+}
+
 struct TestFabricTable : public ::testing::Test
 {
 
@@ -2279,16 +2291,13 @@ TEST_F(TestFabricTable, TestFabricLookup)
     EXPECT_EQ(LoadTestFabric_Node01_01(fabricTable, /* doCommit = */ true), CHIP_NO_ERROR);
     EXPECT_EQ(LoadTestFabric_Node02_01(fabricTable, /* doCommit = */ true, FabricTable::AdvertiseIdentity::No), CHIP_NO_ERROR);
 
+    // These two NOCs have the same fabric id on purpose; only the trust root is
+    // different.
+    constexpr FabricId kNode01_01_and_02_01_FabricId = 0xFAB000000000001D;
+
     // Attempt lookup of the Root01 fabric.
     {
-        Crypto::P256PublicKey key;
-        EXPECT_GE(key.Length(), TestCerts::sTestCert_Root01_PublicKey.size());
-        if (key.Length() < TestCerts::sTestCert_Root01_PublicKey.size())
-        {
-            return;
-        }
-        memcpy(key.Bytes(), TestCerts::sTestCert_Root01_PublicKey.data(), TestCerts::sTestCert_Root01_PublicKey.size());
-        auto fabricInfo = fabricTable.FindFabric(key, 0xFAB000000000001D);
+        auto fabricInfo = FindFabric(fabricTable, TestCerts::sTestCert_Root01_PublicKey, kNode01_01_and_02_01_FabricId);
         ASSERT_NE(fabricInfo, nullptr);
 
         EXPECT_EQ(fabricInfo->GetFabricIndex(), 1);
@@ -2297,14 +2306,7 @@ TEST_F(TestFabricTable, TestFabricLookup)
 
     // Attempt lookup of the Root02 fabric.
     {
-        Crypto::P256PublicKey key;
-        EXPECT_GE(key.Length(), TestCerts::sTestCert_Root02_PublicKey.size());
-        if (key.Length() < TestCerts::sTestCert_Root02_PublicKey.size())
-        {
-            return;
-        }
-        memcpy(key.Bytes(), TestCerts::sTestCert_Root02_PublicKey.data(), TestCerts::sTestCert_Root02_PublicKey.size());
-        auto fabricInfo = fabricTable.FindFabric(key, 0xFAB000000000001D);
+        auto fabricInfo = FindFabric(fabricTable, TestCerts::sTestCert_Root02_PublicKey, kNode01_01_and_02_01_FabricId);
         ASSERT_NE(fabricInfo, nullptr);
 
         EXPECT_EQ(fabricInfo->GetFabricIndex(), 2);
@@ -2314,6 +2316,69 @@ TEST_F(TestFabricTable, TestFabricLookup)
     // Attempt lookup of FabricIndex 0 --> should always fail.
     {
         EXPECT_EQ(fabricTable.FindFabricWithIndex(0), nullptr);
+    }
+}
+
+TEST_F(TestFabricTable, ShouldFailSetFabricIndexWithInvalidIndex)
+{
+    chip::TestPersistentStorageDelegate testStorage;
+    ScopedFabricTable fabricTableHolder;
+    EXPECT_EQ(fabricTableHolder.Init(&testStorage), CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    EXPECT_EQ(fabricTable.SetFabricIndexForNextAddition(kUndefinedFabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+}
+
+TEST_F(TestFabricTable, ShouldFailSetFabricIndexWithPendingFabric)
+{
+    chip::TestPersistentStorageDelegate testStorage;
+    ScopedFabricTable fabricTableHolder;
+    EXPECT_EQ(fabricTableHolder.Init(&testStorage), CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    EXPECT_EQ(fabricTable.AddNewPendingTrustedRootCert(ByteSpan(TestCerts::sTestCert_Root01_Chip)), CHIP_NO_ERROR);
+
+    EXPECT_EQ(fabricTable.SetFabricIndexForNextAddition(1), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestFabricTable, ShouldFailSetFabricIndexWhenInUse)
+{
+    chip::TestPersistentStorageDelegate testStorage;
+    ScopedFabricTable fabricTableHolder;
+    EXPECT_EQ(fabricTableHolder.Init(&testStorage), CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    EXPECT_EQ(LoadTestFabric_Node01_01(fabricTable, /* doCommit = */ true), CHIP_NO_ERROR);
+    EXPECT_EQ(fabricTable.SetFabricIndexForNextAddition(1), CHIP_ERROR_FABRIC_EXISTS);
+}
+
+TEST_F(TestFabricTable, ShouldAddFabricAtRequestedIndex)
+{
+    chip::TestPersistentStorageDelegate testStorage;
+    ScopedFabricTable fabricTableHolder;
+    EXPECT_EQ(fabricTableHolder.Init(&testStorage), CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    EXPECT_EQ(fabricTable.SetFabricIndexForNextAddition(2), CHIP_NO_ERROR);
+    EXPECT_EQ(LoadTestFabric_Node02_01(fabricTable, /* doCommit = */ true), CHIP_NO_ERROR);
+
+    EXPECT_EQ(fabricTable.SetFabricIndexForNextAddition(1), CHIP_NO_ERROR);
+    EXPECT_EQ(LoadTestFabric_Node01_01(fabricTable, /* doCommit = */ true), CHIP_NO_ERROR);
+
+    {
+        auto fabricInfo = FindFabric(fabricTable, TestCerts::sTestCert_Root01_PublicKey, TestCerts::kTestCert_Node01_01_FabricId);
+        ASSERT_NE(fabricInfo, nullptr);
+        EXPECT_EQ(fabricInfo->GetFabricIndex(), 1);
+        EXPECT_EQ(fabricInfo->GetNodeId(), TestCerts::kTestCert_Node01_01_NodeId);
+        EXPECT_EQ(fabricInfo->GetFabricId(), TestCerts::kTestCert_Node01_01_FabricId);
+    }
+
+    {
+        auto fabricInfo = FindFabric(fabricTable, TestCerts::sTestCert_Root02_PublicKey, TestCerts::kTestCert_Node02_01_FabricId);
+        ASSERT_NE(fabricInfo, nullptr);
+        EXPECT_EQ(fabricInfo->GetFabricIndex(), 2);
+        EXPECT_EQ(fabricInfo->GetNodeId(), TestCerts::kTestCert_Node02_01_NodeId);
+        EXPECT_EQ(fabricInfo->GetFabricId(), TestCerts::kTestCert_Node02_01_FabricId);
     }
 }
 

@@ -181,10 +181,6 @@ private:
                         System::PacketBufferHandle pBuf) override;
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                           System::PacketBufferHandle pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBufferHandle pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
-                          const Ble::ChipBleUUID * charId) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -300,7 +296,7 @@ private:
     CHIP_ERROR StartAdvertising(void);
     void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
     void CancelBleAdvTimeoutTimer(void);
-    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
+    static void BleAdvTimeoutHandler(System::Layer *, void *);
 
 #ifdef CONFIG_BT_BLUEDROID_ENABLED
     void HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);

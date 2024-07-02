@@ -121,13 +121,15 @@ using namespace chip::Tracing::DarwinFramework;
     MTRP256KeypairBridge _operationalKeypairBridge;
     MTRDeviceAttestationDelegateBridge * _deviceAttestationDelegateBridge;
     MTRDeviceControllerFactory * _factory;
-    NSMutableDictionary * _nodeIDToDeviceMap;
+    NSMapTable * _nodeIDToDeviceMap;
     os_unfair_lock _deviceMapLock; // protects nodeIDToDeviceMap
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
 
     // _serverEndpoints is only touched on the Matter queue.
     NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
+
+    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
 }
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
@@ -145,9 +147,6 @@ using namespace chip::Tracing::DarwinFramework;
     return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
 }
 
-static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
-static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
-
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
                              queue:(dispatch_queue_t)queue
                    storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
@@ -156,6 +155,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
           otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
                   uniqueIdentifier:(NSUUID *)uniqueIdentifier
     concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
 {
     if (self = [super init]) {
         // Make sure our storage is all set up to work as early as possible,
@@ -236,7 +236,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
         _chipWorkQueue = queue;
         _factory = factory;
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
-        _nodeIDToDeviceMap = [NSMutableDictionary dictionary];
+        _nodeIDToDeviceMap = [NSMapTable strongToWeakObjectsMapTable];
         _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
 
@@ -256,27 +256,29 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
         }
 
         // Provide a way to test different subscription pool sizes without code change
-        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
-        if ([defaults objectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey]) {
-            NSInteger subscriptionPoolSizeOverride = [defaults integerForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+        if ([defaults objectForKey:kDefaultSubscriptionPoolSizeOverrideKey]) {
+            NSInteger subscriptionPoolSizeOverride = [defaults integerForKey:kDefaultSubscriptionPoolSizeOverrideKey];
             if (subscriptionPoolSizeOverride < 1) {
                 concurrentSubscriptionPoolSize = 1;
             } else {
                 concurrentSubscriptionPoolSize = static_cast<NSUInteger>(subscriptionPoolSizeOverride);
             }
 
-            MTR_LOG(" *** Overriding pool size of MTRDeviceController with: %tu", concurrentSubscriptionPoolSize);
+            MTR_LOG(" *** Overriding pool size of MTRDeviceController with: %lu", static_cast<unsigned long>(concurrentSubscriptionPoolSize));
         }
 
         if (!concurrentSubscriptionPoolSize) {
             concurrentSubscriptionPoolSize = 1;
         }
 
-        MTR_LOG("Setting up pool size of MTRDeviceController with: %tu", concurrentSubscriptionPoolSize);
+        MTR_LOG("Setting up pool size of MTRDeviceController with: %lu", static_cast<unsigned long>(concurrentSubscriptionPoolSize));
 
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+
+        _storageBehaviorConfiguration = storageBehaviorConfiguration;
     }
     return self;
 }
@@ -305,7 +307,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
     // while calling out into arbitrary invalidation code, snapshot the list of
     // devices before we start invalidating.
     os_unfair_lock_lock(&_deviceMapLock);
-    NSArray<MTRDevice *> * devices = [_nodeIDToDeviceMap allValues];
+    NSEnumerator * devices = [_nodeIDToDeviceMap objectEnumerator];
     [_nodeIDToDeviceMap removeAllObjects];
     os_unfair_lock_unlock(&_deviceMapLock);
 
@@ -968,7 +970,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // which will be in exactly the state it would be in if it were created
     // while we were running and then we got shut down.
     if ([self isRunning]) {
-        _nodeIDToDeviceMap[nodeID] = deviceToReturn;
+        [_nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
     }
 
     if (prefetchedClusterData) {
@@ -992,13 +994,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         }
     }
 
+    [deviceToReturn setStorageBehaviorConfiguration:_storageBehaviorConfiguration];
+
     return deviceToReturn;
 }
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
 {
     std::lock_guard lock(_deviceMapLock);
-    MTRDevice * deviceToReturn = _nodeIDToDeviceMap[nodeID];
+    MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
     }
@@ -1010,10 +1014,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     std::lock_guard lock(_deviceMapLock);
     auto * nodeID = device.nodeID;
-    MTRDevice * deviceToRemove = _nodeIDToDeviceMap[nodeID];
+    MTRDevice * deviceToRemove = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (deviceToRemove == device) {
         [deviceToRemove invalidate];
-        _nodeIDToDeviceMap[nodeID] = nil;
+        [_nodeIDToDeviceMap removeObjectForKey:nodeID];
     } else {
         MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, nodeID.unsignedLongLongValue);
     }
@@ -1025,7 +1029,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     std::lock_guard lock(_deviceMapLock);
     NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
     for (NSNumber * nodeID in _nodeIDToDeviceMap) {
-        deviceAttributeCounts[nodeID] = @([_nodeIDToDeviceMap[nodeID] unitTestAttributeCount]);
+        deviceAttributeCounts[nodeID] = @([[_nodeIDToDeviceMap objectForKey:nodeID] unitTestAttributeCount]);
     }
     return deviceAttributeCounts;
 }
@@ -1253,6 +1257,33 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
+    // First check if MTRDevice exists from having loaded from storage, or created by a client.
+    // Do not use deviceForNodeID here, because we don't want to create the device if it does not already exist.
+    os_unfair_lock_lock(&_deviceMapLock);
+    MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
+    os_unfair_lock_unlock(&_deviceMapLock);
+
+    // In the case that this device is known to use thread, queue this with subscription attempts as well, to
+    // help with throttling Thread traffic.
+    if (device && [device deviceUsesThread]) {
+        MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
+            MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
+                completion(exchangeManager, session, error, retryDelay);
+                workItemCompletion(MTRAsyncWorkComplete);
+            };
+            [self directlyGetSessionForNode:nodeID completion:completionWrapper];
+        }];
+
+        [_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+    } else {
+        [self directlyGetSessionForNode:nodeID completion:completion];
+    }
+}
+
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
+{
     [self
         asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
             auto connectionBridge = new MTRDeviceConnectionBridge(completion);
@@ -1451,7 +1482,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // Don't use deviceForNodeID here, because we don't want to create the
     // device if it does not already exist.
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * device = _nodeIDToDeviceMap[@(nodeID)];
+    MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
     os_unfair_lock_unlock(&_deviceMapLock);
 
     if (device == nil) {
@@ -1838,7 +1869,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", static_cast<unsigned long>(duration), UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -1864,7 +1895,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                  error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", static_cast<unsigned long>(duration), UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -1872,7 +1903,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     if (discriminator > 0xfff) {
-        MTR_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
+        MTR_LOG_ERROR("Error: Discriminator %lu is too large. Max value %d", static_cast<unsigned long>(discriminator), 0xfff);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }

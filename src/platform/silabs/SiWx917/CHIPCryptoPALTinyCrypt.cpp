@@ -60,6 +60,12 @@
 
 #include <string.h>
 
+#ifdef SLI_SI91X_MCU_INTERFACE
+extern "C" {
+#include "sl_si91x_trng.h"
+}
+#endif // SLI_SI91X_MCU_INTERFACE
+
 namespace chip {
 namespace Crypto {
 
@@ -414,7 +420,7 @@ exit:
 
     return error;
 }
-
+#if !(SLI_SI91X_MCU_INTERFACE)
 static EntropyContext * get_entropy_context()
 {
     if (!gsEntropyContext.mInitialized)
@@ -448,9 +454,15 @@ static mbedtls_ctr_drbg_context * get_drbg_context()
 
     return drbgCtxt;
 }
-
+#endif // !SLI_SI91X_MCU_INTERFACE
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
+#if SLI_SI91X_MCU_INTERFACE
+    // SiWx917 has its hardware based generator
+    (void) fn_source;
+    (void) p_source;
+    (void) threshold;
+#else
     VerifyOrReturnError(fn_source != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     EntropyContext * const entropy_ctxt = get_entropy_context();
@@ -459,6 +471,7 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
     const int result =
         mbedtls_entropy_add_source(&entropy_ctxt->mEntropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+#endif // SLI_SI91X_MCU_INTERFACE
     return CHIP_NO_ERROR;
 }
 
@@ -466,12 +479,17 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-
+#if SLI_SI91X_MCU_INTERFACE
+    sl_status_t status;
+    status = sl_si91x_trng_get_random_num(reinterpret_cast<uint32_t *>(out_buffer), out_length);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_RANDOM_DATA_UNAVAILABLE);
+#else
     mbedtls_ctr_drbg_context * const drbg_ctxt = get_drbg_context();
     VerifyOrReturnError(drbg_ctxt != nullptr, CHIP_ERROR_INTERNAL);
 
     const int result = mbedtls_ctr_drbg_random(drbg_ctxt, Uint8::to_uchar(out_buffer), out_length);
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+#endif // SLI_SI91X_MCU_INTERFACE
 
     return CHIP_NO_ERROR;
 }

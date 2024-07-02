@@ -47,11 +47,13 @@ using CommissionerDeclarationCallback = std::function<void(
 struct ConnectionCallbacks
 {
     /**
-     * The callback called when the connection process has ended, regardless of whether it was successful or not.
+     * (Required) The callback called when the connection process has ended, regardless of whether it was successful or not.
      */
     ConnectCallback mOnConnectionComplete = nullptr;
     /**
-     * The callback called when the Commissionee receives a CommissionerDeclaration message from the Commissioner.
+     * (Optional) The callback called when the Client/Commissionee receives a CommissionerDeclaration message from the
+     * CastingPlayer/Commissioner. This callback is needed to support UDC features where a reply from the Commissioner is expected.
+     * It provides information indicating the Commissioner’s pre-commissioning state.
      */
     CommissionerDeclarationCallback mCommissionerDeclarationCallback = nullptr;
 };

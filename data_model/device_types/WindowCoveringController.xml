@@ -80,6 +80,7 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="client">
       <otherwiseConform>
+        <provisionalConform/>
         <mandatoryConform>
           <attribute name="Active"/>
         </mandatoryConform>

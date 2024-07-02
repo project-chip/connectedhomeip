@@ -54,6 +54,14 @@ public:
     virtual chip::DeviceLayer::NetworkCommissioning::WiFiDriver * GetWifiDriverInstance(void) override;
 #endif
 
+    /**
+     * \brief This function registers applicative features such as custom CLI commands
+     *
+     * \return CHIP_ERROR
+     *
+     */
+    virtual CHIP_ERROR AppMatter_Register(void) override;
+
 private:
     void DispatchEvent(const AppEvent & event);
 };

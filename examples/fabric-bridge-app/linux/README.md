@@ -88,12 +88,45 @@ defined:
 
 -   Build the example application:
 
-    ```sh
-    cd ~/connectedhomeip/examples/fabric-bridge-app/linux
-    git submodule update --init
-    source third_party/connectedhomeip/scripts/activate.sh
-    gn gen out/debug
-    ninja -C out/debug
+    ### For Linux host example:
+
+    ```
+    ./scripts/examples/gn_build_example.sh examples/fabric-bridge-app/linux out/debug/standalone chip_config_network_layer_ble=false 'import("//with_pw_rpc.gni")'
+    ```
+
+    ### For Raspberry Pi 4 example:
+
+    Pull Docker Images
+
+    ```
+    docker pull connectedhomeip/chip-build-vscode:latest
+    ```
+
+    Run docker
+
+    ```
+    docker run -it -v ~/connectedhomeip:/var/connectedhomeip connectedhomeip/chip-build-vscode:latest /bin/bash
+    ```
+
+    Build
+
+    ```
+    cd /var/connectedhomeip
+
+    git config --global --add safe.directory /var/connectedhomeip
+    git config --global --add safe.directory /var/connectedhomeip/third_party/pigweed/repo
+    git config --global --add safe.directory /var/connectedhomeip/examples/common/QRCode/repo
+
+    ./scripts/run_in_build_env.sh \
+     "./scripts/build/build_examples.py \
+        --target linux-arm64-fabric-bridge-no-ble-clang-rpc \
+        build"
+    ```
+
+    Transfer the fabric-bridge-app binary to a Raspberry Pi
+
+    ```
+    scp ./fabric-bridge-app ubuntu@xxx.xxx.xxx.xxx:/home/ubuntu
     ```
 
 -   To delete generated executable, libraries and object files use:
@@ -116,4 +149,4 @@ defined:
     sudo out/debug/fabric-bridge-app
     ```
 
--   Test the device using ChipDeviceController on your laptop / workstation etc.
+-   Test the device using FabricAdmin on your laptop / workstation etc.

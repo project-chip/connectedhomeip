@@ -17,6 +17,7 @@ from enum import Enum, auto
 from platform import uname
 from typing import Optional
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -312,7 +313,8 @@ class HostBuilder(GnBuilder):
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
                  enable_test_event_triggers=None,
-                 enable_dnssd_tests: Optional[bool] = None
+                 enable_dnssd_tests: Optional[bool] = None,
+                 chip_casting_simplified: Optional[bool] = None
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -410,7 +412,7 @@ class HostBuilder(GnBuilder):
             self.build_command = 'runner'
             # board will NOT be used, but is required to be able to properly
             # include things added by the test_runner efr32 build
-            self.extra_gn_options.append('silabs_board="BRD4161A"')
+            self.extra_gn_options.append('silabs_board="BRD4187C"')
 
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
@@ -426,6 +428,9 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_enable_dnssd_tests=true')
             else:
                 self.extra_gn_options.append('chip_enable_dnssd_tests=false')
+
+        if chip_casting_simplified is not None:
+            self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
@@ -564,19 +569,13 @@ class HostBuilder(GnBuilder):
             self.createJavaExecutable("kotlin-matter-controller")
 
     def build_outputs(self):
-        outputs = {}
-
         for name in self.app.OutputNames():
+            if not self.options.enable_link_map_file and name.endswith(".map"):
+                continue
             path = os.path.join(self.output_dir, name)
             if os.path.isdir(path):
                 for root, dirs, files in os.walk(path):
                     for file in files:
-                        outputs.update({
-                            file: os.path.join(root, file)
-                        })
+                        yield BuilderOutput(os.path.join(root, file), file)
             else:
-                outputs.update({
-                    name: os.path.join(self.output_dir, name)
-                })
-
-        return outputs
+                yield BuilderOutput(os.path.join(self.output_dir, name), name)

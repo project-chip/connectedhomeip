@@ -3749,6 +3749,51 @@ static BOOL AttributeIsSpecifiedInBarrierControlCluster(AttributeId aAttributeId
     }
     }
 }
+static BOOL AttributeIsSpecifiedInServiceAreaCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ServiceArea;
+    switch (aAttributeId) {
+    case Attributes::SupportedLocations::Id: {
+        return YES;
+    }
+    case Attributes::SupportedMaps::Id: {
+        return YES;
+    }
+    case Attributes::SelectedLocations::Id: {
+        return YES;
+    }
+    case Attributes::CurrentLocation::Id: {
+        return YES;
+    }
+    case Attributes::EstimatedEndTime::Id: {
+        return YES;
+    }
+    case Attributes::Progress::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInPumpConfigurationAndControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::PumpConfigurationAndControl;
@@ -5288,6 +5333,114 @@ static BOOL AttributeIsSpecifiedInRadonConcentrationMeasurementCluster(Attribute
     }
     }
 }
+static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WiFiNetworkManagement;
+    switch (aAttributeId) {
+    case Attributes::Ssid::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInThreadBorderRouterManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThreadBorderRouterManagement;
+    switch (aAttributeId) {
+    case Attributes::BorderRouterName::Id: {
+        return YES;
+    }
+    case Attributes::BorderAgentID::Id: {
+        return YES;
+    }
+    case Attributes::ThreadVersion::Id: {
+        return YES;
+    }
+    case Attributes::InterfaceEnabled::Id: {
+        return YES;
+    }
+    case Attributes::ActiveDatasetTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInThreadNetworkDirectoryCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThreadNetworkDirectory;
+    switch (aAttributeId) {
+    case Attributes::PreferredExtendedPanID::Id: {
+        return YES;
+    }
+    case Attributes::ThreadNetworks::Id: {
+        return YES;
+    }
+    case Attributes::ThreadNetworkTableSize::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
@@ -6738,6 +6891,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::BarrierControl::Id: {
         return AttributeIsSpecifiedInBarrierControlCluster(aAttributeId);
     }
+    case Clusters::ServiceArea::Id: {
+        return AttributeIsSpecifiedInServiceAreaCluster(aAttributeId);
+    }
     case Clusters::PumpConfigurationAndControl::Id: {
         return AttributeIsSpecifiedInPumpConfigurationAndControlCluster(aAttributeId);
     }
@@ -6803,6 +6959,15 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return AttributeIsSpecifiedInRadonConcentrationMeasurementCluster(aAttributeId);
+    }
+    case Clusters::WiFiNetworkManagement::Id: {
+        return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);
+    }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        return AttributeIsSpecifiedInThreadBorderRouterManagementCluster(aAttributeId);
+    }
+    case Clusters::ThreadNetworkDirectory::Id: {
+        return AttributeIsSpecifiedInThreadNetworkDirectoryCluster(aAttributeId);
     }
     case Clusters::WakeOnLan::Id: {
         return AttributeIsSpecifiedInWakeOnLANCluster(aAttributeId);

@@ -56,14 +56,6 @@ namespace {
 static constexpr unsigned kNewConnectionScanTimeoutMs   = 10000;
 static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(10);
 
-const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x11 } };
-const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x12 } };
-#define CHIP_BLE_GATT_SERVICE "0000fff6-0000-1000-8000-00805f9b34fb"
-#define CHIP_BLE_GATT_CHAR_WRITE "18ee2ef5-263d-4559-959f-4f9c429f9d11"
-#define CHIP_BLE_GATT_CHAR_READ "18ee2ef5-263d-4559-959f-4f9c429f9d12"
-
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -225,7 +217,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         {
             ChipDeviceEvent connectionEvent;
             connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
@@ -234,16 +226,16 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
-        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionError:
@@ -284,18 +276,18 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         }
         break;
     case DeviceEventType::kPlatformWebOSBLEWriteComplete:
-        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX);
+        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID);
         break;
     case DeviceEventType::kPlatformWebOSBLESubscribeOpComplete:
         if (apEvent->Platform.BLESubscribeOpComplete.mIsSubscribed)
             HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
-                                    &ChipUUID_CHIPoBLEChar_TX);
+                                    &Ble::CHIP_BLE_CHAR_2_UUID);
         else
             HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
-                                      &ChipUUID_CHIPoBLEChar_TX);
+                                      &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
     case DeviceEventType::kPlatformWebOSBLEIndicationReceived:
-        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX,
+        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID,
                                  PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralAdvConfiguredComplete:
@@ -434,9 +426,9 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uin
     pbnjson::JValue valueForMonitor = pbnjson::JObject();
 
     valueForMonitor.put("clientId", std::string(mClientId));
-    valueForMonitor.put("service", std::string(CHIP_BLE_GATT_SERVICE));
+    valueForMonitor.put("service", std::string(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR));
     pbnjson::JValue bytesJArray = pbnjson::JArray();
-    bytesJArray.append(std::string(CHIP_BLE_GATT_CHAR_READ));
+    bytesJArray.append(std::string(Ble::CHIP_BLE_CHAR_2_UUID_STR));
 
     valueForMonitor.put("characteristics", bytesJArray);
     valueForMonitor.put("subscribe", true);
@@ -456,8 +448,8 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uin
 
     pbnjson::JValue valueForDescriptor = pbnjson::JObject();
     valueForDescriptor.put("clientId", std::string(mClientId));
-    valueForDescriptor.put("service", std::string(CHIP_BLE_GATT_SERVICE));
-    valueForDescriptor.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_READ));
+    valueForDescriptor.put("service", std::string(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR));
+    valueForDescriptor.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_2_UUID_STR));
 
     valueForDescriptor.put("descriptor", std::string("00002902-0000-1000-8000-00805f9b34fb"));
 
@@ -568,8 +560,8 @@ bool BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * 
     pbnjson::JValue param      = pbnjson::JObject();
     pbnjson::JValue valueParam = pbnjson::JObject();
     param.put("clientId", clientId);
-    param.put("service", std::string(CHIP_BLE_GATT_SERVICE));
-    param.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
+    param.put("service", std::string(Ble::CHIP_BLE_SERVICE_LONG_UUID_STR));
+    param.put("characteristic", std::string(Ble::CHIP_BLE_CHAR_1_UUID_STR));
 
     if (valueType == "byte")
     {
@@ -626,20 +618,6 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
                                      pBuf->Start(), pBuf->DataLength());
 
     return result;
-}
-
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                     chip::System::PacketBufferHandle pBuf)
-{
-    ChipLogError(Ble, "SendReadRequest: Not implemented");
-    return true;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId)
-{
-    ChipLogError(Ble, "SendReadRBluezonse: Not implemented");
-    return true;
 }
 
 void BLEManagerImpl::AddConnectionData(const char * remoteAddr)

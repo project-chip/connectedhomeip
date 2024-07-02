@@ -1,24 +1,22 @@
-## Python tool to generate Matter onboarding codes
+## Python tool to generate and parse Matter onboarding codes
 
-Generates Manual Pairing Code and QR Code
+Generates and parses Manual Pairing Code and QR Code
 
 #### example usage:
 
-```
-./generate_setup_payload.py -h
-./generate_setup_payload.py -d 3840 -p 20202021 -cf 0 -dm 2 -vid 65521 -pid 32768
-```
-
--   Output
+-   Parse
 
 ```
-Manualcode : 34970112332
-QRCode     : MT:Y.K9042C00KA0648G00
+./SetupPayload.py parse MT:U9VJ0OMV172PX813210
+./SetupPayload.py parse 34970112332
+```
+
+-   Generate
+
+```
+./SetupPayload.py generate --help
+./SetupPayload.py generate -d 3840 -p 20202021
+./SetupPayload.py generate -d 3840 -p 20202021 --vendor-id 65521 --product-id 32768 -cf 0 -dm 2
 ```
 
 For more details please refer Matter Specification
-
----
-
-NOTE: This tool is only capable of generating the payloads and no support to
-parse the payloads.

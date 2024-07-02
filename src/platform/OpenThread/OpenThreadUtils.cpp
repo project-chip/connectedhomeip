@@ -87,11 +87,6 @@ void RegisterOpenThreadErrorFormatter(void)
     RegisterErrorFormatter(&sOpenThreadErrorFormatter);
 }
 
-/**
- * Log information related to a state change in the OpenThread stack.
- *
- * NB: This function *must* be called with the Thread stack lock held.
- */
 void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
 {
 #if CHIP_DETAIL_LOGGING

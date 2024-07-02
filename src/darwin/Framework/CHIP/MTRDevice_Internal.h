@@ -21,6 +21,7 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -59,6 +60,7 @@ MTR_TESTABLE
 @property (nonatomic, readonly) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
 
 - (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute;
+- (void)removeValueForAttribute:(NSNumber *)attribute;
 
 - (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes;
 @end
@@ -113,11 +115,24 @@ MTR_TESTABLE
 - (NSUInteger)unitTestAttributeCount;
 #endif
 
+- (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+
+// Returns whether this MTRDevice uses Thread for communication
+- (BOOL)deviceUsesThread;
+
 @end
 
 #pragma mark - Utility for clamping numbers
 // Returns a NSNumber object that is aNumber if it falls within the range [min, max].
 // Returns min or max, if it is below or above, respectively.
 NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
+
+#pragma mark - Constants
+
+static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
+static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
+
+// Declared inside platform, but noting here for reference
+// static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
 
 NS_ASSUME_NONNULL_END

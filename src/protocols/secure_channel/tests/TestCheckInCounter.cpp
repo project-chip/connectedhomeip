@@ -56,7 +56,6 @@ void VerifyCheckInCounterValues(uint32_t startValue, uint32_t expectedValue, Che
     EXPECT_EQ(counter.GetValue(), startValue);
 
     // Test operation
-    CHIP_ERROR err = CHIP_NO_ERROR;
     switch (operation)
     {
     case CheckInCounterOperations::kInvalidateHalf: {
@@ -68,7 +67,6 @@ void VerifyCheckInCounterValues(uint32_t startValue, uint32_t expectedValue, Che
         break;
     }
     default: {
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         FAIL();
     }
     };

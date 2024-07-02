@@ -96,7 +96,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0097" name="Messages" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0097" name="Messages Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Updated from SE1.4 version; CCB 1819"/>

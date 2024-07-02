@@ -2804,8 +2804,8 @@ TEST_F(TestChipCryptoPAL, TestVIDPID_x509Extraction)
         AttestationCertVidPid vidpid;
         CHIP_ERROR result = ExtractVIDPIDFromX509Cert(testCase.cert, vidpid);
         EXPECT_EQ(result, testCase.expectedResult);
-        EXPECT_EQ(vidpid.mVendorId.HasValue(), testCase.expectedVidPresent);
-        EXPECT_EQ(vidpid.mProductId.HasValue(), testCase.expectedPidPresent);
+        ASSERT_EQ(vidpid.mVendorId.HasValue(), testCase.expectedVidPresent);
+        ASSERT_EQ(vidpid.mProductId.HasValue(), testCase.expectedPidPresent);
 
         // If present, make sure the VID matches expectation.
         if (testCase.expectedVidPresent)
