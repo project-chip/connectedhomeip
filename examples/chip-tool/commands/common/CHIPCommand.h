@@ -86,6 +86,8 @@ public:
         AddArgument("only-allow-trusted-cd-keys", 0, 1, &mOnlyAllowTrustedCdKeys,
                     "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
                     "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
+        AddArgument("dac-revocation-set-path", &mDacRevocationSetPath,
+                    "Path to json file containing the device attestation revocation set.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -222,6 +224,7 @@ private:
     chip::Optional<char *> mCDTrustStorePath;
     chip::Optional<bool> mUseMaxSizedCerts;
     chip::Optional<bool> mOnlyAllowTrustedCdKeys;
+    chip::Optional<char *> mDacRevocationSetPath;
 
     // Cached trust store so commands other than the original startup command
     // can spin up commissioners as needed.

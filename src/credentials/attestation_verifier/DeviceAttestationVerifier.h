@@ -79,6 +79,8 @@ enum class AttestationVerificationResult : uint16_t
 
     kInternalError = 900,
 
+    kPaiAndDacRevoked = 1000,
+
     kNotImplemented = 0xFFFFU,
 
     // TODO: Add more attestation verification errors
@@ -259,6 +261,8 @@ protected:
     const size_t mNumCerts;
 };
 
+class DeviceAttestationRevocationDelegate;
+
 class DeviceAttestationVerifier
 {
 public:
@@ -409,6 +413,8 @@ public:
     void EnableCdTestKeySupport(bool enabled) { mEnableCdTestKeySupport = enabled; }
     bool IsCdTestKeySupported() const { return mEnableCdTestKeySupport; }
 
+    void SetRevocationDelegate(DeviceAttestationRevocationDelegate * delegate) { mRevocationDelegate = delegate; }
+
 protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
                                             const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
@@ -416,6 +422,30 @@ protected:
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;
+
+    DeviceAttestationRevocationDelegate * mRevocationDelegate = nullptr;
+};
+
+/**
+ * @brief Interface for checking the device attestation revocation status
+ *
+ */
+class DeviceAttestationRevocationDelegate
+{
+public:
+    DeviceAttestationRevocationDelegate()          = default;
+    virtual ~DeviceAttestationRevocationDelegate() = default;
+
+    /**
+     * @brief Verify whether or not the given DAC chain is revoked.
+     *
+     * @param[in] info All of the information required to check for revoked DAC chain.
+     * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
+     *                         CheckForRevokedDACChain().
+     */
+    virtual void
+    CheckForRevokedDACChain(const DeviceAttestationVerifier::AttestationInfo & info,
+                            Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> * onCompletion) = 0;
 };
 
 /**

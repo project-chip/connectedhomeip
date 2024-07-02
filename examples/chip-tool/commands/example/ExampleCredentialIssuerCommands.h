@@ -24,6 +24,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 class ExampleCredentialIssuerCommands : public CredentialIssuerCommands
@@ -44,6 +45,15 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR SetDeviceAttestationRevocationSetPath(const char * path) override
+    {
+        VerifyOrReturnError(path != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(mTestDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(path));
+        mDacVerifier->SetRevocationDelegate(&mTestDacRevocationDelegate);
+        return CHIP_NO_ERROR;
+    }
+
     chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() override { return &mOpCredsIssuer; }
     void SetCredentialIssuerCATValues(chip::CATValues cats) override { mOpCredsIssuer.SetCATValuesForNextNOCRequest(cats); }
     CHIP_ERROR GenerateControllerNOCChain(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
@@ -108,4 +118,5 @@ protected:
 private:
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
     chip::Credentials::DeviceAttestationVerifier * mDacVerifier;
+    chip::Credentials::TestDACRevocationDelegateImpl mTestDacRevocationDelegate;
 };
