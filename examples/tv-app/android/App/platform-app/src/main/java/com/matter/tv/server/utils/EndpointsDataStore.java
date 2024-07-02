@@ -9,13 +9,13 @@ import com.matter.tv.server.model.ContentApp;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
 
 public class EndpointsDataStore {
 
@@ -132,7 +132,8 @@ public class EndpointsDataStore {
     return app;
   }
 
-  private void serializeSupportedClusters(JsonWriter jsonWriter, Set<SupportedCluster> supportedClusters) throws IOException {
+  private void serializeSupportedClusters(
+      JsonWriter jsonWriter, Set<SupportedCluster> supportedClusters) throws IOException {
     if (supportedClusters != null) {
       jsonWriter.beginArray();
       for (SupportedCluster supportedCluster : supportedClusters) {
@@ -144,7 +145,8 @@ public class EndpointsDataStore {
     }
   }
 
-  private Set<SupportedCluster> deserializeSupportedClusters(JsonReader jsonReader) throws IOException {
+  private Set<SupportedCluster> deserializeSupportedClusters(JsonReader jsonReader)
+      throws IOException {
     Set<SupportedCluster> supportedClusters = new HashSet<>();
     jsonReader.beginArray();
     while (jsonReader.hasNext()) {
@@ -154,7 +156,8 @@ public class EndpointsDataStore {
     return supportedClusters;
   }
 
-  private void serializeSupportedCluster(JsonWriter jsonWriter, SupportedCluster supportedCluster) throws IOException {
+  private void serializeSupportedCluster(JsonWriter jsonWriter, SupportedCluster supportedCluster)
+      throws IOException {
     jsonWriter.beginObject();
     jsonWriter.name(KEY_CLUSTER_IDENTIFIER);
     jsonWriter.value(supportedCluster.clusterIdentifier);
