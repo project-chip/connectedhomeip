@@ -144,7 +144,7 @@ function install_tizen_sdk() {
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     PKG_ARR=(
         'certificate-encryptor_1.0.10_ubuntu-64.zip'
-        'certificate-generator_0.1.3_ubuntu-64.zip'
+        'certificate-generator_0.1.4_ubuntu-64.zip'
         'new-common-cli_2.5.64_ubuntu-64.zip'
         'new-native-cli_2.5.64_ubuntu-64.zip'
         'sdb_4.2.23_ubuntu-64.zip')
@@ -236,6 +236,12 @@ function install_tizen_sdk() {
         'sensord-*.armv7l.rpm')
     download "$URL" "${PKG_ARR[@]}"
 
+    # Tizen Developer Platform Certificate
+    URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
+    PKG_ARR=(
+        "7.0-iot-things-add-ons_*_ubuntu-64.zip")
+    download "$URL" "${PKG_ARR[@]}"
+
     # Install all
     info "Installing Tizen SDK..."
 
@@ -256,6 +262,10 @@ function install_tizen_sdk() {
     echo "TIZEN_SDK_INSTALLED_PATH=$TIZEN_SDK_ROOT" >"$TIZEN_SDK_ROOT/sdk.info"
     echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>"$TIZEN_SDK_ROOT/sdk.info"
     ln -sf "$TIZEN_SDK_DATA_PATH/.tizen-cli-config" "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
+
+    # Use Tizen developer platform certificate as default
+    cp "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/sdk-platform/* \
+        "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/
 
     # Make symbolic links relative
     find "$TIZEN_SDK_SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do
