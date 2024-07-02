@@ -50,5 +50,13 @@ constexpr EventId MockEventId(const uint16_t & id)
 {
     return (0xFFF1'0000 | id);
 }
+
+extern const uint16_t mockClusterRevision;
+extern const uint32_t mockFeatureMap;
+extern const bool mockAttribute1;
+extern const int16_t mockAttribute2;
+extern const uint64_t mockAttribute3;
+extern const uint8_t mockAttribute4[256];
+
 } // namespace Test
 } // namespace chip
