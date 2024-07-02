@@ -176,7 +176,7 @@ template("ti_simplelink_executable") {
           "--align",
           "4",
           "--slot-size",
-          "0x000F6000",  # must match the flash_map_backend definitions
+          "0x000F2000",  # must match the flash_map_backend definitions
           "--version",
           matter_software_ver_str,
           "--pad-header",

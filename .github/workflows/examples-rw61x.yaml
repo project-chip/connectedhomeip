@@ -48,7 +48,8 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: rw61x
+                platform: nxp
+                extra-submodule-parameters: --recursive
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -61,6 +62,8 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target rw61x-all-clusters-app-wifi \
+                      --target rw61x-all-clusters-app-thread \
+                      --target rw61x-all-clusters-app-thread-wifi \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -70,6 +73,8 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target rw61x-thermostat-wifi \
+                      --target rw61x-thermostat-thread \
+                      --target rw61x-thermostat-thread-wifi \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -79,6 +84,8 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target rw61x-laundry-washer-wifi \
+                      --target rw61x-laundry-washer-thread \
+                      --target rw61x-laundry-washer-thread-wifi \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "

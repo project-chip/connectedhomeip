@@ -49,6 +49,10 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
+#include <src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
+
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
 
@@ -70,6 +74,8 @@
 #endif
 #define BUTTON_ENABLE 1
 
+#define OTAREQUESTOR_INIT_TIMER_DELAY_MS 10000
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Credentials;
@@ -89,6 +95,12 @@ static Button_Handle sAppRightHandle;
 AppTask AppTask::sAppTask;
 
 static DeviceCallbacks sDeviceCallbacks;
+
+void StartTimer(uint32_t aTimeoutMs);
+void CancelTimer(void);
+
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static DefaultOTARequestor sRequestorCore;
@@ -110,11 +122,59 @@ void InitializeOTARequestor(void)
 }
 #endif
 
+TimerHandle_t sOTAInitTimer = 0;
+
+// The OTA Init Timer is only started upon the first Thread State Change
+// detected if the device is already on a Thread Network, or during the AppTask
+// Init sequence if the device is not yet on a Thread Network. Once the timer
+// has been started once, it does not need to be started again so the flag will
+// be set to false.
+bool isAppStarting = true;
+
 static const chip::EndpointId sIdentifyEndpointId = 0;
 static const uint32_t sIdentifyBlinkRateMs        = 500;
 
 ::Identify stIdentify = { sIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                           Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::TriggerIdentifyEffectHandler };
+
+void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        PLAT_LOG("CHIPoBLE connection established");
+        break;
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        PLAT_LOG("CHIPoBLE disconnected");
+        break;
+
+    case DeviceEventType::kCommissioningComplete:
+        PLAT_LOG("Commissioning complete");
+        break;
+    case DeviceEventType::kThreadStateChange:
+        PLAT_LOG("Thread State Change");
+        bool isThreadAttached = ThreadStackMgrImpl().IsThreadAttached();
+
+        if (isThreadAttached)
+        {
+            PLAT_LOG("Device is on the Thread Network");
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+            if (isAppStarting)
+            {
+                StartTimer(OTAREQUESTOR_INIT_TIMER_DELAY_MS);
+                isAppStarting = false;
+            }
+#endif
+        }
+        break;
+    }
+}
+
+void OTAInitTimerEventHandler(TimerHandle_t xTimer)
+{
+    InitializeOTARequestor();
+}
 
 int AppTask::StartAppTask()
 {
@@ -146,12 +206,32 @@ int AppTask::Init()
     // Init Chip memory management before the stack
     Platform::MemoryInit();
 
+    PLAT_LOG("Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    PLAT_LOG("Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().InitChipStack() failed");
         while (true)
             ;
+    }
+
+    // Create FreeRTOS sw timer for OTA timer.
+    sOTAInitTimer = xTimerCreate("OTAInitTmr",                     // Just a text name, not used by the RTOS kernel
+                                 OTAREQUESTOR_INIT_TIMER_DELAY_MS, // timer period (mS)
+                                 false,                            // no timer reload (==one-shot)
+                                 (void *) this,                    // init timer id = light obj context
+                                 OTAInitTimerEventHandler          // timer callback handler
+    );
+
+    if (sOTAInitTimer == NULL)
+    {
+        PLAT_LOG("sOTAInitTimer timer create failed");
+    }
+    else
+    {
+        PLAT_LOG("sOTAInitTimer timer created successfully ");
     }
 
     ret = ThreadStackMgr().InitThreadStack();
@@ -185,6 +265,8 @@ int AppTask::Init()
             ;
     }
 
+    PlatformMgr().AddEventHandler(DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
+
     uiInit();
 
     // Initialize device attestation config
@@ -211,15 +293,26 @@ int AppTask::Init()
 #endif
 
     // Init ZCL Data Model
-    static chip::CommonCaseDeviceServerInitParams initParams;
+    PLAT_LOG("Initialize Server");
+    static CommonCaseDeviceServerInitParams initParams;
+    static DefaultTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
     chip::Server::GetInstance().Init(initParams);
 
     ConfigurationMgr().LogDeviceConfig();
 
+    bool isThreadEnabled = ThreadStackMgrImpl().IsThreadEnabled();
+    if (!isThreadEnabled && isAppStarting)
+    {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    InitializeOTARequestor();
+        PLAT_LOG("Thread is Disabled, enable OTA Requestor");
+        StartTimer(OTAREQUESTOR_INIT_TIMER_DELAY_MS);
+        isAppStarting = false;
 #endif
+    }
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
@@ -257,6 +350,32 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     if (xQueueSend(sAppEventQueue, aEvent, 0) != pdPASS)
     {
         /* Failed to post the message */
+    }
+}
+
+void StartTimer(uint32_t aTimeoutMs)
+{
+    PLAT_LOG("Start OTA Init Timer")
+    if (xTimerIsTimerActive(sOTAInitTimer))
+    {
+        PLAT_LOG("app timer already started!");
+        CancelTimer();
+    }
+
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sOTAInitTimer, pdMS_TO_TICKS(aTimeoutMs), 100) != pdPASS)
+    {
+        PLAT_LOG("sOTAInitTimer timer start() failed");
+    }
+}
+
+void CancelTimer(void)
+{
+    if (xTimerStop(sOTAInitTimer, 0) == pdFAIL)
+    {
+        PLAT_LOG("sOTAInitTimer stop() failed");
     }
 }
 
@@ -363,7 +482,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
                 PLAT_LOG("Disabled BLE Advertisements");
             }
         }
-        else if (AppEvent::kAppEventButtonType_LongPressed == aEvent->ButtonEvent.Type)
+        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
             chip::Server::GetInstance().ScheduleFactoryReset();
         }

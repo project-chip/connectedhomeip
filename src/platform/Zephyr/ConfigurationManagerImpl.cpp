@@ -32,6 +32,12 @@
 
 #include "InetUtils.h"
 
+#ifdef CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI) || (CHIP_DEVICE_CONFIG_ENABLE_ETHERNET)
+#include <zephyr/net/net_if.h>
+#endif //(CHIP_DEVICE_CONFIG_ENABLE_WIFI) || (CHIP_DEVICE_CONFIG_ENABLE_ETHERNET)
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 

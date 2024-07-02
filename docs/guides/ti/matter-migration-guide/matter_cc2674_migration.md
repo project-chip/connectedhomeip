@@ -50,9 +50,9 @@ The GPIO pin values for SPI will need to be adjusted based on your design.
 4. Select _Board_ as _None_ and _Device_ as _`CC2674P10RGZ`_, Unselect
    _`Lock PinMux`_, and click _Confirm_.
 5. To fix errors, make the following module changes:
-    - _RF Design_ and _RF Stacks -> BLE -> Radio_: click on _accepting the
-      current value_, which should be _`LP_CC2674P10_RGZ`_ in the drop down menu
-      for _Based On RF Design_
+    - _RF Design_ and _RF Stacks -> Bluetooth LE -> Radio_: click on _accepting
+      the current value_, which should be _`LP_CC2674P10_RGZ`_ in the drop down
+      menu for _Based On RF Design_
     - _TI DEVICES -> Device Configuration_: Clear
       _`XOSC Cap Array Modification`_
     - _TI DRIVERS -> RF_: Set _Global Event Mask_ as _None_ and _No. of Antenna

@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <pw_unit_test/framework.h>
 
 #include "app-common/zap-generated/ids/Clusters.h"
 #include <app-common/zap-generated/cluster-objects.h>

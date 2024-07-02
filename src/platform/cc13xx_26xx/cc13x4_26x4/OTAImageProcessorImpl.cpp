@@ -103,8 +103,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
 
     requestor = GetRequestorInstance();
 
-    return (requestor->GetTargetVersion() == runningSwVer) &&
-        (requestor->GetCurrentUpdateState() == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying);
+    return (requestor->GetCurrentUpdateState() == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying);
 }
 
 /* makes room for the new block if needed */
@@ -167,7 +166,7 @@ static bool writeExtFlashImgPages(NVS_Handle handle, ssize_t offset, MutableByte
 }
 
 /* Erase the MCUBoot slot */
-#define BOOT_SLOT_SIZE (0x000F6000) /* must match flash_map_backend */
+#define BOOT_SLOT_SIZE (0x000F2000) /* must match flash_map_backend */
 static bool eraseExtSlot(NVS_Handle handle)
 {
     int_fast16_t status;
@@ -200,6 +199,22 @@ static bool eraseExtHeader(NVS_Handle handle)
 
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint32_t currentVersion;
+    uint32_t targetVersion = requestor->GetTargetVersion();
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    if (currentVersion != targetVersion)
+    {
+        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion,
+                     targetVersion);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -268,6 +283,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     }
 
     /* reset SoC to kick MCUBoot */
+    ChipLogProgress(SoftwareUpdate, "Resetting device to kick off MCUBoot");
     SysCtrlSystemReset();
 }
 

@@ -95,6 +95,8 @@ public:
     void _ProcMessage(otInstance * aInstance);
     void GetExtAddress(otExtAddress & aExtAddr);
     CHIP_ERROR GetBufferInfo(void);
+    bool IsThreadAttached(void);
+    bool IsThreadEnabled(void);
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.

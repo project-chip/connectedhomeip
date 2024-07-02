@@ -33,7 +33,11 @@ chip_enable_ota_requestor = true
 ot_ti_lib_dir = ""
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/ti:libopenthread-ti"
-chip_openthread_target = ""
+
+# When using TI Certified Openthread libs set to ${chip_root}/third_party/openthread/platforms/ti:ot-ti-cert
+# For source builds, set to empty string.
+chip_openthread_target =
+    "${chip_root}/third_party/openthread/platforms/ti:ot-ti-cert"
 
 chip_openthread_ftd = true
 
@@ -62,3 +66,8 @@ chip_persist_subscriptions = false
 chip_subscription_timeout_resumption = false
 
 freertos_root = "//third_party/connectedhomeip/third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/third_party/freertos"
+
+if (chip_openthread_target != "") {
+  openthread_root =
+      "//third_party/connectedhomeip/third_party/openthread/ot-ti/openthread"
+}

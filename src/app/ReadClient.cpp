@@ -423,15 +423,37 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
             continue;
         }
 
-        DataVersionFilterIB::Builder & filterIB = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
-        ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetError());
-        ClusterPathIB::Builder & path = filterIB.CreatePath();
-        ReturnErrorOnFailure(filterIB.GetError());
-        ReturnErrorOnFailure(path.Endpoint(filter.mEndpointId).Cluster(filter.mClusterId).EndOfClusterPathIB());
-        VerifyOrReturnError(filter.mDataVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(filterIB.DataVersion(filter.mDataVersion.Value()).EndOfDataVersionFilterIB());
-        aEncodedDataVersionList = true;
+        TLV::TLVWriter backup;
+        aDataVersionFilterIBsBuilder.Checkpoint(backup);
+        CHIP_ERROR err = EncodeDataVersionFilter(aDataVersionFilterIBsBuilder, filter);
+        if (err == CHIP_NO_ERROR)
+        {
+            aEncodedDataVersionList = true;
+        }
+        else if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            // Packet is full, ignore the rest of the list
+            aDataVersionFilterIBsBuilder.Rollback(backup);
+            return CHIP_NO_ERROR;
+        }
+        else
+        {
+            return err;
+        }
     }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ReadClient::EncodeDataVersionFilter(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                               DataVersionFilter const & aFilter)
+{
+    // Caller has checked aFilter.IsValidDataVersionFilter()
+    DataVersionFilterIB::Builder & filterIB = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
+    ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetError());
+    ClusterPathIB::Builder & path = filterIB.CreatePath();
+    ReturnErrorOnFailure(filterIB.GetError());
+    ReturnErrorOnFailure(path.Endpoint(aFilter.mEndpointId).Cluster(aFilter.mClusterId).EndOfClusterPathIB());
+    ReturnErrorOnFailure(filterIB.DataVersion(aFilter.mDataVersion.Value()).EndOfDataVersionFilterIB());
     return CHIP_NO_ERROR;
 }
 
@@ -440,15 +462,14 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
                                                      const Span<DataVersionFilter> & aDataVersionFilters,
                                                      bool & aEncodedDataVersionList)
 {
-    if (!aDataVersionFilters.empty())
+    // Give the callback a chance first, otherwise use the list we have, if any.
+    ReturnErrorOnFailure(
+        mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList));
+
+    if (!aEncodedDataVersionList)
     {
         ReturnErrorOnFailure(BuildDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aDataVersionFilters,
                                                         aEncodedDataVersionList));
-    }
-    else
-    {
-        ReturnErrorOnFailure(
-            mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList));
     }
 
     return CHIP_NO_ERROR;

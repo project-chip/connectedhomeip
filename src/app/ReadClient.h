@@ -339,6 +339,9 @@ public:
      *  This will send either a Read Request or a Subscribe Request depending on
      *  the InteractionType this read client was initialized with.
      *
+     *  If the params contain more data version filters than can fit in the request packet
+     *  the list will be truncated as needed, i.e. filter inclusion is on a best effort basis.
+     *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
@@ -559,6 +562,8 @@ private:
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
                                           const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
+    CHIP_ERROR EncodeDataVersionFilter(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                       DataVersionFilter const & aFilter);
     CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);

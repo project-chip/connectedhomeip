@@ -197,6 +197,7 @@ public:
         return pw::OkStatus();
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
     pw::Status GetIP4Address(const pw_protobuf_Empty & request, chip_rpc_IP4Address & response) override
     {
         esp_netif_ip_info_t ip_info;
@@ -204,6 +205,7 @@ public:
         snprintf(response.address, sizeof(response.address), IPSTR, IP2STR(&ip_info.ip));
         return pw::OkStatus();
     }
+#endif
 
     pw::Status GetIP6Address(const pw_protobuf_Empty & request, chip_rpc_IP6Address & response) override
     {

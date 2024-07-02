@@ -24,7 +24,7 @@
 -   [Silicon Labs - Software Update](./silabs_efr32_software_update.md)
 -   [Silicon Labs - CLI Guide](./silabs_cli_guide.md)
 -   [STMicroelectronics (STM32)](./stm32_getting_started_guide.md)
--   [TI - Platform Overview](./ti/ti_platform_overview.md)
+-   [TI - Platform Overview](./ti/ti_matter_overview.md)
 -   [Open IoT SDK - Platform Overview](./openiotsdk_platform_overview.md)
 -   [Open IoT SDK - Examples](./openiotsdk_examples.md)
 -   [Open IoT SDK - Unit Tests](./openiotsdk_unit_tests.md)

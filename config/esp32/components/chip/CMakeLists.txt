@@ -118,7 +118,11 @@ chip_gn_arg_append("chip_config_network_layer_ble"           "false")
 endif()
 
 if(CONFIG_DISABLE_IPV4)
-    chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+    if(NOT CONFIG_LWIP_IPV4)
+        chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+    else()
+	message(FATAL_ERROR "Please also disable config option CONFIG_LWIP_IPV4")
+    endif()
 endif()
 
 if(CONFIG_DISABLE_READ_CLIENT)

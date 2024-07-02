@@ -22,10 +22,13 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
     ```
 
 -   Run the bootstrap script to setup the build environment.
+-   Note, a recursive submodule checkout is required to utilize TI's Openthread
+    reference commit.
 
     ```
     $ cd ~/connectedhomeip
     $ source ./scripts/bootstrap.sh
+    $ ./scripts/checkout_submodules.py --shallow --platform cc13xx_26xx --recursive
 
     ```
 
