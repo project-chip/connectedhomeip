@@ -32,8 +32,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     test_suites_linux:
         name: Test Suites - Linux
+        needs: await-fast-ci
 
         strategy:
             matrix:
