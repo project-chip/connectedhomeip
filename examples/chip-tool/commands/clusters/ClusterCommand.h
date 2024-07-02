@@ -21,6 +21,7 @@
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
 #include <app/tests/suites/commands/interaction_model/InteractionModel.h>
+#include <lib/core/ClusterEnums.h>
 
 class ClusterCommand : public InteractionModelCommands, public ModelCommand, public chip::app::CommandSender::Callback
 {
@@ -70,6 +71,7 @@ public:
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
         mScopedNodeId     = chip::ScopedNodeId(value.checkInNodeID, device->GetSecureSession().Value()->GetFabricIndex());
         mMonitoredSubject = value.monitoredSubject;
+        mClientType       = value.clientType;
         memcpy(mICDSymmetricKey, value.key.data(), value.key.size());
         return CHIP_NO_ERROR;
     }
@@ -148,6 +150,7 @@ public:
                 clientInfo.peer_node         = mScopedNodeId;
                 clientInfo.monitored_subject = mMonitoredSubject;
                 clientInfo.start_icd_counter = value.ICDCounter;
+                clientInfo.client_type       = mClientType;
 
                 StoreICDEntryWithKey(clientInfo, chip::ByteSpan(mICDSymmetricKey));
             }
@@ -258,8 +261,10 @@ private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
     chip::ScopedNodeId mScopedNodeId;
-    uint64_t mMonitoredSubject = static_cast<uint64_t>(0);
+    uint64_t mMonitoredSubject                                     = static_cast<uint64_t>(0);
+    chip::app::Clusters::IcdManagement::ClientTypeEnum mClientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
     uint8_t mICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+
     CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;
 };
