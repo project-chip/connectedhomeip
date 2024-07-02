@@ -3352,7 +3352,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::St
     case EnumType::kSuccess:
     case EnumType::kAppNotAvailable:
     case EnumType::kSystemBusy:
-    case EnumType::kPending:
+    case EnumType::kPendingUserApproval:
     case EnumType::kDownloading:
     case EnumType::kInstalling:
         return val;

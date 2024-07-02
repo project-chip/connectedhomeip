@@ -114,7 +114,7 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
       Log.i(
           TAG,
           "Matter enabled app is not installed, but app is installed. Launching app's install page");
-      status = LauncherResponse.STATUS_PENDING;
+      status = LauncherResponse.STATUS_PENDING_USER_APPROVAL;
       responseData = "App is installed, try updating";
 
       //
@@ -129,7 +129,7 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
         Log.i(TAG, "App is installing");
         status = LauncherResponse.STATUS_INSTALLING;
       } else {
-        status = LauncherResponse.STATUS_PENDING;
+        status = LauncherResponse.STATUS_PENDING_USER_APPROVAL;
         if (appInstallFailed) {
           responseData = "App install failed. Try again";
         }
