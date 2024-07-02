@@ -20,8 +20,11 @@ import("//build_overrides/chip.gni")
 #
 # Use `model.gni` to get access to:
 #   CodegenDataModel.cpp
-#   CodegenDataModel_Read.cpp
 #   CodegenDataModel.h
+#   CodegenDataModel_Read.cpp
+#   CodegenDataModel_Write.cpp
+#   EmberMetadata.cpp
+#   EmberMetadata.h
 #
 # The above list of files exists to satisfy the "dependency linter"
 # since those files should technically be "visible to gn" even though we

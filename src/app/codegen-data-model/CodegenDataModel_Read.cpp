@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/core/CHIPError.h"
 #include <app/codegen-data-model/CodegenDataModel.h>
 
 #include <optional>
@@ -29,6 +28,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
+#include <app/codegen-data-model/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
@@ -48,56 +48,6 @@ namespace chip {
 namespace app {
 namespace {
 using namespace chip::app::Compatibility::Internal;
-
-// Fetch the source for the given attribute path: either a cluster (for global ones) or attribute
-// path.
-//
-// if returning a CHIP_ERROR, it will NEVER be CHIP_NO_ERROR.
-std::variant<const EmberAfCluster *,           // global attribute, data from a cluster
-             const EmberAfAttributeMetadata *, // a specific attribute stored by ember
-             CHIP_ERROR                        // error, this will NEVER be CHIP_NO_ERROR
-             >
-FindAttributeMetadata(const ConcreteAttributePath & aPath)
-{
-    for (auto & attr : GlobalAttributesNotInMetadata)
-    {
-
-        if (attr == aPath.mAttributeId)
-        {
-            const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-            if (cluster == nullptr)
-            {
-                return (emberAfFindEndpointType(aPath.mEndpointId) == nullptr) ? CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)
-                                                                               : CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
-            }
-
-            return cluster;
-        }
-    }
-    const EmberAfAttributeMetadata * metadata =
-        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    if (metadata == nullptr)
-    {
-        const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
-        if (type == nullptr)
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
-        }
-
-        const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
-        if (cluster == nullptr)
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
-        }
-
-        // Since we know the attribute is unsupported and the endpoint/cluster are
-        // OK, this is the only option left.
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    return metadata;
-}
 
 /// Attempts to read via an attribute access interface (AAI)
 ///
@@ -320,7 +270,7 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
         }
     }
 
-    auto metadata = FindAttributeMetadata(request.path);
+    auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))

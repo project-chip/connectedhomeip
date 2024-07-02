@@ -28,6 +28,9 @@ codegen_data_model_SOURCES = [
   "${chip_root}/src/app/codegen-data-model/CodegenDataModel.h",
   "${chip_root}/src/app/codegen-data-model/CodegenDataModel.cpp",
   "${chip_root}/src/app/codegen-data-model/CodegenDataModel_Read.cpp",
+  "${chip_root}/src/app/codegen-data-model/CodegenDataModel_Write.cpp",
+  "${chip_root}/src/app/codegen-data-model/EmberMetadata.cpp",
+  "${chip_root}/src/app/codegen-data-model/EmberMetadata.h",
 ]
 
 codegen_data_model_PUBLIC_DEPS = [

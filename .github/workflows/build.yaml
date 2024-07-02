@@ -204,11 +204,13 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Clang-tidy validation
+              # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
+              #       See https://github.com/llvm/llvm-project/issues/97426
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/sanitizers/compile_commands.json \
-                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl' \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write' \
                        check \
                     "
             - name: Clean output
@@ -422,10 +424,13 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Clang-tidy validation
+              # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
+              #       See https://github.com/llvm/llvm-project/issues/97426
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/default/compile_commands.json \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write' \
                        check \
                     "
             - name: Uploading diagnostic logs

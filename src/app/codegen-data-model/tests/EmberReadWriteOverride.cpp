@@ -17,6 +17,7 @@
 #include "EmberReadWriteOverride.h"
 
 #include <app/util/attribute-storage.h>
+#include <lib/support/Span.h>
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -63,6 +64,11 @@ void SetEmberReadOutput(std::variant<chip::ByteSpan, Status> what)
     gEmberStatusCode = Status::InvalidAction;
 }
 
+ByteSpan GetEmberBuffer()
+{
+    return ByteSpan(gEmberIoBuffer, gEmberIoBufferFill);
+}
+
 } // namespace Test
 } // namespace chip
 
@@ -76,12 +82,24 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
         return gEmberStatusCode;
     }
 
-    if (gEmberIoBufferFill > readLength)
+    if (write)
     {
-        ChipLogError(Test, "Internal TEST error: insufficient output buffer space.");
-        return Status::ResourceExhausted;
+        // copy over as much data as possible
+        // NOTE: we do NOT use (*metadata)->size since it is unclear if our mocks set that correctly
+        size_t len = std::min<size_t>(sizeof(gEmberIoBuffer), readLength);
+        memcpy(gEmberIoBuffer, buffer, len);
+        gEmberIoBufferFill = len;
+    }
+    else
+    {
+        if (gEmberIoBufferFill > readLength)
+        {
+            ChipLogError(Test, "Internal TEST error: insufficient output buffer space.");
+            return Status::ResourceExhausted;
+        }
+
+        memcpy(buffer, gEmberIoBuffer, gEmberIoBufferFill);
     }
 
-    memcpy(buffer, gEmberIoBuffer, gEmberIoBufferFill);
     return Status::Success;
 }
