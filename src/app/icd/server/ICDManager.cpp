@@ -21,6 +21,7 @@
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <lib/core/ClusterEnums.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -187,6 +188,13 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
+            if (entry.clientType == ClientTypeEnum::kEphemeral)
+            {
+                // If the registered client is ephemeral, do not send a Check-In message
+                // continue to next entry
+                continue;
+            }
+
             if (!ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
@@ -245,6 +253,12 @@ bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsg
             {
                 // Try to fetch the next entry upon failure (should not happen).
                 ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry, will try next entry.");
+                continue;
+            }
+
+            if (entry.clientType == ClientTypeEnum::kEphemeral)
+            {
+                // If the registered client is ephemeral, no Check-In message would be sent to this client
                 continue;
             }
 
