@@ -78,7 +78,10 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Register Smoke & Co Test Event Trigger
-    Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
+    if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
+    {
+        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
+    }
 
     sAlarmLED.Init(LIGHT_LED);
     sAlarmLED.Set(false);
