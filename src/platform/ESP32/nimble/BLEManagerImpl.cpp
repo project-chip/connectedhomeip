@@ -674,7 +674,11 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
     return false;
 }
 
-void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
+void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
+{
+    ChipLogDetail(Ble, "Received notification of closed CHIPoBLE connection (con %u)", conId);
+    CloseConnection(conId);
+}
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
@@ -795,23 +799,19 @@ void BLEManagerImpl::DriveBLEState(void)
                     ExitNow();
                 }
             }
-            // mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 
             // Transition to the not Advertising state...
-            if (mFlags.Has(Flags::kAdvertising))
+            mFlags.Clear(Flags::kAdvertising);
+            mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+
+            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
+
+            // Post a CHIPoBLEAdvertisingChange(Stopped) event.
             {
-                mFlags.Clear(Flags::kAdvertising);
-                mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-
-                ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-
-                // Post a CHIPoBLEAdvertisingChange(Stopped) event.
-                {
-                    ChipDeviceEvent advChange;
-                    advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
-                    advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-                    err                                        = PlatformMgr().PostEvent(&advChange);
-                }
+                ChipDeviceEvent advChange;
+                advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+                advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+                err                                        = PlatformMgr().PostEvent(&advChange);
             }
 
             ExitNow();
