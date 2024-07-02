@@ -77,26 +77,21 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 
 bool RvcServiceAreaDelegate::IsSetSelectedLocationsAllowed(MutableCharSpan statusText)
 {
-    return true; // TODO IMPLEMENT
+    // TODO IMPLEMENT
+    return true;
 };
 
 bool RvcServiceAreaDelegate::IsValidSelectLocationsSet(const Commands::SelectLocations::DecodableType & req,
                                                        SelectLocationsStatus & locationStatus, MutableCharSpan statusText)
 {
-    bool ret_value = false;
-
-    ret_value = true; // TODO IMPLEMENT
-
-    return ret_value;
+    // TODO IMPLEMENT
+    return true;
 };
 
 bool RvcServiceAreaDelegate::HandleSkipCurrentLocation(MutableCharSpan skipStatusText)
 {
-    bool ret_value = false;
-
-    ret_value = true; // TODO IMPLEMENT
-
-    return ret_value;
+    // TODO IMPLEMENT
+    return true;
 };
 
 //*************************************************************************
@@ -104,7 +99,8 @@ bool RvcServiceAreaDelegate::HandleSkipCurrentLocation(MutableCharSpan skipStatu
 
 bool RvcServiceAreaDelegate::IsSupportedLocationsChangeAllowed()
 {
-    return true; // TODO
+    // TODO IMPLEMENT
+    return true;
 }
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedLocations()
@@ -114,15 +110,13 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedLocations()
 
 bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation)
 {
-    bool ret_value = false;
-
     if (listIndex < (uint32_t) mSupportedLocations.size())
     {
         aSupportedLocation = mSupportedLocations[listIndex];
-        ret_value          = true;
+        return true;
     }
 
-    return ret_value;
+    return false;
 };
 
 bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint32_t & listIndex,
@@ -131,8 +125,6 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
-    bool ret_value = false;
-
     listIndex         = 0;
     uint32_t listSize = (uint32_t) mSupportedLocations.size();
 
@@ -141,20 +133,17 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint
         if (mSupportedLocations[listIndex].locationID == aLocationId)
         {
             aSupportedLocation = mSupportedLocations[listIndex];
-            ret_value          = true;
-            break;
+            return true;
         }
 
         ++listIndex;
     }
 
-    return ret_value;
+    return false;
 };
 
 bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper & newLocation, uint32_t & listIndex)
 {
-    bool ret_value = false;
-
     // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
     // etc.
 
@@ -164,15 +153,13 @@ bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper
         // not sorting list, number of locations normally expected to be small, max 255
         mSupportedLocations.push_back(newLocation);
         listIndex = (uint32_t) mSupportedMaps.size() - 1; // new element is last in list
-        ret_value = true;
-    }
-    else
-    {
-        ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u",
-                     newLocation.locationID, (uint32_t) kMaxNumSupportedLocations);
+        return true;
     }
 
-    return ret_value;
+    ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u",
+                 newLocation.locationID, (uint32_t) kMaxNumSupportedLocations);
+
+    return false;
 }
 
 bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const LocationStructureWrapper & modifiedLocation)
@@ -195,15 +182,13 @@ bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const L
 
 bool RvcServiceAreaDelegate::ClearSupportedLocations()
 {
-    bool ret_value = false;
-
     if ((uint32_t) mSupportedLocations.size() > 0)
     {
         mSupportedLocations.clear();
-        ret_value = true;
+        return true;
     }
 
-    return ret_value;
+    return false;
 }
 
 //*************************************************************************
@@ -211,7 +196,8 @@ bool RvcServiceAreaDelegate::ClearSupportedLocations()
 
 bool RvcServiceAreaDelegate::IsSupportedMapChangeAllowed()
 {
-    return true; // TODO
+    // TODO IMPLEMENT
+    return true;
 }
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedMaps()
@@ -221,15 +207,13 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedMaps()
 
 bool RvcServiceAreaDelegate::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap)
 {
-    bool ret_value = false;
-
     if (listIndex < (uint32_t) mSupportedMaps.size())
     {
         aSupportedMap = mSupportedMaps[listIndex];
-        ret_value     = true;
+        return true;
     }
 
-    return ret_value;
+    return false;
 };
 
 bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
@@ -237,8 +221,6 @@ bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & list
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
-    bool ret_value = false;
-
     listIndex         = 0;
     uint32_t listSize = (uint32_t) mSupportedMaps.size();
 
@@ -247,20 +229,17 @@ bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & list
         if (mSupportedMaps[listIndex].mapID == aMapId)
         {
             aSupportedMap = mSupportedMaps[listIndex];
-            ret_value     = true;
-            break;
+            return true;
         }
 
         ++listIndex;
     }
 
-    return ret_value;
+    return false;
 };
 
 bool RvcServiceAreaDelegate::AddSupportedMap(const MapStructureWrapper & newMap, uint32_t & listIndex)
 {
-    bool ret_value = false;
-
     // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
     // etc.
 
@@ -270,14 +249,12 @@ bool RvcServiceAreaDelegate::AddSupportedMap(const MapStructureWrapper & newMap,
         // not sorting list, number of locations normally expected to be small, max 255
         mSupportedMaps.push_back(newMap);
         listIndex = (uint32_t) mSupportedMaps.size() - 1; // new element is last in list
+        return true;
     }
-    else
-    {
-        ChipLogError(Zcl, "AddSupportedMap %u - supported maps list is already at maximum size %u", newMap.mapID,
-                     (uint32_t) kMaxNumSupportedMaps);
-    }
+    ChipLogError(Zcl, "AddSupportedMap %u - supported maps list is already at maximum size %u", newMap.mapID,
+                 (uint32_t) kMaxNumSupportedMaps);
 
-    return ret_value;
+    return false;
 }
 
 bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStructureWrapper & modifiedMap)
@@ -300,15 +277,13 @@ bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStr
 
 bool RvcServiceAreaDelegate::ClearSupportedMaps()
 {
-    bool ret_value = false;
-
     if ((uint32_t) mSupportedMaps.size() > 0)
     {
         mSupportedMaps.clear();
-        ret_value = true;
+        return true;
     }
 
-    return ret_value;
+    return false;
 }
 
 //*************************************************************************
@@ -321,21 +296,17 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfSelectedLocations()
 
 bool RvcServiceAreaDelegate::GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & aSelectedLocation)
 {
-    bool ret_value = false;
-
     if (listIndex < (uint32_t) mSelectedLocations.size())
     {
         aSelectedLocation = mSelectedLocations[listIndex];
-        ret_value         = true;
+        return true;
     }
 
-    return ret_value;
+    return false;
 };
 
 bool RvcServiceAreaDelegate::AddSelectedLocation(uint32_t aLocationId, uint32_t & listIndex)
 {
-    bool ret_value = false;
-
     // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
     // etc.
 
@@ -345,27 +316,23 @@ bool RvcServiceAreaDelegate::AddSelectedLocation(uint32_t aLocationId, uint32_t 
         // not sorting list, number of locations normally expected to be small, max 255
         mSelectedLocations.push_back(aLocationId);
         listIndex = (uint32_t) mSelectedLocations.size() - 1; // new element is last in list
+        return true;
     }
-    else
-    {
-        ChipLogError(Zcl, "AddSelectedLocation %u - selected locations list is already at maximum size %u", aLocationId,
-                     (uint32_t) kMaxNumSelectedLocations);
-    }
+    ChipLogError(Zcl, "AddSelectedLocation %u - selected locations list is already at maximum size %u", aLocationId,
+                 (uint32_t) kMaxNumSelectedLocations);
 
-    return ret_value;
+    return false;
 }
 
 bool RvcServiceAreaDelegate::ClearSelectedLocations()
 {
-    bool ret_value = false;
-
     if ((uint32_t) mSelectedLocations.size() > 0)
     {
         mSelectedLocations.clear();
-        ret_value = true;
+        return true;
     }
 
-    return ret_value;
+    return false;
 }
 
 //*************************************************************************
@@ -378,15 +345,13 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfProgressElements()
 
 bool RvcServiceAreaDelegate::GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
-    bool ret_value = false;
-
     if (listIndex < (uint32_t) mProgressList.size())
     {
         aProgressElement = mProgressList[listIndex];
-        ret_value        = true;
+        return true;
     }
 
-    return ret_value;
+    return false;
 };
 
 bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32_t & listIndex,
@@ -395,8 +360,6 @@ bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
-    bool ret_value = false;
-
     listIndex         = 0;
     uint32_t listSize = (uint32_t) mProgressList.size();
 
@@ -405,20 +368,17 @@ bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32
         if (mProgressList[listIndex].locationID == aLocationId)
         {
             aProgressElement = mProgressList[listIndex];
-            ret_value        = true;
-            break;
+            return true;
         }
 
         ++listIndex;
     }
 
-    return ret_value;
+    return false;
 };
 
 bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex)
 {
-    bool ret_value = false;
-
     // The server instance (caller) is responsible for ensuring that there are no duplicate location IDs, list size not exceeded,
     // etc.
 
@@ -428,35 +388,28 @@ bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::T
         // not sorting list, number of locations normally expected to be small, max 255
         mProgressList.push_back(newProgressElement);
         listIndex = (uint32_t) mProgressList.size() - 1; // new element is last in list
+        return true;
     }
-    else
-    {
-        ChipLogError(Zcl, "AddProgressElement %u -progress list is already at maximum size %u", newProgressElement.locationID,
-                     (uint32_t) kMaxNumProgressElements);
-    }
+    ChipLogError(Zcl, "AddProgressElement %u -progress list is already at maximum size %u", newProgressElement.locationID,
+                 (uint32_t) kMaxNumProgressElements);
 
-    return ret_value;
+    return false;
 }
 
 bool RvcServiceAreaDelegate::ModifyProgressElement(uint32_t listIndex,
                                                    const Structs::ProgressStruct::Type & modifiedProgressElement)
 {
-    bool ret_value = false;
-
-    // TODO
-
-    return ret_value;
+    // TODO IMPLEMENT
+    return false;
 }
 
 bool RvcServiceAreaDelegate::ClearProgress()
 {
-    bool ret_value = false;
-
     if ((uint32_t) mProgressList.size() > 0)
     {
         mProgressList.clear();
-        ret_value = true;
+        return true;
     }
 
-    return ret_value;
+    return false;
 }
