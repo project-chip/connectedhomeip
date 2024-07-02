@@ -26,8 +26,13 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     unit_tests:
         name: Unit / Integration Tests
+        needs: await-fast-ci
         if: github.actor != 'restyled-io[bot]'
 
         strategy:

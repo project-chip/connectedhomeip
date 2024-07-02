@@ -1,0 +1,34 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#gh run list -R project-chip/connectedhomeip -c ${{ github.event.pull_request.head.sha }} -L 500
+
+name: Wait For Fast CI to Pass
+
+on:
+  workflow_call:
+
+jobs:
+  wait-for-fast-ci:
+    name: Wait For Fast CI to Pass
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Review Contributor License Agreement Status
+        run: python scripts/helpers/poll_quick_ci.py ${{ github.event.number }} license/cla
+      - name: Review Summary Status
+        run: python scripts/helpers/poll_quick_ci.py ${{ github.event.number }} Summary
+      - name: Review Restyled Status
+        run: python scripts/helpers/poll_quick_ci.py ${{ github.event.number }} restyled
