@@ -296,7 +296,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, si
                                         (uint8_t *) bytes, (uint8_t) kP256_PublicKey_Length);
 
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
+    error = CHIP_NO_ERROR;
 exit:
     if (error != CHIP_NO_ERROR)
     {
@@ -408,7 +408,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, size
                                         (uint8_t *) bytes, (uint8_t) kP256_PublicKey_Length);
 
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
+    error = CHIP_NO_ERROR;
 exit:
     if (error != CHIP_NO_ERROR)
     {

@@ -860,14 +860,6 @@ CHIP_ERROR trustmGetCertificate(uint16_t optiga_oid, uint8_t * buf, uint16_t * b
 
         memcpy(buf, ifx_cert_hex, ifx_cert_hex_len);
         *buflen = ifx_cert_hex_len;
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
-            ;
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            // optiga_util_read_data failed
-            optiga_lib_print_message("optiga_util_read_data failed", OPTIGA_UTIL_SERVICE, OPTIGA_UTIL_SERVICE_COLOR);
-            break;
-        }
     } while (0);
 
     if (p_local_util)
