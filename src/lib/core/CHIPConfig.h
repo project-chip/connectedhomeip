@@ -759,11 +759,6 @@
  *  - 1 reserved slot for CASEServer as a responder.
  *  - 1 reserved slot for PASE.
  *
- *  NOTE: On heap-based platforms, there is no pre-allocation of the pool.
- *  Due to the use of an LRU-scheme to manage sessions, the actual active
- *  size of the pool will grow up to the value of this define,
- *  after which, it will remain at or around this size indefinitely.
- *
  */
 #ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
 #define CHIP_CONFIG_SECURE_SESSION_POOL_SIZE (CHIP_CONFIG_MAX_FABRICS * 3 + 2)
