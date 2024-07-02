@@ -35,12 +35,13 @@ namespace app {
 
 namespace DataModelTests {
 
-ReadResponseDirective gReadResponseDirective       = ReadResponseDirective::kSendDataResponse;
-WriteResponseDirective gWriteResponseDirective     = WriteResponseDirective::kSendAttributeSuccess;
-CommandResponseDirective gCommandResponseDirective = CommandResponseDirective::kSendSuccessStatusCode;
+ScopedChangeOnly<ReadResponseDirective> gReadResponseDirective(ReadResponseDirective::kSendDataResponse);
+ScopedChangeOnly<WriteResponseDirective> gWriteResponseDirective(WriteResponseDirective::kSendAttributeSuccess);
+ScopedChangeOnly<CommandResponseDirective> gCommandResponseDirective(CommandResponseDirective::kSendSuccessStatusCode);
+
+ScopedChangeOnly<bool> gIsLitIcd(false);
 
 uint16_t gInt16uTotalReadCount = 0;
-bool gIsLitIcd                 = false;
 CommandHandler::Handle gAsyncCommandHandle;
 
 } // namespace DataModelTests

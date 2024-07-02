@@ -144,7 +144,7 @@ TEST_F(TestWrite, TestDataResponse)
         i++;
     }
 
-    gWriteResponseDirective = WriteResponseDirective::kSendAttributeSuccess;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendAttributeSuccess);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -182,7 +182,7 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
         i++;
     }
 
-    gWriteResponseDirective = WriteResponseDirective::kSendAttributeSuccess;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendAttributeSuccess);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -222,7 +222,7 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
         i++;
     }
 
-    gWriteResponseDirective = WriteResponseDirective::kSendAttributeSuccess;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendAttributeSuccess);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -261,7 +261,7 @@ TEST_F(TestWrite, TestAttributeError)
         i++;
     }
 
-    gWriteResponseDirective = WriteResponseDirective::kSendAttributeError;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendAttributeError);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -327,7 +327,7 @@ TEST_F(TestWrite, TestMultipleSuccessResponses)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    gWriteResponseDirective = WriteResponseDirective::kSendMultipleSuccess;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendMultipleSuccess);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -354,7 +354,7 @@ TEST_F(TestWrite, TestMultipleFailureResponses)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    gWriteResponseDirective = WriteResponseDirective::kSendMultipleErrors;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendMultipleErrors);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -381,7 +381,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
     // Cluster-specific success code case
     {
-        gWriteResponseDirective = WriteResponseDirective::kSendClusterSpecificSuccess;
+        ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendClusterSpecificSuccess);
 
         this->ResetCallback();
         this->PrepareWriteCallback(
@@ -413,7 +413,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
     // Cluster-specific failure code case
     {
-        gWriteResponseDirective = WriteResponseDirective::kSendClusterSpecificFailure;
+        ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendClusterSpecificFailure);
 
         this->ResetCallback();
         this->PrepareWriteCallback(

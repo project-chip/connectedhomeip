@@ -125,7 +125,7 @@ TEST_F(TestCommands, TestDataResponse)
     // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](CHIP_ERROR aError) { onFailureWasCalled = true; };
 
-    gCommandResponseDirective = CommandResponseDirective::kSendDataResponse;
+    ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendDataResponse);
 
     chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
@@ -163,7 +163,7 @@ TEST_F(TestCommands, TestSuccessNoDataResponse)
     // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](CHIP_ERROR aError) { onFailureWasCalled = true; };
 
-    gCommandResponseDirective = CommandResponseDirective::kSendSuccessStatusCode;
+    ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendSuccessStatusCode);
 
     chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
@@ -201,7 +201,7 @@ TEST_F(TestCommands, TestMultipleSuccessNoDataResponses)
     // not safe to do so.
     auto onFailureCb = [&failureCalls](CHIP_ERROR aError) { ++failureCalls; };
 
-    gCommandResponseDirective = CommandResponseDirective::kSendMultipleSuccessStatusCodes;
+    ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendMultipleSuccessStatusCodes);
 
     Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                      onFailureCb);
@@ -240,7 +240,7 @@ TEST_F(TestCommands, TestAsyncResponse)
     // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](CHIP_ERROR aError) { onFailureWasCalled = true; };
 
-    gCommandResponseDirective = CommandResponseDirective::kAsync;
+    ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kAsync);
 
     chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
@@ -285,7 +285,7 @@ TEST_F(TestCommands, TestFailure)
         onFailureWasCalled = true;
     };
 
-    gCommandResponseDirective = CommandResponseDirective::kSendError;
+    ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendError);
 
     chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
@@ -323,7 +323,7 @@ TEST_F(TestCommands, TestMultipleFailures)
         ++failureCalls;
     };
 
-    gCommandResponseDirective = CommandResponseDirective::kSendMultipleErrors;
+    ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendMultipleErrors);
 
     Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                      onFailureCb);
@@ -363,7 +363,7 @@ TEST_F(TestCommands, TestSuccessNoDataResponseWithClusterStatus)
     // not safe to do so.
     auto onFailureCb = [&onFailureWasCalled](CHIP_ERROR aError) { onFailureWasCalled = true; };
 
-    gCommandResponseDirective = CommandResponseDirective::kSendSuccessStatusCodeWithClusterStatus;
+    ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendSuccessStatusCodeWithClusterStatus);
 
     chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
@@ -402,7 +402,7 @@ TEST_F(TestCommands, TestFailureWithClusterStatus)
         onFailureWasCalled = true;
     };
 
-    gCommandResponseDirective = CommandResponseDirective::kSendErrorWithClusterStatus;
+    ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendErrorWithClusterStatus);
 
     chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);

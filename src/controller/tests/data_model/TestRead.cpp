@@ -177,7 +177,7 @@ TEST_F(TestRead, TestReadAttributeResponse)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -217,8 +217,8 @@ TEST_F(TestRead, TestReadAttributeResponse)
 // `EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0))`.
 TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     MockInteractionModelApp delegate;
     chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
@@ -289,8 +289,8 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
 
 TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     MockInteractionModelApp delegate;
     chip::app::ClusterStateCache cache(delegate);
@@ -1333,7 +1333,7 @@ TEST_F(TestRead, TestReadAttributeError)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataError;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataError);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1364,7 +1364,7 @@ TEST_F(TestRead, TestReadAttributeTimeout)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataError;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataError);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1623,7 +1623,7 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1691,7 +1691,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1757,7 +1757,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1832,7 +1832,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1907,7 +1907,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1984,7 +1984,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest4)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2051,7 +2051,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2126,7 +2126,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2201,7 +2201,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2277,7 +2277,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest8)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2340,7 +2340,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2491,11 +2491,10 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
     auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
+    ScopedChange isLitIcd(gIsLitIcd, false);
 
     {
-        gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
-        gIsLitIcd              = false;
-
         TestResubscriptionCallback callback;
         app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
                                    app::ReadClient::InteractionType::Subscribe);
@@ -2568,7 +2567,7 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
 
         // Part 2. SIT -> LIT
 
-        gIsLitIcd = true;
+        isLitIcd = true;
         {
             app::AttributePathParams path;
             path.mEndpointId  = kRootEndpointId;
@@ -2596,8 +2595,6 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    gIsLitIcd = false;
 }
 
 /**
@@ -2732,7 +2729,7 @@ void TestRead::SubscribeThenReadHelper(TestContext * apCtx, size_t aSubscribeCou
     uint32_t numReadSuccessCalls = 0;
     uint32_t numReadFailureCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2785,7 +2782,7 @@ void TestRead::MultipleReadHelperInternal(TestContext * apCtx, size_t aReadCount
 
     auto sessionHandle = apCtx->GetSessionBobToAlice();
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     uint16_t firstExpectedResponse = gInt16uTotalReadCount + 1;
 
@@ -2828,7 +2825,7 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptionsWithDataVersionFilter)
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2889,7 +2886,7 @@ TEST_F(TestRead, TestReadHandlerResourceExhaustion_MultipleReads)
     uint32_t numSuccessCalls = 0;
     uint32_t numFailureCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2940,7 +2937,7 @@ TEST_F(TestRead, TestReadFabricScopedWithoutFabricFilter)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2985,7 +2982,7 @@ TEST_F(TestRead, TestReadFabricScopedWithFabricFilter)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    gReadResponseDirective = ReadResponseDirective::kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -4543,7 +4540,7 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValues)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendManyDataResponses;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendManyDataResponses);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -4576,7 +4573,7 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValuesWrongPath)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendManyDataResponsesWrongPath;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendManyDataResponsesWrongPath);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -4609,7 +4606,7 @@ TEST_F(TestRead, TestReadAttribute_ManyErrors)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    gReadResponseDirective = ReadResponseDirective::kSendTwoDataErrors;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendTwoDataErrors);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
