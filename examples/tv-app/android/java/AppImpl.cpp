@@ -507,9 +507,10 @@ void ContentAppFactoryImpl::LogInstalledApps()
 {
     for (auto & contentApp : mContentApps)
     {
-        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d is on ep=%d",
+        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d id=%s is on ep=%d",
                         contentApp->GetApplicationBasicDelegate()->HandleGetVendorId(),
-                        contentApp->GetApplicationBasicDelegate()->HandleGetProductId(), contentApp->GetEndpointId());
+                        contentApp->GetApplicationBasicDelegate()->HandleGetProductId(), 
+                        contentApp->GetApplicationBasicDelegate()->GetCatalogVendorApp()->GetApplicationId(), contentApp->GetEndpointId());
     }
 }
 
