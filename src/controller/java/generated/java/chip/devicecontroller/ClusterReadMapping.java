@@ -14576,6 +14576,17 @@ public class ClusterReadMapping {
           readOccupancySensingOccupancySensorTypeBitmapCommandParams
         );
         result.put("readOccupancySensorTypeBitmapAttribute", readOccupancySensingOccupancySensorTypeBitmapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOccupancySensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOccupancySensingHoldTimeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OccupancySensingCluster) cluster).readHoldTimeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readOccupancySensingHoldTimeCommandParams
+        );
+        result.put("readHoldTimeAttribute", readOccupancySensingHoldTimeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readOccupancySensingPIROccupiedToUnoccupiedDelayCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOccupancySensingPIROccupiedToUnoccupiedDelayAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
