@@ -45,12 +45,15 @@
 #endif                                                               // MATTER_DM_PLUGIN_MODE_BASE
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
+
+using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 namespace {
 
@@ -88,6 +91,21 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
 }
 
 #endif // MATTER_DM_PLUGIN_MODE_BASE
+
+BootReasonType GetBootReason() {
+    BootReasonType bootReason = BootReasonType::kUnspecified;
+
+    CHIP_ERROR error = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT, error.Format());
+        bootReason = BootReasonType::kUnspecified;
+    }
+
+    ChipLogProgress(Zcl, "Boot reason: %u", to_underlying(bootReason));
+
+    return bootReason;
+}
 
 } // namespace
 
@@ -500,7 +518,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 
         bool onOffValueForStartUp = false;
         Status status             = getOnOffValueForStartUp(endpoint, onOffValueForStartUp);
-        if (status == Status::Success)
+        if (status == Status::Success && GetBootReason() != BootReasonType::kSoftwareUpdateCompleted)
         {
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
