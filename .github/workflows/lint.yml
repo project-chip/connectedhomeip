@@ -30,7 +30,12 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     code-lints:
+        needs: await-fast-ci
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
