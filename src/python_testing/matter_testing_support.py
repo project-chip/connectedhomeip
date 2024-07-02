@@ -253,17 +253,27 @@ class EventChangeCallback:
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
             self._q.put(res)
 
-    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout: int = 10):
-        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
-           It returns the event data so that the values can be checked."""
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeoutS: int = 10):
+        """This function allows a test script to block waiting for the specific event to arrive with a timeout
+           (specified in seconds). It returns the event data so that the values can be checked."""
         try:
-            res = self._q.get(block=True, timeout=timeout)
+            res = self._q.get(block=True, timeout=timeoutS)
         except queue.Empty:
             asserts.fail("Failed to receive a report for the event {}".format(expected_event))
 
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
+
+    def wait_for_event_expect_no_report(self, timeoutS: int = 10):
+        """This function succceeds/returns if an event does not arrive within the timeout specified in seconds.
+           If an event does arrive, an assert is called."""
+        try:
+            res = self._q.get(block=True, timeout=timeoutS)
+        except queue.Empty:
+            return
+
+        asserts.fail(f"Event reported when not expected {res}")
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
