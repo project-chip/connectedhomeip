@@ -42,6 +42,8 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
+        "energy-calendar-cluster.xml",
+        "meter-identification-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
         "drlc-cluster.xml",
@@ -634,6 +636,13 @@
             "PowerFactor",
             "NeutralCurrent",
             "FeatureMap"
+        ],
+        "Energy Calendar": [
+            "CurrentDay",
+            "NextDay",
+            "CurrentTransition",
+            "CurrentPeakPeriod",
+            "NextPeakPeriod"
         ],
         "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],

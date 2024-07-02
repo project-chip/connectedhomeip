@@ -28,6 +28,8 @@
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
+#include "energy-calendar-instance.h"
+#include <MeterIdentificationDelegate.h>
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
@@ -189,6 +191,14 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         std::string device    = self->mJsonValue["Device"].asString();
         std::string operation = self->mJsonValue["Operation"].asString();
         self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
+    }
+    else if (name == "EnergyCalendar")
+    {
+        self->OnEnergyCalendarHandler(self->mJsonValue);
+    }
+    else if (name == "MeterIdentification")
+    {
+        self->OnMeterIdentificationHandler(self->mJsonValue);
     }
     else
     {
@@ -493,6 +503,18 @@ void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, 
         ChipLogDetail(NotSpecified, "Invalid operation : %s", operation.c_str());
         return;
     }
+}
+
+void AllClustersAppCommandHandler::OnEnergyCalendarHandler(Json::Value param)
+{
+    EnergyCalendar::CalendarProviderInstance * provider = EnergyCalendar::GetProvider();
+    provider->LoadJson(param);
+}
+
+void AllClustersAppCommandHandler::OnMeterIdentificationHandler(Json::Value param)
+{
+    MeterIdentification::MeterIdentificationDelegate * delegate = MeterIdentification::GetDelegate();
+    delegate->LoadJson(param);
 }
 
 void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)

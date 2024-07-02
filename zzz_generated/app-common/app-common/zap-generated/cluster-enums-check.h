@@ -1866,6 +1866,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyCalendar::PeakPeriodSeverityEnum val)
+{
+    using EnumType = EnergyCalendar::PeakPeriodSeverityEnum;
+    switch (val)
+    {
+    case EnumType::kUnused:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::EnergyPriorityEnum val)
 {
     using EnumType = EnergyPreference::EnergyPriorityEnum;
@@ -3380,6 +3395,33 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentAppObserver::Sta
     {
     case EnumType::kSuccess:
     case EnumType::kUnexpectedData:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(MeterIdentification::MeterTypeEnum val)
+{
+    using EnumType = MeterIdentification::MeterTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUtility:
+    case EnumType::kPrivate:
+    case EnumType::kGeneric:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(MeterIdentification::PowerThresholdSourceEnum val)
+{
+    using EnumType = MeterIdentification::PowerThresholdSourceEnum;
+    switch (val)
+    {
+    case EnumType::kContract:
+    case EnumType::kRegulator:
+    case EnumType::kEquipment:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

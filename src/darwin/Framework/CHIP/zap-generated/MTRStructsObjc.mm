@@ -5888,6 +5888,144 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTREnergyCalendarClusterTransitionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _transitionTime = @(0);
+
+        _priceTier = nil;
+
+        _friendlyCredit = nil;
+
+        _auxiliaryLoad = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyCalendarClusterTransitionStruct alloc] init];
+
+    other.transitionTime = self.transitionTime;
+    other.priceTier = self.priceTier;
+    other.friendlyCredit = self.friendlyCredit;
+    other.auxiliaryLoad = self.auxiliaryLoad;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: transitionTime:%@; priceTier:%@; friendlyCredit:%@; auxiliaryLoad:%@; >", NSStringFromClass([self class]), _transitionTime, _priceTier, _friendlyCredit, _auxiliaryLoad];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyCalendarClusterDayStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _date = nil;
+
+        _daysOfWeek = nil;
+
+        _transitions = [NSArray array];
+
+        _calendarID = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyCalendarClusterDayStruct alloc] init];
+
+    other.date = self.date;
+    other.daysOfWeek = self.daysOfWeek;
+    other.transitions = self.transitions;
+    other.calendarID = self.calendarID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: date:%@; daysOfWeek:%@; transitions:%@; calendarID:%@; >", NSStringFromClass([self class]), _date, _daysOfWeek, _transitions, _calendarID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyCalendarClusterCalendarPeriodStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startDate = nil;
+
+        _days = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyCalendarClusterCalendarPeriodStruct alloc] init];
+
+    other.startDate = self.startDate;
+    other.days = self.days;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startDate:%@; days:%@; >", NSStringFromClass([self class]), _startDate, _days];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyCalendarClusterPeakPeriodStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _severity = @(0);
+
+        _peakPeriod = @(0);
+
+        _startTime = nil;
+
+        _endTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyCalendarClusterPeakPeriodStruct alloc] init];
+
+    other.severity = self.severity;
+    other.peakPeriod = self.peakPeriod;
+    other.startTime = self.startTime;
+    other.endTime = self.endTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: severity:%@; peakPeriod:%@; startTime:%@; endTime:%@; >", NSStringFromClass([self class]), _severity, _peakPeriod, _startTime, _endTime];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTREnergyPreferenceClusterBalanceStruct
 - (instancetype)init
 {

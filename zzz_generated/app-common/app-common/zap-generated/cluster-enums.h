@@ -2707,6 +2707,57 @@ enum class TargetDayOfWeekBitmap : uint8_t
 };
 } // namespace EnergyEvse
 
+namespace EnergyCalendar {
+
+// Enum for PeakPeriodSeverityEnum
+enum class PeakPeriodSeverityEnum : uint8_t
+{
+    kUnused = 0x00,
+    kLow    = 0x01,
+    kMedium = 0x02,
+    kHigh   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for AuxiliaryLoadBitmap
+enum class AuxiliaryLoadBitmap : uint8_t
+{
+    kAuxiliarySwitch1 = 0x1,
+    kAuxiliarySwitch2 = 0x2,
+    kAuxiliarySwitch3 = 0x4,
+    kAuxiliarySwitch4 = 0x8,
+    kAuxiliarySwitch5 = 0x10,
+    kAuxiliarySwitch6 = 0x20,
+    kAuxiliarySwitch7 = 0x40,
+    kAuxiliarySwitch8 = 0x80,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPricingTier    = 0x1,
+    kFriendlyCredit = 0x2,
+    kAuxiliaryLoad  = 0x4,
+    kPeakPeriod     = 0x8,
+};
+
+// Bitmap for TransitionDayOfWeekBitmap
+enum class TransitionDayOfWeekBitmap : uint8_t
+{
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
+};
+} // namespace EnergyCalendar
+
 namespace EnergyPreference {
 
 // Enum for EnergyPriorityEnum
@@ -5121,6 +5172,41 @@ enum class StatusEnum : uint8_t
 } // namespace ContentAppObserver
 
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
+
+namespace MeterIdentification {
+
+// Enum for MeterTypeEnum
+enum class MeterTypeEnum : uint8_t
+{
+    kUtility = 0x00,
+    kPrivate = 0x01,
+    kGeneric = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for PowerThresholdSourceEnum
+enum class PowerThresholdSourceEnum : uint8_t
+{
+    kContract  = 0x00,
+    kRegulator = 0x01,
+    kEquipment = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPowerThreshold = 0x1,
+};
+} // namespace MeterIdentification
 
 namespace UnitTesting {
 
