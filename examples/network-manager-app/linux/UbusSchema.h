@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +15,20 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <libubus.h>
 
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 144 // 0x0090 Network Infrastructure Manager
-#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Network Infrastructure Manager"
-
-#ifndef MATTER_ENABLE_UBUS
-#define MATTER_ENABLE_UBUS 0
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-// Inherit defaults from config/standalone/CHIPProjectConfig.h
-#include <CHIPProjectConfig.h>
+// Note these constants are defined in a C file because the macros
+// used to generate these structures don't compile correctly in C++.
+
+extern const struct ubus_object_type kMatterUbusObjectType;
+
+int MatterUbusHandleStatus(struct ubus_context * ctx, struct ubus_object * obj, struct ubus_request_data * req, const char * method,
+                           struct blob_attr * msg);
+
+#ifdef __cplusplus
+}
+#endif

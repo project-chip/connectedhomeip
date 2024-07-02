@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +15,10 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "UbusSchema.h"
 
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 144 // 0x0090 Network Infrastructure Manager
-#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Network Infrastructure Manager"
+const struct ubus_method kMatterMethods[] = {
+    UBUS_METHOD_NOARG("status", &MatterUbusHandleStatus),
+};
 
-#ifndef MATTER_ENABLE_UBUS
-#define MATTER_ENABLE_UBUS 0
-#endif
-
-// Inherit defaults from config/standalone/CHIPProjectConfig.h
-#include <CHIPProjectConfig.h>
+const struct ubus_object_type kMatterUbusObjectType = UBUS_OBJECT_TYPE("matter", kMatterMethods);

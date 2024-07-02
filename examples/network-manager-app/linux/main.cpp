@@ -20,28 +20,61 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/Span.h>
 
+#if MATTER_ENABLE_UBUS
+#include "UbusManager.h"
+#endif // MATTER_ENABLE_UBUS
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-
-void ApplicationInit() {}
-void ApplicationShutdown() {}
 
 ByteSpan ByteSpanFromCharSpan(CharSpan span)
 {
     return ByteSpan(Uint8::from_const_char(span.data()), span.size());
 }
 
-int main(int argc, char * argv[])
+void ApplicationInit()
 {
-    if (ChipLinuxAppInit(argc, argv) != 0)
-    {
-        return -1;
-    }
-
     WiFiNetworkManagementServer::Instance().SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
                                                                   ByteSpanFromCharSpan("Setec Astronomy"_span));
+}
 
-    ChipLinuxAppMainLoop();
-    return 0;
+class ApplicationMainLoop final : public DefaultAppMainLoopImplementation
+{
+public:
+    void RunMainLoop() override;
+    int Status() { return mStarted ? 0 : 1; }
+
+private:
+    bool mStarted = false;
+};
+
+void ApplicationMainLoop::RunMainLoop()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if MATTER_ENABLE_UBUS
+    UbusManager ubus;
+    SuccessOrExit(err = ubus.Init());
+#endif // MATTER_ENABLE_UBUS
+
+    mStarted = true;
+    DefaultAppMainLoopImplementation::RunMainLoop();
+    return;
+
+exit:
+    __attribute__((unused)); // label may be unused
+    ChipLogError(Zcl, "Failed to start application run loop: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+void ApplicationShutdown() {}
+
+int main(int argc, char * argv[])
+{
+    int ret = ChipLinuxAppInit(argc, argv);
+    VerifyOrReturnValue(ret == 0, ret);
+
+    ApplicationMainLoop application;
+    ChipLinuxAppMainLoop(&application);
+    return application.Status();
 }

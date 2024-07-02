@@ -87,6 +87,9 @@ public:
     void HandleEvents() override;
     void EventLoopEnds() override {}
 
+    void AddLoopHandler(EventLoopHandler & handler) override { mLoopHandlers.PushBack(&handler); }
+    void RemoveLoopHandler(EventLoopHandler & handler) override { mLoopHandlers.Remove(&handler); }
+
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
     dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
@@ -134,6 +137,8 @@ protected:
     // we can cancel them.
     TimerList mExpiredTimers;
     timeval mNextTimeout;
+
+    IntrusiveList<EventLoopHandler> mLoopHandlers;
 
     // Members for select loop
     struct SelectSets
