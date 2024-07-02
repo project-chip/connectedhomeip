@@ -138,6 +138,7 @@ jobs:
 
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
+        needs: await-fast-ci
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -281,6 +282,7 @@ jobs:
 
     build_linux_python_lib:
         name: Build on Linux (python_lib)
+        needs: await-fast-ci
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -342,6 +344,7 @@ jobs:
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
+        needs: await-fast-ci
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -376,6 +379,7 @@ jobs:
 
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
+        needs: await-fast-ci
         runs-on: macos-13
         if: github.actor != 'restyled-io[bot]'
 
@@ -451,6 +455,7 @@ jobs:
 
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
+        needs: await-fast-ci
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
