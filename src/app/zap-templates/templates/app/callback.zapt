@@ -14,6 +14,13 @@
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
+
+// Cluster Labels
+
+{{#zcl_clusters}}
+#define MATTER_DM_{{as_delimited_macro define}}_LABEL {{asUpperCamelCase label}}
+{{/zcl_clusters}}
+
 // Cluster Init Functions
 
 {{#zcl_clusters}}
