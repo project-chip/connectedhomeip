@@ -43,6 +43,17 @@ void MeterIdentificationInstance::Shutdown()
 
 // --------------- Internal Attribute Set APIs
 
+void MeterIdentificationDelegate::Init()
+{
+    ChipLogProgress(Zcl, "MeterIdentificationDelegate::Init");
+
+    SetMeterType(MeterTypeEnum::kPrivate);
+    SetUtilityName(CharSpan::fromCharString("Test Utility Name"));
+    SetPointOfDelivery(CharSpan::fromCharString("Test PointOfDelivery"));
+    SetPowerThreshold(100);
+    SetPowerThresholdSource(PowerThresholdSourceEnum::kEquipment);
+}
+
 CHIP_ERROR MeterIdentificationDelegate::LoadJson(Json::Value & root)
 {
     Json::Value value = root.get("MeterType", Json::Value());
@@ -50,45 +61,37 @@ CHIP_ERROR MeterIdentificationDelegate::LoadJson(Json::Value & root)
     {
         if(value.isInt())
         {
-            mMeterType.SetNonNull(static_cast<MeterTypeEnum>(value.asInt()));
+            SetMeterType(static_cast<MeterTypeEnum>(value.asInt()));
         }
         else
         {
-            mMeterType.SetNull();
+            SetMeterType(std::nullopt);
         }
     }
 
     value = root.get("UtilityName", Json::Value());
     if (!value.empty())
     {
-        chip::Platform::MemoryFree((void*)mUtilityName.data());
         if(value.isString())
         {
-            size_t len = value.asString().size()+1;
-            char *str = (char*)chip::Platform::MemoryAlloc(len);
-            memcpy(str, value.asCString(), len);
-            mUtilityName = CharSpan(str, len);
+            SetUtilityName(CharSpan::fromCharString(value.asCString()));
         }
         else
         {
-            mUtilityName = CharSpan();
+            SetUtilityName(CharSpan());
         }
     }
 
     value = root.get("PointOfDelivery", Json::Value());
     if (!value.empty())
     {
-        chip::Platform::MemoryFree((void*)mPointOfDelivery.data());
         if(value.isString())
         {
-            size_t len = value.asString().size()+1;
-            char *str = (char*)chip::Platform::MemoryAlloc(len);
-            memcpy(str, value.asCString(), len);
-            mPointOfDelivery = CharSpan(str, len);
+            SetPointOfDelivery(CharSpan::fromCharString(value.asCString()));
         }
         else
         {
-            mPointOfDelivery = CharSpan();
+            SetPointOfDelivery(CharSpan());
         }
     }
 
@@ -97,11 +100,11 @@ CHIP_ERROR MeterIdentificationDelegate::LoadJson(Json::Value & root)
     {
         if(value.isInt())
         {
-            mPowerThreshold.SetNonNull(value.asInt());
+            SetPowerThreshold(value.asInt());
         }
         else
         {
-            mPowerThreshold.SetNull();
+            SetPowerThreshold(std::nullopt);
         }
     }
 
@@ -110,11 +113,11 @@ CHIP_ERROR MeterIdentificationDelegate::LoadJson(Json::Value & root)
     {
         if(value.isInt())
         {
-            mPowerThresholdSource.SetNonNull(static_cast<PowerThresholdSourceEnum>(value.asInt()));
+            SetPowerThresholdSource(static_cast<PowerThresholdSourceEnum>(value.asInt()));
         }
         else
         {
-            mPowerThresholdSource.SetNull();
+            SetPowerThresholdSource(std::nullopt);
         }
     }
 
@@ -128,17 +131,29 @@ CHIP_ERROR MeterIdentificationDelegate::SetMeterType(DataModel::Nullable<MeterTy
     mMeterType = newValue;
     // if (oldValue != newValue)
     //{
-    //     MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, MeterType::Id);
+         MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, MeterType::Id);
     // }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MeterIdentificationDelegate::SetUtilityName(CharSpan & newValue)
+CHIP_ERROR MeterIdentificationDelegate::SetUtilityName(CharSpan newValue)
 {
     // CharSpan oldValue = mUtilityName;
 
-    mUtilityName = newValue;
+    chip::Platform::MemoryFree((void*)mUtilityName.data());
+    if (!newValue.empty())
+    {
+        size_t len = newValue.size();
+        char *str = (char*)chip::Platform::MemoryAlloc(len);
+        memcpy(str, newValue.data(), len);
+        mUtilityName = CharSpan(str, len);
+    }
+    else
+    {
+        mUtilityName = CharSpan();
+    }
+
     // if (!oldValue.data_equal(newValue))
     //{
     //     MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, UtilityName::Id);
@@ -147,11 +162,23 @@ CHIP_ERROR MeterIdentificationDelegate::SetUtilityName(CharSpan & newValue)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MeterIdentificationDelegate::SetPointOfDelivery(CharSpan & newValue)
+CHIP_ERROR MeterIdentificationDelegate::SetPointOfDelivery(CharSpan newValue)
 {
     // CharSpan oldValue = mPointOfDelivery;
 
-    mPointOfDelivery = newValue;
+    chip::Platform::MemoryFree((void*)mPointOfDelivery.data());
+    if (!newValue.empty())
+    {
+        size_t len = newValue.size();
+        char *str = (char*)chip::Platform::MemoryAlloc(len);
+        memcpy(str, newValue.data(), len);
+        mPointOfDelivery = CharSpan(str, len);
+    }
+    else
+    {
+        mPointOfDelivery = CharSpan();
+    }
+
     // if (!oldValue.data_equal(newValue))
     //{
     //     MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PointOfDelivery::Id);

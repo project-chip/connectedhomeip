@@ -34,6 +34,8 @@ void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpointId)
     gMIDelegate = std::make_unique<MeterIdentificationDelegate>();
     if (gMIDelegate)
     {
+        gMIDelegate->Init();
+        
         gMIInstance = std::make_unique<MeterIdentificationInstance>(endpointId, *gMIDelegate,
                                                                     BitMask<Feature, uint32_t>(Feature::kPowerThreshold));
 

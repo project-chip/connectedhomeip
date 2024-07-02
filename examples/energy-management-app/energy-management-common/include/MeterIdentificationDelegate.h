@@ -32,6 +32,8 @@ class MeterIdentificationDelegate : public MeterIdentification::Delegate
 public:
     ~MeterIdentificationDelegate() = default;
 
+    void Init();
+
     CHIP_ERROR LoadJson(Json::Value & root);
 
     // Attribute Accessors
@@ -44,8 +46,8 @@ public:
 
     // Internal Application API to set attribute values
     CHIP_ERROR SetMeterType(DataModel::Nullable<MeterTypeEnum>);
-    CHIP_ERROR SetUtilityName(CharSpan & value);
-    CHIP_ERROR SetPointOfDelivery(CharSpan & value);
+    CHIP_ERROR SetUtilityName(CharSpan value);
+    CHIP_ERROR SetPointOfDelivery(CharSpan value);
     CHIP_ERROR SetPowerThreshold(DataModel::Nullable<uint64_t>);
     CHIP_ERROR SetPowerThresholdSource(DataModel::Nullable<PowerThresholdSourceEnum>);
 
