@@ -29,7 +29,10 @@
 #include <platform/DiagnosticDataProvider.h>
 
 #include <inet/InetInterface.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 extern "C" {
