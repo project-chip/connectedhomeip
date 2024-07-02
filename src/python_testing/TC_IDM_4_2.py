@@ -310,9 +310,6 @@ class TC_IDM_4_2(MatterBaseTest):
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)],
             subjects=[CR2_nodeid])
 
-        # Restore original DUT ACL
-        await self.write_dut_acl(CR1, dut_acl_original)
-
         # Add limited ACE
         await self.add_ace_to_dut_acl(CR1, CR2_limited_ace, dut_acl_original)
 
@@ -349,9 +346,6 @@ class TC_IDM_4_2(MatterBaseTest):
                 endpoint=1,
                 cluster=Clusters.Descriptor.id)],
             subjects=[CR2_nodeid])
-
-        # Restore original DUT ACL
-        await self.write_dut_acl(CR1, dut_acl_original)
 
         # Add limited ACE
         await self.add_ace_to_dut_acl(CR1, CR2_limited_ace, dut_acl_original)
@@ -396,9 +390,6 @@ class TC_IDM_4_2(MatterBaseTest):
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)],
             subjects=[CR2_nodeid])
 
-        # Restore original DUT ACL
-        await self.write_dut_acl(CR1, dut_acl_original)
-
         # Add limited ACE
         await self.add_ace_to_dut_acl(CR1, CR2_limited_ace, dut_acl_original)
 
@@ -427,7 +418,7 @@ class TC_IDM_4_2(MatterBaseTest):
         self.step(6)
 
         # Skip setting an ACE for controller 2 so the DUT node rejects subscribing to it
-
+        
         # Restore original DUT ACL
         await self.write_dut_acl(CR1, dut_acl_original)
 
