@@ -57,6 +57,7 @@ jobs:
 
     chef_esp32:
         name: Chef - ESP32 CI Examples
+        needs: await-fast-ci
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
