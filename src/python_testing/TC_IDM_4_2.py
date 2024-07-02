@@ -418,7 +418,7 @@ class TC_IDM_4_2(MatterBaseTest):
         self.step(6)
 
         # Skip setting an ACE for controller 2 so the DUT node rejects subscribing to it
-        
+
         # Restore original DUT ACL
         await self.write_dut_acl(CR1, dut_acl_original)
 
