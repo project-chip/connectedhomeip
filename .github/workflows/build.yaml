@@ -35,8 +35,13 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
     
 jobs:
+    await-fast-ci:
+        name: Await Fast CI
+        uses: ./.github/workflows/await-fast-ci.yaml
+
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
+        needs: await-fast-ci
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
