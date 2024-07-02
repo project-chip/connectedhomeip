@@ -107,6 +107,7 @@ class IcdManagementCluster(
     monitoredSubject: ULong,
     key: ByteArray,
     verificationKey: ByteArray?,
+    clientType: UByte,
     timedInvokeTimeout: Duration? = null,
   ): RegisterClientResponse {
     val commandId: UInt = 0u
@@ -127,6 +128,9 @@ class IcdManagementCluster(
     verificationKey?.let {
       tlvWriter.put(ContextSpecificTag(TAG_VERIFICATION_KEY_REQ), verificationKey)
     }
+
+    val TAG_CLIENT_TYPE_REQ: Int = 4
+    tlvWriter.put(ContextSpecificTag(TAG_CLIENT_TYPE_REQ), clientType)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

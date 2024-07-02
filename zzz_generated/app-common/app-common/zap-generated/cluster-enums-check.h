@@ -1328,6 +1328,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(IcdManagement::ClientTypeEnum val)
+{
+    using EnumType = IcdManagement::ClientTypeEnum;
+    switch (val)
+    {
+    case EnumType::kPermanent:
+    case EnumType::kEphemeral:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(IcdManagement::OperatingModeEnum val)
 {
     using EnumType = IcdManagement::OperatingModeEnum;
