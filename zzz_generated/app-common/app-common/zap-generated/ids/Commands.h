@@ -286,6 +286,14 @@ namespace CommissioningCompleteResponse {
 static constexpr CommandId Id = 0x00000005;
 } // namespace CommissioningCompleteResponse
 
+namespace SetTCAcknowledgements {
+static constexpr CommandId Id = 0x00000006;
+} // namespace SetTCAcknowledgements
+
+namespace SetTCAcknowledgementsResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace SetTCAcknowledgementsResponse
+
 } // namespace Commands
 } // namespace GeneralCommissioning
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
+#include <app/server/EnhancedSetupFlowProvider.h>
+#include <app/server/TermsAndConditionsProvider.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -67,6 +69,7 @@
 #endif
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
+#include <system/SystemConfig.h>
 #include <transport/raw/UDP.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -164,6 +167,12 @@ struct ServerInitParams
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
     // Required, if not provided, the Server::Init() WILL fail.
     app::reporting::ReportScheduler * reportScheduler = nullptr;
+#if defined CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS && defined CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION
+    // Optional. Enhanced setup flow provider to support terms and conditions acceptance check.
+    app::EnhancedSetupFlowProvider * enhancedSetupFlowProvider = nullptr;
+    // Optional. Terms and conditions provider to support enhanced setup flow feature.
+    app::TermsAndConditionsProvider * termsAndConditionsProvider = nullptr;
+#endif
 };
 
 /**
@@ -210,76 +219,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
      * @return CHIP_NO_ERROR on success or a CHIP_ERROR value from APIs called to initialize
      *         resources on failure.
      */
-    CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
-    {
-        // KVS-based persistent storage delegate injection
-        if (persistentStorageDelegate == nullptr)
-        {
-            chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager =
-                DeviceLayer::PersistedStorage::KeyValueStoreMgr();
-            ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
-            this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
-        }
-
-        // PersistentStorageDelegate "software-based" operational key access injection
-        if (this->operationalKeystore == nullptr)
-        {
-            // WARNING: PersistentStorageOperationalKeystore::Finish() is never called. It's fine for
-            //          for examples and for now.
-            ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
-            this->operationalKeystore = &sPersistentStorageOperationalKeystore;
-        }
-
-        // OpCertStore can be injected but default to persistent storage default
-        // for simplicity of the examples.
-        if (this->opCertStore == nullptr)
-        {
-            // WARNING: PersistentStorageOpCertStore::Finish() is never called. It's fine for
-            //          for examples and for now, since all storage is immediate for that impl.
-            ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
-            this->opCertStore = &sPersistentStorageOpCertStore;
-        }
-
-        // Injection of report scheduler WILL lead to two schedulers being allocated. As recommended above, this should only be used
-        // for IN-TREE examples. If a default scheduler is desired, the basic ServerInitParams should be used by the application and
-        // CommonCaseDeviceServerInitParams should not be allocated.
-        if (this->reportScheduler == nullptr)
-        {
-            reportScheduler = &sReportScheduler;
-        }
-
-        // Session Keystore injection
-        this->sessionKeystore = &sSessionKeystore;
-
-        // Group Data provider injection
-        sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
-        sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
-        ReturnErrorOnFailure(sGroupDataProvider.Init());
-        this->groupDataProvider = &sGroupDataProvider;
-
-#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-        ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
-        this->sessionResumptionStorage = &sSessionResumptionStorage;
-#else
-        this->sessionResumptionStorage = nullptr;
-#endif
-
-        // Inject access control delegate
-        this->accessDelegate = Access::Examples::GetAccessControlDelegate();
-
-        // Inject ACL storage. (Don't initialize it.)
-        this->aclStorage = &sAclStorage;
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-        ChipLogProgress(AppServer, "Initializing subscription resumption storage...");
-        ReturnErrorOnFailure(sSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
-        this->subscriptionResumptionStorage = &sSubscriptionResumptionStorage;
-#else
-        ChipLogProgress(AppServer, "Subscription persistence not supported");
-#endif
-
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR InitializeStaticResourcesBeforeServerInit();
 
 private:
     static KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
@@ -297,6 +237,10 @@ private:
 #endif
     static app::DefaultAclStorage sAclStorage;
     static Crypto::DefaultSessionKeystore sSessionKeystore;
+#if defined CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS && defined CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION
+    static app::EnhancedSetupFlowProvider * sDefaultEnhancedSetupFlowProvider;
+    static app::TermsAndConditionsProvider * sDefaultTermsAndConditionsProvider;
+#endif
 };
 
 /**
@@ -376,6 +320,10 @@ public:
     app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
+
+#if defined CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS && defined CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION
+    app::EnhancedSetupFlowProvider * GetEnhancedSetupFlowProvider() { return mEnhancedSetupFlowProvider; }
+#endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
@@ -650,6 +598,10 @@ private:
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
     app::reporting::ReportScheduler * mReportScheduler;
+#if defined CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS && defined CHIP_CONFIG_TC_REQUIRED_ACKNOWLEDGEMENTS_VERSION
+    app::EnhancedSetupFlowProvider * mEnhancedSetupFlowProvider;
+    app::TermsAndConditionsProvider * mTermsAndConditionsProvider;
+#endif
 
     Access::AccessControl mAccessControl;
     app::AclStorage * mAclStorage;

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,14 +36,20 @@ static_library("server") {
     "CommissioningWindowManager.h",
     "DefaultAclStorage.cpp",
     "DefaultAclStorage.h",
+    "DefaultEnhancedSetupFlowProvider.cpp",
+    "DefaultEnhancedSetupFlowProvider.h",
+    "DefaultTermsAndConditionsProvider.cpp",
+    "DefaultTermsAndConditionsProvider.h",
     "Dnssd.cpp",
     "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
+    "EnhancedSetupFlowProvider.h",
     "OnboardingCodesUtil.cpp",
     "OnboardingCodesUtil.h",
     "Server.cpp",
     "Server.h",
+    "TermsAndConditionsProvider.h",
   ]
 
   public_configs = [ ":server_config" ]

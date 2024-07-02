@@ -2621,6 +2621,50 @@ public class ClusterReadMapping {
           readGeneralCommissioningSupportsConcurrentConnectionCommandParams
         );
         result.put("readSupportsConcurrentConnectionAttribute", readGeneralCommissioningSupportsConcurrentConnectionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningTCAcceptedVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningTCAcceptedVersionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readTCAcceptedVersionAttribute(
+              (ChipClusters.GeneralCommissioningCluster.TCAcceptedVersionAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedGeneralCommissioningClusterTCAcceptedVersionAttributeCallback(),
+          readGeneralCommissioningTCAcceptedVersionCommandParams
+        );
+        result.put("readTCAcceptedVersionAttribute", readGeneralCommissioningTCAcceptedVersionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningTCMinRequiredVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningTCMinRequiredVersionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readTCMinRequiredVersionAttribute(
+              (ChipClusters.GeneralCommissioningCluster.TCMinRequiredVersionAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedGeneralCommissioningClusterTCMinRequiredVersionAttributeCallback(),
+          readGeneralCommissioningTCMinRequiredVersionCommandParams
+        );
+        result.put("readTCMinRequiredVersionAttribute", readGeneralCommissioningTCMinRequiredVersionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningTCAcknowledgementsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningTCAcknowledgementsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readTCAcknowledgementsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGeneralCommissioningTCAcknowledgementsCommandParams
+        );
+        result.put("readTCAcknowledgementsAttribute", readGeneralCommissioningTCAcknowledgementsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningTCAcknowledgementsRequiredCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningTCAcknowledgementsRequiredAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readTCAcknowledgementsRequiredAttribute(
+              (ChipClusters.GeneralCommissioningCluster.TCAcknowledgementsRequiredAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedGeneralCommissioningClusterTCAcknowledgementsRequiredAttributeCallback(),
+          readGeneralCommissioningTCAcknowledgementsRequiredCommandParams
+        );
+        result.put("readTCAcknowledgementsRequiredAttribute", readGeneralCommissioningTCAcknowledgementsRequiredAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readGeneralCommissioningGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGeneralCommissioningGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

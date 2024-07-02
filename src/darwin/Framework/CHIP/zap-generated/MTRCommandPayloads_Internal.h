@@ -328,6 +328,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRGeneralCommissioningClusterSetTCAcknowledgementsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRGeneralCommissioningClusterSetTCAcknowledgementsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRNetworkCommissioningClusterScanNetworksParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

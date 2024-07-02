@@ -7563,6 +7563,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("errorCode", indent + 1, value.errorCode));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -9585,6 +9593,26 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportsConcurrentConnection", 1, value);
+        }
+        case GeneralCommissioning::Attributes::TCAcceptedVersion::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TCAcceptedVersion", 1, value);
+        }
+        case GeneralCommissioning::Attributes::TCMinRequiredVersion::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TCMinRequiredVersion", 1, value);
+        }
+        case GeneralCommissioning::Attributes::TCAcknowledgements::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TCAcknowledgements", 1, value);
+        }
+        case GeneralCommissioning::Attributes::TCAcknowledgementsRequired::Id: {
+            chip::app::DataModel::Nullable<bool> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TCAcknowledgementsRequired", 1, value);
         }
         case GeneralCommissioning::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -18616,6 +18644,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CommissioningCompleteResponse", 1, value);
+        }
+        case GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::Id: {
+            GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SetTCAcknowledgementsResponse", 1, value);
         }
         }
         break;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -365,6 +365,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
+        return CommissioningStage::kConfigureTCAcknowledgments;
+    case CommissioningStage::kConfigureTCAcknowledgments:
         if (mDeviceCommissioningInfo.requiresUTC)
         {
             return CommissioningStage::kConfigureUTCTime;
