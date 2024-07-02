@@ -819,7 +819,6 @@ TEST(TestCodegenModelViaMocks, GetAttributeInfo)
     // Mocks always set everything as R/W with administrative privileges
     EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister);
     EXPECT_EQ(info->writePrivilege, chip::Access::Privilege::kAdminister);
-  
 
     info = model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
     ASSERT_TRUE(info.has_value());
