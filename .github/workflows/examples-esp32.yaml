@@ -126,6 +126,7 @@ jobs:
 
     esp32_1:
         name: ESP32_1
+        needs: await-fast-ci
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
