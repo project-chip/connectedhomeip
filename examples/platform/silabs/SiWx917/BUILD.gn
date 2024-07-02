@@ -178,6 +178,7 @@ source_set("siwx917-common") {
   public_configs = [
     ":siwx917-common-config",
     "${efr32_sdk_build_root}:silabs_config",
+    ":chip_examples_project_config",
   ]
 
   include_dirs = [
