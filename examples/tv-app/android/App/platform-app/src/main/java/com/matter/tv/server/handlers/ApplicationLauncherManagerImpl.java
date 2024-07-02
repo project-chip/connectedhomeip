@@ -81,7 +81,7 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
   @Override
   public int[] getCatalogList() {
     Log.i(TAG, "Get Catalog List");
-    return new int[] {65521, 8891, 3191};
+    return new int[] {123, 456, 89010};
   }
 
   @Override
@@ -93,8 +93,10 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
     int status = 0;
     String responseData = "";
 
-    boolean matterAppEnabledIsInstalled =
+    // Installed Apps that have declared CSA product id & vendor id in their manifes
+    boolean matterEnabledAppdIsInstalled =
         endpointsDataStore.getAllPersistedContentApps().containsKey(app.applicationId);
+    // Installed App
     boolean appIsInstalled =
         InstallationObserver.getInstalledPackages(packageManager).contains(app.applicationId);
     boolean isAppInstalling =
@@ -106,7 +108,9 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
             lastReceivedInstallationStatus.get(app.applicationId),
             InstallationObserver.InstallStatus.FAILED);
 
-    if (!matterAppEnabledIsInstalled && appIsInstalled) {
+    // This use-case can happen if app is installed
+    // but it does not support Matter
+    if (!matterEnabledAppdIsInstalled && appIsInstalled) {
       Log.i(
           TAG,
           "Matter enabled app is not installed, but app is installed. Launching app's install page");
@@ -117,7 +121,7 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
       // Add code to launch App Install Page
       //
 
-    } else if (!matterAppEnabledIsInstalled && !appIsInstalled) {
+    } else if (!matterEnabledAppdIsInstalled && !appIsInstalled) {
       Log.i(
           TAG,
           "Matter enabled app is not installed and app is not installed. Launching app's install page");
@@ -135,7 +139,7 @@ public class ApplicationLauncherManagerImpl implements ApplicationLauncherManage
       // Add code to launch App Install Page
       //
 
-    } else if (matterAppEnabledIsInstalled && appIsInstalled) {
+    } else if (matterEnabledAppdIsInstalled && appIsInstalled) {
       Log.i(TAG, "Launching the app");
       status = LauncherResponse.STATUS_SUCCESS;
 
