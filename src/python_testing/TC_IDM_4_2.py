@@ -217,11 +217,6 @@ class TC_IDM_4_2(MatterBaseTest):
         # the subscription.
         self.step(1)
 
-        # Adding 5 to subscription_max_interval_publisher_limit_sec and setting result to MaxIntervalCeiling,
-        # as per test step instructions.
-        # The edge cases here are:
-        #       min_interval_floor_sec = 0, max_interval_ceiling_sec = 6
-        #       min_interval_floor_sec = 3, max_interval_ceiling_sec = 3605
         max_interval_ceiling_sec = subscription_max_interval_publisher_limit_sec + 5
         asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec,
                                "MaxIntervalCeiling must be greater than MinIntervalFloor")
