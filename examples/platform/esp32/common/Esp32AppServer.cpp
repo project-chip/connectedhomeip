@@ -38,6 +38,10 @@
 #endif // CONFIG_BT_ENABLED
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#ifdef CONFIG_ENABLE_CHIP_SHELL
+#include <lib/shell/commands/WiFi.h>
+#endif
+
 #include <string.h>
 
 using namespace chip;
@@ -147,6 +151,9 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();
+#ifdef CONFIG_ENABLE_CHIP_SHELL
+    chip::Shell::SetWiFiDriver(&(chip::DeviceLayer::NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     sEthernetNetworkCommissioningInstance.Init();
