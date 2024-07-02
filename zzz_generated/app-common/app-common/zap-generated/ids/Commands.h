@@ -1902,6 +1902,10 @@ namespace TestListInt8UReverseRequest {
 static constexpr CommandId Id = 0x0000000D;
 } // namespace TestListInt8UReverseRequest
 
+namespace StringEchoResponse {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace StringEchoResponse
+
 namespace TestEnumsRequest {
 static constexpr CommandId Id = 0x0000000E;
 } // namespace TestEnumsRequest
@@ -1941,6 +1945,10 @@ static constexpr CommandId Id = 0x00000016;
 namespace TestSecondBatchHelperRequest {
 static constexpr CommandId Id = 0x00000017;
 } // namespace TestSecondBatchHelperRequest
+
+namespace StringEchoRequest {
+static constexpr CommandId Id = 0x00000018;
+} // namespace StringEchoRequest
 
 namespace TestDifferentVendorMeiRequest {
 static constexpr CommandId Id = 0xFFF200AA;
