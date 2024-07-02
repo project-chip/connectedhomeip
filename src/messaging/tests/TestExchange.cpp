@@ -14,12 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <errno.h>
+#include <utility>
+
+#include <gtest/gtest.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -27,12 +29,6 @@
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-
-#include <nlbyteorder.h>
-#include <nlunit-test.h>
-
-#include <errno.h>
-#include <utility>
 
 #if CHIP_CRYPTO_PSA
 #include "psa/crypto.h"
@@ -45,18 +41,30 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-struct TestContext : Test::LoopbackMessagingContext
+class MockExchangeDelegate;
+
+struct TestExchange : public Test::LoopbackMessagingContext, public ::testing::Test
 {
     // TODO Add TearDown function when changing test framework to Pigweed to make it more clear how it works.
     // Currently, the TearDown function is from LoopbackMessagingContext
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
-        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
-        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+        ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
         chip::Test::LoopbackMessagingContext::SetUp();
     }
+
+    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
+
+    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
+
+    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
+
+    template <typename AfterRequestChecker, typename AfterResponseChecker>
+    void DoRoundTripTest(MockExchangeDelegate & delegate1, MockExchangeDelegate & delegate2, uint8_t requestMessageType,
+                         uint8_t responseMessageType, AfterRequestChecker && afterRequestChecker,
+                         AfterResponseChecker && afterResponseChecker);
 };
 
 enum : uint8_t
@@ -113,18 +121,16 @@ public:
 // handler, sends a message of type requestMessageType via an exchange that has
 // delegate1 as delegate, responds with responseMessageType.
 template <typename AfterRequestChecker, typename AfterResponseChecker>
-void DoRoundTripTest(nlTestSuite * inSuite, void * inContext, MockExchangeDelegate & delegate1, MockExchangeDelegate & delegate2,
-                     uint8_t requestMessageType, uint8_t responseMessageType, AfterRequestChecker && afterRequestChecker,
-                     AfterResponseChecker && afterResponseChecker)
+void TestExchange::DoRoundTripTest(MockExchangeDelegate & delegate1, MockExchangeDelegate & delegate2, uint8_t requestMessageType,
+                                   uint8_t responseMessageType, AfterRequestChecker && afterRequestChecker,
+                                   AfterResponseChecker && afterResponseChecker)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    ExchangeContext * ec1 = NewExchangeToBob(&delegate1);
+    ASSERT_NE(ec1, nullptr);
 
-    ExchangeContext * ec1 = ctx.NewExchangeToBob(&delegate1);
-    NL_TEST_ASSERT(inSuite, ec1 != nullptr);
-
-    CHIP_ERROR err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id,
-                                                                                       requestMessageType, &delegate2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    CHIP_ERROR err =
+        GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id, requestMessageType, &delegate2);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // To simplify things, skip MRP for all our messages, and make sure we are
     // always expecting responses.
@@ -133,45 +139,45 @@ void DoRoundTripTest(nlTestSuite * inSuite, void * inContext, MockExchangeDelega
 
     err = ec1->SendMessage(Protocols::SecureChannel::Id, requestMessageType,
                            System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize), sendFlags);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    ctx.DrainAndServiceIO();
+    DrainAndServiceIO();
 
     afterRequestChecker();
 
     ExchangeContext * ec2 = delegate2.mExchange;
     err                   = ec2->SendMessage(Protocols::SecureChannel::Id, responseMessageType,
                                              System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize), sendFlags);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    ctx.DrainAndServiceIO();
+    DrainAndServiceIO();
 
     afterResponseChecker();
 
     ec1->Close();
     ec2->Close();
 
-    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id, kMsgType_TEST1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id, kMsgType_TEST1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
-void CheckBasicMessageRoundTrip(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestExchange, CheckBasicMessageRoundTrip)
 {
     MockExchangeDelegate delegate1;
     MockExchangeDelegate delegate2;
     DoRoundTripTest(
-        inSuite, inContext, delegate1, delegate2, kMsgType_TEST1, kMsgType_TEST2,
+        delegate1, delegate2, kMsgType_TEST1, kMsgType_TEST2,
         [&] {
-            NL_TEST_ASSERT(inSuite, delegate1.mReceivedMessageCount == 0);
-            NL_TEST_ASSERT(inSuite, delegate2.mReceivedMessageCount == 1);
+            EXPECT_EQ(delegate1.mReceivedMessageCount, 0u);
+            EXPECT_EQ(delegate2.mReceivedMessageCount, 1u);
         },
         [&] {
-            NL_TEST_ASSERT(inSuite, delegate1.mReceivedMessageCount == 1);
-            NL_TEST_ASSERT(inSuite, delegate2.mReceivedMessageCount == 1);
+            EXPECT_EQ(delegate1.mReceivedMessageCount, 1u);
+            EXPECT_EQ(delegate2.mReceivedMessageCount, 1u);
         });
 }
 
-void CheckBasicExchangeMessageDispatch(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
 {
     class MockMessageDispatch : public ExchangeMessageDispatch
     {
@@ -191,14 +197,14 @@ void CheckBasicExchangeMessageDispatch(nlTestSuite * inSuite, void * inContext)
         MockExchangeDelegate delegate2;
 
         DoRoundTripTest(
-            inSuite, inContext, delegate1, delegate2, kMsgType_TEST1, kMsgType_TEST1,
+            delegate1, delegate2, kMsgType_TEST1, kMsgType_TEST1,
             [&] {
-                NL_TEST_ASSERT(inSuite, delegate1.mReceivedMessageCount == 0);
-                NL_TEST_ASSERT(inSuite, delegate2.mReceivedMessageCount == 1);
+                EXPECT_EQ(delegate1.mReceivedMessageCount, 0u);
+                EXPECT_EQ(delegate2.mReceivedMessageCount, 1u);
             },
             [&] {
-                NL_TEST_ASSERT(inSuite, delegate1.mReceivedMessageCount == 1);
-                NL_TEST_ASSERT(inSuite, delegate2.mReceivedMessageCount == 1);
+                EXPECT_EQ(delegate1.mReceivedMessageCount, 1u);
+                EXPECT_EQ(delegate2.mReceivedMessageCount, 1u);
             });
     }
 
@@ -209,53 +215,15 @@ void CheckBasicExchangeMessageDispatch(nlTestSuite * inSuite, void * inContext)
         MockExchangeDelegate delegate2;
 
         DoRoundTripTest(
-            inSuite, inContext, delegate1, delegate2, kMsgType_TEST1, kMsgType_TEST2,
+            delegate1, delegate2, kMsgType_TEST1, kMsgType_TEST2,
             [&] {
-                NL_TEST_ASSERT(inSuite, delegate1.mReceivedMessageCount == 0);
-                NL_TEST_ASSERT(inSuite, delegate2.mReceivedMessageCount == 1);
+                EXPECT_EQ(delegate1.mReceivedMessageCount, 0u);
+                EXPECT_EQ(delegate2.mReceivedMessageCount, 1u);
             },
             [&] {
-                NL_TEST_ASSERT(inSuite, delegate1.mReceivedMessageCount == 0);
-                NL_TEST_ASSERT(inSuite, delegate2.mReceivedMessageCount == 1);
+                EXPECT_EQ(delegate1.mReceivedMessageCount, 0u);
+                EXPECT_EQ(delegate2.mReceivedMessageCount, 1u);
             });
     }
 }
-
-// Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("Test ExchangeContext::SendMessage", CheckBasicMessageRoundTrip),
-    NL_TEST_DEF("Test ExchangeMessageDispatch", CheckBasicExchangeMessageDispatch),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-// clang-format off
-nlTestSuite sSuite =
-{
-    "Test-Exchange",
-    &sTests[0],
-    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
-    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
-    NL_TEST_WRAP_METHOD(TestContext, SetUp),
-    NL_TEST_WRAP_METHOD(TestContext, TearDown),
-};
-// clang-format on
-
 } // namespace
-
-/**
- *  Main
- */
-int TestExchange()
-{
-    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestExchange);

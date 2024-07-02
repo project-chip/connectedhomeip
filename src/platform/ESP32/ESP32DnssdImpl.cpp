@@ -355,7 +355,7 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
                     Inet::IPAddress IPAddr;
                     error = GetIPAddress(IPAddr, currentResult->addr);
                     SuccessOrExit(error);
-                    ctx->mService[servicesIndex].mAddress.SetValue(IPAddr);
+                    ctx->mService[servicesIndex].mAddress.emplace(IPAddr);
                 }
                 currentResult = currentResult->next;
                 servicesIndex++;

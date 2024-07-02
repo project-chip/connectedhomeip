@@ -759,9 +759,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1237,7 +1237,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
-provisional cluster ElectricalPowerMeasurement = 144 {
+cluster ElectricalPowerMeasurement = 144 {
   revision 1;
 
   enum MeasurementTypeEnum : enum16 {
@@ -1342,7 +1342,7 @@ provisional cluster ElectricalPowerMeasurement = 144 {
 }
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
-provisional cluster ElectricalEnergyMeasurement = 145 {
+cluster ElectricalEnergyMeasurement = 145 {
   revision 1;
 
   enum MeasurementTypeEnum : enum16 {
@@ -1430,7 +1430,7 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional cluster DeviceEnergyManagement = 152 {
-  revision 3;
+  revision 4;
 
   enum AdjustmentCauseEnum : enum8 {
     kLocalOptimization = 0;
@@ -1491,6 +1491,12 @@ provisional cluster DeviceEnergyManagement = 152 {
     kOptOut = 3;
   }
 
+  enum PowerAdjustReasonEnum : enum8 {
+    kNoAdjustment = 0;
+    kLocalOptimizationAdjustment = 1;
+    kGridOptimizationAdjustment = 2;
+  }
+
   bitmap Feature : bitmap32 {
     kPowerAdjustment = 0x1;
     kPowerForecastReporting = 0x2;
@@ -1508,13 +1514,25 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional int16u currency = 3;
   }
 
+  struct PowerAdjustStruct {
+    power_mw minPower = 0;
+    power_mw maxPower = 1;
+    elapsed_s minDuration = 2;
+    elapsed_s maxDuration = 3;
+  }
+
+  struct PowerAdjustCapabilityStruct {
+    nullable PowerAdjustStruct powerAdjustCapability[] = 0;
+    PowerAdjustReasonEnum cause = 1;
+  }
+
   struct SlotStruct {
     elapsed_s minDuration = 0;
     elapsed_s maxDuration = 1;
     elapsed_s defaultDuration = 2;
     elapsed_s elapsedSlotTime = 3;
     elapsed_s remainingSlotTime = 4;
-    optional boolean slotIsPauseable = 5;
+    optional boolean slotIsPausable = 5;
     optional elapsed_s minPauseDuration = 6;
     optional elapsed_s maxPauseDuration = 7;
     optional int16u manufacturerESAState = 8;
@@ -1530,13 +1548,13 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   struct ForecastStruct {
-    int16u forecastId = 0;
+    int32u forecastID = 0;
     nullable int16u activeSlotNumber = 1;
     epoch_s startTime = 2;
     epoch_s endTime = 3;
     optional nullable epoch_s earliestStartTime = 4;
     optional epoch_s latestEndTime = 5;
-    boolean isPauseable = 6;
+    boolean isPausable = 6;
     SlotStruct slots[] = 7;
     ForecastUpdateReasonEnum forecastUpdateReason = 8;
   }
@@ -1549,16 +1567,9 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional int8s loadControl = 4;
   }
 
-  struct PowerAdjustStruct {
-    power_mw minPower = 0;
-    power_mw maxPower = 1;
-    elapsed_s minDuration = 2;
-    elapsed_s maxDuration = 3;
-  }
-
   struct SlotAdjustmentStruct {
     int8u slotIndex = 0;
-    power_mw nominalPower = 1;
+    optional power_mw nominalPower = 1;
     elapsed_s duration = 2;
   }
 
@@ -1583,7 +1594,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute ESAStateEnum ESAState = 2;
   readonly attribute power_mw absMinPower = 3;
   readonly attribute power_mw absMaxPower = 4;
-  readonly attribute optional nullable PowerAdjustStruct powerAdjustmentCapability[] = 5;
+  readonly attribute optional nullable PowerAdjustCapabilityStruct powerAdjustmentCapability = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
   readonly attribute optional OptOutStateEnum optOutState = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1610,7 +1621,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   request struct ModifyForecastRequestRequest {
-    int32u forecastId = 0;
+    int32u forecastID = 0;
     SlotAdjustmentStruct slotAdjustments[] = 1;
     AdjustmentCauseEnum cause = 2;
   }
@@ -1639,7 +1650,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
-provisional cluster EnergyEvse = 153 {
+cluster EnergyEvse = 153 {
   revision 2;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
@@ -1817,7 +1828,7 @@ provisional cluster EnergyEvse = 153 {
 }
 
 /** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
-provisional cluster PowerTopology = 156 {
+cluster PowerTopology = 156 {
   revision 1;
 
   bitmap Feature : bitmap32 {
@@ -1838,7 +1849,7 @@ provisional cluster PowerTopology = 156 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster EnergyEvseMode = 157 {
+cluster EnergyEvseMode = 157 {
   revision 1;
 
   enum ModeTag : enum16 {

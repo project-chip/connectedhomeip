@@ -17,17 +17,31 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
-
-#ifdef ZCL_USING_OPERATIONAL_STATE_RVC_CLUSTER_SERVER
 #include <chef-rvc-operational-state-delegate.h>
+#include <platform/CHIPDeviceLayer.h>
 
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
+using chip::Protocols::InteractionModel::Status;
 
-CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
+static std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
+static std::unique_ptr<RvcOperationalState::Instance> gRvcOperationalStateInstance;
+
+static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data);
+
+DataModel::Nullable<uint32_t> RvcOperationalStateDelegate::GetCountdownTime()
+{
+    if (mRunningTime > mPhaseDuration.Value())
+        return DataModel::NullNullable;
+
+    return DataModel::MakeNullable((uint32_t) (mPhaseDuration.Value() - mRunningTime));
+}
+
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
     if (index >= mOperationalStateList.size())
     {
@@ -37,7 +51,7 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
     if (index >= mOperationalPhaseList.size())
     {
@@ -46,125 +60,203 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_
     return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
-void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)
+void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
     {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
 
-void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError & err)
+void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
     {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
 
-void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperationalError & err)
+void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
+{
+    OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    GetInstance()->GetCurrentOperationalError(current_err);
+
+    if (current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
+        return;
+    }
+
+    // placeholder implementation
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    if (error == CHIP_NO_ERROR)
+    {
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
+}
+
+void RvcOperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
     // placeholder implementation
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
+
+        OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+        GetInstance()->GetCurrentOperationalError(current_err);
+
+        Optional<DataModel::Nullable<uint32_t>> totalTime((DataModel::Nullable<uint32_t>(mRunningTime + mPausedTime)));
+        Optional<DataModel::Nullable<uint32_t>> pausedTime((DataModel::Nullable<uint32_t>(mPausedTime)));
+
+        GetInstance()->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime, pausedTime);
+
+        mRunningTime = 0;
+        mPausedTime  = 0;
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
     {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
-
-void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperationalError & err)
+static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data)
 {
-    // placeholder implementation
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-    if (error == CHIP_NO_ERROR)
+    RvcOperationalStateDelegate * delegate = reinterpret_cast<RvcOperationalStateDelegate *>(data);
+
+    OperationalState::Instance * instance = gRvcOperationalStateInstance.get();
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
+
+    auto countdown_time = delegate->GetCountdownTime();
+
+    if (countdown_time.ValueOr(1) > 0)
     {
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        if (state == OperationalState::OperationalStateEnum::kRunning)
+        {
+            delegate->mRunningTime++;
+        }
+        else if (state == OperationalState::OperationalStateEnum::kPaused)
+        {
+            delegate->mPausedTime++;
+        }
+    }
+
+    if (state == OperationalState::OperationalStateEnum::kRunning || state == OperationalState::OperationalStateEnum::kPaused)
+    {
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, delegate);
     }
     else
     {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
     }
 }
-
-// Init Operational State cluster
-
-static OperationalState::Instance * gOperationalStateInstance = nullptr;
-static OperationalStateDelegate * gOperationalStateDelegate   = nullptr;
-
-void OperationalState::Shutdown()
-{
-    if (gOperationalStateInstance != nullptr)
-    {
-        delete gOperationalStateInstance;
-        gOperationalStateInstance = nullptr;
-    }
-    if (gOperationalStateDelegate != nullptr)
-    {
-        delete gOperationalStateDelegate;
-        gOperationalStateDelegate = nullptr;
-    }
-}
-
-void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
-{
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
-
-    gOperationalStateDelegate           = new OperationalStateDelegate;
-    EndpointId operationalStateEndpoint = 0x01;
-    gOperationalStateInstance           = new OperationalState::Instance(gOperationalStateDelegate, operationalStateEndpoint);
-
-    gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-
-    gOperationalStateInstance->Init();
-}
-
-// Init RVC Operational State cluster
-
-static RvcOperationalState::Instance * gRvcOperationalStateInstance = nullptr;
-static RvcOperationalStateDelegate * gRvcOperationalStateDelegate   = nullptr;
 
 void RvcOperationalState::Shutdown()
 {
-    if (gRvcOperationalStateInstance != nullptr)
+    gRvcOperationalStateInstance.reset();
+    gRvcOperationalStateDelegate.reset();
+}
+
+chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(chip::EndpointId endpointId,
+                                                                               chip::ClusterId clusterId,
+                                                                               const EmberAfAttributeMetadata * attributeMetadata,
+                                                                               uint8_t * buffer)
+{
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gRvcOperationalStateInstance != nullptr);
+    chip::AttributeId attributeId = attributeMetadata->attributeId;
+
+    switch (attributeId)
     {
-        delete gRvcOperationalStateInstance;
-        gRvcOperationalStateInstance = nullptr;
+    case chip::app::Clusters::RvcOperationalState::Attributes::CurrentPhase::Id: {
+        uint8_t m = static_cast<uint8_t>(buffer[0]);
+        DataModel::Nullable<uint8_t> aPhase(m);
+        CHIP_ERROR err = gRvcOperationalStateInstance->SetCurrentPhase(aPhase);
+        if (CHIP_NO_ERROR == err)
+        {
+            break;
+        }
+        ret = chip::Protocols::InteractionModel::Status::ConstraintError;
+        ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    if (gRvcOperationalStateDelegate != nullptr)
+    break;
+    case chip::app::Clusters::RvcOperationalState::Attributes::OperationalState::Id: {
+        uint8_t m      = static_cast<uint8_t>(buffer[0]);
+        CHIP_ERROR err = gRvcOperationalStateInstance->SetOperationalState(m);
+        if (CHIP_NO_ERROR == err)
+        {
+            break;
+        }
+        ret = chip::Protocols::InteractionModel::Status::ConstraintError;
+        ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    break;
+    default:
+        ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
+        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
+}
+
+chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                              const EmberAfAttributeMetadata * attributeMetadata,
+                                                                              uint8_t * buffer, uint16_t maxReadLength)
+{
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+    chip::AttributeId attributeId                 = attributeMetadata->attributeId;
+    switch (attributeId)
     {
-        delete gRvcOperationalStateDelegate;
-        gRvcOperationalStateDelegate = nullptr;
+    case chip::app::Clusters::RvcOperationalState::Attributes::CurrentPhase::Id: {
+
+        app::DataModel::Nullable<uint8_t> currentPhase = gRvcOperationalStateInstance->GetCurrentPhase();
+        if (currentPhase.IsNull())
+        {
+            ret = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
+            break;
+        }
+        *buffer = currentPhase.Value();
     }
+    break;
+    case chip::app::Clusters::RvcOperationalState::Attributes::OperationalState::Id: {
+        *buffer = gRvcOperationalStateInstance->GetCurrentOperationalState();
+    }
+    break;
+    default:
+        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
 }
 
 void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcOperationalStateInstance == nullptr && gRvcOperationalStateDelegate == nullptr);
+    VerifyOrDie(!gRvcOperationalStateDelegate && !gRvcOperationalStateInstance);
 
-    gRvcOperationalStateDelegate        = new RvcOperationalStateDelegate;
-    EndpointId operationalStateEndpoint = 0x01;
-    gRvcOperationalStateInstance        = new RvcOperationalState::Instance(gRvcOperationalStateDelegate, operationalStateEndpoint);
-
-    gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-
+    gRvcOperationalStateDelegate = std::make_unique<RvcOperationalStateDelegate>();
+    gRvcOperationalStateInstance = std::make_unique<RvcOperationalState::Instance>(gRvcOperationalStateDelegate.get(), endpointId);
     gRvcOperationalStateInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER

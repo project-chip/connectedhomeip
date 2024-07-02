@@ -65,3 +65,5 @@ openthread_config_ip6_slaac_enable = true
 openthread_config_joiner_enable = true
 openthread_config_log_output = "platform_defined"
 openthread_config_srp_client_enable = true
+
+optiga_trust_m_dir = "${chip_root}/third_party/infineon/trustm/optiga-trust-m"

@@ -72,7 +72,7 @@ using namespace chip::Tracing::DarwinFramework;
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit()
 {
-    MTR_LOG_INFO("ShutdownOnExit invoked on exit");
+    MTR_LOG("ShutdownOnExit invoked on exit");
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
@@ -239,7 +239,7 @@ MTR_DIRECT_MEMBERS
 - (void)cleanupStartupObjects
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_INFO("Cleaning startup objects in controller factory");
+    MTR_LOG("Cleaning startup objects in controller factory");
 
     // Make sure the deinit order here is the reverse of the init order in
     // startControllerFactory:
@@ -441,7 +441,7 @@ MTR_DIRECT_MEMBERS
     dispatch_sync(_chipWorkQueue, ^{
         VerifyOrReturn(_running);
 
-        MTR_LOG_INFO("Shutting down the Matter controller factory");
+        MTR_LOG("Shutting down the Matter controller factory");
         _controllerFactory->Shutdown();
         [self cleanupStartupObjects];
         _running = NO;
@@ -472,6 +472,8 @@ MTR_DIRECT_MEMBERS
     NSUUID * uniqueIdentifier;
     id<MTROTAProviderDelegate> _Nullable otaProviderDelegate;
     dispatch_queue_t _Nullable otaProviderDelegateQueue;
+    NSUInteger concurrentSubscriptionPoolSize = 0;
+    MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
     if ([startupParams isKindOfClass:[MTRDeviceControllerParameters class]]) {
         MTRDeviceControllerParameters * params = startupParams;
         storageDelegate = params.storageDelegate;
@@ -479,6 +481,8 @@ MTR_DIRECT_MEMBERS
         uniqueIdentifier = params.uniqueIdentifier;
         otaProviderDelegate = params.otaProviderDelegate;
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
+        concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
+        storageBehaviorConfiguration = params.storageBehaviorConfiguration;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
@@ -496,7 +500,7 @@ MTR_DIRECT_MEMBERS
 
     if (!_running) { // Note: reading _running from outside of the Matter work queue
         if (storageDelegate != nil) {
-            MTR_LOG_DEFAULT("Auto-starting Matter controller factory in per-controller storage mode");
+            MTR_LOG("Auto-starting Matter controller factory in per-controller storage mode");
             auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
             if (![self _startControllerFactory:params startingController:YES error:error]) {
                 return nil;
@@ -539,7 +543,9 @@ MTR_DIRECT_MEMBERS
                         storageDelegateQueue:storageDelegateQueue
                          otaProviderDelegate:otaProviderDelegate
                     otaProviderDelegateQueue:otaProviderDelegateQueue
-                            uniqueIdentifier:uniqueIdentifier];
+                            uniqueIdentifier:uniqueIdentifier
+              concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
+                storageBehaviorConfiguration:storageBehaviorConfiguration];
     if (controller == nil) {
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
@@ -763,7 +769,7 @@ MTR_DIRECT_MEMBERS
         if (!self->_running) {
             MTR_LOG_ERROR("Can't pre-warm, Matter controller factory is not running");
         } else {
-            MTR_LOG_DEFAULT("Pre-warming commissioning session");
+            MTR_LOG("Pre-warming commissioning session");
             self->_controllerFactory->EnsureAndRetainSystemState();
             err = DeviceLayer::PlatformMgrImpl().StartBleScan(&self->_preWarmingDelegate, DeviceLayer::BleScanMode::kPreWarm);
             if (err != CHIP_NO_ERROR) {
@@ -778,7 +784,7 @@ MTR_DIRECT_MEMBERS
 - (void)preWarmCommissioningSessionDone
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_DEFAULT("Pre-warming done");
+    MTR_LOG("Pre-warming done");
     self->_controllerFactory->ReleaseSystemState();
 }
 
@@ -878,24 +884,21 @@ MTR_DIRECT_MEMBERS
 
 - (void)resetOperationalAdvertising
 {
-    if (!_advertiseOperational) {
-        // No need to reset anything; we are not advertising the things that
-        // would need to get reset.
-        return;
+    assertChipStackLockedByCurrentThread();
+
+    // If we're not advertising, then there's no need to reset anything.
+    VerifyOrReturn(_advertiseOperational);
+
+    // If there are no running controllers there will be no advertisements to reset.
+    {
+        std::lock_guard lock(_controllersLock);
+        VerifyOrReturn(_controllers.count > 0);
     }
 
-    std::lock_guard lock(_controllersLock);
-    if (_controllers.count != 0) {
-        // We have a running controller.  That means we likely need to reset
-        // operational advertising for that controller.
-        dispatch_async(_chipWorkQueue, ^{
-            // StartServer() is the only API we have for resetting DNS-SD
-            // advertising.  It sure would be nice if there were a "restart"
-            // that was a no-op if the DNS-SD server was not already
-            // running.
-            app::DnssdServer::Instance().StartServer();
-        });
-    }
+    // StartServer() is the only API we have for resetting DNS-SD advertising.
+    // It sure would be nice if there were a "restart" that was a no-op if the
+    // DNS-SD server was not already running.
+    app::DnssdServer::Instance().StartServer();
 }
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller
@@ -1162,6 +1165,45 @@ MTR_DIRECT_MEMBERS
                                   error:error];
 }
 
+- (void)setMessageReliabilityProtocolIdleRetransmitMs:(nullable NSNumber *)idleRetransmitMs
+                                   activeRetransmitMs:(nullable NSNumber *)activeRetransmitMs
+                                    activeThresholdMs:(nullable NSNumber *)activeThresholdMs
+                          additionalRetransmitDelayMs:(nullable NSNumber *)additionalRetransmitDelayMs
+{
+    [self _assertCurrentQueueIsNotMatterQueue];
+    dispatch_async(_chipWorkQueue, ^{
+        bool resetAdvertising;
+        if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {
+            Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
+            resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(NullOptional);
+        } else {
+            if (additionalRetransmitDelayMs != nil) {
+                System::Clock::Timeout additionalBackoff(additionalRetransmitDelayMs.unsignedLongValue);
+                Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalBackoff));
+            }
+
+            // Get current MRP parameters, then override the things we were asked to
+            // override.
+            ReliableMessageProtocolConfig mrpConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+            if (idleRetransmitMs != nil) {
+                mrpConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(idleRetransmitMs.unsignedLongValue);
+            }
+            if (activeRetransmitMs != nil) {
+                mrpConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(activeRetransmitMs.unsignedLongValue);
+            }
+            if (activeThresholdMs != nil) {
+                mrpConfig.mActiveThresholdTime = System::Clock::Milliseconds32(activeThresholdMs.unsignedLongValue);
+            }
+
+            resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(MakeOptional(mrpConfig));
+        }
+
+        if (resetAdvertising) {
+            [self resetOperationalAdvertising];
+        }
+    });
+}
+
 - (PersistentStorageDelegate *)storageDelegate
 {
     return _persistentStorageDelegate;
@@ -1324,33 +1366,8 @@ void MTRSetMessageReliabilityParameters(NSNumber * _Nullable idleRetransmitMs,
     NSNumber * _Nullable activeThresholdMs,
     NSNumber * _Nullable additionalRetransmitDelayMs)
 {
-    bool resetAdvertising = false;
-    if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {
-        Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
-        resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(NullOptional);
-    } else {
-        if (additionalRetransmitDelayMs != nil) {
-            System::Clock::Timeout additionalBackoff(additionalRetransmitDelayMs.unsignedLongValue);
-            Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalBackoff));
-        }
-
-        // Get current MRP parameters, then override the things we were asked to
-        // override.
-        ReliableMessageProtocolConfig mrpConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
-        if (idleRetransmitMs != nil) {
-            mrpConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(idleRetransmitMs.unsignedLongValue);
-        }
-        if (activeRetransmitMs != nil) {
-            mrpConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(activeRetransmitMs.unsignedLongValue);
-        }
-        if (activeThresholdMs != nil) {
-            mrpConfig.mActiveThresholdTime = System::Clock::Milliseconds32(activeThresholdMs.unsignedLongValue);
-        }
-
-        resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(MakeOptional(mrpConfig));
-    }
-
-    if (resetAdvertising) {
-        [[MTRDeviceControllerFactory sharedInstance] resetOperationalAdvertising];
-    }
+    [MTRDeviceControllerFactory.sharedInstance setMessageReliabilityProtocolIdleRetransmitMs:idleRetransmitMs
+                                                                          activeRetransmitMs:activeThresholdMs
+                                                                           activeThresholdMs:activeThresholdMs
+                                                                 additionalRetransmitDelayMs:additionalRetransmitDelayMs];
 }

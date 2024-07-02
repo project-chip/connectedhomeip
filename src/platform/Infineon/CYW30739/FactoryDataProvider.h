@@ -30,6 +30,8 @@ class FactoryDataProvider : public CommissionableDataProvider,
                             public DeviceInstanceInfoProvider
 {
 public:
+    CHIP_ERROR Init();
+
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator);
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator);

@@ -31,9 +31,9 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 
-#if defined(TINYCRYPT_PRIMITIVES)
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
 #include "tinycrypt/ecc.h"
-#endif
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
@@ -46,8 +46,7 @@ namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-#if SLI_SI91X_MCU_INTERFACE
-#if defined(TINYCRYPT_PRIMITIVES)
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
 sys_mutex_t PlatformManagerImpl::rngMutexHandle = NULL;
 
 int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
@@ -58,8 +57,8 @@ int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
 
     return res;
 }
-#endif // TINYCRYPT_PRIMITIVES
 
+#if !(SLI_SI91X_MCU_INTERFACE)
 static void app_get_random(uint8_t * aOutput, size_t aLen)
 {
     VerifyOrReturn(aOutput != nullptr);
@@ -76,12 +75,11 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
     return 0;
 }
-#endif // SLI_SI91X_MCU_INTERFACE
-
+#endif // !SLI_SI91X_MCU_INTERFACE
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
-
     // Initialize the configuration system.
     err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
@@ -93,15 +91,15 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
-#if SLI_SI91X_MCU_INTERFACE
-    ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16 /*Threshold value*/));
-
-#if defined(TINYCRYPT_PRIMITIVES)
+#if defined(SL_MBEDTLS_USE_TINYCRYPT)
+#if !(SLI_SI91X_MCU_INTERFACE)
+    // 16 : Threshold value
+    ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
+#endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
     VerifyOrExit(sys_mutex_new(&rngMutexHandle) == ERR_OK, err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
-#endif // TINYCRYPT_PRIMITIVES
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

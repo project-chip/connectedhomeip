@@ -22,14 +22,15 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 #include <stdio.h>
 
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/verhoeff/Verhoeff.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
-
-#include <lib/support/verhoeff/Verhoeff.h>
 
 #include <algorithm>
 #include <math.h>
@@ -397,11 +398,14 @@ TEST(TestManualCode, TestLongCodeReadWrite)
     EXPECT_TRUE(inPayload == outPayload);
 }
 
-void assertEmptyPayloadWithError(CHIP_ERROR actualError, CHIP_ERROR expectedError, const SetupPayload & payload)
+void assertEmptyPayloadWithError(CHIP_ERROR actualError, CHIP_ERROR expectedError, const SetupPayload & payload, int line)
 {
+    ChipLogProgress(Test, "Current check line: %d", line);
     EXPECT_EQ(actualError, expectedError);
-    EXPECT_TRUE(payload.setUpPINCode == 0 && payload.discriminator.GetLongValue() == 0 && payload.productID == 0 &&
-                payload.vendorID == 0);
+    EXPECT_EQ(payload.setUpPINCode, 0u);
+    EXPECT_EQ(payload.discriminator.GetLongValue(), 0u);
+    EXPECT_EQ(payload.productID, 0u);
+    EXPECT_EQ(payload.vendorID, 0u);
 }
 
 TEST(TestManualCode, TestPayloadParser_InvalidEntry)
@@ -413,46 +417,46 @@ TEST(TestManualCode, TestPayloadParser_InvalidEntry)
     decimalString = "";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
-                                payload);
+                                payload, __LINE__);
 
     // Invalid character
     decimalString = "24184.2196";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_INTEGER_VALUE,
-                                payload);
+                                payload, __LINE__);
 
     // too short
     decimalString = "2456";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
-                                payload);
+                                payload, __LINE__);
 
     // too long for long code
     decimalString = "123456789123456785671";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
-                                payload);
+                                payload, __LINE__);
 
     // too long for short code
     decimalString = "12749875380";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
-                                payload);
+                                payload, __LINE__);
 
     // bit to indicate short code but long code length
     decimalString = "23456789123456785610";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
-                                payload);
+                                payload, __LINE__);
     // no pin code (= 0)
     decimalString = "2327680000";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
     assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_ARGUMENT,
-                                payload);
+                                payload, __LINE__);
     // wrong check digit
     decimalString = "02684354589";
     assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INTEGRITY_CHECK_FAILED,
-                                payload);
+                                payload, __LINE__);
 }
 
 TEST(TestManualCode, TestCheckDecimalStringValidity)

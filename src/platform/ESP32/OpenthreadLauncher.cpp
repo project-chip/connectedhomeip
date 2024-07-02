@@ -161,7 +161,7 @@ esp_err_t openthread_init_stack(void)
     assert(s_platform_config);
     // Initialize the OpenThread stack
     ESP_ERROR_CHECK(esp_openthread_init(s_platform_config));
-#if CONFIG_OPENTHREAD_CLI
+#ifdef CONFIG_OPENTHREAD_CLI
     esp_openthread_matter_cli_init();
     cli_command_transmit_task();
 #endif

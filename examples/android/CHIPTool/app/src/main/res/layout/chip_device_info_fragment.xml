@@ -151,7 +151,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_below="@id/vendorTagsLabelTv"
+            android:layout_below="@id/vendorTagsContainer"
             android:layout_alignParentStart="true"
             android:textSize="20sp"/>
         <EditText
@@ -159,7 +159,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_below="@id/vendorTagsLabelTv"
+            android:layout_below="@id/vendorTagsContainer"
             android:layout_toEndOf="@id/discoveryCapabilitiesLabelTv"
             android:layout_alignParentEnd="true"
             android:textSize="11sp"
@@ -260,6 +260,6 @@
             android:layout_below="@id/showQRCodeUriBtn"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:textSize="20sp"/>
+            android:textSize="12sp"/>
     </RelativeLayout>
 </ScrollView>

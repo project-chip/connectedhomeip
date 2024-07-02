@@ -31,6 +31,14 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @property (nonatomic) BOOL skipExpectedValuesForWrite;
 @property (nonatomic) BOOL forceAttributeReportsIfMatchingCache;
 @property (nonatomic, nullable) dispatch_block_t onDeviceConfigurationChanged;
+@property (nonatomic) BOOL pretendThreadEnabled;
+@property (nonatomic, nullable) dispatch_block_t onSubscriptionPoolDequeue;
+@property (nonatomic, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
+@property (nonatomic, nullable) dispatch_block_t onClusterDataPersisted;
+@end
+
+@interface MTRDeviceTestDelegateWithSubscriptionSetupOverride : MTRDeviceTestDelegate
+@property (nonatomic) BOOL skipSetupSubscription;
 @end
 
 NS_ASSUME_NONNULL_END

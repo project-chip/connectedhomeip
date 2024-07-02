@@ -90,6 +90,7 @@ asr_executable("ota_requestor_app") {
     "${chip_root}/examples/ota-requestor-app/ota-requestor-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
 

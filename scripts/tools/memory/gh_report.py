@@ -276,6 +276,10 @@ class SizeContext:
                 continue
 
             df = pd.DataFrame(changes.rows, columns=changes.columns)
+
+            # Filter down to region reports only.
+            df = df[df['kind'] == 'region'].drop('kind', axis=1)
+
             df.attrs = {
                 'name': f'{pr},{parent},{commit}',
                 'title': (f'PR #{pr}: ' if pr else '') +
@@ -316,9 +320,6 @@ class V1Comment:
             threshold_df = df[df['% change'] > threshold]
             if threshold_df.empty:
                 threshold_df = None
-        decrease_df = df[df['change'] < 0]
-        if decrease_df.empty:
-            decrease_df = None
 
         with io.StringIO() as md:
             md.write(df.attrs['title'])
@@ -328,22 +329,6 @@ class V1Comment:
                 md.write(f'**Increases above {threshold:.2g}%:**\n\n')
                 md.write('<!--ghr-report:threshold-->\n\n')
                 V1Comment.write_df(config, threshold_df, md)
-
-            if increase_df is not None:
-                summary = V1Comment.summary(increase_df)
-                md.write('<details>\n')
-                md.write(f'<summary>Increases ({summary})</summary>\n')
-                md.write('<!--ghr-report:increases-->\n\n')
-                V1Comment.write_df(config, increase_df, md)
-                md.write('</details>\n\n')
-
-            if decrease_df is not None:
-                summary = V1Comment.summary(decrease_df)
-                md.write('<details>\n')
-                md.write(f'<summary>Decreases ({summary})</summary>\n')
-                md.write('<!--ghr-report:decreases-->\n\n')
-                V1Comment.write_df(config, decrease_df, md)
-                md.write('</details>\n\n')
 
             summary = V1Comment.summary(df)
             md.write('<details>\n')

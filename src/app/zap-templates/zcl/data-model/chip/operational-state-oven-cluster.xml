@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>Appliances</domain>
     <name>Oven Cavity Operational State</name>
     <code>0x0048</code>

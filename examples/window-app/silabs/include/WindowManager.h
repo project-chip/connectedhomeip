@@ -40,6 +40,7 @@ public:
         typedef void (*Callback)(Timer & timer);
 
         Timer(uint32_t timeoutInMs, Callback callback, void * context);
+        ~Timer();
 
         void Start();
         void Stop();
@@ -155,7 +156,7 @@ private:
 
     LEDWidget mActionLED;
 #ifdef DISPLAY_ENABLED
-    Timer mIconTimer;
-    LcdIcon mIcon = LcdIcon::None;
+    Timer * mIconTimer = nullptr;
+    LcdIcon mIcon      = LcdIcon::None;
 #endif
 };

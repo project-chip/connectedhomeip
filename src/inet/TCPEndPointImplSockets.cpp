@@ -947,10 +947,9 @@ void TCPEndPointImplSockets::ReceiveData()
         {
             VerifyOrDie(rcvLen > 0);
             size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
-            VerifyOrDie(CanCastTo<uint16_t>(newDataLength));
             if (isNewBuf)
             {
-                rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength));
+                rcvBuf->SetDataLength(newDataLength);
                 rcvBuf.RightSize();
                 if (mRcvQueue.IsNull())
                 {
@@ -963,7 +962,7 @@ void TCPEndPointImplSockets::ReceiveData()
             }
             else
             {
-                rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength), mRcvQueue);
+                rcvBuf->SetDataLength(newDataLength, mRcvQueue);
             }
         }
     }

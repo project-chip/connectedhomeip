@@ -37,14 +37,14 @@ limitations under the License.
     <type id="0x25" description="Unsigned 48-bit integer"  name="int48u"            size="6"  analog="true"   />
     <type id="0x26" description="Unsigned 56-bit integer"  name="int56u"            size="7"  analog="true"   />
     <type id="0x27" description="Unsigned 64-bit integer"  name="int64u"            size="8"  analog="true"   />
-    <type id="0x28" description="Signed 8-bit integer"     name="int8s"             size="1"  analog="true"   />
-    <type id="0x29" description="Signed 16-bit integer"    name="int16s"            size="2"  analog="true"   />
-    <type id="0x2A" description="Signed 24-bit integer"    name="int24s"            size="3"  analog="true"   />
-    <type id="0x2B" description="Signed 32-bit integer"    name="int32s"            size="4"  analog="true"   />
-    <type id="0x2C" description="Signed 40-bit integer"    name="int40s"            size="5"  analog="true"   />
-    <type id="0x2D" description="Signed 48-bit integer"    name="int48s"            size="6"  analog="true"   />
-    <type id="0x2E" description="Signed 56-bit integer"    name="int56s"            size="7"  analog="true"   />
-    <type id="0x2F" description="Signed 64-bit integer"    name="int64s"            size="8"  analog="true"   />
+    <type id="0x28" description="Signed 8-bit integer"     name="int8s"             size="1"  analog="true"  signed="true" />
+    <type id="0x29" description="Signed 16-bit integer"    name="int16s"            size="2"  analog="true"  signed="true"  />
+    <type id="0x2A" description="Signed 24-bit integer"    name="int24s"            size="3"  analog="true"  signed="true"  />
+    <type id="0x2B" description="Signed 32-bit integer"    name="int32s"            size="4"  analog="true"  signed="true"  />
+    <type id="0x2C" description="Signed 40-bit integer"    name="int40s"            size="5"  analog="true"  signed="true"  />
+    <type id="0x2D" description="Signed 48-bit integer"    name="int48s"            size="6"  analog="true"  signed="true"  />
+    <type id="0x2E" description="Signed 56-bit integer"    name="int56s"            size="7"  analog="true"  signed="true"  />
+    <type id="0x2F" description="Signed 64-bit integer"    name="int64s"            size="8"  analog="true"  signed="true"  />
     <type id="0x39" description="Single precision"         name="single"            size="4"  analog="true"   />
     <type id="0x3A" description="Double precision"         name="double"            size="8"  analog="true"   />
     <type id="0x41" description="Octet String"             name="octet_string"                composite="true"/>

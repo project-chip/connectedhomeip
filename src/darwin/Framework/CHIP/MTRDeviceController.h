@@ -54,7 +54,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *    if it has not already been started.
  * 2) Return nil or a running controller.
  *
- * Once this returns non-nil, it's the caller's resposibility to call shutdown
+ * Once this returns non-nil, it's the caller's responsibility to call shutdown
  * on the controller to avoid leaking it.
  */
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters

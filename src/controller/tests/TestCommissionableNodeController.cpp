@@ -182,4 +182,105 @@ TEST_F(TestCommissionableNodeController, TestDiscoverCommissioners_DiscoverCommi
     EXPECT_NE(controller.DiscoverCommissioners(), CHIP_NO_ERROR);
 }
 
+TEST_F(TestCommissionableNodeController, TestGetDiscoveredCommissioner_MultipleIPAddressDiscover)
+{
+    MockResolver resolver;
+    CommissionableNodeController controller(&resolver);
+
+    // example 1
+    chip::Dnssd::DiscoveredNodeData discNodeData1;
+    discNodeData1.Set<chip::Dnssd::CommissionNodeData>();
+    chip::Dnssd::CommissionNodeData & inNodeData1 = discNodeData1.Get<chip::Dnssd::CommissionNodeData>();
+    Platform::CopyString(inNodeData1.hostName, "mockHostName");
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:1111:2222:3333:4444", inNodeData1.ipAddress[0]);
+    inNodeData1.numIPs++;
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:2222:3333:4444:5555", inNodeData1.ipAddress[1]);
+    inNodeData1.numIPs++;
+    inNodeData1.port = 5540;
+
+    controller.OnNodeDiscovered(discNodeData1);
+
+    // example 5 - exactly same as example 1
+    chip::Dnssd::DiscoveredNodeData discNodeData5;
+    discNodeData5.Set<chip::Dnssd::CommissionNodeData>();
+    chip::Dnssd::CommissionNodeData & inNodeData5 = discNodeData5.Get<chip::Dnssd::CommissionNodeData>();
+    Platform::CopyString(inNodeData1.hostName, "mockHostName");
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:1111:2222:3333:4444", inNodeData5.ipAddress[0]);
+    inNodeData5.numIPs++;
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:2222:3333:4444:5555", inNodeData5.ipAddress[1]);
+    inNodeData5.numIPs++;
+    inNodeData5.port = 5540;
+
+    controller.OnNodeDiscovered(discNodeData5);
+
+    // example 2 - same as example 1 (IPAdress sequence is only different.)
+    chip::Dnssd::DiscoveredNodeData discNodeData2;
+    discNodeData2.Set<chip::Dnssd::CommissionNodeData>();
+    chip::Dnssd::CommissionNodeData & inNodeData2 = discNodeData2.Get<chip::Dnssd::CommissionNodeData>();
+    Platform::CopyString(inNodeData2.hostName, "mockHostName");
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:2222:3333:4444:5555", inNodeData2.ipAddress[0]);
+    inNodeData2.numIPs++;
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:1111:2222:3333:4444", inNodeData2.ipAddress[1]);
+    inNodeData2.numIPs++;
+    inNodeData2.port = 5540;
+
+    controller.OnNodeDiscovered(discNodeData2);
+
+    // example 3 - different example
+    chip::Dnssd::DiscoveredNodeData discNodeData3;
+    discNodeData3.Set<chip::Dnssd::CommissionNodeData>();
+    chip::Dnssd::CommissionNodeData & inNodeData3 = discNodeData3.Get<chip::Dnssd::CommissionNodeData>();
+    Platform::CopyString(inNodeData3.hostName, "mockHostName");
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:1111:2222:3333:4444", inNodeData3.ipAddress[0]);
+    inNodeData3.numIPs++;
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:2222:3333:4444:6666", inNodeData3.ipAddress[1]);
+    inNodeData3.numIPs++;
+    inNodeData3.port = 5540;
+
+    controller.OnNodeDiscovered(discNodeData3);
+
+    // example 4 - different example (Different IP count)
+    chip::Dnssd::DiscoveredNodeData discNodeData4;
+    discNodeData4.Set<chip::Dnssd::CommissionNodeData>();
+    chip::Dnssd::CommissionNodeData & inNodeData4 = discNodeData4.Get<chip::Dnssd::CommissionNodeData>();
+    Platform::CopyString(inNodeData4.hostName, "mockHostName");
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:1111:2222:3333:4444", inNodeData4.ipAddress[0]);
+    inNodeData4.numIPs++;
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:2222:3333:4444:6666", inNodeData4.ipAddress[1]);
+    inNodeData4.numIPs++;
+    Inet::IPAddress::FromString("fd11:1111:1122:2222:2222:3333:4444:7777", inNodeData4.ipAddress[2]);
+    inNodeData4.numIPs++;
+    inNodeData4.port = 5540;
+
+    controller.OnNodeDiscovered(discNodeData4);
+
+    // Example 2 result - example 1 is removed. (reason : duplicate)
+    ASSERT_NE(controller.GetDiscoveredCommissioner(0), nullptr);
+    EXPECT_STREQ(inNodeData1.hostName, controller.GetDiscoveredCommissioner(0)->hostName);
+    EXPECT_EQ(inNodeData2.ipAddress[0], controller.GetDiscoveredCommissioner(0)->ipAddress[0]);
+    EXPECT_EQ(inNodeData2.ipAddress[1], controller.GetDiscoveredCommissioner(0)->ipAddress[1]);
+    EXPECT_EQ(controller.GetDiscoveredCommissioner(0)->port, 5540);
+    EXPECT_EQ(controller.GetDiscoveredCommissioner(0)->numIPs, 2u);
+
+    // Example 3 result
+    ASSERT_NE(controller.GetDiscoveredCommissioner(1), nullptr);
+    EXPECT_STREQ(inNodeData3.hostName, controller.GetDiscoveredCommissioner(1)->hostName);
+    EXPECT_EQ(inNodeData3.ipAddress[0], controller.GetDiscoveredCommissioner(1)->ipAddress[0]);
+    EXPECT_EQ(inNodeData3.ipAddress[1], controller.GetDiscoveredCommissioner(1)->ipAddress[1]);
+    EXPECT_EQ(controller.GetDiscoveredCommissioner(1)->port, 5540);
+    EXPECT_EQ(controller.GetDiscoveredCommissioner(1)->numIPs, 2u);
+
+    // Example 4 result
+    ASSERT_NE(controller.GetDiscoveredCommissioner(2), nullptr);
+    EXPECT_STREQ(inNodeData4.hostName, controller.GetDiscoveredCommissioner(2)->hostName);
+    EXPECT_EQ(inNodeData4.ipAddress[0], controller.GetDiscoveredCommissioner(2)->ipAddress[0]);
+    EXPECT_EQ(inNodeData4.ipAddress[1], controller.GetDiscoveredCommissioner(2)->ipAddress[1]);
+    EXPECT_EQ(inNodeData4.ipAddress[2], controller.GetDiscoveredCommissioner(2)->ipAddress[2]);
+    EXPECT_EQ(controller.GetDiscoveredCommissioner(2)->port, 5540);
+    EXPECT_EQ(controller.GetDiscoveredCommissioner(2)->numIPs, 3u);
+
+    // Total is 3. (Not 4)
+    ASSERT_EQ(controller.GetDiscoveredCommissioner(3), nullptr);
+}
+
 } // namespace

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "ConnectionCallbacks.h"
 #include "Types.h"
 
 namespace matter {
@@ -25,7 +26,8 @@ namespace casting {
 namespace core {
 
 /**
- * @brief React to the Commissioner's CommissionerDeclaration messages with this singleton.
+ * @brief React to the Commissioner's CommissionerDeclaration messages with this singleton. This is an implementation of the
+ * CommissionerDeclarationHandler from connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h.
  */
 class CommissionerDeclarationHandler : public chip::Protocols::UserDirectedCommissioning::CommissionerDeclarationHandler
 {
@@ -35,15 +37,33 @@ public:
 
     static CommissionerDeclarationHandler * GetInstance();
 
+    /**
+     * @brief Called when a Commissioner Declaration UDC message has been received.
+     * @param[in] source The source of the Commissioner Declaration message.
+     * @param[in] cd The Commissioner Declaration message.
+     */
     void OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
                                           chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) override;
 
+    /**
+     * @brief OnCommissionerDeclarationMessage() will call the CommissionerDeclarationCallback set by this function.
+     */
+    void SetCommissionerDeclarationCallback(CommissionerDeclarationCallback callback);
+
+    /**
+     * @brief returns true if the CommissionerDeclarationHandler sigleton has a CommissionerDeclarationCallback set, false
+     * otherwise.
+     */
+    bool HasCommissionerDeclarationCallback() { return static_cast<bool>(mCmmissionerDeclarationCallback_); };
+
 private:
     static CommissionerDeclarationHandler * sCommissionerDeclarationHandler_;
+    CommissionerDeclarationCallback mCmmissionerDeclarationCallback_;
+
     CommissionerDeclarationHandler() {}
     ~CommissionerDeclarationHandler() {}
 };
 
-}; // namespace core
-}; // namespace casting
-}; // namespace matter
+} // namespace core
+} // namespace casting
+} // namespace matter

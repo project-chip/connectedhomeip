@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -130,6 +130,7 @@ def BuildHostTarget():
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
         TargetPart('bridge', app=HostApp.BRIDGE),
+        TargetPart('fabric-admin', app=HostApp.FABRIC_ADMIN),
         TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE),
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
@@ -188,6 +189,7 @@ def BuildHostTarget():
     target.AppendModifier('evse-test-event', enable_test_event_triggers=['EVSE']).OnlyIfRe('-energy-management')
     target.AppendModifier('enable-dnssd-tests', enable_dnssd_tests=True).OnlyIfRe('-tests')
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
+    target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
 
     return target
 
@@ -232,17 +234,17 @@ def BuildEfr32Target():
 
     # board
     target.AppendFixedTargets([
-        TargetPart('brd2703a', board=Efr32Board.BRD2703A),
-        TargetPart('brd4161a', board=Efr32Board.BRD4161A),
-        TargetPart('brd4187c', board=Efr32Board.BRD4187C),
-        TargetPart('brd4186c', board=Efr32Board.BRD4186C),
-        TargetPart('brd4163a', board=Efr32Board.BRD4163A),
-        TargetPart('brd4164a', board=Efr32Board.BRD4164A),
-        TargetPart('brd4166a', board=Efr32Board.BRD4166A),
-        TargetPart('brd4170a', board=Efr32Board.BRD4170A),
+        TargetPart('brd2704b', board=Efr32Board.BRD2704B),
+        TargetPart('brd4316a', board=Efr32Board.BRD4316A),
+        TargetPart('brd4317a', board=Efr32Board.BRD4317A),
+        TargetPart('brd4318a', board=Efr32Board.BRD4318A),
+        TargetPart('brd4319a', board=Efr32Board.BRD4319A),
         TargetPart('brd4186a', board=Efr32Board.BRD4186A),
         TargetPart('brd4187a', board=Efr32Board.BRD4187A),
-        TargetPart('brd4304a', board=Efr32Board.BRD4304A),
+        TargetPart('brd2601b', board=Efr32Board.BRD2601B),
+        TargetPart('brd4187c', board=Efr32Board.BRD4187C),
+        TargetPart('brd4186c', board=Efr32Board.BRD4186C),
+        TargetPart('brd2703a', board=Efr32Board.BRD2703A),
         TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
     ])
 
@@ -737,6 +739,7 @@ def BuildTelinkTarget():
     target = BuildTarget('telink', TelinkBuilder)
 
     target.AppendFixedTargets([
+        TargetPart('tlsr9118bdk40d', board=TelinkBoard.TLRS9118BDK40D),
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),

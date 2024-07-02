@@ -283,6 +283,11 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    sl_status_t status = wfx_sta_discon();
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "wfx_sta_discon() failed: %lx", status);
+    }
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
     wfx_clear_wifi_provision();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION

@@ -54,8 +54,8 @@ public:
     };
 
     void Init(void);
-    static void GenericSwitchInitialPress(void);
-    static void GenericSwitchReleasePress(void);
+    static void GenericSwitchInitialPressHandler(AppEvent * aEvent);
+    static void GenericSwitchReleasePressHandler(AppEvent * aEvent);
     static void ToggleHandler(AppEvent * aEvent);
     static void LevelHandler(AppEvent * aEvent);
     static void ColorHandler(AppEvent * aEvent);

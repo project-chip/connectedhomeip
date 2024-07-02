@@ -403,6 +403,15 @@
         },
 
         {
+            "name": "Fabric Admin (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/fabric-admin",
+            "args": ["--log-file-path", "/tmp/fabric_admin.log"],
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
             "name": "Fabric Bridge App (Linux)",
             "type": "lldb",
             "request": "launch",

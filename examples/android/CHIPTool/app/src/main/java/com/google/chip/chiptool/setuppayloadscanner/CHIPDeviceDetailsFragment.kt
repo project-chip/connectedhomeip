@@ -61,7 +61,6 @@ class CHIPDeviceDetailsFragment : Fragment() {
     binding.discriminatorEd.setText(deviceInfo.discriminator.toString())
     binding.serialNumberEd.setText(deviceInfo.serialNumber)
     binding.discoveryCapabilitiesTv.text = "${deviceInfo.discoveryCapabilities}"
-
     if (deviceInfo.optionalQrCodeInfoMap.isEmpty()) {
       binding.vendorTagsLabelTv.visibility = View.GONE
       binding.vendorTagsContainer.visibility = View.GONE

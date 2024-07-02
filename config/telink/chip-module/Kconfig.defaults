@@ -34,11 +34,11 @@ choice LOG_MODE
 endchoice
 
 choice MATTER_LOG_LEVEL_CHOICE
-    default MATTER_LOG_LEVEL_INF
+    default MATTER_LOG_LEVEL_DBG
 endchoice
 
 config CHIP_APP_LOG_LEVEL
-    default 3 # info
+    default 4 # debug
 
 config LOG_DEFAULT_LEVEL
     default 1 # error
@@ -137,10 +137,12 @@ config BT_BUF_ACL_TX_SIZE
     default 251
 
 config BT_RX_STACK_SIZE
-    default 810
+    default 810 if BT_B9X
+    default 2048 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
-    default 640
+    default 640 if BT_B9X
+    default 2048 if BT_W91
 
 config BT_DEVICE_NAME_GATT_WRITABLE
     bool
@@ -178,7 +180,7 @@ config PWM
 endif
 
 # Board non-retention config
-if BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
+if BOARD_TLSR9118BDK40D || BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
 config PWM
     default y
 endif
@@ -224,7 +226,7 @@ config SETTINGS_NVS_SECTOR_COUNT
 # Enable OpenThread
 
 config NET_L2_OPENTHREAD
-    default y
+    default y if !WIFI
 
 if NET_L2_OPENTHREAD
 
@@ -292,9 +294,77 @@ config NET_MAX_CONTEXTS
 config NET_CONFIG_INIT_TIMEOUT
     default 0
 
+
+config CHIP_WIFI
+	bool "Enable Telink Wi-Fi support"
+	default y if BOARD_TLSR9118BDK40D
+	select WIFI_W91
+	select WIFI
+	select NET_STATISTICS
+	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+	select NET_IPV6_NBR_CACHE
+	select NET_STATISTICS_USER_API
+#	select NET_IPV4 # TODO: remove IPv4 when IPv6 will be ready (see CHIP_IPV4)
+#	select NET_CONFIG_NEED_IPV4
+#	select NET_DHCPV4
+
+if CHIP_WIFI
+
+config DEFAULT_WIFI_SSID
+	string "Default WiFi SSID"
+	depends on CHIP_WIFI
+	default ""
+	help
+	  The SSID of network to connect to if no WiFi station configuration exists in NV storage
+	  at the time the device boots.
+	  This option is for testing only and should be disabled in production releases
+
+config DEFAULT_WIFI_PASSWORD
+	string "Default WiFi Password"
+	depends on CHIP_WIFI
+	default ""
+	help
+	  The password for the default WiFi network.
+	  This option is for testing only and should be disabled in production releases.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+	  Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+	  Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+	  Specifies the maximum number of connection recovery attempts.
+	  If set to 0, no limitation is applied and attempts
+	  to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+	  Specifies the maximum connection recovery jitter interval (in milliseconds).
+	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+	  within range [-JITTER; +JITTER].
+
+endif # CHIP_WIFI
+
 config CHIP_ENABLE_PAIRING_AUTOSTART
     bool "Open commissioning window on boot"
-    default y 
+    default y
     help
         Opens the commissioning window automatically at application boot time if
         the node is not yet commissioned.

@@ -22,8 +22,35 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <bitset>
+
 namespace chip {
 namespace Controller {
+
+static bool SameExceptOrder(const chip::Span<const Inet::IPAddress> & v1, const chip::Span<const Inet::IPAddress> & v2)
+{
+    std::bitset<chip::Dnssd::CommonResolutionData::kMaxIPAddresses> addressUsed;
+
+    VerifyOrDie(v1.size() <= Dnssd::CommissionNodeData::kMaxIPAddresses && v2.size() <= Dnssd::CommissionNodeData::kMaxIPAddresses);
+    if (v1.size() != v2.size())
+    {
+        return false;
+    }
+
+    for (size_t s = 0; s < v1.size(); s++)
+    {
+        for (size_t d = 0; d < v2.size(); d++)
+        {
+            if (!addressUsed[d] && v1[s] == v2[d])
+            {
+                // Change the used flag so that the compared target is no longer used
+                addressUsed.set(d, true);
+                break;
+            }
+        }
+    }
+    return addressUsed.count() == v2.size();
+}
 
 void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & discNodeData)
 {
@@ -38,10 +65,10 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
         {
             continue;
         }
-        // TODO(#32576) Check if IP address are the same. Must account for `numIPs` in the list of `ipAddress`.
-        // Additionally, must NOT assume that the ordering is consistent.
+        chip::Span<const Inet::IPAddress> discoveredNodeIPAddressSpan(&discoveredNode.ipAddress[0], discoveredNode.numIPs);
+        chip::Span<const Inet::IPAddress> nodeDataIPAddressSpan(&nodeData.ipAddress[0], nodeData.numIPs);
         if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 && discoveredNode.port == nodeData.port &&
-            discoveredNode.numIPs == nodeData.numIPs)
+            SameExceptOrder(discoveredNodeIPAddressSpan, nodeDataIPAddressSpan))
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)

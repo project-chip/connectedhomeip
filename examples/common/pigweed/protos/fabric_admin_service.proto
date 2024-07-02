@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+
+package chip.rpc;
+
+// Define the message for a synchronized end device with necessary fields
+message DeviceInfo {
+  uint64 node_id = 1;
+}
+
+// Define the response message to convey the status of the operation
+message OperationStatus {
+  bool success = 1;
+}
+
+service FabricAdmin {
+  rpc OpenCommissioningWindow(DeviceInfo) returns (OperationStatus){}
+}
+

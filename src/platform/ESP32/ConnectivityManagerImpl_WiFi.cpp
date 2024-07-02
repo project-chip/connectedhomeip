@@ -780,7 +780,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
-        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::ESPWiFiDriver::GetInstance().OnNetworkStatusChange(); });
+        NetworkCommissioning::ESPWiFiDriver::GetInstance().OnNetworkStatusChange();
     }
 }
 
@@ -999,6 +999,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 // If the station interface has been assigned an IPv4 address, and has
                 // an IPv4 gateway, then presume that the device has IPv4 Internet
                 // connectivity.
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
                 if (!ip4_addr_isany_val(*netif_ip4_addr(netif)) && !ip4_addr_isany_val(*netif_ip4_gw(netif)))
                 {
                     haveIPv4Conn = true;
@@ -1013,6 +1014,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                         IPAddress::FromString(addrStr, addr);
                     }
                 }
+#endif
 
                 // Search among the IPv6 addresses assigned to the interface for a Global Unicast
                 // address (2000::/3) that is in the valid state.  If such an address is found...
@@ -1108,7 +1110,7 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
     PlatformMgr().PostEventOrDie(&event);
 
-#if CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
+#ifdef CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
     uint8_t station_mac[6];
     if (esp_wifi_get_mac(WIFI_IF_STA, station_mac) == ESP_OK)
     {
@@ -1136,7 +1138,7 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     }
 #endif // CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
 
-#if CONFIG_ENABLE_ROUTE_HOOK
+#ifdef CONFIG_ENABLE_ROUTE_HOOK
     esp_route_hook_init(esp_netif_get_handle_from_ifkey(ESP32Utils::kDefaultWiFiStationNetifKey));
 #endif
 }

@@ -107,6 +107,8 @@ chip_data_model("tv-casting-common") {
     "core/CastingPlayerDiscovery.h",
     "core/Command.h",
     "core/CommissionerDeclarationHandler.cpp",
+    "core/CommissionerDeclarationHandler.h",
+    "core/ConnectionCallbacks.h",
     "core/Endpoint.cpp",
     "core/Endpoint.h",
     "core/Types.h",
@@ -151,6 +153,7 @@ static_library("tvCastingCommon") {
   public_deps = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common",
     "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/platform/logging:default",
   ]
 
   cflags = [ "-Wconversion" ]

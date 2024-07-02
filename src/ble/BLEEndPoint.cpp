@@ -389,7 +389,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR err)
             // Indicate close of chipConnection to peripheral via GATT unsubscribe. Keep end point allocated until
             // unsubscribe completes or times out, so platform doesn't close underlying BLE connection before
             // we're really sure the unsubscribe request has been sent.
-            if (!mBle->mPlatformDelegate->UnsubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_2_ID))
+            if (!mBle->mPlatformDelegate->UnsubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID))
             {
                 ChipLogError(Ble, "BtpEngine unsub failed");
 
@@ -750,7 +750,7 @@ CHIP_ERROR BLEEndPoint::HandleHandshakeConfirmationReceived()
     {
         // Subscribe to characteristic which peripheral will use to send indications. Prompts peripheral to send
         // BLE transport capabilities indication.
-        VerifyOrExit(mBle->mPlatformDelegate->SubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_2_ID),
+        VerifyOrExit(mBle->mPlatformDelegate->SubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID),
                      err = BLE_ERROR_GATT_SUBSCRIBE_FAILED);
 
         // We just sent a GATT subscribe request, so make sure to attempt unsubscribe on close.
@@ -1313,14 +1313,14 @@ bool BLEEndPoint::SendWrite(PacketBufferHandle && buf)
 {
     mConnStateFlags.Set(ConnectionStateFlag::kGattOperationInFlight);
 
-    return mBle->mPlatformDelegate->SendWriteRequest(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_1_ID, std::move(buf));
+    return mBle->mPlatformDelegate->SendWriteRequest(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID, std::move(buf));
 }
 
 bool BLEEndPoint::SendIndication(PacketBufferHandle && buf)
 {
     mConnStateFlags.Set(ConnectionStateFlag::kGattOperationInFlight);
 
-    return mBle->mPlatformDelegate->SendIndication(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_2_ID, std::move(buf));
+    return mBle->mPlatformDelegate->SendIndication(mConnObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_2_UUID, std::move(buf));
 }
 
 CHIP_ERROR BLEEndPoint::StartConnectTimer()

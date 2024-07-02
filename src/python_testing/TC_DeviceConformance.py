@@ -15,6 +15,13 @@
 #    limitations under the License.
 #
 
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${CHIP_LOCK_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --manual-code 10054912339 --bool-arg ignore_in_progress:True allow_provisional:True --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --tests test_TC_IDM_10_2
+
 from typing import Callable
 
 import chip.clusters as Clusters
@@ -56,16 +63,11 @@ class DeviceConformanceTests(BasicCompositionTests):
             record_problem(location, problem, ProblemSeverity.WARNING)
 
         ignore_attributes: dict[int, list[int]] = {}
-        ignore_features: dict[int, list[int]] = {}
         if ignore_in_progress:
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
             in_progress_attributes = {Clusters.BasicInformation.id: [0x15, 0x016],
                                       Clusters.PowerSource.id: [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A]}
             ignore_attributes.update(in_progress_attributes)
-            # The spec currently has an error on the power source features
-            # This should be removed once https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/7823 lands
-            in_progress_features = {Clusters.PowerSource.id: [(1 << 2), (1 << 3), (1 << 4), (1 << 5)]}
-            ignore_features.update(in_progress_features)
 
         if is_ci:
             # The network commissioning clusters on the CI select the features on the fly and end up non-conformant
@@ -76,15 +78,31 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         success = True
         allow_provisional = self.user_params.get("allow_provisional", False)
+        # TODO: automate this once https://github.com/csa-data-model/projects/issues/454 is done.
+        provisional_cluster_ids = [Clusters.ContentControl.id, Clusters.ScenesManagement.id, Clusters.BallastConfiguration.id,
+                                   Clusters.EnergyPreference.id, Clusters.DeviceEnergyManagement.id, Clusters.DeviceEnergyManagementMode.id, Clusters.PulseWidthModulation.id,
+                                   Clusters.ProxyConfiguration.id, Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id]
+        # TODO: Remove this once the latest 1.3 lands with the clusters removed from the DM XML and change the warning below about missing DM XMLs into a proper error
+        # These are clusters that weren't part of the 1.3 spec that landed in the SDK before the branch cut
+        provisional_cluster_ids.extend([Clusters.DemandResponseLoadControl.id])
+        # These clusters are zigbee only. I don't even know why they're part of the codegen, but we should get rid of them.
+        provisional_cluster_ids.extend([Clusters.BarrierControl.id, Clusters.OnOffSwitchConfiguration.id,
+                                       Clusters.BinaryInputBasic.id, Clusters.ElectricalMeasurement.id])
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
+                cluster_location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+
+                if not allow_provisional and cluster_id in provisional_cluster_ids:
+                    record_error(location=cluster_location, problem='Provisional cluster found on device')
+                    continue
+
                 if cluster_id not in self.xml_clusters.keys():
                     if (cluster_id & 0xFFFF_0000) != 0:
                         # manufacturer cluster
                         continue
-                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
                     # TODO: update this from a warning once we have all the data
-                    record_warning(location=location, problem='Standard cluster found on device, but is not present in spec data')
+                    record_warning(location=cluster_location,
+                                   problem='Standard cluster found on device, but is not present in spec data')
                     continue
 
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
@@ -100,15 +118,11 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if f not in self.xml_clusters[cluster_id].features.keys():
                         record_error(location=location, problem=f'Unknown feature with mask 0x{f:02x}')
                         continue
-                    if cluster_id in ignore_features and f in ignore_features[cluster_id]:
-                        continue
                     xml_feature = self.xml_clusters[cluster_id].features[f]
                     conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if not conformance_allowed(conformance_decision, allow_provisional):
                         record_error(location=location, problem=f'Disallowed feature with mask 0x{f:02x}')
                 for feature_mask, xml_feature in self.xml_clusters[cluster_id].features.items():
-                    if cluster_id in ignore_features and feature_mask in ignore_features[cluster_id]:
-                        continue
                     conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
                         record_error(

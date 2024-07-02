@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +48,7 @@ void AppTask::PowerOnFactoryReset(void)
 {
     LOG_INF("Lighting App Power On Factory Reset");
     AppEvent event;
-    event.Type    = AppEvent::kEventType_Lighting;
+    event.Type    = AppEvent::kEventType_DeviceAction;
     event.Handler = PowerOnFactoryResetEventHandler;
     GetAppTask().PostEvent(&event);
 }
@@ -77,7 +77,7 @@ CHIP_ERROR AppTask::Init(void)
     if (status == Protocols::InteractionModel::Status::Success)
     {
         // Set actual state to stored before reboot
-        SetInitiateAction(storedValue ? ON_ACTION : OFF_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), nullptr);
+        SetInitiateAction(storedValue ? ON_ACTION : OFF_ACTION, static_cast<int32_t>(AppEvent::kEventType_DeviceAction), nullptr);
     }
 
     return CHIP_NO_ERROR;
@@ -88,10 +88,10 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
     Fixture_Action action = INVALID_ACTION;
     int32_t actor         = 0;
 
-    if (aEvent->Type == AppEvent::kEventType_Lighting)
+    if (aEvent->Type == AppEvent::kEventType_DeviceAction)
     {
-        action = static_cast<Fixture_Action>(aEvent->LightingEvent.Action);
-        actor  = aEvent->LightingEvent.Actor;
+        action = static_cast<Fixture_Action>(aEvent->DeviceEvent.Action);
+        actor  = aEvent->DeviceEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
