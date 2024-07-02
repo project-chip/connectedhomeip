@@ -13,14 +13,13 @@ def main():
     polling = True
     poll_count = 0
     poll_max = 300
-    check_passed = False
     while (polling):
         for line in subprocess.run(f"gh pr checks -R project-chip/connectedhomeip {args.pr}", stdout=subprocess.PIPE, shell=True).stdout.decode("utf-8").splitlines():
             if args.check in line:
                 print(line)
                 if "pending" in line:
                     if poll_count == poll_max:
-                        polling = false
+                        polling = False
                     else:
                         poll_count += 1
                         time.sleep(1)
