@@ -9114,7 +9114,7 @@ cluster ApplicationLauncher = 1292 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
-    kPending = 3;
+    kPendingUserApproval = 3;
     kDownloading = 4;
     kInstalling = 5;
   }
