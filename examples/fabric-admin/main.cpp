@@ -21,6 +21,7 @@
 #include <commands/fabric-sync/Commands.h>
 #include <commands/interactive/Commands.h>
 #include <commands/pairing/Commands.h>
+#include <device_manager/DeviceManager.h>
 #include <zap-generated/cluster/Commands.h>
 
 #include <iostream>
@@ -39,6 +40,8 @@ void ApplicationInit()
     InitRpcServer(kFabricAdminServerPort);
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
 #endif
+
+    DeviceMgr().Init();
 }
 
 // ================================================================================

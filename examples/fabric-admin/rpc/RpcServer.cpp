@@ -20,6 +20,8 @@
 #include "pw_rpc_system_server/rpc_server.h"
 #include "pw_rpc_system_server/socket.h"
 
+#include <commands/fabric-sync/FabricSyncCommand.h>
+#include <commands/interactive/InteractiveCommands.h>
 #include <system/SystemClock.h>
 #include <thread>
 
@@ -27,17 +29,26 @@
 #include "pigweed/rpc_services/FabricAdmin.h"
 #endif
 
+using namespace ::chip;
+
 namespace {
 
 #if defined(PW_RPC_FABRIC_ADMIN_SERVICE) && PW_RPC_FABRIC_ADMIN_SERVICE
-class FabricAdmin final : public chip::rpc::FabricAdmin
+class FabricAdmin final : public rpc::FabricAdmin
 {
 public:
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceInfo & request, chip_rpc_OperationStatus & response) override
     {
-        chip::NodeId nodeId = request.node_id;
+        NodeId nodeId = request.node_id;
         ChipLogProgress(NotSpecified, "Received OpenCommissioningWindow request: 0x%lx", nodeId);
-        response.success = false;
+
+        char command[64];
+        snprintf(command, sizeof(command), "pairing open-commissioning-window %ld %d %d %d %d %d", nodeId, kRootEndpointId,
+                 kEnhancedCommissioningMethod, kWindowTimeout, kIteration, kDiscriminator);
+
+        PushCommand(command);
+
+        response.success = true;
 
         return pw::OkStatus();
     }
