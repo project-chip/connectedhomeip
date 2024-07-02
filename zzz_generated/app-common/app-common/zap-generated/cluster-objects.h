@@ -33039,6 +33039,33 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace RelativeHumidityMeasurement
 namespace OccupancySensing {
+namespace Structs {
+namespace HoldTimeLimitsStruct {
+enum class Fields : uint8_t
+{
+    kHoldTimeMin     = 0,
+    kHoldTimeMax     = 1,
+    kHoldTimeDefault = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t holdTimeMin     = static_cast<uint16_t>(0);
+    uint16_t holdTimeMax     = static_cast<uint16_t>(0);
+    uint16_t holdTimeDefault = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace HoldTimeLimitsStruct
+} // namespace Structs
 
 namespace Attributes {
 
@@ -33078,6 +33105,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OccupancySensorTypeBitmap
+namespace HoldTime {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HoldTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HoldTime
+namespace HoldTimeLimits {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type;
+    using DecodableType    = chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HoldTimeLimits::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HoldTimeLimits
 namespace PIROccupiedToUnoccupiedDelay {
 struct TypeInfo
 {
@@ -33237,6 +33288,8 @@ struct TypeInfo
             static_cast<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum>(0);
         Attributes::OccupancySensorTypeBitmap::TypeInfo::DecodableType occupancySensorTypeBitmap =
             static_cast<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>(0);
+        Attributes::HoldTime::TypeInfo::DecodableType holdTime = static_cast<uint16_t>(0);
+        Attributes::HoldTimeLimits::TypeInfo::DecodableType holdTimeLimits;
         Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::DecodableType PIROccupiedToUnoccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::DecodableType PIRUnoccupiedToOccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType PIRUnoccupiedToOccupiedThreshold =
