@@ -6,6 +6,7 @@ using namespace chip::app::Clusters;
 
 void RvcDevice::Init()
 {
+    mServiceAreaInstance.Init();
     mRunModeInstance.Init();
     mCleanModeInstance.Init();
     mOperationalStateInstance.Init();
@@ -158,6 +159,35 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
     }
+}
+
+bool RvcDevice::HandleIsSetSelectedLocationCallback(char * statusText)
+{
+    bool canSet;
+
+    switch (mRunModeInstance.GetCurrentMode())
+    {
+    case RvcRunMode::ModeIdle:
+        canSet = true;
+        break;
+
+    case RvcRunMode::ModeCleaning:
+        canSet = false;
+        strncat(statusText, "Cannot select locations while cleaning", ServiceArea::kMaxSizeStatusText);
+        break;
+
+    case RvcRunMode::ModeMapping:
+        canSet = false;
+        strncat(statusText, "Cannot select locations while mapping", ServiceArea::kMaxSizeStatusText);
+        break;
+
+    default:
+        canSet = false;
+        strncat(statusText, "Cannot select locations - unknown mode", ServiceArea::kMaxSizeStatusText);
+        break;
+    }
+
+    return canSet;
 }
 
 void RvcDevice::HandleChargedMessage()
