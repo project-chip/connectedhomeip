@@ -179,7 +179,7 @@ private:
     {
         MessagingContextData() :
             mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-            mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT))
+            mBobAddress(LoopbackTransport::LoopbackPeer(mAliceAddress))
         {}
         ~MessagingContextData() { EXPECT_FALSE(mInitialized); }
 

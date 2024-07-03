@@ -26,6 +26,7 @@
 #include <app/icd/server/ICDStateObserver.h>
 #include <app/icd/server/tests/ICDConfigurationDataTestAccess.h>
 #include <crypto/DefaultSessionKeystore.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
