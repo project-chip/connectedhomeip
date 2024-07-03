@@ -157,6 +157,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         {
             mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
         }
+        if (!mICDClientType.HasValue())
+        {
+            mICDClientType.SetValue(app::Clusters::IcdManagement::ClientTypeEnum::kPermanent);
+        }
         // These Optionals must have values now.
         // The commissioner will verify these values.
         params.SetICDSymmetricKey(mICDSymmetricKey.Value());
@@ -166,6 +170,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         }
         params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
         params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
+        params.SetICDClientType(mICDClientType.Value());
     }
 
     return params;
@@ -459,7 +464,7 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = nodeId;
+    clientInfo.peer_node         = chip::ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
     clientInfo.start_icd_counter = icdCounter;
 
@@ -538,9 +543,7 @@ void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_E
         // print to console
         fprintf(stderr, "Device with Node ID: 0x%lx has been successfully removed.\n", nodeId);
 
-#if defined(PW_RPC_ENABLED)
-        RemoveSynchronizedDevice(nodeId);
-#endif
+        // TODO: (#33973) Add RPC method RemoveSynchronizedDevice
     }
     else
     {

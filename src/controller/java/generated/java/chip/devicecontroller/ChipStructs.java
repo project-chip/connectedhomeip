@@ -3483,18 +3483,22 @@ public static class UserLabelClusterLabelStruct {
 public static class IcdManagementClusterMonitoringRegistrationStruct {
   public Long checkInNodeID;
   public Long monitoredSubject;
+  public Integer clientType;
   public Integer fabricIndex;
   private static final long CHECK_IN_NODE_I_D_ID = 1L;
   private static final long MONITORED_SUBJECT_ID = 2L;
+  private static final long CLIENT_TYPE_ID = 4L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public IcdManagementClusterMonitoringRegistrationStruct(
     Long checkInNodeID,
     Long monitoredSubject,
+    Integer clientType,
     Integer fabricIndex
   ) {
     this.checkInNodeID = checkInNodeID;
     this.monitoredSubject = monitoredSubject;
+    this.clientType = clientType;
     this.fabricIndex = fabricIndex;
   }
 
@@ -3502,6 +3506,7 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CHECK_IN_NODE_I_D_ID, new UIntType(checkInNodeID)));
     values.add(new StructElement(MONITORED_SUBJECT_ID, new UIntType(monitoredSubject)));
+    values.add(new StructElement(CLIENT_TYPE_ID, new UIntType(clientType)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -3513,6 +3518,7 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     }
     Long checkInNodeID = null;
     Long monitoredSubject = null;
+    Integer clientType = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CHECK_IN_NODE_I_D_ID) {
@@ -3525,6 +3531,11 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
           UIntType castingValue = element.value(UIntType.class);
           monitoredSubject = castingValue.value(Long.class);
         }
+      } else if (element.contextTagNum() == CLIENT_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          clientType = castingValue.value(Integer.class);
+        }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -3535,6 +3546,7 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     return new IcdManagementClusterMonitoringRegistrationStruct(
       checkInNodeID,
       monitoredSubject,
+      clientType,
       fabricIndex
     );
   }
@@ -3548,6 +3560,9 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     output.append("\n");
     output.append("\tmonitoredSubject: ");
     output.append(monitoredSubject);
+    output.append("\n");
+    output.append("\tclientType: ");
+    output.append(clientType);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
@@ -9728,6 +9743,82 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
     output.append("\n");
     output.append("\tcoolSetpoint: ");
     output.append(coolSetpoint);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class OccupancySensingClusterHoldTimeLimitsStruct {
+  public Integer holdTimeMin;
+  public Integer holdTimeMax;
+  public Integer holdTimeDefault;
+  private static final long HOLD_TIME_MIN_ID = 0L;
+  private static final long HOLD_TIME_MAX_ID = 1L;
+  private static final long HOLD_TIME_DEFAULT_ID = 2L;
+
+  public OccupancySensingClusterHoldTimeLimitsStruct(
+    Integer holdTimeMin,
+    Integer holdTimeMax,
+    Integer holdTimeDefault
+  ) {
+    this.holdTimeMin = holdTimeMin;
+    this.holdTimeMax = holdTimeMax;
+    this.holdTimeDefault = holdTimeDefault;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(HOLD_TIME_MIN_ID, new UIntType(holdTimeMin)));
+    values.add(new StructElement(HOLD_TIME_MAX_ID, new UIntType(holdTimeMax)));
+    values.add(new StructElement(HOLD_TIME_DEFAULT_ID, new UIntType(holdTimeDefault)));
+
+    return new StructType(values);
+  }
+
+  public static OccupancySensingClusterHoldTimeLimitsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer holdTimeMin = null;
+    Integer holdTimeMax = null;
+    Integer holdTimeDefault = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == HOLD_TIME_MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          holdTimeMin = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HOLD_TIME_MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          holdTimeMax = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HOLD_TIME_DEFAULT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          holdTimeDefault = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new OccupancySensingClusterHoldTimeLimitsStruct(
+      holdTimeMin,
+      holdTimeMax,
+      holdTimeDefault
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OccupancySensingClusterHoldTimeLimitsStruct {\n");
+    output.append("\tholdTimeMin: ");
+    output.append(holdTimeMin);
+    output.append("\n");
+    output.append("\tholdTimeMax: ");
+    output.append(holdTimeMax);
+    output.append("\n");
+    output.append("\tholdTimeDefault: ");
+    output.append(holdTimeDefault);
     output.append("\n");
     output.append("}\n");
     return output.toString();
