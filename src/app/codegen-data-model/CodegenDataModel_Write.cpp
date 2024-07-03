@@ -123,7 +123,7 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
         ReturnErrorOnFailure(decoder.Decode(workingValue));
     }
 
-    typename ENCODING::LengthType len = static_cast<typename ENCODING::LengthType>(workingValue.size());
+    auto len = static_cast<typename ENCODING::LengthType>(workingValue.size());
     VerifyOrReturnError(out.size() >= sizeof(len) + len, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t * output_buffer = out.data();
