@@ -1939,7 +1939,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
     ASSERT_EQ(writtenData[0], 0xFF);
-    ASSERT_EQ(writtenData[0], 0xFF);
+    ASSERT_EQ(writtenData[1], 0xFF);
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortBytes)
