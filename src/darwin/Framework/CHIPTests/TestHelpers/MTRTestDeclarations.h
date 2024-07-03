@@ -79,6 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
     deviceReportingExcessivelyIntervalThreshold:(NSTimeInterval)deviceReportingExcessivelyIntervalThreshold;
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
 - (NSUInteger)unitTestNonnullDelegateCount;
+- (void)unitTestResetSubscription;
 @end
 #endif
 

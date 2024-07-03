@@ -1235,6 +1235,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)_handleSubscriptionError:(NSError *)error
 {
     std::lock_guard lock(_lock);
+    [self _doHandleSubscriptionError:error];
+}
+
+- (void)_doHandleSubscriptionError:(NSError *)error
+{
+    os_unfair_lock_assert_owner(&_lock);
 
     [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
     _unreportedEvents = nil;
@@ -1400,6 +1406,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
     std::lock_guard lock(_lock);
+    [self _doHandleSubscriptionReset:retryDelay];
+}
+
+- (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
+{
+    os_unfair_lock_assert_owner(&_lock);
 
     // If we are here, then either we failed to establish initial CASE, or we
     // failed to send the initial SubscribeRequest message, or our ReadClient
@@ -2134,6 +2146,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     MTRDeviceClusterData * data = [_deviceController.controllerDataStore getStoredClusterDataForNodeID:_nodeID endpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
     if (data != nil) {
         [_persistedClusterData setObject:data forKey:clusterPath];
+    } else {
+        // If clusterPath is in _persistedClusters and the data store returns nil for it, then the in-memory cache is now not dependable, and subscription should be reset and reestablished to reload cache from device
+        [self _resetSubscriptionWithReasonString:[NSString stringWithFormat:@"Data store has no data for cluster %@", clusterPath]];
     }
 
     return data;
@@ -2302,6 +2317,31 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         _connectivityMonitor = nil;
     }
 }
+
+- (void)_resetSubscriptionWithReasonString:(NSString *)reasonString
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    MTR_LOG_ERROR("%@ %@ - resetting subscription", self, reasonString);
+
+    [_deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
+        self->_currentReadClient = nullptr;
+        self->_currentSubscriptionCallback = nullptr;
+
+        [self _doHandleSubscriptionError:nil];
+        // Use nil reset delay so that this keeps existing backoff timing
+        [self _doHandleSubscriptionReset:nil];
+    }
+                                     errorHandler:nil];
+}
+
+#ifdef DEBUG
+- (void)unitTestResetSubscription
+{
+    std::lock_guard lock(self->_lock);
+    [self _resetSubscriptionWithReasonString:@"Unit test reset subscription"];
+}
+#endif
 
 // assume lock is held
 - (void)_setupSubscriptionWithReason:(NSString *)reason

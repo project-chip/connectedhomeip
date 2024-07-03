@@ -2937,4 +2937,92 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     XCTAssertFalse([controller isRunning]);
 }
 
+// Run the test here since detectLeaks is set, and subscription reset needs to not cause leaks
+- (void)testMTRDeviceResetSubscription
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(333);
+    NSNumber * fabricID = @(444);
+
+    NSError * error;
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(22);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // Test that subscription reset works
+
+    XCTestExpectation * subscriptionExpectation2 = [self expectationWithDescription:@"Subscription has been set up 2"];
+
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation2 fulfill];
+        // reset callback so expectation not fulfilled twice
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    // clear cluster data before reset
+    NSUInteger attributeCountBeforeReset = [device unitTestAttributeCount];
+    [device unitTestClearClusterData];
+
+    [device unitTestResetSubscription];
+
+    [self waitForExpectations:@[ subscriptionExpectation2 ] timeout:60];
+
+    // check that in-memory cache has recovered
+    NSUInteger attributeCountAfterReset = [device unitTestAttributeCount];
+    XCTAssertEqual(attributeCountBeforeReset, attributeCountAfterReset);
+
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
 @end
