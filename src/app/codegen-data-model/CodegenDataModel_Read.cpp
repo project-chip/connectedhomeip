@@ -99,7 +99,12 @@ struct LongPascalString
     using LengthType                        = uint16_t;
     static constexpr LengthType kNullLength = 0xFFFF;
 
-    static LengthType GetLength(const uint8_t * buffer) { return emberAfLongStringLength(buffer); }
+    static LengthType GetLength(const uint8_t * buffer)
+    {
+        // NOTE: we do NOT use emberAfLongStringLength because that will result in 0 length
+        //       for null strings
+        return Encoding::LittleEndian::Read16(buffer);
+    }
 };
 
 // ember assumptions ... should just work
