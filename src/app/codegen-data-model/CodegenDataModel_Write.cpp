@@ -304,16 +304,14 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
     }
 
-    if ((*attributeMetadata)->IsReadOnly() && !request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
+    // Internal is allowed to bypass timed writes and read-only.
+    if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
     {
-        // Internal is allowed to try to bypass read-only updates, however otherwise we deny read-only
-        // updates
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
-    }
+        VerifyOrReturnError(!(*attributeMetadata)->IsReadOnly(), CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
-    if ((*attributeMetadata)->MustUseTimedWrite() && !request.writeFlags.Has(InteractionModel::WriteFlags::kTimed))
-    {
-        return CHIP_IM_GLOBAL_STATUS(NeedsTimedInteraction);
+        VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() ||
+                                request.writeFlags.Has(InteractionModel::WriteFlags::kTimed),
+                            CHIP_IM_GLOBAL_STATUS(NeedsTimedInteraction));
     }
 
     if (request.path.mDataVersion.HasValue())
