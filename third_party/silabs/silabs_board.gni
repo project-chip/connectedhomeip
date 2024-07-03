@@ -64,10 +64,13 @@ if (silabs_board == "") {
 
 assert(silabs_board != "", "silabs_board must be specified")
 
+# Si917 WIFI board ----------
 if (silabs_board == "BRD4338A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
+
+  # EFR32 MG24 series ----------
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
   variant = string_replace(silabs_board, "A", "C")
   print(
@@ -95,6 +98,8 @@ if (silabs_board == "BRD4338A") {
   use_external_flash = false
   show_qr_code = false
   disable_lcd = true
+
+  # EFR32 MG24 Modules series ----------
 } else if (silabs_board == "BRD4316A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB22VNA"
@@ -130,6 +135,24 @@ if (silabs_board == "BRD4338A") {
 } else if (silabs_board == "BRD4318A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"
+
+  # EFR32 MG26 series ----------
+} else if (silabs_board == "BRD4116A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B410F3200IM48"
+} else if (silabs_board == "BRD4117A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B420F3200IM48"
+} else if (silabs_board == "BRD4118A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B510F3200IL136"
+} else if (silabs_board == "BRD2608A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B510F3200IM68"
+
+  # ThunderBoards don't have a LCD,
+  show_qr_code = false
+  disable_lcd = true
 } else {
   assert(
       false,
