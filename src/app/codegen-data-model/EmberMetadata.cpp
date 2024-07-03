@@ -32,7 +32,6 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
 {
     for (auto & attr : GlobalAttributesNotInMetadata)
     {
-
         if (attr == aPath.mAttributeId)
         {
             const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);

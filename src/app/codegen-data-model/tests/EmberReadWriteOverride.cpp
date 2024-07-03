@@ -92,12 +92,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
     }
     else
     {
-        if (gEmberIoBufferFill > readLength)
-        {
-            ChipLogError(Test, "Internal TEST error: insufficient output buffer space.");
-            return Status::ResourceExhausted;
-        }
-
+        VerifyOrDie(gEmberIoBufferFill <= readLength);
         memcpy(buffer, gEmberIoBuffer, gEmberIoBufferFill);
     }
 
