@@ -2279,29 +2279,24 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (void)_createDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions dataVersionFilterList:(DataVersionFilter **)dataVersionFilterList count:(size_t *)count
 {
-    size_t maxDataVersionFilterSize = dataVersions.count;
+    size_t dataVersionFilterSize = dataVersions.count;
 
     // Check if any filter list should be generated
-    if (!dataVersions.count) {
+    if (dataVersionFilterSize == 0) {
         *count = 0;
         *dataVersionFilterList = nullptr;
         return;
     }
 
-    DataVersionFilter * dataVersionFilterArray = new DataVersionFilter[maxDataVersionFilterSize];
+    DataVersionFilter * dataVersionFilterArray = new DataVersionFilter[dataVersionFilterSize];
     size_t i = 0;
     for (MTRClusterPath * path in dataVersions) {
         NSNumber * dataVersionNumber = dataVersions[path];
-        if (dataVersionNumber) {
-            dataVersionFilterArray[i++] = DataVersionFilter(static_cast<chip::EndpointId>(path.endpoint.unsignedShortValue), static_cast<chip::ClusterId>(path.cluster.unsignedLongValue), static_cast<chip::DataVersion>(dataVersionNumber.unsignedLongValue));
-        }
+        dataVersionFilterArray[i++] = DataVersionFilter(static_cast<chip::EndpointId>(path.endpoint.unsignedShortValue), static_cast<chip::ClusterId>(path.cluster.unsignedLongValue), static_cast<chip::DataVersion>(dataVersionNumber.unsignedLongValue));
     }
 
     *dataVersionFilterList = dataVersionFilterArray;
-    // Note that we might have i < maxDataVersionFilterSize here if some of the
-    // dictionary entries had a null dataVersionNumber.  The correct size of the
-    // valid entried in our array is "i".
-    *count = i;
+    *count = dataVersionFilterSize;
 }
 
 - (void)_setupConnectivityMonitoring
