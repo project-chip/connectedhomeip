@@ -246,7 +246,7 @@ private:
     Type mTransportType          = Type::kUndefined;
     uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.
     Inet::InterfaceId mInterface = Inet::InterfaceId::Null();
-    NodeId mRemoteId = 0;
+    NodeId mRemoteId             = 0;
 };
 
 } // namespace Transport
