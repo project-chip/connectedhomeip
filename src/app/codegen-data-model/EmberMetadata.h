@@ -28,10 +28,16 @@ namespace Ember {
 /// Fetch the source for the given attribute path: either a cluster (for global ones) or attribute
 /// path.
 ///
-/// if returning a CHIP_ERROR, it will NEVER be CHIP_NO_ERROR.
+/// Possible return values:
+///    - EmberAfCluster (NEVER null)           - Only for GlobalAttributesNotInMetaData
+///    - EmberAfAttributeMetadata (NEVER null) - if the attribute is known to ember datastore
+///    - CHIP_ERROR, only specifically for unknown attributes, may only be one of:
+///        - CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
+///        - CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
+///        - CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 std::variant<const EmberAfCluster *,           // global attribute, data from a cluster
              const EmberAfAttributeMetadata *, // a specific attribute stored by ember
-             CHIP_ERROR                        // error, this will NEVER be CHIP_NO_ERROR
+             CHIP_ERROR                        // error, (CHIP_IM_GLOBAL_STATUS(Unsupported*))
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath);
 

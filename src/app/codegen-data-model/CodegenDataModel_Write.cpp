@@ -126,7 +126,7 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
     typename ENCODING::LengthType len = static_cast<typename ENCODING::LengthType>(workingValue.size());
     VerifyOrReturnError(out.size() >= sizeof(len) + len, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    char * output_buffer = out.data();
+    uint8_t * output_buffer = out.data();
 
     ENCODING::SetLength(output_buffer, len);
     output_buffer += sizeof(len);
@@ -278,7 +278,9 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     // Explicit failure in finding a suitable metadata
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))
     {
-        VerifyOrDie(*err != CHIP_NO_ERROR);
+        VerifyOrDie((*err != CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)) || //
+                    (*err != CHIP_IM_GLOBAL_STATUS(UnsupportedCluster)) ||  //
+                    (*err != CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)));
         return *err;
     }
 
