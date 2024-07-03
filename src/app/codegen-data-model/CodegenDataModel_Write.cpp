@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/ember-io-storage.h>
+#include <app/util/ember-strings.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -74,6 +75,8 @@ struct ShortPascalString
 {
     using LengthType                        = uint8_t;
     static constexpr LengthType kNullLength = 0xFF;
+
+    static void SetLength(uint8_t * buffer, LengthType value) { *buffer = value; }
 };
 
 /// Metadata of what a ember/pascal LONG string means (prepended by a u16 length)
@@ -81,6 +84,9 @@ struct LongPascalString
 {
     using LengthType                        = uint16_t;
     static constexpr LengthType kNullLength = 0xFFFF;
+
+    // Encoding for ember string lengths is little-endian (see ember-strings.cpp)
+    static void SetLength(uint8_t * buffer, LengthType value) { Encoding::LittleEndian::Put16(buffer, value); }
 };
 
 // ember assumptions ... should just work
@@ -106,9 +112,7 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
         if (nullableWorkingValue.IsNull())
         {
             VerifyOrReturnError(out.size() >= sizeof(typename ENCODING::LengthType), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-            typename ENCODING::LengthType nullLength = ENCODING::kNullLength;
-            memcpy(out.data(), &nullLength, sizeof(nullLength));
+            ENCODING::SetLength(out.data(), ENCODING::kNullLength);
             return CHIP_NO_ERROR;
         }
 
@@ -123,7 +127,7 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
     typename ENCODING::LengthType len = static_cast<typename ENCODING::LengthType>(workingValue.size());
     VerifyOrReturnError(out.size() >= sizeof(len) + len, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    memcpy(out.data(), &len, sizeof(len));
+    ENCODING::SetLength(out.data(), len);
     memcpy(out.data() + sizeof(len), workingValue.data(), workingValue.size());
     return CHIP_NO_ERROR;
 }

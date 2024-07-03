@@ -37,6 +37,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/ember-global-attribute-access-interface.h>
 #include <app/util/ember-io-storage.h>
+#include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
@@ -88,6 +89,8 @@ struct ShortPascalString
 {
     using LengthType                        = uint8_t;
     static constexpr LengthType kNullLength = 0xFF;
+
+    static LengthType GetLength(const uint8_t *buffer) { return emberAfStringLength(buffer); }
 };
 
 /// Metadata of what a ember/pascal LONG string means (prepended by a u16 length)
@@ -95,6 +98,8 @@ struct LongPascalString
 {
     using LengthType                        = uint16_t;
     static constexpr LengthType kNullLength = 0xFFFF;
+
+    static LengthType GetLength(const uint8_t *buffer) { return emberAfLongStringLength(buffer); }
 };
 
 // ember assumptions ... should just work
@@ -107,12 +112,8 @@ static_assert(sizeof(LongPascalString::LengthType) == 2);
 template <class OUT, class ENCODING>
 std::optional<OUT> ExtractEmberString(ByteSpan data)
 {
-    typename ENCODING::LengthType len;
-
-    // Ember storage format for pascal-prefix data is specifically "native byte order",
-    // hence the use of memcpy.
-    VerifyOrDie(sizeof(len) <= data.size());
-    memcpy(&len, data.data(), sizeof(len));
+    VerifyOrDie(sizeof(typename ENCODING::LengthType) <= data.size());
+    typename ENCODING::LengthType len = ENCODING::GetLength(data.data());
 
     if (len == ENCODING::kNullLength)
     {
