@@ -30,18 +30,23 @@ std::variant<const EmberAfCluster *,           // global attribute, data from a 
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath)
 {
-    for (auto & attr : GlobalAttributesNotInMetadata)
+    if (IsGlobalAttribute(aPath.mAttributeId))
     {
-        if (attr == aPath.mAttributeId)
+        // Global list attribute check first: during path expansion a lot of attributes
+        // will actually be global attributes (so not too much of a performance hit)
+        for (auto & attr : GlobalAttributesNotInMetadata)
         {
-            const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-            if (cluster == nullptr)
+            if (attr == aPath.mAttributeId)
             {
-                return (emberAfFindEndpointType(aPath.mEndpointId) == nullptr) ? CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)
-                                                                               : CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
-            }
+                const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
+                if (cluster == nullptr)
+                {
+                    return (emberAfFindEndpointType(aPath.mEndpointId) == nullptr) ? CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)
+                                                                                   : CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
+                }
 
-            return cluster;
+                return cluster;
+            }
         }
     }
     const EmberAfAttributeMetadata * metadata =
