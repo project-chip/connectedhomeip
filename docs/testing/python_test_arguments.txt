@@ -4,7 +4,7 @@ In order to streamline the configuration and execution of tests, it is essential
 
 Below is the format of how to define these arguments:
 # test-runner-runs: <run_identifier>
-# test-runner-run/<run_identifier>/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/<run_identifier>/app: ${TYPE_OF_APP}
 # test-runner-run/<run_identifier>/factoryreset: <True|False>
 # test-runner-run/<run_identifier>/quiet: <True|False>
 # test-runner-run/<run_identifier>/app-args: <app_arguments>
