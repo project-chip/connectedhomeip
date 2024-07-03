@@ -2539,7 +2539,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                            readParams.mMinIntervalFloorSeconds = 0;
                            // Select a max interval based on the device's claimed idle sleep interval.
                            auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
-                                 session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
+                               session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
 
                            auto maxIntervalCeilingMin = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
                            if (idleSleepInterval < maxIntervalCeilingMin) {

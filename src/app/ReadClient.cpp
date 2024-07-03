@@ -435,10 +435,12 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
         {
             // Packet is full, ignore the rest of the list
             aDataVersionFilterIBsBuilder.Rollback(backup);
+#if CHIP_PROGRESS_LOGGING
             ssize_t nonSkippedFilters = &filter - aDataVersionFilters.data();
             size_t skippedFilters = aDataVersionFilters.size() - static_cast<size_t>(nonSkippedFilters);
             ChipLogProgress(DataManagement, "Skipped encoding %lu out of %lu data version filters due to lack of space",
                             static_cast<unsigned long>(skippedFilters), static_cast<unsigned long>(aDataVersionFilters.size()));
+#endif // CHIP_PROGRESS_LOGGING
             return CHIP_NO_ERROR;
         }
         else
