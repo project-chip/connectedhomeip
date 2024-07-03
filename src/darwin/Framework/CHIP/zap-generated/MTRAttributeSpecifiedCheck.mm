@@ -4683,6 +4683,12 @@ static BOOL AttributeIsSpecifiedInOccupancySensingCluster(AttributeId aAttribute
     case Attributes::OccupancySensorTypeBitmap::Id: {
         return YES;
     }
+    case Attributes::HoldTime::Id: {
+        return YES;
+    }
+    case Attributes::HoldTimeLimits::Id: {
+        return YES;
+    }
     case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
         return YES;
     }

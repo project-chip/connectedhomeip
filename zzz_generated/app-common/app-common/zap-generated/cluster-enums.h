@@ -1601,6 +1601,18 @@ namespace BooleanState {} // namespace BooleanState
 
 namespace IcdManagement {
 
+// Enum for ClientTypeEnum
+enum class ClientTypeEnum : uint8_t
+{
+    kPermanent = 0x00,
+    kEphemeral = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for OperatingModeEnum
 enum class OperatingModeEnum : uint8_t
 {
@@ -4382,6 +4394,19 @@ enum class OccupancySensorTypeEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOther           = 0x1,
+    kPassiveInfrared = 0x2,
+    kUltrasonic      = 0x4,
+    kPhysicalContact = 0x8,
+    kActiveInfrared  = 0x10,
+    kRadar           = 0x20,
+    kRFSensing       = 0x40,
+    kVision          = 0x80,
 };
 
 // Bitmap for OccupancyBitmap

@@ -2774,6 +2774,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _monitoredSubject = @(0);
 
+        _clientType = @(0);
+
         _fabricIndex = @(0);
     }
     return self;
@@ -2785,6 +2787,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.checkInNodeID = self.checkInNodeID;
     other.monitoredSubject = self.monitoredSubject;
+    other.clientType = self.clientType;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -2792,7 +2795,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; clientType:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, _clientType, _fabricIndex];
     return descriptionString;
 }
 
@@ -7080,6 +7083,39 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic transitionTime;
 @dynamic heatSetpoint;
 @dynamic coolSetpoint;
+@end
+
+@implementation MTROccupancySensingClusterHoldTimeLimitsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _holdTimeMin = @(0);
+
+        _holdTimeMax = @(0);
+
+        _holdTimeDefault = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROccupancySensingClusterHoldTimeLimitsStruct alloc] init];
+
+    other.holdTimeMin = self.holdTimeMin;
+    other.holdTimeMax = self.holdTimeMax;
+    other.holdTimeDefault = self.holdTimeDefault;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: holdTimeMin:%@; holdTimeMax:%@; holdTimeDefault:%@; >", NSStringFromClass([self class]), _holdTimeMin, _holdTimeMax, _holdTimeDefault];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRThreadNetworkDirectoryClusterThreadNetworkStruct

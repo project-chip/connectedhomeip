@@ -1879,6 +1879,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
+        CHIP_ERROR err = LogValue("ClientType", indent + 1, value.clientType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ClientType'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
         if (err != CHIP_NO_ERROR)
         {
@@ -3719,6 +3727,40 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CoolSetpoint'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("HoldTimeMin", indent + 1, value.holdTimeMin);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HoldTimeMin'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("HoldTimeMax", indent + 1, value.holdTimeMax);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HoldTimeMax'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("HoldTimeDefault", indent + 1, value.holdTimeDefault);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HoldTimeDefault'");
             return err;
         }
     }
@@ -8266,6 +8308,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("buffer", indent + 1, value.buffer));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const UnitTesting::Commands::StringEchoResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("payload", indent + 1, value.payload));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -15462,6 +15512,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupancySensorTypeBitmap", 1, value);
         }
+        case OccupancySensing::Attributes::HoldTime::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HoldTime", 1, value);
+        }
+        case OccupancySensing::Attributes::HoldTimeLimits::Id: {
+            chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HoldTimeLimits", 1, value);
+        }
         case OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -19190,6 +19250,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             UnitTesting::Commands::TestBatchHelperResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestBatchHelperResponse", 1, value);
+        }
+        case UnitTesting::Commands::StringEchoResponse::Id: {
+            UnitTesting::Commands::StringEchoResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StringEchoResponse", 1, value);
         }
         case UnitTesting::Commands::TestDifferentVendorMeiResponse::Id: {
             UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType value;

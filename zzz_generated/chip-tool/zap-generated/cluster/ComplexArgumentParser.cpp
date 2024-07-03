@@ -2066,6 +2066,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("checkInNodeID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MonitoringRegistrationStruct.monitoredSubject",
                                                                   "monitoredSubject", value.isMember("monitoredSubject")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MonitoringRegistrationStruct.clientType", "clientType",
+                                                                  value.isMember("clientType")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "checkInNodeID");
@@ -2075,6 +2077,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "monitoredSubject");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.monitoredSubject, value["monitoredSubject"]));
     valueCopy.removeMember("monitoredSubject");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clientType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clientType, value["clientType"]));
+    valueCopy.removeMember("clientType");
 
     if (value.isMember("fabricIndex"))
     {
@@ -2090,6 +2096,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::IcdManagement::Structs
 {
     ComplexArgumentParser::Finalize(request.checkInNodeID);
     ComplexArgumentParser::Finalize(request.monitoredSubject);
+    ComplexArgumentParser::Finalize(request.clientType);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
@@ -4220,6 +4227,45 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::W
     ComplexArgumentParser::Finalize(request.transitionTime);
     ComplexArgumentParser::Finalize(request.heatSetpoint);
     ComplexArgumentParser::Finalize(request.coolSetpoint);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("HoldTimeLimitsStruct.holdTimeMin", "holdTimeMin", value.isMember("holdTimeMin")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("HoldTimeLimitsStruct.holdTimeMax", "holdTimeMax", value.isMember("holdTimeMax")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("HoldTimeLimitsStruct.holdTimeDefault", "holdTimeDefault",
+                                                                  value.isMember("holdTimeDefault")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "holdTimeMin");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.holdTimeMin, value["holdTimeMin"]));
+    valueCopy.removeMember("holdTimeMin");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "holdTimeMax");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.holdTimeMax, value["holdTimeMax"]));
+    valueCopy.removeMember("holdTimeMax");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "holdTimeDefault");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.holdTimeDefault, value["holdTimeDefault"]));
+    valueCopy.removeMember("holdTimeDefault");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.holdTimeMin);
+    ComplexArgumentParser::Finalize(request.holdTimeMax);
+    ComplexArgumentParser::Finalize(request.holdTimeDefault);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

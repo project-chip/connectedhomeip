@@ -2672,6 +2672,11 @@ cluster BooleanState = 69 {
 cluster IcdManagement = 70 {
   revision 2;
 
+  enum ClientTypeEnum : enum8 {
+    kPermanent = 0;
+    kEphemeral = 1;
+  }
+
   enum OperatingModeEnum : enum8 {
     kSIT = 0;
     kLIT = 1;
@@ -2706,6 +2711,7 @@ cluster IcdManagement = 70 {
   fabric_scoped struct MonitoringRegistrationStruct {
     fabric_sensitive node_id checkInNodeID = 1;
     fabric_sensitive int64u monitoredSubject = 2;
+    fabric_sensitive ClientTypeEnum clientType = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2730,6 +2736,7 @@ cluster IcdManagement = 70 {
     int64u monitoredSubject = 1;
     octet_string<16> key = 2;
     optional octet_string<16> verificationKey = 3;
+    ClientTypeEnum clientType = 4;
   }
 
   response struct RegisterClientResponse = 1 {
@@ -7356,6 +7363,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 3;
   }
 
+  bitmap Feature : bitmap32 {
+    kOther = 0x1;
+    kPassiveInfrared = 0x2;
+    kUltrasonic = 0x4;
+    kPhysicalContact = 0x8;
+    kActiveInfrared = 0x10;
+    kRadar = 0x20;
+    kRFSensing = 0x40;
+    kVision = 0x80;
+  }
+
   bitmap OccupancyBitmap : bitmap8 {
     kOccupied = 0x1;
   }
@@ -7366,9 +7384,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 0x4;
   }
 
+  struct HoldTimeLimitsStruct {
+    int16u holdTimeMin = 0;
+    int16u holdTimeMax = 1;
+    int16u holdTimeDefault = 2;
+  }
+
   readonly attribute OccupancyBitmap occupancy = 0;
   readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
+  attribute access(write: manage) optional int16u holdTime = 3;
+  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;
@@ -9616,6 +9642,10 @@ internal cluster UnitTesting = 4294048773 {
     int8u arg1[] = 0;
   }
 
+  response struct StringEchoResponse = 13 {
+    octet_string payload = 0;
+  }
+
   request struct TestEnumsRequestRequest {
     vendor_id arg1 = 0;
     SimpleEnum arg2 = 1;
@@ -9668,6 +9698,10 @@ internal cluster UnitTesting = 4294048773 {
     int16u sleepBeforeResponseTimeMs = 0;
     int16u sizeOfResponseBuffer = 1;
     int8u fillCharacter = 2;
+  }
+
+  request struct StringEchoRequestRequest {
+    octet_string payload = 0;
   }
 
   request struct TestDifferentVendorMeiRequestRequest {
@@ -9749,6 +9783,10 @@ internal cluster UnitTesting = 4294048773 {
   command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
   /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
   command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
+  /** Command that takes an argument which is an octet string.  The response echoes
+        the string back. If the string is large then it would require a session that
+        supports large payloads. */
+  command StringEchoRequest(StringEchoRequestRequest): StringEchoResponse = 24;
   /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
   command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }

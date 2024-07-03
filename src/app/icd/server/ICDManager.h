@@ -18,7 +18,6 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
-#include <app-common/zap-generated/cluster-enums.h>
 #include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>

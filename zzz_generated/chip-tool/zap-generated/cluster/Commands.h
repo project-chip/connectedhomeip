@@ -4242,6 +4242,7 @@ public:
         AddArgument("MonitoredSubject", 0, UINT64_MAX, &mRequest.monitoredSubject);
         AddArgument("Key", &mRequest.key);
         AddArgument("VerificationKey", &mRequest.verificationKey);
+        AddArgument("ClientType", 0, UINT8_MAX, &mRequest.clientType);
         ClusterCommand::AddArguments();
     }
 
@@ -10832,6 +10833,8 @@ private:
 | * Occupancy                                                         | 0x0000 |
 | * OccupancySensorType                                               | 0x0001 |
 | * OccupancySensorTypeBitmap                                         | 0x0002 |
+| * HoldTime                                                          | 0x0003 |
+| * HoldTimeLimits                                                    | 0x0004 |
 | * PIROccupiedToUnoccupiedDelay                                      | 0x0010 |
 | * PIRUnoccupiedToOccupiedDelay                                      | 0x0011 |
 | * PIRUnoccupiedToOccupiedThreshold                                  | 0x0012 |
@@ -13901,6 +13904,7 @@ private:
 | * TestEmitTestFabricScopedEventRequest                              |   0x15 |
 | * TestBatchHelperRequest                                            |   0x16 |
 | * TestSecondBatchHelperRequest                                      |   0x17 |
+| * StringEchoRequest                                                 |   0x18 |
 | * TestDifferentVendorMeiRequest                                     |   0xFFF200AA|
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -14962,6 +14966,44 @@ public:
 
 private:
     chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Type mRequest;
+};
+
+/*
+ * Command StringEchoRequest
+ */
+class UnitTestingStringEchoRequest : public ClusterCommand
+{
+public:
+    UnitTestingStringEchoRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("string-echo-request", credsIssuerConfig)
+    {
+        AddArgument("Payload", &mRequest.payload);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Type mRequest;
 };
 
 /*
@@ -23874,7 +23916,9 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "occupancy", Attributes::Occupancy::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
-                                   credsIssuerConfig), //
+                                   credsIssuerConfig),                                                         //
+        make_unique<ReadAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "piroccupied-to-unoccupied-delay", Attributes::PIROccupiedToUnoccupiedDelay::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "pirunoccupied-to-occupied-delay", Attributes::PIRUnoccupiedToOccupiedDelay::Id,
@@ -23908,6 +23952,10 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>>(
             Id, "occupancy-sensor-type-bitmap", 0, UINT8_MAX, Attributes::OccupancySensorTypeBitmap::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "hold-time", 0, UINT16_MAX, Attributes::HoldTime::Id, WriteCommandType::kWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type>>(
+            Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "piroccupied-to-unoccupied-delay", 0, UINT16_MAX,
                                               Attributes::PIROccupiedToUnoccupiedDelay::Id, WriteCommandType::kWrite,
                                               credsIssuerConfig), //
@@ -23952,7 +24000,9 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "occupancy", Attributes::Occupancy::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
-                                        credsIssuerConfig), //
+                                        credsIssuerConfig),                                                         //
+        make_unique<SubscribeAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "piroccupied-to-unoccupied-delay", Attributes::PIROccupiedToUnoccupiedDelay::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "pirunoccupied-to-occupied-delay", Attributes::PIRUnoccupiedToOccupiedDelay::Id,
@@ -26970,6 +27020,7 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<UnitTestingTestEmitTestFabricScopedEventRequest>(credsIssuerConfig),    //
         make_unique<UnitTestingTestBatchHelperRequest>(credsIssuerConfig),                  //
         make_unique<UnitTestingTestSecondBatchHelperRequest>(credsIssuerConfig),            //
+        make_unique<UnitTestingStringEchoRequest>(credsIssuerConfig),                       //
         make_unique<UnitTestingTestDifferentVendorMeiRequest>(credsIssuerConfig),           //
         //
         // Attributes
