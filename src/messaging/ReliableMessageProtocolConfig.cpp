@@ -67,7 +67,7 @@ namespace {
 
 // This is not a static member of ReliableMessageProtocolConfig because the free
 // function GetLocalMRPConfig() needs access to it.
-// Use std::optional to avoid a static initializers
+// Use std::optional to avoid a static initializer
 std::optional<ReliableMessageProtocolConfig> sDynamicLocalMPRConfig;
 
 } // anonymous namespace
