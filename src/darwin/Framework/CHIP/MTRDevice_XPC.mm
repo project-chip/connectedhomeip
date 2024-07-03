@@ -283,19 +283,6 @@
     }];
 }
 
-static const auto * requiredInternalStateKeys = @{
-    kMTRDeviceInternalPropertyDeviceState : NSNumber.class,
-    kMTRDeviceInternalPropertyLastSubscriptionAttemptWait : NSNumber.class,
-};
-
-static const auto * optionalInternalStateKeys = @{
-    kMTRDeviceInternalPropertyKeyVendorID : NSNumber.class,
-    kMTRDeviceInternalPropertyKeyProductID : NSNumber.class,
-    kMTRDeviceInternalPropertyNetworkFeatures : NSNumber.class,
-    kMTRDeviceInternalPropertyMostRecentReportTime : NSDate.class,
-    kMTRDeviceInternalPropertyLastSubscriptionFailureTime : NSDate.class,
-};
-
 - (BOOL)_ensureValidValuesForKeys:(const NSDictionary<NSString *, Class> *)keys inInternalState:(NSMutableDictionary *)internalState valueRequired:(BOOL)required
 {
     for (NSString * key in keys) {
@@ -343,6 +330,19 @@ static const auto * optionalInternalStateKeys = @{
 
 - (void)_updateInternalState:(NSMutableDictionary *)newState
 {
+    static const auto * requiredInternalStateKeys = @{
+        kMTRDeviceInternalPropertyDeviceState : NSNumber.class,
+        kMTRDeviceInternalPropertyLastSubscriptionAttemptWait : NSNumber.class,
+    };
+
+    static const auto * optionalInternalStateKeys = @{
+        kMTRDeviceInternalPropertyKeyVendorID : NSNumber.class,
+        kMTRDeviceInternalPropertyKeyProductID : NSNumber.class,
+        kMTRDeviceInternalPropertyNetworkFeatures : NSNumber.class,
+        kMTRDeviceInternalPropertyMostRecentReportTime : NSDate.class,
+        kMTRDeviceInternalPropertyLastSubscriptionFailureTime : NSDate.class,
+    };
+
     VerifyOrReturn([self _ensureValidValuesForKeys:requiredInternalStateKeys inInternalState:newState valueRequired:YES]);
     VerifyOrReturn([self _ensureValidValuesForKeys:optionalInternalStateKeys inInternalState:newState valueRequired:NO]);
 

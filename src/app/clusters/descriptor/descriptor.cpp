@@ -29,6 +29,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -242,7 +243,9 @@ CHIP_ERROR DescriptorAttrAccess::ReadClusterRevision(EndpointId endpoint, Attrib
     return aEncoder.Encode(kClusterRevision);
 }
 
-DescriptorAttrAccess gAttrAccess;
+namespace {
+Global<DescriptorAttrAccess> gAttrAccess;
+}
 
 CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -282,10 +285,10 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
 void MatterDescriptorPluginServerInitCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess.get());
 }
 
 void MatterDescriptorPluginServerShutdownCallback()
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess.get());
 }
