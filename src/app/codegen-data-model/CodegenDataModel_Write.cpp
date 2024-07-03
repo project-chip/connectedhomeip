@@ -92,12 +92,12 @@ struct LongPascalString
 static_assert(sizeof(ShortPascalString::LengthType) == 1);
 static_assert(sizeof(LongPascalString::LengthType) == 2);
 
-/// Decode the value stored in 'decoder' into an ember format span 'out'
+/// Convert the value stored in 'decoder' into an ember format span 'out'
 ///
-/// The value decoded will be of type T (e.g. CharSpan or ByteSpan) and it will be decoded
+/// The value converted will be of type T (e.g. CharSpan or ByteSpan) and it will be converted
 /// via the given ENCODING (i.e. ShortPascalString or LongPascalString)
 ///
-/// isNullable defines if the value of NULL is allowed to be decoded.
+/// isNullable defines if the value of NULL is allowed to be converted.
 template <typename T, class ENCODING>
 CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool isNullable, MutableByteSpan out)
 {
