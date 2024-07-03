@@ -290,32 +290,32 @@ function install_tizen_sdk() {
 
 while (($#)); do
     case $1 in
-    -h | --help)
-        show_help
-        exit 0
-        ;;
-    --tizen-sdk-path)
-        TIZEN_SDK_ROOT="$2"
-        shift
-        ;;
-    --tizen-sdk-data-path)
-        TIZEN_SDK_DATA_PATH="$2"
-        shift
-        ;;
-    --tizen-version)
-        TIZEN_VERSION=$2
-        shift
-        ;;
-    --install-dependencies)
-        INSTALL_DEPENDENCIES=true
-        ;;
-    --override-secret-tool)
-        SECRET_TOOL=true
-        ;;
-    *)
-        error "Wrong options usage!"
-        exit 1
-        ;;
+        -h | --help)
+            show_help
+            exit 0
+            ;;
+        --tizen-sdk-path)
+            TIZEN_SDK_ROOT="$2"
+            shift
+            ;;
+        --tizen-sdk-data-path)
+            TIZEN_SDK_DATA_PATH="$2"
+            shift
+            ;;
+        --tizen-version)
+            TIZEN_VERSION=$2
+            shift
+            ;;
+        --install-dependencies)
+            INSTALL_DEPENDENCIES=true
+            ;;
+        --override-secret-tool)
+            SECRET_TOOL=true
+            ;;
+        *)
+            error "Wrong options usage!"
+            exit 1
+            ;;
     esac
     shift
 done
