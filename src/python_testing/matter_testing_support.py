@@ -417,13 +417,7 @@ class CustomCommissioningParameters:
 
 
 @dataclass
-class ProblemLocation:
-    def __str__(self):
-        return "UNKNOWN"
-
-
-@dataclass
-class ClusterPathLocation(ProblemLocation):
+class ClusterPathLocation:
     endpoint_id: int
     cluster_id: int
 
@@ -483,13 +477,9 @@ class FeaturePathLocation(ClusterPathLocation):
 
 
 @dataclass
-class DeviceTypePathLocation(ProblemLocation):
+class DeviceTypePathLocation:
     device_type_id: int
-    cluster_id: Optional[int]
-
-    def __init__(self, device_type_id: int, cluster_id: Optional[int] = None):
-        self.device_type_id = device_type_id
-        self.cluster_id = cluster_id
+    cluster_id: Optional[int] = None
 
     def __str__(self):
         msg = f'\n       DeviceType: {self.device_type_id}'
@@ -497,6 +487,8 @@ class DeviceTypePathLocation(ProblemLocation):
             msg += f'\n       ClusterID: {self.cluster_id}'
         return msg
 
+
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
