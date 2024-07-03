@@ -2234,7 +2234,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
     chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
-  // Embed specifically DOES NOT support structures. Without AAI, we expect a constraint error
+    // Embed specifically DOES NOT support structures. Without AAI, we expect a constraint error
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
                                             MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
 
