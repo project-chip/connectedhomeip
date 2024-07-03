@@ -118,6 +118,6 @@ Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId clu
     size_t len = std::min<size_t>(sizeof(gEmberIoBuffer), chip::app::Compatibility::Internal::gEmberAttributeIOBufferSpan.size());
     memcpy(gEmberIoBuffer, dataPtr, len);
     gEmberIoBufferFill = len;
-   
+
     return Status::Success;
 }
