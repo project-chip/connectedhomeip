@@ -237,7 +237,7 @@ CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * meta
         return EncodeStringLike<ByteSpan, LongPascalString>(data, isNullable, encoder);
     default:
         ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(metadata->attributeType));
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        return CHIP_IM_GLOBAL_STATUS(Failure);
     }
 }
 
