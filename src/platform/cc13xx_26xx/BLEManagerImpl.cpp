@@ -352,20 +352,6 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
     return false;
 }
 
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBufferHandle pBuf)
-{
-    /* Unsupported on TI peripheral device implementation */
-    return false;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    /* Unsupported on TI peripheral device implementation */
-    return false;
-}
-
 // ===== Helper Members that implement the Low level BLE Stack behavior.
 
 /*********************************************************************
@@ -571,7 +557,7 @@ void BLEManagerImpl::EventHandler_init(void)
     CHIPoBLEProfile_AddService(GATT_ALL_SERVICES);
 
     // Start Bond Manager and register callback
-    VOID GAPBondMgr_Register(BLEMgr_BondMgrCBs);
+    VOID GAPBondMgr_Register(&BLEMgr_BondMgrCBs);
 
     // Register with GAP for HCI/Host messages. This is needed to receive HCI
     // events. For more information, see the HCI section in the User's Guide:
@@ -964,9 +950,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
     case PAIR_STATE_EVT: {
         BLEMGR_LOG("BLEMGR: PAIR_STATE_EVT");
-
-        // Send passcode response
-        GAPBondMgr_PasscodeRsp(((PasscodeData_t *) (pMsg->pData))->connHandle, SUCCESS, B_APP_DEFAULT_PASSCODE);
     }
     break;
 

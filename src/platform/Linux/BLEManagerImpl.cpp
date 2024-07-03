@@ -440,20 +440,6 @@ exit:
     return result;
 }
 
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                     chip::System::PacketBufferHandle pBuf)
-{
-    ChipLogError(Ble, "SendReadRequest: Not implemented");
-    return true;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId)
-{
-    ChipLogError(Ble, "SendReadRBluezonse: Not implemented");
-    return true;
-}
-
 void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
 {
     if (sInstance.mIsCentral)
@@ -490,58 +476,37 @@ void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool
 
 void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(value, len);
+    System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
+    VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
 
     ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
 
     ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLEIndicationReceived,
-                           .Platform = { .BLEIndicationReceived = { .mConnection = conId } } };
-
-    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-
-    event.Platform.BLEIndicationReceived.mData = std::move(buf).UnsafeRelease();
+                           .Platform = {
+                               .BLEIndicationReceived = { .mConnection = conId, .mData = std::move(buf).UnsafeRelease() } } };
     PlatformMgr().PostEventOrDie(&event);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-        ChipLogError(DeviceLayer, "HandleTXCharChanged() failed: %s", ErrorStr(err));
 }
 
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle buf;
-
     // Copy the data to a packet buffer.
-    buf = System::PacketBufferHandle::NewWithData(value, len);
-    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
+    VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
+
+    ChipLogProgress(Ble, "Write request received, conn = %p", conId);
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
-    {
-        ChipLogProgress(Ble, "Write request received debug %p", conId);
-        ChipDeviceEvent event{ .Type                  = DeviceEventType::kCHIPoBLEWriteReceived,
-                               .CHIPoBLEWriteReceived = { .ConId = conId, .Data = std::move(buf).UnsafeRelease() } };
-        PlatformMgr().PostEventOrDie(&event);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
-    }
+    ChipDeviceEvent event{ .Type                  = DeviceEventType::kCHIPoBLEWriteReceived,
+                           .CHIPoBLEWriteReceived = { .ConId = conId, .Data = std::move(buf).UnsafeRelease() } };
+    PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId)
+void BLEManagerImpl::HandleConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(DeviceLayer, "Bluez notify CHIPoBluez connection disconnected");
-
     // If this was a CHIPoBLE connection, post an event to deliver a connection error to the CHIPoBLE layer.
-    {
-        ChipDeviceEvent event{ .Type                    = DeviceEventType::kCHIPoBLEConnectionError,
-                               .CHIPoBLEConnectionError = { .ConId = conId, .Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED } };
-        PlatformMgr().PostEventOrDie(&event);
-    }
+    ChipDeviceEvent event{ .Type                    = DeviceEventType::kCHIPoBLEConnectionError,
+                           .CHIPoBLEConnectionError = { .ConId = conId, .Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED } };
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
@@ -549,15 +514,14 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
     VerifyOrReturn(conId != BLE_CONNECTION_UNINITIALIZED,
                    ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
 
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", conId->IsNotifyAcquired() ? "subscribe" : "unsubscribe");
+
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
     ChipDeviceEvent event{ .Type = conId->IsNotifyAcquired() ? static_cast<uint16_t>(DeviceEventType::kCHIPoBLESubscribe)
                                                              : static_cast<uint16_t>(DeviceEventType::kCHIPoBLEUnsubscribe),
                            .CHIPoBLESubscribe = { .ConId = conId } };
     PlatformMgr().PostEventOrDie(&event);
-
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
-                    (event.Type == DeviceEventType::kCHIPoBLESubscribe) ? "subscribe" : "unsubscribe");
 }
 
 void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)

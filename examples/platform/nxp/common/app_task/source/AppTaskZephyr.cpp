@@ -29,7 +29,11 @@
 #include <zephyr/logging/log.h>
 
 #ifdef CONFIG_CHIP_WIFI
-#include <platform/nxp/zephyr/wifi/NxpWifiDriver.h>
+#include <platform/Zephyr/wifi/ZephyrWifiDriver.h>
+#endif
+
+#ifdef ENABLE_CHIP_SHELL
+#include "AppCLIBase.h"
 #endif
 
 #if CONFIG_CHIP_FACTORY_DATA
@@ -62,14 +66,28 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 #if defined(CONFIG_CHIP_WIFI)
 chip::DeviceLayer::NetworkCommissioning::WiFiDriver * chip::NXP::App::AppTaskZephyr::GetWifiDriverInstance()
 {
-    return static_cast<chip::DeviceLayer::NetworkCommissioning::WiFiDriver *>(&(NetworkCommissioning::NxpWifiDriver::Instance()));
+    return static_cast<chip::DeviceLayer::NetworkCommissioning::WiFiDriver *>(
+        &(NetworkCommissioning::ZephyrWifiDriver::Instance()));
 }
 #endif // CONFIG_CHIP_WIFI
 
+CHIP_ERROR chip::NXP::App::AppTaskZephyr::AppMatter_Register()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef ENABLE_CHIP_SHELL
+    /* Register Matter CLI cmds */
+    err = chip::NXP::App::GetAppCLI().Init();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Error during CLI init"));
+    AppMatter_RegisterCustomCliCommands();
+#endif
+    return err;
+}
+
 CHIP_ERROR chip::NXP::App::AppTaskZephyr::Start()
 {
-
+    PreInitMatterStack();
     ReturnErrorOnFailure(Init());
+    PostInitMatterStack();
 
     AppEvent event{};
 

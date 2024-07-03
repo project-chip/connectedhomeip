@@ -184,7 +184,7 @@ export SYSTEM_VERSION_COMPAT=0
 # Make all possible human redable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_crypto=\"boringssl\""
 
 function ninja_target() {
     # Print the ninja target required to build a gn label.
@@ -222,10 +222,10 @@ if [ -n "$install_virtual_env" ]; then
     if [ "$clean_virtual_env" = "yes" ]; then
         # Create a virtual environment that has access to the built python tools
         echo_blue "Creating a clear VirtualEnv in '$ENVIRONMENT_ROOT' ..."
-        virtualenv --clear "$ENVIRONMENT_ROOT"
+        python -m venv --clear "$ENVIRONMENT_ROOT"
     elif [ ! -f "$ENVIRONMENT_ROOT"/bin/activate ]; then
         echo_blue "Creating a new VirtualEnv in '$ENVIRONMENT_ROOT' ..."
-        virtualenv "$ENVIRONMENT_ROOT"
+        python -m venv "$ENVIRONMENT_ROOT"
     fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate

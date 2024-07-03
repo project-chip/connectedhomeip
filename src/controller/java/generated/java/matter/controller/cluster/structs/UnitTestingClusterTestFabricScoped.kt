@@ -32,7 +32,7 @@ class UnitTestingClusterTestFabricScoped(
   val fabricSensitiveCharString: String,
   val fabricSensitiveStruct: UnitTestingClusterSimpleStruct,
   val fabricSensitiveInt8uList: List<UByte>,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestFabricScoped {\n")
@@ -55,7 +55,7 @@ class UnitTestingClusterTestFabricScoped(
         val optoptionalFabricSensitiveInt8u = optionalFabricSensitiveInt8u.get()
         put(
           ContextSpecificTag(TAG_OPTIONAL_FABRIC_SENSITIVE_INT8U),
-          optoptionalFabricSensitiveInt8u
+          optoptionalFabricSensitiveInt8u,
         )
       }
       if (nullableFabricSensitiveInt8u != null) {
@@ -68,7 +68,7 @@ class UnitTestingClusterTestFabricScoped(
           val optnullableOptionalFabricSensitiveInt8u = nullableOptionalFabricSensitiveInt8u.get()
           put(
             ContextSpecificTag(TAG_NULLABLE_OPTIONAL_FABRIC_SENSITIVE_INT8U),
-            optnullableOptionalFabricSensitiveInt8u
+            optnullableOptionalFabricSensitiveInt8u,
           )
         }
       } else {
@@ -132,7 +132,7 @@ class UnitTestingClusterTestFabricScoped(
       val fabricSensitiveStruct =
         UnitTestingClusterSimpleStruct.fromTlv(
           ContextSpecificTag(TAG_FABRIC_SENSITIVE_STRUCT),
-          tlvReader
+          tlvReader,
         )
       val fabricSensitiveInt8uList =
         buildList<UByte> {
@@ -154,7 +154,7 @@ class UnitTestingClusterTestFabricScoped(
         fabricSensitiveCharString,
         fabricSensitiveStruct,
         fabricSensitiveInt8uList,
-        fabricIndex
+        fabricIndex,
       )
     }
   }
