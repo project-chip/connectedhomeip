@@ -57,11 +57,16 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
     async def test_TC_RVCRUNM_1_2(self):
         self.endpoint = self.matter_test_config.endpoint
 
+        RVCRun_cluster = Clusters.RvcRunMode
         attributes = Clusters.RvcRunMode.Attributes
+        RVCRun_attr_list = attributes.AttributeList
+        attribute_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_attr_list)
+        supported_modes_attr_id = attributes.SupportedModes.attribute_id
+        current_mode_attr_id = attributes.CurrentMode.attribute_id
 
         self.print_step(1, "Commissioning, already done")
 
-        if self.check_pics("RVCRUNM.S.A0000"):
+        if supported_modes_attr_id in attribute_list:
             self.print_step(2, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
@@ -143,7 +148,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
             asserts.assert_true(at_least_one_cleaning_mode_tag,
                                 "The Supported Modes does not have an entry of Cleaning(0x4001)")
 
-        if self.check_pics("RVCRUNM.S.A0001"):
+        if current_mode_attr_id in attribute_list:
             self.print_step(3, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 

@@ -47,7 +47,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
         self.supported_modes_dut = []
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.RvcCleanMode
+        cluster = Clusters.RvcCleanMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def pics_TC_RVCCLEANM_1_2(self) -> list[str]:
@@ -57,11 +57,16 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
     async def test_TC_RVCCLEANM_1_2(self):
         self.endpoint = self.matter_test_config.endpoint
 
-        attributes = Clusters.RvcCleanMode.Attributes
+        RVCClean_cluster = Clusters.RvcCleanMode
+        attributes = RVCClean_cluster.Attributes
+        RVCClean_attr_list = attributes.AttributeList
+        attribute_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCClean_cluster, attribute=RVCClean_attr_list)
+        supported_modes_attr_id = attributes.SupportedModes.attribute_id
+        current_mode_attr_id = attributes.CurrentMode.attribute_id
 
         self.print_step(1, "Commissioning, already done")
 
-        if self.check_pics("RVCCLEANM.S.A0000"):
+        if supported_modes_attr_id in attribute_list:
             self.print_step(2, "Read SupportedModes attribute")
             supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
@@ -124,13 +129,12 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
             asserts.assert_true(has_vacuum_or_mop_mode_tag,
                                 "At least one ModeOptionsStruct entry must include either the Vacuum or Mop mode tag")
 
-        if self.check_pics("RVCCLEANM.S.A0001"):
+        if current_mode_attr_id in attribute_list:
             self.print_step(3, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
             logging.info("CurrentMode: %s" % (current_mode))
             asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")
-
 
 if __name__ == "__main__":
     default_matter_test_main()

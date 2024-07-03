@@ -84,19 +84,40 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.endpoint = self.matter_test_config.endpoint
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_OK']
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_FAIL']
-        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
+        app_pid = self.matter_test_config.app_pid
+        if app_pid != 0:
+            self.is_ci = True 
             self.app_pipe = self.app_pipe + str(app_pid)
 
-        asserts.assert_true(self.check_pics("RVCCLEANM.S.A0000"), "RVCCLEANM.S.A0000 must be supported")
-        asserts.assert_true(self.check_pics("RVCCLEANM.S.A0001"), "RVCCLEANM.S.A0001 must be supported")
-        asserts.assert_true(self.check_pics("RVCCLEANM.S.C00.Rsp"), "RVCCLEANM.S.C00.Rsp must be supported")
-        asserts.assert_true(self.check_pics("RVCCLEANM.S.C01.Tx"), "RVCCLEANM.S.C01.Tx must be supported")
+        RVCClean_cluster = Clusters.RvcCleanMode
 
-        attributes = Clusters.RvcCleanMode.Attributes
+        # Gathering Available Attributes and associated ids
+        attributes = RVCClean_cluster.Attributes
+        RVCClean_attr_list = attributes.AttributeList
+        attribute_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCClean_cluster, attribute=RVCClean_attr_list)
+        supported_modes_attr_id = attributes.SupportedModes.attribute_id
+        current_mode_attr_id = attributes.CurrentMode.attribute_id
+
+        # Gathering Accepted and Generated Commands and associated ids
+        commands = RVCClean_cluster.Commands
+        RVCClean_accptcmd_list = attributes.AcceptedCommandList
+        RVCClean_gencmd_list = attributes.GeneratedCommandList
+        accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCClean_cluster, attribute=RVCClean_accptcmd_list)
+        generated_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCClean_cluster, attribute=RVCClean_gencmd_list)
+        chg_mode_cmd_id = commands.ChangeToMode.command_id
+        chg_rsp_cmd_id = commands.ChangeToModeResponse.command_id
+
+        if supported_modes_attr_id not in attribute_list:
+            asserts.fail("supported modes needs to be supported attribute")
+        
+        if current_mode_attr_id not in attribute_list:
+            asserts.fail("Current mode needs to be supported attribute")
+
+        if chg_mode_cmd_id not in accepted_cmd_list:
+            asserts.fail("Change To Mode receiving commands needs to be supported")
+
+        if chg_rsp_cmd_id not in generated_cmd_list:
+            asserts.fail("Change To Mode Response to transmit commands needs to be supported")
 
         self.print_step(1, "Commissioning, already done")
 

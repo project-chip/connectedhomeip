@@ -118,23 +118,47 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                          "PIXIT.RVCRUNM.MODE_B:<mode id>")
 
         self.endpoint = self.matter_test_config.endpoint
-        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+                app_pid = self.matter_test_config.app_pid
+        if app_pid != 0:
+            self.is_ci = True 
             self.app_pipe = self.app_pipe + str(app_pid)
+        
 
-        asserts.assert_true(self.check_pics("RVCRUNM.S"), "RVCRUNM.S must be supported")
-        # I think that the following PICS should be listed in the preconditions section in the test plan as if either
-        # of these PICS is not supported, this test would not be useful.
-        asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")
-        asserts.assert_true(self.check_pics("RVCRUNM.S.A0001"), "RVCRUNM.S.A0001 must be supported")
-        asserts.assert_true(self.check_pics("RVCRUNM.S.C00.Rsp"), "RVCRUNM.S.C00.Rsp must be supported")
+        app_pid = self.matter_test_config.app_pid
+        if app_pid != 0:
+            self.is_ci = True 
+            self.app_pipe = self.app_pipe + str(app_pid)
+        
+        RVCRun_cluster = Clusters.RvcRunMode
+
+        # Gathering Available Attributes and associated ids
+        attributes = RVCRun_cluster.Attributes
+        RVCRun_attr_list = attributes.AttributeList
+        attribute_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_attr_list)
+        supported_modes_attr_id = attributes.SupportedModes.attribute_id
+        current_mode_attr_id = attributes.CurrentMode.attribute_id
+
+        # Gathering Accepted and Generated Commands and associated ids
+        commands = RVCRun_cluster.Commands
+        RVCRun_accptcmd_list = attributes.AcceptedCommandList
+        RVCRun_gencmd_list = attributes.GeneratedCommandList
+        accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_accptcmd_list)
+        generated_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_gencmd_list)
+        chg_mode_cmd_id = commands.ChangeToMode.command_id
+
+        if supported_modes_attr_id not in attribute_list:
+            asserts.fail("Supported modes needs to be supported attribute")
+        
+        if current_mode_attr_id not in attribute_list:
+            asserts.fail("Current mode needs to be supported attribute")
+
+        if chg_mode_cmd_id not in accepted_cmd_list:
+            asserts.fail("Change To Mode receiving commands needs to be supported")
+
         asserts.assert_true(self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED"),
-                            "RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED must be supported")
+                    "RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED must be supported")
 
         # Starting the test steps
         self.print_step(1, "Commissioning, already done")
