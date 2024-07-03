@@ -177,12 +177,14 @@ public:
 
     // ------------------------------------------------------------------
     // Overridden DeviceEnergyManagement::Delegate Set attribute methods
-    virtual CHIP_ERROR SetESAType(ESATypeEnum) override;
-    virtual CHIP_ERROR SetESACanGenerate(bool) override;
     virtual CHIP_ERROR SetESAState(ESAStateEnum) override;
-    virtual CHIP_ERROR SetAbsMinPower(int64_t) override;
-    virtual CHIP_ERROR SetAbsMaxPower(int64_t) override;
-    virtual CHIP_ERROR SetPowerAdjustmentCapability(const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> &) override;
+
+    // Local Set methods
+    CHIP_ERROR SetESAType(ESATypeEnum);
+    CHIP_ERROR SetESACanGenerate(bool);
+    CHIP_ERROR SetAbsMinPower(int64_t);
+    CHIP_ERROR SetAbsMaxPower(int64_t);
+    CHIP_ERROR SetPowerAdjustmentCapability(const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> &);
 
     // The DeviceEnergyManagementDelegate owns the master copy of the ForecastStruct object which is accessed via GetForecast and
     // SetForecast. The slots field of forecast is owned and managed by the object that implements the DEMManufacturerDelegate
@@ -217,9 +219,9 @@ public:
     // delete/allocate the slots memory but this will be done atomically in the call to
     // DEMManufacturerDelegate::HandleModifyForecastRequest so the underlying memory is coherent => the call to
     // DEMManufacturerDelegate::HandleModifyForecastRequest cannot be interrupted by any other CHIP task activity.
-    virtual CHIP_ERROR SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> &) override;
+    CHIP_ERROR SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> &);
 
-    virtual CHIP_ERROR SetOptOutState(OptOutStateEnum) override;
+    CHIP_ERROR SetOptOutState(OptOutStateEnum);
 
     // Returns whether the DeviceEnergyManagement is supported
     uint32_t HasFeature(Feature feature) const;
@@ -277,6 +279,7 @@ private:
 
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustCapabilityStruct;
 
+    // See note above on SetForecast() about mForecast memory management
     DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
 
     // Keep track whether a PowerAdjustment is in progress

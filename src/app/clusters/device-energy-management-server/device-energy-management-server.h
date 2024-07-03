@@ -171,48 +171,7 @@ public:
 
     // ------------------------------------------------------------------
     // Set attribute methods
-    virtual CHIP_ERROR SetESAType(ESATypeEnum)                                                                         = 0;
-    virtual CHIP_ERROR SetESACanGenerate(bool)                                                                         = 0;
     virtual CHIP_ERROR SetESAState(ESAStateEnum)                                                                       = 0;
-    virtual CHIP_ERROR SetAbsMinPower(int64_t)                                                                         = 0;
-    virtual CHIP_ERROR SetAbsMaxPower(int64_t)                                                                         = 0;
-    virtual CHIP_ERROR SetPowerAdjustmentCapability(const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> &) = 0;
-
-    // The DeviceEnergyManagementDelegate owns the master copy of the ForecastStruct object which is accessed via GetForecast and
-    // SetForecast. The slots field of forecast is owned and managed by the object that implements the DEMManufacturerDelegate
-    // interface. The slots memory MUST exist for the lifetime of the forecast object from where it is referenced.
-    //
-    // The rationale for this is as follows:
-    // It is envisioned there will be one master forecast object declared in DeviceEnergyManagementDelegate. When
-    // constructed, the field DataModel::List<const Structs::SlotStruct::Type> slots will be empty.
-    //
-    // The EVSEManufacturerImpl class (examples/energy-management-app/energy-management-common/include/EVSEManufacturerImpl.h) is
-    // an example implementation that a specific vendor can use as a template. It understands how the underlying energy appliance
-    // functions. EVSEManufacturerImpl inherits from DEMManufacturerDelegate
-    // (examples/energy-management-app/energy-management-common/include/DEMManufacturerDelegate.h) which is a generic interface
-    // and how the DeviceEnergyManagementDelegate class
-    // (examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp) communicates from the
-    // generic cluster world to the specific appliance implementation (EVSEManufacturerImpl).
-    //
-    // EVSEManufacturerImpl understands the slot structures of the appliance and configures the slot structures as follows:
-    //
-    //      Call DeviceEnergyManagementDelegate::GetForecast() to get the current forecast
-    //      Modify the slot structure - the slots memory is owned by EVSEManufacturerImpl
-    //      Call DeviceEnergyManagementDelegate::GetForecast() to set the current forecast
-    //
-    //
-    // The cluster object DeviceEnergyManagement::Instance
-    // (src/app/clusters/device-energy-management-server/device-energy-management-server.cpp) only reads the slots field of
-    // forecast when checking commands (indeed it does not modify any forecast fields itself). The DeviceEnergyManagementDelegate
-    // object does modify some of forecast's fields but does NOT modify the slots field. The only command that can modify the
-    // slots field is HandleModifyForecastRequest. Whilst DeviceEnergyManagementDelegate::ModifyForecastRequest does some state
-    // checking, the slots field is only modified by the EVSEManufacturerImpl object via the call
-    // DEMManufacturerDelegate::HandleModifyForecastRequest. DEMManufacturerDelegate::HandleModifyForecastRequest may
-    // delete/allocate the slots memory but this will be done atomically in the call to
-    // DEMManufacturerDelegate::HandleModifyForecastRequest so the underlying memory is coherent => the call to
-    // DEMManufacturerDelegate::HandleModifyForecastRequest cannot be interrupted by any other CHIP task activity.
-    virtual CHIP_ERROR SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> &)                         = 0;
-    virtual CHIP_ERROR SetOptOutState(OptOutStateEnum)                                                                 = 0;
 
 protected:
     EndpointId mEndpointId = 0;
