@@ -9707,11 +9707,11 @@
               - StringEchoResponse
       structs:
           OccupancySensing:
-              # Targeting Fall 2024
+              # Targeting 1.4
               - HoldTimeLimitsStruct
       bitmaps:
           OccupancySensing:
-              # Targeting Fall 2024
+              # Targeting Fall 1.4
               - Feature
       bitmap values:
           Switch:
