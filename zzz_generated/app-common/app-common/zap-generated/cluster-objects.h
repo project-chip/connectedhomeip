@@ -33039,6 +33039,33 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace RelativeHumidityMeasurement
 namespace OccupancySensing {
+namespace Structs {
+namespace HoldTimeLimitsStruct {
+enum class Fields : uint8_t
+{
+    kHoldTimeMin     = 0,
+    kHoldTimeMax     = 1,
+    kHoldTimeDefault = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t holdTimeMin     = static_cast<uint16_t>(0);
+    uint16_t holdTimeMax     = static_cast<uint16_t>(0);
+    uint16_t holdTimeDefault = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace HoldTimeLimitsStruct
+} // namespace Structs
 
 namespace Attributes {
 
@@ -33078,6 +33105,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OccupancySensorTypeBitmap
+namespace HoldTime {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HoldTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HoldTime
+namespace HoldTimeLimits {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type;
+    using DecodableType    = chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HoldTimeLimits::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HoldTimeLimits
 namespace PIROccupiedToUnoccupiedDelay {
 struct TypeInfo
 {
@@ -33237,6 +33288,8 @@ struct TypeInfo
             static_cast<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum>(0);
         Attributes::OccupancySensorTypeBitmap::TypeInfo::DecodableType occupancySensorTypeBitmap =
             static_cast<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>(0);
+        Attributes::HoldTime::TypeInfo::DecodableType holdTime = static_cast<uint16_t>(0);
+        Attributes::HoldTimeLimits::TypeInfo::DecodableType holdTimeLimits;
         Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::DecodableType PIROccupiedToUnoccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::DecodableType PIRUnoccupiedToOccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType PIRUnoccupiedToOccupiedThreshold =
@@ -43022,6 +43075,11 @@ struct Type;
 struct DecodableType;
 } // namespace TestListInt8UReverseRequest
 
+namespace StringEchoResponse {
+struct Type;
+struct DecodableType;
+} // namespace StringEchoResponse
+
 namespace TestEnumsRequest {
 struct Type;
 struct DecodableType;
@@ -43071,6 +43129,11 @@ namespace TestSecondBatchHelperRequest {
 struct Type;
 struct DecodableType;
 } // namespace TestSecondBatchHelperRequest
+
+namespace StringEchoRequest {
+struct Type;
+struct DecodableType;
+} // namespace StringEchoRequest
 
 namespace TestDifferentVendorMeiRequest {
 struct Type;
@@ -44059,6 +44122,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestListInt8UReverseRequest
+namespace StringEchoResponse {
+enum class Fields : uint8_t
+{
+    kPayload = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StringEchoResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StringEchoResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan payload;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StringEchoResponse
 namespace TestEnumsRequest {
 enum class Fields : uint8_t
 {
@@ -44429,6 +44524,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestSecondBatchHelperRequest
+namespace StringEchoRequest {
+enum class Fields : uint8_t
+{
+    kPayload = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StringEchoRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::UnitTesting::Commands::StringEchoResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StringEchoRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan payload;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StringEchoRequest
 namespace TestDifferentVendorMeiRequest {
 enum class Fields : uint8_t
 {

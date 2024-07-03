@@ -13817,6 +13817,31 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
         value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
+    case Attributes::HoldTime::Id: {
+        using TypeInfo = Attributes::HoldTime::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::HoldTimeLimits::Id: {
+        using TypeInfo = Attributes::HoldTimeLimits::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTROccupancySensingClusterHoldTimeLimitsStruct * _Nonnull value;
+        value = [MTROccupancySensingClusterHoldTimeLimitsStruct new];
+        value.holdTimeMin = [NSNumber numberWithUnsignedShort:cppValue.holdTimeMin];
+        value.holdTimeMax = [NSNumber numberWithUnsignedShort:cppValue.holdTimeMax];
+        value.holdTimeDefault = [NSNumber numberWithUnsignedShort:cppValue.holdTimeDefault];
+        return value;
+    }
     case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
         using TypeInfo = Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo;
         TypeInfo::DecodableType cppValue;
