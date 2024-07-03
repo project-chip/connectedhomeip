@@ -80,11 +80,16 @@ ti_simplelink_executable("all-clusters-app") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp",
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
+    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/ClusterManager.cpp",
     "${project_dir}/main/Globals.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
     "${project_dir}/main/main.cpp",
+  ]
+
+  public = [
+    "${chip_root}/src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h",
   ]
 
   deps = [

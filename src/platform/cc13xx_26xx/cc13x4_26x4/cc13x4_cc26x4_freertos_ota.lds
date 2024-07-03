@@ -28,11 +28,13 @@ MEMORY
     MCUBOOT_HDR (RX) : ORIGIN = 0x00006000, LENGTH = 0x00000080
     FLASH (RX)       : ORIGIN = 0x00006080, LENGTH = 0x000F8780
     /*
-     * NVS is the last 5 pages of slot, this area is not erased 
+     * NVS is the last 12 pages of slot, this area is not erased 
      * during OTA. The slot size for the primary and secondary slots
-     * is therefore 0xF6000 (MCUBoot Header + all the remaining space)
+     * is therefore 0xF2000 (MCUBoot Header + all the remaining space
+     * leaves 0xF2800 of space, but the slot size needs to be divisible
+     * by 4k so the slot size therefore becomes 0xF2000)
      */
-    /* FLASH_NVS (RX)   : ORIGIN = 0x000FC000, LENGTH = 0x00002800 */
+    /* FLASH_NVS (RX)   : ORIGIN = 0x000F8800, LENGTH = 0x00006000 */
     FLASH_FACTORY_DATA (R) : ORIGIN = 0x000FE800, LENGTH = 0x900
     /*
      * Customer Configuration Area and Bootloader Backdoor configuration in
@@ -231,8 +233,8 @@ SECTIONS {
     /* End of executable code/data, NVS is not part of the OTA image */
     PROVIDE (_flash_end_address = .);
 
-    /* 5 pages of NV Memory (0x800 each) at the end of Flash */
-    .nvs (0xFC000) (NOLOAD) : AT (0xFC000) ALIGN(0x800) {
+    /* 12 pages of NV Memory (0x800 each) at the end of Flash */
+    .nvs (0xF8800) (NOLOAD) : AT (0xF8800) ALIGN(0x800) {
         *(.nvs)
     } > REGION_TEXT
 

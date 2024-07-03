@@ -55,22 +55,29 @@ public:
     // event emitting, path marking and other operations
     virtual InteractionModelContext CurrentContext() const { return mContext; }
 
-    /// List reading has specific handling logic:
-    ///   `state` contains in/out data about the current list reading. MUST start with kInvalidListIndex on first call
+    /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
+    ///   ReadAttribute is REQUIRED to perform:
+    ///     - ACL validation (see notes on OperationFlags::kInternal)
+    ///     - Validation of readability/writability
+    ///     - use request.path.mExpanded to skip encoding replies for data according
+    ///       to 8.4.3.2 of the spec:
+    ///         > If the path indicates attribute data that is not readable, then the path SHALL
+    ///           be discarded.
+    ///         > Else if reading from the attribute in the path requires a privilege that is not
+    ///           granted to access the cluster in the path, then the path SHALL be discarded.
     ///
     /// Return codes:
-    ///   CHIP_ERROR_MORE_LIST_DATA_AVAILABLE (NOTE: new error defined for this purpose)
-    ///      - partial data written to the destination
-    ///      - destination will contain AT LEAST one valid list entry fully serialized
-    ///      - destination will be fully valid (it will be rolled back on partial list writes)
+    ///   CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL:
+    ///      - Indicates that list encoding had insufficient buffer space to encode elements.
+    ///      - encoder::GetState().AllowPartialData() determines if these errors are permanent (no partial
+    ///        data allowed) or further encoding can be retried (AllowPartialData true for list encoding)
     ///   CHIP_IM_GLOBAL_STATUS(code):
     ///      - error codes that are translatable in IM status codes (otherwise we expect Failure to be reported)
-    ///      - In particular, some handlers rely on special handling for:
-    ///        - `UnsupportedAccess`  - for ACL checks (e.g. wildcard expansion may choose to skip these)
     ///      - to check for this, CHIP_ERROR provides:
     ///        - ::IsPart(ChipError::SdkPart::kIMGlobalStatus) -> bool
     ///        - ::GetSdkCode() -> uint8_t to translate to the actual code
-    virtual CHIP_ERROR ReadAttribute(const ReadAttributeRequest & request, ReadState & state, AttributeValueEncoder & encoder) = 0;
+    ///   other internal falures
+    virtual CHIP_ERROR ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder) = 0;
 
     /// Requests a write of an attribute.
     ///
