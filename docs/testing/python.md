@@ -107,8 +107,7 @@ Below is the format:
 
 -   test-runner-run/<run_identifier>/app: Indicates the application to be used
     in the test. Different app types as needed could be referenced from section
-    [name: Generate an argument environment file ] of the file
-    .github/workflows/tests.yaml
+    [name: Generate an argument environment file ] of the file [.github/workflows/tests.yaml](https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/tests.yaml)
 
         -   Example: \${TYPE_OF_APP}
 
