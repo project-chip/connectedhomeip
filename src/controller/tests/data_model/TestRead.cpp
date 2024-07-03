@@ -73,8 +73,7 @@ protected:
 
     // Helper for MultipleReadHelper that does not spin the event loop, so we
     // don't end up with nested event loops.
-    void MultipleReadHelperInternal(size_t aReadCount, uint32_t & aNumSuccessCalls,
-                                           uint32_t & aNumFailureCalls);
+    void MultipleReadHelperInternal(size_t aReadCount, uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls);
 
     // Establish the given number of subscriptions, then issue the given number
     // of reads in parallel and wait for them all to succeed.
@@ -89,7 +88,7 @@ protected:
     bool mAlterSubscriptionIntervals = false;
 };
 
-uint16_t TestRead::mMaxInterval   = 66;
+uint16_t TestRead::mMaxInterval = 66;
 
 class MockInteractionModelApp : public chip::app::ClusterStateCache::Callback
 {
@@ -1466,7 +1465,7 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         // Drive servicing IO till we have established a subscription.
         //
         GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
@@ -1483,7 +1482,7 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         //
         GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return callback.mOnResubscriptionsAttempted > 0; });
+                                    [&]() { return callback.mOnResubscriptionsAttempted > 0; });
 
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
@@ -1495,7 +1494,7 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         // Drive servicing IO till we have established a subscription.
         //
         GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
 
         //
@@ -1550,7 +1549,7 @@ TEST_F(TestRead, TestSubscribeAttributeTimeout)
         // Drive servicing IO till we have established a subscription.
         //
         GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
 
         //
@@ -1570,7 +1569,7 @@ TEST_F(TestRead, TestSubscribeAttributeTimeout)
         // retransmit timeouts.
         //
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return callback.mOnError >= 1; });
+                                    [&]() { return callback.mOnError >= 1; });
 
         EXPECT_EQ(callback.mOnError, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
@@ -2401,7 +2400,7 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         // Drive servicing IO till we have established a subscription.
         //
         GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
@@ -2418,8 +2417,7 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         //
         //
         GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return false; });
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)), [&]() { return false; });
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
 
@@ -2434,7 +2432,7 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         // Drive servicing IO till we have established a subscription.
         //
         GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
 
         //
@@ -2492,7 +2490,7 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
         // Drive servicing IO till we have established a subscription.
         //
         GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
@@ -2513,7 +2511,7 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
         // normal, non-LIT subscriptions.
         GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return callback.mOnResubscriptionsAttempted != 0; });
+                                    [&]() { return callback.mOnResubscriptionsAttempted != 0; });
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
 
@@ -2524,7 +2522,7 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
         // Drive servicing IO till we have established a subscription.
         //
         GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
 
         //
@@ -2544,14 +2542,12 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
             app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
         }
         callback.ClearCounters();
-        GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
-            return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0;
-        });
+        GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
+                                    [&]() { return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
 
         // When we received the update that OperatingMode becomes LIT, we automatically set the inner peer type to LIT ICD.
         GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return false; });
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)), [&]() { return false; });
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
 
@@ -2605,7 +2601,7 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
         // Drive servicing IO till we have established a subscription.
         //
         GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
@@ -2623,7 +2619,7 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
         //
         GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return callback.mLastError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT; });
+                                    [&]() { return callback.mLastError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT; });
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
 
@@ -2634,7 +2630,7 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
         // Drive servicing IO till we have established a subscription.
         //
         GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
 
         //
@@ -2742,8 +2738,7 @@ void TestRead::SubscribeThenReadHelper(size_t aSubscribeCount, size_t aReadCount
 
 // The guts of MultipleReadHelper which take references to the success/failure
 // counts to modify and assume the consumer will be spinning the event loop.
-void TestRead::MultipleReadHelperInternal(size_t aReadCount, uint32_t & aNumSuccessCalls,
-                                          uint32_t & aNumFailureCalls)
+void TestRead::MultipleReadHelperInternal(size_t aReadCount, uint32_t & aNumSuccessCalls, uint32_t & aNumFailureCalls)
 {
     EXPECT_EQ(aNumSuccessCalls, 0u);
     EXPECT_EQ(aNumFailureCalls, 0u);
@@ -3330,9 +3325,8 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
     readCallback.ClearCounters();
 
     // Run until all subscriptions are clean.
-    GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
-        return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0;
-    });
+    GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
+                                [&]() { return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
 
     // Before the above subscription, we have one subscription with kMinSupportedPathsPerSubscription + 1 paths, we should evict
     // that subscription before evicting any other subscriptions, which will result we used exactly kExpectedParallelPaths and have
@@ -3387,9 +3381,8 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
     readCallbackFabric2.ClearCounters();
 
     // Run until all subscriptions are clean.
-    GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
-        return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0;
-    });
+    GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
+                                [&]() { return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
 
     // Some subscriptions on fabric 1 should be evicted since fabric 1 is using more resources than the limits.
     EXPECT_EQ(readCallback.mAttributeCount,
@@ -3568,12 +3561,10 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 
@@ -3655,12 +3646,10 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 
@@ -3702,12 +3691,10 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 
@@ -3758,13 +3745,12 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &readCallbackForOversizedRead, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return readCallbackForOversizedRead.reportsReceived > 0; });
+                                        [&]() { return readCallbackForOversizedRead.reportsReceived > 0; });
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback.reportsReceived > 0; });
 
             EXPECT_TRUE(readCallbackForOversizedRead.reportsReceived > 0 && backgroundReadCallback.reportsReceived > 0);
 
@@ -3784,8 +3770,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
 
             backgroundReadCallback.ClearCounter();
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback.reportsReceived > 0; });
 
             // We don't check the readCallbackForOversizedRead, since it cannot prove anything -- it can be 0 even when the
             // oversized read request is alive. We ensure this by checking (1) we have only one active read handler, (2) the one
@@ -3812,15 +3797,14 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback.reportsReceived > 0; });
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
                                          app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &readCallbackForOversizedRead, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return readCallbackForOversizedRead.reportsReceived > 0; });
+                                        [&]() { return readCallbackForOversizedRead.reportsReceived > 0; });
 
             EXPECT_TRUE(readCallbackForOversizedRead.reportsReceived > 0 && backgroundReadCallback.reportsReceived > 0);
 
@@ -3840,8 +3824,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
 
             backgroundReadCallback.ClearCounter();
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback.reportsReceived > 0; });
 
             // We don't check the readCallbackForOversizedRead, since it cannot prove anything -- it can be 0 even when the
             // oversized read request is alive. We ensure this by checking (1) we have only one active read handler, (2) the one
@@ -3918,14 +3901,12 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback1.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback1.reportsReceived > 0; });
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback2.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback2.reportsReceived > 0; });
             EXPECT_TRUE(backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0);
 
             backgroundReadCallback1.ClearCounter();
@@ -3949,8 +3930,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
 
             // Note: Younger read handler will be evicted.
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback1.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback1.reportsReceived > 0; });
             EXPECT_GT(backgroundReadCallback1.reportsReceived, 0);
         });
 
@@ -3972,14 +3952,12 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
                                          app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback1.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback1.reportsReceived > 0; });
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback2.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback2.reportsReceived > 0; });
             EXPECT_TRUE(backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0);
 
             backgroundReadCallback1.ClearCounter();
@@ -4003,8 +3981,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
 
             // Note: Larger read handler will be evicted before evicting the younger one.
-            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
-                                                   [&]() { return backgroundReadCallback2.reportsReceived > 0; });
+            GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback2.reportsReceived > 0; });
             EXPECT_GT(backgroundReadCallback2.reportsReceived, 0);
         });
 
@@ -4131,16 +4108,13 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback3;
             std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback3, readClients);
 
@@ -4184,12 +4158,10 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 

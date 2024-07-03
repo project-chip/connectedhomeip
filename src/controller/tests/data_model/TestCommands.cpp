@@ -175,8 +175,7 @@ TEST_F(TestCommands, TestMultipleSuccessNoDataResponses)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendMultipleSuccessStatusCodes);
 
-    Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                     onFailureCb);
+    Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
 
     DrainAndServiceIO();
 
@@ -297,8 +296,7 @@ TEST_F(TestCommands, TestMultipleFailures)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendMultipleErrors);
 
-    Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                     onFailureCb);
+    Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
 
     DrainAndServiceIO();
 
