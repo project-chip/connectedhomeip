@@ -2356,7 +2356,6 @@ TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
     CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
-    // Embed specifically DOES NOT support structures. Without AAI, we expect a constraint error
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
                                             MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
 
@@ -2370,5 +2369,8 @@ TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
     };
 
     AttributeValueDecoder decoder = test.DecoderFor(testValue);
-    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    // Embed specifically DOES NOT support structures.
+    // Without AAI, we expect a data type error (translated to failure)
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(Failure));
 }
