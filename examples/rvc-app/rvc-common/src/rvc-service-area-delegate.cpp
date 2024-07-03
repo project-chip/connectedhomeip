@@ -156,8 +156,8 @@ bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper
         return true;
     }
 
-    ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u",
-                 newLocation.locationID, static_cast<uint32_t>(kMaxNumSupportedLocations));
+    ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u", newLocation.locationID,
+                 static_cast<uint32_t>(kMaxNumSupportedLocations));
 
     return false;
 }
