@@ -117,7 +117,7 @@ template <class OUT, class ENCODING>
 std::optional<OUT> ExtractEmberString(ByteSpan data)
 {
     VerifyOrDie(sizeof(typename ENCODING::LengthType) <= data.size());
-    typename ENCODING::LengthType len = ENCODING::GetLength(data.data());
+    auto len = ENCODING::GetLength(data.data());
 
     if (len == ENCODING::kNullLength)
     {
