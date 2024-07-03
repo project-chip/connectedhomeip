@@ -73,10 +73,15 @@ ti_simplelink_executable("lock_app") {
 
   sources = [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
+    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${project_dir}/src/AppTask.cpp",
     "${project_dir}/src/LockManager.cpp",
     "${project_dir}/src/ZclCallbacks.cpp",
     "${project_dir}/src/main.cpp",
+  ]
+
+  public = [
+    "${chip_root}/src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h",
   ]
 
   deps = [
@@ -85,6 +90,7 @@ ti_simplelink_executable("lock_app") {
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/platform/cc13x4_26x4:cc13x4_26x4-attestation-credentials",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/openthread:openthread",
   ]
   defines = []

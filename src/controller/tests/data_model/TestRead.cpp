@@ -2928,6 +2928,86 @@ exit:
     GetLoopback().SetLoopbackTransportDelegate(nullptr);
 }
 
+TEST_F(TestRead, TestReadHandler_DataVersionFiltersTruncated)
+{
+    struct : public chip::Test::LoopbackTransportDelegate
+    {
+        size_t requestSize = 0;
+        void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+        {
+            // We only care about the messages we (Alice) send to Bob, not the responses.
+            // Assume the first message we see in an iteration is the request.
+            if (peer == mpContext->GetBobAddress() && requestSize == 0)
+            {
+                requestSize = message->TotalLength();
+            }
+        }
+    } loopbackDelegate;
+    mpContext->GetLoopback().SetLoopbackTransportDelegate(&loopbackDelegate);
+
+    // Note that on the server side, wildcard expansion does not actually work for kTestEndpointId due
+    // to lack of meta-data, but we don't care about the reports we get back in this test.
+    AttributePathParams wildcardPath(kTestEndpointId, kInvalidClusterId, kInvalidAttributeId);
+    constexpr size_t maxDataVersionFilterCount = 100;
+    DataVersionFilter dataVersionFilters[maxDataVersionFilterCount];
+    ClusterId nextClusterId = 0;
+    for (auto & dv : dataVersionFilters)
+    {
+        dv.mEndpointId  = wildcardPath.mEndpointId;
+        dv.mClusterId   = nextClusterId++;
+        dv.mDataVersion = MakeOptional(0x01000000u);
+    }
+
+    // Keep increasing the number of data version filters until we see truncation kick in.
+    size_t lastRequestSize;
+    for (size_t count = 1; count <= maxDataVersionFilterCount; count++)
+    {
+        lastRequestSize              = loopbackDelegate.requestSize;
+        loopbackDelegate.requestSize = 0; // reset
+
+        ReadPrepareParams read(mpContext->GetSessionAliceToBob());
+        read.mpAttributePathParamsList    = &wildcardPath;
+        read.mAttributePathParamsListSize = 1;
+        read.mpDataVersionFilterList      = dataVersionFilters;
+        read.mDataVersionFilterListSize   = count;
+
+        struct : public ReadClient::Callback
+        {
+            CHIP_ERROR error = CHIP_NO_ERROR;
+            bool done        = false;
+            void OnError(CHIP_ERROR aError) override { error = aError; }
+            void OnDone(ReadClient * apReadClient) override { done = true; };
+
+        } readCallback;
+
+        ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), readCallback,
+                              ReadClient::InteractionType::Read);
+
+        EXPECT_EQ(readClient.SendRequest(read), CHIP_NO_ERROR);
+
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.done; });
+        EXPECT_EQ(readCallback.error, CHIP_NO_ERROR);
+        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+        EXPECT_NE(loopbackDelegate.requestSize, 0u);
+        EXPECT_GE(loopbackDelegate.requestSize, lastRequestSize);
+        if (loopbackDelegate.requestSize == lastRequestSize)
+        {
+            ChipLogProgress(DataManagement, "Data Version truncation detected after %llu elements",
+                            static_cast<unsigned long long>(count - 1));
+            // With the parameters used in this test and current encoding rules we can fit 68 data versions
+            // into a packet. If we're seeing substantially less then something is likely gone wrong.
+            EXPECT_GE(count, 60u);
+            ExitNow();
+        }
+    }
+    ChipLogProgress(DataManagement, "Unable to detect Data Version truncation, maxDataVersionFilterCount too small?");
+    ADD_FAILURE();
+
+exit:
+    mpContext->GetLoopback().SetLoopbackTransportDelegate(nullptr);
+}
+
 TEST_F(TestRead, TestReadHandlerResourceExhaustion_MultipleReads)
 {
     auto sessionHandle       = GetSessionBobToAlice();

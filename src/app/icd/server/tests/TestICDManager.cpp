@@ -37,6 +37,7 @@
 using namespace chip;
 using namespace chip::Test;
 using namespace chip::app;
+using namespace chip::AddressResolve;
 using namespace chip::System;
 using namespace chip::System::Clock;
 using namespace chip::System::Clock::Literals;

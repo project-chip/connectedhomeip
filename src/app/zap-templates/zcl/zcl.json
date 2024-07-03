@@ -59,6 +59,7 @@
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
         "global-attributes.xml",
+        "global-structs.xml",
         "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
         "icd-management-cluster.xml",
@@ -77,6 +78,7 @@
         "messages-cluster.xml",
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
+        "semantic-tag-namespace-enums.xml",
         "network-commissioning-cluster.xml",
         "occupancy-sensing-cluster.xml",
         "onoff-cluster.xml",
@@ -103,6 +105,7 @@
         "replacable-monitoring-cluster.xml",
         "resource-monitoring-cluster.xml",
         "scene.xml",
+        "service-area-cluster.xml",
         "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
         "switch-cluster.xml",
@@ -272,6 +275,7 @@
             "ICDCounter",
             "ClientsSupportedPerFabric"
         ],
+        "Occupancy Sensing": ["HoldTimeLimits"],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",

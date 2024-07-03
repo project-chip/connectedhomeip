@@ -55,7 +55,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val startHour: UByte?,
     val startMinute: UByte?,
     val endHour: UByte?,
-    val endMinute: UByte?
+    val endMinute: UByte?,
   )
 
   class GetYearDayScheduleResponse(
@@ -63,7 +63,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val userIndex: UShort,
     val status: UByte,
     val localStartTime: UInt?,
-    val localEndTime: UInt?
+    val localEndTime: UInt?,
   )
 
   class GetHolidayScheduleResponse(
@@ -71,7 +71,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val status: UByte,
     val localStartTime: UInt?,
     val localEndTime: UInt?,
-    val operatingMode: UByte?
+    val operatingMode: UByte?,
   )
 
   class GetUserResponse(
@@ -84,13 +84,13 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val credentials: List<DoorLockClusterCredentialStruct>?,
     val creatorFabricIndex: UByte?,
     val lastModifiedFabricIndex: UByte?,
-    val nextUserIndex: UShort?
+    val nextUserIndex: UShort?,
   )
 
   class SetCredentialResponse(
     val status: UByte,
     val userIndex: UShort?,
-    val nextCredentialIndex: UShort?
+    val nextCredentialIndex: UShort?,
   )
 
   class GetCredentialStatusResponse(
@@ -98,7 +98,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val userIndex: UShort?,
     val creatorFabricIndex: UByte?,
     val lastModifiedFabricIndex: UByte?,
-    val nextCredentialIndex: UShort?
+    val nextCredentialIndex: UShort?,
   )
 
   class LockStateAttribute(val value: UByte?)
@@ -235,7 +235,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -256,7 +256,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -266,7 +266,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   suspend fun unlockWithTimeout(
     timeout: UShort,
     PINCode: ByteArray?,
-    timedInvokeTimeout: Duration
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 3u
 
@@ -284,7 +284,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -299,7 +299,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     startMinute: UByte,
     endHour: UByte,
     endMinute: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 11u
 
@@ -332,7 +332,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -342,7 +342,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   suspend fun getWeekDaySchedule(
     weekDayIndex: UByte,
     userIndex: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): GetWeekDayScheduleResponse {
     val commandId: UInt = 12u
 
@@ -360,7 +360,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -502,14 +502,14 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       startHour_decoded,
       startMinute_decoded,
       endHour_decoded,
-      endMinute_decoded
+      endMinute_decoded,
     )
   }
 
   suspend fun clearWeekDaySchedule(
     weekDayIndex: UByte,
     userIndex: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 13u
 
@@ -527,7 +527,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -539,7 +539,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     userIndex: UShort,
     localStartTime: UInt,
     localEndTime: UInt,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 14u
 
@@ -563,7 +563,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -573,7 +573,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   suspend fun getYearDaySchedule(
     yearDayIndex: UByte,
     userIndex: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): GetYearDayScheduleResponse {
     val commandId: UInt = 15u
 
@@ -591,7 +591,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -679,14 +679,14 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       userIndex_decoded,
       status_decoded,
       localStartTime_decoded,
-      localEndTime_decoded
+      localEndTime_decoded,
     )
   }
 
   suspend fun clearYearDaySchedule(
     yearDayIndex: UByte,
     userIndex: UShort,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 16u
 
@@ -704,7 +704,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -716,7 +716,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     localStartTime: UInt,
     localEndTime: UInt,
     operatingMode: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 17u
 
@@ -740,7 +740,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -749,7 +749,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun getHolidaySchedule(
     holidayIndex: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): GetHolidayScheduleResponse {
     val commandId: UInt = 18u
 
@@ -764,7 +764,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -858,7 +858,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       status_decoded,
       localStartTime_decoded,
       localEndTime_decoded,
-      operatingMode_decoded
+      operatingMode_decoded,
     )
   }
 
@@ -876,7 +876,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -891,7 +891,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     userStatus: UByte?,
     userType: UByte?,
     credentialRule: UByte?,
-    timedInvokeTimeout: Duration
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 26u
 
@@ -926,7 +926,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -947,7 +947,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1152,7 +1152,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       credentials_decoded,
       creatorFabricIndex_decoded,
       lastModifiedFabricIndex_decoded,
-      nextUserIndex_decoded
+      nextUserIndex_decoded,
     )
   }
 
@@ -1170,7 +1170,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1184,7 +1184,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     userIndex: UShort?,
     userStatus: UByte?,
     userType: UByte?,
-    timedInvokeTimeout: Duration
+    timedInvokeTimeout: Duration,
   ): SetCredentialResponse {
     val commandId: UInt = 34u
 
@@ -1214,7 +1214,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1282,7 +1282,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun getCredentialStatus(
     credential: DoorLockClusterCredentialStruct,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): GetCredentialStatusResponse {
     val commandId: UInt = 36u
 
@@ -1297,7 +1297,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1401,13 +1401,13 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       userIndex_decoded,
       creatorFabricIndex_decoded,
       lastModifiedFabricIndex_decoded,
-      nextCredentialIndex_decoded
+      nextCredentialIndex_decoded,
     )
   }
 
   suspend fun clearCredential(
     credential: DoorLockClusterCredentialStruct?,
-    timedInvokeTimeout: Duration
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 38u
 
@@ -1422,7 +1422,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1443,7 +1443,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1455,7 +1455,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     verificationKey: ByteArray,
     groupIdentifier: ByteArray,
     groupResolvingKey: ByteArray?,
-    timedInvokeTimeout: Duration
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 40u
 
@@ -1481,7 +1481,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1499,7 +1499,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1545,7 +1545,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeLockStateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LockStateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -1558,7 +1558,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1632,7 +1632,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeLockTypeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -1645,7 +1645,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1713,7 +1713,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeActuatorEnabledAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -1726,7 +1726,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1806,7 +1806,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeDoorStateAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<DoorStateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -1819,7 +1819,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -1913,10 +1913,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1942,7 +1942,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeDoorOpenEventsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -1955,7 +1955,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2046,10 +2046,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2075,7 +2075,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeDoorClosedEventsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -2088,7 +2088,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2179,10 +2179,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2208,7 +2208,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeOpenPeriodAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -2221,7 +2221,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2299,7 +2299,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeNumberOfTotalUsersSupportedAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 17u
     val attributePaths =
@@ -2312,7 +2312,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2392,7 +2392,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeNumberOfPINUsersSupportedAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
@@ -2405,7 +2405,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2485,7 +2485,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeNumberOfRFIDUsersSupportedAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 19u
     val attributePaths =
@@ -2498,7 +2498,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2580,7 +2580,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeNumberOfWeekDaySchedulesSupportedPerUserAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 20u
     val attributePaths =
@@ -2593,7 +2593,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2675,7 +2675,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeNumberOfYearDaySchedulesSupportedPerUserAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 21u
     val attributePaths =
@@ -2688,7 +2688,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2770,7 +2770,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeNumberOfHolidaySchedulesSupportedAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 22u
     val attributePaths =
@@ -2783,7 +2783,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2863,7 +2863,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeMaxPINCodeLengthAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 23u
     val attributePaths =
@@ -2876,7 +2876,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2956,7 +2956,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeMinPINCodeLengthAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 24u
     val attributePaths =
@@ -2969,7 +2969,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3049,7 +3049,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeMaxRFIDCodeLengthAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 25u
     val attributePaths =
@@ -3062,7 +3062,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3142,7 +3142,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeMinRFIDCodeLengthAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 26u
     val attributePaths =
@@ -3155,7 +3155,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3235,7 +3235,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeCredentialRulesSupportAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 27u
     val attributePaths =
@@ -3248,7 +3248,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3330,7 +3330,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeNumberOfCredentialsSupportedPerUserAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 28u
     val attributePaths =
@@ -3343,7 +3343,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3434,10 +3434,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3463,7 +3463,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeLanguageAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<StringSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 33u
     val attributePaths =
@@ -3476,7 +3476,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3565,10 +3565,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3594,7 +3594,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeLEDSettingsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 34u
     val attributePaths =
@@ -3607,7 +3607,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3696,10 +3696,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3725,7 +3725,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAutoRelockTimeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 35u
     val attributePaths =
@@ -3738,7 +3738,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3829,10 +3829,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3858,7 +3858,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeSoundVolumeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 36u
     val attributePaths =
@@ -3871,7 +3871,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3955,10 +3955,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3984,7 +3984,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeOperatingModeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 37u
     val attributePaths =
@@ -3997,7 +3997,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4065,7 +4065,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeSupportedOperatingModesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 38u
     val attributePaths =
@@ -4078,7 +4078,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4153,7 +4153,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeDefaultConfigurationRegisterAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 39u
     val attributePaths =
@@ -4166,7 +4166,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4246,7 +4246,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeEnableLocalProgrammingAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 40u
 
@@ -4260,10 +4260,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4289,7 +4289,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeEnableLocalProgrammingAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 40u
     val attributePaths =
@@ -4302,7 +4302,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4382,7 +4382,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeEnableOneTouchLockingAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 41u
 
@@ -4396,10 +4396,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4425,7 +4425,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeEnableOneTouchLockingAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 41u
     val attributePaths =
@@ -4438,7 +4438,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4518,7 +4518,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeEnableInsideStatusLEDAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 42u
 
@@ -4532,10 +4532,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4561,7 +4561,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeEnableInsideStatusLEDAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 42u
     val attributePaths =
@@ -4574,7 +4574,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4654,7 +4654,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeEnablePrivacyModeButtonAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 43u
 
@@ -4668,10 +4668,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4697,7 +4697,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeEnablePrivacyModeButtonAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 43u
     val attributePaths =
@@ -4710,7 +4710,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4790,7 +4790,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeLocalProgrammingFeaturesAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 44u
 
@@ -4804,10 +4804,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4833,7 +4833,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeLocalProgrammingFeaturesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 44u
     val attributePaths =
@@ -4846,7 +4846,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4937,10 +4937,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4966,7 +4966,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeWrongCodeEntryLimitAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 48u
     val attributePaths =
@@ -4979,7 +4979,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5059,7 +5059,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeUserCodeTemporaryDisableTimeAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 49u
 
@@ -5073,10 +5073,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5102,7 +5102,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeUserCodeTemporaryDisableTimeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 49u
     val attributePaths =
@@ -5115,7 +5115,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5206,10 +5206,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5235,7 +5235,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeSendPINOverTheAirAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 50u
     val attributePaths =
@@ -5248,7 +5248,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5328,7 +5328,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeRequirePINforRemoteOperationAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 51u
 
@@ -5342,10 +5342,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5371,7 +5371,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeRequirePINforRemoteOperationAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 51u
     val attributePaths =
@@ -5384,7 +5384,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5464,7 +5464,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeExpiringUserTimeoutAttribute(
     value: UShort,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 53u
 
@@ -5478,10 +5478,10 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5507,7 +5507,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeExpiringUserTimeoutAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 53u
     val attributePaths =
@@ -5520,7 +5520,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5605,7 +5605,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAliroReaderVerificationKeyAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AliroReaderVerificationKeyAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 128u
     val attributePaths =
@@ -5618,7 +5618,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5710,7 +5710,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAliroReaderGroupIdentifierAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AliroReaderGroupIdentifierAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 129u
     val attributePaths =
@@ -5723,7 +5723,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5812,7 +5812,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAliroReaderGroupSubIdentifierAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ByteArraySubscriptionState> {
     val ATTRIBUTE_ID: UInt = 130u
     val attributePaths =
@@ -5825,7 +5825,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5914,7 +5914,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAliroExpeditedTransactionSupportedProtocolVersionsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 131u
     val attributePaths =
@@ -5927,7 +5927,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6027,7 +6027,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAliroGroupResolvingKeyAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AliroGroupResolvingKeyAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 132u
     val attributePaths =
@@ -6040,7 +6040,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6134,7 +6134,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAliroSupportedBLEUWBProtocolVersionsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 133u
     val attributePaths =
@@ -6147,7 +6147,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6237,7 +6237,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAliroBLEAdvertisingVersionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 134u
     val attributePaths =
@@ -6250,7 +6250,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6332,7 +6332,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeNumberOfAliroCredentialIssuerKeysSupportedAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 135u
     val attributePaths =
@@ -6345,7 +6345,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6427,7 +6427,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeNumberOfAliroEndpointKeysSupportedAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 136u
     val attributePaths =
@@ -6440,7 +6440,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6522,7 +6522,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -6535,7 +6535,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6619,7 +6619,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -6632,7 +6632,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6716,7 +6716,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -6729,7 +6729,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6811,7 +6811,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -6824,7 +6824,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6899,7 +6899,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -6912,7 +6912,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6980,7 +6980,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -6993,7 +6993,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
