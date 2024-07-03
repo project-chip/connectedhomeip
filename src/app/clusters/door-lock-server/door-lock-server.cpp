@@ -84,8 +84,6 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 } // namespace app
 } // namespace chip
 
-DoorLockServer DoorLockServer::instance;
-
 class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 {
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
@@ -101,7 +99,6 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
         }
     }
 };
-static DoorLockClusterFabricDelegate gFabricDelegate;
 
 /**********************************************************
  * DoorLockServer public methods
@@ -109,7 +106,8 @@ static DoorLockClusterFabricDelegate gFabricDelegate;
 
 DoorLockServer & DoorLockServer::Instance()
 {
-    return instance;
+    static DoorLockServer sInstance;
+    return sInstance;
 }
 
 /**
@@ -4165,8 +4163,8 @@ void emberAfPluginDoorLockServerRelockEventHandler() {}
 void MatterDoorLockPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Door Lock server initialized");
+    static DoorLockClusterFabricDelegate gFabricDelegate;
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
-
     registerAttributeAccessOverride(&DoorLockServer::Instance());
 }
 

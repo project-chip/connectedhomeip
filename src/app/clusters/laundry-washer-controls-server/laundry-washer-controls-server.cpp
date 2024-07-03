@@ -60,8 +60,6 @@ Delegate * GetDelegate(EndpointId endpoint)
 
 } // namespace
 
-LaundryWasherControlsServer LaundryWasherControlsServer::sInstance;
-
 /**********************************************************
  * LaundryWasherControlsServer public methods
  *********************************************************/
@@ -78,6 +76,7 @@ void LaundryWasherControlsServer::SetDefaultDelegate(EndpointId endpoint, Delega
 
 LaundryWasherControlsServer & LaundryWasherControlsServer::Instance()
 {
+    static LaundryWasherControlsServer sInstance;
     return sInstance;
 }
 

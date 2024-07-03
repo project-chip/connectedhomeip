@@ -74,8 +74,6 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 };
 
-ThermostatAttrAccess gThermostatAttrAccess;
-
 CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Thermostat::Id);
@@ -928,5 +926,6 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
 void MatterThermostatPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gThermostatAttrAccess);
+    static ThermostatAttrAccess sThermostatAttrAccess;
+    registerAttributeAccessOverride(&sThermostatAttrAccess);
 }
