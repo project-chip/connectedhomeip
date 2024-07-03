@@ -123,7 +123,7 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
 
     if (gActiveThresholdTimeOverride.has_value())
     {
-        config.mActiveThresholdTime = gActiveRetransTimeoutOverride.value();
+        config.mActiveThresholdTime = gActiveThresholdTimeOverride.value();
     }
 #endif
 
