@@ -98,7 +98,8 @@ bool IsKnownEnumValue(EnumType value)
     return (EnsureKnownEnumValue(value) != EnumType::kUnknownEnumValue);
 }
 
-BootReasonType GetBootReason() {
+BootReasonType GetBootReason()
+{
     BootReasonType bootReason = BootReasonType::kUnspecified;
 
     CHIP_ERROR error = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
@@ -561,8 +562,9 @@ Status OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool & on
     }
 
     bool currentOnOff = false;
-    status = Attributes::OnOff::Get(endpoint, &currentOnOff);
-    if (status != Status::Success) {
+    status            = Attributes::OnOff::Get(endpoint, &currentOnOff);
+    if (status != Status::Success)
+    {
         return status;
     }
 
