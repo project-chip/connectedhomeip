@@ -20,7 +20,10 @@ Python tests located in src/python_testing
 ## Writing Python tests
 
 -   Defining arguments in the test script
-    -   In order to streamline the configuration and execution of tests, it is essential to define arguments at the top of the test script. This section should include various parameters and their respective values, which will guide the test runner on how to execute the tests.
+    -   In order to streamline the configuration and execution of tests, it is
+        essential to define arguments at the top of the test script. This
+        section should include various parameters and their respective values,
+        which will guide the test runner on how to execute the tests.
 -   All test classes inherit from MatterBaseTest in
     [matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
     -   support for commissioning using the python controller
@@ -82,9 +85,10 @@ The default_matter_test_main() function is used to run the test on the command
 line. These two lines should appear verbatim at the bottom of every python test
 file.
 
-
 ## Defining the test arguments
+
 Below is the format:
+
 ```
 # test-runner-runs: <run_identifier>
 # test-runner-run/<run_identifier>/app: ${TYPE_OF_APP}
@@ -95,26 +99,42 @@ Below is the format:
 ```
 
 ### Description of Parameters
--   test-runner-runs: Specifies the identifier for the run. This can be any unique identifier.
+
+-   test-runner-runs: Specifies the identifier for the run. This can be any
+    unique identifier.
+
     -   Example: run1
 
--   test-runner-run/<run_identifier>/app: Indicates the application to be used in the test.
-    -   Example: ${ALL_CLUSTERS_APP}
+-   test-runner-run/<run_identifier>/app: Indicates the application to be used
+    in the test.
 
--   test-runner-run/<run_identifier>/factoryreset: Determines whether a factory reset should be performed before the test.
+    -   Example: \${ALL_CLUSTERS_APP}
+
+-   test-runner-run/<run_identifier>/factoryreset: Determines whether a factory
+    reset should be performed before the test.
+
     -   Example: True
 
--   test-runner-run/<run_identifier>/quiet: Sets the verbosity level of the test run. When set to True, the test run will be quieter.
+-   test-runner-run/<run_identifier>/quiet: Sets the verbosity level of the test
+    run. When set to True, the test run will be quieter.
+
     -   Example: True
 
--   test-runner-run/<run_identifier>/app-args: Specifies the arguments to be passed to the application during the test.
-    -   Example: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+-   test-runner-run/<run_identifier>/app-args: Specifies the arguments to be
+    passed to the application during the test.
 
--   test-runner-run/<run_identifier>/script-args: Specifies the arguments to be passed to the test script.
-    -   Example: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+    -   Example: --discriminator 1234 --KVS kvs1 --trace-to
+        json:\${TRACE_APP}.json
 
-This structured format ensures that all necessary configurations are clearly defined and easily understood, allowing for consistent and reliable test execution.
+-   test-runner-run/<run_identifier>/script-args: Specifies the arguments to be
+    passed to the test script.
+    -   Example: --storage-path admin_storage.json --commissioning-method
+        on-network --discriminator 1234 --passcode 20202021 --trace-to
+        json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 
+This structured format ensures that all necessary configurations are clearly
+defined and easily understood, allowing for consistent and reliable test
+execution.
 
 ## Cluster Codegen
 
