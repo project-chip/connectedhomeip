@@ -293,7 +293,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
     // All the global attributes that we do not have metadata for are
     // read-only. Specifically only the following list-based attributes match the
-    // "global attributes not in metadata" (see GlobalAttributes.h :: GlobalAttributesNotInMetadat):
+    // "global attributes not in metadata" (see GlobalAttributes.h :: GlobalAttributesNotInMetadata):
     //   - AttributeList
     //   - EventList
     //   - AcceptedCommands
