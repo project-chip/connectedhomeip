@@ -124,7 +124,7 @@ source_set("operational-state-test-srcs") {
 }
 
 source_set("thread-border-router-management-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-mgmt-server.cpp" ]
+  sources = [ "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp" ]
 
   public_deps = [
     "${chip_root}/src/app",

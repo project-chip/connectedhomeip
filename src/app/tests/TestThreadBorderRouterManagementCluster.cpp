@@ -17,7 +17,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
-#include <app/clusters/thread-border-router-management-server/thread-br-mgmt-server.h>
+#include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
 #include <cstdint>
 #include <cstring>
 #include <lib/core/CHIPError.h>

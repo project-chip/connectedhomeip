@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "thread-br-mgmt-server.h"
+#include "thread-border-router-management-server.h"
 
 #include "app-common/zap-generated/cluster-objects.h"
 #include "app-common/zap-generated/ids/Attributes.h"
