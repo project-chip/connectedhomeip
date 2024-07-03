@@ -357,7 +357,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(status), __FILE__, __LINE__);
+        return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
     }
 
     return CHIP_NO_ERROR;
