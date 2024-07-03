@@ -269,7 +269,7 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
 
             // Implementation of 8.4.3.2 of the spec for path expansion
-            if (request.path.mExpanded && (err == CHIP_ERROR_ACCESS_DENIED))
+            if (request.path.mExpanded)
             {
                 return CHIP_NO_ERROR;
             }
