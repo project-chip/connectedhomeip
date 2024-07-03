@@ -714,23 +714,47 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
     chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
-    TestWriteRequest test(
-        kAdminSubjectDescriptor,
-        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZclType)));
-    AttributeValueDecoder decoder = test.DecoderFor(value);
+    // non-nullable test
+    {
+        TestWriteRequest test(
+            kAdminSubjectDescriptor,
+            ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZclType)));
+        AttributeValueDecoder decoder = test.DecoderFor(value);
 
-    // write should succeed
-    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+        // write should succeed
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
 
-    // Validate data after write
-    chip::ByteSpan writtenData = Test::GetEmberBuffer();
+        // Validate data after write
+        chip::ByteSpan writtenData = Test::GetEmberBuffer();
 
-    typename NumericAttributeTraits<T>::StorageType storage;
-    ASSERT_GE(writtenData.size(), sizeof(storage));
-    memcpy(&storage, writtenData.data(), sizeof(storage));
-    typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
+        typename NumericAttributeTraits<T>::StorageType storage;
+        ASSERT_GE(writtenData.size(), sizeof(storage));
+        memcpy(&storage, writtenData.data(), sizeof(storage));
+        typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
 
-    ASSERT_EQ(actual, value);
+        ASSERT_EQ(actual, value);
+    }
+
+    // nullable test
+    {
+        TestWriteRequest test(
+            kAdminSubjectDescriptor,
+            ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZclType)));
+        AttributeValueDecoder decoder = test.DecoderFor(value);
+
+        // write should succeed
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+
+        // Validate data after write
+        chip::ByteSpan writtenData = Test::GetEmberBuffer();
+
+        typename NumericAttributeTraits<T>::StorageType storage;
+        ASSERT_GE(writtenData.size(), sizeof(storage));
+        memcpy(&storage, writtenData.data(), sizeof(storage));
+        typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
+
+        ASSERT_EQ(actual, value);
+    }
 }
 
 template <typename T, EmberAfAttributeType ZclType>
@@ -1983,9 +2007,9 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNu
     chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
-    TestWriteRequest test(kAdminSubjectDescriptor,
-                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
-                                                MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT24U_ATTRIBUTE_TYPE)));
+    TestWriteRequest test(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT24U_ATTRIBUTE_TYPE)));
 
     using NumericType             = NumericAttributeTraits<uint32_t>;
     using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
