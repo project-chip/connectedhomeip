@@ -66,7 +66,8 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_equal(len(device_type.keys()), 1, "Unexpected number of device types returned")
         asserts.assert_true(self.device_type_id in device_type.keys(), "device type id not found in returned data")
         asserts.assert_equal(device_type[self.device_type_id].revision, self.revision, "Unexpected revision")
-        asserts.assert_equal(len(device_type[self.device_type_id].server_clusters), len(self.clusters), "Unexpected number of clusters")
+        asserts.assert_equal(len(device_type[self.device_type_id].server_clusters),
+                             len(self.clusters), "Unexpected number of clusters")
         for id, name in self.clusters.items():
             asserts.assert_equal(device_type[self.device_type_id].server_clusters[id].name, name, "Incorrect cluster name")
             asserts.assert_equal(str(device_type[self.device_type_id].server_clusters[id].conformance),
