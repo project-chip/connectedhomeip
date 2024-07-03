@@ -65,6 +65,7 @@ public:
     PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) {}
     PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
     PeerAddress(Type type) : mTransportType(type) {}
+    PeerAddress(Type type, NodeId remoteId) : mTransportType(type), mRemoteId(remoteId) {}
 
     PeerAddress(PeerAddress &&)                  = default;
     PeerAddress(const PeerAddress &)             = default;
@@ -77,6 +78,8 @@ public:
         mIPAddress = addr;
         return *this;
     }
+
+    NodeId GetRemoteId() const { return mRemoteId; }
 
     Type GetTransportType() const { return mTransportType; }
     PeerAddress & SetTransportType(Type type)
@@ -213,7 +216,7 @@ public:
         return TCP(addr).SetPort(port).SetInterface(interface);
     }
 
-    static PeerAddress WiFiPAF() { return PeerAddress(Type::kWiFiPAF); }
+    static PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF); }
 
     static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
     {
@@ -243,6 +246,7 @@ private:
     Type mTransportType          = Type::kUndefined;
     uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.
     Inet::InterfaceId mInterface = Inet::InterfaceId::Null();
+    NodeId mRemoteId = 0;
 };
 
 } // namespace Transport
