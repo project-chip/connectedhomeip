@@ -321,7 +321,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         std::optional<InteractionModel::ClusterInfo> clusterInfo = GetClusterInfo(request.path);
         if (!clusterInfo.has_value())
         {
-            ChipLogError(DataManagement, "Unable to get cluster info for Endpoint %x, Cluster " ChipLogFormatMEI,
+            ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
             return CHIP_ERROR_NOT_FOUND;
         }
