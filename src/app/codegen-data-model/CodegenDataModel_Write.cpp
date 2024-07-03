@@ -126,8 +126,13 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
     typename ENCODING::LengthType len = static_cast<typename ENCODING::LengthType>(workingValue.size());
     VerifyOrReturnError(out.size() >= sizeof(len) + len, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ENCODING::SetLength(out.data(), len);
-    memcpy(out.data() + sizeof(len), workingValue.data(), workingValue.size());
+    char * output_buffer = out.data();
+
+    ENCODING::SetLength(output_buffer, len);
+    output_buffer += sizeof(len);
+
+    memcpy(output_buffer, workingValue.data(), workingValue.size());
+
     return CHIP_NO_ERROR;
 }
 
@@ -137,14 +142,14 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
 template <typename T>
 CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullable, MutableByteSpan out)
 {
+    using Traits = NumericAttributeTraits<T>;
+    typename Traits::StorageType storageValue;
+
     if (isNullable)
     {
-        using Traits = NumericAttributeTraits<T>;
-
         DataModel::Nullable<typename Traits::WorkingType> workingValue;
         ReturnErrorOnFailure(decoder.Decode(workingValue));
 
-        typename Traits::StorageType storageValue;
         if (workingValue.IsNull())
         {
             Traits::SetNull(storageValue);
@@ -156,18 +161,12 @@ CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullabl
         }
 
         VerifyOrReturnError(out.size() >= sizeof(storageValue), CHIP_ERROR_INVALID_ARGUMENT);
-
-        const uint8_t * data = Traits::ToAttributeStoreRepresentation(storageValue);
-        memcpy(out.data(), data, sizeof(storageValue));
     }
     else
     {
-        using Traits = NumericAttributeTraits<T>;
-
         typename Traits::WorkingType workingValue;
         ReturnErrorOnFailure(decoder.Decode(workingValue));
 
-        typename Traits::StorageType storageValue;
         Traits::WorkingToStorage(workingValue, storageValue);
 
         VerifyOrReturnError(out.size() >= sizeof(storageValue), CHIP_ERROR_INVALID_ARGUMENT);
@@ -175,10 +174,13 @@ CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullabl
         // This guards against trying to encode something that overlaps nullable, for example
         // Nullable<uint8_t>(0xFF) is not representable because 0xFF is the encoding of NULL in ember
         VerifyOrReturnError(Traits::CanRepresentValue(isNullable, workingValue), CHIP_ERROR_INVALID_ARGUMENT);
-
-        const uint8_t * data = Traits::ToAttributeStoreRepresentation(storageValue);
-        memcpy(out.data(), data, sizeof(storageValue));
     }
+
+    const uint8_t * data = Traits::ToAttributeStoreRepresentation(storageValue);
+
+    // The decoding + ToAttributeStoreRepresentation will result in data being
+    // stored in native format/byteorder, suitable to directly be stored in the data store
+    memcpy(out.data(), data, sizeof(storageValue));
 
     return CHIP_NO_ERROR;
 }
