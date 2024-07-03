@@ -62,11 +62,8 @@ bool PayloadContents::isValidQRCodePayload(ValidationMode mode) const
     if (mode == ValidationMode::kProduce)
     {
         chip::RendezvousInformationFlags valid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
-                                               RendezvousInformationFlag::kSoftAP
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                                               ,
+                                               RendezvousInformationFlag::kSoftAP ,
                                                RendezvousInformationFlag::kWiFiPAF
-#endif
         );
         VerifyOrReturnValue(rendezvousInformation.Value().HasOnly(valid), false);
     }

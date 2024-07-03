@@ -735,7 +735,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
     {
-        peerAddress = Transport::PeerAddress::WiFiPAF();
+        peerAddress = Transport::PeerAddress::WiFiPAF(remoteDeviceId);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 

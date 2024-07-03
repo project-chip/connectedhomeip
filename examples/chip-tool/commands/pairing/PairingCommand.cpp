@@ -82,7 +82,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     case PairingMode::WiFiPAF:
-        err = Pair(remoteId, PeerAddress::WiFiPAF());
+        err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
         break;
 #endif
     case PairingMode::AlreadyDiscovered:
