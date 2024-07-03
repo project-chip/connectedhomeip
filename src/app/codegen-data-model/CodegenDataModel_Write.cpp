@@ -136,9 +136,9 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
     return CHIP_NO_ERROR;
 }
 
-/// Encodes a numeric data value of type T from the given ember-encoded buffer `data`.
+/// Decodes a numeric data value of type T from the `decoder` into a ember-encoded buffer `out`
 ///
-/// isNullable defines if the value of NULL is allowed to be encoded.
+/// isNullable defines if the value of NULL is allowed to be decoded.
 template <typename T>
 CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullable, MutableByteSpan out)
 {
