@@ -161,35 +161,6 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
     }
 }
 
-bool RvcDevice::HandleIsSetSelectedLocationCallback(char * statusText)
-{
-    bool canSet;
-
-    switch (mRunModeInstance.GetCurrentMode())
-    {
-    case RvcRunMode::ModeIdle:
-        canSet = true;
-        break;
-
-    case RvcRunMode::ModeCleaning:
-        canSet = false;
-        strncat(statusText, "Cannot select locations while cleaning", ServiceArea::kMaxSizeStatusText);
-        break;
-
-    case RvcRunMode::ModeMapping:
-        canSet = false;
-        strncat(statusText, "Cannot select locations while mapping", ServiceArea::kMaxSizeStatusText);
-        break;
-
-    default:
-        canSet = false;
-        strncat(statusText, "Cannot select locations - unknown mode", ServiceArea::kMaxSizeStatusText);
-        break;
-    }
-
-    return canSet;
-}
-
 void RvcDevice::HandleChargedMessage()
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() !=

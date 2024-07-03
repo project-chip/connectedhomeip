@@ -95,15 +95,7 @@ public:
      * Handles the RvcOperationalState GoHome command.
      */
     void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
-
-    /**
-     * @brief Handles the check to see if the Selected Locations can be changed
-     * @param locationText if setting the selected location failed, a description of the mode or condition prohibiting the change
-     *        size kMaxSizeStatusText + 1 for termination char
-     * @return true if Selected Locations can be changed
-     */
-    bool HandleIsSetSelectedLocationCallback(char * locationText);
-
+    
     /**
      * Updates the state machine when the device becomes fully-charged.
      */
