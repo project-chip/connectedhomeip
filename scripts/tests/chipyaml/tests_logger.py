@@ -161,7 +161,7 @@ class TestRunnerLogger(TestRunnerHooks):
     def stop(self, duration: int):
         print(self.__strings.stop.format(runned=self.__runned, skipped=self.__skipped, duration=duration))
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         print(self.__strings.test_start.format(name=click.style(name, bold=True), count=click.style(count, bold=True)))
 
         if self.__use_test_harness_log_format:
