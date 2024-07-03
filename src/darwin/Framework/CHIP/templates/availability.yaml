@@ -9696,7 +9696,7 @@
           - WiFiNetworkManagement
       attributes:
           OccupancySensing:
-              # Targeting Fall 2024
+              # Targeting 1.4
               - HoldTime
               - HoldTimeLimits
       commands:
