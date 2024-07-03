@@ -238,6 +238,7 @@ function install_tizen_sdk() {
 
     # Tizen Developer Platform Certificate
     URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
+    # Tizen site do not has this package available in version 8.0. Certificates are the same for 7.0 and 8.0.
     PKG_ARR=(
         "7.0-iot-things-add-ons_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
