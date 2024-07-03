@@ -171,7 +171,7 @@ public:
 
     // ------------------------------------------------------------------
     // Set attribute methods
-    virtual CHIP_ERROR SetESAState(ESAStateEnum)                                                                       = 0;
+    virtual CHIP_ERROR SetESAState(ESAStateEnum) = 0;
 
 protected:
     EndpointId mEndpointId = 0;
