@@ -278,7 +278,7 @@ class AttributeChangeCallback:
 
         asserts.assert_equal(path.AttributeType, self._expected_attribute,
                              f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
-        logging.info(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
+        logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
         q = (path, transaction)
         self._output.put(q)
 
