@@ -442,7 +442,8 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
     if (aLocation.locationInfo.locationInfo.IsNull() && aLocation.locationInfo.landmarkTag.IsNull())
     {
         ChipLogDetail(Zcl, "IsValidAsSupportedLocation %u - must have locationInfo and/or LandmarkTag",
-                      aLocation.locationID) return false;
+                      aLocation.locationID);
+            return false;
     }
 
     // If HomeLocationInfo is not null, and its LocationName field is an empty string, at least one of the following SHALL NOT
@@ -455,7 +456,8 @@ bool Instance::IsValidSupportedLocation(const LocationStructureWrapper & aLocati
         {
             ChipLogDetail(
                 Zcl, "IsValidAsSupportedLocation %u - LocationName is empty string, FloorNumber, AreaType, LandmarkTag are null",
-                aLocation.locationID) return false;
+                aLocation.locationID);
+            return false;
         }
     }
 
