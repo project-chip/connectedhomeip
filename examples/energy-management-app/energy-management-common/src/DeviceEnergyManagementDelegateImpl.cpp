@@ -881,7 +881,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMaxPower(int64_t newValueMw)
 
 CHIP_ERROR
 DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
-    DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & powerAdjustCapabilityStruct)
+    const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & powerAdjustCapabilityStruct)
 {
     if (powerAdjustCapabilityStruct.IsNull())
     {
@@ -895,7 +895,7 @@ DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type> & forecast)
+CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> & forecast)
 {
     // TODO see Issue #31147
     if (forecast.IsNull())
