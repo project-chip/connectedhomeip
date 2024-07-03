@@ -50,7 +50,7 @@ using namespace chip::Protocols;
 
 namespace {
 
-using TestCommands = chip::Test::AppContext
+using TestCommands = chip::Test::AppContext;
 
 TEST_F(TestCommands, TestDataResponse)
 {
