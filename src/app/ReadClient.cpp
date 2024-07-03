@@ -403,6 +403,7 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
                                                   const Span<DataVersionFilter> & aDataVersionFilters,
                                                   bool & aEncodedDataVersionList)
 {
+    ChipLogProgress(DataManagement, "Attempting to encode %lu data version filters", static_cast<unsigned long>(aDataVersionFilters.size()));
     for (auto & filter : aDataVersionFilters)
     {
         VerifyOrReturnError(filter.IsValidDataVersionFilter(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -434,6 +435,10 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
         {
             // Packet is full, ignore the rest of the list
             aDataVersionFilterIBsBuilder.Rollback(backup);
+            ssize_t nonSkippedFilters = &filter - aDataVersionFilters.data();
+            size_t skippedFilters = aDataVersionFilters.size() - static_cast<size_t>(nonSkippedFilters);
+            ChipLogProgress(DataManagement, "Skipped encoding %lu out of %lu data version filters due to lack of space",
+                            static_cast<unsigned long>(skippedFilters), static_cast<unsigned long>(aDataVersionFilters.size()));
             return CHIP_NO_ERROR;
         }
         else
