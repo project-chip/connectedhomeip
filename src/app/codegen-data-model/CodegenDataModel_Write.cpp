@@ -323,7 +323,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         {
             ChipLogError(DataManagement, "Unable to get cluster info for Endpoint %x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
-            return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
+            return CHIP_ERROR_NOT_FOUND;
         }
 
         if (request.path.mDataVersion.Value() != clusterInfo->dataVersion)
