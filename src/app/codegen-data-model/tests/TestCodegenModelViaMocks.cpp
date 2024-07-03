@@ -1125,7 +1125,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
                                 ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
-    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_ERROR_ACCESS_DENIED);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
 }
 
 TEST(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
@@ -1809,7 +1809,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
     TestWriteRequest test(kDenySubjectDescriptor, ConcreteDataAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
     AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
 
-    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_ACCESS_DENIED);
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)

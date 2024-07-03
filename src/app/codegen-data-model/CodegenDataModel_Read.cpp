@@ -267,12 +267,15 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
                                                           RequiredPrivilege::ForReadAttribute(request.path));
         if (err != CHIP_NO_ERROR)
         {
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+
             // Implementation of 8.4.3.2 of the spec for path expansion
             if (request.path.mExpanded && (err == CHIP_ERROR_ACCESS_DENIED))
             {
                 return CHIP_NO_ERROR;
             }
-            return err;
+            // access denied has a specific code for IM
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
         }
     }
 

@@ -258,19 +258,25 @@ CHIP_ERROR DecodeValueIntoEmberBuffer(AttributeValueDecoder & decoder, const Emb
 CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttributeRequest & request,
                                             AttributeValueDecoder & decoder)
 {
-    ChipLogDetail(DataManagement,
-                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
-                  ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
-                  request.path.mExpanded);
+    ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=%x AttributeId=" ChipLogFormatMEI,
+                  ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
 
     // ACL check for non-internal requests
     if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
     {
-        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
 
         Access::RequestPath requestPath{ .cluster = request.path.mClusterId, .endpoint = request.path.mEndpointId };
-        ReturnErrorOnFailure(Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
-                                                              RequiredPrivilege::ForWriteAttribute(request.path)));
+        CHIP_ERROR err = Access::GetAccessControl().Check(*request.subjectDescriptor, requestPath,
+                                                          RequiredPrivilege::ForWriteAttribute(request.path));
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+
+            // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
+        }
     }
 
     auto metadata = Ember::FindAttributeMetadata(request.path);
