@@ -86,7 +86,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_FAIL']
         app_pid = self.matter_test_config.app_pid
         if app_pid != 0:
-            self.is_ci = True 
+            self.is_ci = True
             self.app_pipe = self.app_pipe + str(app_pid)
 
         RVCClean_cluster = Clusters.RvcCleanMode
@@ -109,7 +109,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
 
         if supported_modes_attr_id not in attribute_list:
             asserts.fail("supported modes needs to be supported attribute")
-        
+
         if current_mode_attr_id not in attribute_list:
             asserts.fail("Current mode needs to be supported attribute")
 

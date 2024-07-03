@@ -88,7 +88,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         self.endpoint = self.matter_test_config.endpoint
         app_pid = self.matter_test_config.app_pid
         if app_pid != 0:
-            self.is_ci = True 
+            self.is_ci = True
             self.app_pipe = self.app_pipe + str(app_pid)
 
         # replaces the RVCRUNM attributes from PICS file
@@ -101,7 +101,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
         if supported_modes_attr_id not in attribute_list:
             asserts.fail("Supported modes needs to be supported attribute")
-        
+
         if current_mode_attr_id not in attribute_list:
             asserts.fail("Current mode needs to be supported attribute")
 
@@ -113,10 +113,10 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
         self.print_step(
             2, "Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag.")
-        
+
         if self.is_ci:
             await self.send_run_change_to_mode_cmd(1)
-        
+
         else:
             self.wait_for_user_input(
                 prompt_msg="Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag, and press Enter when done.")

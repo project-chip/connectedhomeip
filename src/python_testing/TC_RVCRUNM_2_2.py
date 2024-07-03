@@ -120,17 +120,16 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         self.endpoint = self.matter_test_config.endpoint
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']
-                app_pid = self.matter_test_config.app_pid
+        app_pid = self.matter_test_config.app_pid
         if app_pid != 0:
-            self.is_ci = True 
+            self.is_ci = True
             self.app_pipe = self.app_pipe + str(app_pid)
-        
 
         app_pid = self.matter_test_config.app_pid
         if app_pid != 0:
-            self.is_ci = True 
+            self.is_ci = True
             self.app_pipe = self.app_pipe + str(app_pid)
-        
+
         RVCRun_cluster = Clusters.RvcRunMode
 
         # Gathering Available Attributes and associated ids
@@ -150,7 +149,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
         if supported_modes_attr_id not in attribute_list:
             asserts.fail("Supported modes needs to be supported attribute")
-        
+
         if current_mode_attr_id not in attribute_list:
             asserts.fail("Current mode needs to be supported attribute")
 
@@ -158,7 +157,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             asserts.fail("Change To Mode receiving commands needs to be supported")
 
         asserts.assert_true(self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED"),
-                    "RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED must be supported")
+                            "RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED must be supported")
 
         # Starting the test steps
         self.print_step(1, "Commissioning, already done")

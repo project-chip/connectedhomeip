@@ -136,5 +136,6 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
             logging.info("CurrentMode: %s" % (current_mode))
             asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")
 
+
 if __name__ == "__main__":
     default_matter_test_main()

@@ -100,7 +100,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
 
         if supported_modes_attr_id not in attribute_list:
             asserts.fail("supported modes needs to be supported attribute")
-        
+
         if current_mode_attr_id not in attribute_list:
             asserts.fail("Current mode needs to be supported attribute")
 
