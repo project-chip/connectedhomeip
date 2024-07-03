@@ -88,6 +88,7 @@ public:
     ///   WriteAttribute is REQUIRED to perform:
     ///     - ACL validation (see notes on OperationFlags::kInternal)
     ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
+    ///     - Validation of timed interaction required (also controlled by OperationFlags::kInternal)
     ///
     /// Return codes
     ///   CHIP_IM_GLOBAL_STATUS(code):
