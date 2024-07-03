@@ -258,7 +258,7 @@ CHIP_ERROR DecodeValueIntoEmberBuffer(AttributeValueDecoder & decoder, const Emb
 CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttributeRequest & request,
                                             AttributeValueDecoder & decoder)
 {
-    ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=%x AttributeId=" ChipLogFormatMEI,
+    ChipLogDetail(DataManagement, "Writing attribute: Cluster=" ChipLogFormatMEI " Endpoint=0x%x AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId));
 
     // ACL check for non-internal requests
@@ -293,7 +293,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
     // All the global attributes that we do not have metadata for are
     // read-only. Specifically only the following list-based attributes match the
-    // "global attributes not in metadata" (see GlobalAttributes.h :: GlobalAttributesNotInMetadat):
+    // "global attributes not in metadata" (see GlobalAttributes.h :: GlobalAttributesNotInMetadata):
     //   - AttributeList
     //   - EventList
     //   - AcceptedCommands
@@ -321,7 +321,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         std::optional<InteractionModel::ClusterInfo> clusterInfo = GetClusterInfo(request.path);
         if (!clusterInfo.has_value())
         {
-            ChipLogError(DataManagement, "Unable to get cluster info for Endpoint %x, Cluster " ChipLogFormatMEI,
+            ChipLogError(DataManagement, "Unable to get cluster info for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
             return CHIP_ERROR_NOT_FOUND;
         }
