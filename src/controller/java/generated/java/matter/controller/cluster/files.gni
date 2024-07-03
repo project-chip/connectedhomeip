@@ -92,6 +92,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/NetworkCommissioningClusterNetworkInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/NetworkCommissioningClusterThreadInterfaceScanResultStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/NetworkCommissioningClusterWiFiInterfaceScanResultStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/OccupancySensingClusterHoldTimeLimitsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/OperationalCredentialsClusterFabricDescriptorStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/OperationalCredentialsClusterNOCStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/OperationalStateClusterErrorStateStruct.kt",

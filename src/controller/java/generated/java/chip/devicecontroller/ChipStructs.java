@@ -9748,6 +9748,82 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
     return output.toString();
   }
 }
+public static class OccupancySensingClusterHoldTimeLimitsStruct {
+  public Integer holdTimeMin;
+  public Integer holdTimeMax;
+  public Integer holdTimeDefault;
+  private static final long HOLD_TIME_MIN_ID = 0L;
+  private static final long HOLD_TIME_MAX_ID = 1L;
+  private static final long HOLD_TIME_DEFAULT_ID = 2L;
+
+  public OccupancySensingClusterHoldTimeLimitsStruct(
+    Integer holdTimeMin,
+    Integer holdTimeMax,
+    Integer holdTimeDefault
+  ) {
+    this.holdTimeMin = holdTimeMin;
+    this.holdTimeMax = holdTimeMax;
+    this.holdTimeDefault = holdTimeDefault;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(HOLD_TIME_MIN_ID, new UIntType(holdTimeMin)));
+    values.add(new StructElement(HOLD_TIME_MAX_ID, new UIntType(holdTimeMax)));
+    values.add(new StructElement(HOLD_TIME_DEFAULT_ID, new UIntType(holdTimeDefault)));
+
+    return new StructType(values);
+  }
+
+  public static OccupancySensingClusterHoldTimeLimitsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer holdTimeMin = null;
+    Integer holdTimeMax = null;
+    Integer holdTimeDefault = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == HOLD_TIME_MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          holdTimeMin = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HOLD_TIME_MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          holdTimeMax = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HOLD_TIME_DEFAULT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          holdTimeDefault = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new OccupancySensingClusterHoldTimeLimitsStruct(
+      holdTimeMin,
+      holdTimeMax,
+      holdTimeDefault
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OccupancySensingClusterHoldTimeLimitsStruct {\n");
+    output.append("\tholdTimeMin: ");
+    output.append(holdTimeMin);
+    output.append("\n");
+    output.append("\tholdTimeMax: ");
+    output.append(holdTimeMax);
+    output.append("\n");
+    output.append("\tholdTimeDefault: ");
+    output.append(holdTimeDefault);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
   public Long extendedPanID;
   public String networkName;

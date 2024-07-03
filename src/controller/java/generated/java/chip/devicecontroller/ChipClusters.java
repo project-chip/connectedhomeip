@@ -47598,6 +47598,8 @@ public class ChipClusters {
     private static final long OCCUPANCY_ATTRIBUTE_ID = 0L;
     private static final long OCCUPANCY_SENSOR_TYPE_ATTRIBUTE_ID = 1L;
     private static final long OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_ID = 2L;
+    private static final long HOLD_TIME_ATTRIBUTE_ID = 3L;
+    private static final long HOLD_TIME_LIMITS_ATTRIBUTE_ID = 4L;
     private static final long P_I_R_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID = 16L;
     private static final long P_I_R_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID = 17L;
     private static final long P_I_R_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID = 18L;
@@ -47622,6 +47624,10 @@ public class ChipClusters {
     @Deprecated
     public long initWithDevice(long devicePtr, int endpointId) {
       return 0L;
+    }
+
+    public interface HoldTimeLimitsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.OccupancySensingClusterHoldTimeLimitsStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -47716,6 +47722,67 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readHoldTimeAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HOLD_TIME_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HOLD_TIME_ATTRIBUTE_ID, true);
+    }
+
+    public void writeHoldTimeAttribute(DefaultClusterCallback callback, Integer value) {
+      writeHoldTimeAttribute(callback, value, 0);
+    }
+
+    public void writeHoldTimeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), HOLD_TIME_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeHoldTimeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HOLD_TIME_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HOLD_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readHoldTimeLimitsAttribute(
+        HoldTimeLimitsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HOLD_TIME_LIMITS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.OccupancySensingClusterHoldTimeLimitsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HOLD_TIME_LIMITS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeHoldTimeLimitsAttribute(
+        HoldTimeLimitsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, HOLD_TIME_LIMITS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.OccupancySensingClusterHoldTimeLimitsStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, HOLD_TIME_LIMITS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPIROccupiedToUnoccupiedDelayAttribute(
@@ -64543,6 +64610,36 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void stringEchoRequest(StringEchoResponseCallback callback, byte[] payload) {
+      stringEchoRequest(callback, payload, 0);
+    }
+
+    public void stringEchoRequest(StringEchoResponseCallback callback, byte[] payload, int timedInvokeTimeoutMs) {
+      final long commandId = 24L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long payloadFieldID = 0L;
+      BaseTLVType payloadtlvValue = new ByteArrayType(payload);
+      elements.add(new StructElement(payloadFieldID, payloadtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long payloadFieldID = 0L;
+          byte[] payload = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == payloadFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                payload = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(payload);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public void testDifferentVendorMeiRequest(TestDifferentVendorMeiResponseCallback callback, Integer arg1) {
       testDifferentVendorMeiRequest(callback, arg1, 0);
     }
@@ -64630,6 +64727,10 @@ public class ChipClusters {
 
     public interface TestBatchHelperResponseCallback extends BaseClusterCallback {
       void onSuccess(byte[] buffer);
+    }
+
+    public interface StringEchoResponseCallback extends BaseClusterCallback {
+      void onSuccess(byte[] payload);
     }
 
     public interface TestDifferentVendorMeiResponseCallback extends BaseClusterCallback {

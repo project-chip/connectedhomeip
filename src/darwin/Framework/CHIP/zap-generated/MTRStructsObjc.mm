@@ -7085,6 +7085,39 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic coolSetpoint;
 @end
 
+@implementation MTROccupancySensingClusterHoldTimeLimitsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _holdTimeMin = @(0);
+
+        _holdTimeMax = @(0);
+
+        _holdTimeDefault = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROccupancySensingClusterHoldTimeLimitsStruct alloc] init];
+
+    other.holdTimeMin = self.holdTimeMin;
+    other.holdTimeMax = self.holdTimeMax;
+    other.holdTimeDefault = self.holdTimeDefault;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: holdTimeMin:%@; holdTimeMax:%@; holdTimeDefault:%@; >", NSStringFromClass([self class]), _holdTimeMin, _holdTimeMax, _holdTimeDefault];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRThreadNetworkDirectoryClusterThreadNetworkStruct
 - (instancetype)init
 {

@@ -5834,6 +5834,14 @@ namespace OccupancySensorTypeBitmap {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace OccupancySensorTypeBitmap
 
+namespace HoldTime {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace HoldTime
+
+namespace HoldTimeLimits {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace HoldTimeLimits
+
 namespace PIROccupiedToUnoccupiedDelay {
 static constexpr AttributeId Id = 0x00000010;
 } // namespace PIROccupiedToUnoccupiedDelay
