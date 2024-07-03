@@ -83,7 +83,7 @@ line. These two lines should appear verbatim at the bottom of every python test
 file.
 
 
-## Defining the arguments
+## Defining the test arguments
 Below is the format:
 ```
 # test-runner-runs: <run_identifier>
