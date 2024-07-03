@@ -95,7 +95,7 @@ public:
      * Handles the RvcOperationalState GoHome command.
      */
     void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
-    
+
     /**
      * Updates the state machine when the device becomes fully-charged.
      */

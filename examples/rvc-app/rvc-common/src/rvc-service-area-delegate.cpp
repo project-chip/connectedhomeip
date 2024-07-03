@@ -105,12 +105,12 @@ bool RvcServiceAreaDelegate::IsSupportedLocationsChangeAllowed()
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedLocations()
 {
-    return (uint32_t) mSupportedLocations.size();
+    return static_cast<uint32_t>(mSupportedLocations.size());
 }
 
 bool RvcServiceAreaDelegate::GetSupportedLocationByIndex(uint32_t listIndex, LocationStructureWrapper & aSupportedLocation)
 {
-    if (listIndex < (uint32_t) mSupportedLocations.size())
+    if (listIndex < static_cast<uint32_t>(mSupportedLocations.size()))
     {
         aSupportedLocation = mSupportedLocations[listIndex];
         return true;
@@ -126,7 +126,7 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
     listIndex         = 0;
-    uint32_t listSize = (uint32_t) mSupportedLocations.size();
+    uint32_t listSize = static_cast<uint32_t>(mSupportedLocations.size());
 
     while (listIndex < listSize)
     {
@@ -148,16 +148,16 @@ bool RvcServiceAreaDelegate::AddSupportedLocation(const LocationStructureWrapper
     // etc.
 
     // Double-check list size to ensure there no memory issues.
-    if ((uint32_t) mSupportedLocations.size() < kMaxNumSupportedLocations)
+    if (mSupportedLocations.size() < kMaxNumSupportedLocations)
     {
         // not sorting list, number of locations normally expected to be small, max 255
         mSupportedLocations.push_back(newLocation);
-        listIndex = (uint32_t) mSupportedMaps.size() - 1; // new element is last in list
+        listIndex = static_cast<uint32_t>(mSupportedMaps.size()) - 1; // new element is last in list
         return true;
     }
 
     ChipLogError(Zcl, "AddSupportedLocation %u - supported locations list is already at maximum size %u",
-                 newLocation.locationID, (uint32_t) kMaxNumSupportedLocations);
+                 newLocation.locationID, static_cast<uint32_t>(kMaxNumSupportedLocations));
 
     return false;
 }
@@ -182,7 +182,7 @@ bool RvcServiceAreaDelegate::ModifySupportedLocation(uint32_t listIndex, const L
 
 bool RvcServiceAreaDelegate::ClearSupportedLocations()
 {
-    if ((uint32_t) mSupportedLocations.size() > 0)
+    if (!mSupportedLocations.empty())
     {
         mSupportedLocations.clear();
         return true;
@@ -202,12 +202,12 @@ bool RvcServiceAreaDelegate::IsSupportedMapChangeAllowed()
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedMaps()
 {
-    return (uint32_t) mSupportedMaps.size();
+    return static_cast<uint32_t>(mSupportedMaps.size());
 }
 
 bool RvcServiceAreaDelegate::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap)
 {
-    if (listIndex < (uint32_t) mSupportedMaps.size())
+    if (listIndex < static_cast<uint32_t>(mSupportedMaps.size()))
     {
         aSupportedMap = mSupportedMaps[listIndex];
         return true;
@@ -222,7 +222,7 @@ bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & list
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
     listIndex         = 0;
-    uint32_t listSize = (uint32_t) mSupportedMaps.size();
+    uint32_t listSize = static_cast<uint32_t>(mSupportedMaps.size());
 
     while (listIndex < listSize)
     {
@@ -244,15 +244,15 @@ bool RvcServiceAreaDelegate::AddSupportedMap(const MapStructureWrapper & newMap,
     // etc.
 
     // Double-check list size to ensure there no memory issues.
-    if ((uint32_t) mSupportedMaps.size() < kMaxNumSupportedMaps)
+    if (mSupportedMaps.size() < kMaxNumSupportedMaps)
     {
         // not sorting list, number of locations normally expected to be small, max 255
         mSupportedMaps.push_back(newMap);
-        listIndex = (uint32_t) mSupportedMaps.size() - 1; // new element is last in list
+        listIndex = static_cast<uint32_t>(mSupportedMaps.size()) - 1; // new element is last in list
         return true;
     }
     ChipLogError(Zcl, "AddSupportedMap %u - supported maps list is already at maximum size %u", newMap.mapID,
-                 (uint32_t) kMaxNumSupportedMaps);
+                 static_cast<uint32_t>(kMaxNumSupportedMaps));
 
     return false;
 }
@@ -277,7 +277,7 @@ bool RvcServiceAreaDelegate::ModifySupportedMap(uint32_t listIndex, const MapStr
 
 bool RvcServiceAreaDelegate::ClearSupportedMaps()
 {
-    if ((uint32_t) mSupportedMaps.size() > 0)
+    if (!mSupportedMaps.empty())
     {
         mSupportedMaps.clear();
         return true;
@@ -291,12 +291,12 @@ bool RvcServiceAreaDelegate::ClearSupportedMaps()
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfSelectedLocations()
 {
-    return (uint32_t) mSelectedLocations.size();
+    return static_cast<uint32_t>(mSelectedLocations.size());
 }
 
 bool RvcServiceAreaDelegate::GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & aSelectedLocation)
 {
-    if (listIndex < (uint32_t) mSelectedLocations.size())
+    if (listIndex < static_cast<uint32_t>(mSelectedLocations.size()))
     {
         aSelectedLocation = mSelectedLocations[listIndex];
         return true;
@@ -311,22 +311,22 @@ bool RvcServiceAreaDelegate::AddSelectedLocation(uint32_t aLocationId, uint32_t 
     // etc.
 
     // Double-check list size to ensure there no memory issues.
-    if ((uint32_t) mSelectedLocations.size() < kMaxNumSelectedLocations)
+    if (mSelectedLocations.size() < kMaxNumSelectedLocations)
     {
         // not sorting list, number of locations normally expected to be small, max 255
         mSelectedLocations.push_back(aLocationId);
-        listIndex = (uint32_t) mSelectedLocations.size() - 1; // new element is last in list
+        listIndex = static_cast<uint32_t>(mSelectedLocations.size()) - 1; // new element is last in list
         return true;
     }
     ChipLogError(Zcl, "AddSelectedLocation %u - selected locations list is already at maximum size %u", aLocationId,
-                 (uint32_t) kMaxNumSelectedLocations);
+                 static_cast<uint32_t>(kMaxNumSelectedLocations));
 
     return false;
 }
 
 bool RvcServiceAreaDelegate::ClearSelectedLocations()
 {
-    if ((uint32_t) mSelectedLocations.size() > 0)
+    if (!mSelectedLocations.empty())
     {
         mSelectedLocations.clear();
         return true;
@@ -340,12 +340,12 @@ bool RvcServiceAreaDelegate::ClearSelectedLocations()
 
 uint32_t RvcServiceAreaDelegate::GetNumberOfProgressElements()
 {
-    return (uint32_t) mProgressList.size();
+    return static_cast<uint32_t>(mProgressList.size());
 }
 
 bool RvcServiceAreaDelegate::GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
-    if (listIndex < (uint32_t) mProgressList.size())
+    if (listIndex < static_cast<uint32_t>(mProgressList.size()))
     {
         aProgressElement = mProgressList[listIndex];
         return true;
@@ -361,7 +361,7 @@ bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
     listIndex         = 0;
-    uint32_t listSize = (uint32_t) mProgressList.size();
+    uint32_t listSize = static_cast<uint32_t>(mProgressList.size());
 
     while (listIndex < listSize)
     {
@@ -383,15 +383,15 @@ bool RvcServiceAreaDelegate::AddProgressElement(const Structs::ProgressStruct::T
     // etc.
 
     // Double-check list size to ensure there no memory issues.
-    if ((uint32_t) mProgressList.size() < kMaxNumProgressElements)
+    if (mProgressList.size() < kMaxNumProgressElements)
     {
         // not sorting list, number of locations normally expected to be small, max 255
         mProgressList.push_back(newProgressElement);
-        listIndex = (uint32_t) mProgressList.size() - 1; // new element is last in list
+        listIndex = static_cast<uint32_t>(mProgressList.size()) - 1; // new element is last in list
         return true;
     }
     ChipLogError(Zcl, "AddProgressElement %u -progress list is already at maximum size %u", newProgressElement.locationID,
-                 (uint32_t) kMaxNumProgressElements);
+                 static_cast<uint32_t>(kMaxNumProgressElements));
 
     return false;
 }
@@ -405,7 +405,7 @@ bool RvcServiceAreaDelegate::ModifyProgressElement(uint32_t listIndex,
 
 bool RvcServiceAreaDelegate::ClearProgress()
 {
-    if ((uint32_t) mProgressList.size() > 0)
+    if (!mProgressList.empty())
     {
         mProgressList.clear();
         return true;
