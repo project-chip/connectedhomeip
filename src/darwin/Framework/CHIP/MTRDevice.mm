@@ -2589,6 +2589,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                                return;
                            }
 
+                           MTR_LOG("%@ Subscribe with data version list size %lu", self, static_cast<unsigned long>(dataVersionFilterListSize));
+
                            // Callback and ClusterStateCache and ReadClient will be deleted
                            // when OnDone is called.
                            os_unfair_lock_lock(&self->_lock);
