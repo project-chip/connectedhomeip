@@ -90,7 +90,7 @@ struct ShortPascalString
     using LengthType                        = uint8_t;
     static constexpr LengthType kNullLength = 0xFF;
 
-    static LengthType GetLength(const uint8_t *buffer) { return emberAfStringLength(buffer); }
+    static LengthType GetLength(const uint8_t * buffer) { return emberAfStringLength(buffer); }
 };
 
 /// Metadata of what a ember/pascal LONG string means (prepended by a u16 length)
@@ -99,7 +99,7 @@ struct LongPascalString
     using LengthType                        = uint16_t;
     static constexpr LengthType kNullLength = 0xFFFF;
 
-    static LengthType GetLength(const uint8_t *buffer) { return emberAfLongStringLength(buffer); }
+    static LengthType GetLength(const uint8_t * buffer) { return emberAfLongStringLength(buffer); }
 };
 
 // ember assumptions ... should just work
