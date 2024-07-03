@@ -142,7 +142,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         # Gathering Accepted and Generated Commands and associated ids
         commands = RVCRun_cluster.Commands
         RVCRun_accptcmd_list = attributes.AcceptedCommandList
-        RVCRun_gencmd_list = attributes.GeneratedCommandList
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_accptcmd_list)
         chg_mode_cmd_id = commands.ChangeToMode.command_id
 
