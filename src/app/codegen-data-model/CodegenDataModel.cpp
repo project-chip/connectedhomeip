@@ -115,7 +115,7 @@ void LoadAttributeInfo(const ConcreteAttributePath & path, const EmberAfAttribut
                        InteractionModel::AttributeInfo * info)
 {
     info->readPrivilege = RequiredPrivilege::ForReadAttribute(path);
-    if (attribute.IsReadOnly())
+    if (!attribute.IsReadOnly())
     {
         info->writePrivilege = RequiredPrivilege::ForWriteAttribute(path);
     }
