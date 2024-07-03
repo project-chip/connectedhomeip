@@ -290,29 +290,31 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     }
 
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
-    if (attributeMetadata == nullptr)
-    {
-        // All the global attributes that we do not have metadata for are
-        // read-only. Specifically only the following list-based attributes match the
-        // "global attributes not in metadata" (see GlobalAttributes.h :: GlobalAttributesNotInMetadat):
-        //   - AttributeList
-        //   - EventList
-        //   - AcceptedCommands
-        //   - GeneratedCommands
-        //
-        // Given the above, UnsupportedWrite should be correct (attempt to write to a read-only list)
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
-    }
+
+    // All the global attributes that we do not have metadata for are
+    // read-only. Specifically only the following list-based attributes match the
+    // "global attributes not in metadata" (see GlobalAttributes.h :: GlobalAttributesNotInMetadat):
+    //   - AttributeList
+    //   - EventList
+    //   - AcceptedCommands
+    //   - GeneratedCommands
+    //
+    // Given the above, UnsupportedWrite should be correct (attempt to write to a read-only list)
+    bool isReadOnly = (attributeMetadata == nullptr) || (*attributeMetadata)->IsReadOnly();
 
     // Internal is allowed to bypass timed writes and read-only.
     if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
     {
-        VerifyOrReturnError(!(*attributeMetadata)->IsReadOnly(), CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+        VerifyOrReturnError(!isReadOnly, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
         VerifyOrReturnError(!(*attributeMetadata)->MustUseTimedWrite() ||
                                 request.writeFlags.Has(InteractionModel::WriteFlags::kTimed),
                             CHIP_IM_GLOBAL_STATUS(NeedsTimedInteraction));
     }
+
+    // Extra check: internal requests can bypass the read only check, however global attributes
+    // have no underlying storage, so write still cannot be done
+    VerifyOrReturnError(attributeMetadata != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     if (request.path.mDataVersion.HasValue())
     {
