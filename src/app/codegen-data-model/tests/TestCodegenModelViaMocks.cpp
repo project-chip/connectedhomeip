@@ -728,6 +728,18 @@ void TestEmberScalarNullWrite()
     ASSERT_TRUE(Traits::IsNullValue(storage));
 }
 
+uint16_t ReadLe16(const void * buffer)
+{
+    const uint8_t * p = reinterpret_cast<const uint8_t *>(buffer);
+    return chip::Encoding::LittleEndian::Read16(p);
+}
+
+void WriteLe16(void * buffer, uint16_t value)
+{
+    uint8_t * p = reinterpret_cast<uint8_t *>(buffer);
+    chip::Encoding::LittleEndian::Write16(p, value);
+}
+
 } // namespace
 
 TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
@@ -1389,9 +1401,8 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 
     // NOTE: This is a pascal string, so actual data is "test"
     //       the longer encoding is to make it clear we do not encode the overflow
-    char data[]  = "\0\0testing here with overflow";
-    uint16_t len = 4;
-    memcpy(data, &len, sizeof(uint16_t));
+    char data[] = "\0\0testing here with overflow";
+    WriteLe16(data, 4);
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
@@ -1465,9 +1476,8 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
 
     // NOTE: This is a pascal string, so actual data is "abcde"
     //       the longer encoding is to make it clear we do not encode the overflow
-    char data[]  = "\0abcdef...this is the alphabet";
-    uint16_t len = 5;
-    memcpy(data, &len, sizeof(uint8_t));
+    char data[] = "\0abcdef...this is the alphabet";
+    *data = 5;
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
@@ -1503,9 +1513,8 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 
     // NOTE: This is a pascal string, so actual data is "abcde"
     //       the longer encoding is to make it clear we do not encode the overflow
-    char data[]  = "\0\0abcdef...this is the alphabet";
-    uint16_t len = 5;
-    memcpy(data, &len, sizeof(uint16_t));
+    char data[] = "\0\0abcdef...this is the alphabet";
+    WriteLe16(data, 5);
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
@@ -1893,8 +1902,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongString)
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
 
-    uint16_t len;
-    memcpy(&len, writtenData.data(), 2);
+    uint16_t len = ReadLe16(writtenData.data());
     EXPECT_EQ(len, 4);
     chip::CharSpan asCharSpan(reinterpret_cast<const char *>(writtenData.data() + 2), 4);
 
@@ -1916,8 +1924,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
 
-    uint16_t len;
-    memcpy(&len, writtenData.data(), 2);
+    uint16_t len = ReadLe16(writtenData.data());
     EXPECT_EQ(len, 4);
     chip::CharSpan asCharSpan(reinterpret_cast<const char *>(writtenData.data() + 2), 4);
 
@@ -1980,8 +1987,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
 
-    uint16_t len;
-    memcpy(&len, writtenData.data(), 2);
+    uint16_t len = ReadLe16(writtenData.data());
     EXPECT_EQ(len, 3);
 
     EXPECT_EQ(writtenData[2], 11u);
