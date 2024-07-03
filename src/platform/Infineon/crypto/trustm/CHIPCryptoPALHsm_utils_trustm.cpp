@@ -961,7 +961,7 @@ optiga_lib_status_t trustm_PBKDF2_HMAC(const unsigned char * salt, size_t slen, 
 
         while (p_local_crypt->instance_state != OPTIGA_LIB_INSTANCE_FREE)
             ;
-            
+
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
 
         {

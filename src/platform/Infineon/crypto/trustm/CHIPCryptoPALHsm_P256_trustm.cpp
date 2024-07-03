@@ -256,7 +256,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     out_secret.SetLength(secret_length);
     error = CHIP_NO_ERROR;
 
- exit:
+exit:
     if (error != CHIP_NO_ERROR)
     {
         trustm_close();
