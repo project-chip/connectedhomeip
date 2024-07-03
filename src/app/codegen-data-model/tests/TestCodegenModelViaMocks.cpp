@@ -1477,7 +1477,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
     // NOTE: This is a pascal string, so actual data is "abcde"
     //       the longer encoding is to make it clear we do not encode the overflow
     char data[] = "\0abcdef...this is the alphabet";
-    *data = 5;
+    *data       = 5;
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
