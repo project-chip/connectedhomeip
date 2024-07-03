@@ -49,7 +49,6 @@ using namespace chip::app::Compatibility::Internal;
 std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteAttributePath & path, AttributeAccessInterface * aai,
                                                      AttributeValueDecoder & decoder)
 {
-
     // Processing can happen only if an attribute access interface actually exists..
     if (aai == nullptr)
     {
