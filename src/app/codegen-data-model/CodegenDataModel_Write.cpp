@@ -353,9 +353,15 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         record.endpoint    = request.path.mEndpointId;
         record.clusterId   = request.path.mClusterId;
         record.attributeId = request.path.mAttributeId;
-        status             = emAfReadOrWriteAttribute(&record, attributeMetadata, gEmberAttributeIOBufferSpan.data(),
-                                                      static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
-                                                      /* write = */ true);
+        // NOTE: gEmberAttributeIOBufferSpah is likely much larger than the attribute itself. Ember is supposed
+        //       to be able to pick up the "valid size" out of this
+        //
+        // Specifically `When writing attributes, readLength is ignored.`.
+        // The actual length is used by unit tests to copy over data without needing "get attribute size" logic
+        // since metadata attribute sizes in our mocks is not generally correct.
+        status = emAfReadOrWriteAttribute(&record, attributeMetadata, gEmberAttributeIOBufferSpan.data(),
+                                          static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
+                                          /* write = */ true);
     }
     else
     {
