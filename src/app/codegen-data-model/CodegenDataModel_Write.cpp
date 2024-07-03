@@ -359,8 +359,8 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         // Specifically `When writing attributes, readLength is ignored.`.
         // The actual length is used by unit tests to copy over data without needing "get attribute size" logic
         // since metadata attribute sizes in our mocks is not generally correct.
-        status = emAfReadOrWriteAttribute(&record, attributeMetadata, gEmberAttributeIOBufferSpan.data(),
-                                          static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
+        status = emAfReadOrWriteAttribute(&record, attributeMetadata, /* buffer = */ gEmberAttributeIOBufferSpan.data(),
+                                          /* readLength = */ static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
                                           /* write = */ true);
     }
     else
