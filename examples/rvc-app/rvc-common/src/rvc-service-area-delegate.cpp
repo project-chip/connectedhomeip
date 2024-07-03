@@ -28,8 +28,8 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
     uint8_t supportedMapId_XX = 3;
     uint8_t supportedMapId_YY = 245;
 
-    GetInstance()->AddSupportedMap(supportedMapId_XX, CharSpan::fromCharString("My Map XX"));
-    GetInstance()->AddSupportedMap(supportedMapId_YY, CharSpan::fromCharString("My Map YY"));
+    GetInstance()->AddSupportedMap(supportedMapId_XX, "My Map XX"_span);
+    GetInstance()->AddSupportedMap(supportedMapId_YY, "My Map YY"_span);
 
     // hardcoded fill of SUPPORTED LOCATIONS for prototyping
     uint32_t supportedLocationId_A = 7;
@@ -39,14 +39,14 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 
     // Location A has name, floor number, uses map XX
     GetInstance()->AddSupportedLocation(
-        supportedLocationId_A, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), CharSpan::fromCharString("My Location A"),
+        supportedLocationId_A, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location A"_span,
         DataModel::Nullable<int16_t>(4), DataModel::Nullable<ServiceArea::AreaTypeTag>(),
         DataModel::Nullable<ServiceArea::LandmarkTag>(), DataModel::Nullable<ServiceArea::PositionTag>(),
         DataModel::Nullable<ServiceArea::FloorSurfaceTag>());
 
     // Location B has name, uses map XX
     GetInstance()->AddSupportedLocation(
-        supportedLocationId_B, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), CharSpan::fromCharString("My Location B"),
+        supportedLocationId_B, DataModel::Nullable<uint_fast8_t>(supportedMapId_XX), "My Location B"_span,
         DataModel::Nullable<int16_t>(), DataModel::Nullable<ServiceArea::AreaTypeTag>(),
         DataModel::Nullable<ServiceArea::LandmarkTag>(), DataModel::Nullable<ServiceArea::PositionTag>(),
         DataModel::Nullable<ServiceArea::FloorSurfaceTag>());
@@ -61,7 +61,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 
     // Location D has null values for all HomeLocationStruct fields, Map YY
     GetInstance()->AddSupportedLocation(supportedLocationId_D, DataModel::Nullable<uint_fast8_t>(supportedMapId_YY),
-                                        CharSpan::fromCharString("My Location D"), DataModel::Nullable<int16_t>(),
+                                        "My Location D"_span, DataModel::Nullable<int16_t>(),
                                         DataModel::Nullable<ServiceArea::AreaTypeTag>(),
                                         DataModel::Nullable<ServiceArea::LandmarkTag>(ServiceArea::LandmarkTag::kCouch),
                                         DataModel::Nullable<ServiceArea::PositionTag>(ServiceArea::PositionTag::kNextTo),
