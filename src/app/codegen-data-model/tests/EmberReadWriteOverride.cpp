@@ -17,6 +17,7 @@
 #include "EmberReadWriteOverride.h"
 
 #include <app/util/attribute-storage.h>
+#include <app/util/ember-io-storage.h>
 #include <lib/support/Span.h>
 
 using chip::Protocols::InteractionModel::Status;
@@ -96,5 +97,27 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
         memcpy(buffer, gEmberIoBuffer, gEmberIoBufferFill);
     }
 
+    return Status::Success;
+}
+
+Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
+                                  uint8_t * dataPtr, EmberAfAttributeType dataType)
+{
+    if (gEmberStatusCode != Status::Success)
+    {
+        return gEmberStatusCode;
+    }
+
+    // ember here deduces the size of dataPtr. For testing however, we KNOW we read
+    // out of the ember IO buffer, so we try to use that
+    VerifyOrDie(dataPtr == chip::app::Compatibility::Internal::gEmberAttributeIOBufferSpan.data());
+
+    // In theory this should do type validation and sizes. This is NOT done for testing.
+    // copy over as much data as possible
+    // NOTE: we do NOT use (*metadata)->size since it is unclear if our mocks set that correctly
+    size_t len = std::min<size_t>(sizeof(gEmberIoBuffer), chip::app::Compatibility::Internal::gEmberAttributeIOBufferSpan.size());
+    memcpy(gEmberIoBuffer, dataPtr, len);
+    gEmberIoBufferFill = len;
+   
     return Status::Success;
 }

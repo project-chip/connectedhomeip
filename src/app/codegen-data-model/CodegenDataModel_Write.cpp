@@ -27,6 +27,7 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage-null-handling.h>
+#include <app/util/attribute-table-detail.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
 #include <app/util/odd-sized-integers.h>
@@ -343,14 +344,24 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
     ReturnErrorOnFailure(DecodeValueIntoEmberBuffer(decoder, *attributeMetadata, gEmberAttributeIOBufferSpan));
 
-    EmberAfAttributeSearchRecord record;
-    record.endpoint    = request.path.mEndpointId;
-    record.clusterId   = request.path.mClusterId;
-    record.attributeId = request.path.mAttributeId;
+    Protocols::InteractionModel::Status status;
 
-    Protocols::InteractionModel::Status status = emAfReadOrWriteAttribute(
-        &record, attributeMetadata, gEmberAttributeIOBufferSpan.data(), static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
-        /* write = */ true);
+    if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
+    {
+
+        EmberAfAttributeSearchRecord record;
+        record.endpoint    = request.path.mEndpointId;
+        record.clusterId   = request.path.mClusterId;
+        record.attributeId = request.path.mAttributeId;
+        status             = emAfReadOrWriteAttribute(&record, attributeMetadata, gEmberAttributeIOBufferSpan.data(),
+                                                      static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
+                                                      /* write = */ true);
+    }
+    else
+    {
+        status = emAfWriteAttributeExternal(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
+                                            gEmberAttributeIOBufferSpan.data(), (*attributeMetadata)->attributeType);
+    }
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
