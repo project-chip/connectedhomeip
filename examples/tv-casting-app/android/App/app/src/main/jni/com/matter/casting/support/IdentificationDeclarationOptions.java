@@ -19,29 +19,37 @@ import java.util.List;
 
 /**
  * This class contains the optional parameters used in the IdentificationDeclaration Message, sent
- * by the Commissionee to the Commissioner. The options specify information relating to the
- * requested UDC commissioning session.
+ * by the Commissionee (CastingApp) to the Commissioner (CastingPlayer). The options specify
+ * information relating to the requested UDC commissioning session.
  */
 public class IdentificationDeclarationOptions {
   private final String TAG = IdentificationDeclarationOptions.class.getSimpleName();
   private final short CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS =
       getChipDeviceConfigUdcMaxTargetApps();
 
+  /** Default constructor. */
   public IdentificationDeclarationOptions() {}
 
+  /**
+   * Constructor to set all fields.
+   *
+   * @param noPasscode the no passcode flag.
+   * @param cdUponPasscodeDialog the cd upon passcode dialog flag.
+   * @param commissionerPasscode the commissioner passcode flag.
+   * @param commissionerPasscodeReady the commissioner passcode ready flag.
+   * @param cancelPasscode the cancel passcode flag.
+   */
   public IdentificationDeclarationOptions(
       boolean noPasscode,
       boolean cdUponPasscodeDialog,
       boolean commissionerPasscode,
       boolean commissionerPasscodeReady,
-      boolean cancelPasscode,
-      List<TargetAppInfo> targetAppInfos) {
+      boolean cancelPasscode) {
     this.noPasscode = noPasscode;
     this.cdUponPasscodeDialog = cdUponPasscodeDialog;
     this.commissionerPasscode = commissionerPasscode;
     this.commissionerPasscodeReady = commissionerPasscodeReady;
     this.cancelPasscode = cancelPasscode;
-    this.targetAppInfos = targetAppInfos != null ? targetAppInfos : new ArrayList<>();
   }
 
   /**
@@ -57,28 +65,28 @@ public class IdentificationDeclarationOptions {
    * Passcode input dialog, and instead send a CommissionerDeclaration message if a commissioning
    * Passcode is needed.
    */
-  public boolean noPasscode = false;
+  private boolean noPasscode = false;
   /**
    * Feature: Coordinate Passcode Dialogs - Flag to instruct the Commissioner to send a
    * CommissionerDeclaration message when the Passcode input dialog on the Commissioner has been
    * shown to the user.
    */
-  public boolean cdUponPasscodeDialog = false;
+  private boolean cdUponPasscodeDialog = false;
   /**
    * Feature: Commissioner-Generated Passcode - Flag to instruct the Commissioner to use the
    * Commissioner-generated Passcode for commissioning.
    */
-  public boolean commissionerPasscode = false;
+  private boolean commissionerPasscode = false;
   /**
    * Feature: Commissioner-Generated Passcode - Flag to indicate whether or not the Commissionee has
    * obtained the Commissioner Passcode from the user and is therefore ready for commissioning.
    */
-  public boolean commissionerPasscodeReady = false;
+  private boolean commissionerPasscodeReady = false;
   /**
    * Feature: Coordinate Passcode Dialogs Flag - to indicate when the Commissionee user has decided
    * to exit the commissioning process.
    */
-  public boolean cancelPasscode = false;
+  private boolean cancelPasscode = false;
   /**
    * Feature: Target Content Application - The set of content app Vendor IDs (and optionally,
    * Product IDs) that can be used for authentication. Also, if TargetAppInfo is passed in,
@@ -102,6 +110,26 @@ public class IdentificationDeclarationOptions {
     }
     targetAppInfos.add(targetAppInfo);
     return true;
+  }
+
+  public boolean isNoPasscode() {
+    return noPasscode;
+  }
+
+  public boolean isCdUponPasscodeDialog() {
+    return cdUponPasscodeDialog;
+  }
+
+  public boolean isCommissionerPasscode() {
+    return commissionerPasscode;
+  }
+
+  public boolean isCommissionerPasscodeReady() {
+    return commissionerPasscodeReady;
+  }
+
+  public boolean isCancelPasscode() {
+    return cancelPasscode;
   }
 
   public List<TargetAppInfo> getTargetAppInfoList() {
@@ -129,11 +157,7 @@ public class IdentificationDeclarationOptions {
     sb.append("IdentificationDeclarationOptions::targetAppInfos list: \n");
 
     for (TargetAppInfo targetAppInfo : targetAppInfos) {
-      sb.append("\t\tTargetAppInfo - Vendor ID: ")
-          .append(targetAppInfo.vendorId)
-          .append(", Product ID: ")
-          .append(targetAppInfo.productId)
-          .append("\n");
+      sb.append("\t\t").append(targetAppInfo).append("\n");
     }
 
     return sb.toString();

@@ -136,7 +136,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] commandSender   The command sender object that initiated the command transaction.
          * @param[in] aResponseData   Information pertaining to the response.
          */
         virtual void OnResponse(CommandSender * commandSender, const ResponseData & aResponseData) {}
@@ -149,7 +149,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param apCommandSender The CommandSender object that initiated the transaction.
+         * @param commandSender   The CommandSender object that initiated the transaction.
          * @param aNoResponseData Details about the request without a response.
          */
         virtual void OnNoResponse(CommandSender * commandSender, const NoResponseData & aNoResponseData) {}
@@ -215,6 +215,12 @@ public:
         AddRequestDataParameters() {}
 
         AddRequestDataParameters(const Optional<uint16_t> & aTimedInvokeTimeoutMs) : timedInvokeTimeoutMs(aTimedInvokeTimeoutMs) {}
+
+        AddRequestDataParameters & SetCommandRef(uint16_t aCommandRef)
+        {
+            commandRef.SetValue(aCommandRef);
+            return *this;
+        }
 
         // When a value is provided for timedInvokeTimeoutMs, this invoke becomes a timed
         // invoke. CommandSender will use the minimum of all provided timeouts for execution.
@@ -308,18 +314,19 @@ public:
      * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
     CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false) :
-        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false) :
+        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {}
     CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
+                  bool aSuppressResponse = false, bool aAllowLargePayload = false);
     // TODO(#32138): After there is a macro that is always defined for all unit tests, the constructor with
     // TestOnlyMarker should only be compiled if that macro is defined.
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
-                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
-        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false,
+                  bool aAllowLargePayload = false) :
+        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse, aAllowLargePayload)
     {
         mpPendingResponseTracker = apPendingResponseTracker;
     }
@@ -511,6 +518,34 @@ private:
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
+    /**
+     * Class to help backup CommandSender's buffer containing InvokeRequestMessage when adding InvokeRequest
+     * in case there is a failure to add InvokeRequest. Intended usage is as follows:
+     *  - Allocate RollbackInvokeRequest on the stack.
+     *  - Attempt adding InvokeRequest into InvokeRequestMessage buffer.
+     *  - If modification is added successfully, call DisableAutomaticRollback() to prevent destructor from
+     *    rolling back InvokeReqestMessage.
+     *  - If there is an issue adding InvokeRequest, destructor will take care of rolling back
+     *    InvokeRequestMessage to previously saved state.
+     */
+    class RollbackInvokeRequest
+    {
+    public:
+        explicit RollbackInvokeRequest(CommandSender & aCommandSender);
+        ~RollbackInvokeRequest();
+
+        /**
+         * Disables rolling back to previously saved state for InvokeRequestMessage.
+         */
+        void DisableAutomaticRollback();
+
+    private:
+        CommandSender & mCommandSender;
+        TLV::TLVWriter mBackupWriter;
+        State mBackupState;
+        bool mRollbackInDestructor = false;
+    };
+
     union CallbackHandle
     {
         CallbackHandle(Callback * apCallback) : legacyCallback(apCallback) {}
@@ -636,6 +671,7 @@ private:
     bool mBufferAllocated       = false;
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
+    bool mAllowLargePayload     = false;
 };
 
 } // namespace app

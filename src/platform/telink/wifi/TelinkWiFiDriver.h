@@ -86,6 +86,7 @@ public:
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
+    uint32_t GetSupportedWiFiBandsMask() const override;
 
     static TelinkWiFiDriver & Instance()
     {
@@ -95,7 +96,9 @@ public:
 
     void OnNetworkStatusChanged(Status status);
     void OnScanWiFiNetworkResult(const WiFiScanResponse & result);
-    void OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status);
+    void OnScanWiFiNetworkDone(const WiFiManager::ScanDoneStatus & status);
+
+    void StartDefaultWiFiNetwork(void);
 
 private:
     void LoadFromStorage();

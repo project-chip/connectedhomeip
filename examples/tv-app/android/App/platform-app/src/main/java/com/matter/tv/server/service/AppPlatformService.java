@@ -24,13 +24,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import com.matter.tv.app.api.SupportedCluster;
 import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
 import com.matter.tv.server.tvapp.AppPlatform;
+import com.matter.tv.server.tvapp.ContentAppSupportedCluster;
 import com.matter.tv.server.utils.EndpointsDataStore;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * This class facilitates the communication with the ContentAppPlatform. It uses the JNI interface
@@ -168,6 +173,7 @@ public class AppPlatformService {
               app.getAppName(),
               app.getProductId(),
               app.getVersion(),
+              mapSupportedClusters(app.getSupportedClusters()),
               desiredEndpointId,
               new ContentAppEndpointManagerImpl(context));
     } else {
@@ -178,6 +184,7 @@ public class AppPlatformService {
               app.getAppName(),
               app.getProductId(),
               app.getVersion(),
+              mapSupportedClusters(app.getSupportedClusters()),
               new ContentAppEndpointManagerImpl(context));
     }
     if (retEndpointId > 0) {
@@ -186,5 +193,22 @@ public class AppPlatformService {
     } else {
       Log.e(TAG, "Could not add content app as endpoint. App Name " + app.getAppName());
     }
+  }
+
+  private Collection<ContentAppSupportedCluster> mapSupportedClusters(
+      Collection<SupportedCluster> supportedClusters) {
+    return supportedClusters
+        .stream()
+        .filter(Objects::nonNull)
+        .map(AppPlatformService::mapSupportedCluster)
+        .collect(Collectors.toList());
+  }
+
+  private static ContentAppSupportedCluster mapSupportedCluster(SupportedCluster cluster) {
+    return new ContentAppSupportedCluster(
+        cluster.clusterIdentifier,
+        cluster.features,
+        cluster.optionalCommandIdentifiers,
+        cluster.optionalAttributesIdentifiers);
   }
 }

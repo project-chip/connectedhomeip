@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /** Controller to interact with the CHIP device. */
@@ -156,6 +157,8 @@ public class ChipDeviceController {
     setICDCheckInDelegate(deviceControllerPtr, new ICDCheckInDelegateWrapper(delegate));
   }
 
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -165,6 +168,8 @@ public class ChipDeviceController {
     pairDevice(bleServer, connId, deviceId, setupPincode, null, networkCredentials, null);
   }
 
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -176,6 +181,8 @@ public class ChipDeviceController {
         bleServer, connId, deviceId, setupPincode, null, networkCredentials, registrationInfo);
   }
 
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}. */
+  @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -199,8 +206,10 @@ public class ChipDeviceController {
    * @param icdRegistrationInfo the informations for ICD registration. For detailed information
    *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
    *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
-   *     ICDRegistrationInfo value.
+   *     ICDRegistrationInfo value. This method was deprecated. Please use {@link
+   *     ChipDeviceController.pairDevice(BluetoothGatt, int, long, long, CommissionParameters)}.
    */
+  @Deprecated
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -209,6 +218,31 @@ public class ChipDeviceController {
       @Nullable byte[] csrNonce,
       NetworkCredentials networkCredentials,
       @Nullable ICDRegistrationInfo icdRegistrationInfo) {
+    CommissionParameters params =
+        new CommissionParameters.Builder()
+            .setCsrNonce(csrNonce)
+            .setNetworkCredentials(networkCredentials)
+            .setICDRegistrationInfo(icdRegistrationInfo)
+            .build();
+    pairDevice(bleServer, connId, deviceId, setupPincode, params);
+  }
+
+  /**
+   * Pair a device connected through BLE.
+   *
+   * @param bleServer the BluetoothGatt representing the BLE connection to the device
+   * @param connId the BluetoothGatt Id representing the BLE connection to the device
+   * @param deviceId the node ID to assign to the device
+   * @param setupPincode the pincode for the device
+   * @param params Parameters representing commissioning arguments. see detailed in {@link
+   *     CommissionParameters}
+   */
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      @Nonnull CommissionParameters params) {
     if (connectionId == 0) {
       connectionId = connId;
 
@@ -225,15 +259,16 @@ public class ChipDeviceController {
           deviceId,
           connectionId,
           setupPincode,
-          csrNonce,
-          networkCredentials,
-          icdRegistrationInfo);
+          params.getCsrNonce(),
+          params.getNetworkCredentials(),
+          params.getICDRegistrationInfo());
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
     }
   }
 
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceWithAddress(long, String, int, int, long, CommissionParameters)}. */
   public void pairDeviceWithAddress(
       long deviceId,
       String address,
@@ -258,8 +293,11 @@ public class ChipDeviceController {
    * @param icdRegistrationInfo the informations for ICD registration. For detailed information
    *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
    *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
-   *     ICDRegistrationInfo value.
+   *     ICDRegistrationInfo value. This method was deprecated. Please use {@link
+   *     ChipDeviceController.pairDeviceWithAddress(long, String, int, int, long,
+   *     CommissionParameters)}.
    */
+  @Deprecated
   public void pairDeviceWithAddress(
       long deviceId,
       String address,
@@ -279,6 +317,42 @@ public class ChipDeviceController {
         icdRegistrationInfo);
   }
 
+  /**
+   * Pair a device connected using IP Address.
+   *
+   * @param deviceId the node ID to assign to the device
+   * @param address IP Address of the connecting device
+   * @param port the port of the connecting device
+   * @param discriminator the discriminator for connecting device
+   * @param pinCode the pincode for connecting device
+   * @param params Parameters representing commissioning arguments. see detailed in {@link
+   *     CommissionParameters}
+   */
+  public void pairDeviceWithAddress(
+      long deviceId,
+      String address,
+      int port,
+      int discriminator,
+      long pinCode,
+      @Nonnull CommissionParameters params) {
+    if (params.getNetworkCredentials() != null) {
+      Log.e(TAG, "Invalid parameter : NetworkCredentials");
+      completionListener.onError(new Exception("Invalid parameter : NetworkCredentials"));
+      return;
+    }
+    pairDeviceWithAddress(
+        deviceControllerPtr,
+        deviceId,
+        address,
+        port,
+        discriminator,
+        pinCode,
+        params.getCsrNonce(),
+        params.getICDRegistrationInfo());
+  }
+
+  /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceWithCode(long, String, boolean, boolean, CommissionParameters)}. */
+  @Deprecated
   public void pairDeviceWithCode(
       long deviceId,
       String setupCode,
@@ -312,7 +386,11 @@ public class ChipDeviceController {
    *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
    *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
    *     ICDRegistrationInfo value.
+   *     <p>This method was deprecated. Please use {@link
+   *     ChipDeviceController.pairDeviceWithCode(long, String, boolean, boolean,
+   *     CommissionParameters)}.
    */
+  @Deprecated
   public void pairDeviceWithCode(
       long deviceId,
       String setupCode,
@@ -330,6 +408,34 @@ public class ChipDeviceController {
         csrNonce,
         networkCredentials,
         icdRegistrationInfo);
+  }
+
+  /**
+   * Pair a device connected using the scanned QR code or manual entry code.
+   *
+   * @param deviceId the node ID to assign to the device
+   * @param setupCode the scanned QR code or manual entry code
+   * @param discoverOnce the flag to enable/disable PASE auto retry mechanism
+   * @param useOnlyOnNetworkDiscovery the flag to indicate the commissionable device is available on
+   *     the network
+   * @param params Parameters representing commissioning arguments. see detailed in {@link
+   *     CommissionParameters}
+   */
+  public void pairDeviceWithCode(
+      long deviceId,
+      String setupCode,
+      boolean discoverOnce,
+      boolean useOnlyOnNetworkDiscovery,
+      @Nonnull CommissionParameters params) {
+    pairDeviceWithCode(
+        deviceControllerPtr,
+        deviceId,
+        setupCode,
+        discoverOnce,
+        useOnlyOnNetworkDiscovery,
+        params.getCsrNonce(),
+        params.getNetworkCredentials(),
+        params.getICDRegistrationInfo());
   }
 
   public void establishPaseConnection(long deviceId, int connId, long setupPincode) {
@@ -371,9 +477,12 @@ public class ChipDeviceController {
    *
    * @param deviceId the ID of the node to be commissioned
    * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   *     <p>This method was deprecated. Please use {@link
+   *     ChipDeviceController.commissionDevice(long, CommissionParameters)}.
    */
+  @Deprecated
   public void commissionDevice(long deviceId, @Nullable NetworkCredentials networkCredentials) {
-    commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials);
+    commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials, null);
   }
 
   /**
@@ -384,10 +493,31 @@ public class ChipDeviceController {
    * @param deviceId the ID of the node to be commissioned
    * @param csrNonce a nonce to be used for the CSR request
    * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   *     <p>This method was deprecated. Please use {@link
+   *     ChipDeviceController.commissionDevice(long, CommissionParameters)}.
    */
+  @Deprecated
   public void commissionDevice(
       long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials) {
-    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
+    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials, null);
+  }
+
+  /**
+   * Initiates the automatic commissioning flow using the specified network credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   *
+   * @param deviceId the ID of the node to be commissioned
+   * @param params Parameters representing commissioning arguments. see detailed in {@link
+   *     CommissionParameters}
+   */
+  public void commissionDevice(long deviceId, @Nonnull CommissionParameters params) {
+    commissionDevice(
+        deviceControllerPtr,
+        deviceId,
+        params.getCsrNonce(),
+        params.getNetworkCredentials(),
+        params.getICDRegistrationInfo());
   }
 
   /**
@@ -1498,7 +1628,8 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long deviceId,
       @Nullable byte[] csrNonce,
-      @Nullable NetworkCredentials networkCredentials);
+      @Nullable NetworkCredentials networkCredentials,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo);
 
   private native void continueCommissioning(
       long deviceControllerPtr, long devicePtr, boolean ignoreAttestationFailure);

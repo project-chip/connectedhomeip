@@ -31,17 +31,29 @@ namespace InteractionModel {
 /// Contains common flags among all interaction model operations: read/write/invoke
 enum class OperationFlags : uint32_t
 {
-    kInternal = 0x0001, // Internal request for data changes (can bypass checks/ACL etc.)
+    // NOTE: temporary flag. This flag exists to faciliate transition from ember-compatibilty-functions
+    //       implementation to DataModel Interface functionality. Specifically currently the
+    //       model is expected to perform ACL and readability/writability checks.
+    //
+    //       In the future, this flag will be removed and InteractionModelEngine/ReportingEngine
+    //       will perform the required validation.
+    //
+    //       Currently the flag FORCES a bypass of:
+    //         - ACL validation (will allow any read/write)
+    //         - Access validation (will allow reading write-only data for example)
+    kInternal = 0x0001,
 };
 
 /// This information is available for ALL interactions: read/write/invoke
 struct OperationRequest
 {
-    OperationFlags operationFlags;
+    BitFlags<OperationFlags> operationFlags;
 
     /// Current authentication data EXCEPT for internal requests.
     ///  - Non-internal requests MUST have this set.
     ///  - operationFlags.Has(OperationFlags::kInternal) MUST NOT have this set
+    ///
+    /// NOTE: once kInternal flag is removed, this will become non-optional
     std::optional<chip::Access::SubjectDescriptor> subjectDescriptor;
 };
 
@@ -55,13 +67,6 @@ struct ReadAttributeRequest : OperationRequest
     ConcreteAttributePath path;
     std::optional<DataVersion> dataVersion;
     BitFlags<ReadFlags> readFlags;
-};
-
-struct ReadState
-{
-    // When reading lists, reading will start at this index.
-    // As list data is read, this index is incremented
-    ListIndex listEncodeStart = kInvalidListIndex;
 };
 
 enum class WriteFlags : uint32_t
