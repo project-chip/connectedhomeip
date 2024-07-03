@@ -16,7 +16,10 @@
  *    limitations under the License.
  */
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
+
+#include "DataModelFixtures.h"
 
 #include "app-common/zap-generated/ids/Clusters.h"
 #include <app-common/zap-generated/cluster-objects.h>
@@ -27,183 +30,17 @@
 #include <controller/WriteInteraction.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
+using namespace chip::app::DataModelTests;
 using namespace chip::Protocols;
 
 namespace {
-
-constexpr EndpointId kTestEndpointId       = 1;
-constexpr DataVersion kRejectedDataVersion = 1;
-constexpr DataVersion kAcceptedDataVersion = 5;
-
-constexpr uint8_t kExampleClusterSpecificSuccess = 11u;
-constexpr uint8_t kExampleClusterSpecificFailure = 12u;
-
-enum ResponseDirective
-{
-    kSendAttributeSuccess,
-    kSendAttributeError,
-    kSendMultipleSuccess,
-    kSendMultipleErrors,
-    kSendClusterSpecificSuccess,
-    kSendClusterSpecificFailure,
-};
-
-ResponseDirective gResponseDirective = kSendAttributeSuccess;
-
-} // namespace
-
-namespace chip {
-namespace app {
-
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
-{
-    // Note: This test does not make use of the real attribute metadata.
-    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
-    return &stub;
-}
-
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
-{
-    static ListIndex listStructOctetStringElementCount = 0;
-
-    if (aPath.mDataVersion.HasValue() && aPath.mDataVersion.Value() == kRejectedDataVersion)
-    {
-        return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
-    }
-
-    if (aPath.mClusterId == Clusters::UnitTesting::Id &&
-        aPath.mAttributeId == Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
-    {
-        if (gResponseDirective == kSendAttributeSuccess)
-        {
-            if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
-            {
-
-                Attributes::ListStructOctetString::TypeInfo::DecodableType value;
-
-                ReturnErrorOnFailure(DataModel::Decode(aReader, value));
-
-                auto iter                         = value.begin();
-                listStructOctetStringElementCount = 0;
-                while (iter.Next())
-                {
-                    auto & item = iter.GetValue();
-
-                    VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
-                    listStructOctetStringElementCount++;
-                }
-
-                aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
-            }
-            else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
-            {
-                Structs::TestListStructOctet::DecodableType item;
-                ReturnErrorOnFailure(DataModel::Decode(aReader, item));
-                VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
-                listStructOctetStringElementCount++;
-
-                aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
-            }
-            else
-            {
-                return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-            }
-        }
-        else
-        {
-            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Failure);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-    if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
-    {
-        // Mock a invalid SubjectDescriptor
-        AttributeValueDecoder decoder(aReader, Access::SubjectDescriptor());
-        if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
-        {
-            Attributes::ListFabricScoped::TypeInfo::DecodableType value;
-
-            ReturnErrorOnFailure(decoder.Decode(value));
-
-            auto iter = value.begin();
-            while (iter.Next())
-            {
-                auto & item = iter.GetValue();
-                (void) item;
-            }
-
-            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
-        }
-        else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
-        {
-            Structs::TestFabricScoped::DecodableType item;
-            ReturnErrorOnFailure(decoder.Decode(item));
-
-            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
-        }
-        else
-        {
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    // Boolean attribute of unit testing cluster triggers "multiple errors" case.
-    if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
-    {
-        InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
-
-        if (gResponseDirective == kSendMultipleSuccess)
-        {
-            status = InteractionModel::Status::Success;
-        }
-        else if (gResponseDirective == kSendMultipleErrors)
-        {
-            status = InteractionModel::Status::Failure;
-        }
-        else
-        {
-            VerifyOrDie(false);
-        }
-
-        for (size_t i = 0; i < 4; ++i)
-        {
-            aWriteHandler->AddStatus(aPath, status);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
-    if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Int8u::TypeInfo::GetAttributeId())
-    {
-        InteractionModel::ClusterStatusCode status{ Protocols::InteractionModel::Status::InvalidValue };
-        if (gResponseDirective == kSendClusterSpecificSuccess)
-        {
-            status = InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(kExampleClusterSpecificSuccess);
-        }
-        else if (gResponseDirective == kSendClusterSpecificFailure)
-        {
-            status = InteractionModel::ClusterStatusCode::ClusterSpecificFailure(kExampleClusterSpecificFailure);
-        }
-        else
-        {
-            VerifyOrDie(false);
-        }
-
-        aWriteHandler->AddStatus(aPath, status);
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
 
 class SingleWriteCallback : public WriteClient::Callback
 {
@@ -245,11 +82,6 @@ private:
     StatusIB mPathStatus;
 };
 
-} // namespace app
-} // namespace chip
-
-namespace {
-
 class TestWrite : public chip::Test::AppContext
 {
 public:
@@ -279,7 +111,7 @@ TEST_F(TestWrite, TestDataResponse)
         i++;
     }
 
-    gResponseDirective = kSendAttributeSuccess;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendAttributeSuccess);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -317,7 +149,7 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
         i++;
     }
 
-    gResponseDirective = kSendAttributeSuccess;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendAttributeSuccess);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -357,7 +189,7 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
         i++;
     }
 
-    gResponseDirective = kSendAttributeSuccess;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendAttributeSuccess);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -396,7 +228,7 @@ TEST_F(TestWrite, TestAttributeError)
         i++;
     }
 
-    gResponseDirective = kSendAttributeError;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendAttributeError);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -462,7 +294,7 @@ TEST_F(TestWrite, TestMultipleSuccessResponses)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    gResponseDirective = kSendMultipleSuccess;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendMultipleSuccess);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -489,7 +321,7 @@ TEST_F(TestWrite, TestMultipleFailureResponses)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    gResponseDirective = kSendMultipleErrors;
+    ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendMultipleErrors);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -516,7 +348,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
     // Cluster-specific success code case
     {
-        gResponseDirective = kSendClusterSpecificSuccess;
+        ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendClusterSpecificSuccess);
 
         this->ResetCallback();
         this->PrepareWriteCallback(
@@ -548,7 +380,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
     // Cluster-specific failure code case
     {
-        gResponseDirective = kSendClusterSpecificFailure;
+        ScopedChange directive(gWriteResponseDirective, WriteResponseDirective::kSendClusterSpecificFailure);
 
         this->ResetCallback();
         this->PrepareWriteCallback(
