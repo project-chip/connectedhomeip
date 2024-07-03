@@ -328,7 +328,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
         if (request.path.mDataVersion.Value() != clusterInfo->dataVersion)
         {
-            ChipLogError(DataManagement, "Write Version mismatch for Endpoint %x, Cluster " ChipLogFormatMEI,
+            ChipLogError(DataManagement, "Write Version mismatch for Endpoint 0x%x, Cluster " ChipLogFormatMEI,
                          request.path.mEndpointId, ChipLogValueMEI(request.path.mClusterId));
             return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
         }
