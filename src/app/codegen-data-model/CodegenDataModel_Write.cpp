@@ -64,7 +64,7 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteAttributePath
 
     // If the decoder tried to decode, then a value should have been read for processing.
     //   - if decoding was done, assume DONE (i.e. final CHIP_NO_ERROR)
-    //   - if no encode, say that processing must continue
+    //   -  otherwise, if no decoding done, return that processing must continue via nullopt
     return decoder.TriedDecode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
 }
 
