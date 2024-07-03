@@ -144,7 +144,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         RVCRun_accptcmd_list = attributes.AcceptedCommandList
         RVCRun_gencmd_list = attributes.GeneratedCommandList
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_accptcmd_list)
-        generated_cmd_list = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=RVCRun_cluster, attribute=RVCRun_gencmd_list)
         chg_mode_cmd_id = commands.ChangeToMode.command_id
 
         if supported_modes_attr_id not in attribute_list:
