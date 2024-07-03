@@ -37,7 +37,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/ember-global-attribute-access-interface.h>
 #include <app/util/ember-io-storage.h>
-#include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
@@ -90,7 +89,7 @@ struct ShortPascalString
     using LengthType                        = uint8_t;
     static constexpr LengthType kNullLength = 0xFF;
 
-    static LengthType GetLength(const uint8_t * buffer) { return emberAfStringLength(buffer); }
+    static LengthType GetLength(const uint8_t * buffer) { return *buffer; }
 };
 
 /// Metadata of what a ember/pascal LONG string means (prepended by a u16 length)
