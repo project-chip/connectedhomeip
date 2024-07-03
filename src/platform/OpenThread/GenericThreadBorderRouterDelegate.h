@@ -32,10 +32,12 @@ namespace ThreadBorderRouterManagement {
 class GenericOpenThreadBorderRouterDelegate : public Delegate
 {
 public:
-    static constexpr char kThreadBorderRourterName[]      = "OpenThread-ThreadBR";
     static constexpr char kFailsafeThreadDatasetTlvsKey[] = "g/fs/td";
 
-    GenericOpenThreadBorderRouterDelegate()  = default;
+    GenericOpenThreadBorderRouterDelegate(const CharSpan &name)
+    {
+        strncpy(mThreadBorderRouterName, name.data(), std::min(name.size(), kBorderRouterNameMaxLength));
+    }
     ~GenericOpenThreadBorderRouterDelegate() = default;
 
     CHIP_ERROR Init() override;
@@ -48,12 +50,12 @@ public:
 
     CHIP_ERROR GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
-        if (borderRouterName.size() < strlen(kThreadBorderRourterName))
+        if (borderRouterName.size() < strlen(mThreadBorderRouterName))
         {
             return CHIP_ERROR_NO_MEMORY;
         }
-        strcpy(borderRouterName.data(), kThreadBorderRourterName);
-        borderRouterName.reduce_size(strlen(kThreadBorderRourterName));
+        strcpy(borderRouterName.data(), mThreadBorderRouterName);
+        borderRouterName.reduce_size(strlen(mThreadBorderRouterName));
         return CHIP_NO_ERROR;
     }
 
@@ -81,6 +83,7 @@ private:
     ActivateDatasetCallback * mCallback        = nullptr;
     Thread::OperationalDataset mStagingDataset = {};
     uint32_t mRandomNumber;
+    char mThreadBorderRouterName[kBorderRouterNameMaxLength + 1];
 };
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters
