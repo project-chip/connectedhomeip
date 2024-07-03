@@ -34,7 +34,7 @@ class GenericOpenThreadBorderRouterDelegate : public Delegate
 public:
     static constexpr char kFailsafeThreadDatasetTlvsKey[] = "g/fs/td";
 
-    GenericOpenThreadBorderRouterDelegate(const CharSpan &name)
+    GenericOpenThreadBorderRouterDelegate(const CharSpan & name)
     {
         strncpy(mThreadBorderRouterName, name.data(), std::min(name.size(), kBorderRouterNameMaxLength));
     }
