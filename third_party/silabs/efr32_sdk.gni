@@ -228,6 +228,90 @@ template("efr32_sdk") {
       "${sl_ot_libs_path}/config",
     ]
 
+    if (is_series_2) {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/emdrv/dmadrv/inc/s2_signals",
+        "${efr32_sdk_root}/platform/driver/debug/inc/",
+        "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/",
+        "${efr32_sdk_root}/platform/service/device_init/config/s2/",
+        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
+      ]
+
+      libs += [
+        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
+        "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
+      ]
+
+      if (!chip_enable_ble_rs911x) {
+        libs += [
+          "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
+          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/bt_host/release/libbt_host.a",
+          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/bt_host/hal/release/libbt_hal_series2.a",
+        ]
+      }
+    }
+
+    if (silabs_family == "efr32mg24") {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24/config",
+        "${efr32_sdk_root}/platform/emdrv/spidrv/inc",
+        "${efr32_sdk_root}/platform/emdrv/spidrv/config",
+      ]
+
+      libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
+
+      if (!chip_enable_ble_rs911x) {
+        libs += [ "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a" ]
+      }
+    } else if (silabs_family == "mgm24") {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Include",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24/config",
+      ]
+
+      libs += [
+        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a",
+        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
+      ]
+
+      if (silabs_mcu == "MGM240PB32VNA") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
+      } else if (silabs_mcu == "MGM240PB22VNA") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb22vna_gcc.a" ]
+      } else if (silabs_mcu == "MGM240L022RNF") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240l022rnf_gcc.a" ]
+      } else if (silabs_mcu == "MGM240SD22VNA") {
+        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a" ]
+        defines += [ "SLI_RADIOAES_REQUIRES_MASKING=1" ]
+      }
+    } else if (silabs_family == "efr32mg26") {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG26/Include",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg26",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg26/config",
+      ]
+
+      libs += [
+        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg26_gcc_release.a",
+        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
+      ]
+    }
+
+    if (use_wf200) {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/firmware",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/pds/brd8022a",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/secure_link",
+      ]
+    }
+
     if (use_SiWx917) {
       _include_dirs += [
         # si91x component
@@ -275,6 +359,10 @@ template("efr32_sdk") {
           "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
         ]
       }
+    }
+
+    if (invoker.enable_dic) {
+      _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -517,96 +605,8 @@ template("efr32_sdk") {
       ]
     }
 
-    if (invoker.enable_dic) {
-      _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
-    }
-
     if (sl_use_subscription_synching) {
       defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
-    }
-
-    if (is_series_2) {
-      _include_dirs += [
-        "${efr32_sdk_root}/platform/emdrv/dmadrv/inc/s2_signals",
-        "${efr32_sdk_root}/platform/driver/debug/inc/",
-        "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/",
-        "${efr32_sdk_root}/platform/service/device_init/config/s2/",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
-      ]
-
-      libs += [
-        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
-        "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
-      ]
-
-      if (!chip_enable_ble_rs911x) {
-        libs += [
-          "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/bt_host/release/libbt_host.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/bt_host/hal/release/libbt_hal_series2.a",
-        ]
-      }
-    }
-
-    if (silabs_family == "efr32mg24") {
-      _include_dirs += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24/config",
-        "${efr32_sdk_root}/platform/emdrv/spidrv/inc",
-        "${efr32_sdk_root}/platform/emdrv/spidrv/config",
-      ]
-
-      libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
-
-      if (!chip_enable_ble_rs911x) {
-        libs += [ "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a" ]
-      }
-    } else if (silabs_family == "mgm24") {
-      _include_dirs += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Include",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24/config",
-      ]
-
-      libs += [
-        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a",
-        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
-      ]
-
-      if (silabs_mcu == "MGM240PB32VNA") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
-      } else if (silabs_mcu == "MGM240PB22VNA") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb22vna_gcc.a" ]
-      } else if (silabs_mcu == "MGM240L022RNF") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240l022rnf_gcc.a" ]
-      } else if (silabs_mcu == "MGM240SD22VNA") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a" ]
-        defines += [ "SLI_RADIOAES_REQUIRES_MASKING=1" ]
-      }
-    } else if (silabs_family == "efr32mg26") {
-      _include_dirs += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG26/Include",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg26",
-        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg26/config",
-      ]
-
-      libs += [
-        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg26_gcc_release.a",
-        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
-      ]
-    }
-
-    if (use_wf200) {
-      _include_dirs += [
-        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver",
-        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus",
-        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/firmware",
-        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/pds/brd8022a",
-        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/secure_link",
-      ]
     }
 
     cflags = []
