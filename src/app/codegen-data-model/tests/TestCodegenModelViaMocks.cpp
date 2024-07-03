@@ -761,6 +761,25 @@ void TestEmberScalarNullWrite()
     ASSERT_TRUE(Traits::IsNullValue(storage));
 }
 
+template <typename T, EmberAfAttributeType ZclType>
+void TestEmberScalarTypeWriteNullValueToNullable()
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZclType)));
+
+    using NumericType             = NumericAttributeTraits<T>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+    AttributeValueDecoder decoder = test.DecoderFor<NullableType>(NullableType());
+
+    // write should fail: we are trying to write null
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_WRONG_TLV_TYPE);
+}
+
 uint16_t ReadLe16(const void * buffer)
 {
     const uint8_t * p = reinterpret_cast<const uint8_t *>(buffer);
@@ -1895,7 +1914,70 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
     TestEmberScalarTypeWrite<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>(0.625);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypesLowestValue)
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteInvalidValueToNullable)
+{
+    TestEmberScalarTypeWriteNullValueToNullable<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<uint16_t, ZCL_ENUM16_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<3, false>, ZCL_INT24U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<5, false>, ZCL_INT40U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<6, false>, ZCL_INT48U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<7, false>, ZCL_INT56U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<uint64_t, ZCL_INT64U_ATTRIBUTE_TYPE>();
+
+    TestEmberScalarTypeWriteNullValueToNullable<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<3, true>, ZCL_INT24S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<5, true>, ZCL_INT40S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<6, true>, ZCL_INT48S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<7, true>, ZCL_INT56S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
+
+    TestEmberScalarTypeWriteNullValueToNullable<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<float, ZCL_SINGLE_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>();
+}
+
+TEST(TestCodegenModelViaMocks, EmberTestWriteReservedNullPlaceholderToNullable)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE)));
+
+    using NumericType             = NumericAttributeTraits<uint32_t>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+    AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0xFFFFFFFF);
+
+    // write should fail: we are trying to write null which is out of range
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddInteger)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_INT24U_ATTRIBUTE_TYPE)));
+
+    using NumericType             = NumericAttributeTraits<uint32_t>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+    AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0x1223344);
+
+    // write should fail: written value is not in range
+    // NOTE: this matches legacy behaviour, however realistically maybe ConstraintError would be more correct
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestCodegenModelViaMoceNullValueToNullables, EmberAttributeWriteBasicTypesLowestValue)
 {
     TestEmberScalarTypeWrite<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>(-127);
     TestEmberScalarTypeWrite<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>(-32767);
