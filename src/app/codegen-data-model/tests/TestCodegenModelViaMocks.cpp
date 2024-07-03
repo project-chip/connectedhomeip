@@ -2139,6 +2139,8 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
     EXPECT_TRUE(aai->GetData().e.data_equal("aai_write_test"_span));
 
     // AAI does not prevent read/write of regular attributes
+    // validate that once AAI is added, we still can go through writing regular bits (i.e.
+  // AAI returning "unknown" has fallback to ember)
     TestEmberScalarTypeWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(1234);
     TestEmberScalarNullWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
 }
