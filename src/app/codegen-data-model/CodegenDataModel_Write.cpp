@@ -156,6 +156,9 @@ CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullabl
         }
         else
         {
+            // This guards against trying to encode something that overlaps nullable, for example
+            // Nullable<uint8_t>(0xFF) is not representable because 0xFF is the encoding of NULL in ember
+            // as well as odd-sized integers.
             VerifyOrReturnError(Traits::CanRepresentValue(isNullable, *workingValue), CHIP_ERROR_INVALID_ARGUMENT);
             Traits::WorkingToStorage(*workingValue, storageValue);
         }
@@ -171,8 +174,8 @@ CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullabl
 
         VerifyOrReturnError(out.size() >= sizeof(storageValue), CHIP_ERROR_INVALID_ARGUMENT);
 
-        // This guards against trying to encode something that overlaps nullable, for example
-        // Nullable<uint8_t>(0xFF) is not representable because 0xFF is the encoding of NULL in ember
+        // Even non-nullable values may be outside range: e.g. odd-sized integers have working values
+        // that are larger than the storage values (e.g. a uint32_t being stored as a 3-byte integer)
         VerifyOrReturnError(Traits::CanRepresentValue(isNullable, workingValue), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
