@@ -289,13 +289,18 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         return *err;
     }
 
-    // All the global attributes that we do not have metadata for are
-    // read-only (i.e. cannot write atribute_list/event_list/accepted_cmds/generated_cmds)
-    //
-    // so if no metadata available, we wil lreturn an error
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
     if (attributeMetadata == nullptr)
     {
+        // All the global attributes that we do not have metadata for are
+        // read-only. Specifically only the following list-based attributes match the
+        // "global attributes not in metadata" (see GlobalAttributes.h :: GlobalAttributesNotInMetadat):
+        //   - AttributeList
+        //   - EventList
+        //   - AcceptedCommands
+        //   - GeneratedCommands
+        //
+        // Given the above, UnsupportedWrite should be correct (attempt to write to a read-only list)
         return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
     }
 
