@@ -1958,7 +1958,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteReservedNullPlaceholderToNullable)
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
-TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddInteger)
+TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNonNullable)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     chip::app::CodegenDataModel model;
@@ -1967,6 +1967,25 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddInteger)
     TestWriteRequest test(kAdminSubjectDescriptor,
                           ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
                                                 MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_INT24U_ATTRIBUTE_TYPE)));
+
+    using NumericType             = NumericAttributeTraits<uint32_t>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+    AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0x1223344);
+
+    // write should fail: written value is not in range
+    // NOTE: this matches legacy behaviour, however realistically maybe ConstraintError would be more correct
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNullable)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT24U_ATTRIBUTE_TYPE)));
 
     using NumericType             = NumericAttributeTraits<uint32_t>;
     using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
