@@ -281,7 +281,6 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
-    // Explicit failure in finding a suitable metadata
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))
     {
         VerifyOrDie((*err == CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)) || //
