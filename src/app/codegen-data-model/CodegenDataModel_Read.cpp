@@ -281,11 +281,9 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
     // Explicit failure in finding a suitable metadata
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))
     {
-        VerifyOrDie(
-          (*err != CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)) ||
-          (*err != CHIP_IM_GLOBAL_STATUS(UnsupportedCluster)) ||
-          (*err != CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute))
-                    );
+        VerifyOrDie((*err == CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)) || //
+                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedCluster)) ||  //
+                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)));
         return *err;
     }
 
