@@ -106,10 +106,11 @@ Below is the format:
     -   Example: run1
 
 -   test-runner-run/<run_identifier>/app: Indicates the application to be used
-    in the test. Different app types as needed could be referenced from section [name: Generate an argument environment file
-] of the file .github/workflows/tests.yaml
+    in the test. Different app types as needed could be referenced from section
+    [name: Generate an argument environment file ] of the file
+    .github/workflows/tests.yaml
 
-    -   Example: \${TYPE_OF_APP} 
+        -   Example: \${TYPE_OF_APP}
 
 -   test-runner-run/<run_identifier>/factoryreset: Determines whether a factory
     reset should be performed before the test.
