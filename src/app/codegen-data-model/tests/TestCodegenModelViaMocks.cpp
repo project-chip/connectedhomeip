@@ -450,6 +450,39 @@ private:
     Clusters::UnitTesting::Structs::SimpleStruct::Type mData;
 };
 
+class ErrorAccessInterface : public AttributeAccessInterface
+{
+public:
+    ErrorAccessInterface(ConcreteAttributePath path, CHIP_ERROR err) :
+        AttributeAccessInterface(MakeOptional(path.mEndpointId), path.mClusterId), mPath(path), mError(err)
+    {}
+    ~ErrorAccessInterface() = default;
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder) override
+    {
+        if (static_cast<const ConcreteAttributePath &>(path) != mPath)
+        {
+            // returning without trying to handle means "I do not handle this"
+            return CHIP_NO_ERROR;
+        }
+        return mError;
+    }
+
+    CHIP_ERROR Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override
+    {
+        if (static_cast<const ConcreteAttributePath &>(path) != mPath)
+        {
+            // returning without trying to handle means "I do not handle this"
+            return CHIP_NO_ERROR;
+        }
+        return mError;
+    }
+
+private:
+    ConcreteAttributePath mPath;
+    CHIP_ERROR mError;
+};
+
 class ListAttributeAcessInterface : public AttributeAccessInterface
 {
 public:
@@ -1580,6 +1613,21 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
     ASSERT_TRUE(actual.e.data_equal("foo"_span));
 }
 
+TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceReadError)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor, kStructPath);
+    RegisteredAttributeAccessInterface<ErrorAccessInterface> aai(kStructPath, CHIP_ERROR_KEY_NOT_FOUND);
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_ERROR_KEY_NOT_FOUND);
+}
+
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
@@ -2155,4 +2203,27 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
     // AAI returning "unknown" has fallback to ember)
     TestEmberScalarTypeWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(1234);
     TestEmberScalarNullWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
+}
+
+TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceReturningError)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
+    RegisteredAttributeAccessInterface<ErrorAccessInterface> aai(kStructPath, CHIP_ERROR_KEY_NOT_FOUND);
+
+    TestWriteRequest test(kAdminSubjectDescriptor, kStructPath);
+    Clusters::UnitTesting::Structs::SimpleStruct::Type testValue{
+        .a = 112,
+        .b = true,
+        .e = "aai_write_test"_span,
+        .g = 0.5,
+        .h = 0.125,
+    };
+
+    AttributeValueDecoder decoder = test.DecoderFor(testValue);
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_KEY_NOT_FOUND);
 }

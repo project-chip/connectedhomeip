@@ -248,9 +248,8 @@ CHIP_ERROR DecodeValueIntoEmberBuffer(AttributeValueDecoder & decoder, const Emb
         return DecodeStringLikeIntoEmberBuffer<ByteSpan, LongPascalString>(decoder, isNullable, out);
     default:
         ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(metadata->attributeType));
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
-    return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
 
 } // namespace
