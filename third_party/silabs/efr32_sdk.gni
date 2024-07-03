@@ -138,6 +138,8 @@ template("efr32_sdk") {
   config("${sdk_target_name}_config") {
     include_dirs = []
     libs = []
+    defines = []
+
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
@@ -267,6 +269,8 @@ template("efr32_sdk") {
       if (!chip_enable_ble_rs911x) {
         libs += [ "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a" ]
       }
+
+      defines += [ "EFR32MG24" ]
     } else if (silabs_family == "mgm24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Include",
@@ -289,6 +293,8 @@ template("efr32_sdk") {
         libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a" ]
         defines += [ "SLI_RADIOAES_REQUIRES_MASKING=1" ]
       }
+
+      defines += [ "MGM24" ]
     } else if (silabs_family == "efr32mg26") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG26/Include",
@@ -300,6 +306,8 @@ template("efr32_sdk") {
         "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg26_gcc_release.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
       ]
+
+      defines += [ "EFR32MG26" ]
     }
 
     if (use_wf200) {
@@ -361,6 +369,29 @@ template("efr32_sdk") {
       }
     }
 
+    if (use_system_view) {
+      _include_dirs += [
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/init/",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
+      ]
+
+      defines += [
+        "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT",
+        "SEGGER_SYSVIEW_RTT_BUFFER_SIZE=8192",
+      ]
+    }
+
+    if (use_wstk_leds) {
+      _include_dirs += [ "${efr32_sdk_root}/platform/driver/leddrv/inc" ]
+
+      defines += [ "ENABLE_WSTK_LEDS" ]
+    }
+
+    if (use_wstk_buttons) {
+      _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
+    }
+
     if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
@@ -370,7 +401,7 @@ template("efr32_sdk") {
     # the content of these, only when changing the filename itself.
     # To fix this, these files are also manually depended upon in the source set
     # declared in efr32_mbedtls_config further down this file.
-    defines = [
+    defines += [
       "MBEDTLS_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
       "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"efr32-psa-crypto-config.h\"",
       "__STARTUP_CLEAR_BSS",
@@ -511,29 +542,6 @@ template("efr32_sdk") {
           defines += [ "LWIP_IPV6=0" ]
         }
       }
-    }
-
-    if (use_system_view) {
-      _include_dirs += [
-        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/init/",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
-      ]
-
-      defines += [
-        "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT",
-        "SEGGER_SYSVIEW_RTT_BUFFER_SIZE=8192",
-      ]
-    }
-
-    if (use_wstk_leds) {
-      _include_dirs += [ "${efr32_sdk_root}/platform/driver/leddrv/inc" ]
-
-      defines += [ "ENABLE_WSTK_LEDS" ]
-    }
-
-    if (use_wstk_buttons) {
-      _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
 
     if (chip_enable_icd_server) {
