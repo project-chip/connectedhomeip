@@ -26,7 +26,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>

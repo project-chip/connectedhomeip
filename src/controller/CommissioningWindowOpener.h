@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/OperationalSessionSetup.h>
-#include <app/data-model/NullObject.h>
+#include <lib/support/NullObject.h>
 #include <controller/CHIPDeviceController.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCallback.h>

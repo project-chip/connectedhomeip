@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/CustomArgument.h>
 #include <inet/InetInterface.h>

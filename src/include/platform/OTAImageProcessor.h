@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>

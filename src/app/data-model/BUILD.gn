@@ -24,20 +24,12 @@ source_set("data-model") {
     "FabricScopedPreEncodedValue.cpp",
     "FabricScopedPreEncodedValue.h",
     "List.h",
-    "NullObject.h",
-    "Nullable.h",
     "PreEncodedValue.cpp",
     "PreEncodedValue.h",
     "WrappedStructEncoder.h",
   ]
 
   deps = [
-    # TODO: dependencies NOT declared because they are not part of
-    #       any GN dependency. Overall src/app seems to suffer greatly
-    #       of this, in part due to zap-generated code dependency.
-    #
-    #  - app/util/attribute-storage-null-handling.h
-    #
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core",

@@ -24,7 +24,7 @@
 #include <app/ConcreteClusterPath.h>
 #include <app/clusters/resource-monitoring-server/replacement-product-list-manager.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>

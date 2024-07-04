@@ -21,7 +21,6 @@ source_set("types") {
     "att-storage.h",
     "attribute-metadata.cpp",
     "attribute-metadata.h",
-    "attribute-storage-null-handling.h",
     "basic-types.h",
     "ember-strings.cpp",
     "ember-strings.h",

@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <string>
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 

@@ -22,7 +22,7 @@
 #include <app/util/af-types.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 
 static constexpr chip::Percent100ths WC_PERCENT100THS_MIN_OPEN   = 0;
 static constexpr chip::Percent100ths WC_PERCENT100THS_MAX_CLOSED = 10000;

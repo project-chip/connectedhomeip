@@ -19,7 +19,7 @@
 
 #include <app/CommandHandler.h>
 #include <app/InteractionModelEngine.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <inttypes.h>
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>

@@ -21,7 +21,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/util/attribute-storage-null-handling.h>
+#include <lib/support/MatterScalarNullHandling.h>
 #include <lib/support/TypeTraits.h>
 
 #include <limits>

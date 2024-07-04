@@ -35,7 +35,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <commands/common/HexConversion.h>
 #include <json/json.h>
 #include <lib/core/Optional.h>

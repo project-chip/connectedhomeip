@@ -23,7 +23,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/data-model/DecodableList.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>

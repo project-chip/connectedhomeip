@@ -33,7 +33,7 @@
 #include <app/util/attribute-metadata.h> // EmberAfAttributeMetadata
 
 #include <app/ConcreteAttributePath.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Variant.h>
 #include <messaging/ExchangeContext.h>

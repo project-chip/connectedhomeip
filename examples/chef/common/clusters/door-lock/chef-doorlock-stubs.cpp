@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 

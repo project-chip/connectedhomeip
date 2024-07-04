@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/data-model/FabricScoped.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>

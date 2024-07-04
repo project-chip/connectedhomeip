@@ -21,7 +21,7 @@
 #include "protocols/interaction_model/Constants.h"
 #include <app/CommandSender.h>
 #include <app/data-model/Decode.h>
-#include <app/data-model/NullObject.h>
+#include <lib/support/NullObject.h>
 #include <functional>
 
 namespace chip {

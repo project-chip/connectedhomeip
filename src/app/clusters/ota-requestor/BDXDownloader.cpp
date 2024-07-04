@@ -18,7 +18,7 @@
 
 #include "BDXDownloader.h"
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BytesToHex.h>

@@ -24,7 +24,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/Span.h>
 
 using namespace chip;

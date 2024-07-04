@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

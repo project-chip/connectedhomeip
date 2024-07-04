@@ -25,7 +25,7 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>

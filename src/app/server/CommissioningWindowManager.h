@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <crypto/CHIPCryptoPAL.h>

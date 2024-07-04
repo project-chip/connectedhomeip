@@ -22,7 +22,7 @@
 #import "MTRError_Internal.h"
 #import "zap-generated/MTRBaseClusters.h"
 
-#include <app/data-model/NullObject.h>
+#include <lib/support/NullObject.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/Session.h>

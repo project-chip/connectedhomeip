@@ -47,6 +47,7 @@ chip_test_suite("tests") {
     "TestIntrusiveList.cpp",
     "TestJsonToTlv.cpp",
     "TestJsonToTlvToJson.cpp",
+    "TestNullable.cpp",
     "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",

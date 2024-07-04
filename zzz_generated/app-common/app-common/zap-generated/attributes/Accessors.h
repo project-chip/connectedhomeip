@@ -25,9 +25,9 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
 #include <app/util/ember-strings.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 

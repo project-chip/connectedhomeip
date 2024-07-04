@@ -25,7 +25,7 @@
 
 #include <app/AppConfig.h>
 #include <app/data-model/Encode.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 
 namespace chip {
 namespace app {

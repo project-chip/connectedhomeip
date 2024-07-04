@@ -21,7 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/Variant.h>
 #include <platform/NetworkCommissioning.h>

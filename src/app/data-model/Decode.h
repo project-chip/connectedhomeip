@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-enums-check.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>

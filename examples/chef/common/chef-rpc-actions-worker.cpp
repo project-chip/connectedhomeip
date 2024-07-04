@@ -19,7 +19,7 @@
 #include "chef-rpc-actions-worker.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
-#include <app/data-model/Nullable.h>
+#include <lib/support/Nullable.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 #include <map>

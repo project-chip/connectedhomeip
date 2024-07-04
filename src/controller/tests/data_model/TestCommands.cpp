@@ -30,7 +30,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
-#include <app/data-model/NullObject.h>
+#include <lib/support/NullObject.h>
 #include <app/tests/AppTestContext.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPCore.h>

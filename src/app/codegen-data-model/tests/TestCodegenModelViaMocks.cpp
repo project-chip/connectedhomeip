@@ -31,7 +31,7 @@
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
-#include <app/util/attribute-storage-null-handling.h>
+#include <lib/support/MatterScalarNullHandling.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
