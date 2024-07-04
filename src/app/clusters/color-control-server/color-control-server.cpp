@@ -237,76 +237,60 @@ public:
             case Attributes::CurrentX::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kCurrentXAndCurrentY))
                 {
-                    if (decodePair.valueUnsigned16.HasValue())
-                        colorXTransitionState->finalValue =
-                            std::min(decodePair.valueUnsigned16.Value(), colorXTransitionState->highLimit);
+                    VerifyOrReturnError(decodePair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                    colorXTransitionState->finalValue =
+                        std::min(decodePair.valueUnsigned16.Value(), colorXTransitionState->highLimit);
                 }
                 break;
             case Attributes::CurrentY::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kCurrentXAndCurrentY))
                 {
-                    if (decodePair.valueUnsigned16.HasValue())
-                    {
-                        colorYTransitionState->finalValue =
-                            std::min(decodePair.valueUnsigned16.Value(), colorYTransitionState->highLimit);
-                    }
+                    VerifyOrReturnError(decodePair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                    colorYTransitionState->finalValue =
+                        std::min(decodePair.valueUnsigned16.Value(), colorYTransitionState->highLimit);
                 }
                 break;
             case Attributes::EnhancedCurrentHue::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
                 {
-                    if (decodePair.valueUnsigned16.HasValue())
-                    {
-                        colorHueTransitionState->finalEnhancedHue = decodePair.valueUnsigned16.Value();
-                    }
+                    VerifyOrReturnError(decodePair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                    colorHueTransitionState->finalEnhancedHue = decodePair.valueUnsigned16.Value();
                 }
                 break;
             case Attributes::CurrentSaturation::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation))
                 {
-                    if (decodePair.valueUnsigned8.HasValue())
-                    {
-                        colorSaturationTransitionState->finalValue = std::min(
-                            static_cast<uint16_t>(decodePair.valueUnsigned8.Value()), colorSaturationTransitionState->highLimit);
-                    }
+                    VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                    colorSaturationTransitionState->finalValue = std::min(static_cast<uint16_t>(decodePair.valueUnsigned8.Value()),
+                                                                          colorSaturationTransitionState->highLimit);
                 }
                 break;
             case Attributes::ColorLoopActive::Id:
-                if (decodePair.valueUnsigned8.HasValue())
-                {
-                    loopActiveValue = decodePair.valueUnsigned8.Value();
-                }
+                VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                loopActiveValue = decodePair.valueUnsigned8.Value();
                 break;
             case Attributes::ColorLoopDirection::Id:
-                if (decodePair.valueUnsigned8.HasValue())
-                {
-                    loopDirectionValue = decodePair.valueUnsigned8.Value();
-                }
+                VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                loopDirectionValue = decodePair.valueUnsigned8.Value();
                 break;
             case Attributes::ColorLoopTime::Id:
-                if (decodePair.valueUnsigned16.HasValue())
-                {
-                    loopTimeValue = decodePair.valueUnsigned16.Value();
-                }
+                VerifyOrReturnError(decodePair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                loopTimeValue = decodePair.valueUnsigned16.Value();
                 break;
             case Attributes::ColorTemperatureMireds::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kColorTemperature))
                 {
-                    if (decodePair.valueUnsigned16.HasValue())
-                    {
-                        colorTempTransitionState->finalValue =
-                            std::min(decodePair.valueUnsigned16.Value(), colorTempTransitionState->highLimit);
-                    }
+                    VerifyOrReturnError(decodePair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                    colorTempTransitionState->finalValue =
+                        std::min(decodePair.valueUnsigned16.Value(), colorTempTransitionState->highLimit);
                 }
                 break;
             case Attributes::EnhancedColorMode::Id:
-                if (decodePair.valueUnsigned8.HasValue())
+                VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                if (decodePair.valueUnsigned8.Value() <=
+                    static_cast<uint8_t>(ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
                 {
-                    if (decodePair.valueUnsigned8.Value() <=
-                        static_cast<uint8_t>(ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
-                    {
-                        targetColorMode = decodePair.valueUnsigned8.Value();
-                    }
+                    targetColorMode = decodePair.valueUnsigned8.Value();
                 }
                 break;
             default:
