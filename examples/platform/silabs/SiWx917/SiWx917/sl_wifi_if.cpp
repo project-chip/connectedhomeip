@@ -751,7 +751,9 @@ void HandleDHCPPolling()
      */
     if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
     {
-        ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", ip6addr_ntoa(netif_ip6_addr(sta_netif, 0)));
+        char addrStr[40] = { 0 };
+        VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), buf, sizeof(buf)) != NULL);
+        ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
         wfx_ipv6_notify(GET_IPV6_SUCCESS);
         hasNotifiedIPV6 = true;
         event.eventType = WFX_EVT_STA_DHCP_DONE;
