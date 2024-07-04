@@ -13,14 +13,14 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
-source_set("nullable-support") {
+source_set("nullable") {
   sources = [
     "NullObject.h",
     "Nullable.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/app/util:nullable-support-primitives",
+    "${chip_root}/src/app/util:nullable-primitives",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/core:string-builder-adapters",
@@ -52,7 +52,7 @@ source_set("data-model") {
     "${chip_root}/src/protocols/interaction_model",
   ]
 
-  public_deps = [ ":nullable-support" ]
+  public_deps = [ ":nullable" ]
 }
 
 # Provides extensions that use heap and should be

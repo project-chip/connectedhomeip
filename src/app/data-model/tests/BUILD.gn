@@ -21,7 +21,7 @@ chip_test_suite("tests") {
   test_sources = [ "TestNullable.cpp" ]
 
   public_deps = [
-    "${chip_root}/src/app/data-model:nullable-support",
+    "${chip_root}/src/app/data-model:nullable",
     "${chip_root}/src/lib/core",
   ]
 }
