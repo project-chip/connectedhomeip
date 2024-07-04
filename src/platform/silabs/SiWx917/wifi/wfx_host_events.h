@@ -181,7 +181,7 @@ typedef struct wfx_wifi_scan_result
 {
     char ssid[WFX_MAX_SSID_LENGTH + 1];
     wfx_sec_t security;
-    uint8_t bssid[6];
+    uint8_t bssid[BSSID_MAX_STR_LEN];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
 } wfx_wifi_scan_result_t;
