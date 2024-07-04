@@ -87,8 +87,7 @@ protected:
      *
      * @param[in] req List of new selected locations.
      * @param[out] locationStatus Success if all checks pass, error code if failure.
-     * @param[out] statusText text describing failure (see description above), size kMaxSizeStatusText + 1 byte for terminating
-     * character.
+     * @param[out] statusText text describing failure (see description above), size kMaxSizeStatusText
      * @return true if success.
      *
      * @note If the SelectLocations command is allowed when the device is operating and the selected locations change to none, the
@@ -126,7 +125,7 @@ protected:
     virtual bool HandleSkipCurrentLocation(MutableCharSpan skipStatusText)
     {
         // device support of this command is optional
-        chip::CopyCharSpanToMutableCharSpan("Skip Current Location command not supported by device"_span, skipStatusText);
+        CopyCharSpanToMutableCharSpan("Skip Current Location command not supported by device"_span, skipStatusText);
         return false;
     }
 
