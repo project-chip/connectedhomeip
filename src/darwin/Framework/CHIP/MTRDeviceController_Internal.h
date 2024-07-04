@@ -32,6 +32,7 @@
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
+#import "MTRDeviceStorageBehaviorConfiguration.h"
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
@@ -42,6 +43,7 @@
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
+@class MTRAsyncWorkQueue;
 
 namespace chip {
 class FabricTable;
@@ -95,17 +97,25 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
 
 /**
+ * A queue with a fixed width that allows a number of MTRDevice objects to perform
+ * subscription at the same time.
+ */
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+
+/**
  * Init a newly created controller.
  *
  * Only MTRDeviceControllerFactory should be calling this.
  */
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                          queue:(dispatch_queue_t)queue
-                storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-            otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-       otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-               uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+                             queue:(dispatch_queue_t)queue
+                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
+    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 
 /**
  * Check whether this controller is running on the given fabric, as represented
@@ -257,6 +267,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeDevice:(MTRDevice *)device;
 
 - (NSNumber * _Nullable)syncGetCompressedFabricID;
+
+/**
+ * Since getSessionForNode now enqueues by the subscription pool for Thread
+ * devices, MTRDevice needs a direct non-queued access because it already
+ * makes use of the subscription pool.
+ */
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 @end
 

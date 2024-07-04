@@ -21,6 +21,7 @@
 #include <ButtonHandler.h>
 #include <LightingManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <cycfg_pins.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <stdio.h>
 #include <wiced.h>
@@ -59,9 +60,10 @@ wiced_result_t app_button_init(void)
     memset(app_button_configurations, 0, (sizeof(wiced_button_configuration_t) * APP_MAX_BUTTON_DEF));
     memset(app_buttons, 0, (sizeof(button_manager_button_t) * APP_MAX_BUTTON_DEF));
 
-    app_button_configurations[ON_OFF_BUTTON].button            = PLATFORM_BUTTON_1;
-    app_button_configurations[ON_OFF_BUTTON].button_event_mask = BUTTON_CLICK_EVENT | BUTTON_HOLDING_EVENT;
-    app_buttons[ON_OFF_BUTTON].configuration                   = &app_button_configurations[ON_OFF_BUTTON];
+    app_button_configurations[ON_OFF_BUTTON].gpio = PLATFORM_BUTTON_USER;
+    app_button_configurations[ON_OFF_BUTTON].button_event_mask =
+        BUTTON_CLICK_EVENT | BUTTON_HOLDING_EVENT | BUTTON_LONG_DURATION_EVENT;
+    app_buttons[ON_OFF_BUTTON].configuration = &app_button_configurations[ON_OFF_BUTTON];
 
     result = wiced_button_manager_init(&app_button_manager, &app_button_manager_configuration, app_buttons, 1);
 
@@ -76,26 +78,34 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
                               button_manager_button_state_t state)
 {
     chip::BitMask<OccupancySensing::OccupancyBitmap> attributeValue;
-    if (button_mgr[0].configuration->button == PLATFORM_BUTTON_1 && event == BUTTON_CLICK_EVENT && state == BUTTON_STATE_RELEASED)
+    if (button_mgr[0].configuration->gpio == PLATFORM_BUTTON_USER)
     {
-        if (LightMgr().IsLightOn())
+        if (event == BUTTON_CLICK_EVENT && state == BUTTON_STATE_RELEASED)
         {
-            printf("Button Toggle:ON -> OFF\n");
-            LightMgr().InitiateAction(LightingManager::ACTOR_BUTTON, LightingManager::OFF_ACTION, 0);
+            if (LightMgr().IsLightOn())
+            {
+                printf("Button Toggle:ON -> OFF\n");
+                LightMgr().InitiateAction(LightingManager::ACTOR_BUTTON, LightingManager::OFF_ACTION, 0);
+            }
+            else
+            {
+                printf("Button Toggle:OFF -> ON\n");
+                LightMgr().InitiateAction(LightingManager::ACTOR_BUTTON, LightingManager::ON_ACTION, 0);
+            }
         }
-        else
+        else if (event == BUTTON_LONG_DURATION_EVENT && state == BUTTON_STATE_RELEASED)
         {
-            printf("Button Toggle:OFF -> ON\n");
-            LightMgr().InitiateAction(LightingManager::ACTOR_BUTTON, LightingManager::ON_ACTION, 0);
+            // update the current occupancy here for hardcoded endpoint 1
+            OccupancySensing::Attributes::Occupancy::Get(1, &attributeValue);
+            uint8_t bitValue = attributeValue.Raw();
+            printf("Button Holding Toggle: %d -> %d\n", bitValue, !bitValue);
+            attributeValue.SetRaw(!bitValue);
+            OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
         }
-    }
-    else if (button_mgr[0].configuration->button == PLATFORM_BUTTON_1 && event == BUTTON_HOLDING_EVENT)
-    {
-        // update the current occupancy here for hardcoded endpoint 1
-        OccupancySensing::Attributes::Occupancy::Get(1, &attributeValue);
-        uint8_t bitValue = attributeValue.Raw();
-        printf("Button Holding Toggle: %d -> %d\n", bitValue, !bitValue);
-        attributeValue.SetRaw(!bitValue);
-        OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
+        else if (event == BUTTON_HOLDING_EVENT)
+        {
+            printf("Button Performing factory reset ...\r\n");
+            chip::DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
+        }
     }
 }

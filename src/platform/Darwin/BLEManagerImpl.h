@@ -25,14 +25,12 @@
 
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/Darwin/BleScannerDelegate.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 namespace chip {
 namespace DeviceLayer {
-
-class BleScannerDelegate;
-
 namespace Internal {
 
 using namespace chip::Ble;
@@ -48,7 +46,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer
 
 public:
     CHIP_ERROR ConfigureBle(uint32_t aNodeId, bool aIsCentral) { return CHIP_NO_ERROR; }
-    CHIP_ERROR StartScan(BleScannerDelegate * delegate = nullptr);
+    CHIP_ERROR StartScan(BleScannerDelegate * delegate, BleScanMode mode = BleScanMode::kDefault);
     CHIP_ERROR StopScan();
 
 private:

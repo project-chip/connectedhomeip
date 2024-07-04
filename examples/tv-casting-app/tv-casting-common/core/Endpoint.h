@@ -145,6 +145,12 @@ public:
         }
         return nullptr;
     }
+
+    void LogDetail() const
+    {
+        ChipLogProgress(AppServer, "Endpoint::LogDetail() Endpoint ID: %d, Vendor ID: %d, Product ID: %d", mAttributes.mId,
+                        mAttributes.mVendorId, mAttributes.mProductId);
+    }
 };
 
 }; // namespace core

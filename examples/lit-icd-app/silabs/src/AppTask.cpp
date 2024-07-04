@@ -170,11 +170,15 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
 void AppTask::OnEnterActiveMode()
 {
+#ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(true);
+#endif
 }
 
 // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
 void AppTask::OnEnterIdleMode()
 {
+#ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(false);
+#endif
 }

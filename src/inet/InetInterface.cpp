@@ -500,12 +500,12 @@ int GetIOCTLSocket()
     {
         int s;
 #ifdef SOCK_CLOEXEC
-        s = socket(AF_INET, SOCK_STREAM, SOCK_CLOEXEC);
+        s = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
         if (s < 0)
 #endif
         {
             s = socket(AF_INET, SOCK_STREAM, 0);
-            fcntl(s, O_CLOEXEC);
+            fcntl(s, F_SETFD, O_CLOEXEC);
         }
 
         if (!__sync_bool_compare_and_swap(&sIOCTLSocket, -1, s))

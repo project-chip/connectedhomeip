@@ -34,6 +34,8 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -44,8 +46,10 @@
 
 #ifdef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
 #define ChipLogDebugBtpEngine(MOD, MSG, ...) ChipLogError(MOD, MSG, ##__VA_ARGS__)
+#define ChipLogDebugBufferBtpEngine(MOD, BUF) ChipLogByteSpan(MOD, ByteSpan((BUF)->Start(), (BUF)->DataLength()))
 #else
 #define ChipLogDebugBtpEngine(MOD, MSG, ...)
+#define ChipLogDebugBufferBtpEngine(MOD, BUF)
 #endif
 
 namespace chip {
@@ -60,18 +64,6 @@ static inline bool DidReceiveData(BitFlags<BtpEngine::HeaderFlags> rx_flags)
 {
     return rx_flags.HasAny(BtpEngine::HeaderFlags::kStartMessage, BtpEngine::HeaderFlags::kContinueMessage,
                            BtpEngine::HeaderFlags::kEndMessage);
-}
-
-static void PrintBufDebug(const System::PacketBufferHandle & buf)
-{
-#ifdef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
-    uint8_t * b = buf->Start();
-
-    for (int i = 0; i < buf->DataLength(); i++)
-    {
-        ChipLogError(Ble, "\t%02x", b[i]);
-    }
-#endif
 }
 
 const uint16_t BtpEngine::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
@@ -282,13 +274,13 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
         // mRxFragmentSize may be smaller than the characteristic size.  Make sure
         // we're not truncating to a data length smaller than what we have already consumed.
         VerifyOrExit(reader.OctetsRead() <= mRxFragmentSize, err = BLE_ERROR_REASSEMBLER_INCORRECT_STATE);
-        data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
+        data->SetDataLength(chip::min(data->DataLength(), static_cast<size_t>(mRxFragmentSize)));
 
         // Now mark the bytes we consumed as consumed.
         data->ConsumeHead(static_cast<uint16_t>(reader.OctetsRead()));
 
         ChipLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
-        PrintBufDebug(data);
+        ChipLogDebugBufferBtpEngine(Ble, data);
     }
 
     if (mRxState == kState_Idle)
@@ -346,11 +338,12 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
     if (rx_flags.Has(HeaderFlags::kEndMessage))
     {
         // Trim remainder, if any, of the received packet buffer based on sender-specified length of reassembled message.
-        int padding = mRxBuf->DataLength() - mRxLength;
+        VerifyOrExit(CanCastTo<uint16_t>(mRxBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+        int padding = static_cast<uint16_t>(mRxBuf->DataLength()) - mRxLength;
 
         if (padding > 0)
         {
-            mRxBuf->SetDataLength(mRxLength);
+            mRxBuf->SetDataLength(static_cast<size_t>(mRxLength));
         }
 
         // Ensure all received fragments add up to sender-specified total message size.
@@ -375,7 +368,7 @@ exit:
         }
         if (!mRxBuf.IsNull())
         {
-            ChipLogError(Ble, "With rx buf data length = %u", mRxBuf->DataLength());
+            ChipLogError(Ble, "With rx buf data length = %u", static_cast<unsigned>(mRxBuf->DataLength()));
         }
         LogState();
 
@@ -426,12 +419,13 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
             return false;
         }
 
-        mTxBuf    = std::move(data);
-        mTxState  = kState_InProgress;
-        mTxLength = mTxBuf->DataLength();
+        mTxBuf   = std::move(data);
+        mTxState = kState_InProgress;
+        VerifyOrReturnError(CanCastTo<uint16_t>(mTxBuf->DataLength()), false);
+        mTxLength = static_cast<uint16_t>(mTxBuf->DataLength());
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send whole message:");
-        PrintBufDebug(mTxBuf);
+        ChipLogDebugBufferBtpEngine(Ble, mTxBuf);
 
         // Determine fragment header size.
         uint8_t header_size =
@@ -482,7 +476,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
 
         characteristic[0] = headerFlags.Raw();
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send first fragment:");
-        PrintBufDebug(mTxBuf);
+        ChipLogDebugBufferBtpEngine(Ble, mTxBuf);
     }
     else if (mTxState == kState_InProgress)
     {
@@ -528,7 +522,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
 
         characteristic[0] = headerFlags.Raw();
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send additional fragment:");
-        PrintBufDebug(mTxBuf);
+        ChipLogDebugBufferBtpEngine(Ble, mTxBuf);
     }
     else
     {

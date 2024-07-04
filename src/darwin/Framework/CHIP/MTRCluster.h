@@ -141,7 +141,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * those consumers is readAttributeWithEndpointID:clusterID:attributeID:params:
  * on MTRDevice.
  */
-@property (nonatomic, assign, getter=shouldAssumeUnknownAttributesReportable) BOOL assumeUnknownAttributesReportable MTR_NEWLY_AVAILABLE;
+@property (nonatomic, assign, getter=shouldAssumeUnknownAttributesReportable) BOOL assumeUnknownAttributesReportable MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 @end
 

@@ -30,10 +30,13 @@
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -64,9 +67,9 @@ using ::chip::System::pbuf;
 #define OF_LWIP_PBUF(x) (reinterpret_cast<PacketBuffer *>(reinterpret_cast<void *>(x)))
 
 namespace {
-void ScrambleData(uint8_t * start, uint16_t length)
+void ScrambleData(uint8_t * start, size_t length)
 {
-    for (uint16_t i = 0; i < length; ++i)
+    for (size_t i = 0; i < length; ++i)
         ++start[i];
 }
 } // namespace
@@ -117,7 +120,7 @@ public:
 
     static void PrintHandle(const char * tag, const PacketBuffer * buffer)
     {
-        printf("%s %p ref=%u len=%-4u next=%p\n", StringOrNullMarker(tag), buffer, buffer ? buffer->ref : 0,
+        printf("%s %p ref=%u len=%-4zu next=%p\n", StringOrNullMarker(tag), buffer, buffer ? buffer->ref : 0,
                buffer ? buffer->len : 0, buffer ? buffer->next : nullptr);
     }
     static void PrintHandle(const char * tag, const PacketBufferHandle & handle) { PrintHandle(tag, handle.mBuffer); }
@@ -129,7 +132,7 @@ public:
             handle(nullptr)
         {}
 
-        uint16_t init_len;
+        size_t init_len;
         uint16_t reserved_size;
         uint8_t * start_buffer;
         uint8_t * end_buffer;
@@ -140,7 +143,7 @@ public:
     static void PrintHandle(const char * tag, const BufferConfiguration & config) { PrintHandle(tag, config.handle); }
     static void PrintConfig(const char * tag, const BufferConfiguration & config)
     {
-        printf("%s pay=%-4zu len=%-4u res=%-4u:", StringOrNullMarker(tag), config.payload_ptr - config.start_buffer,
+        printf("%s pay=%-4zu len=%-4zu res=%-4u:", StringOrNullMarker(tag), config.payload_ptr - config.start_buffer,
                config.init_len, config.reserved_size);
         PrintHandle("", config.handle);
     }
@@ -191,16 +194,6 @@ public:
     void CheckSetStart();
 };
 
-/*
- * Run fixture's class function as a test.
- */
-#define TEST_F_FROM_FIXTURE(test_fixture, test_name)                                                                               \
-    TEST_F(test_fixture, test_name)                                                                                                \
-    {                                                                                                                              \
-        test_name();                                                                                                               \
-    }                                                                                                                              \
-    void test_fixture::test_name()
-
 /**
  *  Allocate memory for a test buffer and configure according to test buffer configuration.
  */
@@ -209,21 +202,17 @@ void TestSystemPacketBuffer::PrepareTestBuffer(BufferConfiguration * config, int
     if (config->handle.IsNull())
     {
         config->handle = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-        if (config->handle.IsNull())
-        {
-            printf("NewPacketBuffer: Failed to allocate packet buffer (%u retained): %s\n",
-                   static_cast<unsigned int>(handles.size()), strerror(errno));
-            exit(EXIT_FAILURE);
-        }
+        VerifyOrDieWithMsg(!config->handle.IsNull(), chipSystemLayer,
+                           "NewPacketBuffer: Failed to allocate packet buffer (%u retained): %s",
+                           static_cast<unsigned int>(handles.size()), strerror(errno));
         if (flags & kRecordHandle)
         {
             handles.push_back(config->handle.Retain());
         }
     }
-    else if ((flags & kAllowHandleReuse) == 0)
+    else
     {
-        printf("Dirty test configuration\n");
-        exit(EXIT_FAILURE);
+        VerifyOrDieWithMsg((flags & kAllowHandleReuse) != 0, chipSystemLayer, "Dirty test configuration");
     }
 
     const size_t lInitialSize = kStructureSize + config->reserved_size;
@@ -251,8 +240,15 @@ void TestSystemPacketBuffer::PrepareTestBuffer(BufferConfiguration * config, int
         config->handle->next = nullptr;
     }
     config->handle->payload = config->payload_ptr;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    VerifyOrDieWithMsg(chip::CanCastTo<uint16_t>(config->init_len), chipSystemLayer, "Max Length exceeded for LwIP based systems");
+
+    config->handle->len     = static_cast<uint16_t>(config->init_len);
+    config->handle->tot_len = static_cast<uint16_t>(config->init_len);
+#else
     config->handle->len     = config->init_len;
     config->handle->tot_len = config->init_len;
+#endif
 }
 
 bool TestSystemPacketBuffer::ResetConfigurations()
@@ -305,7 +301,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNew)
     {
         const PacketBufferHandle buffer = PacketBufferHandle::New(0, config.reserved_size);
 
-        if (config.reserved_size > PacketBuffer::kMaxSizeWithoutReserve)
+        if (config.reserved_size > PacketBuffer::kMaxAllocSize)
         {
             EXPECT_TRUE(buffer.IsNull());
             continue;
@@ -321,8 +317,8 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNew)
             const pbuf * const pb = TO_LWIP_PBUF(buffer.Get());
             // NOLINTEND(bugprone-casting-through-void)
 
-            EXPECT_EQ(pb->len, 0);
-            EXPECT_EQ(pb->tot_len, 0);
+            EXPECT_EQ(pb->len, static_cast<size_t>(0));
+            EXPECT_EQ(pb->tot_len, static_cast<size_t>(0));
             EXPECT_EQ(pb->next, nullptr);
             EXPECT_EQ(pb->ref, 1);
         }
@@ -409,16 +405,17 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetStart)
 
             EXPECT_EQ(config.handle->payload, verify_start);
 
-            if ((verify_start - config.payload_ptr) > config.init_len)
+            if (verify_start - config.payload_ptr > static_cast<ptrdiff_t>(config.init_len))
             {
                 // Set start to the beginning of payload, right after handle's header.
-                EXPECT_EQ(config.handle->len, 0);
+                EXPECT_EQ(config.handle->len, static_cast<size_t>(0));
             }
             else
             {
                 // Set start to somewhere between the end of the handle's
                 // header and the end of payload.
-                EXPECT_EQ(config.handle->len, (config.init_len - (verify_start - config.payload_ptr)));
+                EXPECT_EQ(config.handle->len,
+                          static_cast<size_t>((static_cast<int32_t>(config.init_len) - (verify_start - config.payload_ptr))));
             }
         }
     }
@@ -467,15 +464,15 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetDataLength)
 
                     if (length > (config_2.end_buffer - config_2.payload_ptr))
                     {
-                        EXPECT_EQ(config_2.handle->len, (config_2.end_buffer - config_2.payload_ptr));
-                        EXPECT_EQ(config_2.handle->tot_len, (config_2.end_buffer - config_2.payload_ptr));
-                        EXPECT_EQ(config_2.handle->next, nullptr);
+                        EXPECT_EQ(config_2.handle->len, static_cast<size_t>(config_2.end_buffer - config_2.payload_ptr));
+                        EXPECT_EQ(config_2.handle->tot_len, static_cast<size_t>(config_2.end_buffer - config_2.payload_ptr));
+                        EXPECT_EQ(config_2.handle.GetNext(), nullptr);
                     }
                     else
                     {
                         EXPECT_EQ(config_2.handle->len, length);
                         EXPECT_EQ(config_2.handle->tot_len, length);
-                        EXPECT_EQ(config_2.handle->next, nullptr);
+                        EXPECT_EQ(config_2.handle.GetNext(), nullptr);
                     }
                 }
                 else
@@ -485,22 +482,24 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetDataLength)
 
                     if (length > (config_2.end_buffer - config_2.payload_ptr))
                     {
-                        EXPECT_EQ(config_2.handle->len, (config_2.end_buffer - config_2.payload_ptr));
-                        EXPECT_EQ(config_2.handle->tot_len, (config_2.end_buffer - config_2.payload_ptr));
-                        EXPECT_EQ(config_2.handle->next, nullptr);
+                        EXPECT_EQ(config_2.handle->len, static_cast<size_t>(config_2.end_buffer - config_2.payload_ptr));
+                        EXPECT_EQ(config_2.handle->tot_len, static_cast<size_t>(config_2.end_buffer - config_2.payload_ptr));
+                        EXPECT_EQ(config_2.handle.GetNext(), nullptr);
 
                         EXPECT_EQ(config_1.handle->tot_len,
-                                  (config_1.init_len + static_cast<int32_t>(config_2.end_buffer - config_2.payload_ptr) -
-                                   static_cast<int32_t>(config_2.init_len)));
+                                  static_cast<size_t>(static_cast<int32_t>(config_1.init_len) +
+                                                      static_cast<int32_t>(config_2.end_buffer - config_2.payload_ptr) -
+                                                      static_cast<int32_t>(config_2.init_len)));
                     }
                     else
                     {
                         EXPECT_EQ(config_2.handle->len, length);
                         EXPECT_EQ(config_2.handle->tot_len, length);
-                        EXPECT_EQ(config_2.handle->next, nullptr);
+                        EXPECT_EQ(config_2.handle.GetNext(), nullptr);
 
                         EXPECT_EQ(config_1.handle->tot_len,
-                                  (config_1.init_len + static_cast<int32_t>(length) - static_cast<int32_t>(config_2.init_len)));
+                                  static_cast<size_t>(static_cast<int32_t>(config_1.init_len) + static_cast<int32_t>(length) -
+                                                      static_cast<int32_t>(config_2.init_len)));
                     }
                 }
             }
@@ -528,7 +527,7 @@ TEST_F(TestSystemPacketBuffer, CheckMaxDataLength)
     for (auto & config : configurations)
     {
         PrepareTestBuffer(&config, kRecordHandle);
-        EXPECT_EQ(config.handle->MaxDataLength(), (config.end_buffer - config.payload_ptr));
+        EXPECT_EQ(config.handle->MaxDataLength(), static_cast<size_t>(config.end_buffer - config.payload_ptr));
     }
 }
 
@@ -540,7 +539,9 @@ TEST_F(TestSystemPacketBuffer, CheckAvailableDataLength)
     for (auto & config : configurations)
     {
         PrepareTestBuffer(&config, kRecordHandle);
-        EXPECT_EQ(config.handle->AvailableDataLength(), ((config.end_buffer - config.payload_ptr) - config.init_len));
+        EXPECT_EQ(config.handle->AvailableDataLength(),
+                  static_cast<size_t>(static_cast<int32_t>(config.end_buffer - config.payload_ptr) -
+                                      static_cast<int32_t>(config.init_len)));
     }
 }
 
@@ -632,9 +633,9 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckAddToEnd)
                 EXPECT_EQ(config_3.handle->ref, 1); // config_3.handle
 
                 EXPECT_EQ(config_1.handle->tot_len, (config_1.init_len + config_2.init_len));
-                EXPECT_EQ(config_1.handle->next, config_2.handle.Get());
-                EXPECT_EQ(config_2.handle->next, nullptr);
-                EXPECT_EQ(config_3.handle->next, nullptr);
+                EXPECT_EQ(config_1.handle.GetNext(), config_2.handle.Get());
+                EXPECT_EQ(config_2.handle.GetNext(), nullptr);
+                EXPECT_EQ(config_3.handle.GetNext(), nullptr);
 
                 config_1.handle->AddToEnd(config_3.handle.Retain());
                 EXPECT_EQ(config_1.handle->ref, 1); // config_1.handle
@@ -642,9 +643,9 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckAddToEnd)
                 EXPECT_EQ(config_3.handle->ref, 2); // config_3.handle and config_2.handle->next
 
                 EXPECT_EQ(config_1.handle->tot_len, (config_1.init_len + config_2.init_len + config_3.init_len));
-                EXPECT_EQ(config_1.handle->next, config_2.handle.Get());
-                EXPECT_EQ(config_2.handle->next, config_3.handle.Get());
-                EXPECT_EQ(config_3.handle->next, nullptr);
+                EXPECT_EQ(config_1.handle.GetNext(), config_2.handle.Get());
+                EXPECT_EQ(config_2.handle.GetNext(), config_3.handle.Get());
+                EXPECT_EQ(config_3.handle.GetNext(), nullptr);
 
                 config_1.handle = nullptr;
                 config_2.handle = nullptr;
@@ -703,7 +704,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckPopHead)
             const PacketBufferHandle popped = config_1.handle.PopHead();
 
             EXPECT_EQ(config_1.handle, config_2.handle);
-            EXPECT_EQ(config_1.handle->next, nullptr);
+            EXPECT_EQ(config_1.handle.GetNext(), nullptr);
             EXPECT_EQ(config_1.handle->tot_len, config_1.init_len);
         }
     }
@@ -729,7 +730,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckCompactHead)
         {
             PrepareTestBuffer(&config, kRecordHandle | kAllowHandleReuse);
             config.handle->SetDataLength(length, config.handle);
-            const uint16_t data_length = config.handle->DataLength();
+            const uint32_t data_length = static_cast<uint32_t>(config.handle->DataLength());
 
             config.handle->CompactHead();
 
@@ -769,14 +770,14 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckCompactHead)
                     EXPECT_TRUE(config_2.handle.IsNull());
 
                     config_1.handle->SetDataLength(length_1, config_1.handle);
-                    const uint16_t data_length_1 = config_1.handle->DataLength();
+                    const uint32_t data_length_1 = static_cast<uint32_t>(config_1.handle->DataLength());
 
                     // This chain will cause buffer_2 to be freed.
                     config_1.handle->next = buffer_2;
 
                     // Add various lengths to the second buffer
                     buffer_2->SetDataLength(length_2, config_1.handle);
-                    const uint16_t data_length_2 = buffer_2->DataLength();
+                    const uint32_t data_length_2 = static_cast<uint32_t>(buffer_2->DataLength());
 
                     config_1.handle->CompactHead();
 
@@ -786,7 +787,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckCompactHead)
                     {
                         EXPECT_EQ(config_1.handle->len, config_1.handle->MaxDataLength());
                         EXPECT_EQ(buffer_2->len, config_1.handle->tot_len - config_1.handle->MaxDataLength());
-                        EXPECT_EQ(config_1.handle->next, buffer_2);
+                        EXPECT_EQ(config_1.handle.GetNext(), buffer_2);
                         EXPECT_EQ(config_1.handle->ref, 2);
                         EXPECT_EQ(buffer_2->ref, 1);
                     }
@@ -796,13 +797,13 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckCompactHead)
                         if (data_length_1 >= config_1.handle->MaxDataLength() && data_length_2 == 0)
                         {
                             /* make sure the second buffer is not freed */
-                            EXPECT_EQ(config_1.handle->next, buffer_2);
+                            EXPECT_EQ(config_1.handle.GetNext(), buffer_2);
                             EXPECT_EQ(buffer_2->ref, 1);
                         }
                         else
                         {
                             /* make sure the second buffer is freed */
-                            EXPECT_EQ(config_1.handle->next, nullptr);
+                            EXPECT_EQ(config_1.handle.GetNext(), nullptr);
                             buffer_2 = nullptr;
                         }
                     }
@@ -841,8 +842,8 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckConsumeHead)
             if (length > config.init_len)
             {
                 EXPECT_EQ(config.handle->payload, (config.payload_ptr + config.init_len));
-                EXPECT_EQ(config.handle->len, 0);
-                EXPECT_EQ(config.handle->tot_len, 0);
+                EXPECT_EQ(config.handle->len, static_cast<size_t>(0));
+                EXPECT_EQ(config.handle->tot_len, static_cast<size_t>(0));
             }
             else
             {
@@ -897,8 +898,8 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckConsume)
                         config_1.handle->SetDataLength(len_1, config_1.handle);
                         config_2.handle->SetDataLength(len_2, config_1.handle);
 
-                        const uint16_t buf_1_len = config_1.handle->len;
-                        const uint16_t buf_2_len = config_2.handle->len;
+                        const uint32_t buf_1_len = static_cast<uint32_t>(config_1.handle->len);
+                        const uint32_t buf_2_len = static_cast<uint32_t>(config_2.handle->len);
 
                         PacketBufferHandle original_handle_1 = config_1.handle.Retain();
                         EXPECT_EQ(config_1.handle->ref, 2); // config_1.handle and original_handle_1
@@ -963,7 +964,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckEnsureReservedSize)
         for (auto length : kLengths)
         {
             PrepareTestBuffer(&config, kRecordHandle | kAllowHandleReuse);
-            const uint16_t kAllocSize = config.handle->AllocSize();
+            const uint32_t kAllocSize = static_cast<uint32_t>(config.handle->AllocSize());
             uint16_t reserved_size    = config.reserved_size;
 
             if (kStructureSize + config.reserved_size > kAllocSize)
@@ -1005,7 +1006,7 @@ TEST_F(TestSystemPacketBuffer, CheckAlignPayload)
         for (auto length : kLengths)
         {
             PrepareTestBuffer(&config, kRecordHandle | kAllowHandleReuse);
-            const uint16_t kAllocSize = config.handle->AllocSize();
+            const uint32_t kAllocSize = static_cast<uint32_t>(config.handle->AllocSize());
 
             if (length == 0)
             {
@@ -1013,16 +1014,16 @@ TEST_F(TestSystemPacketBuffer, CheckAlignPayload)
                 continue;
             }
 
-            uint16_t reserved_size = config.reserved_size;
+            uint32_t reserved_size = config.reserved_size;
             if (config.reserved_size > kAllocSize)
             {
                 reserved_size = kAllocSize;
             }
 
-            const uint16_t payload_offset = static_cast<uint16_t>(reinterpret_cast<uintptr_t>(config.handle->Start()) % length);
-            uint16_t payload_shift        = 0;
+            const uint32_t payload_offset = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(config.handle->Start()) % length);
+            uint32_t payload_shift        = 0;
             if (payload_offset > 0)
-                payload_shift = static_cast<uint16_t>(length - payload_offset);
+                payload_shift = static_cast<uint32_t>(length - payload_offset);
 
             if (payload_shift <= kAllocSize - reserved_size)
             {
@@ -1136,10 +1137,10 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckRead)
             PrepareTestBuffer(&config_1, kAllowHandleReuse);
             PrepareTestBuffer(&config_2, kAllowHandleReuse);
 
-            const uint16_t length_1     = config_1.handle->MaxDataLength();
-            const uint16_t length_2     = config_2.handle->MaxDataLength();
+            const size_t length_1       = config_1.handle->MaxDataLength();
+            const size_t length_2       = config_2.handle->MaxDataLength();
             const size_t length_sum     = length_1 + length_2;
-            const uint16_t length_total = static_cast<uint16_t>(length_sum);
+            const uint32_t length_total = static_cast<uint32_t>(length_sum);
             EXPECT_EQ(length_total, length_sum);
 
             memcpy(config_1.handle->Start(), payloads, length_1);
@@ -1167,7 +1168,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckRead)
             EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
 
             // Check that running off the end of a corrupt buffer chain is detected.
-            if (length_total < UINT16_MAX)
+            if (length_total < UINT32_MAX)
             {
                 // First case: TotalLength() is wrong.
                 config_1.handle->tot_len = static_cast<uint16_t>(config_1.handle->tot_len + 1);
@@ -1263,7 +1264,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckFree)
                     // Verify that head ref count is decremented.
                     EXPECT_EQ(config_1.handle->ref, initial_refs_1 - 1);
                     // Verify that chain is maintained.
-                    EXPECT_EQ(config_1.handle->next, config_2.handle.Get());
+                    EXPECT_EQ(config_1.handle.GetNext(), config_2.handle.Get());
                     // Verify that chained buffer ref count has not changed.
                     EXPECT_EQ(config_2.handle->ref, initial_refs_2);
                 }
@@ -1596,7 +1597,8 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleRightSize)
 
 TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleCloneData)
 {
-    uint8_t lPayload[2 * PacketBuffer::kMaxSizeWithoutReserve];
+    uint8_t lPayload[2 * PacketBuffer::kMaxAllocSize];
+
     for (uint8_t & payload : lPayload)
     {
         payload = static_cast<uint8_t>(random());
@@ -1675,7 +1677,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleCloneData)
     // This is only testable on heap allocation configurations, where pbuf records the allocation size and we can manually
     // construct an oversize buffer.
 
-    constexpr uint16_t kOversizeDataSize = PacketBuffer::kMaxSizeWithoutReserve + 99;
+    constexpr size_t kOversizeDataSize = PacketBuffer::kMaxAllocSize + 99;
     PacketBuffer * p = reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(kStructureSize + kOversizeDataSize));
     ASSERT_NE(p, nullptr);
 
@@ -1689,15 +1691,16 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleCloneData)
     PacketBufferHandle handle = PacketBufferHandle::Adopt(p);
 
     // Fill the buffer to maximum and verify that it can be cloned.
+    size_t maxSize = PacketBuffer::kMaxAllocSize;
 
-    memset(handle->Start(), 1, PacketBuffer::kMaxSizeWithoutReserve);
-    handle->SetDataLength(PacketBuffer::kMaxSizeWithoutReserve);
-    EXPECT_EQ(handle->DataLength(), PacketBuffer::kMaxSizeWithoutReserve);
+    memset(handle->Start(), 1, maxSize);
+    handle->SetDataLength(maxSize);
+    EXPECT_EQ(handle->DataLength(), maxSize);
 
     PacketBufferHandle clone = handle.CloneData();
     ASSERT_FALSE(clone.IsNull());
-    EXPECT_EQ(clone->DataLength(), PacketBuffer::kMaxSizeWithoutReserve);
-    EXPECT_EQ(memcmp(handle->Start(), clone->Start(), PacketBuffer::kMaxSizeWithoutReserve), 0);
+    EXPECT_EQ(clone->DataLength(), maxSize);
+    EXPECT_EQ(memcmp(handle->Start(), clone->Start(), maxSize), 0);
 
     // Overfill the buffer and verify that it can not be cloned.
     memset(handle->Start(), 2, kOversizeDataSize);

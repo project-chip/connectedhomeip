@@ -24,6 +24,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Variant.h>
+#include <matter/tracing/build_config.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -47,6 +48,7 @@ enum CommissioningStage : uint8_t
     kSendDACCertificateRequest,  ///< Send DAC CertificateChainRequest (0x3E:2) command to the device
     kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
     kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
+    kAttestationRevocationCheck, ///< Verify Revocation Status of device's DAC chain
     kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
     kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
@@ -77,6 +79,9 @@ enum CommissioningStage : uint8_t
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
     /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
+    kPrimaryOperationalNetworkFailed, ///< Indicate that the primary operational network (on root endpoint) failed, should disable
+                                      ///< the primary network interface later.
+    kDisablePrimaryNetworkInterface,  ///< Send InterfaceEnabled write request to the device to disable network interface.
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -87,6 +92,10 @@ enum class ICDRegistrationStrategy : uint8_t
 };
 
 const char * StageToString(CommissioningStage stage);
+
+#if MATTER_TRACING_ENABLED
+const char * MetricKeyForCommissioningStage(CommissioningStage stage);
+#endif
 
 struct WiFiCredentials
 {
@@ -549,6 +558,13 @@ public:
         return *this;
     }
 
+    Optional<app::Clusters::IcdManagement::ClientTypeEnum> GetICDClientType() const { return mICDClientType; }
+    CommissioningParameters & SetICDClientType(app::Clusters::IcdManagement::ClientTypeEnum icdClientType)
+    {
+        mICDClientType = MakeOptional(icdClientType);
+        return *this;
+    }
+
     Optional<uint32_t> GetICDStayActiveDurationMsec() const { return mICDStayActiveDurationMsec; }
     CommissioningParameters & SetICDStayActiveDurationMsec(uint32_t stayActiveDurationMsec)
     {
@@ -623,6 +639,7 @@ private:
     Optional<NodeId> mICDCheckInNodeId;
     Optional<uint64_t> mICDMonitoredSubject;
     Optional<ByteSpan> mICDSymmetricKey;
+    Optional<app::Clusters::IcdManagement::ClientTypeEnum> mICDClientType;
     Optional<uint32_t> mICDStayActiveDurationMsec;
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
@@ -782,6 +799,7 @@ public:
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
      * kAttestationVerification: AttestationErrorInfo if there is an error
+     * kAttestationRevocationCheck: AttestationErrorInfo if there is an error
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None

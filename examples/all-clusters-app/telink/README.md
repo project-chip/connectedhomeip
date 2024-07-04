@@ -27,7 +27,7 @@ creating your own application.
     ```
 
 3. In the example dir run (replace _<build_target>_ with your board name, for
-   example, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9258a`):
+   example, `tlsr9118bdk40d`, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9258a`):
 
     ```bash
     $ west build -b <build_target>

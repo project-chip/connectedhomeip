@@ -171,6 +171,7 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
     """Tests that fail in darwin-framework-tool for some reason"""
     return {
         "DL_LockUnlock",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "DL_UsersAndCredentials",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_AddNewFabricFromExistingFabric",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
         # The name of the arguments once converted differs for chip-tool and darwin-framework-tool (attribute-ids vs attribute-id. See #31934)
         "TestAttributesById",
@@ -420,8 +421,8 @@ def AllReplYamlTests():
         yield test
 
 
-def AllChipToolYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=True):
+def AllChipToolYamlTests(use_short_run_name: bool = True):
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=use_short_run_name):
         yield test
 
 

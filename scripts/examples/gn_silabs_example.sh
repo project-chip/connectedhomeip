@@ -56,14 +56,18 @@ if [ "$#" == "0" ]; then
     <silabs_board_name>
         Identifier of the board for which this app is built
         Currently Supported :
-            BRD4161A
-            BRD4163A
-            BRD4164A
-            BRD4166A
-            BRD4170A
             BRD4186A
             BRD4187A
-            BRD4304A
+            BRD4186C
+            BRD4187C
+            BRD2601B
+            BRD2703A
+            BRD2704A
+            BRD4316A
+            BRD4317A
+            BRD4318A
+            BRD4319A
+
 
     <Build options> - optional noteworthy build options for EFR32
         chip_build_libshell

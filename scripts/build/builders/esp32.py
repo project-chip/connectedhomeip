@@ -17,7 +17,7 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder
+from .builder import Builder, BuilderOutput
 
 
 class Esp32Board(Enum):
@@ -197,6 +197,8 @@ class Esp32Builder(Builder):
         if not self.enable_ipv4:
             self._Execute(
                 ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
+            self._Execute(
+                ['bash', '-c', 'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>%s' % shlex.quote(defaults_out)])
 
         if self.enable_insights_trace:
             insights_flag = 'y'
@@ -248,26 +250,21 @@ class Esp32Builder(Builder):
     def build_outputs(self):
         if self.app == Esp32App.TESTS:
             # Include the runnable image names as artifacts
-            result = dict()
             with open(os.path.join(self.output_dir, 'test_images.txt'), 'rt') as f:
-                for name in f.readlines():
-                    name = name.strip()
-                    result[name] = os.path.join(self.output_dir, name)
+                for name in filter(None, [x.strip() for x in f.readlines()]):
+                    yield BuilderOutput(os.path.join(self.output_dir, name), name)
+            return
 
-            return result
+        extensions = ["elf"]
+        if self.options.enable_link_map_file:
+            extensions.append("map")
+        for ext in extensions:
+            name = f"{self.app.AppNamePrefix}.{ext}"
+            yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
-        return {
-            self.app.AppNamePrefix + '.elf':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
-            self.app.AppNamePrefix + '.map':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.map'),
-        }
-
-    def flashbundle(self):
+    def bundle_outputs(self):
         if not self.app.FlashBundleName:
-            return {}
-
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName), 'r') as fp:
-            return {
-                line.strip(): os.path.join(self.output_dir, line.strip()) for line in fp.readlines() if line.strip()
-            }
+            return
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName)) as f:
+            for line in filter(None, [x.strip() for x in f.readlines()]):
+                yield BuilderOutput(os.path.join(self.output_dir, line), line)

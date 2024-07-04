@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 100,
+  "featureLevel": 103,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -29,6 +29,7 @@
       "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
+      "category": "matter",
       "version": "chip-v1"
     }
   ],
@@ -3002,7 +3003,7 @@
           ]
         },
         {
-          "name": "WiFi Network Diagnostics",
+          "name": "Wi-Fi Network Diagnostics",
           "code": 54,
           "mfgCode": null,
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
@@ -9135,6 +9136,22 @@
               "source": "server",
               "isIncoming": 0,
               "isEnabled": 1
+            },
+            {
+              "name": "StringEchoRequest",
+              "code": 24,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "StringEchoResponse",
+              "code": 13,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
             }
           ],
           "attributes": [
@@ -11837,27 +11854,27 @@
       "id": 4,
       "name": "Anonymous Endpoint Type",
       "deviceTypeRef": {
-        "code": 4293984258,
+        "code": 25,
         "profileId": 259,
-        "label": "MA-secondary-network-commissioning",
-        "name": "MA-secondary-network-commissioning"
+        "label": "MA-secondary-network-interface",
+        "name": "MA-secondary-network-interface"
       },
       "deviceTypes": [
         {
-          "code": 4293984258,
+          "code": 25,
           "profileId": 259,
-          "label": "MA-secondary-network-commissioning",
-          "name": "MA-secondary-network-commissioning"
+          "label": "MA-secondary-network-interface",
+          "name": "MA-secondary-network-interface"
         }
       ],
       "deviceVersions": [
         1
       ],
       "deviceIdentifiers": [
-        4293984258
+        25
       ],
-      "deviceTypeName": "MA-secondary-network-commissioning",
-      "deviceTypeCode": 4293984258,
+      "deviceTypeName": "MA-secondary-network-interface",
+      "deviceTypeCode": 25,
       "deviceTypeProfileId": 259,
       "clusters": [
         {

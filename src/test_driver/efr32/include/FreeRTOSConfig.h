@@ -146,7 +146,7 @@ extern "C" {
 /* Some of the standard demo test tasks assume a tick rate of 1KHz, even
 though that is faster than would normally be warranted by a real
 application. */
-#define configTICK_RATE_HZ (1000)
+#define configTICK_RATE_HZ (1024)
 
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)

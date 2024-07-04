@@ -68,7 +68,7 @@ public:
     DeviceDiscoveryDelegateImpl() {}
     DeviceDiscoveryDelegateImpl(DiscoveryDelegate * delegate) { mClientDelegate = delegate; }
 
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
 };
 
 /**

@@ -185,7 +185,7 @@ using Fibonacci backoff for retries pacing.
 Use `chip_with_factory_data=1` in the gn build command to enable factory data.
 
 For a full guide on manufacturing flow, please see
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 
 ## Flashing
 

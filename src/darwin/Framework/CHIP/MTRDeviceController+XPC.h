@@ -192,7 +192,7 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
                            nodeId:(NSNumber *)nodeId
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
-                       completion:(void (^)(NSString * _Nullable url, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+                       completion:(void (^)(NSString * _Nullable url, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 @end
 

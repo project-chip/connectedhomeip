@@ -178,7 +178,7 @@ CHIP_ERROR WebSocketServer::Run(chip::Optional<uint16_t> port, WebSocketServerDe
     info.protocols                    = protocols;
     static const lws_retry_bo_t retry = {
         .secs_since_valid_ping   = 400,
-        .secs_since_valid_hangup = 400,
+        .secs_since_valid_hangup = 420,
     };
     info.retry_and_idle_policy = &retry;
 

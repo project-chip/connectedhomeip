@@ -229,9 +229,6 @@ public:
     void * mAppState                 = nullptr;
     BleLayerDelegate * mBleTransport = nullptr;
 
-    typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
-    BleConnectionReceivedFunct OnChipBleConnectReceived;
-
     // Public functions:
     BleLayer();
 
@@ -302,10 +299,6 @@ public:
     /// Call when an outstanding GATT indication receives a positive receipt confirmation.
     bool HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
-    /// Call when a GATT read request is received.
-    bool HandleReadReceived(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                            const ChipBleUUID * charId);
-
     /**< Platform must call this function when any previous operation undertaken by the BleLayer via BleAdapter
      *   fails, such as a characteristic write request or subscribe attempt, or when a BLE connection is closed.
      *
@@ -320,13 +313,6 @@ public:
 private:
     // Private data members:
 
-    // UUID of CHIP service characteristic used for central writes.
-    static const ChipBleUUID CHIP_BLE_CHAR_1_ID;
-    // UUID of CHIP service characteristic used for peripheral indications.
-    static const ChipBleUUID CHIP_BLE_CHAR_2_ID;
-    // UUID of CHIP service characteristic used for additional data
-    static const ChipBleUUID CHIP_BLE_CHAR_3_ID;
-
     BleConnectionDelegate * mConnectionDelegate;
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;
@@ -334,7 +320,6 @@ private:
 
     // Private functions:
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
-    void DriveSending();
     CHIP_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle && pBuf);
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);

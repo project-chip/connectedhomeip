@@ -18,7 +18,9 @@
 
 #include "TizenServiceAppMain.h"
 
+#include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformManager.h>
 
 #include <service_app.h>
 #include <tizen.h>
@@ -29,13 +31,13 @@ namespace {
 bool service_app_create(void * data)
 {
     auto app = reinterpret_cast<TizenServiceAppMain *>(data);
-    return app->AppCreated();
+    return app->AppCreate();
 }
 
 void service_app_terminate(void * data)
 {
     auto app = reinterpret_cast<TizenServiceAppMain *>(data);
-    app->AppTerminated();
+    app->AppTerminate();
 }
 
 void service_app_control(app_control_h app_control, void * data)
@@ -68,15 +70,17 @@ void TizenServiceAppMain::Exit()
     service_app_exit();
 }
 
-bool TizenServiceAppMain::AppCreated()
+bool TizenServiceAppMain::AppCreate()
 {
-    ChipLogProgress(NotSpecified, "Tizen app created");
+    ChipLogProgress(NotSpecified, "Tizen app create");
     return true;
 }
 
-void TizenServiceAppMain::AppTerminated()
+void TizenServiceAppMain::AppTerminate()
 {
-    ChipLogProgress(NotSpecified, "Tizen app terminated");
+    ChipLogProgress(NotSpecified, "Tizen app terminate");
+    chip::Server::GetInstance().GenerateShutDownEvent();
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 static void TizenMainLoopWrapper()

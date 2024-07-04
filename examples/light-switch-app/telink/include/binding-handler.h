@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,8 +27,11 @@ void BindingWorkerFunction(intptr_t context);
 
 struct BindingCommandData
 {
+    chip::AttributeId attributeId;
     chip::EndpointId localEndpointId = 1;
     chip::CommandId commandId;
     chip::ClusterId clusterId;
-    bool isGroup = false;
+    bool isGroup         = false;
+    bool isReadAttribute = false;
+    uint32_t args[7];
 };

@@ -220,5 +220,6 @@ find_in_ancestors() {
     # generate and build
     set -x
     gn --root="$CHIP_ROOT" gen --check out --args="${args[*]}"
-    exec ninja -v -C out
+    ninja -C out -v
+    ninja -C out -t missingdeps
 }

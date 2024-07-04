@@ -254,6 +254,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 }
 @end
 
+constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
+
 @implementation MTRDeviceControllerParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
@@ -285,6 +287,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _storageDelegate = storageDelegate;
     _storageDelegateQueue = storageDelegateQueue;
     _uniqueIdentifier = uniqueIdentifier;
+
+    _concurrentSubscriptionEstablishmentsAllowedOnThread = kDefaultConcurrentSubscriptionPoolSize;
 
     return self;
 }
@@ -610,7 +614,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
             // Our NOC has changed in a way that would affect ACL checks.  Clear
             // out our session resumption storage, because resuming those CASE
             // sessions will end up doing ACL checks against our old NOC.
-            MTR_LOG_DEFAULT("Node ID or CATs changed.  Clearing CASE resumption storage.");
+            MTR_LOG("Node ID or CATs changed.  Clearing CASE resumption storage.");
             [controller.controllerDataStore clearAllResumptionInfo];
         }
     }

@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <access/SubjectDescriptor.h>
+#include <app/AttributeEncodeState.h>
 #include <app/AttributeReportBuilder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -51,9 +53,9 @@ public:
             // If we are encoding for a fabric filtered attribute read and the fabric index does not match that present in the
             // request, skip encoding this list item.
             VerifyOrReturnError(!mAttributeValueEncoder.mIsFabricFiltered ||
-                                    aArg.GetFabricIndex() == mAttributeValueEncoder.mAccessingFabricIndex,
+                                    aArg.GetFabricIndex() == mAttributeValueEncoder.AccessingFabricIndex(),
                                 CHIP_NO_ERROR);
-            return mAttributeValueEncoder.EncodeListItem(mAttributeValueEncoder.mAccessingFabricIndex, std::forward<T>(aArg));
+            return mAttributeValueEncoder.EncodeListItem(mAttributeValueEncoder.AccessingFabricIndex(), std::forward<T>(aArg));
         }
 
         template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
@@ -66,42 +68,11 @@ public:
         AttributeValueEncoder & mAttributeValueEncoder;
     };
 
-    class AttributeEncodeState
-    {
-    public:
-        AttributeEncodeState() : mAllowPartialData(false), mCurrentEncodingListIndex(kInvalidListIndex) {}
-        bool AllowPartialData() const { return mAllowPartialData; }
-
-    private:
-        friend class AttributeValueEncoder;
-        /**
-         * When an attempt to encode an attribute returns an error, the buffer may contain tailing dirty data
-         * (since the put was aborted).  The report engine normally rolls back the buffer to right before encoding
-         * of the attribute started on errors.
-         *
-         * When chunking a list, EncodeListItem will atomically encode list items, ensuring that the
-         * state of the buffer is valid to send (i.e. contains no trailing garbage), and return an error
-         * if the list doesn't entirely fit.  In this situation, mAllowPartialData is set to communicate to the
-         * report engine that it should not roll back the list items.
-         *
-         * TODO: There might be a better name for this variable.
-         */
-        bool mAllowPartialData = false;
-        /**
-         * If set to kInvalidListIndex, indicates that we have not encoded any data for the list yet and
-         * need to start by encoding an empty list before we start encoding any list items.
-         *
-         * When set to a valid ListIndex value, indicates the index of the next list item that needs to be
-         * encoded (i.e. the count of items encoded so far).
-         */
-        ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
-    };
-
-    AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, FabricIndex aAccessingFabricIndex,
+    AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, Access::SubjectDescriptor subjectDescriptor,
                           const ConcreteAttributePath & aPath, DataVersion aDataVersion, bool aIsFabricFiltered = false,
                           const AttributeEncodeState & aState = AttributeEncodeState()) :
         mAttributeReportIBsBuilder(aAttributeReportIBsBuilder),
-        mAccessingFabricIndex(aAccessingFabricIndex), mPath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+        mSubjectDescriptor(subjectDescriptor), mPath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
         mDataVersion(aDataVersion), mIsFabricFiltered(aIsFabricFiltered), mEncodeState(aState)
     {}
 
@@ -169,17 +140,19 @@ public:
         if (err == CHIP_NO_ERROR)
         {
             // The Encode procedure finished without any error, clear the state.
-            mEncodeState = AttributeEncodeState();
+            mEncodeState.Reset();
         }
         return err;
     }
 
     bool TriedEncode() const { return mTriedEncode; }
 
+    const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
+
     /**
      * The accessing fabric index for this read or subscribe interaction.
      */
-    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+    FabricIndex AccessingFabricIndex() const { return GetSubjectDescriptor().fabricIndex; }
 
     /**
      * AttributeValueEncoder is a short lived object, and the state is persisted by mEncodeState and restored by constructor.
@@ -195,7 +168,7 @@ private:
     {
         // EncodeListItem must be called after EnsureListStarted(), thus mCurrentEncodingListIndex and
         // mEncodeState.mCurrentEncodingListIndex are not invalid values.
-        if (mCurrentEncodingListIndex < mEncodeState.mCurrentEncodingListIndex)
+        if (mCurrentEncodingListIndex < mEncodeState.CurrentEncodingListIndex())
         {
             // We have encoded this element in previous chunks, skip it.
             mCurrentEncodingListIndex++;
@@ -226,7 +199,7 @@ private:
         }
 
         mCurrentEncodingListIndex++;
-        mEncodeState.mCurrentEncodingListIndex++;
+        mEncodeState.SetCurrentEncodingListIndex(mCurrentEncodingListIndex);
         mEncodedAtLeastOneListItem = true;
         return CHIP_NO_ERROR;
     }
@@ -266,20 +239,20 @@ private:
      */
     void EnsureListEnded();
 
-    bool mTriedEncode = false;
     AttributeReportIBs::Builder & mAttributeReportIBsBuilder;
-    const FabricIndex mAccessingFabricIndex;
+    const Access::SubjectDescriptor mSubjectDescriptor;
     ConcreteDataAttributePath mPath;
     DataVersion mDataVersion;
+    bool mTriedEncode      = false;
     bool mIsFabricFiltered = false;
     // mEncodingInitialList is true if we're encoding a list and we have not
     // started chunking it yet, so we're encoding a single attribute report IB
     // for the whole list, not one per item.
     bool mEncodingInitialList = false;
     // mEncodedAtLeastOneListItem becomes true once we successfully encode a list item.
-    bool mEncodedAtLeastOneListItem = false;
-    AttributeEncodeState mEncodeState;
+    bool mEncodedAtLeastOneListItem     = false;
     ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
+    AttributeEncodeState mEncodeState;
 };
 
 } // namespace app

@@ -38,7 +38,6 @@ tests:
     - label:
           "Step 2: TH1 sends RemoveFabric command with Fabric Index as
           FabricIndex_TH1 to DUT"
-      PICS: OPCREDS.S.C0a.Rsp
       verification: |
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 

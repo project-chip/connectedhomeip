@@ -102,7 +102,7 @@ tests:
 
           [1663841939.843550][13897:13897] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
           [1663841939.843617][13897:13897] CHIP:DL: Inet Layer shutdown
-          [1663841939.843673][13897:13897] CHIP:DL: BLE shutdown
+          [1663841939.843673][13897:13897] CHIP:DL: BLE Layer shutdown
           [1663841939.843727][13897:13897] CHIP:DL: System Layer shutdown
           [1663841939.844009][13897:13897] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/pairing/PairingCommand.cpp:151: CHIP Error 0x00000003: Incorrect state
       disabled: true
@@ -161,7 +161,7 @@ tests:
           [1665481996.786704][4913:4913] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
           [1665481996.786930][4913:4913] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
           [1665481996.786999][4913:4913] CHIP:DL: Inet Layer shutdown
-          [1665481996.787065][4913:4913] CHIP:DL: BLE shutdown
+          [1665481996.787065][4913:4913] CHIP:DL: BLE Layer shutdown
           [1665481996.787123][4913:4913] CHIP:DL: System Layer shutdown
           [1665481996.787363][4913:4913] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:164: CHIP Error 0x00000003: Incorrect state
       disabled: true
@@ -284,7 +284,7 @@ tests:
 
           [1678796869.645576][648903:648903] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
           [1678796869.645584][648903:648903] CHIP:DL: Inet Layer shutdown
-          [1678796869.645589][648903:648903] CHIP:DL: BLE shutdown
+          [1678796869.645589][648903:648903] CHIP:DL: BLE Layer shutdown
           [1678796869.645596][648903:648903] CHIP:DL: System Layer shutdown
           [1678796869.645693][648903:648903] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:215: CHIP Error 0x00000003: Incorrect state
       disabled: true

@@ -54,6 +54,7 @@ qpg_executable("lock_app") {
     "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "${examples_plat_dir}/ota/ota.cpp",
+    "${examples_plat_dir}/powercycle_counting.c",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -64,6 +65,7 @@ qpg_executable("lock_app") {
     "${chip_root}/examples/lock-app/qpg/zap/",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -83,7 +85,7 @@ qpg_executable("lock_app") {
     "${examples_plat_dir}/ota",
   ]
 
-  defines = []
+  defines = [ "GP_APP_DIVERSITY_POWERCYCLECOUNTING" ]
 
   if (chip_enable_pw_rpc) {
     defines += [
@@ -137,7 +139,7 @@ qpg_executable("lock_app") {
     }
   }
 
-  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}/QorvoStack_${qpg_target_ic}.ld"
+  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}${qpg_flavour}/QorvoStack_${qpg_target_ic}${qpg_flavour}.ld"
 
   inputs = [ ldscript ]
 

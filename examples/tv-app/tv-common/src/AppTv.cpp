@@ -146,6 +146,16 @@ class MyPasscodeService : public PasscodeService
 };
 MyPasscodeService gMyPasscodeService;
 
+class MyAppInstallationService : public AppInstallationService
+{
+    bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) override
+    {
+        return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
+    }
+};
+
+MyAppInstallationService gMyAppInstallationService;
+
 class MyPostCommissioningListener : public PostCommissioningListener
 {
     void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
@@ -527,19 +537,23 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 {
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: LoadContentAppByAppId catalogVendorId=%d applicationId=%s ",
                     vendorApp.catalogVendorId, vendorApp.applicationId);
+    int index = 0;
 
-    for (size_t i = 0; i < ArraySize(mContentApps); ++i)
+    for (auto & contentApp : mContentApps)
     {
-        auto & app = mContentApps[i];
 
-        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
-        if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, " Looking next=%s ", app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
+        if (app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
-            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[i]),
+            ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[index]),
                                                             Span<const EmberAfDeviceType>(gContentAppDeviceType));
-            return &app;
+            return app;
         }
+        index++;
     }
+
     ChipLogProgress(DeviceLayer, "LoadContentAppByAppId NOT FOUND catalogVendorId=%d applicationId=%s ", vendorApp.catalogVendorId,
                     vendorApp.applicationId);
 
@@ -549,6 +563,88 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
 {
     mAdminVendorIds.push_back(vendorId);
+}
+
+void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t productId)
+{
+    auto make_default_supported_clusters = []() {
+        return std::vector<ContentApp::SupportedCluster>{ { Descriptor::Id },      { ApplicationBasic::Id },
+                                                          { KeypadInput::Id },     { ApplicationLauncher::Id },
+                                                          { AccountLogin::Id },    { ContentLauncher::Id },
+                                                          { TargetNavigator::Id }, { Channel::Id } };
+    };
+
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: InstallContentApp vendorId=%d productId=%d ", vendorId, productId);
+    if (vendorId == 1 && productId == 11)
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1", "34567890",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+    else if (vendorId == 65521 && productId == 32769)
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+    else if (vendorId == 9050 && productId == 22)
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+    else if (vendorId == 1111 && productId == 22)
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+    else
+    {
+        auto ptr = std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2", "20202021",
+                                                    make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
+}
+
+bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)
+{
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: UninstallContentApp vendorId=%d productId=%d ", vendorId, productId);
+
+    int index = 0;
+    for (auto & contentApp : mContentApps)
+    {
+
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, "Looking next vid=%d pid=%d", app->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                        app->GetApplicationBasicDelegate()->HandleGetProductId());
+
+        if (app->MatchesPidVid(productId, vendorId))
+        {
+            ChipLogProgress(DeviceLayer, "Found an app vid=%d pid=%d. Uninstalling it.",
+                            app->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                            app->GetApplicationBasicDelegate()->HandleGetProductId());
+            mContentApps.erase(mContentApps.begin() + index);
+            // TODO: call ContentAppPlatform->RemoveContentApp(ids...)
+            return true;
+        }
+
+        index++;
+    }
+    return false;
+}
+
+void ContentAppFactoryImpl::LogInstalledApps()
+{
+    for (auto & contentApp : mContentApps)
+    {
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, "Content app vid=%d pid=%d is on ep=%d",
+                        app->GetApplicationBasicDelegate()->HandleGetVendorId(),
+                        app->GetApplicationBasicDelegate()->HandleGetProductId(), app->GetEndpointId());
+    }
 }
 
 Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
@@ -605,8 +701,22 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
 CHIP_ERROR AppTvInit()
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    // test data for apps
+    constexpr uint16_t kApp1VendorId  = 1;
+    constexpr uint16_t kApp1ProductId = 11;
+    constexpr uint16_t kApp2VendorId  = 65521;
+    constexpr uint16_t kApp2ProductId = 32769;
+    constexpr uint16_t kApp3VendorId  = 9050;
+    constexpr uint16_t kApp3ProductId = 22;
+    constexpr uint16_t kApp4VendorId  = 1111;
+    constexpr uint16_t kApp4ProductId = 22;
+
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
+    gFactory.InstallContentApp(kApp1VendorId, kApp1ProductId);
+    gFactory.InstallContentApp(kApp2VendorId, kApp2ProductId);
+    gFactory.InstallContentApp(kApp3VendorId, kApp3ProductId);
+    gFactory.InstallContentApp(kApp4VendorId, kApp4ProductId);
     uint16_t value;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {
@@ -623,6 +733,7 @@ CHIP_ERROR AppTvInit()
     if (cdc != nullptr)
     {
         cdc->SetPasscodeService(&gMyPasscodeService);
+        cdc->SetAppInstallationService(&gMyAppInstallationService);
         cdc->SetUserPrompter(&gMyUserPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

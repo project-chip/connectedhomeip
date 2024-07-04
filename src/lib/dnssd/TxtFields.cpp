@@ -105,14 +105,14 @@ bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
     return val.size() == 1 && static_cast<char>(*val.data()) == '1';
 }
 
-Optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
+std::optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
 {
     char character = static_cast<char>(*val.data());
     if (val.size() == 1 && ((character == '1') || (character == '0')))
     {
-        return MakeOptional(character == '1');
+        return std::make_optional(character == '1');
     }
-    return NullOptional;
+    return std::nullopt;
 }
 
 size_t GetPlusSignIdx(const ByteSpan & value)
@@ -188,27 +188,27 @@ uint8_t GetCommissionerPasscode(const ByteSpan & value)
     return MakeBoolFromAsciiDecimal(value);
 }
 
-Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
+std::optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
 {
     const auto undefined     = std::numeric_limits<uint32_t>::max();
     const auto retryInterval = MakeU32FromAsciiDecimal(value, undefined);
 
     if (retryInterval != undefined && retryInterval <= kMaxRetryInterval.count())
-        return MakeOptional(System::Clock::Milliseconds32(retryInterval));
+        return std::make_optional(System::Clock::Milliseconds32(retryInterval));
 
-    return NullOptional;
+    return std::nullopt;
 }
 
-Optional<System::Clock::Milliseconds16> GetRetryActiveThreshold(const ByteSpan & value)
+std::optional<System::Clock::Milliseconds16> GetRetryActiveThreshold(const ByteSpan & value)
 {
     const auto retryInterval = MakeU16FromAsciiDecimal(value);
 
     if (retryInterval == 0)
     {
-        return NullOptional;
+        return std::nullopt;
     }
 
-    return MakeOptional(System::Clock::Milliseconds16(retryInterval));
+    return std::make_optional(System::Clock::Milliseconds16(retryInterval));
 }
 
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
@@ -225,7 +225,7 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 
 } // namespace Internal
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DnssdNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionNodeData & nodeData)
 {
     TxtFieldKey keyType = Internal::GetTxtFieldKey(key);
     switch (keyType)

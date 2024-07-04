@@ -259,9 +259,8 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
 
 CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
 {
-    DeviceLayer::ChipDeviceEvent event;
-    event.Type                        = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
-    event.BindingsChanged.fabricIndex = mAccessingFabricIndex;
+    DeviceLayer::ChipDeviceEvent event{ .Type            = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster,
+                                        .BindingsChanged = { .fabricIndex = mAccessingFabricIndex } };
     return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
 }
 

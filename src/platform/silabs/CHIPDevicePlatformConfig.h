@@ -69,6 +69,15 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+ *
+ * Unique ID length in bytes. The value should be 16-bytes or longer.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 32
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
 /**
  *  @brief Fallback value for the basic information cluster's Vendor name attribute
@@ -96,7 +105,9 @@
 #endif /* CHIP_ENABLE_OPENTHREAD */
 #endif /* defined(SL_WIFI) */
 
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+#endif
 
 #if defined(SL_WIFI)
 

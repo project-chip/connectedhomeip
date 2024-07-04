@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 #if CONFIG_NETWORK_LAYER_BLE
@@ -24,6 +26,7 @@
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/SetupDiscriminator.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -59,11 +62,55 @@ public:
 
     // Discriminators in RendezvousParameters are always long (12-bit)
     // discriminators.
-    bool HasDiscriminator() const { return mDiscriminator <= kMaxRendezvousDiscriminatorValue; }
-    uint16_t GetDiscriminator() const { return mDiscriminator; }
+    bool HasDiscriminator() const { return mSetupDiscriminator.has_value(); }
+
+    // Obtains the long version of the discriminator, or 0 if short.
+    // WARNING: This is lossy and a bad idea to use. The correct method to use
+    //          is GetSetupDiscriminator(). This method exists for public
+    //          API backwards compatibility.
+    uint16_t GetDiscriminator() const
+    {
+        if (!mSetupDiscriminator.has_value())
+        {
+            ChipLogError(Discovery,
+                         "Get RendezvousParameters::GetDiscriminator() called without discriminator in params (inconsistent). "
+                         "Using value 0 to avoid crash! Ensure discriminator is set!");
+            return 0;
+        }
+
+        if (mSetupDiscriminator.value().IsShortDiscriminator())
+        {
+            ChipLogError(Discovery,
+                         "Get RendezvousParameters::GetDiscriminator() called with SHORT discriminator (inconsistent). Using value "
+                         "0 to avoid crash! Call GetSetupDiscriminator() to avoid loss.");
+            return 0;
+        }
+
+        return mSetupDiscriminator.value().GetLongValue();
+    }
+
+    std::optional<SetupDiscriminator> GetSetupDiscriminator() const
+    {
+        if (!mSetupDiscriminator.has_value())
+        {
+            ChipLogError(
+                Discovery,
+                "Get RendezvousParameters::GetSetupDiscriminator() called without discriminator in params (inconsistent).");
+        }
+        return mSetupDiscriminator;
+    }
+
+    RendezvousParameters & SetSetupDiscriminator(SetupDiscriminator discriminator)
+    {
+        mSetupDiscriminator = discriminator;
+        return *this;
+    }
+
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
     {
-        mDiscriminator = discriminator;
+        SetupDiscriminator tempDiscriminator;
+        tempDiscriminator.SetLongValue(discriminator);
+        mSetupDiscriminator = tempDiscriminator;
         return *this;
     }
 
@@ -128,9 +175,9 @@ public:
     }
 
 private:
-    Transport::PeerAddress mPeerAddress;  ///< the peer node address
-    uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
-    uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
+    Transport::PeerAddress mPeerAddress; ///< the peer node address
+    uint32_t mSetupPINCode = 0;          ///< the target peripheral setup PIN Code
+    std::optional<SetupDiscriminator> mSetupDiscriminator;
 
     Crypto::Spake2pVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;

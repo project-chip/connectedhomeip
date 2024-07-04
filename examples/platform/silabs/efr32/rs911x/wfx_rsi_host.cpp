@@ -31,6 +31,7 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
+
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
@@ -106,16 +107,14 @@ bool wfx_is_sta_mode_enabled(void)
  ***********************************************************************/
 void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
 {
-    sl_wfx_mac_address_t * mac;
-
+    if (addr)
+    {
 #ifdef SL_WFX_CONFIG_SOFTAP
-    mac = (interface == SL_WFX_SOFTAP_INTERFACE) ? &wfx_rsi.softap_mac : &wfx_rsi.sta_mac;
+        *addr = (interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac;
 #else
-    mac = &wfx_rsi.sta_mac;
+        *addr = wfx_rsi.sta_mac;
 #endif
-    *addr = *mac;
-    SILABS_LOG("%s: %02x:%02x:%02x:%02x:%02x:%02x", __func__, mac->octet[0], mac->octet[1], mac->octet[2], mac->octet[3],
-               mac->octet[4], mac->octet[5]);
+    }
 }
 
 /*********************************************************************
@@ -128,10 +127,11 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * 
  ***********************************************************************/
 void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
 {
-    SILABS_LOG("%s: SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
-
-    wfx_rsi.sec = *cfg;
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
+    if (cfg)
+    {
+        wfx_rsi.sec = *cfg;
+        wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
+    }
 }
 
 /*********************************************************************
@@ -178,14 +178,16 @@ void wfx_clear_wifi_provision(void)
  ****************************************************************************/
 sl_status_t wfx_connect_to_ap(void)
 {
+    WfxEvent_t event;
     if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
     {
-        SILABS_LOG("%s: connecting to access point -> SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
-        xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+        SILABS_LOG("Connecting to access point -> SSID: %s", &wfx_rsi.sec.ssid[0]);
+        event.eventType = WFX_EVT_STA_START_JOIN;
+        WfxPostEvent(&event);
     }
     else
     {
-        SILABS_LOG("%s: error: access point not provisioned", __func__);
+        SILABS_LOG("Error: access point not provisioned.");
         return SL_STATUS_INVALID_CONFIGURATION;
     }
     return SL_STATUS_OK;
@@ -392,7 +394,7 @@ int32_t wfx_reset_counts()
 bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
     int sz;
-
+    WfxEvent_t event;
     if (wfx_rsi.scan_cb)
         return false; /* Already in progress */
     if (ssid)
@@ -405,7 +407,9 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
         strcpy(wfx_rsi.scan_ssid, ssid);
     }
     wfx_rsi.scan_cb = callback;
-    xEventGroupSetBits(wfx_rsi.events, WFX_EVT_SCAN);
+
+    event.eventType = WFX_EVT_SCAN;
+    WfxPostEvent(&event);
 
     return true;
 }

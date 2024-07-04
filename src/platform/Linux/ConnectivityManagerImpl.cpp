@@ -1278,11 +1278,9 @@ void ConnectivityManagerImpl::PostNetworkConnect()
             chip::Inet::IPAddress addr;
             if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
             {
-                ChipDeviceEvent event;
-                event.Type                                 = DeviceEventType::kInternetConnectivityChange;
-                event.InternetConnectivityChange.IPv4      = kConnectivity_Established;
-                event.InternetConnectivityChange.IPv6      = kConnectivity_NoChange;
-                event.InternetConnectivityChange.ipAddress = addr;
+                ChipDeviceEvent event{ .Type                       = DeviceEventType::kInternetConnectivityChange,
+                                       .InternetConnectivityChange = {
+                                           .IPv4 = kConnectivity_Established, .IPv6 = kConnectivity_NoChange, .ipAddress = addr } };
 
                 char ipStrBuf[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
                 addr.ToString(ipStrBuf);

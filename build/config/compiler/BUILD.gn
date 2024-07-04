@@ -271,6 +271,11 @@ config("strict_warnings") {
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
+  if (current_os == "nuttx") {
+    cflags -= [ "-Wshadow" ]
+    cflags_cc -= [ "-Wnon-virtual-dtor" ]
+  }
+
   configs = []
   ldflags = []
 
@@ -351,6 +356,7 @@ config("runtime_default") {
   }
   if (current_os == "linux" || current_os == "tizen" || current_os == "webos") {
     libs = [
+      "atomic",
       "dl",
       "pthread",
       "rt",

@@ -28,7 +28,7 @@ typedef NS_ENUM(NSUInteger, MTROnboardingPayloadType) {
     MTROnboardingPayloadTypeNFC
 } MTR_DEPRECATED("MTROnboardingPayloadType is unused", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
 
-MTR_DEPRECATED("Please use [MTRSetupPayload setupPayloadWithOnboardingPayload:error:]", ios(16.1, 17.0), macos(13.0, 14.0),
+MTR_DEPRECATED("Please use [MTRSetupPayload initWithPayload:]", ios(16.1, 17.0), macos(13.0, 14.0),
     watchos(9.1, 10.0), tvos(16.1, 17.0))
 @interface MTROnboardingPayloadParser : NSObject
 

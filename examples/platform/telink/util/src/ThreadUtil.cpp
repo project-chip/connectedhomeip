@@ -18,7 +18,7 @@
 
 #include "ThreadUtil.h"
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CONFIG_OPENTHREAD
 
 #include <platform/CHIPDeviceLayer.h>
 

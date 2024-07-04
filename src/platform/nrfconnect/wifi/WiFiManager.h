@@ -88,6 +88,12 @@ private:
 class WiFiManager
 {
 public:
+    /* No copy, nor move. */
+    WiFiManager(const WiFiManager &)             = delete;
+    WiFiManager & operator=(const WiFiManager &) = delete;
+    WiFiManager(WiFiManager &&)                  = delete;
+    WiFiManager & operator=(WiFiManager &&)      = delete;
+
     using ScanDoneStatus     = decltype(wifi_status::status);
     using ScanResultCallback = void (*)(const NetworkCommissioning::WiFiScanResponse &);
     using ScanDoneCallback   = void (*)(const ScanDoneStatus &);
@@ -185,6 +191,9 @@ public:
 private:
     using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>, size_t);
 
+    WiFiManager()  = default;
+    ~WiFiManager() = default;
+
     struct ConnectionParams
     {
         wifi_connect_req_params mParams;
@@ -222,7 +231,9 @@ private:
 
     net_if * mNetIf{ nullptr };
     ConnectionParams mWiFiParams{};
-    ConnectionHandling mHandling;
+    ConnectionHandling mHandling{};
+    wifi_scan_params mScanParams{};
+    char mScanSsidBuffer[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1] = { 0 };
     wifi_iface_state mWiFiState;
     wifi_iface_state mCachedWiFiState;
     net_mgmt_event_callback mWiFiMgmtClbk{};

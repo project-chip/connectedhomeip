@@ -45,6 +45,11 @@ public:
      */
     static CHIP_ERROR SetUdcStatus(bool udcInProgress);
 
+    /**
+     * @brief Returns true if User Directed Commissioning (UDC) is in progress, false otherwise.
+     */
+    static bool isUdcInProgress();
+
 private:
     /**
      * @brief if kFailSafeTimerExpired is received and a request to connect to a CastingPlayer is pending, open a basic

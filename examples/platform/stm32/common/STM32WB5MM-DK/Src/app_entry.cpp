@@ -19,12 +19,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_entry.h"
+#include "AppTask.h"
 #include "app_ble.h"
 #include "app_common.h"
 #include "app_conf.h"
+#include "app_debug.h"
 #include "app_thread.h"
 #include "cmsis_os.h"
 #include "dbg_trace.h"
+#include "flash_wb.h"
 #include "hw_conf.h"
 #include "main.h"
 #include "shci.h"
@@ -33,9 +36,9 @@
 #include "stm32_lcd.h"
 #include "stm32_lpm.h"
 #include "stm32wb5mm_dk_lcd.h"
+#include "stm_ext_flash.h"
 #include "stm_logging.h"
 
-#include "AppTask.h"
 /* Private includes -----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -48,7 +51,7 @@
 
 /* Private defines -----------------------------------------------------------*/
 /* POOL_SIZE = 2(TL_PacketHeader_t) + 258 (3(TL_EVT_HDR_SIZE) + 255(Payload size)) */
-#define POOL_SIZE (CFG_TLBLE_EVT_QUEUE_LENGTH * 4 * DIVC((sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE), 4))
+#define POOL_SIZE (CFG_TLBLE_EVT_QUEUE_LENGTH * 4U * DIVC((sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE), 4U))
 /* USER CODE BEGIN PD */
 
 /* USER CODE END PD */
@@ -70,17 +73,11 @@ PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t SystemCmdBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t SystemSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t BleSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
 uint8_t g_ot_notification_allowed = 0U;
+
 /* Global variables ----------------------------------------------------------*/
-
-/* Global function prototypes -----------------------------------------------*/
-#if (CFG_DEBUG_TRACE != 0)
-size_t DbgTraceWrite(int handle, const unsigned char * buf, size_t bufSize);
-#endif
-
-/* USER CODE BEGIN GFP */
+osMutexId_t MtxShciId;
 osSemaphoreId_t SemShciId;
-osSemaphoreId_t SemShciUserEvtProcessId;
-osThreadId_t OsShciUserEvtProcessId;
+osThreadId_t ShciUserEvtProcessId;
 osThreadId_t OsPushButtonProcessId;
 
 const osThreadAttr_t ShciUserEvtProcess_attr = { .name       = CFG_SHCI_USER_EVT_PROCESS_NAME,
@@ -99,6 +96,13 @@ const osThreadAttr_t PushButtonProcess_attr = { .name       = CFG_PUSH_BUTTON_EV
                                                 .stack_size = CFG_PUSH_BUTTON_EVT_PROCESS_STACK_SIZE,
                                                 .priority   = CFG_PUSH_BUTTON_EVT_PROCESS_PRIORITY };
 
+/* Global function prototypes -----------------------------------------------*/
+#if (CFG_DEBUG_TRACE != 0)
+size_t DbgTraceWrite(int handle, const unsigned char * buf, size_t bufSize);
+#endif
+
+/* USER CODE BEGIN GFP */
+
 /* USER CODE END GFP */
 
 /* Private functions prototypes-----------------------------------------------*/
@@ -108,6 +112,9 @@ static void APPE_SysStatusNot(SHCI_TL_CmdStatus_t status);
 static void APPE_SysUserEvtRx(void * pPayload);
 static void APPE_SysEvtReadyProcessing(void);
 static void APPE_SysEvtError(SCHI_SystemErrCode_t ErrorCode);
+static void ShciUserEvtProcess(void * argument);
+static void PushButtonEvtProcess(void * argument);
+
 static void appe_Tl_Init(void);
 /* USER CODE BEGIN PFP */
 static void Led_Init(void);
@@ -115,11 +122,7 @@ static void Button_Init(void);
 #if (CFG_HW_EXTPA_ENABLED == 1)
 static void ExtPA_Init(void);
 #endif
-static void ShciUserEvtProcess(void * argument);
-static void PushButtonEvtProcess(void * argument);
 /* USER CODE END PFP */
-
-static void displayConcurrentMode(void);
 
 // Callback function to handle pushbutton to apptask
 PushButtonCallback PbCb = NULL;
@@ -128,7 +131,6 @@ void APP_ENTRY_PBSetReceiveCallback(PushButtonCallback aCallback)
 {
     PbCb = aCallback;
 }
-
 /* Functions Definition ------------------------------------------------------*/
 void APPE_Init(void)
 {
@@ -142,8 +144,12 @@ void APPE_Init(void)
     /* initialize debugger module if supported and debug trace if activated */
     Init_Debug();
 
-    /* Display Dynamic concurrent mode (BLE and Thread)  */
-    displayConcurrentMode();
+    // Init qspi and external flash
+    STM_EXT_FLASH_Init();
+    // Init nvm
+    NM_Init();
+
+    APPD_Init();
 
     /**
      * The Standby mode should not be entered before the initialization is over
@@ -151,12 +157,7 @@ void APPE_Init(void)
      */
     UTIL_LPM_SetOffMode(1 << CFG_LPM_APP, UTIL_LPM_DISABLE);
 
-    /** init freertos  semaphore */
-    SemShciId               = osSemaphoreNew(1, 0, NULL); /*< Create the semaphore and make it busy at initialization */
-    SemShciUserEvtProcessId = osSemaphoreNew(1, 0, NULL); /*< Create the semaphore and make it busy at initialization */
-    OsShciUserEvtProcessId  = osThreadNew(ShciUserEvtProcess, NULL, &ShciUserEvtProcess_attr);
-    OsPushButtonProcessId   = osThreadNew(PushButtonEvtProcess, NULL, &PushButtonProcess_attr);
-
+    OsPushButtonProcessId = osThreadNew(PushButtonEvtProcess, NULL, &PushButtonProcess_attr);
     Led_Init();
     Button_Init();
 
@@ -164,6 +165,7 @@ void APPE_Init(void)
     /* Initialize all transport layers and start CPU2 which will send back a ready event to CPU1 */
     appe_Tl_Init();
 
+#if (CFG_LCD_SUPPORTED == 1)
     BSP_LCD_Init(0, LCD_ORIENTATION_LANDSCAPE);
     /* Set LCD Foreground Layer  */
     UTIL_LCD_SetFuncDriver(&LCD_Driver); /* SetFunc before setting device */
@@ -177,9 +179,9 @@ void APPE_Init(void)
     UTIL_LCD_SetBackColor(SSD1315_COLOR_BLACK);
     BSP_LCD_Clear(0, SSD1315_COLOR_BLACK);
     BSP_LCD_Refresh(0);
-    UTIL_LCD_DisplayStringAt(0, 0, (uint8_t *) "Matter LightingApp", CENTER_MODE);
+    UTIL_LCD_DisplayStringAt(0, 0, (uint8_t *) APP_NAME, CENTER_MODE);
     BSP_LCD_Refresh(0);
-
+#endif
     /**
      * From now, the application is waiting for the ready event ( VS_HCI_C2_Ready )
      * received on the system channel before starting the Stack
@@ -192,11 +194,6 @@ void APPE_Init(void)
 
     /* USER CODE END APPE_Init_2 */
     return;
-}
-
-static void displayConcurrentMode()
-{
-    APP_DBG("Matter Over Thread Lighting-App starting...");
 }
 
 /*************************************************************
@@ -292,6 +289,12 @@ static void appe_Tl_Init(void)
     /**< Reference table initialization */
     TL_Init();
 
+    MtxShciId = osMutexNew(NULL);
+    SemShciId = osSemaphoreNew(1, 0, NULL); /*< Create the semaphore and make it busy at initialization */
+
+    /** FreeRTOS system task creation */
+    ShciUserEvtProcessId = osThreadNew(ShciUserEvtProcess, NULL, &ShciUserEvtProcess_attr);
+
     /**< System channel initialization */
     SHci_Tl_Init_Conf.p_cmdbuffer       = (uint8_t *) &SystemCmdBuffer;
     SHci_Tl_Init_Conf.StatusNotCallBack = APPE_SysStatusNot;
@@ -311,7 +314,19 @@ static void appe_Tl_Init(void)
 
 static void APPE_SysStatusNot(SHCI_TL_CmdStatus_t status)
 {
-    UNUSED(status);
+    switch (status)
+    {
+    case SHCI_TL_CmdBusy:
+        osMutexAcquire(MtxShciId, osWaitForever);
+        break;
+
+    case SHCI_TL_CmdAvailable:
+        osMutexRelease(MtxShciId);
+        break;
+
+    default:
+        break;
+    }
     return;
 }
 
@@ -321,7 +336,7 @@ static void APPE_SysStatusNot(SHCI_TL_CmdStatus_t status)
  *    - a ready event (subevtcode = SHCI_SUB_EVT_CODE_READY)
  *    - reported by the FUS (sysevt_ready_rsp == FUS_FW_RUNNING)
  * The buffer shall not be released
- * ( eg ((tSHCI_UserEvtRxParam*)pPayload)->status shall be set to SHCI_TL_UserEventFlow_Disable )
+ * (eg ((tSHCI_UserEvtRxParam*)pPayload)->status shall be set to SHCI_TL_UserEventFlow_Disable )
  * When the status is not filled, the buffer is released by default
  */
 static void APPE_SysUserEvtRx(void * pPayload)
@@ -373,31 +388,64 @@ static void APPE_SysEvtError(SCHI_SystemErrCode_t ErrorCode)
 static void APPE_SysEvtReadyProcessing(void)
 {
     /* Traces channel initialization */
-    TL_TRACES_Init();
+    APPD_EnableCPU2();
 
+    /* Configuration to CPU2 */
+    SHCI_C2_CONFIG_Cmd_Param_t config_param = { 0 };
+    uint32_t Ot_NVMAddr                     = 0;
     /* In the Context of Dynamic Concurrent mode, the Init and start of each stack must be split and executed
      * in the following order :
-     * APP_BLE_Init    : BLE Stack Init until it's ready to start ADV
+     * APP_BLE_Init_Dyn_1()    : BLE Stack Init until it's ready to start ADV
      * APP_THREAD_Init_Dyn_1() : Thread Stack Init until it's ready to be configured (default channel, PID, etc...)
+     * APP_BLE_Init_Dyn_2()    : Start ADV
+     * APP_THREAD_Init_Dyn_2() : Thread Stack configuration (default channel, PID, etc...) to be able to start scanning
+     *                           or joining a Thread Network
      */
     APP_DBG("1- Initialisation of BLE Stack...");
     APP_BLE_Init_Dyn_1();
-    APP_DBG("2- Initialisation of OpenThread Stack. FW info :");
-    APP_THREAD_Init();
-    APP_BLE_Init_Dyn_2();
+    /* Set the address that will be used by OT stack for NVM data management */
+    if (NM_GetOtNVMAddr(&Ot_NVMAddr) == NVM_OK)
+    {
+        config_param.ThreadNvmRamAddress = Ot_NVMAddr;
+        (void) SHCI_C2_Config(&config_param);
+    }
 
+    APP_DBG("2- Initialisation of OpenThread Stack. FW info :");
+    APP_THREAD_Init_Dyn_1();
+    APP_BLE_Init_Dyn_2();
+    APP_THREAD_Init_Dyn_2();
     APP_DBG("Start init matter");
     GetAppTask().StartAppTask();
-
 #if (CFG_LPM_SUPPORTED == 1)
     /* Thread stack is initialized, low power mode can be enabled */
     UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_ENABLE);
     UTIL_LPM_SetStopMode(1U << CFG_LPM_APP, UTIL_LPM_ENABLE);
 #endif
-
     return;
 }
 
+/*************************************************************
+ *
+ * FREERTOS WRAPPER FUNCTIONS
+ *
+ *************************************************************/
+static void ShciUserEvtProcess(void * argument)
+{
+    UNUSED(argument);
+    for (;;)
+    {
+        /* USER CODE BEGIN SHCI_USER_EVT_PROCESS_1 */
+
+        /* USER CODE END SHCI_USER_EVT_PROCESS_1 */
+        osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+        shci_user_evt_proc();
+        /* USER CODE BEGIN SHCI_USER_EVT_PROCESS_2 */
+
+        /* USER CODE END SHCI_USER_EVT_PROCESS_2 */
+    }
+}
+
+/* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
 static void Led_Init(void)
 {
 #if (CFG_LED_SUPPORTED == 1U)
@@ -413,12 +461,14 @@ static void Led_Init(void)
 static void Button_Init(void)
 {
 
-#if (CFG_BUTTON_SUPPORTED == 1U)
+#if ((CFG_BUTTON_SUPPORTED == 1U) || (CFG_HW_EXTPA_ENABLED == 1))
     /**
      * Button Initialization
      */
 
     BSP_PB_Init(BUTTON_USER1, BUTTON_MODE_EXTI);
+    BSP_PB_Init(BUTTON_USER2, BUTTON_MODE_EXTI);
+
 #endif
 
     return;
@@ -457,33 +507,25 @@ static void ExtPA_Init(void)
 static void PushButtonEvtProcess(void * argument)
 {
     UNUSED(argument);
+    uint32_t ButtonPressed = 0;
+
     for (;;)
     {
         /* USER CODE BEGIN SHCI_USER_EVT_PROCESS_1 */
-
         /* USER CODE END SHCI_USER_EVT_PROCESS_1 */
-        osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+        ButtonPressed = osThreadFlagsWait(3, osFlagsWaitAny, osWaitForever);
         Push_Button_st Message;
-        Message.Pushed_Button = BUTTON_USER1;
-        Message.State         = 1;
+        if (1 == ButtonPressed)
+        {
+            Message.Pushed_Button = BUTTON_USER1;
+            Message.State         = 1;
+        }
+        if (2 == ButtonPressed)
+        {
+            Message.Pushed_Button = BUTTON_USER2;
+            Message.State         = 2;
+        }
         PbCb(&Message); // call matter callback to handle push button
-        /* USER CODE BEGIN SHCI_USER_EVT_PROCESS_2 */
-
-        /* USER CODE END SHCI_USER_EVT_PROCESS_2 */
-    }
-}
-
-static void ShciUserEvtProcess(void * argument)
-{
-    UNUSED(argument);
-    for (;;)
-    {
-        /* USER CODE BEGIN SHCI_USER_EVT_PROCESS_1 */
-
-        /* USER CODE END SHCI_USER_EVT_PROCESS_1 */
-        // osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
-        osSemaphoreAcquire(SemShciUserEvtProcessId, osWaitForever);
-        shci_user_evt_proc();
         /* USER CODE BEGIN SHCI_USER_EVT_PROCESS_2 */
 
         /* USER CODE END SHCI_USER_EVT_PROCESS_2 */
@@ -493,7 +535,7 @@ static void ShciUserEvtProcess(void * argument)
 void shci_notify_asynch_evt(void * pdata)
 {
     UNUSED(pdata);
-    osSemaphoreRelease(SemShciUserEvtProcessId);
+    osThreadFlagsSet(ShciUserEvtProcessId, 1);
     return;
 }
 
@@ -506,8 +548,7 @@ void shci_cmd_resp_release(uint32_t flag)
 
 void shci_cmd_resp_wait(uint32_t timeout)
 {
-    UNUSED(timeout);
-    osSemaphoreAcquire(SemShciId, osWaitForever);
+    osSemaphoreAcquire(SemShciId, pdMS_TO_TICKS(timeout));
     return;
 }
 
@@ -569,7 +610,7 @@ void BSP_PB_Callback(Button_TypeDef Button)
 
     case BUTTON_USER2:
         APP_DBG("BUTTON 2 PUSHED !");
-        /* Set "Switch Protocol" Task */
+        osThreadFlagsSet(OsPushButtonProcessId, 2);
         break;
 
     default:
@@ -578,6 +619,7 @@ void BSP_PB_Callback(Button_TypeDef Button)
 
     return;
 }
+
 #ifdef __cplusplus
 }
 #endif

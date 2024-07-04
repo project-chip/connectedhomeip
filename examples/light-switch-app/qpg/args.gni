@@ -30,7 +30,7 @@ chip_enable_icd_lit = true
 chip_stack_lock_tracking = "none"
 
 matter_device_vid = "0xFFF1"
-matter_device_pid = "0x8006"
+matter_device_pid = "0x8004"
 
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
 pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"

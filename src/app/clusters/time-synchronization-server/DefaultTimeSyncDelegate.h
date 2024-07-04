@@ -29,14 +29,9 @@ class DefaultTimeSyncDelegate : public Delegate
 
 public:
     DefaultTimeSyncDelegate() : Delegate(){};
-    void TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList) override;
-    bool HandleUpdateDSTOffset(CharSpan name) override;
     bool IsNTPAddressValid(CharSpan ntp) override;
     bool IsNTPAddressDomain(CharSpan ntp) override;
     CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) override;
-    CHIP_ERROR UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
-                                          chip::Callback::Callback<OnFallbackNTPCompletion> * callback) override;
-    void UTCTimeAvailabilityChanged(uint64_t time) override;
 };
 
 } // namespace TimeSynchronization

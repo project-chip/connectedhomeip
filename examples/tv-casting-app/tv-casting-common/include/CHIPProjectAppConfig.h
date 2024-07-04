@@ -53,6 +53,10 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
 
+// TVs can handle the memory impact of supporting a larger list of target apps. See
+// examples/tv-app/tv-common/include/CHIPProjectAppConfig.h
+#define CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS 10
+
 // For casting, we need to allow more ACL entries, and more complex entries
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY 20
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY 20

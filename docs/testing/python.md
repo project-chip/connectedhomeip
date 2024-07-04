@@ -480,16 +480,64 @@ second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
 
 # Running tests locally
 
-You can run the python script as-is for local testing against an already-running
-DUT
+## Setup
 
-`./scripts/tests/run_python_test.py` is a convenient script to fire up an
-example DUT on the host, with factory reset support
+The scripts require the python wheel to be compiled and installed before
+running. To compile and install the wheel, do the following:
+
+First activate the matter environment using either
+
+```
+. ./scripts/bootstrap.sh
+```
+
+or
+
+```
+. ./scripts/activate.sh
+```
+
+bootstrap.sh should be used for for the first setup, activate.sh may be used for
+subsequent setups as it is faster.
+
+Next build the python wheels and create / activate a venv (called `py` here, but
+any name may be used)
+
+```
+./scripts/build_python.sh -i py
+source py/bin/activate
+```
+
+## Running tests
+
+-   Note that devices must be commissioned by the python test harness to run
+    tests. chip-tool and the python test harness DO NOT share a fabric.
+
+Once the wheel is installed, you can run the python script as a normal python
+file for local testing against an already-running DUT. This can be an example
+app on the host computer (running in a different terminal), or a separate device
+that will be commissioned either over BLE or WiFi.
+
+For example, to run the TC-ACE-1.2 tests against an un-commissioned DUT:
+
+```
+python3 src/python_testing/TC_ACE_1_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00
+```
+
+Some tests require additional arguments (ex. PIXITs or configuration variables
+for the CI). These arguments can be passed as sets of key-value pairs using the
+`--<type>-arg` command line arguments. For example
+
+```
+--int-arg PIXIT.ACE.APPENDPOINT:1 PIXIT.ACE.APPDEVTYPEID:0x0100 --string-arg PIXIT.ACE.APPCLUSTER:OnOff PIXIT.ACE.APPATTRIBUTE:OnOff
+```
+
+## Local host app testing
+
+`./scripts/tests/run_python_test.py` is a convenient script that starts an
+example DUT on the host and includes factory reset support
 
 `./scripts/tests/run_python_test.py --factoryreset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"`
-
-Note that devices must be commissioned by the python test harness to run tests.
-chip-tool and the python test harness DO NOT share a fabric.
 
 # Running tests in CI
 

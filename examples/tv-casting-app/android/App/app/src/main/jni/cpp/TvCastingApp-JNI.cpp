@@ -372,7 +372,7 @@ JNI_METHOD(jboolean, sendCommissioningRequest)(JNIEnv * env, jobject, jobject jD
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "JNI_METHOD sendCommissioningRequest called");
 
-    chip::Dnssd::DiscoveredNodeData commissioner;
+    chip::Dnssd::CommissionNodeData commissioner;
     CHIP_ERROR err = convertJDiscoveredNodeDataToCppDiscoveredNodeData(jDiscoveredNodeData, commissioner);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(AppServer,

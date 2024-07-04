@@ -177,7 +177,6 @@ tests:
       disabled: true
 
     - label: "Step 6: From TH1 read the CurrentFabricIndex"
-      PICS: OPCREDS.S.A0005
       verification: |
           ./chip-tool operationalcredentials read   current-fabric-index   1 0
 

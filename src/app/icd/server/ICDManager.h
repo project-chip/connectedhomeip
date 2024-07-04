@@ -18,7 +18,6 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
-#include <app-common/zap-generated/cluster-enums.h>
 #include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
@@ -47,9 +46,9 @@ using SymmetricKeystore = SessionKeystore;
 namespace chip {
 namespace app {
 
-// Forward declaration of TestICDManager to allow it to be friend with ICDManager
+// Forward declaration of TestICDManager tests to allow it to be friend with ICDManager
 // Used in unit tests
-class TestICDManager;
+class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
@@ -74,7 +73,7 @@ public:
     };
 
     /**
-     * @brief This enum class represents to all ICDStateObserver callbacks available from the
+     * @brief This enum class represents all ICDStateObserver callbacks available from the
      *        mStateObserverPool for the ICDManager.
      *
      *        EnterActiveMode, TransitionToIdle and EnterIdleMode will always be called as a trio in the same order.
@@ -85,12 +84,12 @@ public:
      *         When this event is called, the ICD is still in ActiveMode.
      *        If the ActiveMode timer is increased due to the TransitionToIdle event, the event will not be called a second time in
      *        a given cycle.
-     *        OnEnterIdleMode will always the third when the ICD has transitioned to IdleMode.
+     *        OnEnterIdleMode will always the third event and indicates that the ICD has transitioned to IdleMode.
      *
      *        The ICDModeChange event can occur independently from the EnterActiveMode, TransitionToIdle and EnterIdleMode.
-     *        It will typpically hapen at the ICDManager init when a client is already registered with the ICD before the
-     *        OnEnterIdleMode event or when a client send a register command after the OnEnterActiveMode event. Nothing prevents the
-     *        ICDModeChange event to happen multiple times per cycle or while the ICD is in IdleMode.
+     *        It will typically happen at the ICDManager init when a client is already registered with the ICD before the
+     *        OnEnterIdleMode event or when a client sends a register command after the OnEnterActiveMode event. Nothing prevents
+     *        the ICDModeChange event from happening multiple times per cycle or while the ICD is in IdleMode.
      *
      *        See src/app/icd/server/ICDStateObserver.h for more information on the APIs each event triggers
      */
@@ -131,6 +130,8 @@ public:
     bool SupportsFeature(Clusters::IcdManagement::Feature feature);
 
     ICDConfigurationData::ICDMode GetICDMode() { return ICDConfigurationData::GetInstance().GetICDMode(); };
+
+    OperationalState GetOperaionalState() { return mOperationalState; };
 
     /**
      * @brief Adds the referenced observer in parameters to the mStateObserverPool
@@ -199,7 +200,9 @@ public:
     void OnSubscriptionReport() override;
 
 private:
-    friend class TestICDManager;
+    // TODO : Once <gtest/gtest_prod.h> can be included, use FRIEND_TEST for the friend class.
+    friend class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
+
     /**
      * @brief UpdateICDMode evaluates in which mode the ICD can be in; SIT or LIT mode.
      *        If the current operating mode does not match the evaluated operating mode, function updates the ICDMode and triggers

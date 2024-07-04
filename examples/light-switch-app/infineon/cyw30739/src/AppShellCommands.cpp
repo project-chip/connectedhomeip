@@ -19,8 +19,9 @@
 #include <App.h>
 #include <AppShellCommands.h>
 #include <BindingHandler.h>
+#include <LEDWidget.h>
 #include <LightSwitch.h>
-#include <LightingManager.h>
+#include <cycfg.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -80,7 +81,7 @@ static CHIP_ERROR AppCommandHandler(int argc, char ** argv)
 CHIP_ERROR OnCommandHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "Turning the light on ...\n");
-    LightMgr().Set(true, PLATFORM_LED_1);
+    LEDWid().Set(true, PLATFORM_LED_RED);
 
     return CHIP_NO_ERROR;
 }
@@ -88,7 +89,7 @@ CHIP_ERROR OnCommandHandler(int argc, char ** argv)
 CHIP_ERROR OffCommandHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "Turning the light off ...\n");
-    LightMgr().Set(false, PLATFORM_LED_1);
+    LEDWid().Set(false, PLATFORM_LED_RED);
 
     return CHIP_NO_ERROR;
 }
@@ -96,13 +97,13 @@ CHIP_ERROR OffCommandHandler(int argc, char ** argv)
 CHIP_ERROR ToggleCommandHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "Toggling the light ...\n");
-    if (LightMgr().IsLightOn())
+    if (LEDWid().IsLEDOn())
     {
-        LightMgr().Set(false, PLATFORM_LED_1);
+        LEDWid().Set(false, PLATFORM_LED_RED);
     }
     else
     {
-        LightMgr().Set(true, PLATFORM_LED_1);
+        LEDWid().Set(true, PLATFORM_LED_RED);
     }
 
     return CHIP_NO_ERROR;

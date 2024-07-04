@@ -45,9 +45,9 @@ public:
     CHIP_ERROR StopDiscovery() { return mDNSResolver.StopDiscovery(); };
 
 protected:
-    using DiscoveredNodeList = FixedSpan<Dnssd::DiscoveredNodeData, CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES>;
+    using DiscoveredNodeList = FixedSpan<Dnssd::CommissionNodeData, CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES>;
     CHIP_ERROR SetUpNodeDiscovery();
-    const Dnssd::DiscoveredNodeData * GetDiscoveredNode(int idx);
+    const Dnssd::CommissionNodeData * GetDiscoveredNode(int idx);
     virtual DiscoveredNodeList GetDiscoveredNodes()    = 0;
     DeviceDiscoveryDelegate * mDeviceDiscoveryDelegate = nullptr;
     Dnssd::ResolverProxy mDNSResolver;

@@ -30,7 +30,7 @@ limitations under the License.
     <item value="0x4008" name="Proofing"/>
   </enum>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>General</domain>
     <name>Oven Mode</name>
     <code>0x0049</code>
