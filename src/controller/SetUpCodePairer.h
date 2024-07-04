@@ -168,6 +168,12 @@ private:
     static void OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    void OnDiscoveredDeviceOverWifiPAF();
+    void OnWifiPAFDiscoveryError(CHIP_ERROR err);
+    static void OnWiFiPAFSubscribeComplete(void * appState);
+    static void OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err);
+#endif
 
     bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const;
     static bool IdIsPresent(uint16_t vendorOrProductID);

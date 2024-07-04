@@ -254,7 +254,22 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ChipLogProgress(Controller, "Starting commissioning discovery over WiFiPAF");
+
+    VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mWaitingForDiscovery[kWiFiPAFTransport] = true;
+    CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFConnect(payload.discriminator, this, OnWiFiPAFSubscribeComplete,
+                                                          OnWiFiPAFSubscribeError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
+        mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    }
+    return err;
+#else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CONFIG_NETWORK_LAYER_BLE
 }
 
 CHIP_ERROR SetUpCodePairer::StopConnectOverWiFiPAF()
@@ -354,6 +369,37 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
     LogErrorOnFailure(err);
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
+{
+    ChipLogProgress(Controller, "Discovered device to be commissioned over WiFiPAF, RemoteId: %lu", mRemoteId);
+
+    mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    auto param = SetUpCodePairerParameters();
+    param.SetPeerAddress(Transport::PeerAddress(Transport::Type::kWiFiPAF, mRemoteId));
+    mDiscoveredParameters.emplace_front(param);
+    ConnectToDiscoveredDevice();
+}
+
+void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
+{
+    ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed: %" CHIP_ERROR_FORMAT, err.Format());
+    mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    LogErrorOnFailure(err);
+}
+
+void SetUpCodePairer::OnWiFiPAFSubscribeComplete(void * appState)
+{
+    (static_cast<SetUpCodePairer *>(appState))->OnDiscoveredDeviceOverWifiPAF();
+}
+
+void SetUpCodePairer::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
+{
+    static_cast<SetUpCodePairer *>(appState)->OnWifiPAFDiscoveryError(err);
+}
+#endif
+
 
 bool SetUpCodePairer::IdIsPresent(uint16_t vendorOrProductID)
 {
@@ -493,6 +539,7 @@ void SetUpCodePairer::ResetDiscoveryState()
     StopConnectOverBle();
     StopConnectOverIP();
     StopConnectOverSoftAP();
+    StopConnectOverWiFiPAF();
 
     // Just in case any of those failed to reset the waiting state properly.
     for (auto & waiting : mWaitingForDiscovery)

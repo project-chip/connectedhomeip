@@ -361,7 +361,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
 #else  // CONFIG_NETWORK_LAYER_BLE
-    RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
+    RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #ifdef CONFIG_RENDEZVOUS_MODE
