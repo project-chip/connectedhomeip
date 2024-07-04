@@ -102,7 +102,7 @@ static_assert(sizeof(LongPascalString::LengthType) == 2);
 ///
 /// isNullable defines if the value of NULL is allowed to be converted.
 template <typename T, class ENCODING>
-CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool isNullable, MutableByteSpan &out)
+CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool isNullable, MutableByteSpan & out)
 {
     T workingValue;
 
@@ -146,7 +146,7 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
 ///
 /// isNullable defines if the value of NULL is allowed to be decoded.
 template <typename T>
-CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullable, MutableByteSpan &out)
+CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullable, MutableByteSpan & out)
 {
     using Traits = NumericAttributeTraits<T>;
     typename Traits::StorageType storageValue;
@@ -204,7 +204,7 @@ CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullabl
 ///
 /// Uses the attribute `metadata` to determine how the data is to be encoded into out.
 CHIP_ERROR DecodeValueIntoEmberBuffer(AttributeValueDecoder & decoder, const EmberAfAttributeMetadata * metadata,
-                                      MutableByteSpan &out)
+                                      MutableByteSpan & out)
 {
     VerifyOrReturnError(metadata != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 

@@ -113,7 +113,8 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
                                      std::initializer_list<MockEventConfig> aEvents,
                                      std::initializer_list<CommandId> aAcceptedCommands,
                                      std::initializer_list<CommandId> aGeneratedCommands) :
-    id(aId), attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
+    id(aId),
+    attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
     mGeneratedCommands(aGeneratedCommands)
 {
     VerifyOrDie(aAttributes.size() < UINT16_MAX);
