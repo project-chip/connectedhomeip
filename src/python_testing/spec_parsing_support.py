@@ -22,7 +22,7 @@ import typing
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
 from dataclasses import dataclass
-from enum import Enum, StrEnum, auto
+from enum import Enum, auto
 from typing import Callable, Optional
 
 import chip.clusters as Clusters
@@ -502,7 +502,7 @@ class PrebuiltDataModelDirectory(Enum):
     kMaster = auto()
 
 
-class DataModelLevel(StrEnum):
+class DataModelLevel(str, Enum):
     kCluster = 'clusters'
     kDeviceType = 'device_types'
 
