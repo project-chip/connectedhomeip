@@ -64,7 +64,7 @@ public:
 
     /**
      * @brief
-     *   This function is used to set the path to Device Attestation revocation set JSON file.
+     *   This function is used to set the path to the Device Attestation revocation set JSON file.
      *
      * @param[in] path Path to the JSON file containing list of revoked DACs or PAIs.
      *                 It can be generated using credentials/generate-revocation-set.py script
