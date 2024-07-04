@@ -693,7 +693,7 @@ bool Instance::AddSupportedMap(uint8_t aMapId, const CharSpan & aMapName)
         // the name cannot be the same as an existing map
         if (entry.IsNameEqual(aMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMap %u - A map already exists with same name '%s'", aMapId, entry.GetNameAsCString());
+            ChipLogError(Zcl, "AddSupportedMap %u - A map already exists with same name '%s'", aMapId, entry.GetName().data());
             return false;
         }
 
@@ -754,7 +754,7 @@ bool Instance::RenameSupportedMap(uint8_t aMapId, const CharSpan & newMapName)
 
         if (entry.IsNameEqual(newMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.GetNameAsCString());
+            ChipLogError(Zcl, "AddSupportedMap %u - map already exists with same name '%s'", aMapId, entry.GetName().data());
             return false;
         }
 
