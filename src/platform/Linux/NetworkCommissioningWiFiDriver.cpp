@@ -208,7 +208,6 @@ CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
     mCurrentNetId = 0;
     Network configuredNetwork;
 
-    memset(mStagingNetwork, 0, sizeof(mStagingNetwork));
     memcpy(mStagingNetwork, mSavedNetwork, sizeof(mStagingNetwork));
     mStagedConnectedNetworkIndex = mSavedConnectedNetworkIndex;
 

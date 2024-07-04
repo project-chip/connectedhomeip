@@ -153,11 +153,12 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
 
-    // Number of entries in mSavedNetworks
+    // Number of entries in mStagedNetwork
     uint8_t mCurrentNetId = 0;
     WiFiNetwork mSavedNetwork[kMaxNetworks];
     WiFiNetwork mStagingNetwork[kMaxNetworks];
     ConnectCallback * mpConnectCallback;
+    // Index location of the network the device is connected to
     int8_t mStagedConnectedNetworkIndex = -1;
     int8_t mSavedConnectedNetworkIndex = -1;
     bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
