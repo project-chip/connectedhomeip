@@ -443,7 +443,7 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
 
 size_t LinuxWiFiDriver::WiFiNetworkIterator::Count()
 {
-    size_t count;
+    size_t count = 0;
 
     for (uint8_t networkIndex = 0; networkIndex < kMaxNetworks; networkIndex++)
     {
