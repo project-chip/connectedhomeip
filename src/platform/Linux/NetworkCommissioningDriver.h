@@ -75,7 +75,7 @@ public:
 
     private:
         LinuxWiFiDriver * driver;
-        bool exhausted = false;
+        bool exhausted               = false;
         uint8_t networkIteratorIndex = 0;
     };
 
@@ -160,7 +160,7 @@ private:
     ConnectCallback * mpConnectCallback;
     // Index location of the network the device is connected to
     int8_t mStagedConnectedNetworkIndex = -1;
-    int8_t mSavedConnectedNetworkIndex = -1;
+    int8_t mSavedConnectedNetworkIndex  = -1;
     bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
     void ShiftNetworkAfterRemove();
     // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
