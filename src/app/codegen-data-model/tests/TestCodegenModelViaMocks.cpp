@@ -31,7 +31,6 @@
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
-#include <lib/support/MatterScalarNullHandling.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
@@ -42,6 +41,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
+#include <lib/support/MatterScalarNullHandling.h>
 
 #include <gtest/gtest.h>
 #include <vector>

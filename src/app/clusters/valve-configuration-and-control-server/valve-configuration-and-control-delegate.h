@@ -19,9 +19,9 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <lib/support/Nullable.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/Nullable.h>
 
 namespace chip {
 namespace app {

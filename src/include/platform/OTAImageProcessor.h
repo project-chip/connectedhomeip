@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <lib/support/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/Span.h>
 
 namespace chip {

@@ -23,9 +23,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
-#include <lib/support/Nullable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Nullable.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;

@@ -20,11 +20,11 @@
 
 #include <app-common/zap-generated/cluster-enums-check.h>
 #include <app/ConcreteAttributePath.h>
-#include <lib/support/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
+#include <lib/support/Nullable.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {

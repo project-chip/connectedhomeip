@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <lib/support/Nullable.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/CustomArgument.h>
 #include <inet/InetInterface.h>
 #include <lib/core/Optional.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 

@@ -21,9 +21,9 @@
 #include "LEDManager.h"
 #include <LockManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <lib/support/Nullable.h>
 #include <app/server/Server.h>
 #include <credentials/FabricTable.h>
+#include <lib/support/Nullable.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 

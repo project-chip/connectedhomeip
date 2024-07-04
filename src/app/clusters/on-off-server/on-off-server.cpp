@@ -20,11 +20,11 @@
 #include "on-off-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <lib/support/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
+#include <lib/support/Nullable.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
 

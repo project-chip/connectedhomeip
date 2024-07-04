@@ -21,10 +21,10 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
-#include <lib/support/Nullable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/Span.h>
 #include <stddef.h>
 #include <stdint.h>

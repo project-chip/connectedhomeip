@@ -35,12 +35,12 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
-#include <lib/support/Nullable.h>
 #include <commands/common/HexConversion.h>
 #include <json/json.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/SafeInt.h>
 
 #include "JsonParser.h"

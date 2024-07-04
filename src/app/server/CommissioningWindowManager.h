@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <lib/support/Nullable.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -25,6 +24,7 @@
 #include <lib/core/ClusterEnums.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/dnssd/Advertiser.h>
+#include <lib/support/Nullable.h>
 #include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>

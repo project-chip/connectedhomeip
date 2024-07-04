@@ -28,7 +28,6 @@
 #include <app/reporting/reporting.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage-detail.h>
-#include <lib/support/MatterScalarNullHandling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table-detail.h>
 #include <app/util/attribute-table.h>
@@ -40,6 +39,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/MatterScalarNullHandling.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/LockTracker.h>

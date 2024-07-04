@@ -19,9 +19,9 @@
 #include "chef-rpc-actions-worker.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
-#include <lib/support/Nullable.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Nullable.h>
 #include <map>
 #include <platform/CHIPDeviceLayer.h>
 

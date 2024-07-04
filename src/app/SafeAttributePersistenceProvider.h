@@ -16,12 +16,12 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
-#include <lib/support/Nullable.h>
 #include <app/util/attribute-metadata.h>
 #include <cstring>
 #include <inttypes.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/Span.h>
 
 namespace chip {

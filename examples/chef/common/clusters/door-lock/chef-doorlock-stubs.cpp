@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <lib/support/Nullable.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Nullable.h>
 
 #ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #include "chef-lock-manager.h"

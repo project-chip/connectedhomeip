@@ -21,8 +21,8 @@
 #include "protocols/interaction_model/Constants.h"
 #include <app/CommandSender.h>
 #include <app/data-model/Decode.h>
-#include <lib/support/NullObject.h>
 #include <functional>
+#include <lib/support/NullObject.h>
 
 namespace chip {
 namespace Controller {

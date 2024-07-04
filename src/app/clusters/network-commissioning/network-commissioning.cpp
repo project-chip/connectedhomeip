@@ -26,12 +26,12 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
-#include <lib/support/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SortUtils.h>
 #include <lib/support/ThreadOperationalDataset.h>

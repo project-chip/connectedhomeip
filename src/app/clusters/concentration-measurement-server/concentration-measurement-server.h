@@ -21,10 +21,10 @@
 #include "concentration-measurement-cluster-objects.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <lib/support/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/IntrusiveList.h>
+#include <lib/support/Nullable.h>
 #include <type_traits>
 
 namespace chip {

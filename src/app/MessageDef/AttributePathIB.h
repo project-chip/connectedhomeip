@@ -24,12 +24,12 @@
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
-#include <lib/support/Nullable.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Nullable.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {

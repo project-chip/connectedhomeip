@@ -25,11 +25,11 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/Nullable.h>
 #include <app/util/basic-types.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/Nullable.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {

@@ -18,13 +18,13 @@
 #pragma once
 
 #include <app/OperationalSessionSetup.h>
-#include <lib/support/NullObject.h>
 #include <controller/CHIPDeviceController.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
+#include <lib/support/NullObject.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/SystemClock.h>
 
