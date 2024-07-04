@@ -310,7 +310,7 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
             // we should not set the large payload while the TCP support is not enabled
             ChipLogError(
                 Discovery,
-                "LargePayload support is enabled while TCP server support is not enabled, PeerNodeId=" ChipLogFormatScopedNodeId,
+                "LargePayload session requested but peer does not support TCP server, PeerNodeId=" ChipLogFormatScopedNodeId,
                 ChipLogValueScopedNodeId(mPeerId));
             return CHIP_ERROR_INTERNAL;
         }
