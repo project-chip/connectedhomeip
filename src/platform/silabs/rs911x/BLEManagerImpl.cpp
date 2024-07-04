@@ -253,8 +253,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
     sl_ble_event_sem   = osSemaphoreNew(1, 0, NULL);
 
-    wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL, 2,
-                                         wfxBLETaskStack, &rsiBLETaskStruct);
+    wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL,
+                                         BLE_DRIVER_TASK_PRIORITY, wfxBLETaskStack, &rsiBLETaskStruct);
 
     if (wfx_rsi.ble_task == NULL)
     {

@@ -55,6 +55,7 @@
 #define WLAN_TASK_STACK_SIZE (1024)
 #define WLAN_TASK_PRIORITY (3)
 #define WLAN_DRIVER_TASK_PRIORITY (2)
+#define BLE_DRIVER_TASK_PRIORITY (2)
 #define MAX_JOIN_RETRIES_COUNT (5)
 
 // WLAN retry time intervals in milli seconds
