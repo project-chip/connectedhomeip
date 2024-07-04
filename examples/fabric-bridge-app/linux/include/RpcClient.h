@@ -41,4 +41,5 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
  * - CHIP_ERROR_BUSY: Another commissioning window is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred.
  */
-CHIP_ERROR OpenCommissioningWindow(chip::NodeId nodeId);
+CHIP_ERROR OpenCommissioningWindow(chip::NodeId nodeId, uint16_t commissioningTimeout, uint16_t discriminator, uint32_t iterations,
+                                   chip::Optional<chip::ByteSpan> salt, chip::Optional<chip::ByteSpan> verifier);

@@ -47,6 +47,10 @@ public:
                     &mIteration, "Number of PBKDF iterations to use to derive the verifier.  Ignored if 'option' is 0.");
         AddArgument("discriminator", 0, 4096, &mDiscriminator, "Discriminator to use for advertising.  Ignored if 'option' is 0.");
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout, "Time, in seconds, before this command is considered to have timed out.");
+        AddArgument("salt", &mSalt, "Salt payload encoded in hexadecimal. Random salt will be generated if absent");
+        AddArgument("verifier", &mVerifier,
+                    "PAKE Passcode verifier encoded in hexadecimal format. Will be generated from random setup pin and other "
+                    "params if absent");
     }
 
     void RegisterDelegate(CommissioningWindowDelegate * delegate) { mDelegate = delegate; }
@@ -69,6 +73,8 @@ private:
     uint16_t mDiscriminator;
 
     chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::ByteSpan> mSalt;
+    chip::Optional<chip::ByteSpan> mVerifier;
 
     chip::Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> mWindowOpener;
 

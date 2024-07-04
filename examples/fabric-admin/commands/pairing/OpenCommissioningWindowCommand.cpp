@@ -35,7 +35,7 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
     {
         SetupPayload ignored;
         return mWindowOpener->OpenCommissioningWindow(mNodeId, System::Clock::Seconds16(mCommissioningWindowTimeout), mIteration,
-                                                      mDiscriminator, NullOptional, NullOptional, NullOptional,
+                                                      mDiscriminator, NullOptional, mSalt, mVerifier,
                                                       &mOnOpenCommissioningWindowCallback, ignored,
                                                       /* readVIDPIDAttributes */ true);
     }
