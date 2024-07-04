@@ -66,17 +66,6 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteAttributePath
         return std::make_optional(err);
     }
 
-    if (decoder.TriedDecode())
-    {
-        // TODO: change callbacks should likely be routed through the context `MarkDirty`
-        //       however for now this is called directly because ember code does this call
-        //       inside emberAfWriteAttribute.
-        //
-        //       If we pull out the logic, the remaining `MarkDirty` calls should be
-        //       sufficient.
-        MatterReportingAttributeChangeCallback(path);
-    }
-
     // If the decoder tried to decode, then a value should have been read for processing.
     //   - if decoding was done, assume DONE (i.e. final CHIP_NO_ERROR)
     //   -  otherwise, if no decoding done, return that processing must continue via nullopt
@@ -352,7 +341,12 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
     if (aai_result.has_value())
     {
-        if (*aai_result == CHIP_NO_ERROR) {
+        if (*aai_result == CHIP_NO_ERROR)
+        {
+            // TODO: change callbacks should likely be routed through the context `MarkDirty` only
+            //       however for now this is called directly because ember code does this call
+            //       inside emberAfWriteAttribute.
+            MatterReportingAttributeChangeCallback(request.path);
             CurrentContext().dataModelChangeListener->MarkDirty(request.path);
         }
         return *aai_result;
