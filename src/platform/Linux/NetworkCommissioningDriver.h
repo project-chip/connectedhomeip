@@ -25,11 +25,13 @@
 
 #include <vector>
 
+#define CAN_HAVE_MAX_NETWORK 10
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
 static constexpr uint8_t kMaxNetworks = CHIP_CONFIG_MAX_WIFI_NETWORK;
+static_assert(kMaxNetworks <= CAN_HAVE_MAX_NETWORK, "Cannot have more than 10 networks");
 
 template <typename T>
 class LinuxScanResponseIterator : public Iterator<T>
@@ -73,7 +75,7 @@ public:
 
     private:
         LinuxWiFiDriver * driver;
-        bool exhausted               = false;
+        bool exhausted = false;
         uint8_t networkIteratorIndex = 0;
     };
 
@@ -150,17 +152,18 @@ private:
         Platform::SharedPtr<Crypto::P256Keypair> clientIdentityKeypair;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
-    // Stores the index location of the most recent WiFi Network added. The value is increments if a new
-    // WiFi network is added and decrements if a network is removed
-    uint8_t mCurrentNetworkIndex   = 0;
-    // The index of the WiFi network the device is connected to
-    uint8_t mConnectedNetworkIndex = 0;
-    WiFiNetwork mSavedNetworks[kMaxNetworks];
-    WiFiNetwork mStagingNetworks[kMaxNetworks];
-    // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
-    bool mIs5gSupported = false;
+
+    // Number of entries in mSavedNetworks
+    uint8_t mCurrentNetId = 0;
+    WiFiNetwork mSavedNetwork[kMaxNetworks];
+    WiFiNetwork mStagingNetwork[kMaxNetworks];
+    ConnectCallback * mpConnectCallback;
+    int8_t mStagedConnectedNetworkIndex = -1;
+    int8_t mSavedConnectedNetworkIndex = -1;
     bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
     void ShiftNetworkAfterRemove();
+    // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
+    bool mIs5gSupported = false;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
