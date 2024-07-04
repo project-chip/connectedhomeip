@@ -260,7 +260,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mWaitingForDiscovery[kWiFiPAFTransport] = true;
     CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFConnect(payload.discriminator, this, OnWiFiPAFSubscribeComplete,
-                                                          OnWiFiPAFSubscribeError);
+                                                                   OnWiFiPAFSubscribeError);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
@@ -376,7 +376,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
     ChipLogProgress(Controller, "Discovered device to be commissioned over WiFiPAF, RemoteId: %lu", mRemoteId);
 
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
-    auto param = SetUpCodePairerParameters();
+    auto param                              = SetUpCodePairerParameters();
     param.SetPeerAddress(Transport::PeerAddress(Transport::Type::kWiFiPAF, mRemoteId));
     mDiscoveredParameters.emplace_front(param);
     ConnectToDiscoveredDevice();
@@ -399,7 +399,6 @@ void SetUpCodePairer::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err)
     static_cast<SetUpCodePairer *>(appState)->OnWifiPAFDiscoveryError(err);
 }
 #endif
-
 
 bool SetUpCodePairer::IdIsPresent(uint16_t vendorOrProductID)
 {
