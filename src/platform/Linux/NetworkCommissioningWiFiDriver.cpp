@@ -73,12 +73,12 @@ constexpr std::array<char[size], kMaxNetworks> createNetworkStorageKeys(const ch
     return arr;
 }
 
-const char ssidKeyName[SSID_KEY_NAME_LEN] = "wifi-ssid";
-const char passKeyName[PASS_KEY_NAME_LEN] = "wifi-pass";
+constexpr char ssidKeyName[SSID_KEY_NAME_LEN] = "wifi-ssid";
+constexpr char passKeyName[PASS_KEY_NAME_LEN] = "wifi-pass";
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-const char networkIDKeyName[NETWORK_ID_KEY_NAME_LEN] = "wifi-ni";
-const char clientIDKeyName[CLIENT_ID_KEY_NAME_LEN] = "wifi-ci";
-const char clientIDKeypairKeyName[CLIENT_ID_KEYPAIR_NAME_LEN] = "wifi-cik";
+constexpr char networkIDKeyName[NETWORK_ID_KEY_NAME_LEN] = "wifi-ni";
+constexpr char clientIDKeyName[CLIENT_ID_KEY_NAME_LEN] = "wifi-ci";
+constexpr char clientIDKeypairKeyName[CLIENT_ID_KEYPAIR_NAME_LEN] = "wifi-cik";
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 constexpr std::array<char[SSID_KEY_NAME_LEN], kMaxNetworks> kWiFiSSIDKeyName = createNetworkStorageKeys<SSID_KEY_NAME_LEN>(ssidKeyName);
