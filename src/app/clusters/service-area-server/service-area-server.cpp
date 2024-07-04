@@ -252,7 +252,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     {
         // do as much parameter validation as we can
         {
-            uint32_t i = 0;
+            uint32_t i         = 0;
             auto iLocationIter = req.newLocations.Value().begin();
             while (iLocationIter.Next())
             {
@@ -267,7 +267,7 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
                 }
 
                 // Checking for duplicate locations.
-                uint32_t j = 0;
+                uint32_t j         = 0;
                 auto jLocationIter = req.newLocations.Value().begin();
                 while (j < i)
                 {
