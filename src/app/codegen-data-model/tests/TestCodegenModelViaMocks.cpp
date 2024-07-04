@@ -159,6 +159,9 @@ public:
     }
     ~CodegenDataModelWithContext() { Shutdown(); }
 
+    TestDataModelChangeListener & ChangeListener() { return mChangeListener; }
+    const TestDataModelChangeListener & ChangeListener() const { return mChangeListener; }
+
 private:
     TestEventGenerator mEventGenerator;
     TestDataModelChangeListener mChangeListener;
@@ -779,7 +782,12 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         memcpy(&storage, writtenData.data(), sizeof(storage));
         typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
 
-        ASSERT_EQ(actual, value);
+        EXPECT_EQ(actual, value);
+        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
+
+        // reset for the next test
+        model.ChangeListener().DirtyList().clear();
     }
 
     // nullable test
@@ -801,6 +809,8 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
 
         ASSERT_EQ(actual, value);
+        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
     }
 }
 
@@ -1957,6 +1967,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
     AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
 
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
+    ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
@@ -2368,6 +2379,10 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
     EXPECT_EQ(aai->GetData().a, 112);
     EXPECT_TRUE(aai->GetData().e.data_equal("aai_write_test"_span));
 
+    // AAI marks dirty paths
+    ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+    EXPECT_EQ(model.ChangeListener().DirtyList()[0], kStructPath);
+
     // AAI does not prevent read/write of regular attributes
     // validate that once AAI is added, we still can go through writing regular bits (i.e.
     // AAI returning "unknown" has fallback to ember)
@@ -2396,6 +2411,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceReturningError)
 
     AttributeValueDecoder decoder = test.DecoderFor(testValue);
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_KEY_NOT_FOUND);
+    ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
 }
 
 TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
@@ -2421,4 +2437,5 @@ TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
     // Embed specifically DOES NOT support structures.
     // Without AAI, we expect a data type error (translated to failure)
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(Failure));
+    ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
 }
