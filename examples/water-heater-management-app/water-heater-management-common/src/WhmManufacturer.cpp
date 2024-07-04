@@ -27,6 +27,8 @@
 using namespace chip;
 using namespace chip::app::Clusters::WaterHeaterManagement;
 
+using Protocols::InteractionModel::Status;
+
 CHIP_ERROR WhmManufacturer::Init()
 {
     WaterHeaterManagementDelegate * dg = GetWhmManufacturer()->GetWhmDelegate();
@@ -35,6 +37,8 @@ CHIP_ERROR WhmManufacturer::Init()
         ChipLogError(AppServer, "WhmDelegate is not initialized");
         return CHIP_ERROR_UNINITIALIZED;
     }
+
+    mBoostActive = false;
 
     return CHIP_NO_ERROR;
 }
@@ -90,14 +94,48 @@ BitMask<WaterHeaterDemandBitmap> WhmManufacturer::DetermineHeatingSources()
     return BitMask<WaterHeaterDemandBitmap>(heaterDemandMask);
 }
 
-void WhmManufacturer::TurnHeatingOn()
+Status WhmManufacturer::TurnHeatingOn()
 {
+    Status status = Status::Success;
+
     ChipLogProgress(AppServer, "WhmManufacturer::TurnHeatingOn");
+
+    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+
+    if (dg->GetBoostState() == BoostStateEnum::kActive)
+    {
+        mBoostActive = true;
+    }
+
+    return status;
 }
 
-void WhmManufacturer::TurnHeatingOff()
+Status WhmManufacturer::TurnHeatingOff()
 {
+    Status status = Status::Success;
+
     ChipLogProgress(AppServer, "WhmManufacturer::TurnHeatingOff");
+
+    if (mBoostActive)
+    {
+        mBoostActive = false;
+    }
+
+    return status;
+}
+
+Status WhmManufacturer::BoostCommandStarted(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat)
+{
+    return Status::Success;
+}
+
+Status WhmManufacturer::BoostCommandCancelled()
+{
+    return Status::Success;
+}
+
+void WhmManufacturer::BoostCommandFinished()
+{
 }
 
 WaterHeaterManagementDelegate * GetWhmDelegate()

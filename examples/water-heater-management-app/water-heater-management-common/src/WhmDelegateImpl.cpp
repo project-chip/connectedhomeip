@@ -169,7 +169,9 @@ void WaterHeaterManagementDelegate::SetBoostState(BoostStateEnum boostState)
  */
 Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat)
 {
-    ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleBoost");
+    Status status = Status::Success;
+
+    ChipLogProgress(AppServer, "HandleBoost");
 
     // Keep track of the boost command parameters
     mBoostOneShot = oneShot;
@@ -189,7 +191,7 @@ Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<b
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(durationS), BoostTimerExpiry, this);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Unable to start a Boost timer: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "HandleBoost: Unable to start a Boost timer: %" CHIP_ERROR_FORMAT, err.Format());
 
         // Not a lot we can do -> just set the boost state to inactive
         SetBoostState(BoostStateEnum::kInactive);
@@ -200,10 +202,23 @@ Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<b
     // Now running a boost command
     SetBoostState(BoostStateEnum::kActive);
 
-    // See if the heat needs to be turned on or off as a result of this boost command
-    CheckIfHeatNeedsToBeTurnedOnOrOff();
+    if (mpWhmManufacturer != nullptr)
+    {
+        status = mpWhmManufacturer->BoostCommandStarted(durationS, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
+    }
+    else
+    {
+        status = Status::InvalidInState;
+        ChipLogError(AppServer, "HandleBoost: mpWhmManufacturer == nullptr");
+    }
 
-    return Status::Success;
+    if (status == Status::Success)
+    {
+        // See if the heat needs to be turned on or off as a result of this boost command
+        status = CheckIfHeatNeedsToBeTurnedOnOrOff();
+    }
+
+    return status;
 }
 
 void WaterHeaterManagementDelegate::BoostTimerExpiry(System::Layer * systemLayer, void * delegate)
@@ -218,10 +233,19 @@ void WaterHeaterManagementDelegate::BoostTimerExpiry(System::Layer * systemLayer
  */
 void WaterHeaterManagementDelegate::HandleBoostTimerExpiry()
 {
-    ChipLogError(AppServer, "WaterHeaterManagementDelegate::HandleBoostTimerExpiry");
+    ChipLogError(AppServer, "HandleBoostTimerExpiry");
 
     // The PowerAdjustment is no longer in progress
     SetBoostState(BoostStateEnum::kInactive);
+
+    if (mpWhmManufacturer != nullptr)
+    {
+        mpWhmManufacturer->BoostCommandFinished();
+    }
+    else
+    {
+        ChipLogError(AppServer, "HandleBoostTimerExpiry: mpWhmManufacturer == nullptr");
+    }
 
     CheckIfHeatNeedsToBeTurnedOnOrOff();
 }
@@ -233,7 +257,9 @@ void WaterHeaterManagementDelegate::HandleBoostTimerExpiry()
  */
 Status WaterHeaterManagementDelegate::HandleCancelBoost()
 {
-    ChipLogProgress(AppServer, "WaterHeaterManagementDelegate::HandleCancelBoost");
+    Status status = Status::Success;
+
+    ChipLogProgress(AppServer, "HandleCancelBoost");
 
     if (mBoostState == BoostStateEnum::kActive)
     {
@@ -241,10 +267,20 @@ Status WaterHeaterManagementDelegate::HandleCancelBoost()
 
         DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
 
-        CheckIfHeatNeedsToBeTurnedOnOrOff();
+        if (mpWhmManufacturer != nullptr)
+        {
+            status = mpWhmManufacturer->BoostCommandCancelled();
+        }
+        else
+        {
+            status = Status::InvalidInState;
+            ChipLogError(AppServer, "HandleCancelBoost: mpWhmManufacturer == nullptr");
+        }
+
+        status = CheckIfHeatNeedsToBeTurnedOnOrOff();
     }
 
-    return Status::Success;
+    return status;
 }
 
 /*********************************************************************************
@@ -387,8 +423,9 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
     return (mTankPercentage >= targetPercentage) && (mHotWaterTemperature >= targetTemperature);
 }
 
-void WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
+Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
 {
+    Status status = Status::Success;
     bool turningHeatOff = false;
 
     if (!HasWaterTemperatureReachedTarget())
@@ -416,11 +453,12 @@ void WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
                     SetHeatDemand(heaterDemand);
 
                     // And turn the heating of the water tank on.
-                    mpWhmManufacturer->TurnHeatingOn();
+                    status = mpWhmManufacturer->TurnHeatingOn();
                 }
                 else
                 {
-                    ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff: Failed as mpWhmManufacturer == nullptr");
+                    status = Status::InvalidInState;
+                    ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff: Failed as mpWhmManufacturer == nullptr");
                 }
             }
         }
@@ -428,7 +466,7 @@ void WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
         {
             // The water temperature is not at the target temperature but there is no boost command in progress and the mode is Off
             // so need to ensure the heating is turned off.
-            ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff turning heating off due to mode");
+            ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff turning heating off due to mode");
 
             SetHeatDemand(BitMask<WaterHeaterDemandBitmap>(0));
 
@@ -455,32 +493,45 @@ void WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
             SetBoostState(BoostStateEnum::kInactive);
 
             DeviceLayer::SystemLayer().CancelTimer(BoostTimerExpiry, this);
+
+            if (mpWhmManufacturer != nullptr)
+            {
+                status = mpWhmManufacturer->BoostCommandCancelled();
+            }
+            else
+            {
+                status = Status::InvalidInState;
+                ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff: mpWhmManufacturer == nullptr");
+            }
         }
 
         // Turn the heating off
         if (mpWhmManufacturer != nullptr)
         {
-            mpWhmManufacturer->TurnHeatingOff();
+            status = mpWhmManufacturer->TurnHeatingOff();
         }
         else
         {
-            ChipLogError(Zcl, "WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff: Failed to turn the heating off as mpWhmManufacturer == nullptr");
+            status = Status::InvalidInState;
+            ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff: Failed to turn the heating off as mpWhmManufacturer == nullptr");
         }
     }
+
+    return status;
 }
 
 void WaterHeaterManagementDelegate::SetWaterHeaterMode(uint8_t modeValue)
 {
     if (!mInstance->IsSupportedMode(modeValue))
     {
-        ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetWaterHeaterMode bad mode");
+        ChipLogError(AppServer, "SetWaterHeaterMode bad mode");
         return;
     }
 
     Status status = mInstance->UpdateCurrentMode(modeValue);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "WaterHeaterManagementDelegate::SetWaterHeaterMode updateMode failed");
+        ChipLogError(AppServer, "SetWaterHeaterMode updateMode failed");
         return;
     }
 

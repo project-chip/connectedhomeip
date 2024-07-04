@@ -174,7 +174,7 @@ public:
     /**
      * @brief Determine whether the heating sources need to be turned on or off
      */
-    void CheckIfHeatNeedsToBeTurnedOnOrOff();
+    Protocols::InteractionModel::Status CheckIfHeatNeedsToBeTurnedOnOrOff();
 
     /**
      * @brief Static timer callback for when Boost timer expires.
