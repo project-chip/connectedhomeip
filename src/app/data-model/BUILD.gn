@@ -23,7 +23,6 @@ source_set("nullable") {
     "${chip_root}/src/app/util:nullable-primitives",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:error",
-    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
   ]
 }

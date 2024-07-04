@@ -22,6 +22,8 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/app/data-model:nullable",
-    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
   ]
 }
