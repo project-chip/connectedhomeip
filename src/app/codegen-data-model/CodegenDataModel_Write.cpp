@@ -102,7 +102,7 @@ static_assert(sizeof(LongPascalString::LengthType) == 2);
 ///
 /// isNullable defines if the value of NULL is allowed to be converted.
 template <typename T, class ENCODING>
-CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool isNullable, MutableByteSpan out)
+CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool isNullable, MutableByteSpan &out)
 {
     T workingValue;
 
@@ -115,6 +115,7 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
         {
             VerifyOrReturnError(out.size() >= sizeof(typename ENCODING::LengthType), CHIP_ERROR_BUFFER_TOO_SMALL);
             ENCODING::SetLength(out.data(), ENCODING::kNullLength);
+            out.reduce_size(sizeof(typename ENCODING::LengthType));
             return CHIP_NO_ERROR;
         }
 
@@ -135,7 +136,9 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
     output_buffer += sizeof(len);
 
     memcpy(output_buffer, workingValue.data(), workingValue.size());
+    output_buffer += workingValue.size();
 
+    out.reduce_size(output_buffer - out.data());
     return CHIP_NO_ERROR;
 }
 
@@ -143,7 +146,7 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
 ///
 /// isNullable defines if the value of NULL is allowed to be decoded.
 template <typename T>
-CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullable, MutableByteSpan out)
+CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullable, MutableByteSpan &out)
 {
     using Traits = NumericAttributeTraits<T>;
     typename Traits::StorageType storageValue;
@@ -188,15 +191,20 @@ CHIP_ERROR DecodeIntoEmberBuffer(AttributeValueDecoder & decoder, bool isNullabl
     // The decoding + ToAttributeStoreRepresentation will result in data being
     // stored in native format/byteorder, suitable to directly be stored in the data store
     memcpy(out.data(), data, sizeof(storageValue));
+    out.reduce_size(sizeof(storageValue));
 
     return CHIP_NO_ERROR;
 }
 
 /// Read the data from "decoder" into an ember-formatted buffer "out"
 ///
+/// `out` is a in/out buffer:
+///    - its initial size determines the maximum size of the buffer
+///    - its output size reflects the actual data size
+///
 /// Uses the attribute `metadata` to determine how the data is to be encoded into out.
 CHIP_ERROR DecodeValueIntoEmberBuffer(AttributeValueDecoder & decoder, const EmberAfAttributeMetadata * metadata,
-                                      MutableByteSpan out)
+                                      MutableByteSpan &out)
 {
     VerifyOrReturnError(metadata != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -352,7 +360,8 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         return *aai_result;
     }
 
-    ReturnErrorOnFailure(DecodeValueIntoEmberBuffer(decoder, *attributeMetadata, gEmberAttributeIOBufferSpan));
+    MutableByteSpan dataBuffer = gEmberAttributeIOBufferSpan;
+    ReturnErrorOnFailure(DecodeValueIntoEmberBuffer(decoder, *attributeMetadata, dataBuffer));
 
     Protocols::InteractionModel::Status status;
 
@@ -366,6 +375,12 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     }
     else
     {
+        if (dataBuffer.size() > (*attributeMetadata)->size)
+        {
+            ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
+            return CHIP_IM_GLOBAL_STATUS(InvalidValue);
+        }
+
         status = emAfWriteAttributeExternal(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
                                             gEmberAttributeIOBufferSpan.data(), (*attributeMetadata)->attributeType);
     }
