@@ -35,8 +35,8 @@ namespace NetworkCommissioning {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 // The length value is the strlen of the keyname plus the number of networks allowed followed by a null terminator.
-// Example: "wifi-ssid" has a string len of 9. If the max network supported is 2 then we want to create keys 
-// "wifi-ssid0" and "wifi-ssid1". With the below method we can only have a max of 10 networks as the lengths would 
+// Example: "wifi-ssid" has a string len of 9. If the max network supported is 2 then we want to create keys
+// "wifi-ssid0" and "wifi-ssid1". With the below method we can only have a max of 10 networks as the lengths would
 // change if wanting to have wifi-ssid10.
 #define SSID_KEY_NAME_LEN 11 // wifi-ssid
 #define PASS_KEY_NAME_LEN 11 // wifi-pass
