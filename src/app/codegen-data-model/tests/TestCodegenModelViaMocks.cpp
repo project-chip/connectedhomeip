@@ -2131,6 +2131,23 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortString)
     ASSERT_TRUE(asCharSpan.data_equal("\x0Bhello world"_span));
 }
 
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongStringOutOfBounds)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
+
+    // Mocks allow for 16 bytes only by default for string attributes
+    AttributeValueDecoder decoder = test.DecoderFor<CharSpan>(
+        "this is a very long string that will be longer than the default attribute size for our mocks"_span);
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(InvalidValue));
+}
+
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
