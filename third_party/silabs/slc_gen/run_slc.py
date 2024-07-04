@@ -66,8 +66,11 @@ else:
 # make sure we have a configured and trusted gsdk in slc
 subprocess.run(["slc", "configuration", "--sdk", sisdk_root], check=True)
 subprocess.run(["slc", "signature", "trust", "--sdk", sisdk_root], check=True)
-
-subprocess.run(["slc", "generate", slcp_file_path, "-d", output_path, "--with", slc_arguments], check=True)
+# Use python defined in silabs sdk. I don't know why, but python called from venv by slc does not use `site-packages` installed in venv. This causes an error with missing `jinja2` module.
+env = os.environ.copy()
+env["PATH"] = "/opt/silabs/slc_cli/bin/slc-cli/developer/adapter_packs/python/bin" + os.pathsep + env["PATH"]
+print(env["PATH"])
+subprocess.run(["slc", "generate", slcp_file_path, "-d", output_path, "--with", slc_arguments], env=env, check=True)
 
 # cleanup of unwanted files
 fileList = glob.glob(os.path.join(output_path, "matter-platform.*"))
