@@ -840,7 +840,7 @@ static BOOL sNeedsStackShutdown = YES;
         NSNumber * offset, MTRStatusCompletion outerCompletion) {
         sOTAProviderDelegate.transferBeginHandler = nil;
         // Now that we've begun a transfer, we expect to be told when it ends, even if it's due to an error
-        sOTAProviderDelegate.transferEndHandler = ^(NSNumber *nodeID, MTRDeviceController *controller, NSError * _Nullable error) {
+        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
             [transferEndExpectation fulfill];
             sOTAProviderDelegate.transferEndHandler = nil;
             XCTAssertEqualObjects(nodeID, @(kDeviceId1));

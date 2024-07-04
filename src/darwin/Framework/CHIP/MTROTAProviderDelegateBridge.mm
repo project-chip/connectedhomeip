@@ -311,7 +311,7 @@ private:
         } else if (event.EventType != TransferSession::OutputEventType::kAckEOFReceived) {
             error = CHIP_ERROR_INTERNAL;
         }
-        
+
         ResetState(error); // will notify the delegate
         return CHIP_NO_ERROR;
     }
