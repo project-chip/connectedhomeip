@@ -84,10 +84,12 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         self.endpoint = self.matter_test_config.endpoint
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_OK']
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.RVCCLEANM.MODE_CHANGE_FAIL']
-        app_pid = self.matter_test_config.app_pid
-        if app_pid != 0:
-            self.is_ci = True
-            self.app_pipe = self.app_pipe + str(app_pid)
+        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+        if self.is_ci:
+            app_pid = self.matter_test_config.app_pid
+            if app_pid != 0:
+                self.is_ci = True
+                self.app_pipe = self.app_pipe + str(app_pid)
 
         RVCClean_cluster = Clusters.RvcCleanMode
 

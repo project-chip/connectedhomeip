@@ -120,15 +120,12 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         self.endpoint = self.matter_test_config.endpoint
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']
-        app_pid = self.matter_test_config.app_pid
-        if app_pid != 0:
-            self.is_ci = True
-            self.app_pipe = self.app_pipe + str(app_pid)
-
-        app_pid = self.matter_test_config.app_pid
-        if app_pid != 0:
-            self.is_ci = True
-            self.app_pipe = self.app_pipe + str(app_pid)
+        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+        if self.is_ci:
+            app_pid = self.matter_test_config.app_pid
+            if app_pid != 0:
+                self.is_ci = True
+                self.app_pipe = self.app_pipe + str(app_pid)
 
         RVCRun_cluster = Clusters.RvcRunMode
 
