@@ -25,11 +25,14 @@
 
 #include <string.h>
 
+#include <app/server/Dnssd.h>
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/java/AndroidICDClient.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/TLV.h>
@@ -185,7 +188,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
     }
 
-    *errInfoOnFailure = wrapper->mICDClientStorage.Init(wrapperStorage, &wrapper->mSessionKeystore);
+    *errInfoOnFailure = getICDClientStorage()->Init(wrapperStorage, &wrapper->mSessionKeystore);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "ICD Client Storage failure");
@@ -401,12 +404,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(
         &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), ipkSpan, compressedFabricIdSpan);
 
-    wrapper->getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
+    getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
 
     auto engine       = chip::app::InteractionModelEngine::GetInstance();
-    *errInfoOnFailure = wrapper->mCheckInDelegate.Init(&wrapper->mICDClientStorage, engine);
+    *errInfoOnFailure = wrapper->mCheckInDelegate.Init(getICDClientStorage(), engine);
     *errInfoOnFailure = wrapper->mCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                      &wrapper->mICDClientStorage, &wrapper->mCheckInDelegate, engine);
+                                                      getICDClientStorage(), &wrapper->mCheckInDelegate, engine);
 
     memset(ipkBuffer.data(), 0, ipkBuffer.size());
 
@@ -523,6 +526,12 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     jbyteArray jSymmetricKey = static_cast<jbyteArray>(env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod));
 
+    jmethodID getClientTypeMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getClientType", "()Ljava/lang/Integer;",
+                                                        &getClientTypeMethod);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jobject jClientType = env->CallObjectMethod(icdRegistrationInfo, getClientTypeMethod);
+
     chip::NodeId checkInNodeId = chip::kUndefinedNodeId;
     if (jCheckInNodeId != nullptr)
     {
@@ -552,6 +561,14 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
         chip::Crypto::DRBG_get_bytes(mICDSymmetricKey, sizeof(mICDSymmetricKey));
     }
     params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
+
+    chip::app::Clusters::IcdManagement::ClientTypeEnum clientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
+    if (jClientType != nullptr)
+    {
+        clientType = static_cast<chip::app::Clusters::IcdManagement::ClientTypeEnum>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(jClientType));
+    }
+    params.SetICDClientType(clientType);
 
     return err;
 }
@@ -725,7 +742,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
 
     if (error != CHIP_NO_ERROR && mDeviceIsICD)
     {
-        CHIP_ERROR deleteEntryError = mICDClientStorage.DeleteEntry(ScopedNodeId(deviceId, Controller()->GetFabricIndex()));
+        CHIP_ERROR deleteEntryError = getICDClientStorage()->DeleteEntry(ScopedNodeId(deviceId, Controller()->GetFabricIndex()));
         if (deleteEntryError != CHIP_NO_ERROR)
         {
             ChipLogError(chipTool, "Failed to delete ICD entry: %" CHIP_ERROR_FORMAT, deleteEntryError.Format());
@@ -991,33 +1008,33 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationInfoRequired()
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationInfoRequiredMethod);
 }
 
-void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdNodeId, uint32_t icdCounter)
+void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::ScopedNodeId icdNodeId, uint32_t icdCounter)
 {
     chip::DeviceLayer::StackUnlock unlock;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = ScopedNodeId(icdNodeId, Controller()->GetFabricIndex());
+    clientInfo.peer_node         = icdNodeId;
     clientInfo.monitored_subject = mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value();
     clientInfo.start_icd_counter = icdCounter;
 
     ByteSpan symmetricKey = mAutoCommissioner.GetCommissioningParameters().GetICDSymmetricKey().Value();
 
-    err = mICDClientStorage.SetKey(clientInfo, symmetricKey);
+    err = getICDClientStorage()->SetKey(clientInfo, symmetricKey);
     if (err == CHIP_NO_ERROR)
     {
-        err = mICDClientStorage.StoreEntry(clientInfo);
+        err = getICDClientStorage()->StoreEntry(clientInfo);
     }
 
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(Controller, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(icdNodeId));
+        ChipLogProgress(Controller, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(icdNodeId.GetNodeId()));
     }
     else
     {
-        mICDClientStorage.RemoveKey(clientInfo);
-        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(icdNodeId),
-                     err.AsString());
+        getICDClientStorage()->RemoveKey(clientInfo);
+        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s",
+                     ChipLogValueX64(icdNodeId.GetNodeId()), err.AsString());
     }
 
     mDeviceIsICD = true;
@@ -1052,7 +1069,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     icdDeviceInfoObj = env->NewObject(
         icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()),
         jUserActiveModeTriggerInstruction, static_cast<jlong>(mIdleModeDuration), static_cast<jlong>(mActiveModeDuration),
-        static_cast<jint>(mActiveModeThreshold), static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
+        static_cast<jint>(mActiveModeThreshold), static_cast<jlong>(icdNodeId.GetNodeId()), static_cast<jlong>(icdCounter),
         static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()),
         static_cast<jlong>(Controller()->GetFabricId()), static_cast<jint>(Controller()->GetFabricIndex()));
 
@@ -1062,7 +1079,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
-    ChipLogProgress(chipTool, "KVS: Getting key %s", StringOrNullMarker(key));
+    ChipLogProgress(Controller, "KVS: Getting key %s", StringOrNullMarker(key));
 
     size_t read_size = 0;
 
@@ -1075,12 +1092,25 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, voi
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    ChipLogProgress(chipTool, "KVS: Setting key %s", StringOrNullMarker(key));
+    ChipLogProgress(Controller, "KVS: Setting key %s", StringOrNullMarker(key));
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
 {
-    ChipLogProgress(chipTool, "KVS: Deleting key %s", StringOrNullMarker(key));
+    ChipLogProgress(Controller, "KVS: Deleting key %s", StringOrNullMarker(key));
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+}
+
+void AndroidDeviceControllerWrapper::StartDnssd()
+{
+    FabricTable * fabricTable = DeviceControllerFactory::GetInstance().GetSystemState()->Fabrics();
+    VerifyOrReturn(fabricTable != nullptr, ChipLogError(Controller, "Fail to get fabricTable in StartDnssd"));
+    chip::app::DnssdServer::Instance().SetFabricTable(fabricTable);
+    chip::app::DnssdServer::Instance().StartServer();
+}
+
+void AndroidDeviceControllerWrapper::StopDnssd()
+{
+    chip::app::DnssdServer::Instance().StopServer();
 }

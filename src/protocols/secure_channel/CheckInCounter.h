@@ -22,6 +22,7 @@
 #pragma once
 
 #include <crypto/RandUtils.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/PersistedCounter.h>
 
 namespace chip {
@@ -44,6 +45,24 @@ public:
      * @return uint32_t Check-in Counter value to use
      */
     inline uint32_t GetNextCheckInCounterValue() { return (mCounterValue + 1); };
+
+    /**
+     * @brief Advances the current Check-In counter value to invalidate half of the values.
+     *        Function adds UINT32_MAX / 2 to the current counter value. Next time a Check-In message is sent, 1 is added to the
+     *        current value.
+     *
+     * @return CHIP_ERROR Any error returned by a write to persisted storage.
+     */
+    CHIP_ERROR InvalidateHalfCheckInCounterValues();
+
+    /**
+     * @brief Invalidates all the Check-In counter values. After this function is called, the new Check-In counter value will be
+     *        equal to current value minus 1 (with rollover) to mimic N -> UINT32_MAX -> N-1. Next time a Check-In message is sent,
+     *        1 is added to the current value which will be an invalid counter value.
+     *
+     * @return CHIP_ERROR Any error returned by a write to persisted storage.
+     */
+    CHIP_ERROR InvalidateAllCheckInCounterValues();
 
 private:
     /**

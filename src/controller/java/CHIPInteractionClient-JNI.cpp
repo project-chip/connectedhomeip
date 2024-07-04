@@ -73,10 +73,10 @@ void AndroidChipInteractionJNI_OnUnload(JavaVM * jvm, void * reserved)
 JNI_METHOD(void, subscribe)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
  jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered,
- jint imTimeoutMs, jobject eventMin)
+ jint imTimeoutMs, jobject eventMin, jboolean isPeerLIT)
 {
     CHIP_ERROR err = subscribe(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList,
-                               minInterval, maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, eventMin);
+                               minInterval, maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, eventMin, isPeerLIT);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.Format());
@@ -137,4 +137,16 @@ JNI_METHOD(void, shutdownSubscriptions)
     {
         ChipLogError(Controller, "Failed to shutdown subscriptions with Error: %" CHIP_ERROR_FORMAT, err.Format());
     }
+}
+
+JNI_METHOD(jlong, getRemoteDeviceId)
+(JNIEnv * env, jobject self, jlong devicePtr)
+{
+    return getRemoteDeviceId(devicePtr);
+}
+
+JNI_METHOD(jint, getFabricIndex)
+(JNIEnv * env, jobject self, jlong devicePtr)
+{
+    return getFabricIndex(devicePtr);
 }

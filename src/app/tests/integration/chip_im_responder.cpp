@@ -50,6 +50,25 @@
 namespace chip {
 namespace app {
 
+namespace {
+
+class TestTLVDataEncoder : public DataModel::EncodableToTLV
+{
+public:
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+    {
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outerType));
+
+        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));
+        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTestFieldId2), kTestFieldValue2));
+
+        return writer.EndContainer(outerType);
+    }
+};
+
+} // namespace
+
 Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // The Mock cluster catalog -- only have one command on one cluster on one endpoint.
@@ -104,27 +123,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
     {
         printf("responder constructing command data in command");
 
-        chip::TLV::TLVWriter * writer;
-
-        const CommandHandler::InvokeResponseParameters prepareParams(aRequestCommandPath);
-        ReturnOnFailure(apCommandObj->PrepareInvokeResponseCommand(path, prepareParams));
-
-        writer = apCommandObj->GetCommandDataIBTLVWriter();
-        ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));
-
-        ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId2), kTestFieldValue2));
-
-        ReturnOnFailure(apCommandObj->FinishCommand());
+        TestTLVDataEncoder testData;
+        apCommandObj->AddResponse(path, kTestCommandId, testData);
     }
     statusCodeFlipper = !statusCodeFlipper;
 }
 
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
+                                 AttributeEncodeState * apEncoderState)
 {
-    ReturnErrorOnFailure(AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1));
-    return CHIP_NO_ERROR;
+    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0).Encode(kTestFieldValue1);
 }
 
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)

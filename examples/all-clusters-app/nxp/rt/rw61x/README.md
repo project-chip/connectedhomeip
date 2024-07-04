@@ -139,16 +139,16 @@ Optional GN options that can be added when building an application:
 -   To build with the option to have Matter certificates/keys pre-loaded in a
     specific flash area the argument `chip_with_factory_data=1` must be added to
     the _gn gen_ command. (for more information see
-    [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
+    [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 -   To build the application with the OTA Requestor enabled, the arguments
     `chip_enable_ota_requestor=true no_mcuboot=false` must be added to the _gn
     gen_ command. (More information about the OTA Requestor feature in
-    [OTA Requestor README](../../../../../docs/guides/nxp_rw61x_ota_software_update.md)
+    [OTA Requestor README](../../../../../docs/guides/nxp/nxp_rw61x_ota_software_update.md)
 
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md)
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md)
 
 Other comments:
 
@@ -374,4 +374,4 @@ Done
 Over-The-Air software updates are supported with the RW61x all-clusters example.
 The process to follow in order to perform a software update is described in the
 dedicated guide
-['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/guides/nxp_rw61x_ota_software_update.md).
+['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/guides/nxp/nxp_rw61x_ota_software_update.md).

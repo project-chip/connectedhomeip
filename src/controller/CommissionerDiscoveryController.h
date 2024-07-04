@@ -158,7 +158,7 @@ class DLL_EXPORT PasscodeService
 public:
     /**
      * @brief
-     *   Called to determine if the given target app is available to the commissionee with the given given
+     *   Called to determine if the given target app is available to the commissionee with the given
      * vendorId/productId, and if so, return the passcode.
      *
      * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
@@ -202,6 +202,23 @@ public:
     virtual void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
 
     virtual ~PasscodeService() = default;
+};
+
+class DLL_EXPORT AppInstallationService
+{
+public:
+    /**
+     * @brief
+     *   Called to check if the given target app is available to the commissione with th given
+     *   vendorId/productId
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) = 0;
+
+    virtual ~AppInstallationService() = default;
 };
 
 class DLL_EXPORT PostCommissioningListener
@@ -393,6 +410,14 @@ public:
     inline PasscodeService * GetPasscodeService() { return mPasscodeService; }
 
     /**
+     * Assign an AppInstallationService
+     */
+    inline void SetAppInstallationService(AppInstallationService * appInstallationService)
+    {
+        mAppInstallationService = appInstallationService;
+    }
+
+    /**
      * Assign a Commissioner Callback to perform commissioning once user consent has been given
      */
     inline void SetCommissionerCallback(CommissionerCallback * commissionerCallback)
@@ -430,6 +455,7 @@ protected:
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;
     PasscodeService * mPasscodeService                     = nullptr;
+    AppInstallationService * mAppInstallationService       = nullptr;
     CommissionerCallback * mCommissionerCallback           = nullptr;
     PostCommissioningListener * mPostCommissioningListener = nullptr;
 };

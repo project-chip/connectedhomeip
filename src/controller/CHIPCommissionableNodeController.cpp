@@ -45,7 +45,7 @@ CommissionableNodeController::~CommissionableNodeController()
     mDNSResolver.SetDiscoveryDelegate(nullptr);
 }
 
-const Dnssd::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
+const Dnssd::CommissionNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
 {
     return GetDiscoveredNode(idx);
 }

@@ -422,14 +422,14 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                                 ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
 
             // create a castingPlayer with Endpoints and add it to the castingPlayers to be returned
-            core::CastingPlayer castingPlayer(attributes);
+            core::CastingPlayer * castingPlayer = new core::CastingPlayer(attributes);
             for (auto & endpointAttributes : endpointAttributesList)
             {
-                std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(&castingPlayer, endpointAttributes));
+                std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(castingPlayer, endpointAttributes));
                 endpoint->RegisterClusters(endpointServerListMap[endpointAttributes.mId]);
-                castingPlayer.RegisterEndpoint(endpoint);
+                castingPlayer->RegisterEndpoint(endpoint);
             }
-            castingPlayers.push_back(castingPlayer);
+            castingPlayers.push_back(*castingPlayer);
             continue;
         }
     }

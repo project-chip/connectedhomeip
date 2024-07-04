@@ -53,7 +53,7 @@
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
 
-#include "SilabsDeviceDataProvider.h"
+#include <ProvisionManager.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
 
@@ -77,8 +77,6 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
@@ -89,7 +87,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::Credentials::Silabs;
+using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -171,7 +169,7 @@ void ApplicationStart(void * unused)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Credentials::Silabs::GetSilabsDacProvider());
+    SetDeviceAttestationCredentialsProvider(&Provision::Manager::GetInstance().GetStorage());
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     SILABS_LOG("Starting App Task");
@@ -187,7 +185,6 @@ void ApplicationStart(void * unused)
 void SilabsMatterConfig::AppInit()
 {
     GetPlatform().Init();
-
     sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
     SILABS_LOG("Starting scheduler");
     VerifyOrDie(sMainTaskHandle); // We can't proceed if the Main Task creation failed.
@@ -237,7 +234,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #endif
 
 #ifdef HEAP_MONITORING
-    MemMonitoring::startHeapMonitoring();
+    MemMonitoring::StartMonitor();
 #endif
 
     //==============================================
@@ -254,8 +251,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
-    SetDeviceInstanceInfoProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
-    SetCommissionableDataProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+    // Provision Manager
+    Silabs::Provision::Manager & provision = Silabs::Provision::Manager::GetInstance();
+    ReturnErrorOnFailure(provision.Init());
+    SetDeviceInstanceInfoProvider(&provision.GetStorage());
+    SetCommissionableDataProvider(&provision.GetStorage());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 
@@ -342,7 +342,6 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
     sl_status_t status;
     if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
     {
-        SILABS_LOG("wfx_wifi_rsi_init failed with status: %x", status);
         ReturnErrorOnFailure((CHIP_ERROR) status);
     }
 #endif // SLI_SI91X_MCU_INTERFACE
@@ -356,7 +355,7 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 // ================================================================================
 extern "C" void vApplicationIdleHook(void)
 {
-#if SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
-    sl_wfx_host_si91x_sleep_wakeup();
+#if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
+    sl_si91x_invoke_btn_press_event();
 #endif
 }

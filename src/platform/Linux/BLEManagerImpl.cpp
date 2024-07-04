@@ -72,19 +72,9 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS >=
               "The extended advertising interval change time must be greater than the fast advertising interval change time");
 #endif
 
-const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x11 } };
-const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x12 } };
-
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
-
-void HandleIncomingBleConnection(BLEEndPoint * bleEP)
-{
-    ChipLogProgress(DeviceLayer, "CHIPoBluez con rcvd");
-}
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
@@ -98,8 +88,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
-
-    OnChipBleConnectReceived = HandleIncomingBleConnection;
 
     DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 
@@ -209,25 +197,24 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
-        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         {
-            ChipDeviceEvent connectionEvent;
-            connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
+            ChipDeviceEvent connectionEvent{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
             PlatformMgr().PostEventOrDie(&connectionEvent);
         }
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
-        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionError:
@@ -298,18 +285,18 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         }
         break;
     case DeviceEventType::kPlatformLinuxBLEWriteComplete:
-        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX);
+        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID);
         break;
     case DeviceEventType::kPlatformLinuxBLESubscribeOpComplete:
         if (apEvent->Platform.BLESubscribeOpComplete.mIsSubscribed)
             HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
-                                    &ChipUUID_CHIPoBLEChar_TX);
+                                    &Ble::CHIP_BLE_CHAR_2_UUID);
         else
             HandleUnsubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
-                                      &ChipUUID_CHIPoBLEChar_TX);
+                                      &Ble::CHIP_BLE_CHAR_2_UUID);
         break;
     case DeviceEventType::kPlatformLinuxBLEIndicationReceived:
-        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX,
+        HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID,
                                  PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete:
@@ -376,7 +363,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
                  ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
-    VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
 
     VerifyOrExit(conId->SubscribeCharacteristic() == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SubscribeCharacteristic() failed"));
@@ -394,7 +381,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
                  ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid service ID"));
-    VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid characteristic ID"));
 
     VerifyOrExit(conId->UnsubscribeCharacteristic() == CHIP_NO_ERROR,
@@ -443,7 +430,7 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
                  ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
-    VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX),
+    VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_1_UUID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
 
     VerifyOrExit(conId->SendWriteRequest(std::move(pBuf)) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SendWriteRequest() failed"));
@@ -453,27 +440,12 @@ exit:
     return result;
 }
 
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                     chip::System::PacketBufferHandle pBuf)
-{
-    ChipLogError(Ble, "SendReadRequest: Not implemented");
-    return true;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId)
-{
-    ChipLogError(Ble, "SendReadRBluezonse: Not implemented");
-    return true;
-}
-
 void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
 {
     if (sInstance.mIsCentral)
     {
-        ChipDeviceEvent event;
-        event.Type                                     = DeviceEventType::kPlatformLinuxBLECentralConnected;
-        event.Platform.BLECentralConnected.mConnection = conId;
+        ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLECentralConnected,
+                               .Platform = { .BLECentralConnected = { .mConnection = conId } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }
@@ -482,88 +454,59 @@ void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
 {
     if (sInstance.mIsCentral)
     {
-        ChipDeviceEvent event;
-        event.Type                                    = DeviceEventType::kPlatformLinuxBLECentralConnectFailed;
-        event.Platform.BLECentralConnectFailed.mError = error;
+        ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLECentralConnectFailed,
+                               .Platform = { .BLECentralConnectFailed = { .mError = error } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }
 
 void BLEManagerImpl::HandleWriteComplete(BLE_CONNECTION_OBJECT conId)
 {
-    ChipDeviceEvent event;
-    event.Type                                  = DeviceEventType::kPlatformLinuxBLEWriteComplete;
-    event.Platform.BLEWriteComplete.mConnection = conId;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLEWriteComplete,
+                           .Platform = { .BLEWriteComplete = { .mConnection = conId } } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed)
 {
-    ChipDeviceEvent event;
-    event.Type                                          = DeviceEventType::kPlatformLinuxBLESubscribeOpComplete;
-    event.Platform.BLESubscribeOpComplete.mConnection   = conId;
-    event.Platform.BLESubscribeOpComplete.mIsSubscribed = subscribed;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLESubscribeOpComplete,
+                           .Platform = { .BLESubscribeOpComplete = { .mConnection = conId, .mIsSubscribed = subscribed } } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(value, len);
+    System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
+    VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
 
     ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
 
-    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-
-    ChipDeviceEvent event;
-    event.Type                                       = DeviceEventType::kPlatformLinuxBLEIndicationReceived;
-    event.Platform.BLEIndicationReceived.mConnection = conId;
-    event.Platform.BLEIndicationReceived.mData       = std::move(buf).UnsafeRelease();
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLEIndicationReceived,
+                           .Platform = {
+                               .BLEIndicationReceived = { .mConnection = conId, .mData = std::move(buf).UnsafeRelease() } } };
     PlatformMgr().PostEventOrDie(&event);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-        ChipLogError(DeviceLayer, "HandleTXCharChanged() failed: %s", ErrorStr(err));
 }
 
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle buf;
-
     // Copy the data to a packet buffer.
-    buf = System::PacketBufferHandle::NewWithData(value, len);
-    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
+    VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
+
+    ChipLogProgress(Ble, "Write request received, conn = %p", conId);
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
-    {
-        ChipDeviceEvent event;
-        event.Type = DeviceEventType::kCHIPoBLEWriteReceived;
-        ChipLogProgress(Ble, "Write request received debug %p", conId);
-        event.CHIPoBLEWriteReceived.ConId = conId;
-        event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-        PlatformMgr().PostEventOrDie(&event);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
-    }
+    ChipDeviceEvent event{ .Type                  = DeviceEventType::kCHIPoBLEWriteReceived,
+                           .CHIPoBLEWriteReceived = { .ConId = conId, .Data = std::move(buf).UnsafeRelease() } };
+    PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId)
+void BLEManagerImpl::HandleConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(DeviceLayer, "Bluez notify CHIPoBluez connection disconnected");
-
     // If this was a CHIPoBLE connection, post an event to deliver a connection error to the CHIPoBLE layer.
-    {
-        ChipDeviceEvent event;
-        event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
-        event.CHIPoBLEConnectionError.ConId  = conId;
-        event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
-        PlatformMgr().PostEventOrDie(&event);
-    }
+    ChipDeviceEvent event{ .Type                    = DeviceEventType::kCHIPoBLEConnectionError,
+                           .CHIPoBLEConnectionError = { .ConId = conId, .Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED } };
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
@@ -571,23 +514,20 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
     VerifyOrReturn(conId != BLE_CONNECTION_UNINITIALIZED,
                    ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
 
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", conId->IsNotifyAcquired() ? "subscribe" : "unsubscribe");
+
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
-    ChipDeviceEvent event;
-    event.Type = conId->IsNotifyAcquired() ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
-    event.CHIPoBLESubscribe.ConId = conId;
+    ChipDeviceEvent event{ .Type = conId->IsNotifyAcquired() ? static_cast<uint16_t>(DeviceEventType::kCHIPoBLESubscribe)
+                                                             : static_cast<uint16_t>(DeviceEventType::kCHIPoBLEUnsubscribe),
+                           .CHIPoBLESubscribe = { .ConId = conId } };
     PlatformMgr().PostEventOrDie(&event);
-
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
-                    (event.Type == DeviceEventType::kCHIPoBLESubscribe) ? "subscribe" : "unsubscribe");
 }
 
 void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
 {
     // Post an event to the Chip queue to process the indicate confirmation.
-    ChipDeviceEvent event;
-    event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
-    event.CHIPoBLEIndicateConfirm.ConId = conId;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEIndicateConfirm, .CHIPoBLEIndicateConfirm = { .ConId = conId } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -842,50 +782,44 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 
 void BLEManagerImpl::NotifyBLEAdapterAdded(unsigned int aAdapterId, const char * aAdapterAddress)
 {
-    ChipDeviceEvent event;
-    event.Type                           = DeviceEventType::kPlatformLinuxBLEAdapterAdded;
-    event.Platform.BLEAdapter.mAdapterId = aAdapterId;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLEAdapterAdded,
+                           .Platform = { .BLEAdapter = { .mAdapterId = aAdapterId } } };
     Platform::CopyString(event.Platform.BLEAdapter.mAdapterAddress, aAdapterAddress);
     PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::NotifyBLEAdapterRemoved(unsigned int aAdapterId, const char * aAdapterAddress)
 {
-    ChipDeviceEvent event;
-    event.Type                           = DeviceEventType::kPlatformLinuxBLEAdapterRemoved;
-    event.Platform.BLEAdapter.mAdapterId = aAdapterId;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLEAdapterRemoved,
+                           .Platform = { .BLEAdapter = { .mAdapterId = aAdapterId } } };
     Platform::CopyString(event.Platform.BLEAdapter.mAdapterAddress, aAdapterAddress);
     PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error)
 {
-    ChipDeviceEvent event;
-    event.Type                                             = DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete;
-    event.Platform.BLEPeripheralRegisterAppComplete.mError = error;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete,
+                           .Platform = { .BLEPeripheralRegisterAppComplete = { .mError = error } } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error)
 {
-    ChipDeviceEvent event;
-    event.Type                                          = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete;
-    event.Platform.BLEPeripheralAdvStartComplete.mError = error;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete,
+                           .Platform = { .BLEPeripheralAdvStartComplete = { .mError = error } } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error)
 {
-    ChipDeviceEvent event;
-    event.Type                                         = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete;
-    event.Platform.BLEPeripheralAdvStopComplete.mError = error;
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete,
+                           .Platform = { .BLEPeripheralAdvStopComplete = { .mError = error } } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralAdvReleased()
 {
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kPlatformLinuxBLEPeripheralAdvReleased;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kPlatformLinuxBLEPeripheralAdvReleased };
     PlatformMgr().PostEventOrDie(&event);
 }
 

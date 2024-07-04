@@ -35,7 +35,6 @@ public:
 
     CHIP_ERROR Init() override;
     CHIP_ERROR Clear() override;
-    CHIP_ERROR ApplyAction() override;
     CHIP_ERROR AbortAction() override;
     CHIP_ERROR ExitAction() override;
 

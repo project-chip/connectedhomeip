@@ -65,10 +65,15 @@ ti_simplelink_executable("lighting_app") {
 
   sources = [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
+    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${project_dir}/src/AppTask.cpp",
     "${project_dir}/src/LightingManager.cpp",
     "${project_dir}/src/ZclCallbacks.cpp",
     "${project_dir}/src/main.cpp",
+  ]
+
+  public = [
+    "${chip_root}/src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h",
   ]
 
   deps = [
@@ -77,6 +82,7 @@ ti_simplelink_executable("lighting_app") {
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/platform/cc13x4_26x4:cc13x4_26x4-attestation-credentials",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/openthread:openthread",
   ]
   defines = []

@@ -51,7 +51,7 @@ uint64_t TimeMonotonicMillis()
 
 void SleepMillis(uint64_t millisecs)
 {
-    uint32_t ticks = static_cast<uint32_t>(millisecs / portTICK_PERIOD_MS);
+    uint32_t ticks = pdMS_TO_TICKS(millisecs);
     vTaskDelay(ticks == 0 ? 1 : ticks); // delay at least 1 tick
 }
 

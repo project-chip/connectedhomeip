@@ -20,7 +20,8 @@
 
 #include <ButtonHandler.h>
 #include <LockManager.h>
-#include <stdio.h>
+#include <cycfg_pins.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <wiced.h>
 #include <wiced_button_manager.h>
 #include <wiced_platform.h>
@@ -55,9 +56,10 @@ wiced_result_t app_button_init(void)
     memset(app_button_configurations, 0, (sizeof(wiced_button_configuration_t) * APP_MAX_BUTTON_DEF));
     memset(app_buttons, 0, (sizeof(button_manager_button_t) * APP_MAX_BUTTON_DEF));
 
-    app_button_configurations[ON_OFF_BUTTON].button            = PLATFORM_BUTTON_1;
-    app_button_configurations[ON_OFF_BUTTON].button_event_mask = (BUTTON_CLICK_EVENT | BUTTON_LONG_DURATION_EVENT);
-    app_buttons[ON_OFF_BUTTON].configuration                   = &app_button_configurations[ON_OFF_BUTTON];
+    app_button_configurations[ON_OFF_BUTTON].gpio = PLATFORM_BUTTON_USER;
+    app_button_configurations[ON_OFF_BUTTON].button_event_mask =
+        (BUTTON_CLICK_EVENT | BUTTON_LONG_DURATION_EVENT | BUTTON_HOLDING_EVENT);
+    app_buttons[ON_OFF_BUTTON].configuration = &app_button_configurations[ON_OFF_BUTTON];
 
     result = wiced_button_manager_init(&app_button_manager, &app_button_manager_configuration, app_buttons, 1);
 
@@ -74,30 +76,31 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
     bool initiated = false;
     LockManager::Action_t action;
 
-    ChipLogProgress(Zcl, "app_button_event_handler. button=%d, event=%d, state=%d\n",
-                    button_mgr[ON_OFF_BUTTON].configuration->button, event, state);
-
-    /* This app is interested in PLATFORM_BUTTON_1 only */
-    if (button_mgr[0].configuration->button != PLATFORM_BUTTON_1)
-        return;
-
-    /* This callback is invoked both for held and released state, we want to process on the released event to avoid duplication */
-    if (state != BUTTON_STATE_RELEASED)
-        return;
+    ChipLogProgress(Zcl, "app_button_event_handler. gpio=%d, event=%d, state=%d\n", button_mgr[ON_OFF_BUTTON].configuration->gpio,
+                    event, state);
 
     /* single click to Lock/Unlock
        long press to generate Jammed event */
-    if (event == BUTTON_CLICK_EVENT)
+    if (button_mgr[0].configuration->gpio == PLATFORM_BUTTON_USER)
     {
-        action = (LockMgr().NextState() == true) ? LockManager::LOCK_ACTION : LockManager::UNLOCK_ACTION;
-    }
-    else if (event == BUTTON_LONG_DURATION_EVENT)
-    {
-        action = LockManager::LOCK_JAMMED;
-    }
-    else
-    {
-        return;
+        if (event == BUTTON_CLICK_EVENT && state == BUTTON_STATE_RELEASED)
+        {
+            action = (LockMgr().NextState() == true) ? LockManager::LOCK_ACTION : LockManager::UNLOCK_ACTION;
+        }
+        else if (event == BUTTON_LONG_DURATION_EVENT && state == BUTTON_STATE_RELEASED)
+        {
+            action = LockManager::LOCK_JAMMED;
+        }
+        else if (event == BUTTON_HOLDING_EVENT)
+        {
+            printf("Button Performing factory reset ...\r\n");
+            chip::DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
+            return;
+        }
+        else
+        {
+            return;
+        }
     }
 
     initiated = LockMgr().InitiateAction(AppEvent::kEventType_Button, action);

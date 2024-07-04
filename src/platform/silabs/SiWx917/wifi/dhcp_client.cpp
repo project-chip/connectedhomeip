@@ -26,9 +26,10 @@
 #include "wfx_host_events.h"
 #include "wifi_config.h"
 
-#include "AppConfig.h"
 #include "FreeRTOS.h"
 #include "event_groups.h"
+
+#include <lib/support/logging/CHIPLogging.h>
 
 #define MAX_DHCP_TRIES (4)
 #define NETIF_IPV4_ADDRESS(X, Y) (((X) >> (8 * Y)) & 0xFF)
@@ -62,7 +63,7 @@ void dhcpclient_set_link_state(int link_up)
     if (link_up)
     {
         dhcp_state = DHCP_START;
-        SILABS_LOG("DHCP: Starting");
+        ChipLogProgress(DeviceLayer, "DHCP: Starting");
     }
     else
     {
@@ -88,7 +89,7 @@ uint8_t dhcpclient_poll(void * arg)
     switch (dhcp_state)
     {
     case DHCP_START:
-        SILABS_LOG("DHCP: Wait addr");
+        ChipLogProgress(DeviceLayer, "DHCP: Wait addr");
         ip_addr_set_zero_ip4(&netif->ip_addr);
         ip_addr_set_zero_ip4(&netif->netmask);
         ip_addr_set_zero_ip4(&netif->gw);
@@ -102,8 +103,8 @@ uint8_t dhcpclient_poll(void * arg)
             dhcp_state = DHCP_ADDRESS_ASSIGNED;
 
             uint64_t addr = netif->ip_addr.u_addr.ip4.addr;
-            SILABS_LOG("DHCP IP: %d.%d.%d.%d", NETIF_IPV4_ADDRESS(addr, 0), NETIF_IPV4_ADDRESS(addr, 1),
-                       NETIF_IPV4_ADDRESS(addr, 2), NETIF_IPV4_ADDRESS(addr, 3));
+            ChipLogProgress(DeviceLayer, "DHCP IP: %d.%d.%d.%d", NETIF_IPV4_ADDRESS(addr, 0), NETIF_IPV4_ADDRESS(addr, 1),
+                            NETIF_IPV4_ADDRESS(addr, 2), NETIF_IPV4_ADDRESS(addr, 3));
         }
         else
         {
@@ -114,7 +115,7 @@ uint8_t dhcpclient_poll(void * arg)
             {
                 dhcp_state = DHCP_TIMEOUT;
 
-                SILABS_LOG("*ERR*DHCP: Failed");
+                ChipLogProgress(DeviceLayer, "*ERR*DHCP: Failed");
                 /* Stop DHCP */
                 dhcp_stop(netif);
 
@@ -130,7 +131,7 @@ uint8_t dhcpclient_poll(void * arg)
 
     case DHCP_LINK_DOWN:
         /* Stop DHCP */
-        SILABS_LOG("*ERR*DHCP Link down");
+        ChipLogProgress(DeviceLayer, "*ERR*DHCP Link down");
         dhcp_stop(netif);
         dhcp_state = DHCP_OFF;
         break;

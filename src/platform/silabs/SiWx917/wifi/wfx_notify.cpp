@@ -19,8 +19,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "AppConfig.h"
-
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "silabs_utils.h"
@@ -35,9 +33,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "sl_si91x_m4_ps.h"
-extern "C" uint8_t m4_alarm_initialization_done;
-extern "C" void set_alarm_interrupt_timer(uint16_t interval);
+
 #ifdef __cplusplus
 }
 #endif
@@ -50,6 +46,8 @@ extern "C" void set_alarm_interrupt_timer(uint16_t interval);
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
+
+#include <lib/support/logging/CHIPLogging.h>
 
 extern uint32_t retryInterval;
 /*
@@ -68,8 +66,6 @@ void wfx_started_notify()
 {
     sl_wfx_startup_ind_t evt;
     sl_wfx_mac_address_t mac;
-
-    SILABS_LOG("%s: started.", __func__);
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_STARTUP_IND_ID;
@@ -94,15 +90,13 @@ void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 {
     sl_wfx_connect_ind_t evt;
 
-    SILABS_LOG("%s: started.", __func__);
-
     if (status != SUCCESS_STATUS)
     {
-        SILABS_LOG("%s: error: failed status: %d.", __func__, status);
+        ChipLogProgress(DeviceLayer, "%s: error: failed status: %ld.", __func__, status);
         return;
     }
 
-    SILABS_LOG("%s: connected.", __func__);
+    ChipLogProgress(DeviceLayer, "%s: connected.", __func__);
 
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_CONNECT_IND_ID;
@@ -127,8 +121,6 @@ void wfx_disconnected_notify(int32_t status)
 {
     sl_wfx_disconnect_ind_t evt;
 
-    SILABS_LOG("%s: started.", __func__);
-
     memset(&evt, 0, sizeof(evt));
     evt.header.id     = SL_WFX_DISCONNECT_IND_ID;
     evt.header.length = sizeof evt;
@@ -146,8 +138,6 @@ void wfx_disconnected_notify(int32_t status)
 void wfx_ipv6_notify(int got_ip)
 {
     sl_wfx_generic_message_t eventData;
-
-    SILABS_LOG("%s: started.", __func__);
 
     memset(&eventData, 0, sizeof(eventData));
     eventData.header.id     = got_ip ? IP_EVENT_GOT_IP6 : IP_EVENT_STA_LOST_IP;
@@ -176,8 +166,6 @@ void wfx_ip_changed_notify(int got_ip)
 {
     sl_wfx_generic_message_t eventData;
 
-    SILABS_LOG("%s: started.", __func__);
-
     memset(&eventData, 0, sizeof(eventData));
     eventData.header.id     = got_ip ? IP_EVENT_STA_GOT_IP : IP_EVENT_STA_LOST_IP;
     eventData.header.length = sizeof(eventData.header);
@@ -203,12 +191,6 @@ void wfx_ip_changed_notify(int got_ip)
  ********************************************************************************************/
 void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin)
 {
-#if SL_ICD_ENABLED
-    if (m4_alarm_initialization_done == false)
-    {
-        initialize_m4_alarm();
-    }
-#endif // SL_ICD_ENABLED
     if (!is_wifi_disconnection_event)
     {
         /* After the reboot or a commissioning time device failed to connect with AP.
@@ -216,27 +198,20 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
          */
         if (retryJoin < MAX_JOIN_RETRIES_COUNT)
         {
-            SILABS_LOG("wfx_retry_interval_handler : Next attempt after %d Seconds", CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
+            ChipLogProgress(DeviceLayer, "wfx_retry_interval_handler : Next attempt after %d Seconds",
+                            CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
 #if SL_ICD_ENABLED
             // TODO: cleanup the retry logic MATTER-1921
             if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
             {
-                set_alarm_interrupt_timer(WLAN_RETRY_TIMER_MS / 1000);
                 wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
-                // TODO: remove this once TICKLESS_IDLE is applied. MATTER-3134
-                sl_wfx_host_si91x_sleep_wakeup();
             }
-            else
-            {
-                vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
-            }
-#else
-            vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
 #endif // SL_ICD_ENABLED
+            vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
         }
         else
         {
-            SILABS_LOG("Connect failed after max %d tries", retryJoin);
+            ChipLogProgress(DeviceLayer, "Connect failed after max %d tries", retryJoin);
         }
     }
     else
@@ -250,15 +225,12 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
         {
             retryInterval = WLAN_MAX_RETRY_TIMER_MS;
         }
-        SILABS_LOG("wfx_retry_interval_handler : Next attempt after %d Seconds", CONVERT_MS_TO_SEC(retryInterval));
+        ChipLogProgress(DeviceLayer, "wfx_retry_interval_handler : Next attempt after %ld Seconds",
+                        CONVERT_MS_TO_SEC(retryInterval));
 #if SL_ICD_ENABLED
-        set_alarm_interrupt_timer(retryInterval / 1000);
         wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
-        // TODO: remove this once TICKLESS_IDLE is applied. MATTER-3134
-        sl_wfx_host_si91x_sleep_wakeup();
-#else
-        vTaskDelay(pdMS_TO_TICKS(retryInterval));
 #endif // SL_ICD_ENABLED
+        vTaskDelay(pdMS_TO_TICKS(retryInterval));
         retryInterval += retryInterval;
     }
 }

@@ -24,7 +24,7 @@ limitations under the License.
     <item value="0x4002" name="SolarCharging"/>
   </enum>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>General</domain>
     <name>Energy EVSE Mode</name>
     <code>0x009D</code>

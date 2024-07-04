@@ -68,6 +68,8 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
 
+    // Initialize the system state. Note that it is left in a somewhat
+    // special state where it is initialized, but has a ref count of 0.
     CHIP_ERROR err = InitSystemState(params);
 
     return err;
@@ -76,7 +78,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
 CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mSystemState->IsShutdown(), CHIP_NO_ERROR);
+    VerifyOrReturnError(mSystemState->IsShutDown(), CHIP_NO_ERROR);
 
     FactoryInitParams params;
     params.systemLayer        = mSystemState->SystemLayer();
@@ -159,6 +161,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if CONFIG_NETWORK_LAYER_BLE
                                                             ,
                                                         Transport::BleListenParameters(stateParams.bleLayer)
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                                            ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(IPAddressType::kIPv6)
+                                                            .SetListenPort(params.listenPort)
 #endif
                                                             ));
 
@@ -404,6 +412,8 @@ void DeviceControllerFactory::Shutdown()
 {
     if (mSystemState != nullptr)
     {
+        // ~DeviceControllerSystemState will call Shutdown(),
+        // which in turn ensures that the reference count is 0.
         Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
@@ -464,6 +474,15 @@ void DeviceControllerSystemState::Shutdown()
         mCASESessionManager->Shutdown();
         Platform::Delete(mCASESessionManager);
         mCASESessionManager = nullptr;
+    }
+
+    // The above took care of CASE handshakes, and shutting down all the
+    // controllers should have taken care of the PASE handshakes.  Clean up any
+    // outstanding secure sessions (shouldn't really be any, since controllers
+    // should have handled that, but just in case).
+    if (mSessionMgr != nullptr)
+    {
+        mSessionMgr->ExpireAllSecureSessions();
     }
 
     // mCASEClientPool and mSessionSetupPool must be deallocated

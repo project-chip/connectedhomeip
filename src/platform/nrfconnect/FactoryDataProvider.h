@@ -25,8 +25,20 @@
 #include <crypto/CHIPCryptoPALPSA.h>
 #endif
 
+#ifdef CONFIG_FPROTECT
 #include <fprotect.h>
+#endif // if CONFIG_FPROTECT
+
+#if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
 #include <pm_config.h>
+#define FACTORY_DATA_ADDRESS PM_FACTORY_DATA_ADDRESS
+#define FACTORY_DATA_SIZE PM_FACTORY_DATA_SIZE
+#else
+#include <zephyr/storage/flash_map.h>
+#define FACTORY_DATA_SIZE DT_REG_SIZE(DT_ALIAS(factory_data))
+#define FACTORY_DATA_ADDRESS DT_REG_ADDR(DT_ALIAS(factory_data))
+#endif // if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
+
 #include <system/SystemError.h>
 #include <zephyr/drivers/flash.h>
 
@@ -39,8 +51,8 @@ struct InternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
     {
-        data     = reinterpret_cast<uint8_t *>(PM_FACTORY_DATA_ADDRESS);
-        dataSize = PM_FACTORY_DATA_SIZE;
+        data     = reinterpret_cast<uint8_t *>(FACTORY_DATA_ADDRESS);
+        dataSize = FACTORY_DATA_SIZE;
         return CHIP_NO_ERROR;
     }
 
@@ -54,8 +66,8 @@ struct InternalFlashFactoryData
     // the application code at runtime anyway.
     constexpr size_t FactoryDataBlockBegin()
     {
-        // calculate the nearest multiple of CONFIG_FPROTECT_BLOCK_SIZE smaller than PM_FACTORY_DATA_ADDRESS
-        return PM_FACTORY_DATA_ADDRESS & (-CONFIG_FPROTECT_BLOCK_SIZE);
+        // calculate the nearest multiple of CONFIG_FPROTECT_BLOCK_SIZE smaller than FACTORY_DATA_ADDRESS
+        return FACTORY_DATA_ADDRESS & (-CONFIG_FPROTECT_BLOCK_SIZE);
     }
 
     constexpr size_t FactoryDataBlockSize()
@@ -63,7 +75,7 @@ struct InternalFlashFactoryData
         // calculate the factory data end address rounded up to the nearest multiple of CONFIG_FPROTECT_BLOCK_SIZE
         // and make sure we do not overlap with settings partition
         constexpr size_t kFactoryDataBlockEnd =
-            (PM_FACTORY_DATA_ADDRESS + PM_FACTORY_DATA_SIZE + CONFIG_FPROTECT_BLOCK_SIZE - 1) & (-CONFIG_FPROTECT_BLOCK_SIZE);
+            (FACTORY_DATA_ADDRESS + FACTORY_DATA_SIZE + CONFIG_FPROTECT_BLOCK_SIZE - 1) & (-CONFIG_FPROTECT_BLOCK_SIZE);
         static_assert(kFactoryDataBlockEnd <= PM_SETTINGS_STORAGE_ADDRESS,
                       "FPROTECT memory block, which contains factory data"
                       "partition overlaps with the settings partition."
@@ -75,19 +87,24 @@ struct InternalFlashFactoryData
 #undef TO_STR_IMPL
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite()
     {
+#ifdef CONFIG_FPROTECT
         int ret = fprotect_area(FactoryDataBlockBegin(), FactoryDataBlockSize());
         return System::MapErrorZephyr(ret);
+#else
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // if CONFIG_FPROTECT
     }
 #else
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
 };
 
+#if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1 && (defined(CONFIG_CHIP_QSPI_NOR) || defined(CONFIG_CHIP_SPI_NOR))
 struct ExternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
     {
-        int ret = flash_read(mFlashDevice, PM_FACTORY_DATA_ADDRESS, mFactoryDataBuffer, PM_FACTORY_DATA_SIZE);
+        int ret = flash_read(mFlashDevice, FACTORY_DATA_ADDRESS, mFactoryDataBuffer, FACTORY_DATA_SIZE);
 
         if (ret != 0)
         {
@@ -95,24 +112,69 @@ struct ExternalFlashFactoryData
         }
 
         data     = mFactoryDataBuffer;
-        dataSize = PM_FACTORY_DATA_SIZE;
+        dataSize = FACTORY_DATA_SIZE;
 
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
-    uint8_t mFactoryDataBuffer[PM_FACTORY_DATA_SIZE];
+    const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(nordic_pm_ext_flash));
+    uint8_t mFactoryDataBuffer[FACTORY_DATA_SIZE];
+};
+#endif // if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1 && (defined(CONFIG_CHIP_QSPI_NOR) ||
+       // defined(CONFIG_CHIP_SPI_NOR))
+
+class FactoryDataProviderBase : public chip::Credentials::DeviceAttestationCredentialsProvider,
+                                public CommissionableDataProvider,
+                                public DeviceInstanceInfoProvider
+{
+public:
+    /**
+     * @brief Perform all operations needed to initialize factory data provider.
+     *
+     * @returns CHIP_NO_ERROR in case of a success, specific error code otherwise
+     */
+    virtual CHIP_ERROR Init() = 0;
+
+    /**
+     * @brief Get the EnableKey as MutableByteSpan
+     *
+     * @param enableKey MutableByteSpan object to obtain EnableKey
+     * @returns
+     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain enable_key field, or the value cannot be read
+     * out. CHIP_ERROR_BUFFER_TOO_SMALL if provided MutableByteSpan is too small
+     */
+    virtual CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey) = 0;
+
+    /**
+     * @brief Get the user data in CBOR format as MutableByteSpan
+     *
+     * @param userData MutableByteSpan object to obtain all user data in CBOR format
+     * @returns
+     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user field, or the value cannot be read out.
+     * CHIP_ERROR_BUFFER_TOO_SMALL if provided MutableByteSpan is too small
+     */
+    virtual CHIP_ERROR GetUserData(MutableByteSpan & userData) = 0;
+
+    /**
+     * @brief Try to find user data key and return its value
+     *
+     * @param userKey A key name to be found
+     * @param buf Buffer to store value of found key
+     * @param len Length of the buffer. This value will be updated to the actual value if the key is read.
+     * @returns
+     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user key field, or the value cannot be read
+     * out. CHIP_ERROR_BUFFER_TOO_SMALL if provided buffer length is too small
+     */
+    virtual CHIP_ERROR GetUserKey(const char * userKey, void * buf, size_t & len) = 0;
 };
 
 template <class FlashFactoryData>
-class FactoryDataProvider : public chip::Credentials::DeviceAttestationCredentialsProvider,
-                            public CommissionableDataProvider,
-                            public DeviceInstanceInfoProvider
+class FactoryDataProvider : public FactoryDataProviderBase
 {
 public:
-    CHIP_ERROR Init();
+    CHIP_ERROR Init() override;
 
     // ===== Members functions that implement the DeviceAttestationCredentialsProvider
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
@@ -147,33 +209,13 @@ public:
     CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
 
     // ===== Members functions that are platform-specific
-    CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey);
-
-    /**
-     * @brief Get the user data in CBOR format as MutableByteSpan
-     *
-     * @param userData MutableByteSpan object to obtain all user data in CBOR format
-     * @returns
-     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user field, or the value cannot be read out.
-     * CHIP_ERROR_BUFFER_TOO_SMALL if provided MutableByteSpan is too small
-     */
-    CHIP_ERROR GetUserData(MutableByteSpan & userData);
-
-    /**
-     * @brief Try to find user data key and return its value
-     *
-     * @param userKey A key name to be found
-     * @param buf Buffer to store value of found key
-     * @param len Length of the buffer. This value will be updated to the actual value if the key is read.
-     * @returns
-     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user field, or the value cannot be read out.
-     * CHIP_ERROR_BUFFER_TOO_SMALL if provided buffer length is too small
-     */
-    CHIP_ERROR GetUserKey(const char * userKey, void * buf, size_t & len);
+    CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey) override;
+    CHIP_ERROR GetUserData(MutableByteSpan & userData) override;
+    CHIP_ERROR GetUserKey(const char * userKey, void * buf, size_t & len) override;
 
 private:
-    static constexpr uint16_t kFactoryDataPartitionSize    = PM_FACTORY_DATA_SIZE;
-    static constexpr uint32_t kFactoryDataPartitionAddress = PM_FACTORY_DATA_ADDRESS;
+    static constexpr uint16_t kFactoryDataPartitionSize    = FACTORY_DATA_SIZE;
+    static constexpr uint32_t kFactoryDataPartitionAddress = FACTORY_DATA_ADDRESS;
     static constexpr uint8_t kDACPrivateKeyLength          = 32;
     static constexpr uint8_t kDACPublicKeyLength           = 65;
 

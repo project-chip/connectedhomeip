@@ -70,11 +70,10 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
         mFlags.Set(Flags::kHaveServiceConnectivity, haveServiceConnectivity);
 
         {
-            ChipDeviceEvent event;
-            event.Clear();
-            event.Type = DeviceEventType::kServiceConnectivityChange;
-            event.ServiceConnectivityChange.ViaThread.Result =
-                (haveServiceConnectivity) ? kConnectivity_Established : kConnectivity_Lost;
+            ChipDeviceEvent event{ .Type                      = DeviceEventType::kServiceConnectivityChange,
+                                   .ServiceConnectivityChange = { .ViaThread = { .Result = (haveServiceConnectivity)
+                                                                                     ? kConnectivity_Established
+                                                                                     : kConnectivity_Lost } } };
             event.ServiceConnectivityChange.Overall.Result = event.ServiceConnectivityChange.ViaThread.Result;
             CHIP_ERROR status                              = PlatformMgr().PostEvent(&event);
             if (status != CHIP_NO_ERROR)

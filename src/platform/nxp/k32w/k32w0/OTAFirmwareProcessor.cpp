@@ -28,12 +28,12 @@ namespace chip {
 
 CHIP_ERROR OTAFirmwareProcessor::Init()
 {
-    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 #if OTA_ENCRYPTION_ENABLE
     mUnalignmentNum = 0;
 #endif
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_ClientInit(), CHIP_OTA_PROCESSOR_CLIENT_INIT);
+    ReturnErrorCodeIf(gOtaSuccess_c != OTA_ClientInit(), CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT);
 
     auto offset = OTA_GetCurrentEepromAddressOffset();
     if (offset != 0)
@@ -41,8 +41,8 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
         offset += 1;
     }
 
-    ReturnErrorCodeIf(OTA_UTILS_IMAGE_INVALID_ADDR == OTA_SetStartEepromOffset(offset), CHIP_OTA_PROCESSOR_EEPROM_OFFSET);
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_OTA_PROCESSOR_START_IMAGE);
+    ReturnErrorCodeIf(OTA_UTILS_IMAGE_INVALID_ADDR == OTA_SetStartEepromOffset(offset), CHIP_ERROR_OTA_PROCESSOR_EEPROM_OFFSET);
+    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_ERROR_OTA_PROCESSOR_START_IMAGE);
 
     return CHIP_NO_ERROR;
 }
@@ -95,7 +95,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (gOtaSuccess_c != status)
     {
         ChipLogError(SoftwareUpdate, "Failed to make room for next block. Status: %d", status);
-        return CHIP_OTA_PROCESSOR_MAKE_ROOM;
+        return CHIP_ERROR_OTA_PROCESSOR_MAKE_ROOM;
     }
 #if OTA_ENCRYPTION_ENABLE
     status = OTA_PushImageChunk((uint8_t *) mBlock.data(), (uint16_t) mBlock.size(), NULL, NULL);
@@ -105,10 +105,10 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (gOtaSuccess_c != status)
     {
         ChipLogError(SoftwareUpdate, "Failed to write image block. Status: %d", status);
-        return CHIP_OTA_PROCESSOR_PUSH_CHUNK;
+        return CHIP_ERROR_OTA_PROCESSOR_PUSH_CHUNK;
     }
 
-    return CHIP_OTA_FETCH_ALREADY_SCHEDULED;
+    return CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED;
 }
 
 CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
@@ -118,12 +118,6 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 
     mDescriptorProcessed = true;
     mAccumulator.Clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
-{
 
     return CHIP_NO_ERROR;
 }
@@ -144,13 +138,15 @@ CHIP_ERROR OTAFirmwareProcessor::ExitAction()
     if (OTA_CommitImage(NULL) != gOtaSuccess_c)
     {
         ChipLogError(SoftwareUpdate, "Failed to commit firmware image.");
-        return CHIP_OTA_PROCESSOR_IMG_COMMIT;
+        mApplyState = ApplyState::kDoNotApply;
+        return CHIP_ERROR_OTA_PROCESSOR_IMG_COMMIT;
     }
 
     if (OTA_ImageAuthenticate() != gOtaImageAuthPass_c)
     {
         ChipLogError(SoftwareUpdate, "Failed to authenticate firmware image.");
-        return CHIP_OTA_PROCESSOR_IMG_AUTH;
+        mApplyState = ApplyState::kDoNotApply;
+        return CHIP_ERROR_OTA_PROCESSOR_IMG_AUTH;
     }
 
     OTA_AddNewImageFlag();

@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
@@ -98,6 +99,8 @@ class RW61XBuilder(GnBuilder):
 
         if self.enable_thread:
             args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
+            if self.enable_wifi:
+                args.append('openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\"')
 
         if self.enable_factory_data:
             args.append('chip_with_factory_data=1')
@@ -117,8 +120,10 @@ class RW61XBuilder(GnBuilder):
         super(RW61XBuilder, self).generate()
 
     def build_outputs(self):
-        name = '%s' % self.app.NameSuffix()
-        return {
-            '%s.elf' % name: os.path.join(self.output_dir, name),
-            '%s.map' % name: os.path.join(self.output_dir, '%s.map' % name)
-        }
+        yield BuilderOutput(
+            os.path.join(self.output_dir, self.app.NameSuffix()),
+            f'{self.app.NameSuffix()}.elf')
+        if self.options.enable_link_map_file:
+            yield BuilderOutput(
+                os.path.join(self.output_dir, f'{self.app.NameSuffix()}.map'),
+                f'{self.app.NameSuffix()}.map')

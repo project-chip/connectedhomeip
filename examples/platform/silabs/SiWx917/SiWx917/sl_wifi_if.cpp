@@ -21,6 +21,7 @@
 
 #include "silabs_utils.h"
 #include "sl_status.h"
+#include <app/icd/server/ICDServerConfig.h>
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
@@ -39,9 +40,12 @@ extern "C" {
 
 #include "ble_config.h"
 
-#if SL_ICD_ENABLED && SLI_SI91X_MCU_INTERFACE
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 #include "rsi_rom_power_save.h"
 #include "sl_si91x_button_pin_config.h"
+#if DISPLAY_ENABLED
+#include "sl_memlcd.h"
+#endif // DISPLAY_ENABLED
 extern "C" {
 #include "sl_si91x_driver.h"
 #include "sl_si91x_m4_ps.h"
@@ -50,7 +54,7 @@ extern "C" {
 // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
 #define BUTTON_PRESSED 1
 bool btn0_pressed = false;
-#endif // SL_ICD_ENABLED && SLI_SI91X_MCU_INTERFACE
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
 
 #include "dhcp_client.h"
 #include "wfx_host_events.h"
@@ -70,11 +74,11 @@ extern "C" {
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "wfx_host_events.h"
-#if SLI_SI91X_MCU_INTERFACE
+#if SL_MBEDTLS_USE_TINYCRYPT
+#include "sl_si91x_constants.h"
 #include "sl_si91x_trng.h"
-#define TRNGKEY_SIZE 4
-#endif // SLI_SI91X_MCU_INTERFACE
-} // extern "C" {
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+}
 
 WfxRsi_t wfx_rsi;
 
@@ -241,10 +245,9 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING);
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
-        SILABS_LOG("F: Join Event received with %u bytes payload\n", result_length);
         callback_status = *(sl_status_t *) result;
+        SILABS_LOG("join_callback_handler: failed: 0x%X", callback_status);
         wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTED);
-        is_wifi_disconnection_event = true;
         wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
         if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
         {
@@ -257,57 +260,55 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
      * Join was complete - Do the DHCP
      */
     memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
-    SILABS_LOG("join_callback_handler: join completed.");
-    SILABS_LOG("%c: Join Event received with %u bytes payload\n", *result, result_length);
+    SILABS_LOG("join_callback_handler: success");
 
     WfxEvent.eventType = WFX_EVT_STA_CONN;
     WfxPostEvent(&WfxEvent);
     wfx_rsi.join_retries = 0;
     retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
-    if (is_wifi_disconnection_event)
-    {
-        is_wifi_disconnection_event = false;
-    }
-    callback_status = SL_STATUS_OK;
+    // Once the join passes setting the disconnection event to true to differentiate between the first connection and reconnection
+    is_wifi_disconnection_event = true;
+    callback_status             = SL_STATUS_OK;
     return SL_STATUS_OK;
 }
 
-#if SL_ICD_ENABLED
-
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
+// Required to invoke button press event during sleep as falling edge is not detected
+void sl_si91x_invoke_btn_press_event()
+{
+    // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
+    if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
+    {
+        sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
+        btn0_pressed = true;
+    }
+    if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
+    {
+        btn0_pressed = false;
+    }
+}
+
 /******************************************************************
- * @fn   sl_wfx_host_si91x_sleep_wakeup()
+ * @fn   sl_app_sleep_ready()
  * @brief
- *       M4 going to sleep
- *
+ *       Called from the supress ticks from tickless to check if it
+ *       is ok to go to sleep
  * @param[in] None
  * @return
  *        None
  *********************************************************************/
-void sl_wfx_host_si91x_sleep_wakeup()
+uint32_t sl_app_sleep_ready()
 {
     if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY)
     {
-        // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
-        if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
-        {
-            sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
-            btn0_pressed = true;
-        }
-        if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
-        {
-#ifdef DISPLAY_ENABLED
-            // if LCD is enabled, power down the lcd before setting the M4 to sleep
-            sl_si91x_hardware_setup();
-#endif
-            btn0_pressed = false;
-            /* Configure RAM Usage and Retention Size */
-            sl_si91x_m4_sleep_wakeup();
-#if SILABS_LOG_ENABLED
-            silabsInitLog();
-#endif
-        }
+#if DISPLAY_ENABLED
+        // Powering down the LCD
+        sl_memlcd_power_on(NULL, false);
+#endif /* DISPLAY_ENABLED */
+        return true;
     }
+    return false;
 }
 #endif // SLI_SI91X_MCU_INTERFACE
 
@@ -348,7 +349,7 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
     }
     return status;
 }
-#endif /* SL_ICD_ENABLED */
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
 /*************************************************************************************
  * @fn  static int32_t wfx_wifi_rsi_init(void)
@@ -427,7 +428,7 @@ static sl_status_t wfx_rsi_init(void)
         return status;
     }
 #else // For SoC
-#if SL_ICD_ENABLED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     uint8_t xtal_enable = 1;
     status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
     if (status != SL_STATUS_OK)
@@ -435,7 +436,7 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
         return status;
     }
-#endif /* SL_ICD_ENABLED */
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 #endif /* SLI_SI91X_MCU_INTERFACE */
 
     sl_wifi_firmware_version_t version = { 0 };
@@ -455,8 +456,8 @@ static sl_status_t wfx_rsi_init(void)
         return status;
     }
 
-#ifdef SLI_SI91X_MCU_INTERFACE
-    const uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
+    const uint32_t trngKey[TRNG_KEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
 
     // To check the Entropy of TRNG and verify TRNG functioning.
     status = sl_si91x_trng_entropy();
@@ -467,13 +468,13 @@ static sl_status_t wfx_rsi_init(void)
     }
 
     // Initiate and program the key required for TRNG hardware engine
-    status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNGKEY_SIZE);
+    status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNG_KEY_SIZE);
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("TRNG Key Programming Failed");
         return status;
     }
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
@@ -498,12 +499,13 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
 {
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
-        callback_status       = *(sl_status_t *) scan_result;
+        callback_status = *(sl_status_t *) scan_result;
+        SILABS_LOG("scan_callback_handler: failed: 0x%X", callback_status);
         scan_results_complete = true;
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA3;
 #else
-        wfx_rsi.sec.security = WFX_SEC_WPA2;
+        wfx_rsi.sec.security  = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
 
         osSemaphoreRelease(sScanSemaphore);
@@ -519,9 +521,9 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
         break;
     case SL_WIFI_WPA:
     case SL_WIFI_WPA_ENTERPRISE:
-    case SL_WIFI_WPA_WPA2_MIXED:
         wfx_rsi.sec.security = WFX_SEC_WPA;
         break;
+    case SL_WIFI_WPA_WPA2_MIXED:
     case SL_WIFI_WPA2:
     case SL_WIFI_WPA2_ENTERPRISE:
         wfx_rsi.sec.security = WFX_SEC_WPA2;
@@ -534,7 +536,7 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
     case SL_WIFI_WPA3:
         wfx_rsi.sec.security = WFX_SEC_WPA3;
 #else
-        wfx_rsi.sec.security = WFX_SEC_WPA2;
+        wfx_rsi.sec.security  = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         break;
     default:
@@ -639,14 +641,18 @@ static sl_status_t wfx_rsi_do_join(void)
         connect_security_mode = SL_WIFI_WEP;
         break;
     case WFX_SEC_WPA:
-    case WFX_SEC_WPA2:
         connect_security_mode = SL_WIFI_WPA_WPA2_MIXED;
         break;
+    case WFX_SEC_WPA2:
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-    case WFX_SEC_WPA3:
         connect_security_mode = SL_WIFI_WPA3_TRANSITION;
         break;
-#endif /*WIFI_ENABLE_SECURITY_WPA3_TRANSITION*/
+    case WFX_SEC_WPA3:
+        connect_security_mode = SL_WIFI_WPA3_TRANSITION;
+#else
+        connect_security_mode = SL_WIFI_WPA_WPA2_MIXED;
+#endif // WIFI_ENABLE_SECURITY_WPA3_TRANSITION
+        break;
     case WFX_SEC_NONE:
         connect_security_mode = SL_WIFI_OPEN;
         break;
@@ -673,14 +679,14 @@ static sl_status_t wfx_rsi_do_join(void)
 
         sl_wifi_set_join_callback(join_callback_handler, NULL);
 
-#if SL_ICD_ENABLED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
         // Setting the listen interval to 0 which will set it to DTIM interval
         sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0 };
         status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
 
         sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 5 };
         sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
-#endif // SL_ICD_ENABLED
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         /* Try to connect Wifi with given Credentials
          * untill there is a success or maximum number of tries allowed
          */
@@ -984,47 +990,3 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     wfx_rsi.dev_state |= WFX_RSI_ST_STA_READY;
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-
-/********************************************************************************************
- * @fn   void wfx_rsi_pkt_add_data(void *p, uint8_t *buf, uint16_t len, uint16_t off)
- * @brief
- *       add the data into packet
- * @param[in]  p:
- * @param[in]  buf:
- * @param[in]  len:
- * @param[in]  off:
- * @return
- *        None
- **********************************************************************************************/
-void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off)
-{
-    sl_si91x_packet_t * pkt;
-    pkt = (sl_si91x_packet_t *) p;
-    memcpy(((char *) pkt->data) + off, buf, len);
-}
-
-#if !EXP_BOARD
-/********************************************************************************************
- * @fn   int32_t wfx_rsi_send_data(void *p, uint16_t len)
- * @brief
- *       Driver send a data
- * @param[in]  p:
- * @param[in]  len:
- * @return
- *        None
- **********************************************************************************************/
-int32_t wfx_rsi_send_data(void * p, uint16_t len)
-{
-    int32_t status;
-    sl_wifi_buffer_t * buffer;
-    buffer = (sl_wifi_buffer_t *) p;
-
-    if (sl_si91x_driver_send_data_packet(SI91X_WLAN_CMD_QUEUE, buffer, RSI_SEND_RAW_DATA_RESPONSE_WAIT_TIME))
-    {
-        SILABS_LOG("*ERR*EN-RSI:Send fail");
-        return ERR_IF;
-    }
-    return status;
-}
-
-#endif

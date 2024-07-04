@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 namespace chip {
 namespace bdx {
 namespace DiagnosticLogs {

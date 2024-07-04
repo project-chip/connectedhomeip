@@ -93,7 +93,20 @@ public:
 
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
 
-    void Disconnect(const PeerAddress & address) override { return DisconnectImpl<0>(address); }
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    CHIP_ERROR TCPConnect(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
+                          Transport::ActiveTCPConnectionState ** peerConnState) override
+    {
+        return TCPConnectImpl<0>(address, appState, peerConnState);
+    }
+
+    void TCPDisconnect(const PeerAddress & address) override { return TCPDisconnectImpl<0>(address); }
+
+    void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0) override
+    {
+        return TCPDisconnectImpl<0>(conn, shouldAbort);
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     void Close() override { return CloseImpl<0>(); }
 
@@ -138,26 +151,78 @@ private:
         return false;
     }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    /**
+     * Recursive TCPConnect implementation iterating through transport members.
+     *
+     * @tparam N the index of the underlying transport to send disconnect to
+     *
+     * @param address what address to connect to.
+     */
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
+    CHIP_ERROR TCPConnectImpl(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
+                              Transport::ActiveTCPConnectionState ** peerConnState)
+    {
+        Base * base = &std::get<N>(mTransports);
+        if (base->CanSendToPeer(address))
+        {
+            return base->TCPConnect(address, appState, peerConnState);
+        }
+        return TCPConnectImpl<N + 1>(address, appState, peerConnState);
+    }
+
+    /**
+     * TCPConnectImpl template for out of range N.
+     */
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
+    CHIP_ERROR TCPConnectImpl(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
+                              Transport::ActiveTCPConnectionState ** peerConnState)
+    {
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+
     /**
      * Recursive disconnect implementation iterating through transport members.
      *
      * @tparam N the index of the underlying transport to send disconnect to
      *
-     * @param address what address to check.
+     * @param address what address to disconnect from.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    void DisconnectImpl(const PeerAddress & address)
+    void TCPDisconnectImpl(const PeerAddress & address)
     {
-        std::get<N>(mTransports).Disconnect(address);
-        DisconnectImpl<N + 1>(address);
+        std::get<N>(mTransports).TCPDisconnect(address);
+        TCPDisconnectImpl<N + 1>(address);
     }
 
     /**
-     * DisconnectImpl template for out of range N.
+     * TCPDisconnectImpl template for out of range N.
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    void DisconnectImpl(const PeerAddress & address)
+    void TCPDisconnectImpl(const PeerAddress & address)
     {}
+
+    /**
+     * Recursive disconnect implementation iterating through transport members.
+     *
+     * @tparam N the index of the underlying transport to send disconnect to
+     *
+     * @param conn pointer to the connection to the peer.
+     */
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
+    void TCPDisconnectImpl(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0)
+    {
+        std::get<N>(mTransports).TCPDisconnect(conn, shouldAbort);
+        TCPDisconnectImpl<N + 1>(conn, shouldAbort);
+    }
+
+    /**
+     * TCPDisconnectImpl template for out of range N.
+     */
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
+    void TCPDisconnectImpl(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0)
+    {}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**
      * Recursive disconnect implementation iterating through transport members.

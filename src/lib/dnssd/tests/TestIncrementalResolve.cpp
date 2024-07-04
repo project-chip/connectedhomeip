@@ -20,6 +20,7 @@
 
 #include <string.h>
 
+#include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
@@ -161,7 +162,7 @@ TEST(TestIncrementalResolve, TestCreation)
     IncrementalResolver resolver;
 
     EXPECT_FALSE(resolver.IsActive());
-    EXPECT_FALSE(resolver.IsActiveBrowseParse());
+    EXPECT_FALSE(resolver.IsActiveCommissionParse());
     EXPECT_FALSE(resolver.IsActiveOperationalParse());
     EXPECT_TRUE(
         resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kSrvInitialization));
@@ -177,10 +178,10 @@ TEST(TestIncrementalResolve, TestInactiveResetOnInitError)
     PreloadSrvRecord(srvRecord);
 
     // test host name is not a 'matter' name
-    EXPECT_NE(resolver.InitializeParsing(kTestHostName.Serialized(), srvRecord), CHIP_NO_ERROR);
+    EXPECT_NE(resolver.InitializeParsing(kTestHostName.Serialized(), 0, srvRecord), CHIP_NO_ERROR);
 
     EXPECT_FALSE(resolver.IsActive());
-    EXPECT_FALSE(resolver.IsActiveBrowseParse());
+    EXPECT_FALSE(resolver.IsActiveCommissionParse());
     EXPECT_FALSE(resolver.IsActiveOperationalParse());
 }
 
@@ -193,10 +194,10 @@ TEST(TestIncrementalResolve, TestStartOperational)
     SrvRecord srvRecord;
     PreloadSrvRecord(srvRecord);
 
-    EXPECT_EQ(resolver.InitializeParsing(kTestOperationalName.Serialized(), srvRecord), CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestOperationalName.Serialized(), 1, srvRecord), CHIP_NO_ERROR);
 
     EXPECT_TRUE(resolver.IsActive());
-    EXPECT_FALSE(resolver.IsActiveBrowseParse());
+    EXPECT_FALSE(resolver.IsActiveCommissionParse());
     EXPECT_TRUE(resolver.IsActiveOperationalParse());
     EXPECT_TRUE(resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     EXPECT_EQ(resolver.GetTargetHostName(), kTestHostName.Serialized());
@@ -211,10 +212,10 @@ TEST(TestIncrementalResolve, TestStartCommissionable)
     SrvRecord srvRecord;
     PreloadSrvRecord(srvRecord);
 
-    EXPECT_EQ(resolver.InitializeParsing(kTestCommissionableNode.Serialized(), srvRecord), CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestCommissionableNode.Serialized(), 0, srvRecord), CHIP_NO_ERROR);
 
     EXPECT_TRUE(resolver.IsActive());
-    EXPECT_TRUE(resolver.IsActiveBrowseParse());
+    EXPECT_TRUE(resolver.IsActiveCommissionParse());
     EXPECT_FALSE(resolver.IsActiveOperationalParse());
     EXPECT_TRUE(resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     EXPECT_EQ(resolver.GetTargetHostName(), kTestHostName.Serialized());
@@ -229,10 +230,10 @@ TEST(TestIncrementalResolve, TestStartCommissioner)
     SrvRecord srvRecord;
     PreloadSrvRecord(srvRecord);
 
-    EXPECT_EQ(resolver.InitializeParsing(kTestCommissionerNode.Serialized(), srvRecord), CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestCommissionerNode.Serialized(), 0, srvRecord), CHIP_NO_ERROR);
 
     EXPECT_TRUE(resolver.IsActive());
-    EXPECT_TRUE(resolver.IsActiveBrowseParse());
+    EXPECT_TRUE(resolver.IsActiveCommissionParse());
     EXPECT_FALSE(resolver.IsActiveOperationalParse());
     EXPECT_TRUE(resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     EXPECT_EQ(resolver.GetTargetHostName(), kTestHostName.Serialized());
@@ -247,7 +248,7 @@ TEST(TestIncrementalResolve, TestParseOperational)
     SrvRecord srvRecord;
     PreloadSrvRecord(srvRecord);
 
-    EXPECT_EQ(resolver.InitializeParsing(kTestOperationalName.Serialized(), srvRecord), CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestOperationalName.Serialized(), 1, srvRecord), CHIP_NO_ERROR);
 
     // once initialized, parsing should be ready however no IP address is available
     EXPECT_TRUE(resolver.IsActiveOperationalParse());
@@ -304,12 +305,12 @@ TEST(TestIncrementalResolve, TestParseOperational)
     // validate data as it was passed in
     EXPECT_EQ(nodeData.operationalData.peerId,
               PeerId().SetCompressedFabricId(0x1234567898765432LL).SetNodeId(0xABCDEFEDCBAABCDELL));
+    EXPECT_FALSE(nodeData.operationalData.hasZeroTTL);
     EXPECT_EQ(nodeData.resolutionData.numIPs, 1u);
     EXPECT_EQ(nodeData.resolutionData.port, 0x1234);
     EXPECT_FALSE(nodeData.resolutionData.supportsTcp);
-    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
-    EXPECT_TRUE(nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
-    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalIdle().Value(), chip::System::Clock::Milliseconds32(23));
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
+    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalIdle(), std::make_optional(chip::System::Clock::Milliseconds32(23)));
 
     Inet::IPAddress addr;
     EXPECT_TRUE(Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
@@ -325,10 +326,10 @@ TEST(TestIncrementalResolve, TestParseCommissionable)
     SrvRecord srvRecord;
     PreloadSrvRecord(srvRecord);
 
-    EXPECT_EQ(resolver.InitializeParsing(kTestCommissionableNode.Serialized(), srvRecord), CHIP_NO_ERROR);
+    EXPECT_EQ(resolver.InitializeParsing(kTestCommissionableNode.Serialized(), 0, srvRecord), CHIP_NO_ERROR);
 
     // once initialized, parsing should be ready however no IP address is available
-    EXPECT_TRUE(resolver.IsActiveBrowseParse());
+    EXPECT_TRUE(resolver.IsActiveCommissionParse());
     EXPECT_TRUE(resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     EXPECT_EQ(resolver.GetTargetHostName(), kTestHostName.Serialized());
 
@@ -385,28 +386,30 @@ TEST(TestIncrementalResolve, TestParseCommissionable)
     EXPECT_FALSE(resolver.GetMissingRequiredInformation().HasAny());
 
     // At this point taking value should work. Once taken, the resolver is reset.
-    DiscoveredNodeData nodeData;
-    EXPECT_EQ(resolver.Take(nodeData), CHIP_NO_ERROR);
+    DiscoveredNodeData discoveredNodeData;
+    EXPECT_TRUE(resolver.Take(discoveredNodeData) == CHIP_NO_ERROR);
     EXPECT_FALSE(resolver.IsActive());
 
+    EXPECT_TRUE(discoveredNodeData.Is<CommissionNodeData>());
+    CommissionNodeData nodeData = discoveredNodeData.Get<CommissionNodeData>();
+
     // validate data as it was passed in
-    EXPECT_EQ(nodeData.resolutionData.numIPs, 2u);
-    EXPECT_EQ(nodeData.resolutionData.port, 0x1234);
-    EXPECT_FALSE(nodeData.resolutionData.supportsTcp);
-    EXPECT_TRUE(nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
-    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalActive().Value(), chip::System::Clock::Milliseconds32(321));
-    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    EXPECT_EQ(nodeData.numIPs, 2u);
+    EXPECT_EQ(nodeData.port, 0x1234);
+    EXPECT_FALSE(nodeData.supportsTcp);
+    EXPECT_EQ(nodeData.GetMrpRetryIntervalActive(), std::make_optional(chip::System::Clock::Milliseconds32(321)));
+    EXPECT_FALSE(nodeData.GetMrpRetryIntervalIdle().has_value());
 
     Inet::IPAddress addr;
     EXPECT_TRUE(Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
-    EXPECT_EQ(nodeData.resolutionData.ipAddress[0], addr);
+    EXPECT_EQ(nodeData.ipAddress[0], addr);
     EXPECT_TRUE(Inet::IPAddress::FromString("fe80::f0f1:f2f3:f4f5:1234", addr));
-    EXPECT_EQ(nodeData.resolutionData.ipAddress[1], addr);
+    EXPECT_EQ(nodeData.ipAddress[1], addr);
 
     // parsed txt data for discovered nodes
-    EXPECT_EQ(nodeData.nodeData.longDiscriminator, 22345);
-    EXPECT_EQ(nodeData.nodeData.vendorId, 321);
-    EXPECT_EQ(nodeData.nodeData.productId, 654);
-    EXPECT_STREQ(nodeData.nodeData.deviceName, "mytest");
+    EXPECT_EQ(nodeData.longDiscriminator, 22345);
+    EXPECT_EQ(nodeData.vendorId, 321);
+    EXPECT_EQ(nodeData.productId, 654);
+    EXPECT_STREQ(nodeData.deviceName, "mytest");
 }
 } // namespace

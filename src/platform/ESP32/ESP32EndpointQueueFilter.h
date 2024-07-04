@@ -44,7 +44,8 @@ public:
         }
         // Drop the mDNS packets which don't contain 'matter' or '<device-hostname>'.
         const uint8_t matterBytes[] = { 'm', 'a', 't', 't', 'e', 'r' };
-        if (PayloadContains(pktPayload, ByteSpan(matterBytes)) || PayloadContainsHostNameCaseInsensitive(pktPayload))
+        if (PayloadContainsCaseInsensitive(pktPayload, ByteSpan(matterBytes)) ||
+            PayloadContainsCaseInsensitive(pktPayload, ByteSpan(mHostNameBuffer)))
         {
             return FilterOutcome::kAllowPacket;
         }
@@ -79,7 +80,21 @@ private:
         return false;
     }
 
-    static bool PayloadContains(const chip::System::PacketBufferHandle & payload, const chip::ByteSpan & byteSpan)
+    static bool BytesCaseInsensitiveCompare(const uint8_t * buf1, const uint8_t * buf2, size_t size)
+    {
+        for (size_t i = 0; i < size; ++i)
+        {
+            uint8_t byte1 = (buf1[i] >= 'A' && buf1[i] <= 'Z') ? buf1[i] - 'A' + 'a' : buf1[i];
+            uint8_t byte2 = (buf2[i] >= 'A' && buf2[i] <= 'Z') ? buf2[i] - 'A' + 'a' : buf2[i];
+            if (byte1 != byte2)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static bool PayloadContainsCaseInsensitive(const chip::System::PacketBufferHandle & payload, const chip::ByteSpan & byteSpan)
     {
         if (payload->HasChainedBuffer() || payload->TotalLength() < byteSpan.size())
         {
@@ -87,26 +102,12 @@ private:
         }
         for (size_t i = 0; i <= payload->TotalLength() - byteSpan.size(); ++i)
         {
-            if (memcmp(payload->Start() + i, byteSpan.data(), byteSpan.size()) == 0)
+            if (BytesCaseInsensitiveCompare(payload->Start() + i, byteSpan.data(), byteSpan.size()))
             {
                 return true;
             }
         }
         return false;
-    }
-
-    bool PayloadContainsHostNameCaseInsensitive(const chip::System::PacketBufferHandle & payload)
-    {
-        uint8_t hostNameLowerCase[12];
-        memcpy(hostNameLowerCase, mHostNameBuffer, sizeof(mHostNameBuffer));
-        for (size_t i = 0; i < sizeof(hostNameLowerCase); ++i)
-        {
-            if (hostNameLowerCase[i] <= 'F' && hostNameLowerCase[i] >= 'A')
-            {
-                hostNameLowerCase[i] = static_cast<uint8_t>('a' + hostNameLowerCase[i] - 'A');
-            }
-        }
-        return PayloadContains(payload, ByteSpan(mHostNameBuffer)) || PayloadContains(payload, ByteSpan(hostNameLowerCase));
     }
 
     static bool IsValidMdnsHostName(const chip::CharSpan & hostName)

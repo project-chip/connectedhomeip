@@ -45,16 +45,23 @@ public:
     virtual ~Counter() {}
 
     /**
-     *  @brief
-     *  Advance the value of the counter.
+     *  @brief Advance the value of the counter.
      *
      *  @return A CHIP error code if anything failed, CHIP_NO_ERROR otherwise.
      */
     virtual CHIP_ERROR Advance() = 0;
 
     /**
-     *  @brief
-     *  Get the current value of the counter.
+     * @brief Advances the current counter value by N
+     *
+     * @param value value of N
+     *
+     * @return A CHIP error code if anything failed, CHIP_NO_ERROR otherwise.
+     */
+    virtual CHIP_ERROR AdvanceBy(T value) = 0;
+
+    /**
+     *  @brief Get the current value of the counter.
      *
      *  @return The current value of the counter.
      */
@@ -76,8 +83,7 @@ public:
     ~MonotonicallyIncreasingCounter() override{};
 
     /**
-     *  @brief
-     *    Initialize a MonotonicallyIncreasingCounter object.
+     *  @brief Initialize a MonotonicallyIncreasingCounter object.
      *
      *  @param[in] aStartValue  The starting value of the counter.
      *
@@ -93,8 +99,7 @@ public:
     }
 
     /**
-     *  @brief
-     *  Advance the value of the counter.
+     *  @brief Advance the value of the counter.
      *
      *  @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
      */
@@ -108,8 +113,20 @@ public:
     }
 
     /**
-     *  @brief
-     *  Get the current value of the counter.
+     * @brief Advances the current counter value by N
+     *
+     * @param value value of N
+     *
+     * @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
+     */
+    CHIP_ERROR AdvanceBy(T value) override
+    {
+        mCounterValue = static_cast<T>(mCounterValue + value);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     *  @brief Get the current value of the counter.
      *
      *  @return The current value of the counter.
      */

@@ -274,6 +274,40 @@ class TestXmlParser(unittest.TestCase):
                              Cluster(name='Test2', code=20, enums=[e3])],
                              ))
 
+    def testFeatures(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster>
+                  <name>TestFeatures</name>
+                  <code>20</code>
+
+                  <features>
+                    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Test">
+                      <optionalConform/>
+                    </feature>
+                    <feature bit="1" code="TEST" name="TestFeature" summary="Test2">
+                      <optionalConform/>
+                    </feature>
+                    <feature bit="2" code="XYZ" name="AnotherTest" summary="Test2">
+                      <optionalConform/>
+                    </feature>
+                  </features>
+              </cluster>
+            </configurator>
+        ''')
+        bitmap = Bitmap(
+            name='Feature',
+            base_type='bitmap32',
+            entries=[
+                ConstantEntry(name='OnOff', code=1),
+                ConstantEntry(name='TestFeature', code=2),
+                ConstantEntry(name='AnotherTest', code=4),
+            ])
+        self.assertEqual(idl,
+                         Idl(clusters=[
+                             Cluster(name='TestFeatures', code=20, bitmaps=[bitmap])
+                         ])),
+
     def testStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>

@@ -17,7 +17,7 @@
 
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
+#include <lib/shell/SubShellCommand.h>
 #include <lib/shell/commands/WiFi.h>
 #include <lib/shell/streamer.h>
 #include <lib/support/Span.h>
@@ -32,14 +32,7 @@ using namespace chip::DeviceLayer::NetworkCommissioning;
 namespace chip {
 namespace Shell {
 
-static Shell::Engine sShellWiFiSubCommands;
 static DeviceLayer::NetworkCommissioning::WiFiDriver * sDriver;
-
-static CHIP_ERROR WiFiHelpHandler(int argc, char ** argv)
-{
-    sShellWiFiSubCommands.ForEachCommand(PrintCommandHelp, nullptr);
-    return CHIP_NO_ERROR;
-}
 
 static CHIP_ERROR PrintWiFiMode()
 {
@@ -143,15 +136,6 @@ static CHIP_ERROR WiFiDisconnectHandler(int argc, char ** argv)
     return ConnectivityMgr().DisconnectNetwork();
 }
 
-static CHIP_ERROR WiFiDispatch(int argc, char ** argv)
-{
-    if (argc == 0)
-    {
-        return WiFiHelpHandler(argc, argv);
-    }
-    return sShellWiFiSubCommands.ExecCommand(argc, argv);
-}
-
 void SetWiFiDriver(WiFiDriver * driver)
 {
     sDriver = driver;
@@ -164,17 +148,15 @@ WiFiDriver * GetWiFiDriver()
 
 void RegisterWiFiCommands()
 {
-    /// Subcommands for root command: `device <subcommand>`
-    static const shell_command_t sWiFiSubCommands[] = {
-        { &WiFiHelpHandler, "help", "" },
+    static constexpr Command subCommands[] = {
         { &WiFiModeHandler, "mode", "Get/Set wifi mode. Usage: wifi mode [disable|ap|sta]" },
         { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect <ssid> <psk>" },
         { &WiFiDisconnectHandler, "disconnect", "Disconnect device from AP. Usage: wifi disconnect" },
     };
-    static const shell_command_t sWiFiCommand = { &WiFiDispatch, "wifi", "Usage: wifi <subcommand>" };
 
-    sShellWiFiSubCommands.RegisterCommands(sWiFiSubCommands, ArraySize(sWiFiSubCommands));
-    Engine::Root().RegisterCommands(&sWiFiCommand, 1);
+    static constexpr Command wifiCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "wifi", "Wi-Fi commands" };
+
+    Engine::Root().RegisterCommands(&wifiCommand, 1);
 }
 
 } // namespace Shell

@@ -20,9 +20,13 @@ import("${chip_root}/src/platform/device.gni")
 
 source_set("shell_core") {
   sources = [
+    "Command.h",
+    "CommandSet.cpp",
+    "CommandSet.h",
     "Commands.h",
     "Engine.cpp",
     "Engine.h",
+    "SubShellCommand.h",
     "streamer.cpp",
     "streamer.h",
   ]

@@ -49,6 +49,10 @@ static constexpr int16_t kAnyMessageType = -1;
  *    handling the registration/unregistration of unsolicited message handlers.
  */
 class DLL_EXPORT ExchangeManager : public SessionMessageDelegate
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    ,
+                                   public SessionConnectionDelegate
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 {
     friend class ExchangeContext;
 
@@ -76,9 +80,13 @@ public:
      *  Shutdown the ExchangeManager. This terminates this instance
      *  of the object and releases all held resources.
      *
+     * Please see documentation for SessionManager::Shutdown() for ordering
+     * dependecies between that and this Shutdown() method.
+     *
      *  @note
      *     The protocol should only call this function after ensuring that
-     *     there are no active ExchangeContext objects. Furthermore, it is the
+     *     there are no active ExchangeContext objects (again, see
+     *     SessionManager::Shutdown() documentation). Furthermore, it is the
      *     onus of the application to de-allocate the ExchangeManager
      *     object after calling ExchangeManager::Shutdown().
      */
@@ -242,6 +250,9 @@ private:
                            DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override;
     void SendStandaloneAckIfNeeded(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    const SessionHandle & session, MessageFlags msgFlags, System::PacketBufferHandle && msgBuf);
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void OnTCPConnectionClosed(const SessionHandle & session, CHIP_ERROR conErr) override;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 } // namespace Messaging

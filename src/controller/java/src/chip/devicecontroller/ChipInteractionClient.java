@@ -37,7 +37,8 @@ public class ChipInteractionClient {
       boolean keepSubscriptions,
       boolean isFabricFiltered,
       int imTimeoutMs,
-      @Nullable Long eventMin);
+      @Nullable Long eventMin,
+      boolean isPeerICD);
 
   static native void read(
       long deviceControllerPtr,
@@ -79,4 +80,8 @@ public class ChipInteractionClient {
       @Nullable Integer fabricIndex,
       @Nullable Long peerNodeId,
       @Nullable Long subscriptionId);
+
+  static native long getRemoteDeviceId(long devicePtr);
+
+  static native int getFabricIndex(long devicePtr);
 }

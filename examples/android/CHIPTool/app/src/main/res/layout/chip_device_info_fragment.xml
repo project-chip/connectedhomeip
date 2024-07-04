@@ -1,5 +1,6 @@
 <ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -26,16 +27,18 @@
             android:layout_below="@id/titleTv"
             android:layout_alignParentStart="true"
             android:textSize="20sp"/>
-        <TextView
-            android:id="@+id/versionTv"
+        <EditText
+            android:id="@+id/versionEd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="8dp"
             android:layout_below="@id/titleTv"
             android:layout_toEndOf="@id/versionLabelTv"
             android:layout_alignParentEnd="true"
-            android:textSize="20sp"/>
+            android:textSize="11sp"
+            android:autofillHints="@string/chip_device_info_version_label"
+            android:inputType="number"
+            tools:ignore="LabelFor" />
 
         <TextView
             android:id="@+id/vendorLabelTv"
@@ -46,16 +49,18 @@
             android:layout_below="@id/versionLabelTv"
             android:layout_alignParentStart="true"
             android:textSize="20sp"/>
-        <TextView
-            android:id="@+id/vendorIdTv"
+        <EditText
+            android:id="@+id/vendorIdEd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="8dp"
             android:layout_below="@id/versionLabelTv"
             android:layout_toEndOf="@id/vendorLabelTv"
             android:layout_alignParentEnd="true"
-            android:textSize="20sp"/>
+            android:textSize="11sp"
+            android:autofillHints="@string/chip_device_info_vendor_id_label"
+            android:inputType="number"
+            tools:ignore="LabelFor" />
 
         <TextView
             android:id="@+id/productIdLabelTv"
@@ -66,16 +71,18 @@
             android:layout_below="@id/vendorLabelTv"
             android:layout_alignParentStart="true"
             android:textSize="20sp"/>
-        <TextView
-            android:id="@+id/productIdTv"
+        <EditText
+            android:id="@+id/productIdEd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="8dp"
             android:layout_below="@id/vendorLabelTv"
             android:layout_toEndOf="@id/productIdLabelTv"
             android:layout_alignParentEnd="true"
-            android:textSize="20sp"/>
+            android:textSize="11sp"
+            android:autofillHints="@string/chip_device_info_product_id_label"
+            android:inputType="number"
+            tools:ignore="LabelFor" />
 
         <TextView
             android:id="@+id/discriminatorLabelTv"
@@ -86,16 +93,18 @@
             android:layout_below="@id/productIdLabelTv"
             android:layout_alignParentStart="true"
             android:textSize="20sp"/>
-        <TextView
-            android:id="@+id/discriminatorTv"
+        <EditText
+            android:id="@+id/discriminatorEd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="8dp"
             android:layout_below="@id/productIdLabelTv"
             android:layout_toEndOf="@id/discriminatorLabelTv"
             android:layout_alignParentEnd="true"
-            android:textSize="20sp"/>
+            android:textSize="11sp"
+            android:autofillHints="@string/chip_device_info_discriminator_label"
+            android:inputType="number"
+            tools:ignore="LabelFor" />
 
         <TextView
             android:id="@+id/setupCodeLabelTv"
@@ -106,16 +115,18 @@
             android:layout_below="@id/discriminatorLabelTv"
             android:layout_alignParentStart="true"
             android:textSize="20sp"/>
-        <TextView
-            android:id="@+id/setupCodeTv"
+        <EditText
+            android:id="@+id/setupCodeEd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="8dp"
             android:layout_below="@id/discriminatorLabelTv"
             android:layout_toEndOf="@id/setupCodeLabelTv"
             android:layout_alignParentEnd="true"
-            android:textSize="20sp"/>
+            android:textSize="11sp"
+            android:autofillHints="@string/chip_device_info_setup_code_label"
+            android:inputType="number"
+            tools:ignore="LabelFor" />
 
         <TextView
             android:id="@+id/vendorTagsLabelTv"
@@ -135,11 +146,32 @@
             android:layout_below="@id/vendorTagsLabelTv"/>
 
         <TextView
-            android:id="@+id/discoveryCapabilitiesTv"
+            android:id="@+id/discoveryCapabilitiesLabelTv"
+            android:text="@string/chip_device_info_discovery_capabilities_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_below="@id/vendorTagsContainer"
+            android:layout_alignParentStart="true"
+            android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/discoveryCapabilitiesEd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_below="@id/vendorTagsContainer"
+            android:layout_toEndOf="@id/discoveryCapabilitiesLabelTv"
+            android:layout_alignParentEnd="true"
+            android:textSize="11sp"
+            android:autofillHints="@string/chip_device_info_discovery_capabilities_label"
+            android:inputType="number"
+            tools:ignore="LabelFor" />
+        <TextView
+            android:id="@+id/discoveryCapabilitiesTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_below="@id/discoveryCapabilitiesLabelTv"
             android:layout_alignParentStart="true"
             android:textSize="20sp"/>
 
@@ -152,27 +184,82 @@
             android:layout_below="@id/discoveryCapabilitiesTv"
             android:layout_alignParentStart="true"
             android:textSize="20sp"/>
-        <TextView
-            android:id="@+id/commissioningFlowTv"
+        <EditText
+            android:id="@+id/commissioningFlowEd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="8dp"
             android:layout_below="@id/discoveryCapabilitiesTv"
             android:layout_toEndOf="@id/commissioningFlowLabelTv"
             android:layout_alignParentEnd="true"
+            android:textSize="11sp"
+            android:autofillHints="@string/chip_device_info_discovery_capabilities_label"
+            android:inputType="number"
+            tools:ignore="LabelFor" />
+
+        <TextView
+            android:id="@+id/serialNumberLabelTv"
+            android:text="@string/chip_device_info_serial_number_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_below="@id/commissioningFlowLabelTv"
+            android:layout_alignParentStart="true"
             android:textSize="20sp"/>
+        <EditText
+            android:id="@+id/serialNumberEd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_below="@id/commissioningFlowLabelTv"
+            android:layout_toEndOf="@id/serialNumberLabelTv"
+            android:layout_alignParentEnd="true"
+            android:textSize="11sp"
+            android:autofillHints="@string/chip_device_info_setup_code_label"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
 
         <Button
             android:id="@+id/customFlowBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/commissioningFlowTv"
-            android:layout_alignParentBottom="true"
+            android:layout_below="@id/serialNumberLabelTv"
             android:layout_alignParentRight="true"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:visibility="invisible"
             android:text="@string/chip_device_info_custom_flow_btn_text" />
+
+        <Button
+            android:id="@+id/showQRCodeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/customFlowBtn"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:visibility="visible"
+            android:text="@string/chip_device_info_show_qr_code_btn_text" />
+
+        <Button
+            android:id="@+id/showQRCodeUriBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/showQRCodeBtn"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:visibility="visible"
+            android:text="@string/chip_device_info_show_qr_code_uri_btn_text" />
+
+        <TextView
+            android:id="@+id/qrCodeTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_below="@id/showQRCodeUriBtn"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:textSize="12sp"/>
     </RelativeLayout>
 </ScrollView>

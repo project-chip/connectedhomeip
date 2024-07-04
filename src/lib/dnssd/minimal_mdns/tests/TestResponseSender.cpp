@@ -286,34 +286,34 @@ TEST_F(TestResponseSender, AddManyQueryResponders)
 
 TEST_F(TestResponseSender, PtrSrvTxtMultipleRespondersToInstance)
 {
-    CommonTestElements common1("test1");
-    CommonTestElements common2("test2");
+    auto common1 = std::make_unique<CommonTestElements>("test1");
+    auto common2 = std::make_unique<CommonTestElements>("test2");
 
     // Just use the server from common1.
-    ResponseSender responseSender(&common1.server);
+    ResponseSender responseSender(&common1->server);
 
-    EXPECT_EQ(responseSender.AddQueryResponder(&common1.queryResponder), CHIP_NO_ERROR);
-    common1.queryResponder.AddResponder(&common1.ptrResponder).SetReportInServiceListing(true);
-    common1.queryResponder.AddResponder(&common1.srvResponder);
-    common1.queryResponder.AddResponder(&common1.txtResponder);
+    EXPECT_EQ(responseSender.AddQueryResponder(&common1->queryResponder), CHIP_NO_ERROR);
+    common1->queryResponder.AddResponder(&common1->ptrResponder).SetReportInServiceListing(true);
+    common1->queryResponder.AddResponder(&common1->srvResponder);
+    common1->queryResponder.AddResponder(&common1->txtResponder);
 
-    EXPECT_EQ(responseSender.AddQueryResponder(&common2.queryResponder), CHIP_NO_ERROR);
-    common2.queryResponder.AddResponder(&common2.ptrResponder).SetReportInServiceListing(true);
-    common2.queryResponder.AddResponder(&common2.srvResponder);
-    common2.queryResponder.AddResponder(&common2.txtResponder);
+    EXPECT_EQ(responseSender.AddQueryResponder(&common2->queryResponder), CHIP_NO_ERROR);
+    common2->queryResponder.AddResponder(&common2->ptrResponder).SetReportInServiceListing(true);
+    common2->queryResponder.AddResponder(&common2->srvResponder);
+    common2->queryResponder.AddResponder(&common2->txtResponder);
 
     // Build a query for the second instance.
-    common2.recordWriter.WriteQName(common2.instance);
-    QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common2.requestNameStart, common2.requestBytesRange);
+    common2->recordWriter.WriteQName(common2->instance);
+    QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common2->requestNameStart, common2->requestBytesRange);
 
     // Should get back answers from second instance only.
-    common1.server.AddExpectedRecord(&common2.srvRecord);
-    common1.server.AddExpectedRecord(&common2.txtRecord);
+    common1->server.AddExpectedRecord(&common2->srvRecord);
+    common1->server.AddExpectedRecord(&common2->txtRecord);
 
-    responseSender.Respond(1, queryData, &common1.packetInfo, ResponseConfiguration());
+    responseSender.Respond(1, queryData, &common1->packetInfo, ResponseConfiguration());
 
-    EXPECT_TRUE(common1.server.GetSendCalled());
-    EXPECT_TRUE(common1.server.GetHeaderFound());
+    EXPECT_TRUE(common1->server.GetSendCalled());
+    EXPECT_TRUE(common1->server.GetHeaderFound());
 }
 
 TEST_F(TestResponseSender, PtrSrvTxtMultipleRespondersToServiceListing)

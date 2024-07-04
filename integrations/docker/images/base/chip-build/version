@@ -1,1 +1,1 @@
-48 : [QEMU] Add QEMU Dockerfile for ble-wifi testing on Linux
+62 : Fix ESP32 qemu build

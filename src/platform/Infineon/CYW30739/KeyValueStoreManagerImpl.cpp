@@ -121,8 +121,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
     entry = AllocateEntry(key);
-    VerifyOrExit(entry != nullptr, ChipLogError(DeviceLayer, "%s AllocateEntry %s", __func__, ErrorStr(err));
-                 err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(entry != nullptr, ChipLogError(DeviceLayer, "%s AllocateEntry failed", __func__); err = CHIP_ERROR_NO_MEMORY);
 
     if (value_size != 0)
     {

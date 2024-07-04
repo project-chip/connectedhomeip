@@ -85,6 +85,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # devices with multiple radios that have different sleep behavior for
     # different radios.
     chip_device_config_enable_dynamic_mrp_config = false
+
+    # Define the default endpoint id for the generic Thread network commissioning instance
+    chip_device_config_thread_network_endpoint_id = 0
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -308,6 +311,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "stm32") {
       device_layer_target_define = "STM32"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=stm32" ]
+    } else if (chip_device_platform == "nuttx") {
+      device_layer_target_define = "NUTTX"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=NuttX",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
     } else {
       device_layer_target_define = ""
     }
@@ -346,6 +355,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "OPEN_IOT_SDK",
       "ASR",
       "STM32",
+      "NUTTX",
     ]
     foreach(possible_device_layer_target_define,
             possible_device_layer_target_defines) {
@@ -381,6 +391,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     }
 
     defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
+
+    if (chip_enable_openthread && chip_device_platform != "linux" &&
+        chip_device_platform != "tizen" && chip_device_platform != "webos") {
+      defines += [ "CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID=${chip_device_config_thread_network_endpoint_id}" ]
+    }
 
     visibility = [
       ":platform_config_header",
@@ -418,7 +433,9 @@ if (chip_device_platform != "none") {
   source_set("platform_base") {
     public_deps = [
       ":platform_config_header",
+      "${chip_root}/src/app/icd/server:icd-server-config",
       "${chip_root}/src/ble",
+      "${chip_root}/src/credentials:build_time_header",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
@@ -507,10 +524,7 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
-      "${chip_root}/src/app:app_config",
       "${chip_root}/src/app/common:cluster-objects",
-      "${chip_root}/src/app/icd/server:icd-server-config",
-      "${chip_root}/src/credentials:build_time_header",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]
@@ -577,6 +591,8 @@ if (chip_device_platform != "none") {
       _platform_target = "ASR"
     } else if (chip_device_platform == "stm32") {
       _platform_target = "stm32"
+    } else if (chip_device_platform == "nuttx") {
+      _platform_target = "NuttX"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }

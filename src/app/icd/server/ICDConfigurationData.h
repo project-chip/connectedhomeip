@@ -28,12 +28,13 @@ namespace chip {
 namespace app {
 // Forward declaration of ICDManager to allow it to be friend with ICDConfigurationData.
 class ICDManager;
-
-// Forward declaration of TestICDManager to allow it to be friend with the ICDConfigurationData.
-// Used in unit tests
-class TestICDManager;
-
 } // namespace app
+
+namespace Test {
+// Forward declaration of ICDConfigurationDataTestAccess tests to allow it to be friend with the ICDConfigurationData.
+// Used in unit tests
+class ICDConfigurationDataTestAccess;
+} // namespace Test
 
 /**
  * @brief ICDConfigurationData manages and stores ICD related configurations for the ICDManager.
@@ -99,7 +100,8 @@ private:
     // the ICDManager, the ICDManager is a friend that can access the private setters. If a consummer needs to be notified when a
     // value is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/server/ICDStateObserver.h
     friend class chip::app::ICDManager;
-    friend class chip::app::TestICDManager;
+
+    friend class chip::Test::ICDConfigurationDataTestAccess;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
     void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };

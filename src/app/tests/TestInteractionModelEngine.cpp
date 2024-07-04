@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for CHIP Interaction Model Engine
- *
- */
-
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/icd/server/ICDServerConfig.h>
@@ -31,23 +25,21 @@
 #include <app/util/mock/Functions.h>
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestExtendedAssertions.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <pw_unit_test/framework.h>
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #include <app/SimpleSubscriptionResumptionStorage.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-
-#include <nlunit-test.h>
-
 namespace {
 
 using TestContext = chip::Test::AppContext;
@@ -67,25 +59,52 @@ public:
 
 namespace chip {
 namespace app {
-class TestInteractionModelEngine
+class TestInteractionModelEngine : public ::testing::Test
 {
 public:
-    static void TestAttributePathParamsPushRelease(nlTestSuite * apSuite, void * apContext);
-    static void TestRemoveDuplicateConcreteAttribute(nlTestSuite * apSuite, void * apContext);
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    static void TestSubjectHasPersistedSubscription(nlTestSuite * apSuite, void * apContext);
-#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-    static void TestSubscriptionResumptionTimer(nlTestSuite * apSuite, void * apContext);
-#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    static void SetUpTestSuite()
+    {
+        mpTestContext = new chip::Test::AppContext;
+        mpTestContext->SetUpTestSuite();
+    }
+    static void TearDownTestSuite()
+    {
+        mpTestContext->TearDownTestSuite();
+        if (mpTestContext != nullptr)
+        {
+            delete mpTestContext;
+        }
+    }
+
+    void SetUp() override
+    {
+
+        if (mpTestContext != nullptr)
+        {
+            mpTestContext->SetUp();
+        }
+    }
+    void TearDown() override
+    {
+        if (mpTestContext != nullptr)
+        {
+            mpTestContext->TearDown();
+        }
+    }
+
+    void TestSubjectHasActiveSubscriptionSingleSubOneEntry();
+    void TestSubjectHasActiveSubscriptionSingleSubMultipleEntries();
+    void TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry();
+    void TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries();
+    void TestSubjectHasActiveSubscriptionSubWithCAT();
+    void TestSubscriptionResumptionTimer();
+    void TestDecrementNumSubscriptionsToResume();
     static int GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apattributePathParamsList);
-    static void TestSubjectHasActiveSubscriptionSingleSubOneEntry(nlTestSuite * apSuite, void * apContext);
-    static void TestSubjectHasActiveSubscriptionSingleSubMultipleEntries(nlTestSuite * apSuite, void * apContext);
-    static void TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry(nlTestSuite * apSuite, void * apContext);
-    static void TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries(nlTestSuite * apSuite, void * apContext);
-    static void TestSubjectHasActiveSubscriptionSubWithCAT(nlTestSuite * apSuite, void * apContext);
-    static void TestDecrementNumSubscriptionsToResume(nlTestSuite * apSuite, void * apContext);
+
+    static chip::Test::AppContext * mpTestContext;
 };
+
+chip::Test::AppContext * TestInteractionModelEngine::mpTestContext = nullptr;
 
 int TestInteractionModelEngine::GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apAttributePathParamsList)
 {
@@ -99,13 +118,15 @@ int TestInteractionModelEngine::GetAttributePathListLength(SingleLinkedListNode<
     return length;
 }
 
-void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestInteractionModelEngine, TestAttributePathParamsPushRelease)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                                    app::reporting::GetDefaultReportScheduler());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+
+    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
+
     SingleLinkedListNode<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
     AttributePathParams attributePathParams2;
@@ -115,158 +136,157 @@ void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite 
     attributePathParams2.mEndpointId = 2;
     attributePathParams3.mEndpointId = 3;
 
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    NL_TEST_ASSERT(apSuite,
-                   attributePathParamsList != nullptr &&
-                       attributePathParams1.mEndpointId == attributePathParamsList->mValue.mEndpointId);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    ASSERT_NE(attributePathParamsList, nullptr);
+    EXPECT_EQ(attributePathParams1.mEndpointId, attributePathParamsList->mValue.mEndpointId);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 1);
 
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    NL_TEST_ASSERT(apSuite,
-                   attributePathParamsList != nullptr &&
-                       attributePathParams2.mEndpointId == attributePathParamsList->mValue.mEndpointId);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 2);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    ASSERT_NE(attributePathParamsList, nullptr);
+    EXPECT_EQ(attributePathParams2.mEndpointId, attributePathParamsList->mValue.mEndpointId);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 2);
 
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    NL_TEST_ASSERT(apSuite,
-                   attributePathParamsList != nullptr &&
-                       attributePathParams3.mEndpointId == attributePathParamsList->mValue.mEndpointId);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    ASSERT_NE(attributePathParamsList, nullptr);
+    EXPECT_EQ(attributePathParams3.mEndpointId, attributePathParamsList->mValue.mEndpointId);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 3);
 
-    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 0);
+    engine->ReleaseAttributePathList(attributePathParamsList);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 0);
 }
 
-void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                                    app::reporting::GetDefaultReportScheduler());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           app::reporting::GetDefaultReportScheduler()));
+
     SingleLinkedListNode<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
     AttributePathParams attributePathParams2;
     AttributePathParams attributePathParams3;
 
     // Three concrete paths, no duplicates
-    attributePathParams1.mEndpointId  = Test::kMockEndpoint3;
-    attributePathParams1.mClusterId   = Test::MockClusterId(2);
-    attributePathParams1.mAttributeId = Test::MockAttributeId(1);
+    attributePathParams1.mEndpointId  = chip::Test::kMockEndpoint3;
+    attributePathParams1.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams1.mAttributeId = chip::Test::MockAttributeId(1);
 
-    attributePathParams2.mEndpointId  = Test::kMockEndpoint3;
-    attributePathParams2.mClusterId   = Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = Test::MockAttributeId(2);
+    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
+    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = Test::kMockEndpoint3;
-    attributePathParams3.mClusterId   = Test::MockClusterId(2);
-    attributePathParams3.mAttributeId = Test::MockAttributeId(3);
+    attributePathParams3.mEndpointId  = chip::Test::kMockEndpoint3;
+    attributePathParams3.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
 
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
-    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 3);
+    engine->ReleaseAttributePathList(attributePathParamsList);
 
     attributePathParams1.mEndpointId  = kInvalidEndpointId;
     attributePathParams1.mClusterId   = kInvalidClusterId;
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = Test::kMockEndpoint3;
-    attributePathParams2.mClusterId   = Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = Test::MockAttributeId(2);
+    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
+    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = Test::kMockEndpoint3;
-    attributePathParams3.mClusterId   = Test::MockClusterId(2);
-    attributePathParams3.mAttributeId = Test::MockAttributeId(3);
+    attributePathParams3.mEndpointId  = chip::Test::kMockEndpoint3;
+    attributePathParams3.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
 
     // 1st path is wildcard endpoint, 2nd, 3rd paths are concrete paths, the concrete ones would be removed.
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
-    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 1);
+    engine->ReleaseAttributePathList(attributePathParamsList);
 
     // 2nd path is wildcard endpoint, 1st, 3rd paths are concrete paths, the latter two would be removed.
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
-    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 1);
+    engine->ReleaseAttributePathList(attributePathParamsList);
 
     // 3nd path is wildcard endpoint, 1st, 2nd paths are concrete paths, the latter two would be removed.
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 1);
-    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 1);
+    engine->ReleaseAttributePathList(attributePathParamsList);
 
-    attributePathParams1.mEndpointId  = Test::kMockEndpoint3;
-    attributePathParams1.mClusterId   = Test::MockClusterId(2);
+    attributePathParams1.mEndpointId  = chip::Test::kMockEndpoint3;
+    attributePathParams1.mClusterId   = chip::Test::MockClusterId(2);
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = Test::kMockEndpoint2;
-    attributePathParams2.mClusterId   = Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = Test::MockAttributeId(2);
+    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint2;
+    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = Test::kMockEndpoint2;
-    attributePathParams3.mClusterId   = Test::MockClusterId(2);
-    attributePathParams3.mAttributeId = Test::MockAttributeId(3);
+    attributePathParams3.mEndpointId  = chip::Test::kMockEndpoint2;
+    attributePathParams3.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
 
     // 1st is wildcard one, but not intersect with the latter two concrete paths, so the paths in total are 3 finally
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
-    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 3);
+    engine->ReleaseAttributePathList(attributePathParamsList);
 
     attributePathParams1.mEndpointId  = kInvalidEndpointId;
     attributePathParams1.mClusterId   = kInvalidClusterId;
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = Test::kMockEndpoint3;
+    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
     attributePathParams2.mClusterId   = kInvalidClusterId;
     attributePathParams2.mAttributeId = kInvalidAttributeId;
 
     attributePathParams3.mEndpointId  = kInvalidEndpointId;
     attributePathParams3.mClusterId   = kInvalidClusterId;
-    attributePathParams3.mAttributeId = Test::MockAttributeId(3);
+    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
 
     // Wildcards cannot be deduplicated.
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 3);
-    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams3);
+    engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 3);
+    engine->ReleaseAttributePathList(attributePathParamsList);
 
     attributePathParams1.mEndpointId  = kInvalidEndpointId;
-    attributePathParams1.mClusterId   = Test::MockClusterId(2);
-    attributePathParams1.mAttributeId = Test::MockAttributeId(10);
+    attributePathParams1.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams1.mAttributeId = chip::Test::MockAttributeId(10);
 
-    attributePathParams2.mEndpointId  = Test::kMockEndpoint3;
-    attributePathParams2.mClusterId   = Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = Test::MockAttributeId(10);
+    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
+    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(10);
 
     // 1st path is wildcard endpoint, 2nd path is invalid attribute
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
-    InteractionModelEngine::GetInstance()->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
-    InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
-    NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 2);
-    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1);
+    engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2);
+    engine->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
+    EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 2);
+    engine->ReleaseAttributePathList(attributePathParamsList);
 }
 
 /**
  * @brief Test verifies the SubjectHasActiveSubscription with a single subscription with a single entry
  */
-void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubOneEntry(nlTestSuite * apSuite, void * apContext)
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscriptionSingleSubOneEntry)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
     NullReadHandlerCallback nullCallback;
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
@@ -274,44 +294,44 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubOneEnt
     FabricIndex bobFabricIndex = 1;
 
     // Create ExchangeContext
-    Messaging::ExchangeContext * exchangeCtx1 = ctx.NewExchangeToBob(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx1);
+    Messaging::ExchangeContext * exchangeCtx1 = mpTestContext->NewExchangeToBob(nullptr, false);
+    ASSERT_TRUE(exchangeCtx1);
 
     // InteractionModelEngine init
-    NL_TEST_ASSERT(apSuite,
-                   CHIP_NO_ERROR ==
-                       engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), reporting::GetDefaultReportScheduler()));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           reporting::GetDefaultReportScheduler()));
 
     // Verify that there are no active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Create and setup readHandler 1
     ReadHandler * readHandler1 = engine->GetReadHandlerPool().CreateObject(
         nullCallback, exchangeCtx1, ReadHandler::InteractionType::Subscribe, reporting::GetDefaultReportScheduler());
 
     // Verify that Bob still doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Set readHandler1 to active
     readHandler1->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, true);
 
     // Verify that Bob still has an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Clean up read handlers
     engine->GetReadHandlerPool().ReleaseAll();
 
     // Verify that there are no active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 }
 
 /**
  * @brief Test verifies that the SubjectHasActiveSubscription will continue iterating till it fines at least one valid active
  * subscription
  */
-void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubMultipleEntries(nlTestSuite * apSuite, void * apContext)
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscriptionSingleSubMultipleEntries)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
     NullReadHandlerCallback nullCallback;
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
@@ -319,45 +339,45 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubMultip
     FabricIndex bobFabricIndex = 1;
 
     // Create ExchangeContexts
-    Messaging::ExchangeContext * exchangeCtx1 = ctx.NewExchangeToBob(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx1);
+    Messaging::ExchangeContext * exchangeCtx1 = mpTestContext->NewExchangeToBob(nullptr, false);
+    ASSERT_TRUE(exchangeCtx1);
 
-    Messaging::ExchangeContext * exchangeCtx2 = ctx.NewExchangeToBob(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx1);
+    Messaging::ExchangeContext * exchangeCtx2 = mpTestContext->NewExchangeToBob(nullptr, false);
+    ASSERT_TRUE(exchangeCtx1);
 
     // InteractionModelEngine init
-    NL_TEST_ASSERT(apSuite,
-                   CHIP_NO_ERROR ==
-                       engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), reporting::GetDefaultReportScheduler()));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           reporting::GetDefaultReportScheduler()));
 
     // Verify that both Alice and Bob have no active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Create readHandler 1
     engine->GetReadHandlerPool().CreateObject(nullCallback, exchangeCtx1, ReadHandler::InteractionType::Subscribe,
                                               reporting::GetDefaultReportScheduler());
 
     // Verify that Bob still doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Create and setup readHandler 2
     ReadHandler * readHandler2 = engine->GetReadHandlerPool().CreateObject(
         nullCallback, exchangeCtx2, ReadHandler::InteractionType::Subscribe, reporting::GetDefaultReportScheduler());
 
     // Verify that Bob still doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Set readHandler2 to active
     readHandler2->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, true);
 
-    // Verify that Bob still doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    // Verify that Bob has an active subscription
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Release active ReadHandler
     engine->GetReadHandlerPool().ReleaseObject(readHandler2);
 
     // Verify that there are no active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Clean up read handlers
     engine->GetReadHandlerPool().ReleaseAll();
@@ -366,9 +386,9 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubMultip
 /**
  * @brief Test validates that the SubjectHasActiveSubscription can support multiple subscriptions from different clients
  */
-void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry(nlTestSuite * apSuite, void * apContext)
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
     NullReadHandlerCallback nullCallback;
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
@@ -378,20 +398,20 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsSin
     FabricIndex aliceFabricIndex = 2;
 
     // Create ExchangeContexts
-    Messaging::ExchangeContext * exchangeCtx1 = ctx.NewExchangeToBob(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx1);
+    Messaging::ExchangeContext * exchangeCtx1 = mpTestContext->NewExchangeToBob(nullptr, false);
+    ASSERT_TRUE(exchangeCtx1);
 
-    Messaging::ExchangeContext * exchangeCtx2 = ctx.NewExchangeToAlice(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx2);
+    Messaging::ExchangeContext * exchangeCtx2 = mpTestContext->NewExchangeToAlice(nullptr, false);
+    ASSERT_TRUE(exchangeCtx2);
 
     // InteractionModelEngine init
-    NL_TEST_ASSERT(apSuite,
-                   CHIP_NO_ERROR ==
-                       engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), reporting::GetDefaultReportScheduler()));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           reporting::GetDefaultReportScheduler()));
 
     // Verify that both Alice and Bob have no active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 
     // Create and setup readHandler 1
     ReadHandler * readHandler1 = engine->GetReadHandlerPool().CreateObject(
@@ -402,51 +422,49 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsSin
         nullCallback, exchangeCtx2, ReadHandler::InteractionType::Subscribe, reporting::GetDefaultReportScheduler());
 
     // Verify that Bob still doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Set readHandler1 to active
     readHandler1->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, true);
 
     // Verify that Bob has an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Verify that Alice still doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 
     // Set readHandler2 to active
     readHandler2->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, true);
 
     // Verify that Bob has an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
-    // Verify that Alice still doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
+    // Verify that Alice has an active subscription
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 
     // Set readHandler1 to inactive
     readHandler1->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, false);
 
     // Verify that Bob doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Verify that Alice still has an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 
     // Clean up read handlers
     engine->GetReadHandlerPool().ReleaseAll();
 
     // Verify that both Alice and Bob have no active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 }
 
 /**
  * @brief Test validates that the SubjectHasActiveSubscription can find the active subscription even if there are multiple
  * subscriptions for each client
  */
-void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries(nlTestSuite * apSuite,
-                                                                                             void * apContext)
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
     NullReadHandlerCallback nullCallback;
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
@@ -456,26 +474,26 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsMul
     FabricIndex aliceFabricIndex = 2;
 
     // Create ExchangeContexts
-    Messaging::ExchangeContext * exchangeCtx11 = ctx.NewExchangeToBob(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx11);
+    Messaging::ExchangeContext * exchangeCtx11 = mpTestContext->NewExchangeToBob(nullptr, false);
+    ASSERT_TRUE(exchangeCtx11);
 
-    Messaging::ExchangeContext * exchangeCtx12 = ctx.NewExchangeToBob(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx12);
+    Messaging::ExchangeContext * exchangeCtx12 = mpTestContext->NewExchangeToBob(nullptr, false);
+    ASSERT_TRUE(exchangeCtx12);
 
-    Messaging::ExchangeContext * exchangeCtx21 = ctx.NewExchangeToAlice(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx21);
+    Messaging::ExchangeContext * exchangeCtx21 = mpTestContext->NewExchangeToAlice(nullptr, false);
+    ASSERT_TRUE(exchangeCtx21);
 
-    Messaging::ExchangeContext * exchangeCtx22 = ctx.NewExchangeToAlice(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx22);
+    Messaging::ExchangeContext * exchangeCtx22 = mpTestContext->NewExchangeToAlice(nullptr, false);
+    ASSERT_TRUE(exchangeCtx22);
 
     // InteractionModelEngine init
-    NL_TEST_ASSERT(apSuite,
-                   CHIP_NO_ERROR ==
-                       engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), reporting::GetDefaultReportScheduler()));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           reporting::GetDefaultReportScheduler()));
 
     // Verify that both Alice and Bob have no active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 
     // Create and setup readHandler 1-1
     engine->GetReadHandlerPool().CreateObject(nullCallback, exchangeCtx11, ReadHandler::InteractionType::Subscribe,
@@ -494,50 +512,49 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsMul
         nullCallback, exchangeCtx22, ReadHandler::InteractionType::Subscribe, reporting::GetDefaultReportScheduler());
 
     // Verify that both Alice and Bob have no active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 
     // Set readHandler 1-2 to active
     readHandler12->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, true);
 
     // Verify that Bob has an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Verify that Alice still doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 
     // Set readHandler 2-2 to active
     readHandler22->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, true);
 
     // Verify that Bob has an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
-    // Verify that Alice still doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
+    // Verify that Alice has an active subscription
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 
     // Set readHandler1 to inactive
     readHandler12->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, false);
 
     // Verify that Bob doesn't have an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
 
     // Verify that Alice still has an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 
     // Clean up read handlers
     engine->GetReadHandlerPool().ReleaseAll();
 
     // Verify that both Alice and Bob have no active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId));
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId));
 }
 
 /**
  * @brief Verifies that SubjectHasActiveSubscription support CATs as a subject-id
  */
-void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSubWithCAT(nlTestSuite * apSuite, void * apContext)
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubjectHasActiveSubscriptionSubWithCAT)
 {
-    TestContext & ctx               = *reinterpret_cast<TestContext *>(apContext);
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
     NullReadHandlerCallback nullCallback;
 
@@ -549,41 +566,41 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSubWithCAT(nlTe
     FabricIndex bobFabricIndex = 1;
 
     // InteractionModelEngine init
-    NL_TEST_ASSERT(apSuite,
-                   CHIP_NO_ERROR ==
-                       engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), reporting::GetDefaultReportScheduler()));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           reporting::GetDefaultReportScheduler()));
 
     // Make sure we are using CASE sessions, because there is no defunct-marking for PASE.
-    ctx.ExpireSessionBobToAlice();
-    ctx.ExpireSessionAliceToBob();
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == ctx.CreateCASESessionBobToAlice(cats));
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == ctx.CreateCASESessionAliceToBob(cats));
+    mpTestContext->ExpireSessionBobToAlice();
+    mpTestContext->ExpireSessionAliceToBob();
+    EXPECT_EQ(CHIP_NO_ERROR, mpTestContext->CreateCASESessionBobToAlice(cats));
+    EXPECT_EQ(CHIP_NO_ERROR, mpTestContext->CreateCASESessionAliceToBob(cats));
 
     // Create ExchangeContexts
-    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToBob(nullptr, false);
-    NL_TEST_ASSERT(apSuite, exchangeCtx);
+    Messaging::ExchangeContext * exchangeCtx = mpTestContext->NewExchangeToBob(nullptr, false);
+    ASSERT_TRUE(exchangeCtx);
 
     // Create readHandler
     ReadHandler * readHandler = engine->GetReadHandlerPool().CreateObject(
         nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, reporting::GetDefaultReportScheduler());
 
     // Verify there are not active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, valideSubjectId) == false);
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, invalideSubjectId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, valideSubjectId));
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, invalideSubjectId));
 
     // Set readHandler to active
     readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, true);
 
     // Verify tthat valid subjectID has an active subscription
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, valideSubjectId));
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, invalideSubjectId) == false);
+    EXPECT_TRUE(engine->SubjectHasActiveSubscription(bobFabricIndex, valideSubjectId));
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, invalideSubjectId));
 
     // Clean up read handlers
     engine->GetReadHandlerPool().ReleaseAll();
 
     // Verify there are not active subscriptions
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, valideSubjectId) == false);
-    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, invalideSubjectId) == false);
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, valideSubjectId));
+    EXPECT_FALSE(engine->SubjectHasActiveSubscription(bobFabricIndex, invalideSubjectId));
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -591,20 +608,18 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSubWithCAT(nlTe
 /**
  * @brief Test verifies the SubjectHasPersistedSubscription with single and multiple persisted subscriptions.
  */
-void TestInteractionModelEngine::TestSubjectHasPersistedSubscription(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestInteractionModelEngine, TestSubjectHasPersistedSubscription)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
     chip::TestPersistentStorageDelegate storage;
     chip::app::SimpleSubscriptionResumptionStorage subscriptionStorage;
 
-    err = subscriptionStorage.Init(&storage);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(subscriptionStorage.Init(&storage), CHIP_NO_ERROR);
 
-    err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                      app::reporting::GetDefaultReportScheduler(), nullptr, &subscriptionStorage);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(CHIP_NO_ERROR,
+              engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           app::reporting::GetDefaultReportScheduler(), nullptr, &subscriptionStorage));
 
     NodeId nodeId1      = 1;
     FabricIndex fabric1 = 1;
@@ -621,29 +636,29 @@ void TestInteractionModelEngine::TestSubjectHasPersistedSubscription(nlTestSuite
                                                               .mSubscriptionId = sub2 };
 
     // Test with no persisted subscriptions - Should return false
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(fabric1, nodeId1) == false);
+    EXPECT_FALSE(engine->SubjectHasPersistedSubscription(fabric1, nodeId1));
 
     // Add one entry
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == subscriptionStorage.Save(info1));
+    EXPECT_EQ(CHIP_NO_ERROR, subscriptionStorage.Save(info1));
 
     // Verify that entry matches - Should return true
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(fabric1, nodeId1));
+    EXPECT_TRUE(engine->SubjectHasPersistedSubscription(fabric1, nodeId1));
 
     // Test with absent subscription - Should return false
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(fabric2, nodeId2) == false);
+    EXPECT_FALSE(engine->SubjectHasPersistedSubscription(fabric2, nodeId2));
 
     // Add second entry
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == subscriptionStorage.Save(info2));
+    EXPECT_EQ(CHIP_NO_ERROR, subscriptionStorage.Save(info2));
 
     // Verify that entry matches - Should return true
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(fabric2, nodeId2));
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(fabric1, nodeId1));
+    EXPECT_TRUE(engine->SubjectHasPersistedSubscription(fabric2, nodeId2));
+    EXPECT_TRUE(engine->SubjectHasPersistedSubscription(fabric1, nodeId1));
 
     // Remove an entry
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == subscriptionStorage.Delete(nodeId1, fabric1, sub1));
+    EXPECT_EQ(CHIP_NO_ERROR, subscriptionStorage.Delete(nodeId1, fabric1, sub1));
 
     // Test with absent subscription - Should return false
-    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(fabric1, nodeId1) == false);
+    EXPECT_FALSE(engine->SubjectHasPersistedSubscription(fabric1, nodeId1));
 
     // Clean Up entries
     subscriptionStorage.DeleteAll(fabric1);
@@ -652,48 +667,47 @@ void TestInteractionModelEngine::TestSubjectHasPersistedSubscription(nlTestSuite
 
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
-void TestInteractionModelEngine::TestSubscriptionResumptionTimer(nlTestSuite * apSuite, void * apContext)
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestSubscriptionResumptionTimer)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                                    app::reporting::GetDefaultReportScheduler());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+
+    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
 
     uint32_t timeTillNextResubscriptionMs;
-    InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries = 0;
-    timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeSecondsTillNextSubscriptionResumption();
-    NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs == CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS);
+    engine->mNumSubscriptionResumptionRetries = 0;
+    timeTillNextResubscriptionMs              = engine->ComputeTimeSecondsTillNextSubscriptionResumption();
+    EXPECT_EQ(timeTillNextResubscriptionMs, (unsigned) CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MIN_RETRY_INTERVAL_SECS);
 
     uint32_t lastTimeTillNextResubscriptionMs = timeTillNextResubscriptionMs;
-    for (InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries = 1;
-         InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries <=
-         CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX;
-         InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries++)
+    for (engine->mNumSubscriptionResumptionRetries = 1;
+         engine->mNumSubscriptionResumptionRetries <= CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX;
+         engine->mNumSubscriptionResumptionRetries++)
     {
-        timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeSecondsTillNextSubscriptionResumption();
-        NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs >= lastTimeTillNextResubscriptionMs);
-        NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs < CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS);
+        timeTillNextResubscriptionMs = engine->ComputeTimeSecondsTillNextSubscriptionResumption();
+        EXPECT_GE(timeTillNextResubscriptionMs, lastTimeTillNextResubscriptionMs);
+        EXPECT_LT(timeTillNextResubscriptionMs, (unsigned) CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS);
         lastTimeTillNextResubscriptionMs = timeTillNextResubscriptionMs;
     }
 
-    InteractionModelEngine::GetInstance()->mNumSubscriptionResumptionRetries = 2000;
-    timeTillNextResubscriptionMs = InteractionModelEngine::GetInstance()->ComputeTimeSecondsTillNextSubscriptionResumption();
-    NL_TEST_ASSERT(apSuite, timeTillNextResubscriptionMs == CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS);
+    engine->mNumSubscriptionResumptionRetries = 2000;
+    timeTillNextResubscriptionMs              = engine->ComputeTimeSecondsTillNextSubscriptionResumption();
+    EXPECT_EQ(timeTillNextResubscriptionMs, (unsigned) CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS);
 }
 
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
-void TestInteractionModelEngine::TestDecrementNumSubscriptionsToResume(nlTestSuite * apSuite, void * apContext)
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestDecrementNumSubscriptionsToResume)
 {
-    TestContext & ctx                       = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
     InteractionModelEngine * engine         = InteractionModelEngine::GetInstance();
     constexpr uint8_t kNumberOfSubsToResume = 5;
     uint8_t numberOfSubsRemaining           = kNumberOfSubsToResume;
 
-    err = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                           app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     ICDManager manager;
@@ -705,35 +719,35 @@ void TestInteractionModelEngine::TestDecrementNumSubscriptionsToResume(nlTestSui
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     // Verify mIsBootUpResumeSubscriptionExecuted has not been set
-    NL_TEST_ASSERT(apSuite, !manager.GetIsBootUpResumeSubscriptionExecuted());
+    EXPECT_FALSE(manager.GetIsBootUpResumeSubscriptionExecuted());
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
     // Decrease number of subs by 1
     numberOfSubsRemaining--;
     engine->DecrementNumSubscriptionsToResume();
-    NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionsToResume);
+    EXPECT_EQ(numberOfSubsRemaining, engine->mNumOfSubscriptionsToResume);
 
     // Decrease to 0 subs remaining
     while (numberOfSubsRemaining > 0)
     {
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         // Verify mIsBootUpResumeSubscriptionExecuted has not been set
-        NL_TEST_ASSERT(apSuite, !manager.GetIsBootUpResumeSubscriptionExecuted());
+        EXPECT_FALSE(manager.GetIsBootUpResumeSubscriptionExecuted());
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
         numberOfSubsRemaining--;
         engine->DecrementNumSubscriptionsToResume();
-        NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionsToResume);
+        EXPECT_EQ(numberOfSubsRemaining, engine->mNumOfSubscriptionsToResume);
     }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     // Verify mIsBootUpResumeSubscriptionExecuted has been set
-    NL_TEST_ASSERT(apSuite, manager.GetIsBootUpResumeSubscriptionExecuted());
+    EXPECT_TRUE(manager.GetIsBootUpResumeSubscriptionExecuted());
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
     // Make sure we don't rollover / go negative
     engine->DecrementNumSubscriptionsToResume();
-    NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionsToResume);
+    EXPECT_EQ(numberOfSubsRemaining, engine->mNumOfSubscriptionsToResume);
 
     // Clean up
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
@@ -744,47 +758,3 @@ void TestInteractionModelEngine::TestDecrementNumSubscriptionsToResume(nlTestSui
 
 } // namespace app
 } // namespace chip
-
-namespace {
-
-// clang-format off
-const nlTest sTests[] =
-        {
-                NL_TEST_DEF("TestAttributePathParamsPushRelease", chip::app::TestInteractionModelEngine::TestAttributePathParamsPushRelease),
-                NL_TEST_DEF("TestRemoveDuplicateConcreteAttribute", chip::app::TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute),
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-                NL_TEST_DEF("TestSubjectHasPersistedSubscription", chip::app::TestInteractionModelEngine::TestSubjectHasPersistedSubscription),
-                NL_TEST_DEF("TestDecrementNumSubscriptionsToResume", chip::app::TestInteractionModelEngine::TestDecrementNumSubscriptionsToResume),
-#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-                NL_TEST_DEF("TestSubscriptionResumptionTimer", chip::app::TestInteractionModelEngine::TestSubscriptionResumptionTimer),
-#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-                NL_TEST_DEF("TestSubjectHasActiveSubscriptionSingleSubOneEntry", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubOneEntry),
-                NL_TEST_DEF("TestSubjectHasActiveSubscriptionSingleSubMultipleEntries", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubMultipleEntries),
-                NL_TEST_DEF("TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry),
-                NL_TEST_DEF("TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries),
-                NL_TEST_DEF("TestSubjectHasActiveSubscriptionSubWithCAT", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSubWithCAT),
-                NL_TEST_SENTINEL()
-        };
-// clang-format on
-
-// clang-format off
-nlTestSuite sSuite =
-{
-    "TestInteractionModelEngine",
-    &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
-};
-// clang-format on
-
-} // namespace
-
-int TestInteractionModelEngine()
-{
-    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestInteractionModelEngine)

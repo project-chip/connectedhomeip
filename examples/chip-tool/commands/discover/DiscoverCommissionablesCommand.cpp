@@ -23,7 +23,7 @@
 
 using namespace ::chip;
 
-void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
 {
     nodeData.LogDetail();
     LogErrorOnFailure(RemoteDataModelLogger::LogDiscoveredNodeData(nodeData));

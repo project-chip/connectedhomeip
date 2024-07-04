@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  * MTRServerCluster's API can be accessed from any thread.
  */
 NS_SWIFT_SENDABLE
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRServerCluster : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;

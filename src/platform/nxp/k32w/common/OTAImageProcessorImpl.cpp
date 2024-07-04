@@ -142,7 +142,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
         }
 
         status = mCurrentProcessor->Process(block);
-        if (status == CHIP_OTA_CHANGE_PROCESSOR)
+        if (status == CHIP_ERROR_OTA_CHANGE_PROCESSOR)
         {
             mAccumulator.Clear();
             mAccumulator.Init(sizeof(OTATlvHeader));
@@ -180,7 +180,7 @@ CHIP_ERROR OTAImageProcessorImpl::SelectProcessor(ByteSpan & block)
     if (pair == mProcessorMap.end())
     {
         ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %" PRIu32, header.tag);
-        return CHIP_OTA_PROCESSOR_NOT_REGISTERED;
+        return CHIP_ERROR_OTA_PROCESSOR_NOT_REGISTERED;
     }
 
     ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %ld", pair->first);
@@ -197,7 +197,7 @@ CHIP_ERROR OTAImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcesso
     if (pair != mProcessorMap.end())
     {
         ChipLogError(SoftwareUpdate, "A processor for tag %" PRIu32 " is already registered.", tag);
-        return CHIP_OTA_PROCESSOR_ALREADY_REGISTERED;
+        return CHIP_ERROR_OTA_PROCESSOR_ALREADY_REGISTERED;
     }
 
     mProcessorMap.insert({ tag, processor });
@@ -249,7 +249,7 @@ void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
         mParams.downloadedBytes += mBlock.size();
         FetchNextData(0);
     }
-    else if (status == CHIP_OTA_FETCH_ALREADY_SCHEDULED)
+    else if (status == CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED)
     {
         mParams.downloadedBytes += mBlock.size();
     }

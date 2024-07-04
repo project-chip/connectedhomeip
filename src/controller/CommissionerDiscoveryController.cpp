@@ -219,6 +219,18 @@ void CommissionerDiscoveryController::InternalOk()
         ChipLogError(AppServer, "UX InternalOk: could not find instance=%s", mCurrentInstance);
         return;
     }
+
+    if (mAppInstallationService == nullptr)
+    {
+        ChipLogError(AppServer, "UX InternalOk: no app installation service");
+        return;
+    }
+
+    if (!mAppInstallationService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId()))
+    {
+        ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
+    }
+
     if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
     {
         ChipLogError(AppServer, "UX InternalOk: invalid state for ok");
@@ -244,6 +256,7 @@ void CommissionerDiscoveryController::InternalOk()
     CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
+
     if (targetAppCount > 0)
     {
         ChipLogDetail(AppServer, "UX InternalOk: checking for each target app specified");
@@ -583,6 +596,7 @@ void CommissionerDiscoveryController::Cancel()
     }
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
     mPendingConsent = false;
+    ResetState();
 }
 
 void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,

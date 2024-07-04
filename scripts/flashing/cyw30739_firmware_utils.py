@@ -19,6 +19,7 @@ through an `Flasher` instance, or operations according to a command line.
 For `Flasher`, see the class documentation.
 """
 
+import pathlib
 import sys
 
 import firmware_utils
@@ -43,17 +44,37 @@ CYW30739_OPTIONS = {
             "default": None,
             "argparse": {"action": "store"},
         },
+        "hci_id": {
+            "help": "The HCI ID file.",
+            "default": None,
+            "argparse": {"type": pathlib.Path},
+        },
+        "btp": {
+            "help": "The BTP file.",
+            "default": None,
+            "argparse": {"type": pathlib.Path},
+        },
+        "minidriver": {
+            "help": "The minidriver.",
+            "default": None,
+            "argparse": {"type": pathlib.Path},
+        },
+        "flags": {
+            "help": "The additional flags file.",
+            "default": None,
+            "argparse": {"type": pathlib.Path},
+        },
         "program": {
             "help": "The script to program the flash.",
             "command": [
-                "bash",
-                "--norc",
-                "--noprofile",
-                "{sdk_scripts_dir}/bt_program.bash",
-                "--tools={sdk_tools_dir}",
-                "--scripts={sdk_scripts_dir}",
-                "--elf={application}",
-                "--direct={direct}",
+                "perl",
+                "{sdk_scripts_dir}/ChipLoad.pl",
+                "-tools_path", "{sdk_tools_dir}",
+                "-id", "{hci_id}",
+                "-btp", "{btp}",
+                "-mini", "{minidriver}",
+                "-flags", "{flags}",
+                "-direct", "{direct}",
                 (),
             ],
         },
@@ -64,6 +85,18 @@ CYW30739_OPTIONS = {
         },
     },
 }
+
+FLASH_SUCCESS_MESSAGES = "Download succeeded."
+FLASH_FAIL_MESSAGES = """Download failed.
+
+If the serial port was not detected, make sure no other program such as ClientControl has the port open.
+
+If you have issues downloading to the kit, follow the steps below:
+
+Press and hold the 'Recover' button on the kit.
+Press and hold the 'Reset' button on the kit.
+Release the 'Reset' button.
+After one second, release the 'Recover' button."""
 
 
 class Flasher(firmware_utils.Flasher):
@@ -89,16 +122,13 @@ class Flasher(firmware_utils.Flasher):
         """Flash image."""
 
         arguments = [
-            "--hex={}/{}_download.hex".format(
-                self.option.application.parent, self.option.application.stem
-            ),
+            "-build_path", self.option.application.parent,
+            "-hex", self.option.application.with_suffix(".hex"),
         ]
         if self.option.port:
-            arguments.append("--uart={port}")
-        if self.option.verbose > 0:
-            arguments.append("--verbose")
+            arguments.extend(["-uart", "{port}"])
 
-        return self.run_tool("program", arguments, name="Flash")
+        return self.run_tool("program", arguments, pass_message=FLASH_SUCCESS_MESSAGES, fail_message=FLASH_FAIL_MESSAGES)
 
     def reset(self):
         """Not supported"""

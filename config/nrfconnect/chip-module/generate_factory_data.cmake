@@ -129,9 +129,21 @@ set(factory_data_output_path ${output_path}/${factory_data_target})
 string(APPEND script_args "-o \"${factory_data_output_path}\"\n")
 string(APPEND script_args "-s \"${schema_path}\"\n")
 
-# Add optional offset and size arguments to generate both .hex and .json files.
-string(APPEND script_args "--offset $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_ADDRESS>\n")
-string(APPEND script_args "--size $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_OFFSET>\n")
+# Add optional offset and size arguments to generate .hex file as well as .json.
+if(CONFIG_PARTITION_MANAGER_ENABLED)     
+    string(APPEND script_args "--offset $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_ADDRESS>\n")
+    string(APPEND script_args "--size $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_OFFSET>\n")
+else()
+    dt_alias(factory_data_alias PROPERTY "factory-data")
+    dt_node_exists(factory_data_exists PATH "${factory_data_alias}")
+    if(NOT ${factory_data_exists})
+        message(FATAL_ERROR "factory-data alias does not exist in DTS")
+    endif()
+    dt_reg_addr(factory_data_addr PATH ${factory_data_alias})
+    dt_reg_size(factory_data_size PATH ${factory_data_alias})
+    string(APPEND script_args "--offset ${factory_data_addr}\n")
+    string(APPEND script_args "--size ${factory_data_size}\n")     
+endif()
 
 # execute first script to create a JSON file
 separate_arguments(separated_script_args NATIVE_COMMAND ${script_args})
@@ -175,10 +187,15 @@ nrfconnect_create_factory_data(factory_data
                                ${FACTORY_DATA_SCHEMA_PATH} 
                                ${OUTPUT_FILE_PATH})
 
-if(CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)                                   
-    # set custom target for merging factory_data hex file
-    set_property(GLOBAL PROPERTY factory_data_PM_HEX_FILE ${OUTPUT_FILE_PATH}/factory_data.hex)
-    set_property(GLOBAL PROPERTY factory_data_PM_TARGET factory_data)
+if(CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
+    if(CONFIG_PARTITION_MANAGER_ENABLED)                           
+        # set custom target for merging factory_data hex file
+        set_property(GLOBAL PROPERTY factory_data_PM_HEX_FILE ${OUTPUT_FILE_PATH}/factory_data.hex)
+        set_property(GLOBAL PROPERTY factory_data_PM_TARGET factory_data)
+    else()
+        set_property(GLOBAL APPEND PROPERTY HEX_FILES_TO_MERGE ${OUTPUT_FILE_PATH}/factory_data.hex ${OUTPUT_FILE_PATH}/zephyr.hex)
+        set_property(TARGET runners_yaml_props_target PROPERTY hex_file ${OUTPUT_FILE_PATH}/merged.hex)
+    endif()
 endif()
 
 

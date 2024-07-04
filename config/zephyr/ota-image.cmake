@@ -31,18 +31,33 @@ function(chip_ota_image TARGET_NAME)
     endif()
 
     # Prepare ota_image_tool.py argument list
-    set(OTA_ARGS
-        "--vendor-id"
-        ${CONFIG_CHIP_DEVICE_VENDOR_ID}
-        "--product-id"
-        ${CONFIG_CHIP_DEVICE_PRODUCT_ID}
-        "--version"
-        ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION}
-        "--version-str"
-        ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING}
-        "--digest-algorithm"
-        "sha256"
-    )
+    if(DEFINED APPVERSION)
+        set(OTA_ARGS
+            "--vendor-id"
+            ${CONFIG_CHIP_DEVICE_VENDOR_ID}
+            "--product-id"
+            ${CONFIG_CHIP_DEVICE_PRODUCT_ID}
+            "--version"
+            ${APPVERSION}
+            "--version-str"
+            ${APP_VERSION_TWEAK_STRING}
+            "--digest-algorithm"
+            "sha256"
+        )
+    else()
+        set(OTA_ARGS
+            "--vendor-id"
+            ${CONFIG_CHIP_DEVICE_VENDOR_ID}
+            "--product-id"
+            ${CONFIG_CHIP_DEVICE_PRODUCT_ID}
+            "--version"
+            ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION}
+            "--version-str"
+            ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING}
+            "--digest-algorithm"
+            "sha256"
+        )
+    endif()
 
     separate_arguments(OTA_EXTRA_ARGS NATIVE_COMMAND "${CHIP_OTA_IMAGE_EXTRA_ARGS}")
 
