@@ -685,12 +685,12 @@ static sl_status_t wfx_rsi_do_join(void)
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
     uint32_t timeout_ms = 0;
-
-    ap.ssid.length = strnlen(wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
+    ap.ssid.length      = strnlen(wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
+    ap.encryption       = SL_WIFI_NO_ENCRYPTION;
+    ap.credential_id    = id;
     memcpy(ap.ssid.value, (int8_t *) &wfx_rsi.sec.ssid[0], ap.ssid.length);
-    ap.encryption    = SL_WIFI_NO_ENCRYPTION;
-    ap.credential_id = id;
-    status           = sl_wifi_connect(SL_WIFI_CLIENT_INTERFACE, &ap, timeout_ms);
+
+    status = sl_wifi_connect(SL_WIFI_CLIENT_INTERFACE, &ap, timeout_ms);
     // sl_wifi_connect returns SL_STATUS_IN_PROGRESS if join is in progress
     // after the initial scan is done, the scan does not check for SSID
     ReturnErrorCodeIf((status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS), status);
