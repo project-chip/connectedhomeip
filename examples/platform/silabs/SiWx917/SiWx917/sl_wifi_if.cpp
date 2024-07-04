@@ -677,7 +677,7 @@ static sl_status_t wfx_rsi_do_join(void)
     status = sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-    VerifyOrReturnError(strlen(wfx_rsi.sec.passkey) > SL_WIFI_MAX_PSK_LENGTH, SL_STATUS_SI91X_INVALID_PSK_LENGTH);
+    VerifyOrReturnError(strlen(wfx_rsi.sec.passkey) <= SL_WIFI_MAX_PSK_LENGTH, SL_STATUS_SI91X_INVALID_PSK_LENGTH);
     sl_net_credential_id_t id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
     status                    = sl_net_set_credential(id, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0], strlen(wfx_rsi.sec.passkey));
     VerifyOrReturnError(status == SL_STATUS_OK, status);
