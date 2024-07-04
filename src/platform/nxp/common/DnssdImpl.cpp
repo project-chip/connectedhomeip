@@ -440,7 +440,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
     mdnsService.mInterface = ConnectivityManagerImpl().GetThreadInterface();
 
     mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
-    mdnsService.mAddress     = MakeOptional(ToIPAddress(*ip6AddrPtr));
+    mdnsService.mAddress     = std::optional(ToIPAddress(*ip6AddrPtr));
 
     // Extract TXT record SRP service
     txtStringPtr = otSrpServerServiceGetTxtData(service, &txtDataLen);
@@ -547,7 +547,7 @@ CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const cha
     if (!otIp6IsAddressUnspecified(&serviceInfo.mHostAddress))
     {
         mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
-        mdnsService.mAddress     = MakeOptional(ToIPAddress(serviceInfo.mHostAddress));
+        mdnsService.mAddress     = std::optional(ToIPAddress(serviceInfo.mHostAddress));
     }
 
     // Check if TXT record was included in DNS response.

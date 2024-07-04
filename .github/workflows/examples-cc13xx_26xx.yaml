@@ -17,16 +17,19 @@ name: Build example - TI CC13XX_26XX
 on:
     push:
         branches-ignore:
-            - 'dependabot/**'
+            - "dependabot/**"
     pull_request:
     merge_group:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+        'pull_request' && github.event.number) || (github.event_name ==
+        'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     cc13xx_26xx:
         name: cc13xx_26xx
@@ -47,13 +50,14 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: cc13xx_26xx
+                  platform: cc13xx_26xx
+                  extra-submodule-parameters: " --recursive"
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
               with:
-                gh-context: ${{ toJson(github) }}
-        
+                  gh-context: ${{ toJson(github) }}
+
             - name: Build examples
               run: |
                   scripts/run_in_build_env.sh "\
@@ -103,4 +107,4 @@ jobs:
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                platform-name: cc13x4_26x4
+                  platform-name: cc13x4_26x4

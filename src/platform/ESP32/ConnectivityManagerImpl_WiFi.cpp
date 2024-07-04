@@ -999,6 +999,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 // If the station interface has been assigned an IPv4 address, and has
                 // an IPv4 gateway, then presume that the device has IPv4 Internet
                 // connectivity.
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
                 if (!ip4_addr_isany_val(*netif_ip4_addr(netif)) && !ip4_addr_isany_val(*netif_ip4_gw(netif)))
                 {
                     haveIPv4Conn = true;
@@ -1013,6 +1014,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                         IPAddress::FromString(addrStr, addr);
                     }
                 }
+#endif
 
                 // Search among the IPv6 addresses assigned to the interface for a Global Unicast
                 // address (2000::/3) that is in the valid state.  If such an address is found...

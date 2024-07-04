@@ -63,10 +63,20 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "scripts/examples/gn_build_example.sh examples/tv-casting-app/linux/ out/tv-casting-app chip_casting_simplified=true"
 
-            - name: Test casting from Linux tv-casting-app to Linux tv-app
+            - name:
+                  Test casting from Linux tv-casting-app to Linux tv-app -
+                  Commissionee Generated Passcode
               run: |
                   ./scripts/run_in_build_env.sh \
                     "python3 ./scripts/tests/run_tv_casting_test.py"
+              timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
+
+            - name:
+                  Test casting from Linux tv-casting-app to Linux tv-app -
+                  Commissioner Generated Passcode
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "python3 ./scripts/tests/run_tv_casting_test.py --commissioner-generated-passcode=True"
               timeout-minutes: 2 # Comment this out to debug if GitHub Action times out.
 
             - name: Uploading Size Reports
