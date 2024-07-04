@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-table-detail.h>
+#include <app/util/attribute-table.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
 #include <app/util/odd-sized-integers.h>
@@ -346,22 +347,13 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
     Protocols::InteractionModel::Status status;
 
-    if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
+    if (request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
     {
-
-        EmberAfAttributeSearchRecord record;
-        record.endpoint    = request.path.mEndpointId;
-        record.clusterId   = request.path.mClusterId;
-        record.attributeId = request.path.mAttributeId;
-        // NOTE: gEmberAttributeIOBufferSpah is likely much larger than the attribute itself. Ember is supposed
-        //       to be able to pick up the "valid size" out of this
-        //
-        // Specifically `When writing attributes, readLength is ignored.`.
-        // The actual length is used by unit tests to copy over data without needing "get attribute size" logic
-        // since metadata attribute sizes in our mocks is not generally correct.
-        status = emAfReadOrWriteAttribute(&record, attributeMetadata, /* buffer = */ gEmberAttributeIOBufferSpan.data(),
-                                          /* readLength = */ static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
-                                          /* write = */ true);
+        // Internal requests use the non-External interface that has less enforcement
+        // than the external version (e.g. does not check/enforce writable settings, does not
+        // validate atribute types) - see attribute-table.h documentation for details.
+        status = emberAfWriteAttribute(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
+                                       gEmberAttributeIOBufferSpan.data(), (*attributeMetadata)->attributeType);
     }
     else
     {

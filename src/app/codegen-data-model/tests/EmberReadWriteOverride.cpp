@@ -121,3 +121,8 @@ Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId clu
 
     return Status::Success;
 }
+
+Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
+                             uint8_t * dataPtr, EmberAfAttributeType dataType) {
+  return emAfWriteAttributeExternal(endpoint, cluster, attributeID, dataPtr, dataType);
+}
