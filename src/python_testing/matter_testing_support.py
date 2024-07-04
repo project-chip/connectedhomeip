@@ -274,7 +274,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     def stop(self, duration: int):
         logging.info(f'Finished test set, ran for {duration}ms')
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         logging.info(f'Starting test from {filename}: {name} - {count} steps')
 
     def test_stop(self, exception: Exception, duration: int):
@@ -740,7 +740,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             num_steps = 1 if steps is None else len(steps)
             filename = inspect.getfile(self.__class__)
             desc = self.get_test_desc(test_name)
-            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps)
+            steps_descriptions = [] if steps is None else [step.description for step in steps]
+            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
             # If we don't have defined steps, we're going to start the one and only step now
             # if there are steps defined by the test, rely on the test calling the step() function
             # to indicates how it is proceeding
