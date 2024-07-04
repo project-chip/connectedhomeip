@@ -694,9 +694,9 @@ static sl_status_t wfx_rsi_do_join(void)
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
     ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: retry attempt %d", wfx_rsi.join_retries);
     wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
+    wfx_rsi.join_retries++;
     event.eventType = WFX_EVT_STA_START_JOIN;
     WfxPostEvent(&event);
-    wfx_rsi.join_retries++;
     return status;
 }
 
