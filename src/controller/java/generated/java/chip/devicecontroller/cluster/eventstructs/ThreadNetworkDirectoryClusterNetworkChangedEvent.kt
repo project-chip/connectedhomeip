@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThreadNetworkDirectoryClusterNetworkChangedEvent(val extendedPanID: ULong) {
+class ThreadNetworkDirectoryClusterNetworkChangedEvent(val extendedPanID: ByteArray) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDirectoryClusterNetworkChangedEvent {\n")
     append("\textendedPanID : $extendedPanID\n")
@@ -45,7 +45,7 @@ class ThreadNetworkDirectoryClusterNetworkChangedEvent(val extendedPanID: ULong)
       tlvReader: TlvReader,
     ): ThreadNetworkDirectoryClusterNetworkChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val extendedPanID = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))
+      val extendedPanID = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))
 
       tlvReader.exitContainer()
 
