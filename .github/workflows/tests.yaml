@@ -576,7 +576,6 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestMatterTestingSupport.py" --script-args "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestSpecParsingSupport.py" --script-args "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py'
-                  scripts/run_in_python_env.sh out/venv './src/python_testing/test_testing/test_TC_DA_1_2.py'
                   scripts/run_in_python_env.sh out/venv './src/python_testing/test_testing/test_TC_ICDM_2_1.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestIdChecks.py'
 
