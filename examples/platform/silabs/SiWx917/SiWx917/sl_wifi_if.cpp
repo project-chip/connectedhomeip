@@ -246,7 +246,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
         callback_status = *(sl_status_t *) result;
-        ChipLogError(DeviceLayer, "join_callback_handler: failed: 0x%x", callback_status);
+        ChipLogError(DeviceLayer, "join_callback_handler: failed: 0x%lx", static_cast<uint32_t>(callback_status));
         wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTED);
         wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
         if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
@@ -329,14 +329,14 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
     status = rsi_bt_power_save_profile(sl_si91x_ble_state, 0);
     if (status != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: 0x%x", status);
+        ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
     sl_wifi_performance_profile_t wifi_profile = { .profile = sl_si91x_wifi_state };
     status                                     = sl_wifi_set_performance_profile(&wifi_profile);
     if (status != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "sl_wifi_set_performance_profile failed: 0x%x", status);
+        ChipLogError(DeviceLayer, "sl_wifi_set_performance_profile failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
     if (sl_si91x_wifi_state == HIGH_PERFORMANCE)
@@ -413,7 +413,7 @@ static sl_status_t wfx_rsi_init(void)
     status = wfx_wifi_rsi_init();
     if (status != SL_STATUS_OK)
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_init failed: 0x%x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_init failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
 #else // For SoC
@@ -422,7 +422,7 @@ static sl_status_t wfx_rsi_init(void)
     status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
     if (status != SL_STATUS_OK)
     {
-        ChipLogError(DeviceLayer, "sl_si91x_m4_ta_secure_handshake failed: 0x%x", status);
+        ChipLogError(DeviceLayer, "sl_si91x_m4_ta_secure_handshake failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
@@ -432,7 +432,7 @@ static sl_status_t wfx_rsi_init(void)
     status                             = sl_wifi_get_firmware_version(&version);
     if (status != SL_STATUS_OK)
     {
-        ChipLogError(DeviceLayer, "sl_wifi_get_firmware_version failed: 0x%x", status);
+        ChipLogError(DeviceLayer, "sl_wifi_get_firmware_version failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
     sl_print_firmware_version(&version);
@@ -440,7 +440,7 @@ static sl_status_t wfx_rsi_init(void)
     status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, (sl_mac_address_t *) &wfx_rsi.sta_mac.octet[0]);
     if (status != SL_STATUS_OK)
     {
-        ChipLogDetail(DeviceLayer, "sl_wifi_get_mac_address failed: 0x%x", status);
+        ChipLogDetail(DeviceLayer, "sl_wifi_get_mac_address failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
 
@@ -451,7 +451,7 @@ static sl_status_t wfx_rsi_init(void)
     status = sl_si91x_trng_entropy();
     if (status != SL_STATUS_OK)
     {
-        ChipLogError(DeviceLayer, "sl_si91x_trng_entropy failed: 0x%x", status);
+        ChipLogError(DeviceLayer, "sl_si91x_trng_entropy failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
 
@@ -459,7 +459,7 @@ static sl_status_t wfx_rsi_init(void)
     status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNG_KEY_SIZE);
     if (status != SL_STATUS_OK)
     {
-        ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%x", status);
+        ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%lx", static_cast<uint32_t>(status));
         return status;
     }
 #endif // SL_MBEDTLS_USE_TINYCRYPT
@@ -488,7 +488,7 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
         callback_status = *(sl_status_t *) scan_result;
-        ChipLogError(DeviceLayer, "scan_callback_handler: failed: 0x%x", callback_status);
+        ChipLogError(DeviceLayer, "scan_callback_handler: failed: 0x%lx", static_cast<uint32_t>(callback_status));
         scan_results_complete = true;
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA3;
@@ -688,7 +688,7 @@ static sl_status_t wfx_rsi_do_join(void)
     ReturnErrorCodeIf((status == SL_STATUS_OK || status == SL_STATUS_IN_PROGRESS), status);
 
     // failure only happens when the firmware returns an error
-    ChipLogError(DeviceLayer, "wfx_rsi_do_join: sl_wifi_connect failed: 0x%x", status);
+    ChipLogError(DeviceLayer, "wfx_rsi_do_join: sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
     VerifyOrReturnError((is_wifi_disconnection_event || wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
@@ -758,7 +758,7 @@ void WfxPostEvent(WfxEvent_t * event)
 
     if (status != osOK)
     {
-        ChipLogError(DeviceLayer, "WfxPostEvent: failed to post event: 0x%x", status);
+        ChipLogError(DeviceLayer, "WfxPostEvent: failed to post event: 0x%lx", static_cast<uint32_t>(status));
         // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
     }
 }
@@ -836,7 +836,7 @@ void ProcessEvent(WfxEvent_t inEvent)
             if (SL_STATUS_OK != status)
             {
                 // TODO: Seems like Chipdie should be called here, the device should be initialized here
-                ChipLogError(DeviceLayer, "sl_wifi_set_advanced_scan_configuration failed: 0x%x", status);
+                ChipLogError(DeviceLayer, "sl_wifi_set_advanced_scan_configuration failed: 0x%lx", static_cast<uint32_t>(status));
                 return;
             }
 
@@ -899,7 +899,7 @@ void wfx_rsi_task(void * arg)
     WfxEvent_t wfxEvent;
     if (status != RSI_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "wfx_rsi_task: wfx_rsi_init failed: 0x%x", status);
+        ChipLogError(DeviceLayer, "wfx_rsi_task: wfx_rsi_init failed: 0x%lx", static_cast<uint32_t>(status));
         return;
     }
     wfx_lwip_start();
@@ -915,7 +915,7 @@ void wfx_rsi_task(void * arg)
         }
         else
         {
-            ChipLogError(DeviceLayer, "wfx_rsi_task: get event failed: 0x%x", status);
+            ChipLogError(DeviceLayer, "wfx_rsi_task: get event failed: 0x%lx", static_cast<uint32_t>(status));
         }
     }
 }
