@@ -117,6 +117,54 @@ bool operator==(const Access::SubjectDescriptor & a, const Access::SubjectDescri
     return true;
 }
 
+class TestDataModelChangeListener : public DataModelChangeListener
+{
+public:
+    void MarkDirty(const ConcreteAttributePath & path) override { mDirtyList.push_back(path); }
+
+    std::vector<ConcreteAttributePath> & DirtyList() { return mDirtyList; }
+    const std::vector<ConcreteAttributePath> & DirtyList() const { return mDirtyList; }
+
+private:
+    std::vector<ConcreteAttributePath> mDirtyList;
+};
+
+class TestEventGenerator : public EventsGenerator
+{
+    CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
+                             EventNumber & generatedEventNumber) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+};
+
+class TestActionContext : public ActionContext
+{
+public:
+    Messaging::ExchangeContext * CurrentExchange() override { return nullptr; }
+};
+
+class CodegenDataModelWithContext : public CodegenDataModel
+{
+public:
+    CodegenDataModelWithContext()
+    {
+        InteractionModelContext context{
+            .eventsGenerator         = &mEventGenerator,
+            .dataModelChangeListener = &mChangeListener,
+            .actionContext           = &mActionContext,
+        };
+
+        Startup(context);
+    }
+    ~CodegenDataModelWithContext() { Shutdown(); }
+
+private:
+    TestEventGenerator mEventGenerator;
+    TestDataModelChangeListener mChangeListener;
+    TestActionContext mActionContext;
+};
+
 class MockAccessControl : public Access::AccessControl::Delegate, public Access::AccessControl::DeviceTypeResolver
 {
 public:
@@ -643,7 +691,7 @@ template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType value)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -677,7 +725,7 @@ template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarNullRead()
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -710,7 +758,7 @@ template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingType value)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     // non-nullable test
@@ -760,7 +808,7 @@ template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarNullWrite()
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -788,7 +836,7 @@ template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarTypeWriteNullValueToNullable()
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(
@@ -820,7 +868,7 @@ void WriteLe16(void * buffer, uint16_t value)
 TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
     EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
@@ -848,7 +896,7 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
 TEST(TestCodegenModelViaMocks, IterateOverClusters)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     chip::Test::ResetVersion();
 
@@ -911,7 +959,7 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
 {
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     chip::Test::ResetVersion();
 
@@ -936,7 +984,7 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
 TEST(TestCodegenModelViaMocks, IterateOverAttributes)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
@@ -1007,7 +1055,7 @@ TEST(TestCodegenModelViaMocks, IterateOverAttributes)
 TEST(TestCodegenModelViaMocks, GetAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // various non-existent or invalid paths should return no info data
     ASSERT_FALSE(
@@ -1034,7 +1082,7 @@ TEST(TestCodegenModelViaMocks, GetAttributeInfo)
 TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     std::optional<AttributeInfo> info = model.GetAttributeInfo(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
@@ -1049,7 +1097,7 @@ TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
 TEST(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
@@ -1114,7 +1162,7 @@ TEST(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 TEST(TestCodegenModelViaMocks, AcceptedCommandInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 1)).has_value());
@@ -1146,7 +1194,7 @@ TEST(TestCodegenModelViaMocks, AcceptedCommandInfo)
 TEST(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).HasValidIds());
@@ -1205,7 +1253,7 @@ TEST(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kDenySubjectDescriptor,
@@ -1218,7 +1266,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
 TEST(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     {
@@ -1239,7 +1287,7 @@ TEST(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
 TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     // Invalid attribute
@@ -1273,7 +1321,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 TEST(TestCodegenModelViaMocks, EmberAttributePathExpansionAccessDeniedRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kDenySubjectDescriptor,
@@ -1291,7 +1339,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributePathExpansionAccessDeniedRead)
 TEST(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kTestPath(kMockEndpoint3, MockClusterId(4),
@@ -1395,7 +1443,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     {
@@ -1431,7 +1479,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -1466,7 +1514,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -1505,7 +1553,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -1542,7 +1590,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -1578,7 +1626,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -1615,7 +1663,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1658,7 +1706,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceReadError)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1673,7 +1721,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceReadError)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1725,7 +1773,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1784,7 +1832,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1846,7 +1894,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
 TEST(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -1902,7 +1950,7 @@ TEST(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kDenySubjectDescriptor, ConcreteDataAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
@@ -1966,7 +2014,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteInvalidValueToNullable)
 TEST(TestCodegenModelViaMocks, EmberTestWriteReservedNullPlaceholderToNullable)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(
@@ -1984,7 +2032,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteReservedNullPlaceholderToNullable)
 TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNonNullable)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -2003,7 +2051,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNo
 TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNullable)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(
@@ -2058,7 +2106,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteNulls)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -2075,7 +2123,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortString)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -2096,7 +2144,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongString)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -2117,7 +2165,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -2134,7 +2182,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortBytes)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -2156,7 +2204,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortBytes)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -2180,7 +2228,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteTimedWrite)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor, ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), kAttributeIdTimedWrite));
@@ -2196,7 +2244,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteTimedWrite)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteReadOnlyAttribute)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor, ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), kAttributeIdReadOnly));
@@ -2212,7 +2260,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteReadOnlyAttribute)
 TEST(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -2239,7 +2287,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)
 TEST(TestCodegenModelViaMocks, WriteToInvalidPath)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     {
@@ -2263,7 +2311,7 @@ TEST(TestCodegenModelViaMocks, WriteToInvalidPath)
 TEST(TestCodegenModelViaMocks, WriteToGlobalAttribute)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor, ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), AttributeList::Id));
@@ -2274,7 +2322,7 @@ TEST(TestCodegenModelViaMocks, WriteToGlobalAttribute)
 TEST(TestCodegenModelViaMocks, EmberWriteFailure)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestWriteRequest test(kAdminSubjectDescriptor,
@@ -2298,7 +2346,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteFailure)
 TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -2330,7 +2378,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
 TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceReturningError)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -2353,7 +2401,7 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceReturningError)
 TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),

@@ -23,6 +23,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/codegen-data-model/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-detail.h>
@@ -63,6 +64,17 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteAttributePath
     if (err != CHIP_NO_ERROR)
     {
         return std::make_optional(err);
+    }
+
+    if (decoder.TriedDecode())
+    {
+        // TODO: change callbacks should likely be routed through the context `MarkDirty`
+        //       however for now this is called directly because ember code does this call
+        //       inside emberAfWriteAttribute.
+        //
+        //       If we pull out the logic, the remaining `MarkDirty` calls should be
+        //       sufficient.
+        MatterReportingAttributeChangeCallback(path);
     }
 
     // If the decoder tried to decode, then a value should have been read for processing.
@@ -340,6 +352,9 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     std::optional<CHIP_ERROR> aai_result = TryWriteViaAccessInterface(request.path, aai, decoder);
     if (aai_result.has_value())
     {
+        if (*aai_result == CHIP_NO_ERROR) {
+            CurrentContext().dataModelChangeListener->MarkDirty(request.path);
+        }
         return *aai_result;
     }
 
@@ -366,6 +381,10 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
     }
 
+    // TODO: this may need more refinement:
+    //       - should internal requests be able to decide if something is marked dirty or not?
+    //       - changes-omitted paths should not be marked dirty (ember is not aware of these)
+    CurrentContext().dataModelChangeListener->MarkDirty(request.path);
     return CHIP_NO_ERROR;
 }
 
