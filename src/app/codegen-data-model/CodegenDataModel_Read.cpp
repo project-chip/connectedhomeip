@@ -89,7 +89,7 @@ struct ShortPascalString
     using LengthType                        = uint8_t;
     static constexpr LengthType kNullLength = 0xFF;
 
-    static LengthType GetLength(ByteSpan buffer)
+    static size_t GetLength(ByteSpan buffer)
     {
         VerifyOrDie(buffer.size() >= 1);
         // NOTE: we do NOT use emberAfLongStringLength because that will result in 0 length
@@ -104,12 +104,12 @@ struct LongPascalString
     using LengthType                        = uint16_t;
     static constexpr LengthType kNullLength = 0xFFFF;
 
-    static LengthType GetLength(ByteSpan buffer)
+    static size_t GetLength(ByteSpan buffer)
     {
         // NOTE: we do NOT use emberAfLongStringLength because that will result in 0 length
         //       for null sizes (i.e. 0xFFFF is translated to 0 and we do not want that here)
         VerifyOrDie(buffer.size() >= 2);
-        const uint8_t *data = buffer.data();
+        const uint8_t * data = buffer.data();
         return Encoding::LittleEndian::Read16(data);
     }
 };
@@ -124,7 +124,8 @@ static_assert(sizeof(LongPascalString::LengthType) == 2);
 template <class OUT, class ENCODING>
 std::optional<OUT> ExtractEmberString(ByteSpan data)
 {
-    VerifyOrDie(sizeof(typename ENCODING::LengthType) <= data.size());
+    constexpr size_t kLengthTypeSize = sizeof(typename ENCODING::LengthType);
+    VerifyOrDie(kLengthTypeSize <= data.size());
     auto len = ENCODING::GetLength(data);
 
     if (len == ENCODING::kNullLength)
@@ -132,8 +133,8 @@ std::optional<OUT> ExtractEmberString(ByteSpan data)
         return std::nullopt;
     }
 
-    VerifyOrDie(static_cast<size_t>(len + sizeof(len)) <= data.size());
-    return std::make_optional<OUT>(reinterpret_cast<typename OUT::pointer>(data.data() + sizeof(len)), len);
+    VerifyOrDie(len + sizeof(len) <= data.size());
+    return std::make_optional<OUT>(reinterpret_cast<typename OUT::pointer>(data.data() + kLengthTypeSize), len);
 }
 
 /// Encode a value inside `encoder`
