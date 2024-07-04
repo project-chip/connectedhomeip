@@ -21,7 +21,7 @@
 
 #include "sl_status.h"
 #include <app/icd/server/ICDServerConfig.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
