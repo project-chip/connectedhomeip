@@ -41,6 +41,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Electrical Power Measurement
     - Electrical Energy Measurement
     - Wi-Fi Network Management
+    - Thread Network Directory
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -59,6 +60,7 @@ ClustersWithInitFunctions:
     - Sample MEI
     - Scenes Management
     - Wi-Fi Network Management
+    - Thread Network Directory
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
