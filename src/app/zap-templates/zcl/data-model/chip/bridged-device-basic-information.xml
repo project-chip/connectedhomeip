@@ -85,7 +85,7 @@ limitations under the License.
         <attribute side="server" code="14" define="PRODUCT_LABEL"             type="char_string"               length="64"                              optional="true">ProductLabel</attribute>
         <attribute side="server" code="15" define="SERIAL_NUMBER"             type="char_string"               length="32"                              optional="true">SerialNumber</attribute>
         <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                 optional="false">Reachable</attribute>
-        <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="true">UniqueID</attribute>
+        <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="false">UniqueID</attribute>
         <attribute side="server" code="20" define="PRODUCT_APPEARANCE"        type="ProductAppearanceStruct"                                            optional="true">ProductAppearance</attribute>
 
         <event side="server" code="0x00" name="StartUp" priority="critical" optional="true">

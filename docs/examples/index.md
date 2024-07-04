@@ -85,6 +85,15 @@ darwin-framework-tool/README
 energy-management-app/**/README
 ```
 
+## Fabric Admin example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+fabric-admin/README
+```
+
 ## Fabric Bridge example
 
 ```{toctree}

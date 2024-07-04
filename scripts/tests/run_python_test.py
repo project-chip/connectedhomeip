@@ -110,6 +110,10 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
             )
         ]
 
+    if not runs:
+        raise Exception(
+            "No valid runs were found. Make sure you add runs to your file, see https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
+
     for run in runs:
         print(f"Executing {run.py_script_path.split('/')[-1]} {run.run}")
         main_impl(run.app, run.factoryreset, run.factoryreset_app_only, run.app_args,
