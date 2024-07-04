@@ -78,16 +78,15 @@ protected:
 
     /**
      * Given a set of locations to be set to the SelectedLocations attribute, this method should check that:
-     *  - There are no duplicates in the list. If there are duplicates, the locationStatus SHALL be set to
-     *     DuplicatedLocations and the statusText SHALL be an empty string.
      *  - The set of locations as a whole is valid and reachable by the device. If the set of locations is invalid,
      *     the locationStatus should be set to InvalidSet and the statusText SHALL include a vendor-defined error description.
      *
-     * The caller of this method will ensure that all the locations in the set are valid supported locations.
+     * The caller of this method will ensure that there are no duplicates is the list
+     * and that all the locations in the set are valid supported locations.
      *
      * @param[in] req List of new selected locations.
      * @param[out] locationStatus Success if all checks pass, error code if failure.
-     * @param[out] statusText text describing failure (see description above), size kMaxSizeStatusText
+     * @param[out] statusText text describing failure (see description above), size kMaxSizeStatusText.
      * @return true if success.
      *
      * @note If the SelectLocations command is allowed when the device is operating and the selected locations change to none, the

@@ -252,10 +252,11 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
     {
         // do as much parameter validation as we can
         {
-            auto locationIter = req.newLocations.Value().begin();
-            while (locationIter.Next())
+            uint32_t i = 0;
+            auto iLocationIter = req.newLocations.Value().begin();
+            while (iLocationIter.Next())
             {
-                uint32_t aSelectedLocation = locationIter.GetValue();
+                uint32_t aSelectedLocation = iLocationIter.GetValue();
 
                 // each item in this list SHALL match the LocationID field of an entry on the SupportedLocations attribute's list
                 // If the Status field is set to UnsupportedLocation, the StatusText field SHALL be an empty string.
@@ -265,8 +266,19 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
                     return;
                 }
 
-                // todo Should we take the responsibility for checking that there are no duplicate locations
-                //  from the delegate's IsValidSelectLocationsSet method?
+                // Checking for duplicate locations.
+                uint32_t j = 0;
+                auto jLocationIter = req.newLocations.Value().begin();
+                while (j < i)
+                {
+                    jLocationIter.Next();
+                    if (jLocationIter.GetValue() == aSelectedLocation)
+                    {
+                        exitResponse(SelectLocationsStatus::kDuplicatedLocations, ""_span);
+                        return;
+                    }
+                    j += 1;
+                }
 
                 // check to see if parameter list and attribute still match
                 if (matchesCurrentSelectedLocations)
@@ -277,10 +289,12 @@ void Instance::HandleSelectLocationsCmd(HandlerContext & ctx, const Commands::Se
                         matchesCurrentSelectedLocations = false;
                     }
                 }
+
+                i += 1;
             }
 
             // after iterating with Next through DecodableType - check for failure
-            if (CHIP_NO_ERROR != locationIter.GetStatus())
+            if (CHIP_NO_ERROR != iLocationIter.GetStatus())
             {
                 exitResponse(SelectLocationsStatus::kInvalidSet, "decoding of newLocations parameter failed"_span);
                 return;
