@@ -21,6 +21,7 @@
 
 #include "sl_status.h"
 #include <app/icd/server/ICDServerConfig.h>
+#include <inet/IPAddress.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "FreeRTOS.h"
@@ -554,19 +555,16 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         {
             continue;
         }
-
         cur_scan_result.security = static_cast<wfx_sec_t>(scan_result->scan_info[idx].security_mode);
         cur_scan_result.rssi     = (-1) * scan_result->scan_info[idx].rssi_val;
         memcpy(cur_scan_result.bssid, scan_result->scan_info[idx].bssid, BSSID_MAX_STR_LEN);
+        wfx_rsi.scan_cb(&cur_scan_result);
 
         // if user has not provided the ssid, then call the callback for each scan result
         if (wfx_rsi.scan_ssid == NULL)
         {
-            wfx_rsi.scan_cb(&cur_scan_result);
             continue;
         }
-
-        wfx_rsi.scan_cb(&cur_scan_result);
         break;
     }
 
@@ -751,8 +749,8 @@ void HandleDHCPPolling()
      */
     if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
     {
-        char addrStr[40] = { 0 };
-        VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), buf, sizeof(buf)) != NULL);
+        char addrStr[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
+        VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), addrStr, sizeof(addrStr)) != NULL);
         ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
         wfx_ipv6_notify(GET_IPV6_SUCCESS);
         hasNotifiedIPV6 = true;
