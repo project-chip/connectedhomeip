@@ -556,17 +556,11 @@ Status OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool & on
 {
     app::DataModel::Nullable<OnOff::StartUpOnOffEnum> startUpOnOff;
     Status status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
-    if (status != Status::Success)
-    {
-        return status;
-    }
+    VerifyOrReturnError(status == Status::Success, status);
 
     bool currentOnOff = false;
     status            = Attributes::OnOff::Get(endpoint, &currentOnOff);
-    if (status != Status::Success)
-    {
-        return status;
-    }
+    VerifyOrReturnError(status == Status::Success, status);
 
     if (startUpOnOff.IsNull() || GetBootReason() == BootReasonType::kSoftwareUpdateCompleted)
     {
@@ -587,6 +581,7 @@ Status OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool & on
         break;
     default:
         // All other values 0x03- 0xFE are reserved - no action.
+        onOffValueForStartUp = currentOnOff;
         break;
     }
 
