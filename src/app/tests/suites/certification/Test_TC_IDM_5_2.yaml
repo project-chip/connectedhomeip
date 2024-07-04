@@ -117,15 +117,16 @@ tests:
       verification: |
           ./chip-tool modeselect write on-mode 0 1 1 --repeat-delay-ms 1000 --timedInteractionTimeoutMs 500
 
-          On TH(chip-tool), Verify we are getting status response and UNSUPPORTED_ACCESS  from DUT to TH for above command
+          If the device being certified is Matter release 1.4 or later, verify DUT sends back a Status response with the TIMEOUT status code.
+          If the device being certified is Matter release 1.3 or earlier, verify the DUT sends back a Status response with either TIMEOUT or UNSUPPORTED_ACCESS status code.
 
-          [1654771611.106067][28715:28720] CHIP:DMG: WriteClient moving to [ResponseRe]
-          [1654771611.106112][28715:28720] CHIP:DMG: StatusResponseMessage =
-          [1654771611.106140][28715:28720] CHIP:DMG: {
-          [1654771611.106165][28715:28720] CHIP:DMG:         Status = 0x7e (UNSUPPORTED_ACCESS),
-          [1654771611.106192][28715:28720] CHIP:DMG:         InteractionModelRevision = 1
-          [1654771611.106216][28715:28720] CHIP:DMG: }
-          [1654771611.106244][28715:28720] CHIP:IM: Received status response, status is 0x7e (UNSUPPORTED_ACCESS)
-          [1654771611.106280][28715:28720] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1654771611.106303][28715:28720] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1720104134.620521][3325282:3325284] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1720104134.620540][3325282:3325284] CHIP:DMG: StatusResponseMessage =
+          [1720104134.620555][3325282:3325284] CHIP:DMG: {
+          [1720104134.620569][3325282:3325284] CHIP:DMG: 	Status = 0x94 (TIMEOUT),
+          [1720104134.620583][3325282:3325284] CHIP:DMG: 	InteractionModelRevision = 11
+          [1720104134.620596][3325282:3325284] CHIP:DMG: }
+          [1720104134.620611][3325282:3325284] CHIP:IM: Received status response, status is 0x94 (TIMEOUT)
+          [1720104134.620689][3325282:3325284] CHIP:TOO: Error: IM Error 0x00000594: General error: 0x94 (TIMEOUT)
+
       disabled: true
