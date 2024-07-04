@@ -114,11 +114,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define SL_WFX_CONNECT_IND_ID 2
 #define SL_WFX_DISCONNECT_IND_ID 3
 #define SL_WFX_SCAN_COMPLETE_ID 4
-// MAX SSID LENGTH excluding NULL character
-#define WFX_MAX_SSID_LENGTH 32
-// MAX PASSKEY LENGTH including NULL character
-#define WFX_MAX_PASSKEY_LENGTH 64
-
 #endif /* WF200 */
 
 /* LwIP includes. */
@@ -151,7 +146,12 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define WLAN_TASK_STACK_SIZE 1024
 #define WLAN_TASK_PRIORITY 1
 #define MAX_JOIN_RETRIES_COUNT 5
-#endif
+#endif // RS911X_WIFI
+
+// MAX SSID LENGTH excluding NULL character
+#define WFX_MAX_SSID_LENGTH 32
+// MAX PASSKEY LENGTH including NULL character
+#define WFX_MAX_PASSKEY_LENGTH 64
 
 // WLAN retry time intervals in milli seconds
 #define WLAN_MAX_RETRY_TIMER_MS 30000
