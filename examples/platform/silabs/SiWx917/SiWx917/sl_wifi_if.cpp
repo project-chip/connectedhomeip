@@ -686,7 +686,7 @@ static sl_status_t wfx_rsi_do_join(void)
 
     uint32_t timeout_ms = 0;
 
-    ap.ssid.length = strlen(wfx_rsi.sec.ssid);
+    ap.ssid.length = strnlen(wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
     memcpy(ap.ssid.value, (int8_t *) &wfx_rsi.sec.ssid[0], ap.ssid.length);
     ap.encryption    = SL_WIFI_NO_ENCRYPTION;
     ap.credential_id = id;
