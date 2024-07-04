@@ -43,11 +43,11 @@ source_set("types") {
   ]
 
   deps = [
+    ":null-utils",
     "${chip_root}/src/app/common:attribute-type",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:encoding",
     "${chip_root}/src/lib/core:types",
-    ":null-utils",
   ]
   public_configs = [ "${chip_root}/src:includes" ]
 }
