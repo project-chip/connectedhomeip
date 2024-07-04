@@ -20,8 +20,10 @@ source_set("nullable-support") {
   ]
 
   public_deps = [
-    "${chip_root}/src/app/util:null-utils",
+    "${chip_root}/src/app/util:nullable-support-primitives",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
   ]
 }
