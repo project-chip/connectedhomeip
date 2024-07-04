@@ -263,10 +263,11 @@ struct LocationStructureWrapper : public chip::app::Clusters::ServiceArea::Struc
     /**
      * @return The location name.
      */
-    CharSpan GetName() {
+    CharSpan GetName()
+    {
         if (locationInfo.locationInfo.IsNull())
         {
-            return {mLocationNameBuffer, 0};
+            return { mLocationNameBuffer, 0 };
         }
 
         return locationInfo.locationInfo.Value().locationName;

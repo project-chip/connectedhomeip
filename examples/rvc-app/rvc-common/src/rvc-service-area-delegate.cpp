@@ -125,7 +125,7 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
-    listIndex         = 0;
+    listIndex = 0;
 
     while (listIndex < mSupportedLocations.size())
     {
@@ -220,7 +220,7 @@ bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & list
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
-    listIndex         = 0;
+    listIndex = 0;
 
     while (listIndex < mSupportedMaps.size())
     {
@@ -358,7 +358,7 @@ bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32
     // We do not need to reimplement this method as it's already done by the SDK.
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
-    listIndex         = 0;
+    listIndex = 0;
 
     while (listIndex < mProgressList.size())
     {
