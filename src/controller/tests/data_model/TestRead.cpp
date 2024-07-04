@@ -19,8 +19,8 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-#include "system/SystemClock.h"
-#include "transport/SecureSession.h"
+#include "DataModelFixtures.h"
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
@@ -35,228 +35,17 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
+#include <system/SystemClock.h>
+#include <transport/SecureSession.h>
 
 using TestContext = chip::Test::AppContext;
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::DataModelTests;
 using namespace chip::Protocols;
-
-namespace {
-
-constexpr EndpointId kTestEndpointId        = 1;
-constexpr DataVersion kDataVersion          = 5;
-constexpr AttributeId kPerpetualAttributeid = chip::Test::MockAttributeId(1);
-constexpr ClusterId kPerpetualClusterId     = chip::Test::MockClusterId(2);
-bool expectedAttribute1                     = true;
-int16_t expectedAttribute2                  = 42;
-uint64_t expectedAttribute3                 = 0xdeadbeef0000cafe;
-uint8_t expectedAttribute4[256]             = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-};
-
-enum ResponseDirective
-{
-    kSendDataResponse,
-    kSendManyDataResponses,          // Many data blocks, for a single concrete path
-                                     // read, simulating a malicious server.
-    kSendManyDataResponsesWrongPath, // Many data blocks, all using the wrong
-                                     // path, for a single concrete path
-                                     // read, simulating a malicious server.
-    kSendDataError,
-    kSendTwoDataErrors, // Multiple errors, for a single concrete path,
-                        // simulating a malicious server.
-};
-
-ResponseDirective responseDirective;
-
-// Number of reads of Clusters::UnitTesting::Attributes::Int16u that we have observed.
-// Every read will increment this count by 1 and return the new value.
-uint16_t totalReadCount = 0;
-
-bool isLitIcd = false;
-
-} // namespace
-
-namespace chip {
-namespace app {
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState)
-{
-    if (aPath.mEndpointId >= chip::Test::kMockEndpointMin)
-    {
-        return chip::Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
-    }
-
-    if (responseDirective == kSendManyDataResponses || responseDirective == kSendManyDataResponsesWrongPath)
-    {
-        if (aPath.mClusterId != Clusters::UnitTesting::Id || aPath.mAttributeId != Clusters::UnitTesting::Attributes::Boolean::Id)
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-        for (size_t i = 0; i < 4; ++i)
-        {
-            ConcreteAttributePath path(aPath);
-            // Use an incorrect attribute id for some of the responses.
-            path.mAttributeId =
-                static_cast<AttributeId>(path.mAttributeId + (i / 2) + (responseDirective == kSendManyDataResponsesWrongPath));
-            AttributeEncodeState state(apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, path, kDataVersion, aIsFabricFiltered, state);
-            ReturnErrorOnFailure(valueEncoder.Encode(true));
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
-    if (responseDirective == kSendDataResponse)
-    {
-        if (aPath.mClusterId == app::Clusters::UnitTesting::Id &&
-            aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::ListFabricScoped::Id)
-        {
-            AttributeEncodeState state(apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
-                                               state);
-
-            return valueEncoder.EncodeList([aSubjectDescriptor](const auto & encoder) -> CHIP_ERROR {
-                app::Clusters::UnitTesting::Structs::TestFabricScoped::Type val;
-                val.fabricIndex = aSubjectDescriptor.fabricIndex;
-                ReturnErrorOnFailure(encoder.Encode(val));
-                val.fabricIndex = (val.fabricIndex == 1) ? 2 : 1;
-                ReturnErrorOnFailure(encoder.Encode(val));
-                return CHIP_NO_ERROR;
-            });
-        }
-        if (aPath.mClusterId == app::Clusters::UnitTesting::Id &&
-            aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id)
-        {
-            AttributeEncodeState state(apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
-                                               state);
-
-            return valueEncoder.Encode(++totalReadCount);
-        }
-        if (aPath.mClusterId == kPerpetualClusterId ||
-            (aPath.mClusterId == app::Clusters::UnitTesting::Id && aPath.mAttributeId == kPerpetualAttributeid))
-        {
-            AttributeEncodeState state;
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
-                                               state);
-
-            CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-                encoder.Encode(static_cast<uint8_t>(1));
-                return CHIP_ERROR_NO_MEMORY;
-            });
-
-            if (err != CHIP_NO_ERROR)
-            {
-                // If the err is not CHIP_NO_ERROR, means the encoding was aborted, then the valueEncoder may save its state.
-                // The state is used by list chunking feature for now.
-                if (apEncoderState != nullptr)
-                {
-                    *apEncoderState = valueEncoder.GetState();
-                }
-                return err;
-            }
-        }
-        if (aPath.mClusterId == app::Clusters::IcdManagement::Id &&
-            aPath.mAttributeId == app::Clusters::IcdManagement::Attributes::OperatingMode::Id)
-        {
-            AttributeEncodeState state(apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
-                                               state);
-
-            return valueEncoder.Encode(isLitIcd ? Clusters::IcdManagement::OperatingModeEnum::kLit
-                                                : Clusters::IcdManagement::OperatingModeEnum::kSit);
-        }
-
-        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-        ReturnErrorOnFailure(aAttributeReports.GetError());
-        AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
-        ReturnErrorOnFailure(attributeReport.GetError());
-        Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
-        Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
-
-        value = valueBuf;
-
-        uint8_t i = 0;
-        for (auto & item : valueBuf)
-        {
-            item.member1 = i;
-            i++;
-        }
-
-        attributeData.DataVersion(kDataVersion);
-        ReturnErrorOnFailure(attributeData.GetError());
-        AttributePathIB::Builder & attributePath = attributeData.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePath.GetError());
-
-        ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(AttributeDataIB::Tag::kData), value));
-        ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
-        return attributeReport.EndOfAttributeReportIB();
-    }
-
-    for (size_t i = 0; i < (responseDirective == kSendTwoDataErrors ? 2 : 1); ++i)
-    {
-        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-        ReturnErrorOnFailure(aAttributeReports.GetError());
-        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-        AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePath.GetError());
-
-        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
-        attributeStatus.EndOfAttributeStatusIB();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        ReturnErrorOnFailure(attributeReport.EndOfAttributeReportIB());
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-bool IsClusterDataVersionEqual(const app::ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    if (aRequiredVersion == kDataVersion)
-    {
-        return true;
-    }
-    if (Test::GetVersion() == aRequiredVersion)
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
-}
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return true;
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-} // namespace app
-} // namespace chip
+using namespace chip::Test;
 
 namespace {
 
@@ -390,7 +179,7 @@ TEST_F(TestRead, TestReadAttributeResponse)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -430,8 +219,8 @@ TEST_F(TestRead, TestReadAttributeResponse)
 // `EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0))`.
 TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    responseDirective = kSendDataResponse;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     MockInteractionModelApp delegate;
     chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
@@ -502,8 +291,8 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
 
 TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    responseDirective = kSendDataResponse;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     MockInteractionModelApp delegate;
     chip::app::ClusterStateCache cache(delegate);
@@ -606,7 +395,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -616,7 +405,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -626,7 +415,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         delegate.mNumAttributeResponse = 0;
@@ -684,7 +473,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -694,7 +483,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
     }
@@ -739,7 +528,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -749,7 +538,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -759,7 +548,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
             reader.Get(receivedAttribute3);
-            EXPECT_EQ(receivedAttribute3, expectedAttribute3);
+            EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
@@ -769,7 +558,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
     }
@@ -818,7 +607,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -828,7 +617,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -838,7 +627,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
     }
@@ -882,7 +671,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -892,7 +681,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -902,7 +691,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
             reader.Get(receivedAttribute3);
-            EXPECT_EQ(receivedAttribute3, expectedAttribute3);
+            EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
@@ -912,7 +701,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
     }
@@ -964,7 +753,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -974,7 +763,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -984,7 +773,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
     }
@@ -1033,7 +822,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -1043,7 +832,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -1053,7 +842,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
     }
@@ -1097,7 +886,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -1107,7 +896,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -1117,7 +906,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
             reader.Get(receivedAttribute3);
-            EXPECT_EQ(receivedAttribute3, expectedAttribute3);
+            EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
@@ -1127,7 +916,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
     }
@@ -1180,7 +969,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -1190,7 +979,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -1200,7 +989,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
             reader.Get(receivedAttribute3);
-            EXPECT_EQ(receivedAttribute3, expectedAttribute3);
+            EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
@@ -1210,7 +999,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse             = 0;
         readPrepareParams.mpEventPathParamsList    = nullptr;
@@ -1269,7 +1058,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -1279,7 +1068,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -1289,7 +1078,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -1299,7 +1088,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
             reader.Get(receivedAttribute3);
-            EXPECT_EQ(receivedAttribute3, expectedAttribute3);
+            EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
@@ -1309,7 +1098,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
         {
             app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
@@ -1318,7 +1107,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         delegate.mNumAttributeResponse = 0;
@@ -1380,7 +1169,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -1390,7 +1179,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -1400,7 +1189,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -1410,7 +1199,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
             reader.Get(receivedAttribute3);
-            EXPECT_EQ(receivedAttribute3, expectedAttribute3);
+            EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
@@ -1420,7 +1209,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -1430,7 +1219,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse             = 0;
         readPrepareParams.mpEventPathParamsList    = nullptr;
@@ -1469,7 +1258,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
             reader.Get(receivedAttribute1);
-            EXPECT_EQ(receivedAttribute1, expectedAttribute1);
+            EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
@@ -1479,7 +1268,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
             reader.Get(receivedAttribute2);
-            EXPECT_EQ(receivedAttribute2, expectedAttribute2);
+            EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
@@ -1489,7 +1278,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
             reader.Get(receivedAttribute3);
-            EXPECT_EQ(receivedAttribute3, expectedAttribute3);
+            EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
@@ -1499,7 +1288,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint8_t receivedAttribute4[256];
             reader.GetBytes(receivedAttribute4, 256);
-            EXPECT_TRUE(memcmp(receivedAttribute4, expectedAttribute4, 256));
+            EXPECT_TRUE(memcmp(receivedAttribute4, mockAttribute4, 256));
         }
         delegate.mNumAttributeResponse = 0;
     }
@@ -1546,7 +1335,7 @@ TEST_F(TestRead, TestReadAttributeError)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    responseDirective = kSendDataError;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataError);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1577,7 +1366,7 @@ TEST_F(TestRead, TestReadAttributeTimeout)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    responseDirective = kSendDataError;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataError);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1836,7 +1625,7 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1904,7 +1693,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -1970,7 +1759,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2045,7 +1834,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2120,7 +1909,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2197,7 +1986,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest4)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2264,7 +2053,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2339,7 +2128,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2414,7 +2203,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2490,7 +2279,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest8)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2553,7 +2342,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
     uint32_t numFailureCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2704,16 +2493,16 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
     auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
+    ScopedChange isLitIcd(gIsLitIcd, false);
 
     {
         TestResubscriptionCallback callback;
         app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
                                    app::ReadClient::InteractionType::Subscribe);
 
-        responseDirective                           = kSendDataResponse;
         callback.mScheduleLITResubscribeImmediately = false;
         callback.SetReadClient(&readClient);
-        isLitIcd = false;
 
         app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
 
@@ -2808,8 +2597,6 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    isLitIcd = false;
 }
 
 /**
@@ -2944,7 +2731,7 @@ void TestRead::SubscribeThenReadHelper(TestContext * apCtx, size_t aSubscribeCou
     uint32_t numReadSuccessCalls = 0;
     uint32_t numReadFailureCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -2997,9 +2784,9 @@ void TestRead::MultipleReadHelperInternal(TestContext * apCtx, size_t aReadCount
 
     auto sessionHandle = apCtx->GetSessionBobToAlice();
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
-    uint16_t firstExpectedResponse = totalReadCount + 1;
+    uint16_t firstExpectedResponse = gInt16uTotalReadCount + 1;
 
     auto onFailureCb = [&aNumFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         aNumFailureCalls++;
@@ -3040,7 +2827,7 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptionsWithDataVersionFilter)
     uint32_t numSuccessCalls                 = 0;
     uint32_t numSubscriptionEstablishedCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -3181,7 +2968,7 @@ TEST_F(TestRead, TestReadHandlerResourceExhaustion_MultipleReads)
     uint32_t numSuccessCalls = 0;
     uint32_t numFailureCalls = 0;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -3232,7 +3019,7 @@ TEST_F(TestRead, TestReadFabricScopedWithoutFabricFilter)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -3277,7 +3064,7 @@ TEST_F(TestRead, TestReadFabricScopedWithFabricFilter)
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
 
-    responseDirective = kSendDataResponse;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -4835,7 +4622,7 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValues)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    responseDirective = kSendManyDataResponses;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendManyDataResponses);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -4868,7 +4655,7 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValuesWrongPath)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    responseDirective = kSendManyDataResponsesWrongPath;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendManyDataResponsesWrongPath);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -4901,7 +4688,7 @@ TEST_F(TestRead, TestReadAttribute_ManyErrors)
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
-    responseDirective = kSendTwoDataErrors;
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendTwoDataErrors);
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.

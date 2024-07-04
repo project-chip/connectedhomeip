@@ -1411,7 +1411,7 @@ class BridgedDeviceBasicInformationCluster(
     }
   }
 
-  suspend fun readUniqueIDAttribute(): String? {
+  suspend fun readUniqueIDAttribute(): String {
     val ATTRIBUTE_ID: UInt = 18u
 
     val attributePath =
@@ -1437,12 +1437,7 @@ class BridgedDeviceBasicInformationCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: String? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getString(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: String = tlvReader.getString(AnonymousTag)
 
     return decodedValue
   }
@@ -1486,14 +1481,9 @@ class BridgedDeviceBasicInformationCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: String? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getString(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: String = tlvReader.getString(AnonymousTag)
 
-          decodedValue?.let { emit(StringSubscriptionState.Success(it)) }
+          emit(StringSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(StringSubscriptionState.SubscriptionEstablished)

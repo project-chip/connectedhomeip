@@ -4396,6 +4396,19 @@ enum class OccupancySensorTypeEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOther           = 0x1,
+    kPassiveInfrared = 0x2,
+    kUltrasonic      = 0x4,
+    kPhysicalContact = 0x8,
+    kActiveInfrared  = 0x10,
+    kRadar           = 0x20,
+    kRFSensing       = 0x40,
+    kVision          = 0x80,
+};
+
 // Bitmap for OccupancyBitmap
 enum class OccupancyBitmap : uint8_t
 {
