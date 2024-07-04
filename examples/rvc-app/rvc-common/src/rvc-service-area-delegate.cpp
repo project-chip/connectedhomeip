@@ -126,9 +126,8 @@ bool RvcServiceAreaDelegate::GetSupportedLocationById(uint32_t aLocationId, uint
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
     listIndex         = 0;
-    uint32_t listSize = static_cast<uint32_t>(mSupportedLocations.size());
 
-    while (listIndex < listSize)
+    while (listIndex < mSupportedLocations.size())
     {
         if (mSupportedLocations[listIndex].locationID == aLocationId)
         {
@@ -207,7 +206,7 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfSupportedMaps()
 
 bool RvcServiceAreaDelegate::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap)
 {
-    if (listIndex < static_cast<uint32_t>(mSupportedMaps.size()))
+    if (listIndex < mSupportedMaps.size())
     {
         aSupportedMap = mSupportedMaps[listIndex];
         return true;
@@ -222,9 +221,8 @@ bool RvcServiceAreaDelegate::GetSupportedMapById(uint8_t aMapId, uint32_t & list
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
     listIndex         = 0;
-    uint32_t listSize = static_cast<uint32_t>(mSupportedMaps.size());
 
-    while (listIndex < listSize)
+    while (listIndex < mSupportedMaps.size())
     {
         if (mSupportedMaps[listIndex].mapID == aMapId)
         {
@@ -296,7 +294,7 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfSelectedLocations()
 
 bool RvcServiceAreaDelegate::GetSelectedLocationByIndex(uint32_t listIndex, uint32_t & aSelectedLocation)
 {
-    if (listIndex < static_cast<uint32_t>(mSelectedLocations.size()))
+    if (listIndex < mSelectedLocations.size())
     {
         aSelectedLocation = mSelectedLocations[listIndex];
         return true;
@@ -345,7 +343,7 @@ uint32_t RvcServiceAreaDelegate::GetNumberOfProgressElements()
 
 bool RvcServiceAreaDelegate::GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
-    if (listIndex < static_cast<uint32_t>(mProgressList.size()))
+    if (listIndex < mProgressList.size())
     {
         aProgressElement = mProgressList[listIndex];
         return true;
@@ -361,9 +359,8 @@ bool RvcServiceAreaDelegate::GetProgressElementById(uint32_t aLocationId, uint32
     // We are reimplementing this method, still using linear search, but with some optimization on the SDK implementation
     // since we have direct access to the list.
     listIndex         = 0;
-    uint32_t listSize = static_cast<uint32_t>(mProgressList.size());
 
-    while (listIndex < listSize)
+    while (listIndex < mProgressList.size())
     {
         if (mProgressList[listIndex].locationID == aLocationId)
         {
