@@ -369,7 +369,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     {
         // Internal requests use the non-External interface that has less enforcement
         // than the external version (e.g. does not check/enforce writable settings, does not
-        // validate atribute types) - see attribute-table.h documentation for details.
+        // validate attribute types) - see attribute-table.h documentation for details.
         status = emberAfWriteAttribute(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
                                        gEmberAttributeIOBufferSpan.data(), (*attributeMetadata)->attributeType);
     }
@@ -377,7 +377,7 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
     {
         if (dataBuffer.size() > (*attributeMetadata)->size)
         {
-            ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
+            ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
             return CHIP_IM_GLOBAL_STATUS(InvalidValue);
         }
 
