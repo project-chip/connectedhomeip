@@ -211,7 +211,7 @@ private:
             // If the send was successful for a status report, since we are not expecting a response the exchange context is
             // already closed. We need to null out the reference to avoid having a dangling pointer.
             mExchangeCtx = nullptr;
-            ResetState(CHIP_ERROR_INTERNAL); // TODO: is this an error scenario?
+            ResetState(CHIP_ERROR_INTERNAL);
         }
         return err;
     }
