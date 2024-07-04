@@ -537,44 +537,51 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
     osSemaphoreRelease(sScanSemaphore);
     return SL_STATUS_OK;
 }
+
 sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
 {
     SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
-    int x;
-    wfx_wifi_scan_result_t ap;
-    for (x = 0; x < (int) scan_result->scan_count; x++)
+    VerifyOrReturnError(wfx_rsi.scan_cb != NULL, SL_STATUS_INVALID_HANDLE);
+
+    wfx_wifi_scan_result_t cur_scan_result;
+    for (int idx = 0; idx < (int) scan_result->scan_count; idx++)
     {
-        strcpy(&ap.ssid[0], (char *) &scan_result->scan_info[x].ssid);
-        if (wfx_rsi.scan_ssid)
+        memset(&cur_scan_result, 0, sizeof(wfx_wifi_scan_result_t));
+        strncpy(cur_scan_result.ssid, (char *) &scan_result->scan_info[idx].ssid, WFX_MAX_SSID_LENGTH);
+
+        // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
+        if (wfx_rsi.scan_ssid != NULL && strcmp(wfx_rsi.scan_ssid, cur_scan_result.ssid) != CMP_SUCCESS)
         {
-            ChipLogDetail(DeviceLayer, "Scan SSID: %s , AP scan: %s", wfx_rsi.scan_ssid, ap.ssid);
-            if (strcmp(wfx_rsi.scan_ssid, ap.ssid) == CMP_SUCCESS)
-            {
-                ap.security = static_cast<wfx_sec_t>(scan_result->scan_info[x].security_mode);
-                ap.rssi     = (-1) * scan_result->scan_info[x].rssi_val;
-                memcpy(&ap.bssid[0], &scan_result->scan_info[x].bssid[0], BSSID_MAX_STR_LEN);
-                (*wfx_rsi.scan_cb)(&ap);
-                break;
-            }
+            continue;
         }
-        else
+
+        cur_scan_result.security = static_cast<wfx_sec_t>(scan_result->scan_info[idx].security_mode);
+        cur_scan_result.rssi     = (-1) * scan_result->scan_info[idx].rssi_val;
+        memcpy(cur_scan_result.bssid, scan_result->scan_info[idx].bssid, BSSID_MAX_STR_LEN);
+
+        // if user has not provided the ssid, then call the callback for each scan result
+        if (wfx_rsi.scan_ssid == NULL)
         {
-            ap.security = static_cast<wfx_sec_t>(scan_result->scan_info[x].security_mode);
-            ap.rssi     = (-1) * scan_result->scan_info[x].rssi_val;
-            memcpy(&ap.bssid[0], &scan_result->scan_info[x].bssid[0], BSSID_MAX_STR_LEN);
-            (*wfx_rsi.scan_cb)(&ap);
+            wfx_rsi.scan_cb(&cur_scan_result);
+            continue;
         }
+
+        wfx_rsi.scan_cb(&cur_scan_result);
+        break;
     }
+
+    // cleanup and return
     wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
-    (*wfx_rsi.scan_cb)((wfx_wifi_scan_result_t *) 0);
-    wfx_rsi.scan_cb = (void (*)(wfx_wifi_scan_result_t *)) 0;
+    wfx_rsi.scan_cb((wfx_wifi_scan_result_t *) 0);
+    wfx_rsi.scan_cb = NULL;
     if (wfx_rsi.scan_ssid)
     {
         vPortFree(wfx_rsi.scan_ssid);
-        wfx_rsi.scan_ssid = (char *) 0;
+        wfx_rsi.scan_ssid = NULL;
     }
     return SL_STATUS_OK;
 }
+
 sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t * result, uint32_t result_length, void * arg)
 {
     callback_status          = show_scan_results(result);
@@ -598,7 +605,8 @@ static void wfx_rsi_save_ap_info() // translation
     sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 #endif
     sl_wifi_ssid_t ssid_arg;
-    ssid_arg.length = strlen(wfx_rsi.sec.ssid);
+    memset(&ssid_arg, 0, sizeof(sl_wifi_ssid_t));
+    ssid_arg.length = strnlen(wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
     memcpy(ssid_arg.value, (int8_t *) &wfx_rsi.sec.ssid[0], ssid_arg.length);
     sl_wifi_set_scan_callback(scan_callback_handler, NULL);
     scan_results_complete = false;

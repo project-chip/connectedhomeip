@@ -41,7 +41,10 @@
 #define SL_WFX_CONNECT_IND_ID (2)
 #define SL_WFX_DISCONNECT_IND_ID (3)
 #define SL_WFX_SCAN_COMPLETE_ID (4)
-#define WFX_RSI_SSID_SIZE (64)
+// MAX SSID LENGTH excluding NULL character
+#define WFX_MAX_SSID_LENGTH 32
+// MAX PASSKEY LENGTH including NULL character
+#define WFX_MAX_PASSKEY_LENGTH SL_WIFI_MAX_PSK_LENGTH
 
 /* Wi-Fi bitmask events - for the task */
 #define SL_WFX_CONNECT (1 << 1)
@@ -160,8 +163,8 @@ typedef enum
 
 typedef struct
 {
-    char ssid[32 + 1];
-    char passkey[64 + 1];
+    char ssid[WFX_MAX_SSID_LENGTH + 1];
+    char passkey[WFX_MAX_PASSKEY_LENGTH];
     wfx_sec_t security;
 } wfx_wifi_provision_t;
 
@@ -176,7 +179,7 @@ typedef enum
 
 typedef struct wfx_wifi_scan_result
 {
-    char ssid[32 + 1];
+    char ssid[WFX_MAX_SSID_LENGTH + 1];
     wfx_sec_t security;
     uint8_t bssid[6];
     uint8_t chan;
