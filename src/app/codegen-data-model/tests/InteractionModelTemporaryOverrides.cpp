@@ -87,4 +87,3 @@ void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePa
 {
     // TODO: should we add logic to track these calls for test purposes?
 }
-
