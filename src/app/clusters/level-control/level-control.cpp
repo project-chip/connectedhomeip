@@ -225,10 +225,12 @@ public:
             switch (decodePair.attributeID)
             {
             case Attributes::CurrentLevel::Id:
+                VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
                 level = decodePair.valueUnsigned8.Value();
                 break;
             case Attributes::CurrentFrequency::Id:
                 // TODO : Uncomment when frequency is supported by the level control cluster
+                // VerifyOrReturnError(decodePair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
                 // frequency = decodePair.valueUnsigned16.Value();
                 break;
             default:

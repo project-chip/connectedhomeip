@@ -195,6 +195,7 @@ public:
         {
             auto & decodePair = pair_iterator.GetValue();
             VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(
                 OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.valueUnsigned8.Value()))));
         }
