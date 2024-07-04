@@ -53,7 +53,7 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     // ActivateDatasetCallbackInterface
-    void OnActivateDatasetComplete(uint32_t randomNum, CHIP_ERROR error) override;
+    void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) override;
 
 private:
     friend class TestThreadBorderRouterManagementCluster;
@@ -86,7 +86,7 @@ private:
     app::CommandHandler::Handle mAsyncCommandHandle;
     ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
     Optional<uint64_t> mBreadcrumb;
-    uint32_t mRandomNumber;
+    uint32_t mSetActiveDatasetSequenceNumber = 0;
 };
 
 bool IsFailSafeArmed(FabricIndex accessingFabricIndex);

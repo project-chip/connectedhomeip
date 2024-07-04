@@ -48,7 +48,7 @@ public:
         // If the dataset is set successfully, OnActivateDatasetComplete should be called with CHIP_NO_ERROR when the
         // Border Router is attached to the Thread network.
         // If an error occurs while setting the active dataset, this callback should be called with the error.
-        virtual void OnActivateDatasetComplete(uint32_t randomNumber, CHIP_ERROR error) = 0;
+        virtual void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) = 0;
     };
 
     enum class DatasetType : uint8_t
@@ -72,14 +72,16 @@ public:
     virtual CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) = 0;
 
     // The Delegate implementation should back up the old active dataset at the beginning of function if no backup already exists.
-    // The Delegate implementation should store the random number and pass it to OnActivateDatasetComplete.
-    virtual CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t randomNum,
+    // The Delegate implementation must store the sequence number and pass it to OnActivateDatasetComplete.
+    virtual CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
                                         ActivateDatasetCallback * callback) = 0;
 
     // The Delegate implementation should remove the backup active dataset in this function.
     virtual CHIP_ERROR CommitActiveDataset() = 0;
 
-    // The Delegate implementation should restore the backup active dataset in this function.
+    // The Delegate implementation should restore the backup active dataset in this function. The delegate is allowed to call
+    // OnActivateDatasetComplete for the previous SetActiveDataset request even after this function is called as the sequence
+    // number passed to OnActivateDatasetComplete will be different.
     virtual CHIP_ERROR RevertActiveDataset() = 0;
 
     virtual CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) = 0;

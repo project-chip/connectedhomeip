@@ -95,13 +95,9 @@ Status ServerInstance::HandleSetActiveDatasetRequest(bool failSafeArmed,
         return Status::InvalidInState;
     }
 
-    mBreadcrumb    = req.breadcrumb;
-    mRandomNumber  = Crypto::GetRandU32();
-    CHIP_ERROR err = mDelegate->SetActiveDataset(activeDataset, mRandomNumber, this);
-    if (err != CHIP_NO_ERROR)
-    {
-        mRandomNumber = 0;
-    }
+    mBreadcrumb = req.breadcrumb;
+    mSetActiveDatasetSequenceNumber++;
+    CHIP_ERROR err = mDelegate->SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber, this);
     return StatusIB(err).mStatus;
 }
 
@@ -161,7 +157,8 @@ void ServerInstance::InvokeCommand(HandlerContext & ctxt)
                 Status status = HandleSetActiveDatasetRequest(IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()), req);
                 if (status != Status::Success)
                 {
-                    OnActivateDatasetComplete(mRandomNumber, ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(status)));
+                    OnActivateDatasetComplete(mSetActiveDatasetSequenceNumber,
+                                              ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(status)));
                 }
             }
             else
@@ -317,7 +314,7 @@ void ServerInstance::CommitSavedBreadcrumb()
     mBreadcrumb.ClearValue();
 }
 
-void ServerInstance::OnActivateDatasetComplete(uint32_t randomNumber, CHIP_ERROR error)
+void ServerInstance::OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error)
 {
     auto commandHandleRef = std::move(mAsyncCommandHandle);
     auto commandHandle    = commandHandleRef.Get();
@@ -325,12 +322,11 @@ void ServerInstance::OnActivateDatasetComplete(uint32_t randomNumber, CHIP_ERROR
     {
         return;
     }
-    if (mRandomNumber != randomNumber)
+    if (mSetActiveDatasetSequenceNumber != sequenceNum)
     {
         // Previous SetActiveDatasetRequest was handled.
         return;
     }
-    mRandomNumber = 0;
     if (error == CHIP_NO_ERROR)
     {
         // The successful completion of the activation process SHALL disarm the fail-safe timer.
@@ -356,8 +352,6 @@ void ServerInstance::OnFailSafeTimerExpired()
     {
         return;
     }
-    // Reset the RandomNumeber so that the OnActivateDatasetComplete will not handle the previous SetActiveDatasetRequest command.
-    mRandomNumber = 0;
     commandHandle->AddStatus(mPath, Status::Timeout);
 }
 
