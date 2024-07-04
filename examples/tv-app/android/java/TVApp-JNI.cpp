@@ -252,13 +252,13 @@ SampleTvAppInstallationService gSampleTvAppInstallationService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
-    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                                const SessionHandle & sessionHandle) override
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, std::string rotatingId, uint32_t passcode,
+                                Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle) override
     {
         // read current binding list
         chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
-        cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
+        cacheContext(vendorId, productId, nodeId, std::move(rotatingId), passcode, exchangeMgr, sessionHandle);
 
         CHIP_ERROR err =
             cluster.ReadAttribute<Binding::Attributes::Binding::TypeInfo>(this, OnReadSuccessResponse, OnReadFailureResponse);
@@ -342,17 +342,19 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
-        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
+        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId, mRotatingId, mPasscode,
                                                              bindings, OnSuccessResponse, OnFailureResponse);
         clearContext();
     }
 
-    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
+    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, std::string rotatingId, uint32_t passcode, Messaging::ExchangeManager & exchangeMgr,
                       const SessionHandle & sessionHandle)
     {
         mVendorId    = vendorId;
         mProductId   = productId;
         mNodeId      = nodeId;
+        mRotatingId  = std::move(rotatingId);
+        mPasscode    = passcode;
         mExchangeMgr = &exchangeMgr;
         mSecureSession.ShiftToSession(sessionHandle);
     }
@@ -368,6 +370,8 @@ class MyPostCommissioningListener : public PostCommissioningListener
     uint16_t mVendorId                        = 0;
     uint16_t mProductId                       = 0;
     NodeId mNodeId                            = 0;
+    std::string mRotatingId;
+    uint32_t mPasscode                         = 0;
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     SessionHolder mSecureSession;
 };

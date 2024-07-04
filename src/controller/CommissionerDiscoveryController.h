@@ -38,7 +38,6 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-using chip::CharSpan;
 using chip::NodeId;
 using chip::OperationalSessionSetup;
 using chip::Protocols::UserDirectedCommissioning::UDCClientState;
@@ -233,11 +232,14 @@ public:
      *  @param[in]    vendorId           The vendorid from the DAC of the new node.
      *  @param[in]    productId          The productid from the DAC of the new node.
      *  @param[in]    nodeId             The node id for the newly commissioned node.
+     *  @param[in]    rotatingId         The rotating ID to handle account login.
+     *  @param[in]    passcode           The passcode to handle account login.
      *  @param[in]    exchangeMgr        The exchange manager to be used to get an exchange context.
      *  @param[in]    sessionHandle      A reference to an established session.
      *
      */
     virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId,
+                                        std::string rotatingId, uint32_t passcode,
                                         chip::Messaging::ExchangeManager & exchangeMgr,
                                         const chip::SessionHandle & sessionHandle) = 0;
 
@@ -452,8 +454,6 @@ protected:
     uint16_t mProductId = 0;
     NodeId mNodeId      = 0;
     uint32_t mPasscode  = 0;
-    CharSpan mTempAccountIdentifier;
-    CharSpan mCommissionerSetupPin;
 
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;

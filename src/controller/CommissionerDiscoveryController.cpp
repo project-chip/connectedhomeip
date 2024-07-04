@@ -32,6 +32,33 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+namespace {
+
+bool fillRotatingIdBuffer(UDCClientState* client, char[] buffer) {
+    auto rotatingIdLength = client->GetRotatingIdLength();
+    auto hexBufferByteCount = 2 * rotatingIdLength;
+    if (sizeof(buffer) < hexBufferByteCount) {
+        return false;
+    }
+    auto err = Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, buffer, sizeof(buffer));
+    return err == CHIP_NO_ERROR;
+}
+
+// Returned CharSpan valid lifetime equals buffer lifetime.
+CharSpan getRotatingIdSpan(UDCClientState* client, char[] buffer) {
+    auto ok = fillRotatingIdBuffer(client, buffer);
+    return ok ? { buffer, hexBufferByteCount } : {};
+}
+
+// Allocates memory for rotating ID string and copies to string
+std::string getRotatingIdString(UDCClientState* client) {
+    auto buffer = char[Dnssd::kMaxRotatingIdLen * 2];
+    auto ok = fillRotatingIdBuffer(client, buffer);
+    return ok ? { buffer, hexBufferByteCount } : {};
+}
+
+}
+
 using namespace ::chip;
 using namespace chip::Protocols::UserDirectedCommissioning;
 
@@ -246,15 +273,11 @@ void CommissionerDiscoveryController::InternalOk()
     }
 
     char rotatingIdBuffer[Dnssd::kMaxRotatingIdLen * 2];
-    size_t rotatingIdLength = client->GetRotatingIdLength();
-    CHIP_ERROR err =
-        Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, rotatingIdBuffer, sizeof(rotatingIdBuffer));
-    if (err != CHIP_NO_ERROR)
-    {
+    CharSpan rotatingIdSpan = getRotatingIdSpan(client, rotatingIdBuffer);
+    if (rotatingIdSpan.empty()) {
         ChipLogError(AppServer, "UX InternalOk: could not convert rotating id to hex");
         return;
     }
-    CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
 
@@ -406,7 +429,6 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
     ValidateSession();
     uint32_t passcode = mPasscode;
 
-    // Q: Seems like getting rotating ID is done twice - once here and once in InternalOk. Is this necessary or could it be cached?
     if (mUdcServer == nullptr)
     {
         ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: no udc server");
@@ -432,18 +454,11 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         if (passcode == 0 && client->GetCommissionerPasscode() && client->GetCdPort() != 0)
         {
             char rotatingIdBuffer[Dnssd::kMaxRotatingIdLen * 2];
-            size_t rotatingIdLength = client->GetRotatingIdLength();
-            CHIP_ERROR err = Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, rotatingIdBuffer,
-                                                                 sizeof(rotatingIdBuffer));
-            if (err != CHIP_NO_ERROR)
-            {
+            CharSpan rotatingIdSpan = getRotatingIdSpan(client, rotatingIdBuffer);
+            if (rotatingIdSpan.empty()) {
                 ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: could not convert rotating id to hex");
                 return;
             }
-            CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
-
-            // Store rotating ID as tempAccountIdentifier to use in AccountLogin::Login payload later.
-            mTempAccountIdentifier = rotatingIdSpan;
 
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
@@ -460,9 +475,6 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
                     cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
                 return;
             }
-            // Store commissioner passcode as setup PIN (string/charspan).
-            // If this PIN is not empty it signals that user prompt was shown to enter PIN and AccountLogin::Login command has to be sent.
-            mCommissionerSetupPin = CharSpan::fromCharString(std::to_string(passcode));
 
             client->SetCachedCommissionerPasscode(passcode);
             client->SetUDCClientProcessingState(UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
@@ -616,26 +628,22 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     mProductId = productId;
     mNodeId    = nodeId;
 
-    // Send AccountLogin::Login command if user was prompted to enter setup PIN manually.
-    // Q: Is this the correct place to have this logic?
-    // Q: Is there an easier way call AccountLoginDelegate from here?
-    if (!mCommissionerSetupPIN.empty()) {
-        ChipLogProgress(AppServer, "UX ComissioningSucceeded with setupPIN prompt flow");
-        auto app = ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId);
-        if (app == nullptr) {
-            ChipLogError(AppServer, "UX ComissioningSucceeded with setupPIN prompt flow: Failed to get ContentApp");
-            // Q: Any action to take?
-        } else {
-            auto status = app->GetAccountLoginDelegate()->HandleLogin(mTempAccountIdentifier, mCommissionerSetupPin, {mNodeId});
-            ChipLogProgress(AppServer, "UX ComissioningSucceeded with setupPIN prompt flow: HandleLogin response status: %d", status);
-            // Q: Any action to take here if status is true/false?
-        }
+    auto rotatingId = std::string{};
+    auto passcode = uint32_t{ 0 };
+
+    auto client = GetUDCClientState();
+    if (client != nullptr)
+    {
+        // Get rotating ID and cached (commissioner?) passcode to handle AccountLogin
+        rotatingId = getRotatingIdString(client);
+        // Q: Should we use mPasscode, client->GetCommissionerPasscode, or client->GetCachedCommissionerPasscode?
+        passcode = std::to_string(client->GetCachedCommissionerPasscode());
     }
 
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, std::move(rotatingId), passcode, exchangeMgr, sessionHandle);
     }
     else
     {

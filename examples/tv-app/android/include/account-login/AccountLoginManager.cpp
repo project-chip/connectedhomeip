@@ -58,7 +58,7 @@ AccountLoginManager::AccountLoginManager(ContentAppCommandDelegate * commandDele
     CopyString(mSetupPin, sizeof(mSetupPin), setupPin);
 }
 
-bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin,
+bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountId, const CharSpan & setupPIN,
                                       const chip::Optional<chip::NodeId> & nodeId)
 {
     ChipLogProgress(DeviceLayer, "AccountLoginManager::HandleLogin called for endpoint %d", mEndpointId);
@@ -76,7 +76,7 @@ bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, co
 
     Json::Value response;
     bool commandHandled = true;
-    AccountLogin::Commands::Login::Type cmd = { tempAccountIdentifier, setupPin, nodeId };
+    AccountLogin::Commands::Login::Type cmd = { tempAccountId, setupPIN, nodeId };
 
     // Deliberately ignore returned status
     mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id,

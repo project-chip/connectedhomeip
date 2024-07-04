@@ -176,6 +176,8 @@ public:
      * @param[in] targetVendorId  Vendor ID for the target device.
      * @param[in] targetProductId Product ID for the target device.
      * @param[in] localNodeId     The NodeId for the local device.
+     * @param[in] rotatingId      The rotating account ID to handle account login.
+     * @param[in] passcode        The passcode to handle account login.
      * @param[in] bindings        Any additional bindings to include. This may include current bindings.
      * @param[in] successCb       The function to be called on success of adding the binding.
      * @param[in] failureCb       The function to be called on failure of adding the binding.
@@ -184,6 +186,7 @@ public:
      */
     CHIP_ERROR ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle, uint16_t targetVendorId,
                                   uint16_t targetProductId, NodeId localNodeId,
+                                  const std::string& rotatingId, uint32_t passcode,
                                   std::vector<app::Clusters::Binding::Structs::TargetStruct::Type> bindings,
                                   Controller::WriteResponseSuccessCallback successCb,
                                   Controller::WriteResponseFailureCallback failureCb);
