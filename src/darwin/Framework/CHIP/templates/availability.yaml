@@ -9694,6 +9694,25 @@
           - ThreadBorderRouterManagement
           - ThreadNetworkDirectory
           - WiFiNetworkManagement
+      attributes:
+          OccupancySensing:
+              # Targeting 1.4
+              - HoldTime
+              - HoldTimeLimits
+      commands:
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - StringEchoRequest
+              - StringEchoResponse
+      structs:
+          OccupancySensing:
+              # Targeting 1.4
+              - HoldTimeLimitsStruct
+      bitmaps:
+          OccupancySensing:
+              # Targeting Fall 1.4
+              - Feature
       bitmap values:
           Switch:
               Feature:
