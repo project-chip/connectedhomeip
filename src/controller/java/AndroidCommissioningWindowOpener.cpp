@@ -96,8 +96,8 @@ CHIP_ERROR AndroidCommissioningWindowOpener::OpenCommissioningWindow(DeviceContr
     }
 
     CHIP_ERROR err = opener->CommissioningWindowOpener::OpenCommissioningWindow(
-        deviceId, timeout, iteration, discriminator, setupPIN, salt, &opener->mOnOpenCommissioningWindowCallback, payload,
-        readVIDPIDAttributes);
+        deviceId, timeout, iteration, discriminator, setupPIN, salt, NullOptional, &opener->mOnOpenCommissioningWindowCallback,
+        payload, readVIDPIDAttributes);
     if (err != CHIP_NO_ERROR)
     {
         delete opener;

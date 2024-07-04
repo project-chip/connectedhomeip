@@ -1784,7 +1784,7 @@ CHIP_ERROR OpenCommissioningWindowHelper::OpenCommissioningWindow(Controller::De
     auto * self = new OpenCommissioningWindowHelper(controller, callback);
     SetupPayload unused;
     CHIP_ERROR err = self->mOpener.OpenCommissioningWindow(nodeID, timeout, Crypto::kSpake2p_Min_PBKDF_Iterations, discriminator,
-        setupPIN, NullOptional, &self->mOnOpenCommissioningWindowCallback, unused);
+        setupPIN, NullOptional, NullOptional, &self->mOnOpenCommissioningWindowCallback, unused);
     if (err != CHIP_NO_ERROR) {
         delete self;
     }

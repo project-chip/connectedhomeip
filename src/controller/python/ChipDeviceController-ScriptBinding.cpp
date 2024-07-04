@@ -715,7 +715,7 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
         auto opener =
             Platform::New<Controller::CommissioningWindowOpener>(static_cast<chip::Controller::DeviceController *>(devCtrl));
         PyChipError err = ToPyChipError(opener->OpenCommissioningWindow(nodeid, System::Clock::Seconds16(timeout), iteration,
-                                                                        discriminator, NullOptional, NullOptional,
+                                                                        discriminator, NullOptional, NullOptional, NullOptional,
                                                                         pairingDelegate->GetOpenWindowCallback(opener), payload));
         return err;
     }

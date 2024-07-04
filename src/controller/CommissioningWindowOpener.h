@@ -89,6 +89,8 @@ public:
      *                          least kSpake2p_Min_PBKDF_Salt_Length bytes and
      *                          at most kSpake2p_Max_PBKDF_Salt_Length bytes in
      *                          length.
+     * @param[in] verifier      The PAKE passcode verifier to use, or NullOptional to
+     *                          generate verifier based on PIN and other parameters.
      * @param[in] callback      The function to be called on success or failure of opening of commissioning window.
      * @param[out] payload      The setup payload, not including the VID/PID bits,
      *                          even if those were asked for, that is generated
@@ -104,8 +106,8 @@ public:
      */
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, System::Clock::Seconds16 timeout, uint32_t iteration,
                                        uint16_t discriminator, Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
-                                       Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload,
-                                       bool readVIDPIDAttributes = false);
+                                       Optional<ByteSpan> verifier, Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                       SetupPayload & payload, bool readVIDPIDAttributes = false);
 
 private:
     enum class Step : uint8_t

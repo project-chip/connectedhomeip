@@ -55,7 +55,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId device
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, Seconds16 timeout, uint32_t iteration,
                                                               uint16_t discriminator, Optional<uint32_t> setupPIN,
-                                                              Optional<ByteSpan> salt,
+                                                              Optional<ByteSpan> salt, Optional<ByteSpan> verifier,
                                                               Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                               SetupPayload & payload, bool readVIDPIDAttributes)
 {
@@ -106,9 +106,16 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
     mCommissioningWindowTimeout       = timeout;
     mPBKDFIterations                  = iteration;
 
-    bool randomSetupPIN = !setupPIN.HasValue();
-    ReturnErrorOnFailure(
-        PASESession::GeneratePASEVerifier(mVerifier, mPBKDFIterations, mPBKDFSalt, randomSetupPIN, mSetupPayload.setUpPINCode));
+    if (verifier.HasValue())
+    {
+        ReturnErrorOnFailure(mVerifier.Deserialize(verifier.Value()));
+    }
+    else
+    {
+        bool randomSetupPIN = !setupPIN.HasValue();
+        ReturnErrorOnFailure(
+            PASESession::GeneratePASEVerifier(mVerifier, mPBKDFIterations, mPBKDFSalt, randomSetupPIN, mSetupPayload.setUpPINCode));
+    }
 
     payload = mSetupPayload;
 
@@ -354,8 +361,8 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceControll
     }
 
     CHIP_ERROR err = opener->CommissioningWindowOpener::OpenCommissioningWindow(
-        deviceId, timeout, iteration, discriminator, setupPIN, salt, &opener->mOnOpenCommissioningWindowCallback, payload,
-        readVIDPIDAttributes);
+        deviceId, timeout, iteration, discriminator, setupPIN, salt, NullOptional, &opener->mOnOpenCommissioningWindowCallback,
+        payload, readVIDPIDAttributes);
     if (err != CHIP_NO_ERROR)
     {
         delete opener;
