@@ -270,12 +270,26 @@ def run_test_sequence_steps(
 @click.command()
 @click.option('--tv-app-rel-path', type=str, default='out/tv-app/chip-tv-app', help='Path to the Linux tv-app executable.')
 @click.option('--tv-casting-app-rel-path', type=str, default='out/tv-casting-app/chip-tv-casting-app', help='Path to the Linux tv-casting-app executable.')
-def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
+@click.option('--commissioner-generated-passcode', type=bool, default=False, help='Enable the commissioner generated passcode test flow.')
+def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path, commissioner_generated_passcode):
     """Test if the casting experience between the Linux tv-casting-app and the Linux tv-app continues to work.
 
-    Default paths for the executables are provided but can be overridden via command line arguments.
-    For example: python3 run_tv_casting_test.py --tv-app-rel-path=path/to/tv-app
-                 --tv-casting-app-rel-path=path/to/tv-casting-app
+    By default, it uses the provided executable paths and the commissionee generated passcode flow as the test sequence.
+
+    Example usages:
+    1. Use default paths and test sequence:
+        python3 run_tv_casting_test.py
+
+    2. Use custom executable paths and default test sequence:
+        python3 run_tv_casting_test.py --tv-app-rel-path=path/to/tv-app --tv-casting-app-rel-path=path/to/tv-casting-app
+
+    3. Use default paths and a test sequence that is not the default test sequence (replace `test-sequence-name` with the actual name of the test sequence):
+        python3 run_tv_casting_test.py --test-sequence-name=True
+
+    4. Use custom executable paths and a test sequence that is not the default test sequence (replace `test-sequence-name` with the actual name of the test sequence):
+        python3 run_tv_casting_test.py --tv-app-rel-path=path/to/tv-app --tv-casting-app-rel-path=path/to/tv-casting-app --test-sequence-name=True
+
+    Note: In order to enable a new test sequence, we also need to define a @click.option() entry for the test sequence.
     """
 
     # Store the log files to a temporary directory.
@@ -288,15 +302,17 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
             # Get all the test sequences.
             test_sequences = Sequence.get_test_sequences()
 
-            # Get the test sequence of interest.
-            test_sequence = Sequence.get_test_sequence_by_name(test_sequences, 'commissionee_generated_passcode_test')
+            # Get the test sequence that we are interested in validating.
+            test_sequence_name = 'commissionee_generated_passcode_test'
+            if commissioner_generated_passcode:
+                test_sequence_name = 'commissioner_generated_passcode_test'
+            test_sequence = Sequence.get_test_sequence_by_name(test_sequences, test_sequence_name)
 
             if not test_sequence:
                 logging.error('No test sequence found by the test sequence name provided.')
                 handle_casting_failure(None, [])
 
             # At this point, we have retrieved the test sequence of interest.
-            test_sequence_name = test_sequence.name
             test_sequence_steps = test_sequence.steps
 
             # Configure command options to disable stdout buffering during tests.
