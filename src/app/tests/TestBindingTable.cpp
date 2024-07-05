@@ -22,7 +22,6 @@
 #include <app/util/config.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/UnitTestRegistration.h>
 
 using chip::BindingTable;
 

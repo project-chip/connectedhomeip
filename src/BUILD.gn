@@ -22,11 +22,6 @@ import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
-declare_args() {
-  # Build monolithic test library.
-  chip_monolithic_tests = false
-}
-
 # chip_root relative to root_build_dir for macro-prefix-map.
 # "/." avoids trailing "/" in result when chip_root is "//"
 build_relative_chip_root = rebase_path("${chip_root}/.", root_build_dir)
@@ -55,7 +50,6 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
-      "${chip_root}/src/app/codegen-data-model/tests",
       "${chip_root}/src/app/data-model-interface/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
@@ -87,7 +81,15 @@ if (chip_build_tests) {
 
     if (current_os != "zephyr" && current_os != "mbed" &&
         chip_device_platform != "efr32") {
+      # Avoid these items from "one single binary" test executions. Once tests
+      # are split, we can re-visit this (and likely many others)
+      #
+      # In particular:
+      #   "app/codegen-data-model/tests" contains symbols for ember mocks which
+      #                                  are used by other tests
+
       tests += [
+        "${chip_root}/src/app/codegen-data-model/tests",
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]
@@ -97,7 +99,6 @@ if (chip_build_tests) {
     if (chip_device_platform != "efr32") {
       tests += [
         "${chip_root}/src/app/tests",
-        "${chip_root}/src/app/tests:tests_nltest",
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",

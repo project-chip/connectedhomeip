@@ -52,6 +52,9 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
+#include <ProvisionChannel.h>
+#include <ProvisionManager.h>
+
 using namespace ::chip;
 using namespace ::chip::Ble;
 
@@ -344,20 +347,6 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
                                       PacketBufferHandle pBuf)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
-    return false;
-}
-
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBufferHandle pBuf)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
-    return false;
-}
-
-bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadResponse() not supported");
     return false;
 }
 
@@ -739,12 +728,20 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 void BLEManagerImpl::HandleWriteEvent(volatile sl_bt_msg_t * evt)
 {
     uint16_t attribute = evt->data.evt_gatt_server_user_write_request.characteristic;
-
+    bool do_provision  = chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().IsProvisionRequired();
     ChipLogProgress(DeviceLayer, "Char Write Req, char : %d", attribute);
 
     if (gattdb_CHIPoBLEChar_Rx == attribute)
     {
-        HandleRXCharWrite(evt);
+        if (do_provision)
+        {
+            chip::DeviceLayer::Silabs::Provision::Channel::Update(attribute);
+            chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().Step();
+        }
+        else
+        {
+            HandleRXCharWrite(evt);
+        }
     }
 }
 

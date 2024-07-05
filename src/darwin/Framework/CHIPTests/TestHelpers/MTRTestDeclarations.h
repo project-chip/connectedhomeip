@@ -78,6 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
           reportToPersistenceDelayMaxMultiplier:(double)reportToPersistenceDelayMaxMultiplier
     deviceReportingExcessivelyIntervalThreshold:(NSTimeInterval)deviceReportingExcessivelyIntervalThreshold;
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
+- (NSUInteger)unitTestNonnullDelegateCount;
 @end
 #endif
 

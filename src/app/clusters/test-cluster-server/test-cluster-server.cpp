@@ -1041,6 +1041,16 @@ bool emberAfUnitTestingClusterSimpleStructEchoRequestCallback(CommandHandler * c
     return true;
 }
 
+bool emberAfUnitTestingClusterStringEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                        const Commands::StringEchoRequest::DecodableType & commandData)
+{
+    Commands::StringEchoResponse::Type response;
+    response.payload = commandData.payload;
+
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
 bool emberAfUnitTestingClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::TimedInvokeRequest::DecodableType & commandData)
 {

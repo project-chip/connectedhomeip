@@ -259,6 +259,7 @@ public:
         mPrematureCompleteAfter = chip::Controller::CommissioningStage::kError;
         mReadCommissioningInfo  = chip::Controller::ReadCommissioningInfo();
         mNeedsDST               = false;
+        mCompletionError        = CHIP_NO_ERROR;
     }
     bool GetTestCommissionerUsed() { return mTestCommissionerUsed; }
     void OnCommissioningSuccess(chip::PeerId peerId) { mReceivedCommissioningSuccess = true; }

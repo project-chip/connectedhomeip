@@ -41,7 +41,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatUserInterfaceConfigurationCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
@@ -116,7 +116,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun writeTemperatureDisplayModeAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 0u
 
@@ -130,10 +130,10 @@ class ThermostatUserInterfaceConfigurationCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -159,7 +159,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun subscribeTemperatureDisplayModeAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -172,7 +172,7 @@ class ThermostatUserInterfaceConfigurationCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -253,10 +253,10 @@ class ThermostatUserInterfaceConfigurationCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -282,7 +282,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun subscribeKeypadLockoutAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -295,7 +295,7 @@ class ThermostatUserInterfaceConfigurationCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -370,7 +370,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun writeScheduleProgrammingVisibilityAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 2u
 
@@ -384,10 +384,10 @@ class ThermostatUserInterfaceConfigurationCluster(
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -413,7 +413,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun subscribeScheduleProgrammingVisibilityAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -426,7 +426,7 @@ class ThermostatUserInterfaceConfigurationCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -508,7 +508,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -521,7 +521,7 @@ class ThermostatUserInterfaceConfigurationCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -605,7 +605,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -618,7 +618,7 @@ class ThermostatUserInterfaceConfigurationCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -702,7 +702,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -715,7 +715,7 @@ class ThermostatUserInterfaceConfigurationCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -797,7 +797,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -810,7 +810,7 @@ class ThermostatUserInterfaceConfigurationCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -885,7 +885,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -898,7 +898,7 @@ class ThermostatUserInterfaceConfigurationCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -966,7 +966,7 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -979,7 +979,7 @@ class ThermostatUserInterfaceConfigurationCluster(
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

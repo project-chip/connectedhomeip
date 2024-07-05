@@ -126,7 +126,7 @@ struct PayloadContents
     // payload parsed from a QR code would always have a value for
     // rendezvousInformation.
     Optional<RendezvousInformationFlags> rendezvousInformation;
-    SetupDiscriminator discriminator;
+    SetupDiscriminator discriminator{};
     uint32_t setUpPINCode = 0;
 
     enum class ValidationMode : uint8_t
