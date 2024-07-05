@@ -242,6 +242,12 @@ public:
         // TODO : Implement action on frequency when frequency not provisional anymore
         // if(LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency)){}
 
+        EmberAfLevelControlState * state = getState(endpoint);
+        if (level < state->minLevel || level > state->maxLevel)
+        {
+            chip::app::NumericAttributeTraits<uint8_t>::SetNull(level);
+        }
+
         if (!app::NumericAttributeTraits<uint8_t>::IsNullValue(level))
         {
             CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
