@@ -93,6 +93,11 @@ public:
 
     chip::app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
+    // Accessor for the cluster state cache, so that stale data can be cleared
+    // from it as needed.  The returned pointer must not be held long-term,
+    // because it can dangle if this callback object is destroyed.
+    chip::app::ClusterStateCache * GetClusterStateCache() { return mClusterStateCache.get(); }
+
     // We need to exist to get a ReadClient, so can't take this as a constructor argument.
     void AdoptReadClient(std::unique_ptr<chip::app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
     void AdoptClusterStateCache(std::unique_ptr<chip::app::ClusterStateCache> aClusterStateCache)
