@@ -94,7 +94,6 @@ public:
     static constexpr System::Clock::Timeout kResponsiveActiveRetransTimeout = System::Clock::Milliseconds32(10);
 
     MessagingContext() : mpData(new MessagingContextData()) {}
-    // TODO Currently src/app/icd/server/tests is using MessagingContext as dependency.
     ~MessagingContext() { delete mpData; }
 
     // Whether Alice and Bob are initialized, must be called before Init
@@ -175,23 +174,25 @@ public:
     System::Layer & GetSystemLayer() { return mpData->mIOContext->GetSystemLayer(); }
 
 private:
+    // These members are encapsulated in a struct which is allocated upon construction of MessagingContext and freed upon
+    // destruction of MessagingContext.  This is done to save stack space.
     struct MessagingContextData
     {
         MessagingContextData() :
-            mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
+            mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
             mBobAddress(LoopbackTransport::LoopbackPeer(mAliceAddress))
         {}
         ~MessagingContextData() { EXPECT_FALSE(mInitialized); }
 
         bool mInitializeNodes = true;
-        bool mInitialized;
+        bool mInitialized     = false;
         FabricTable mFabricTable;
 
         SessionManager mSessionManager;
         Messaging::ExchangeManager mExchangeManager;
         secure_channel::MessageCounterManager mMessageCounterManager;
-        IOContext * mIOContext;
-        TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
+        IOContext * mIOContext        = nullptr;
+        TransportMgrBase * mTransport = nullptr;      // Only needed for InitFromExisting.
         chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
         chip::PersistentStorageOperationalKeystore mOpKeyStore;
         chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
