@@ -35071,7 +35071,7 @@ class ColorControl(Cluster):
         class DriftCompensationEnum(MatterIntEnum):
             kNone = 0x00
             kOtherOrUnknown = 0x01
-            kTemperaturemonitoring = 0x02
+            kTemperatureMonitoring = 0x02
             kOpticalLuminanceMonitoringAndFeedback = 0x03
             kOpticalColorMonitoringAndFeedback = 0x04
             # All received enum values that are not listed above will be mapped

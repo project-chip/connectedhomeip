@@ -80,6 +80,15 @@ using StepMode            = StepModeEnum;
 using LevelControlOptions = OptionsBitmap;
 } // namespace LevelControl
 
+namespace ColorControl {
+// https://github.com/project-chip/connectedhomeip/pull/33612 renamed this
+using ColorMode            = ColorModeEnum;
+using ColorTemperature     = ColorTemperatureMireds;
+using ColorCapabilities    = ColorCapabilitiesBitmap;
+using ColorLoopUpdateFlags = UpdateFlagsBitmap;
+using ColorLoopAction      = ColorLoopActionEnum;
+} // namespace ColorControl
+
 namespace RefrigeratorAlarm {
 // https://github.com/project-chip/connectedhomeip/pull/31517 renamed this
 using AlarmMap = AlarmBitmap;

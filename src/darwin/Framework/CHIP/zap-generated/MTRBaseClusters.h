@@ -20229,7 +20229,7 @@ typedef NS_ENUM(uint8_t, MTRColorControlDirection) {
 typedef NS_ENUM(uint8_t, MTRColorControlDriftCompensation) {
     MTRColorControlDriftCompensationNone MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRColorControlDriftCompensationOtherOrUnknown MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRColorControlDriftCompensationTemperaturemonitoring MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRColorControlDriftCompensationTemperatureMonitoring MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRColorControlDriftCompensationOpticalLuminanceMonitoringAndFeedback MTR_PROVISIONALLY_AVAILABLE = 0x03,
     MTRColorControlDriftCompensationOpticalColorMonitoringAndFeedback MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;

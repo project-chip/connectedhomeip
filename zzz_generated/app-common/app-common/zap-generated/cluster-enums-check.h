@@ -3001,7 +3001,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::DriftComp
     {
     case EnumType::kNone:
     case EnumType::kOtherOrUnknown:
-    case EnumType::kTemperaturemonitoring:
+    case EnumType::kTemperatureMonitoring:
     case EnumType::kOpticalLuminanceMonitoringAndFeedback:
     case EnumType::kOpticalColorMonitoringAndFeedback:
         return val;

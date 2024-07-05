@@ -86,7 +86,7 @@ limitations under the License.
     <cluster code="0x0300"/>
     <item name="None" value="0x00"/>
     <item name="OtherOrUnknown" value="0x01"/>
-    <item name="Temperaturemonitoring" value="0x02"/>
+    <item name="TemperatureMonitoring" value="0x02"/>
     <item name="OpticalLuminanceMonitoringAndFeedback" value="0x03"/>
     <item name="OpticalColorMonitoringAndFeedback" value="0x04"/>
   </enum>
