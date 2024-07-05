@@ -14,7 +14,7 @@ RUN set -x \
     && tar xvf zephyr-sdk-0.16.5_linux-x86_64_minimal.tar.xz \
     && rm -rf zephyr-sdk-0.16.5_linux-x86_64_minimal.tar.xz \
     && zephyr-sdk-0.16.5/setup.sh -t arm-zephyr-eabi \
-    && pip3 install -U --no-cache-dir west \
+    && pip3 install --break-system-packages -U --no-cache-dir west \
     && west init zephyrproject -m https://github.com/nxp-zephyr-ear/zephyr.git --mr zephyr_rw61x_v3.6_RFP \
     && cd zephyrproject/zephyr \
     && west update -o=--depth=1 -n \
