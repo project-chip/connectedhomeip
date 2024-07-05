@@ -720,7 +720,8 @@ void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType val
     ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
 
     typename NumericAttributeTraits<T>::WorkingType actual;
-    ASSERT_EQ(chip::app::DataModel::Decode<typename NumericAttributeTraits<T>::WorkingType>(encodedData.dataReader, actual), CHIP_NO_ERROR);
+    ASSERT_EQ(chip::app::DataModel::Decode<typename NumericAttributeTraits<T>::WorkingType>(encodedData.dataReader, actual),
+              CHIP_NO_ERROR);
     ASSERT_EQ(actual, value);
 }
 
@@ -752,7 +753,7 @@ void TestEmberScalarNullRead()
 
     DecodedAttributeData & encodedData = attribute_data[0];
     ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
-    DataModel::Nullable<typename NumericAttributeTraits<T>::WorkingType> actual;
+    chip::app::DataModel::Nullable<typename NumericAttributeTraits<T>::WorkingType> actual;
     ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
     ASSERT_TRUE(actual.IsNull());
 }
@@ -1516,8 +1517,8 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
     // data element should be null for the given 0xFFFF length
     ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Null);
 
-    DataModel::Nullable<ByteSpan> actual;
-    ASSERT_EQ(DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
+    chip::app::DataModel::Nullable<ByteSpan> actual;
+    ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
     ASSERT_TRUE(actual.IsNull());
 }
 
@@ -1704,7 +1705,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
 
     ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Structure);
     Clusters::UnitTesting::Structs::SimpleStruct::DecodableType actual;
-    ASSERT_EQ(DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
+    ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
 
     ASSERT_EQ(actual.a, 123);
     ASSERT_EQ(actual.b, true);
@@ -1891,7 +1892,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
         ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Structure);
 
         Clusters::UnitTesting::Structs::SimpleStruct::DecodableType actual;
-        ASSERT_EQ(DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
 
         ASSERT_EQ(actual.a, static_cast<uint8_t>((i + kEncodeIndexStart) & 0xFF));
         ASSERT_EQ(actual.b, true);
@@ -2033,7 +2034,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteReservedNullPlaceholderToNullable)
         ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE)));
 
     using NumericType             = NumericAttributeTraits<uint32_t>;
-    using NullableType            = DataModel::Nullable<typename NumericType::WorkingType>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
     AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0xFFFFFFFF);
 
     // write should fail: we are trying to write null which is out of range
@@ -2051,7 +2052,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNo
                                                 MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_INT24U_ATTRIBUTE_TYPE)));
 
     using NumericType             = NumericAttributeTraits<uint32_t>;
-    using NullableType            = DataModel::Nullable<typename NumericType::WorkingType>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
     AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0x1223344);
 
     // write should fail: written value is not in range
@@ -2070,7 +2071,7 @@ TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNu
         ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT24U_ATTRIBUTE_TYPE)));
 
     using NumericType             = NumericAttributeTraits<uint32_t>;
-    using NullableType            = DataModel::Nullable<typename NumericType::WorkingType>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
     AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0x1223344);
 
     // write should fail: written value is not in range
@@ -2178,7 +2179,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
     TestWriteRequest test(kAdminSubjectDescriptor,
                           ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
                                                 MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
-    AttributeValueDecoder decoder = test.DecoderFor<DataModel::Nullable<CharSpan>>(chip::app::DataModel::MakeNullable("text"_span));
+    AttributeValueDecoder decoder = test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::MakeNullable("text"_span));
 
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
@@ -2199,7 +2200,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
     TestWriteRequest test(kAdminSubjectDescriptor,
                           ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
                                                 MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
-    AttributeValueDecoder decoder = test.DecoderFor<DataModel::Nullable<CharSpan>>(chip::app::DataModel::Nullable<CharSpan>());
+    AttributeValueDecoder decoder = test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::Nullable<CharSpan>());
 
     ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
