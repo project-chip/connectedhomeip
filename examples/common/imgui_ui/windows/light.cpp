@@ -158,7 +158,7 @@ void Light::Render()
         (mColorMode == ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation) ? "Hue/Saturation"
         : (mColorMode == ColorControl::ColorModeEnum::kCurrentXAndCurrentY)          ? "X/Y"
         : (mColorMode == ColorControl::ColorModeEnum::kColorTemperatureMireds)       ? "Temperature/Mireds"
-                                                                                                          : "UNKNOWN";
+                                                                                     : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
 
