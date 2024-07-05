@@ -714,9 +714,16 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
         SetupPayload payload;
         auto opener =
             Platform::New<Controller::CommissioningWindowOpener>(static_cast<chip::Controller::DeviceController *>(devCtrl));
-        PyChipError err = ToPyChipError(opener->OpenCommissioningWindow(nodeid, System::Clock::Seconds16(timeout), iteration,
-                                                                        discriminator, NullOptional, NullOptional, NullOptional,
-                                                                        pairingDelegate->GetOpenWindowCallback(opener), payload));
+        Controller::CommissioningWindowOpener::CommissioningWindowPasscodeParams params = {
+            .common   = { .deviceId      = nodeid,
+                          .timeout       = System::Clock::Seconds16(timeout),
+                          .iteration     = iteration,
+                          .discriminator = discriminator },
+            .setupPIN = NullOptional,
+            .salt     = NullOptional,
+            .callback = pairingDelegate->GetOpenWindowCallback(opener),
+        };
+        PyChipError err = ToPyChipError(opener->OpenCommissioningWindow(params, payload));
         return err;
     }
 

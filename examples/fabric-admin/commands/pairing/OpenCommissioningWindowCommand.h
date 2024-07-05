@@ -35,6 +35,7 @@ public:
     OpenCommissioningWindowCommand(CredentialIssuerCommands * credIssuerCommands) :
         CHIPCommand("open-commissioning-window", credIssuerCommands),
         mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this),
+        mOnOpenCommissioningWindowVerifierCallback(OnOpenCommissioningWindowVerifierResponse, this),
         mOnOpenBasicCommissioningWindowCallback(OnOpenBasicCommissioningWindowResponse, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId, "Node to send command to.");
@@ -79,8 +80,10 @@ private:
     chip::Platform::UniquePtr<chip::Controller::CommissioningWindowOpener> mWindowOpener;
 
     static void OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload);
+    static void OnOpenCommissioningWindowVerifierResponse(void * context, NodeId deviceId, CHIP_ERROR status);
     static void OnOpenBasicCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status);
 
     chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindow> mOnOpenCommissioningWindowCallback;
+    chip::Callback::Callback<chip::Controller::OnOpenCommissioningWindowWithVerifier> mOnOpenCommissioningWindowVerifierCallback;
     chip::Callback::Callback<chip::Controller::OnOpenBasicCommissioningWindow> mOnOpenBasicCommissioningWindowCallback;
 };

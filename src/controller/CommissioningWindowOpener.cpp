@@ -43,11 +43,12 @@ CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId device
 
     // Basic commissioning does not use the setup payload.
 
-    mCommissioningWindowOption        = CommissioningWindowOption::kOriginalSetupCode;
-    mBasicCommissioningWindowCallback = callback;
-    mCommissioningWindowCallback      = nullptr;
-    mNodeId                           = deviceId;
-    mCommissioningWindowTimeout       = timeout;
+    mCommissioningWindowOption           = CommissioningWindowOption::kOriginalSetupCode;
+    mBasicCommissioningWindowCallback    = callback;
+    mCommissioningWindowCallback         = nullptr;
+    mCommissioningWindowVerifierCallback = nullptr;
+    mNodeId                              = deviceId;
+    mCommissioningWindowTimeout          = timeout;
 
     mNextStep = Step::kOpenCommissioningWindow;
     return mController->GetConnectedDevice(mNodeId, &mDeviceConnected, &mDeviceConnectionFailure);
@@ -55,40 +56,54 @@ CHIP_ERROR CommissioningWindowOpener::OpenBasicCommissioningWindow(NodeId device
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, Seconds16 timeout, uint32_t iteration,
                                                               uint16_t discriminator, Optional<uint32_t> setupPIN,
-                                                              Optional<ByteSpan> salt, Optional<ByteSpan> verifier,
+                                                              Optional<ByteSpan> salt,
                                                               Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                               SetupPayload & payload, bool readVIDPIDAttributes)
 {
-    VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
+    CommissioningWindowPasscodeParams params = {
+        .common   = { .deviceId = deviceId, .timeout = timeout, .iteration = iteration, .discriminator = discriminator },
+        .setupPIN = setupPIN,
+        .salt     = salt,
+        .readVIDPIDAttributes = readVIDPIDAttributes,
+        .callback             = callback,
+    };
 
-    VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= iteration && iteration <= kSpake2p_Max_PBKDF_Iterations,
+    return OpenCommissioningWindow(params, payload);
+}
+
+CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params,
+                                                              SetupPayload & payload)
+{
+    VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= params.common.iteration &&
+                            params.common.iteration <= kSpake2p_Max_PBKDF_Iterations,
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(
-        !salt.HasValue() ||
-            (salt.Value().size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.Value().size() <= kSpake2p_Max_PBKDF_Salt_Length),
-        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!params.salt.HasValue() ||
+                            (params.salt.Value().size() >= kSpake2p_Min_PBKDF_Salt_Length &&
+                             params.salt.Value().size() <= kSpake2p_Max_PBKDF_Salt_Length),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     mSetupPayload = SetupPayload();
 
-    if (setupPIN.HasValue())
+    if (params.setupPIN.HasValue())
     {
-        if (!SetupPayload::IsValidSetupPIN(setupPIN.Value()))
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
+        VerifyOrReturnError(SetupPayload::IsValidSetupPIN(params.setupPIN.Value()), CHIP_ERROR_INVALID_ARGUMENT);
         mCommissioningWindowOption = CommissioningWindowOption::kTokenWithProvidedPIN;
-        mSetupPayload.setUpPINCode = setupPIN.Value();
+        mSetupPayload.setUpPINCode = params.setupPIN.Value();
     }
     else
     {
         mCommissioningWindowOption = CommissioningWindowOption::kTokenWithRandomPIN;
     }
 
-    if (salt.HasValue())
+    mSetupPayload.version = 0;
+    mSetupPayload.discriminator.SetLongValue(params.common.discriminator);
+    mSetupPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
+
+    if (params.salt.HasValue())
     {
-        memcpy(mPBKDFSaltBuffer, salt.Value().data(), salt.Value().size());
-        mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, salt.Value().size());
+        memcpy(mPBKDFSaltBuffer, params.salt.Value().data(), params.salt.Value().size());
+        mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, params.salt.Value().size());
     }
     else
     {
@@ -96,30 +111,19 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
         mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer);
     }
 
-    mSetupPayload.version = 0;
-    mSetupPayload.discriminator.SetLongValue(discriminator);
-    mSetupPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
+    bool randomSetupPIN = !params.setupPIN.HasValue();
+    ReturnErrorOnFailure(
+        PASESession::GeneratePASEVerifier(mVerifier, mPBKDFIterations, mPBKDFSalt, randomSetupPIN, mSetupPayload.setUpPINCode));
 
-    mCommissioningWindowCallback      = callback;
-    mBasicCommissioningWindowCallback = nullptr;
-    mNodeId                           = deviceId;
-    mCommissioningWindowTimeout       = timeout;
-    mPBKDFIterations                  = iteration;
+    payload                              = mSetupPayload;
+    mCommissioningWindowCallback         = params.callback;
+    mBasicCommissioningWindowCallback    = nullptr;
+    mCommissioningWindowVerifierCallback = nullptr;
+    mNodeId                              = params.common.deviceId;
+    mCommissioningWindowTimeout          = params.common.timeout;
+    mPBKDFIterations                     = params.common.iteration;
 
-    if (verifier.HasValue())
-    {
-        ReturnErrorOnFailure(mVerifier.Deserialize(verifier.Value()));
-    }
-    else
-    {
-        bool randomSetupPIN = !setupPIN.HasValue();
-        ReturnErrorOnFailure(
-            PASESession::GeneratePASEVerifier(mVerifier, mPBKDFIterations, mPBKDFSalt, randomSetupPIN, mSetupPayload.setUpPINCode));
-    }
-
-    payload = mSetupPayload;
-
-    if (readVIDPIDAttributes)
+    if (params.readVIDPIDAttributes)
     {
         mNextStep = Step::kReadVID;
     }
@@ -127,6 +131,31 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
     {
         mNextStep = Step::kOpenCommissioningWindow;
     }
+
+    return mController->GetConnectedDevice(mNodeId, &mDeviceConnected, &mDeviceConnectionFailure);
+}
+
+CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowVerifierParams & params)
+{
+    VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= params.common.iteration &&
+                            params.common.iteration <= kSpake2p_Max_PBKDF_Iterations,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.salt.size() >= kSpake2p_Min_PBKDF_Salt_Length &&
+                            params.salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    memcpy(mPBKDFSaltBuffer, params.salt.data(), params.salt.size());
+    mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, params.salt.size());
+
+    ReturnErrorOnFailure(mVerifier.Deserialize(params.verifier));
+    mCommissioningWindowVerifierCallback = params.callback;
+    mBasicCommissioningWindowCallback    = nullptr;
+    mCommissioningWindowCallback         = nullptr;
+    mNodeId                              = params.common.deviceId;
+    mCommissioningWindowTimeout          = params.common.timeout;
+    mPBKDFIterations                     = params.common.iteration;
+
+    mNextStep = Step::kOpenCommissioningWindow;
 
     return mController->GetConnectedDevice(mNodeId, &mDeviceConnected, &mDeviceConnectionFailure);
 }
@@ -237,15 +266,19 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowSuccess(void * context,
 
         self->mCommissioningWindowCallback->mCall(self->mCommissioningWindowCallback->mContext, self->mNodeId, CHIP_NO_ERROR,
                                                   self->mSetupPayload);
-        // Don't touch `self` anymore; it might have been destroyed by the
-        // callee.
+        // Don't touch `self` anymore; it might have been destroyed by the callee.
+    }
+    else if (self->mCommissioningWindowVerifierCallback != nullptr)
+    {
+        self->mCommissioningWindowVerifierCallback->mCall(self->mCommissioningWindowVerifierCallback->mContext, self->mNodeId,
+                                                          CHIP_NO_ERROR);
+        // Don't touch `self` anymore; it might have been destroyed by the callee.
     }
     else if (self->mBasicCommissioningWindowCallback != nullptr)
     {
         self->mBasicCommissioningWindowCallback->mCall(self->mBasicCommissioningWindowCallback->mContext, self->mNodeId,
                                                        CHIP_NO_ERROR);
-        // Don't touch `self` anymore; it might have been destroyed by the
-        // callee.
+        // Don't touch `self` anymore; it might have been destroyed by the callee.
     }
 }
 
@@ -258,6 +291,11 @@ void CommissioningWindowOpener::OnOpenCommissioningWindowFailure(void * context,
     {
         self->mCommissioningWindowCallback->mCall(self->mCommissioningWindowCallback->mContext, self->mNodeId, error,
                                                   SetupPayload());
+    }
+    else if (self->mCommissioningWindowVerifierCallback != nullptr)
+    {
+        self->mCommissioningWindowVerifierCallback->mCall(self->mCommissioningWindowVerifierCallback->mContext, self->mNodeId,
+                                                          error);
     }
     else if (self->mBasicCommissioningWindowCallback != nullptr)
     {
@@ -361,8 +399,8 @@ CHIP_ERROR AutoCommissioningWindowOpener::OpenCommissioningWindow(DeviceControll
     }
 
     CHIP_ERROR err = opener->CommissioningWindowOpener::OpenCommissioningWindow(
-        deviceId, timeout, iteration, discriminator, setupPIN, salt, NullOptional, &opener->mOnOpenCommissioningWindowCallback,
-        payload, readVIDPIDAttributes);
+        deviceId, timeout, iteration, discriminator, setupPIN, salt, &opener->mOnOpenCommissioningWindowCallback, payload,
+        readVIDPIDAttributes);
     if (err != CHIP_NO_ERROR)
     {
         delete opener;
