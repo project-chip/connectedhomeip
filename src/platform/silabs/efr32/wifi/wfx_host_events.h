@@ -149,9 +149,9 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #endif // RS911X_WIFI
 
 // MAX SSID LENGTH excluding NULL character
-#define WFX_MAX_SSID_LENGTH 32
+#define WFX_MAX_SSID_LENGTH (32)
 // MAX PASSKEY LENGTH including NULL character
-#define WFX_MAX_PASSKEY_LENGTH 64
+#define WFX_MAX_PASSKEY_LENGTH (64)
 
 // WLAN retry time intervals in milli seconds
 #define WLAN_MAX_RETRY_TIMER_MS 30000
@@ -162,7 +162,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 // WLAN related Macros
 #define ETH_FRAME 0
 #define CMP_SUCCESS 0
-#define BSSID_MAX_STR_LEN 6
+#define BSSID_LEN (6)
 #define MAC_ADDRESS_FIRST_OCTET 6
 #define AP_START_SUCCESS 0
 #define BITS_TO_WAIT 0
@@ -258,7 +258,7 @@ typedef enum
 typedef struct
 {
     char ssid[WFX_MAX_SSID_LENGTH + 1];
-    char passkey[WFX_MAX_PASSKEY_LENGTH];
+    char passkey[WFX_MAX_PASSKEY_LENGTH + 1];
     wfx_sec_t security;
 } wfx_wifi_provision_t;
 
@@ -275,7 +275,7 @@ typedef struct wfx_wifi_scan_result
 {
     char ssid[WFX_MAX_SSID_LENGTH + 1];
     wfx_sec_t security;
-    uint8_t bssid[BSSID_MAX_STR_LEN];
+    uint8_t bssid[BSSID_LEN];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
 } wfx_wifi_scan_result_t;

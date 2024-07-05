@@ -172,7 +172,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     int32_t rssi       = 0;
     ap->security       = wfx_rsi.sec.security;
     ap->chan           = wfx_rsi.ap_chan;
-    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_MAX_STR_LEN);
+    memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_LEN);
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &rssi);
     ap->rssi = rssi;
     return status;
@@ -502,7 +502,7 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
     wfx_rsi.ap_chan      = scan_result->scan_info[0].rf_channel;
-    memcpy(&wfx_rsi.ap_mac.octet, scan_result->scan_info[0].bssid, BSSID_MAX_STR_LEN);
+    memcpy(&wfx_rsi.ap_mac.octet, scan_result->scan_info[0].bssid, BSSID_LEN);
     switch (scan_result->scan_info[0].security_mode)
     {
     case SL_WIFI_OPEN:
@@ -557,7 +557,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         }
         cur_scan_result.security = static_cast<wfx_sec_t>(scan_result->scan_info[idx].security_mode);
         cur_scan_result.rssi     = (-1) * scan_result->scan_info[idx].rssi_val;
-        memcpy(cur_scan_result.bssid, scan_result->scan_info[idx].bssid, BSSID_MAX_STR_LEN);
+        memcpy(cur_scan_result.bssid, scan_result->scan_info[idx].bssid, BSSID_LEN);
         wfx_rsi.scan_cb(&cur_scan_result);
 
         // if user has not provided the ssid, then call the callback for each scan result
@@ -599,17 +599,17 @@ static void wfx_rsi_save_ap_info() // translation
 {
     sl_status_t status = SL_STATUS_OK;
 #ifndef EXP_BOARD
-    // TODO: this changes will be reverted back after the SDK team fix the scan API
+    // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
     sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 #endif
     sl_wifi_ssid_t ssid_arg;
     memset(&ssid_arg, 0, sizeof(sl_wifi_ssid_t));
     ssid_arg.length = strnlen(wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
-    memcpy(ssid_arg.value, (int8_t *) &wfx_rsi.sec.ssid[0], ssid_arg.length);
+    strncpy((char *) &ssid_arg.value[0], wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
     sl_wifi_set_scan_callback(scan_callback_handler, NULL);
     scan_results_complete = false;
 #ifndef EXP_BOARD
-    // TODO: this changes will be reverted back after the SDK team fix the scan API
+    // TODO: this changes will be reverted back after the Silabs WiFi SDK team fix the scan API
     status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &ssid_arg, &wifi_scan_configuration);
 #endif
     if (SL_STATUS_IN_PROGRESS == status)
@@ -628,8 +628,9 @@ static void wfx_rsi_save_ap_info() // translation
 static sl_status_t wfx_rsi_do_join(void)
 {
     ReturnErrorCodeIf((wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
-    sl_status_t status                = SL_STATUS_OK;
-    sl_wifi_client_configuration_t ap = { 0 };
+    sl_status_t status = SL_STATUS_OK;
+    sl_wifi_client_configuration_t ap;
+    memset(&ap, 0, sizeof(sl_wifi_client_configuration_t));
     WfxEvent_t event;
     switch (wfx_rsi.sec.security)
     {
@@ -686,7 +687,8 @@ static sl_status_t wfx_rsi_do_join(void)
     ap.ssid.length      = strnlen(wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
     ap.encryption       = SL_WIFI_NO_ENCRYPTION;
     ap.credential_id    = id;
-    memcpy(ap.ssid.value, (int8_t *) &wfx_rsi.sec.ssid[0], ap.ssid.length);
+    memset(&ap.ssid.value, 0, (sizeof(ap.ssid.value) / sizeof(ap.ssid.value[0])));
+    strncpy((char *) &ap.ssid.value[0], wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
 
     status = sl_wifi_connect(SL_WIFI_CLIENT_INTERFACE, &ap, timeout_ms);
     // sl_wifi_connect returns SL_STATUS_IN_PROGRESS if join is in progress
