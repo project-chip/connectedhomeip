@@ -5896,7 +5896,7 @@ cluster ColorControl = 768 {
   enum DriftCompensationEnum : enum8 {
     kNone = 0;
     kOtherOrUnknown = 1;
-    kTemperaturemonitoring = 2;
+    kTemperatureMonitoring = 2;
     kOpticalLuminanceMonitoringAndFeedback = 3;
     kOpticalColorMonitoringAndFeedback = 4;
   }
@@ -6224,7 +6224,7 @@ cluster ColorControl = 768 {
   enum DriftCompensationEnum : enum8 {
     kNone = 0;
     kOtherOrUnknown = 1;
-    kTemperaturemonitoring = 2;
+    kTemperatureMonitoring = 2;
     kOpticalLuminanceMonitoringAndFeedback = 3;
     kOpticalColorMonitoringAndFeedback = 4;
   }
