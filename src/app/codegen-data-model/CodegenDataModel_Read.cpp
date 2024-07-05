@@ -92,8 +92,8 @@ struct ShortPascalString
     static size_t GetLength(ByteSpan buffer)
     {
         VerifyOrDie(buffer.size() >= 1);
-        // NOTE: we do NOT use emberAfLongStringLength because that will result in 0 length
-        //       for null sizes (i.e. 0xFF is translated to 0 and we do not want that here)
+        // NOTE: we do NOT use emberAfStringLength from ember-strings.h because that will result in 0
+        //       length for null sizes (i.e. 0xFF is translated to 0 and we do not want that here)
         return buffer[0];
     }
 };
@@ -106,8 +106,8 @@ struct LongPascalString
 
     static size_t GetLength(ByteSpan buffer)
     {
-        // NOTE: we do NOT use emberAfLongStringLength because that will result in 0 length
-        //       for null sizes (i.e. 0xFFFF is translated to 0 and we do not want that here)
+        // NOTE: we do NOT use emberAfLongStringLength from ember-strings.h because that will result in 0
+        //       length for null sizes (i.e. 0xFFFF is translated to 0 and we do not want that here)
         VerifyOrDie(buffer.size() >= 2);
         const uint8_t * data = buffer.data();
         return Encoding::LittleEndian::Read16(data);

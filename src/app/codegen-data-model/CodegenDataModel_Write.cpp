@@ -365,24 +365,24 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
 
     Protocols::InteractionModel::Status status;
 
+    if (dataBuffer.size() > (*attributeMetadata)->size)
+    {
+        ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
+        return CHIP_IM_GLOBAL_STATUS(InvalidValue);
+    }
+
     if (request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
     {
         // Internal requests use the non-External interface that has less enforcement
         // than the external version (e.g. does not check/enforce writable settings, does not
         // validate attribute types) - see attribute-table.h documentation for details.
         status = emberAfWriteAttribute(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                       gEmberAttributeIOBufferSpan.data(), (*attributeMetadata)->attributeType);
+                                       dataBuffer.data(), (*attributeMetadata)->attributeType);
     }
     else
     {
-        if (dataBuffer.size() > (*attributeMetadata)->size)
-        {
-            ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
-            return CHIP_IM_GLOBAL_STATUS(InvalidValue);
-        }
-
         status = emAfWriteAttributeExternal(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId,
-                                            gEmberAttributeIOBufferSpan.data(), (*attributeMetadata)->attributeType);
+                                            dataBuffer.data(), (*attributeMetadata)->attributeType);
     }
 
     if (status != Protocols::InteractionModel::Status::Success)
@@ -390,9 +390,13 @@ CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttribu
         return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
     }
 
-    // TODO: this may need more refinement:
-    //       - should internal requests be able to decide if something is marked dirty or not?
-    //       - changes-omitted paths should not be marked dirty (ember is not aware of these)
+    // TODO: this WILL requre updates
+    //
+    // - Internal writes may need to be able to decide if to mark things dirty or not (see AAI as well)
+    // - Changes-ommited paths should not be marked dirty (ember is not aware of that flag)
+    // - This likely maps to `MatterReportingAttributeChangeCallback` HOWEVER current ember write functions
+    //   will selectively call that one depending on old attribute state (i.e. calling every time is a
+    //   change in behavior)
     CurrentContext().dataModelChangeListener->MarkDirty(request.path);
     return CHIP_NO_ERROR;
 }
