@@ -1,1 +1,1 @@
-63 : [NXP] Add docker image for Zephyr examples
+64 : [NXP] Add `--break-system-packages` to pip install
