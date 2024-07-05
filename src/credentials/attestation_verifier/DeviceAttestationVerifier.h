@@ -47,6 +47,7 @@ enum class AttestationVerificationResult : uint16_t
     kPaiVendorIdMismatch  = 205,
     kPaiAuthorityNotFound = 206,
     kPaiMissing           = 207,
+    kPaiAndDacRevoked     = 208,
 
     kDacExpired           = 300,
     kDacSignatureInvalid  = 301,
@@ -78,8 +79,6 @@ enum class AttestationVerificationResult : uint16_t
     kInvalidArgument = 800,
 
     kInternalError = 900,
-
-    kPaiAndDacRevoked = 1000,
 
     kNotImplemented = 0xFFFFU,
 
@@ -413,8 +412,6 @@ public:
     void EnableCdTestKeySupport(bool enabled) { mEnableCdTestKeySupport = enabled; }
     bool IsCdTestKeySupported() const { return mEnableCdTestKeySupport; }
 
-    void SetRevocationDelegate(DeviceAttestationRevocationDelegate * delegate) { mRevocationDelegate = delegate; }
-
 protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
                                             const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
@@ -422,8 +419,6 @@ protected:
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;
-
-    DeviceAttestationRevocationDelegate * mRevocationDelegate = nullptr;
 };
 
 /**

@@ -57,21 +57,14 @@ public:
      *                        Verifier.
      * @param[in] trustStore  A pointer to the PAA trust store to use to find valid PAA roots.
      *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    virtual CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
-                                              const chip::Credentials::AttestationTrustStore * trustStore) = 0;
-
-    /**
-     * @brief
-     *   This function is used to set the path to the Device Attestation revocation set JSON file.
-     *
-     * @param[in] path Path to the JSON file containing list of revoked DACs or PAIs.
-     *                 It can be generated using credentials/generate-revocation-set.py script
+     * @param[in] revocationDelegate A pointer to the Device Attestation Revocation Delegate for checking revoked DACs and PAIs.
+     *                               Default is nullptr.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR SetDeviceAttestationRevocationSetPath(const char * path) = 0;
+    virtual CHIP_ERROR
+    SetupDeviceAttestation(chip::Controller::SetupParams & setupParams, const chip::Credentials::AttestationTrustStore * trustStore,
+                           chip::Credentials::DeviceAttestationRevocationDelegate * revocationDelegate = nullptr) = 0;
 
     /**
      * @brief Add a list of additional non-default CD verifying keys (by certificate)

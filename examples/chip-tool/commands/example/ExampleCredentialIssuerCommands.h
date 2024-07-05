@@ -24,7 +24,6 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 class ExampleCredentialIssuerCommands : public CredentialIssuerCommands
@@ -35,22 +34,15 @@ public:
         return mOpCredsIssuer.Initialize(storage);
     }
     CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
-                                      const chip::Credentials::AttestationTrustStore * trustStore) override
+                                      const chip::Credentials::AttestationTrustStore * trustStore,
+                                      chip::Credentials::DeviceAttestationRevocationDelegate * revocationDelegate) override
     {
         chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-        mDacVerifier                          = chip::Credentials::GetDefaultDACVerifier(trustStore);
+        mDacVerifier                          = chip::Credentials::GetDefaultDACVerifier(trustStore, revocationDelegate);
         setupParams.deviceAttestationVerifier = mDacVerifier;
         mDacVerifier->EnableCdTestKeySupport(mAllowTestCdSigningKey);
 
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR SetDeviceAttestationRevocationSetPath(const char * path) override
-    {
-        VerifyOrReturnError(path != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(mTestDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(path));
-        mDacVerifier->SetRevocationDelegate(&mTestDacRevocationDelegate);
         return CHIP_NO_ERROR;
     }
 
@@ -118,5 +110,4 @@ protected:
 private:
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
     chip::Credentials::DeviceAttestationVerifier * mDacVerifier;
-    chip::Credentials::TestDACRevocationDelegateImpl mTestDacRevocationDelegate;
 };

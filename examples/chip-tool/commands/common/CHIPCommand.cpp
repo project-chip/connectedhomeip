@@ -21,6 +21,7 @@
 #include <commands/icd/ICDCommand.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
@@ -48,7 +49,9 @@ constexpr chip::FabricId kIdentityOtherFabricId = 4;
 constexpr char kPAATrustStorePathVariable[]     = "CHIPTOOL_PAA_TRUST_STORE_PATH";
 constexpr char kCDTrustStorePathVariable[]      = "CHIPTOOL_CD_TRUST_STORE_PATH";
 
-const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
+const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore    = nullptr;
+chip::Credentials::DeviceAttestationRevocationDelegate * sRevocationDelegate = nullptr;
+
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 // All fabrics share the same ICD client storage.
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
@@ -450,12 +453,14 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
     chip::Controller::SetupParams commissionerParams;
 
-    ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore));
-
     if (mDacRevocationSetPath.HasValue())
     {
-        ReturnLogErrorOnFailure(mCredIssuerCmds->SetDeviceAttestationRevocationSetPath(mDacRevocationSetPath.Value()));
+        static chip::Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
+        ReturnErrorOnFailure(testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(mDacRevocationSetPath.Value()));
+        sRevocationDelegate = &testDacRevocationDelegate;
     }
+
+    ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore, sRevocationDelegate));
 
     chip::Crypto::P256Keypair ephemeralKey;
 
