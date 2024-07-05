@@ -923,8 +923,10 @@ exit:
 
 void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
 {
+    DeviceLayer::PlatformMgr().LockChipStack();
     // stop the indication confirmation timer
     DeviceLayer::SystemLayer().CancelTimer(OnSendIndicationTimeout, this);
+    DeviceLayer::PlatformMgr().UnlockChipStack();
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
