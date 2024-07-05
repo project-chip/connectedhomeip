@@ -667,7 +667,7 @@ struct TestWriteRequest
         //   - END_STRUCT
         TLV::TLVType outerContainerType;
         VerifyOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
-        VerifyOrDie(DataModel::Encode(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
+        VerifyOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
         VerifyOrDie(writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
         VerifyOrDie(writer.Finalize() == CHIP_NO_ERROR);
 
@@ -720,7 +720,7 @@ void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType val
     ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
 
     typename NumericAttributeTraits<T>::WorkingType actual;
-    ASSERT_EQ(DataModel::Decode<typename NumericAttributeTraits<T>::WorkingType>(encodedData.dataReader, actual), CHIP_NO_ERROR);
+    ASSERT_EQ(chip::app::DataModel::Decode<typename NumericAttributeTraits<T>::WorkingType>(encodedData.dataReader, actual), CHIP_NO_ERROR);
     ASSERT_EQ(actual, value);
 }
 
@@ -753,7 +753,7 @@ void TestEmberScalarNullRead()
     DecodedAttributeData & encodedData = attribute_data[0];
     ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
     DataModel::Nullable<typename NumericAttributeTraits<T>::WorkingType> actual;
-    ASSERT_EQ(DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
+    ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
     ASSERT_TRUE(actual.IsNull());
 }
 
@@ -825,7 +825,7 @@ void TestEmberScalarNullWrite()
                           ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZclType)));
 
     using NumericType             = NumericAttributeTraits<T>;
-    using NullableType            = DataModel::Nullable<typename NumericType::WorkingType>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
     AttributeValueDecoder decoder = test.DecoderFor<NullableType>(NullableType());
 
     // write should succeed
@@ -854,7 +854,7 @@ void TestEmberScalarTypeWriteNullValueToNullable()
         ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZclType)));
 
     using NumericType             = NumericAttributeTraits<T>;
-    using NullableType            = DataModel::Nullable<typename NumericType::WorkingType>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
     AttributeValueDecoder decoder = test.DecoderFor<NullableType>(NullableType());
 
     // write should fail: we are trying to write null
