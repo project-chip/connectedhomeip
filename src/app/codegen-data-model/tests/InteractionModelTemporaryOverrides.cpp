@@ -82,3 +82,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 
 } // namespace app
 } // namespace chip
+
+void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath)
+{
+    // TODO: should we add logic to track these calls for test purposes?
+}

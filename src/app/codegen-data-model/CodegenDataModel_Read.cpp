@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/core/CHIPError.h"
 #include <app/codegen-data-model/CodegenDataModel.h>
 
 #include <optional>
@@ -29,6 +28,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
+#include <app/codegen-data-model/EmberMetadata.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
@@ -48,56 +48,6 @@ namespace chip {
 namespace app {
 namespace {
 using namespace chip::app::Compatibility::Internal;
-
-// Fetch the source for the given attribute path: either a cluster (for global ones) or attribute
-// path.
-//
-// if returning a CHIP_ERROR, it will NEVER be CHIP_NO_ERROR.
-std::variant<const EmberAfCluster *,           // global attribute, data from a cluster
-             const EmberAfAttributeMetadata *, // a specific attribute stored by ember
-             CHIP_ERROR                        // error, this will NEVER be CHIP_NO_ERROR
-             >
-FindAttributeMetadata(const ConcreteAttributePath & aPath)
-{
-    for (auto & attr : GlobalAttributesNotInMetadata)
-    {
-
-        if (attr == aPath.mAttributeId)
-        {
-            const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-            if (cluster == nullptr)
-            {
-                return (emberAfFindEndpointType(aPath.mEndpointId) == nullptr) ? CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)
-                                                                               : CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
-            }
-
-            return cluster;
-        }
-    }
-    const EmberAfAttributeMetadata * metadata =
-        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    if (metadata == nullptr)
-    {
-        const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
-        if (type == nullptr)
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
-        }
-
-        const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
-        if (cluster == nullptr)
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
-        }
-
-        // Since we know the attribute is unsupported and the endpoint/cluster are
-        // OK, this is the only option left.
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    return metadata;
-}
 
 /// Attempts to read via an attribute access interface (AAI)
 ///
@@ -138,6 +88,14 @@ struct ShortPascalString
 {
     using LengthType                        = uint8_t;
     static constexpr LengthType kNullLength = 0xFF;
+
+    static size_t GetLength(ByteSpan buffer)
+    {
+        VerifyOrDie(buffer.size() >= 1);
+        // NOTE: we do NOT use emberAfStringLength from ember-strings.h because that will result in 0
+        //       length for null sizes (i.e. 0xFF is translated to 0 and we do not want that here)
+        return buffer[0];
+    }
 };
 
 /// Metadata of what a ember/pascal LONG string means (prepended by a u16 length)
@@ -145,6 +103,15 @@ struct LongPascalString
 {
     using LengthType                        = uint16_t;
     static constexpr LengthType kNullLength = 0xFFFF;
+
+    static size_t GetLength(ByteSpan buffer)
+    {
+        // NOTE: we do NOT use emberAfLongStringLength from ember-strings.h because that will result in 0
+        //       length for null sizes (i.e. 0xFFFF is translated to 0 and we do not want that here)
+        VerifyOrDie(buffer.size() >= 2);
+        const uint8_t * data = buffer.data();
+        return Encoding::LittleEndian::Read16(data);
+    }
 };
 
 // ember assumptions ... should just work
@@ -157,20 +124,17 @@ static_assert(sizeof(LongPascalString::LengthType) == 2);
 template <class OUT, class ENCODING>
 std::optional<OUT> ExtractEmberString(ByteSpan data)
 {
-    typename ENCODING::LengthType len;
-
-    // Ember storage format for pascal-prefix data is specifically "native byte order",
-    // hence the use of memcpy.
-    VerifyOrDie(sizeof(len) <= data.size());
-    memcpy(&len, data.data(), sizeof(len));
+    constexpr size_t kLengthTypeSize = sizeof(typename ENCODING::LengthType);
+    VerifyOrDie(kLengthTypeSize <= data.size());
+    auto len = ENCODING::GetLength(data);
 
     if (len == ENCODING::kNullLength)
     {
         return std::nullopt;
     }
 
-    VerifyOrDie(static_cast<size_t>(len + sizeof(len)) <= data.size());
-    return std::make_optional<OUT>(reinterpret_cast<typename OUT::pointer>(data.data() + sizeof(len)), len);
+    VerifyOrDie(len + sizeof(len) <= data.size());
+    return std::make_optional<OUT>(reinterpret_cast<typename OUT::pointer>(data.data() + kLengthTypeSize), len);
 }
 
 /// Encode a value inside `encoder`
@@ -282,7 +246,7 @@ CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * meta
         return EncodeStringLike<ByteSpan, LongPascalString>(data, isNullable, encoder);
     default:
         ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(metadata->attributeType));
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
+        return CHIP_IM_GLOBAL_STATUS(Failure);
     }
 }
 
@@ -311,21 +275,26 @@ CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttribute
                                                           RequiredPrivilege::ForReadAttribute(request.path));
         if (err != CHIP_NO_ERROR)
         {
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+
             // Implementation of 8.4.3.2 of the spec for path expansion
-            if (request.path.mExpanded && (err == CHIP_ERROR_ACCESS_DENIED))
+            if (request.path.mExpanded)
             {
                 return CHIP_NO_ERROR;
             }
-            return err;
+            // access denied has a specific code for IM
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAccess);
         }
     }
 
-    auto metadata = FindAttributeMetadata(request.path);
+    auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))
     {
-        VerifyOrDie(*err != CHIP_NO_ERROR);
+        VerifyOrDie((*err == CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint)) || //
+                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedCluster)) ||  //
+                    (*err == CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)));
         return *err;
     }
 
