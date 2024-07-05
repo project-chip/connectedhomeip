@@ -95,35 +95,28 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
     return rpc::client::StartPacketProcessing();
 }
 
-CHIP_ERROR OpenCommissioningWindow(NodeId nodeId, uint16_t commissioningTimeout, uint16_t discriminator, uint32_t iterations,
-                                   chip::Optional<chip::ByteSpan> salt, chip::Optional<chip::ByteSpan> verifier)
+CHIP_ERROR OpenCommissioningWindow(CommissioningWindowParams params)
 {
-    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with Node Id 0x:" ChipLogFormatX64, ChipLogValueX64(nodeId));
+    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with Node Id 0x:" ChipLogFormatX64, ChipLogValueX64(params.nodeId));
 
     chip_rpc_DeviceCommissioningWindowInfo device;
-    device.node_id               = nodeId;
-    device.commissioning_timeout = commissioningTimeout;
-    device.discriminator         = discriminator;
-    device.iterations            = iterations;
+    device.node_id               = params.nodeId;
+    device.commissioning_timeout = params.commissioningTimeout;
+    device.discriminator         = params.discriminator;
+    device.iterations            = params.iterations;
 
-    if (salt.HasValue())
+    if (params.salt.HasValue())
     {
-        if (salt.Value().size() > sizeof(device.salt.bytes))
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
-        memcpy(device.salt.bytes, salt.Value().data(), salt.Value().size());
-        device.salt.size = static_cast<size_t>(salt.Value().size());
+        VerifyOrReturnError(params.salt.Value().size() <= sizeof(device.salt.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(device.salt.bytes, params.salt.Value().data(), params.salt.Value().size());
+        device.salt.size = static_cast<size_t>(params.salt.Value().size());
     }
 
-    if (verifier.HasValue())
+    if (params.verifier.HasValue())
     {
-        if (verifier.Value().size() > sizeof(device.verifier.bytes))
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
-        memcpy(device.verifier.bytes, verifier.Value().data(), verifier.Value().size());
-        device.verifier.size = static_cast<size_t>(verifier.Value().size());
+        VerifyOrReturnError(params.verifier.Value().size() <= sizeof(device.verifier.bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(device.verifier.bytes, params.verifier.Value().data(), params.verifier.Value().size());
+        device.verifier.size = static_cast<size_t>(params.verifier.Value().size());
     }
 
     // The RPC call is kept alive until it completes. When a response is received, it will be logged by the handler

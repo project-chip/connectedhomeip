@@ -69,7 +69,10 @@ void BridgePollingThread()
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             else if (ch == 'o')
             {
-                CHIP_ERROR err = OpenCommissioningWindow(0x1234, 300, 3840, 1000, chip::NullOptional, chip::NullOptional);
+                CommissioningWindowParams params = {
+                    .nodeId = 0x1234, .commissioningTimeout = 300, .discriminator = 3840, .iterations = 1000
+                };
+                CHIP_ERROR err = OpenCommissioningWindow(params);
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(NotSpecified, "Failed to call OpenCommissioningWindow RPC: %" CHIP_ERROR_FORMAT, err.Format());
@@ -125,31 +128,27 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
 
     handlerContext.SetCommandHandled();
 
-    uint16_t commissioningTimeout;
-    uint16_t discriminator;
-    uint32_t iterations;
-    chip::Optional<chip::ByteSpan> salt;
-    chip::Optional<chip::ByteSpan> verifier;
-    Device * device = nullptr;
-    Status status   = Status::Failure;
-
     Commands::OpenCommissioningWindow::DecodableType commandData;
-    CHIP_ERROR tlvError = DataModel::Decode(handlerContext.mPayload, commandData);
-    SuccessOrExit(tlvError);
+    if (DataModel::Decode(handlerContext.mPayload, commandData) != CHIP_NO_ERROR)
+    {
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::InvalidCommand);
+        return;
+    }
 
-    commissioningTimeout = commandData.commissioningTimeout;
-    discriminator        = commandData.discriminator;
-    iterations           = commandData.iterations;
-    salt                 = chip::Optional<chip::ByteSpan>(commandData.salt);
-    verifier             = chip::Optional<chip::ByteSpan>(commandData.PAKEPasscodeVerifier);
+    Status status = Status::Failure;
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
-    device = DeviceMgr().GetDevice(endpointId);
+    Device * device = DeviceMgr().GetDevice(endpointId);
+
+    CommissioningWindowParams params = { .nodeId               = device->GetNodeId(),
+                                         .commissioningTimeout = commandData.commissioningTimeout,
+                                         .discriminator        = commandData.discriminator,
+                                         .iterations           = commandData.iterations,
+                                         .salt                 = chip::Optional<chip::ByteSpan>(commandData.salt),
+                                         .verifier             = chip::Optional<chip::ByteSpan>(commandData.PAKEPasscodeVerifier) };
 
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
-    if (device != nullptr &&
-        OpenCommissioningWindow(device->GetNodeId(), commissioningTimeout, discriminator, iterations, salt, verifier) ==
-            CHIP_NO_ERROR)
+    if (device != nullptr && OpenCommissioningWindow(params) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Commissioning window is now open");
         status = Status::Success;
@@ -162,7 +161,6 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     ChipLogProgress(NotSpecified, "Commissioning window failed to open: PW_RPC_FABRIC_BRIDGE_SERVICE not defined");
 #endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
 
-exit:
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 

@@ -32,14 +32,24 @@ constexpr uint16_t kFabricAdminServerPort = 33001;
  */
 CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
 
+struct CommissioningWindowParams
+{
+    chip::NodeId nodeId;
+    uint16_t commissioningTimeout;
+    uint16_t discriminator;
+    uint32_t iterations;
+    chip::Optional<chip::ByteSpan> salt     = chip::NullOptional;
+    chip::Optional<chip::ByteSpan> verifier = chip::NullOptional;
+};
+
 /**
  * Opens a commissioning window for a specified node.
  *
- * @param nodeId The identifier of the node for which the commissioning window should be opened.
+ * @param params    Params for opening the commissioning window on given node.
  * @return CHIP_ERROR An error code indicating the success or failure of the operation.
  * - CHIP_NO_ERROR: The RPC command was successfully processed.
  * - CHIP_ERROR_BUSY: Another commissioning window is currently in progress.
  * - CHIP_ERROR_INTERNAL: An internal error occurred.
  */
-CHIP_ERROR OpenCommissioningWindow(chip::NodeId nodeId, uint16_t commissioningTimeout, uint16_t discriminator, uint32_t iterations,
-                                   chip::Optional<chip::ByteSpan> salt, chip::Optional<chip::ByteSpan> verifier);
+CHIP_ERROR
+OpenCommissioningWindow(CommissioningWindowParams params);
