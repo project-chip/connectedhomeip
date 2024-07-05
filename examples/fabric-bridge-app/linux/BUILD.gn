@@ -46,8 +46,6 @@ executable("fabric-bridge-app") {
     "${chip_root}/src/lib",
   ]
 
-  cflags = [ "-Wconversion" ]
-
   include_dirs = [ "include" ]
 
   if (bridge_enable_pw_rpc) {
@@ -87,6 +85,10 @@ executable("fabric-bridge-app") {
       "${chip_root}/examples/common",
       "${chip_root}/examples/platform/linux",
     ]
+  } else {
+    # The system_rpc_server.cc file is in pigweed and doesn't compile with
+    # -Wconversion, remove check for RPC build only.
+    cflags = [ "-Wconversion" ]
   }
 
   output_dir = root_out_dir

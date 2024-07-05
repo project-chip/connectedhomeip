@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/nxp_sdk.gni")
-import("${nxp_sdk_build_root}/nxp_sdk.gni")
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-assert(nxp_platform == "k32w/k32w0", "${nxp_platform} must be k32w/k32w0.")
+chip_test_suite("tests") {
+  output_name = "libAppDataModelTests"
 
-arm_float_abi = "soft"
-arm_cpu = "cortex-m4"
-arm_arch = "armv7e-m"
+  test_sources = [ "TestNullable.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/app/data-model:nullable",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
+  ]
+}

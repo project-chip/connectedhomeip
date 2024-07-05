@@ -46,3 +46,18 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort);
  * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
  */
 CHIP_ERROR AddSynchronizedDevice(chip::NodeId nodeId);
+
+/**
+ * @brief Removes a synchronized device from the RPC client.
+ *
+ * This function attempts to remove a device identified by its `nodeId` from the synchronized device list.
+ * It logs the progress and checks if a `RemoveSynchronizedDevice` operation is already in progress.
+ * If an operation is in progress, it returns `CHIP_ERROR_BUSY`.
+ *
+ * @param nodeId The Node ID of the device to be removed.
+ * @return CHIP_ERROR An error code indicating the success or failure of the operation.
+ * - CHIP_NO_ERROR: The RPC command was successfully sent.
+ * - CHIP_ERROR_BUSY: Another operation is currently in progress.
+ * - CHIP_ERROR_INTERNAL: An internal error occurred while activating the RPC call.
+ */
+CHIP_ERROR RemoveSynchronizedDevice(chip::NodeId nodeId);
