@@ -27,7 +27,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
 
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <stdarg.h>
 #include <stdio.h>

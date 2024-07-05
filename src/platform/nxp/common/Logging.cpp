@@ -17,11 +17,11 @@
  *    limitations under the License.
  */
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include "fsl_debug_console.h"
 #include <lib/core/CHIPConfig.h>
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <lib/support/logging/Constants.h>
 #include <stdio.h>

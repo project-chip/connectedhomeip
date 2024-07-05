@@ -20,7 +20,7 @@
 
 #include <lib/support/Base64.h>
 #include <logging/logging.h>
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <string>
 

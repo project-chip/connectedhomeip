@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <cstdint>
 #include <cstdio>

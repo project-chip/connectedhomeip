@@ -79,7 +79,7 @@ static_library("SiWx917") {
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/platform:platform_base",
   ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [ "${chip_root}/src/platform:logging-header" ]
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
@@ -111,7 +111,7 @@ static_library("SiWx917") {
 source_set("logging") {
   sources = [ "${chip_root}/src/platform/silabs/Logging.cpp" ]
   deps = [
+    "${chip_root}/src/platform:logging-header",
     "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
   ]
 }

@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 #include <stdio.h>
 #include <wiced_rtos.h>
 
