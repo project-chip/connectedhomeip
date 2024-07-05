@@ -77,7 +77,8 @@ uint16_t SizeForType(EmberAfAttributeType type)
         // this type of attribute is not supported for tests, we cannot guess its size
         //
         // see attribute-type.h for a list of attributes
-        ChipLogError(Test, "Warning: size for attribute type 0x%x is not set", type) return 0;
+        ChipLogError(Test, "Warning: size for attribute type 0x%x is not set", type);
+        return 0;
     }
 }
 
@@ -113,8 +114,7 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
                                      std::initializer_list<MockEventConfig> aEvents,
                                      std::initializer_list<CommandId> aAcceptedCommands,
                                      std::initializer_list<CommandId> aGeneratedCommands) :
-    id(aId),
-    attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
+    id(aId), attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
     mGeneratedCommands(aGeneratedCommands)
 {
     VerifyOrDie(aAttributes.size() < UINT16_MAX);
