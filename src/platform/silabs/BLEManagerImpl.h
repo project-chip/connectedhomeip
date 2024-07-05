@@ -201,7 +201,7 @@ private:
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 protected:
-    static void OnSendIndicationTimeout(TimerHandle_t xTimer);
+    static void OnSendIndicationTimeout(System::Layer * aLayer, void * appState);
 #endif
 };
 

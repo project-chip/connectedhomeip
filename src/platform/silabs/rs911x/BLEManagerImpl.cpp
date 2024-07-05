@@ -237,7 +237,6 @@ namespace {
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
-TimerHandle_t sbleIndicationTimeoutTimer;
 
 const uint8_t UUID_CHIPoBLEService[]      = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
                                               0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
@@ -271,17 +270,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer        = xTimerCreate("BleAdvTimer", // Just a text name, not used by the RTOS kernel
-                                              pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD_MS), // == default timer period
-                                              false,                                      // no timer reload (==one-shot)
-                                              (void *) this,                              // init timer id = ble obj context
-                                              BleAdvTimeoutHandler                        // timer callback handler
-           );
-    sbleIndicationTimeoutTimer = xTimerCreate("BleIndicationTimer", // Just a text name, not used by the RTOS kernel
-                                              pdMS_TO_TICKS(BLE_SEND_INDICATION_TIMER_PERIOD_MS), // == default timer period
-                                              false,                                              // no timer reload (==one-shot)
-                                              (void *) this,                                      // init timer id = ble obj context
-                                              OnSendIndicationTimeout                             // timer callback handler
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                              // Just a text name, not used by the RTOS kernel
+                                       pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD_MS), // == default timer period
+                                       false,                                      // no timer reload (==one-shot)
+                                       (void *) this,                              // init timer id = ble obj context
+                                       BleAdvTimeoutHandler                        // timer callback handler
     );
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
@@ -292,7 +285,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::OnSendIndicationTimeout(TimerHandle_t xTimer)
+void BLEManagerImpl::OnSendIndicationTimeout(System::Layer * aLayer, void * appState)
 {
     // TODO: change the connection handle with the ble device ID
     uint8_t connHandle = 1;
@@ -482,10 +475,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     }
 
     // start timer for the indication Confirmation Event
-    if (xTimerStart(sbleIndicationTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
-    {
-        ChipLogError(DeviceLayer, "Failed to start indication timer");
-    }
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(BLE_SEND_INDICATION_TIMER_PERIOD_MS),
+                                          OnSendIndicationTimeout, this);
     return true;
 }
 
@@ -933,10 +924,7 @@ exit:
 void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
 {
     // stop the indication confirmation timer
-    if (xTimerStop(sbleIndicationTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
-    {
-        ChipLogError(DeviceLayer, "Failed to stop indication timer");
-    }
+    DeviceLayer::SystemLayer().CancelTimer(OnSendIndicationTimeout, this);
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
