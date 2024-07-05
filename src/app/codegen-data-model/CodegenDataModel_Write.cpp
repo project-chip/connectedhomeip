@@ -138,7 +138,7 @@ CHIP_ERROR DecodeStringLikeIntoEmberBuffer(AttributeValueDecoder decoder, bool i
     memcpy(output_buffer, workingValue.data(), workingValue.size());
     output_buffer += workingValue.size();
 
-    out.reduce_size(output_buffer - out.data());
+    out.reduce_size(static_cast<size_t>(output_buffer - out.data()));
     return CHIP_NO_ERROR;
 }
 
