@@ -7,7 +7,7 @@
 ## Fabric Sync Example Applications
 
 Fabric-Admin and Fabric-Bridge applications are provided to demonstrate Fabric
-Synchronization feature.. You can find them in the examples.
+Synchronization feature. You can find them in the examples.
 
 ### Building the Example Application
 
