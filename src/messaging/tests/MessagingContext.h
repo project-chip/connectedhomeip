@@ -93,8 +93,7 @@ public:
     static constexpr System::Clock::Timeout kResponsiveIdleRetransTimeout   = System::Clock::Milliseconds32(10);
     static constexpr System::Clock::Timeout kResponsiveActiveRetransTimeout = System::Clock::Milliseconds32(10);
 
-    MessagingContext() : mpData(new MessagingContextData()) {}
-    ~MessagingContext() { delete mpData; }
+    MessagingContext() : mpData(std::make_unique<MessagingContextData>()) {}
 
     // Whether Alice and Bob are initialized, must be called before Init
     void ConfigInitializeNodes(bool initializeNodes) { mpData->mInitializeNodes = initializeNodes; }
@@ -210,7 +209,8 @@ private:
         SessionHolder mSessionCharlieToDavid;
         SessionHolder mSessionDavidToCharlie;
         Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
-    } * mpData;
+    };
+    std::unique_ptr<MessagingContextData> mpData;
 };
 
 // LoopbackMessagingContext enriches MessagingContext with an async loopback transport
