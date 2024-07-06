@@ -228,30 +228,31 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
     }
 
     case app::Clusters::AccountLogin::Id: {
-        switch (handlerContext.mRequestPath.mCommandId) {
-            case app::Clusters::AccountLogin::Commands::GetSetupPIN::Id: {
-                Status status;
-                GetSetupPINResponseType getSetupPINresponse = FormatGetSetupPINResponse(value, status);
-                if (status != chip::Protocols::InteractionModel::Status::Success)
-                {
-                    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
-                }
-                else
-                {
-                    handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, getSetupPINresponse);
-                }
-                break;
+        switch (handlerContext.mRequestPath.mCommandId)
+        {
+        case app::Clusters::AccountLogin::Commands::GetSetupPIN::Id: {
+            Status status;
+            GetSetupPINResponseType getSetupPINresponse = FormatGetSetupPINResponse(value, status);
+            if (status != chip::Protocols::InteractionModel::Status::Success)
+            {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
             }
-            case app::Clusters::AccountLogin::Commands::Login::Id: {
-                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, FormatStatusResponse(value));
-                break;
+            else
+            {
+                handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, getSetupPINresponse);
             }
-            case app::Clusters::AccountLogin::Commands::Logout::Id: {
-                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, FormatStatusResponse(value));
-                break;
-            }
-            default:
-                break;
+            break;
+        }
+        case app::Clusters::AccountLogin::Commands::Login::Id: {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, FormatStatusResponse(value));
+            break;
+        }
+        case app::Clusters::AccountLogin::Commands::Logout::Id: {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, FormatStatusResponse(value));
+            break;
+        }
+        default:
+            break;
         }
         break;
     }
@@ -351,7 +352,8 @@ GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(Jso
 
 Status ContentAppCommandDelegate::FormatStatusResponse(Json::Value value)
 {
-    if (value.isUInt()) {
+    if (value.isUInt())
+    {
         return static_cast<Protocols::InteractionModel::Status>(value.asUInt());
     }
     else

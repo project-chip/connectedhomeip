@@ -185,8 +185,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle, uint16_t targetVendorId,
-                                  uint16_t targetProductId, NodeId localNodeId,
-                                  chip::CharSpan rotatingId, uint32_t passcode,
+                                  uint16_t targetProductId, NodeId localNodeId, chip::CharSpan rotatingId, uint32_t passcode,
                                   std::vector<app::Clusters::Binding::Structs::TargetStruct::Type> bindings,
                                   Controller::WriteResponseSuccessCallback successCb,
                                   Controller::WriteResponseFailureCallback failureCb);

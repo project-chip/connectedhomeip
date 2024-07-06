@@ -165,7 +165,9 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     {
         ChipLogError(AppServer, "On UDC: could not convert rotating id to hex");
         rotatingIdString[0] = '\0';
-    } else {
+    }
+    else
+    {
         // Store rotating ID string. Don't include null terminator character.
         mRotatingId = std::string{ rotatingIdString, state.GetRotatingIdLength() * 2 };
     }
@@ -618,7 +620,8 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
         // * Is it right to use mPasscode here?
         // * Would it not be zero if HandleContentAppPasscodeResponse returns zero passcode?
         // * Which client/app does the passcode refer to? Same question for Rotating ID.
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, GetRotatingIdSpan(), mPasscode, exchangeMgr, sessionHandle);
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, GetRotatingIdSpan(), mPasscode, exchangeMgr,
+                                                           sessionHandle);
     }
     else
     {

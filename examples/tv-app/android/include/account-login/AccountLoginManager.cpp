@@ -30,27 +30,30 @@ using Status = chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-const auto loginTempAccountIdentifierFieldId = to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kTempAccountIdentifier));
+const auto loginTempAccountIdentifierFieldId =
+    to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kTempAccountIdentifier));
 const auto loginSetupPINFieldId = to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kSetupPIN));
-const auto loginNodeFieldId = to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kNode));
-const auto logoutNodeFieldId = to_string(chip::to_underlying(AccountLogin::Commands::Logout::Fields::kNode));
+const auto loginNodeFieldId     = to_string(chip::to_underlying(AccountLogin::Commands::Login::Fields::kNode));
+const auto logoutNodeFieldId    = to_string(chip::to_underlying(AccountLogin::Commands::Logout::Fields::kNode));
 
-string charSpanToString(const CharSpan& charSpan) {
+string charSpanToString(const CharSpan & charSpan)
+{
     return { charSpan.data(), charSpan.size() };
 }
 
-std::string serializeLoginCommand(AccountLogin::Commands::Login::Type cmd) {
-    return
-        R"({")" + loginTempAccountIdentifierFieldId + R"(":")" + charSpanToString(cmd.tempAccountIdentifier) + R"(",)" +
-        R"(")" + loginSetupPINFieldId + R"(":")" + charSpanToString(cmd.setupPIN) + R"(",)" +
-        R"(")" + loginNodeFieldId + R"(":")" + to_string(cmd.node.Value()) + R"("})";
+std::string serializeLoginCommand(AccountLogin::Commands::Login::Type cmd)
+{
+    return R"({")" + loginTempAccountIdentifierFieldId + R"(":")" + charSpanToString(cmd.tempAccountIdentifier) + R"(",)" + R"(")" +
+        loginSetupPINFieldId + R"(":")" + charSpanToString(cmd.setupPIN) + R"(",)" + R"(")" + loginNodeFieldId + R"(":")" +
+        to_string(cmd.node.Value()) + R"("})";
 }
 
-std::string serializeLogoutCommand(AccountLogin::Commands::Logout::Type cmd) {
+std::string serializeLogoutCommand(AccountLogin::Commands::Logout::Type cmd)
+{
     return R"({")" + logoutNodeFieldId + R"(":")" + to_string(cmd.node.Value()) + R"("})";
 }
 
-}
+} // namespace
 
 AccountLoginManager::AccountLoginManager(ContentAppCommandDelegate * commandDelegate, const char * setupPin) :
     mCommandDelegate(commandDelegate)
@@ -69,19 +72,20 @@ bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, co
         return false;
     }
 
-    if (tempAccountIdentifier.empty() || setupPIN.empty() || !nodeId.HasValue()) {
+    if (tempAccountIdentifier.empty() || setupPIN.empty() || !nodeId.HasValue())
+    {
         ChipLogError(Zcl, "Invalid parameters");
         return false;
     }
 
     Json::Value response;
-    bool commandHandled = true;
+    bool commandHandled                     = true;
     AccountLogin::Commands::Login::Type cmd = { tempAccountIdentifier, setupPIN, nodeId };
 
-    auto status = mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id,
-                                    AccountLogin::Commands::Login::Id,
-                                    serializeLoginCommand(cmd), commandHandled, response);
-    if (status == Status::Success) {
+    auto status = mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id, AccountLogin::Commands::Login::Id,
+                                                  serializeLoginCommand(cmd), commandHandled, response);
+    if (status == Status::Success)
+    {
         // Format status response to verify that response is non-failure.
         status = mCommandDelegate->FormatStatusResponse(response);
     }
@@ -99,18 +103,18 @@ bool AccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & node
         return false;
     }
 
-    if (!nodeId.HasValue()) {
+    if (!nodeId.HasValue())
+    {
         ChipLogError(Zcl, "Invalid parameters");
         return false;
     }
 
     Json::Value response;
-    bool commandHandled = true;
+    bool commandHandled                      = true;
     AccountLogin::Commands::Logout::Type cmd = { nodeId };
 
-    auto status = mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id,
-                                    AccountLogin::Commands::Logout::Id,
-                                    serializeLogoutCommand(cmd), commandHandled, response);
+    auto status = mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id, AccountLogin::Commands::Logout::Id,
+                                                  serializeLogoutCommand(cmd), commandHandled, response);
 
     if (status == Status::Success)
     {

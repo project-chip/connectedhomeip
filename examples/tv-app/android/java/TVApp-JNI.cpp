@@ -342,18 +342,21 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
-        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId, getRotatingIdSpan(), mPasscode,
-                                                             bindings, OnSuccessResponse, OnFailureResponse);
+        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
+                                                             getRotatingIdSpan(), mPasscode, bindings, OnSuccessResponse,
+                                                             OnFailureResponse);
         clearContext();
     }
 
-    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, CharSpan rotatingId, uint32_t passcode, Messaging::ExchangeManager & exchangeMgr,
-                      const SessionHandle & sessionHandle)
+    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, CharSpan rotatingId, uint32_t passcode,
+                      Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
     {
-        mVendorId    = vendorId;
-        mProductId   = productId;
-        mNodeId      = nodeId;
-        mRotatingId  = std::string{ rotatingId.data(), rotatingId.size() }; // Allocates and copies to string instead of storing span to make sure lifetime is valid.
+        mVendorId   = vendorId;
+        mProductId  = productId;
+        mNodeId     = nodeId;
+        mRotatingId = std::string{
+            rotatingId.data(), rotatingId.size()
+        }; // Allocates and copies to string instead of storing span to make sure lifetime is valid.
         mPasscode    = passcode;
         mExchangeMgr = &exchangeMgr;
         mSecureSession.ShiftToSession(sessionHandle);
@@ -369,13 +372,11 @@ class MyPostCommissioningListener : public PostCommissioningListener
         mExchangeMgr = nullptr;
         mSecureSession.SessionReleased();
     }
-    CharSpan getRotatingIdSpan() {
-        return { mRotatingId.data(), mRotatingId.size() };
-    }
+    CharSpan getRotatingIdSpan() { return { mRotatingId.data(), mRotatingId.size() }; }
 
-    uint16_t mVendorId                        = 0;
-    uint16_t mProductId                       = 0;
-    NodeId mNodeId                            = 0;
+    uint16_t mVendorId  = 0;
+    uint16_t mProductId = 0;
+    NodeId mNodeId      = 0;
     std::string mRotatingId;
     uint32_t mPasscode                        = 0;
     Messaging::ExchangeManager * mExchangeMgr = nullptr;

@@ -238,9 +238,8 @@ public:
      *  @param[in]    sessionHandle      A reference to an established session.
      *
      */
-    virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId,
-                                        chip::CharSpan rotatingId, uint32_t passcode,
-                                        chip::Messaging::ExchangeManager & exchangeMgr,
+    virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, chip::CharSpan rotatingId,
+                                        uint32_t passcode, chip::Messaging::ExchangeManager & exchangeMgr,
                                         const chip::SessionHandle & sessionHandle) = 0;
 
     virtual ~PostCommissioningListener() = default;
@@ -449,10 +448,7 @@ public:
     /**
      * Get the rotating ID string CharSpan view
      */
-    inline chip::CharSpan GetRotatingIdSpan()
-    {
-        return chip::CharSpan(mRotatingId.data(), mRotatingId.size());
-    }
+    inline chip::CharSpan GetRotatingIdSpan() { return chip::CharSpan(mRotatingId.data(), mRotatingId.size()); }
 
 protected:
     bool mReady          = true; // ready to start commissioning
