@@ -28,36 +28,8 @@
 #include <controller/CommissionerDiscoveryController.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
-#include <app/app-platform/ContentAppPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-
-namespace {
-
-bool fillRotatingIdBuffer(UDCClientState* client, char[] buffer) {
-    auto rotatingIdLength = client->GetRotatingIdLength();
-    auto hexBufferByteCount = 2 * rotatingIdLength;
-    if (sizeof(buffer) < hexBufferByteCount) {
-        return false;
-    }
-    auto err = Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, buffer, sizeof(buffer));
-    return err == CHIP_NO_ERROR;
-}
-
-// Returned CharSpan valid lifetime equals buffer lifetime.
-CharSpan getRotatingIdSpan(UDCClientState* client, char[] buffer) {
-    auto ok = fillRotatingIdBuffer(client, buffer);
-    return ok ? { buffer, hexBufferByteCount } : {};
-}
-
-// Allocates memory for rotating ID string and copies to string
-std::string getRotatingIdString(UDCClientState* client) {
-    auto buffer = char[Dnssd::kMaxRotatingIdLen * 2];
-    auto ok = fillRotatingIdBuffer(client, buffer);
-    return ok ? { buffer, hexBufferByteCount } : {};
-}
-
-}
 
 using namespace ::chip;
 using namespace chip::Protocols::UserDirectedCommissioning;
@@ -193,6 +165,9 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     {
         ChipLogError(AppServer, "On UDC: could not convert rotating id to hex");
         rotatingIdString[0] = '\0';
+    } else {
+        // Store rotating ID string. Don't include null terminator character.
+        mRotatingId = std::string{ rotatingIdString, state.GetRotatingIdLength() * 2 };
     }
 
     ChipLogDetail(Controller,
@@ -273,11 +248,15 @@ void CommissionerDiscoveryController::InternalOk()
     }
 
     char rotatingIdBuffer[Dnssd::kMaxRotatingIdLen * 2];
-    CharSpan rotatingIdSpan = getRotatingIdSpan(client, rotatingIdBuffer);
-    if (rotatingIdSpan.empty()) {
+    size_t rotatingIdLength = client->GetRotatingIdLength();
+    CHIP_ERROR err =
+        Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, rotatingIdBuffer, sizeof(rotatingIdBuffer));
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(AppServer, "UX InternalOk: could not convert rotating id to hex");
         return;
     }
+    CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
 
@@ -454,11 +433,15 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         if (passcode == 0 && client->GetCommissionerPasscode() && client->GetCdPort() != 0)
         {
             char rotatingIdBuffer[Dnssd::kMaxRotatingIdLen * 2];
-            CharSpan rotatingIdSpan = getRotatingIdSpan(client, rotatingIdBuffer);
-            if (rotatingIdSpan.empty()) {
+            size_t rotatingIdLength = client->GetRotatingIdLength();
+            CHIP_ERROR err = Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, rotatingIdBuffer,
+                                                                 sizeof(rotatingIdBuffer));
+            if (err != CHIP_NO_ERROR)
+            {
                 ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: could not convert rotating id to hex");
                 return;
             }
+            CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
@@ -628,22 +611,14 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     mProductId = productId;
     mNodeId    = nodeId;
 
-    auto rotatingId = std::string{};
-    auto passcode = uint32_t{ 0 };
-
-    auto client = GetUDCClientState();
-    if (client != nullptr)
-    {
-        // Get rotating ID and cached (commissioner?) passcode to handle AccountLogin
-        rotatingId = getRotatingIdString(client);
-        // Q: Should we use mPasscode, client->GetCommissionerPasscode, or client->GetCachedCommissionerPasscode?
-        passcode = std::to_string(client->GetCachedCommissionerPasscode());
-    }
-
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, std::move(rotatingId), passcode, exchangeMgr, sessionHandle);
+        // Qs:
+        // * Is it right to use mPasscode here?
+        // * Would it not be zero if HandleContentAppPasscodeResponse returns zero passcode?
+        // * Which client/app does the passcode refer to? Same question for Rotating ID.
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, GetRotatingIdSpan(), mPasscode, exchangeMgr, sessionHandle);
     }
     else
     {

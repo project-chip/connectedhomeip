@@ -100,7 +100,6 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
 Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clusterId, CommandId commandId, std::string payload,
                                                 bool & commandHandled, Json::Value & value)
 {
-    // Q1: It seems like this InvokeCommand *never* returns success status.
     if (epId >= FIXED_ENDPOINT_COUNT)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -121,6 +120,7 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
             ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
             env->ExceptionDescribe();
             env->ExceptionClear();
+            return chip::Protocols::InteractionModel::Status::Failure;
         }
         else
         {
@@ -136,7 +136,8 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
         }
         env->DeleteLocalRef(resp);
 
-        // handle errors from platform-app
+        // Parse response here in case there is failure response.
+        // Return non-success error code to indicate to caller it should not parse response.
         if (!value[FAILURE_KEY].empty())
         {
             value = value[FAILURE_KEY];
@@ -147,8 +148,9 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
             return chip::Protocols::InteractionModel::Status::Failure;
         }
 
-        // Q: It would seem that this is the successfull return case (?)
-        return chip::Protocols::InteractionModel::Status::UnsupportedEndpoint;
+        // Return success to indicate command has been sent, response returned and parsed successfully.
+        // Caller has to manually parse value input/output parameter to get response status/object.
+        return chip::Protocols::InteractionModel::Status::Success;
     }
     else
     {
@@ -342,7 +344,7 @@ GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(Jso
     }
     else
     {
-        getSetupPINresponse.setupPIN = "";
+        status = chip::Protocols::InteractionModel::Status::Failure;
     }
     return getSetupPINresponse;
 }

@@ -239,7 +239,7 @@ public:
      *
      */
     virtual void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId,
-                                        std::string rotatingId, uint32_t passcode,
+                                        chip::CharSpan rotatingId, uint32_t passcode,
                                         chip::Messaging::ExchangeManager & exchangeMgr,
                                         const chip::SessionHandle & sessionHandle) = 0;
 
@@ -446,6 +446,14 @@ public:
      */
     UDCClientState * GetUDCClientState();
 
+    /**
+     * Get the rotating ID string CharSpan view
+     */
+    inline chip::CharSpan GetRotatingIdSpan()
+    {
+        return chip::CharSpan(mRotatingId.data(), mRotatingId.size());
+    }
+
 protected:
     bool mReady          = true; // ready to start commissioning
     bool mPendingConsent = false;
@@ -454,6 +462,7 @@ protected:
     uint16_t mProductId = 0;
     NodeId mNodeId      = 0;
     uint32_t mPasscode  = 0;
+    std::string mRotatingId;
 
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;

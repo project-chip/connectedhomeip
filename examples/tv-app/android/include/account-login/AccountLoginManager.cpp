@@ -58,7 +58,7 @@ AccountLoginManager::AccountLoginManager(ContentAppCommandDelegate * commandDele
     CopyString(mSetupPin, sizeof(mSetupPin), setupPin);
 }
 
-bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountId, const CharSpan & setupPIN,
+bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPIN,
                                       const chip::Optional<chip::NodeId> & nodeId)
 {
     ChipLogProgress(DeviceLayer, "AccountLoginManager::HandleLogin called for endpoint %d", mEndpointId);
@@ -76,16 +76,16 @@ bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountId, const Char
 
     Json::Value response;
     bool commandHandled = true;
-    AccountLogin::Commands::Login::Type cmd = { tempAccountId, setupPIN, nodeId };
+    AccountLogin::Commands::Login::Type cmd = { tempAccountIdentifier, setupPIN, nodeId };
 
-    // Deliberately ignore returned status
-    mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id,
+    auto status = mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id,
                                     AccountLogin::Commands::Login::Id,
                                     serializeLoginCommand(cmd), commandHandled, response);
-
-    Status status = mCommandDelegate->FormatStatusResponse(response);
+    if (status == Status::Success) {
+        // Format status response to verify that response is non-failure.
+        status = mCommandDelegate->FormatStatusResponse(response);
+    }
     ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin command returned with status: %d", chip::to_underlying(status));
-
     return status == chip::Protocols::InteractionModel::Status::Success;
 }
 
@@ -108,14 +108,16 @@ bool AccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & node
     bool commandHandled = true;
     AccountLogin::Commands::Logout::Type cmd = { nodeId };
 
-    // Deliberately ignore returned status
-    mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id,
+    auto status = mCommandDelegate->InvokeCommand(mEndpointId, AccountLogin::Id,
                                     AccountLogin::Commands::Logout::Id,
                                     serializeLogoutCommand(cmd), commandHandled, response);
 
-    Status status = mCommandDelegate->FormatStatusResponse(response);
+    if (status == Status::Success)
+    {
+        // Format status response to verify that response is non-failure.
+        status = mCommandDelegate->FormatStatusResponse(response);
+    }
     ChipLogProgress(Zcl, "AccountLoginManager::HandleLogout command returned with status: %d", chip::to_underlying(status));
-
     return status == chip::Protocols::InteractionModel::Status::Success;
 }
 

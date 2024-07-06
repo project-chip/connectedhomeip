@@ -609,7 +609,7 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
 // and create bindings on the given client so that it knows what it has access to.
 CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle,
                                                   uint16_t targetVendorId, uint16_t targetProductId, NodeId localNodeId,
-                                                  const std::string& rotatingId, uint32_t passcode,
+                                                  CharSpan rotatingId, uint32_t passcode,
                                                   std::vector<Binding::Structs::TargetStruct::Type> bindings,
                                                   Controller::WriteResponseSuccessCallback successCb,
                                                   Controller::WriteResponseFailureCallback failureCb)
@@ -757,17 +757,14 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                 // notify content app about this nodeId
                 app->AddClientNode(subjectNodeId);
 
-                auto tempAccountId = CharSpan::fromCharString(rotatingId.c_str());
-                auto setupPIN = CharSpan::fromCharString(std::to_string(passcode).c_str());
-                auto nodeId = MakeOptional(subjectNodeId); // Q: Is subjectNodeId correct NodeId to use?
-
-                // send login command to content app
-                if (!tempAccountId.empty() && !setupPIN.empty()) {
-                    // Q: Should we only do this if (commissioner) passcode is not 0, e.g when user was shown PIN prompt?
-                    auto status = app->GetAccountLoginDelegate()->HandleLogin(tempAccountId, setupPIN, nodeId);
+                // handle login
+                auto setupPIN = std::to_string(passcode);
+                auto accountLoginDelegate = app->GetAccountLoginDelegate();
+                if (accountLoginDelegate != nullptr) {
+                    auto status = accountLoginDelegate->HandleLogin(rotatingId, { setupPIN.data(), setupPIN.size() }, MakeOptional(subjectNodeId));
                     ChipLogProgress(Controller, "AccountLogin::Login command sent and returned with status: %d", status);
                 } else {
-                    ChipLogError(Controller, "Failed to get tempAccountId or setupPIN to set AccountLogin::Login command");
+                    ChipLogError(Controller, "AccountLoginDelegate not found for app");
                 }
             }
         }
