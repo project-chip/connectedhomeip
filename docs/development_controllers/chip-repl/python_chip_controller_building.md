@@ -39,7 +39,7 @@ Linux (amd64 / aarch64) or macOS.
 To build and run the Python CHIP controller:
 
 1. Install all necessary packages and prepare the build system. For more
-   details, see the [Building Matter](BUILDING.md) documentation:
+   details, see the [Building Matter](../../guides/BUILDING.md) documentation:
 
     ```
     sudo apt-get update

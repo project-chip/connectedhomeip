@@ -85,11 +85,11 @@ needed to perform communication through the Matter stack.
 Sample Matter applications are provided for the Mbed OS platform. They can be
 used to speed up development:
 
--   [shell](../../examples/shell/mbed/README.md)
--   [all-clusters-app](../../examples/all-clusters-app/mbed/README.md)
--   [lock-app](../../examples/lock-app/mbed/README.md)
--   [lighting-app](../../examples/lighting-app/mbed/README.md)
--   [pigweed-app](../../examples/pigweed-app/mbed/README.md)
+-   [shell](../../../examples/shell/mbed/README.md)
+-   [all-clusters-app](../../../examples/all-clusters-app/mbed/README.md)
+-   [lock-app](../../../examples/lock-app/mbed/README.md)
+-   [lighting-app](../../../examples/lighting-app/mbed/README.md)
+-   [pigweed-app](../../../examples/pigweed-app/mbed/README.md)
 
 ### Example configuration
 

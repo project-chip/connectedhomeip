@@ -225,15 +225,16 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
 
 ## Test Commission and Control with chip-tool
 
-Please follow [chip_tool_guide](../../../docs/guides/chip_tool_guide.md) and
-[guide](../../chip-tool/README.md) to build and use chip-tool for test.
+Please follow
+[chip_tool_guide](../../../docs/development_controllers/chip-tool/chip_tool_guide.md)
+and [guide](../../chip-tool/README.md) to build and use chip-tool for test.
 
 ### Prerequisite for Thread Protocol
 
 Thread wireless protocol runs on BL706, which needs a Thread border router to
 connect Thread network to Wi-Fi/Ethernet network. Please follow this
-[guide](../../../docs/guides/openthread_border_router_pi.md) to setup a
-raspberry Pi border router.
+[guide](../../../docs/platforms/openthread/openthread_border_router_pi.md) to
+setup a raspberry Pi border router.
 
 After Thread border router setup, please type following command on Thread border
 router to get Thread network credential.

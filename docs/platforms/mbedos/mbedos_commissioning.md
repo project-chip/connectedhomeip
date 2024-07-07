@@ -58,7 +58,7 @@ To make provisioning possible and to control the Matter device from your Android
 based smartphone, you must first build and install the CHIPTool application.
 
 To build the CHIPTool application for your smartphone, read
-[Android building guide](android_building.md).
+[Android building guide](../android/android_building.md).
 
 After building, install the application by completing the following steps:
 
@@ -154,7 +154,7 @@ brightness between 0-255.
 If **Lighting LED** is available then brightness change can be observed.
 
 > For more details about Android CHIPTool please visit
-> [CHIPTool](../../examples/android/CHIPTool/README.md)
+> [CHIPTool](../../../examples/android/CHIPTool/README.md)
 
 ## POSIX CLI CHIPTool
 
@@ -164,7 +164,7 @@ To make provisioning possible and to control the Matter device from Linux-based
 device, you can build and run the Matter Client example application on it.
 
 To build the POSIX CLI CHIPTool application check the guide
-[POSIX CLI guide](../../examples/chip-tool/README.md).
+[POSIX CLI guide](../../../examples/chip-tool/README.md).
 
 ### Device commissioning for CLI
 
@@ -196,7 +196,7 @@ For example:
 The client will send a single command packet and then exit.
 
 > For more details about POSIX CLI CHIPTool please visit
-> [POSIX CLI CHIPTool](../../examples/chip-tool/README.md)
+> [POSIX CLI CHIPTool](../../../examples/chip-tool/README.md)
 
 ## Python Device Controller
 
@@ -206,7 +206,7 @@ To make provisioning possible and to control the Matter device with Python
 application, you can build and run the Python CHIP controller.
 
 To build and install the Python Device Controller application check the guide
-[Python Device Controller guide](python_chip_controller_building.md).
+[Python Device Controller guide](../../development_controllers/chip-repl/python_chip_controller_building.md).
 
 ### Device commissioning for Python Device Controller
 

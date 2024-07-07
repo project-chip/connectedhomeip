@@ -14,7 +14,7 @@ This example demonstrates the Matter Lighting application on stm32 platform.
 ## Building and Commissioning
 
 Please refer
-[Building and Commissioning](../../../docs/guides/stm32_getting_started_guide.md#building-the-example-application)
+[Building and Commissioning](../../../docs/platforms/stm32/stm32_getting_started_guide.md#building-the-example-application)
 guides to get started
 
 ```

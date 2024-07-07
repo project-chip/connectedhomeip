@@ -28,7 +28,7 @@ subfolder.
 
 ## Building the Example Application
 
--   [Set Up Matter Environment](./BUILDING.md)
+-   [Set Up Matter Environment](../../guides/BUILDING.md)
 
 -   Set up STLINK tools
 

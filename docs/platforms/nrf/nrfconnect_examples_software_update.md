@@ -17,7 +17,7 @@ protocols:
 
 > **_NOTE:_** The procedure presented below requires that you have OpenThread
 > Border Router (OTBR) set up either in Docker or on a Raspberry Pi. Read
-> [Setup OpenThread Border Router on Raspberry Pi](openthread_border_router_pi.md)
+> [Setup OpenThread Border Router on Raspberry Pi](../openthread/openthread_border_router_pi.md)
 > to learn how to install the OTBR on a Raspberry Pi.
 
 The DFU over Matter involves two kinds of nodes:
@@ -93,7 +93,6 @@ To test the DFU over Matter, you need to complete the following steps:
     ```
 
 10. Initiate the DFU procedure in one of the following ways:
-
 
     -   If you have built the device firmware with `-DCONFIG_CHIP_LIB_SHELL=y`
         option, which enables Matter shell commands, run the following command

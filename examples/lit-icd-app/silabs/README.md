@@ -202,7 +202,7 @@ combination with JLinkRTTClient as follows:
 
 -   It is assumed here that you already have an OpenThread border router
     configured and running. If not see the following guide
-    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
     for more information on how to setup a border router on a raspberryPi.
 
     Take note that the RCP code is available directly through
@@ -317,7 +317,7 @@ tracking code inside the `trackAlloc` and `trackFree` function
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../docs/platforms/silabs/silabs_efr32_software_update.md)
 
 ## Building options
 

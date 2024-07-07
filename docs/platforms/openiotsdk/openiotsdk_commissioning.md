@@ -9,11 +9,11 @@ connected to the IP network and do not require credentials provisioning.
 
 ## Building Matter controller
 
-The [Matter controller](../../src/controller/README.md) is a client application
-that allows commission and control of the Matter node.
+The [Matter controller](../../../src/controller/README.md) is a client
+application that allows commission and control of the Matter node.
 
-The [POSIX CLI chip-tool](../../examples/chip-tool/README.md) is the recommended
-Matter controller to use with Open IoT SDK devices.
+The [POSIX CLI chip-tool](../../../examples/chip-tool/README.md) is the
+recommended Matter controller to use with Open IoT SDK devices.
 
 To build `chip-tool` execute command:
 

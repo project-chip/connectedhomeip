@@ -33,7 +33,7 @@ to speed up development. You can find them in the samples with `/asr` subfolder.
 
 ## Building the Example Application
 
--   [Setup Matter Environment](./BUILDING.md)
+-   [Setup Matter Environment](../../guides/BUILDING.md)
 
 -   Setup toolchain
     -   for ASR582X and ASR550X
@@ -140,7 +140,7 @@ There are two commissioning modes supported by ASR platform:
    `build_examples.py` script. For example:
    `./scripts/build/build_examples.py --target asr-$ASR_BOARD-lighting-ota build`
 2. For more usage details, please refer to the
-   [OTA example](../../examples/ota-requestor-app/asr/README.md)
+   [OTA example](../../../examples/ota-requestor-app/asr/README.md)
 
 ## Factory
 

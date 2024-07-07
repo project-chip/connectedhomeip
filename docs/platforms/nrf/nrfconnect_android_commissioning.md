@@ -1,7 +1,7 @@
 # Commissioning nRF Connect Accessory using Android CHIPTool
 
-You can use [CHIPTool](android_building.md) for Android smartphones to
-commission a Nordic Semiconductor's development kit programmed with a Matter
+You can use [CHIPTool](../android/android_building.md) for Android smartphones
+to commission a Nordic Semiconductor's development kit programmed with a Matter
 example for the nRF Connect platform into a Matter fabric.
 
 This guide references the nRF52840 DK and Matter nRF Connect Lighting Example
@@ -86,9 +86,10 @@ accessory using Android CHIPTool:
 > _Note:_ This step is only needed if you're testing a Thread device. Skip it if
 > the tested device operates in a Wi-Fi network.
 
-Follow the [OpenThread Border Router](openthread_border_router_pi.md) article to
-set up OpenThread Border Router on the Raspberry Pi, with either the nRF52840 DK
-or the nRF52840 Dongle acting as the
+Follow the
+[OpenThread Border Router](../openthread/openthread_border_router_pi.md) article
+to set up OpenThread Border Router on the Raspberry Pi, with either the nRF52840
+DK or the nRF52840 Dongle acting as the
 [OpenThread Radio Co-Processor](https://openthread.io/platforms/co-processor).
 During the setup, make sure that the Raspberry Pi is connected to your Wi-Fi
 Access Point.
@@ -107,7 +108,7 @@ Application to learn how to build and program the example onto an nRF52840 DK.
 ## Building and installing Android CHIPTool
 
 To build the CHIPTool application for your smartphone, read the
-[Building Android](android_building.md) guide.
+[Building Android](../android/android_building.md) guide.
 
 After building, install the application by completing the following steps:
 

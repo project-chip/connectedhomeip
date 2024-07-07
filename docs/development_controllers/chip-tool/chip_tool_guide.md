@@ -38,7 +38,7 @@ Before you can use the CHIP Tool, you must compile it from source on Linux
 To build and run the CHIP Tool:
 
 1. Install all required packages for Matter and prepare the source code and the
-   build system. Read the [Building Matter](../guides/BUILDING.md) guide for
+   build system. Read the [Building Matter](../../guides/BUILDING.md) guide for
    instructions.
 2. Open a command prompt in the `connectedhomeip` directory.
 3. Run the following command:

@@ -9,8 +9,8 @@ file and apply it.
 
 The application is configured to support:
 
--   [TF-M](../../../docs/guides/openiotsdk_examples.md#trusted-firmware-m)
--   [Device Firmware Update](../../../docs/guides/openiotsdk_examples.md#device-firmware-update)
+-   [TF-M](../../../docs/platforms/openiotsdk/openiotsdk_examples.md#trusted-firmware-m)
+-   [Device Firmware Update](../../../docs/platforms/openiotsdk/openiotsdk_examples.md#device-firmware-update)
 
 The example behaves as a Matter accessory, device that can be paired into an
 existing Matter network and can be controlled by it.
@@ -19,7 +19,7 @@ existing Matter network and can be controlled by it.
 
 For information on how to build, run, test and debug this example and further
 information about the platform it is run on see
-[Open IoT SDK examples](../../../docs/guides/openiotsdk_examples.md).
+[Open IoT SDK examples](../../../docs/platforms/openiotsdk/openiotsdk_examples.md).
 
 The example name to use in the scripts is `ota-requestor-app`.
 
@@ -39,14 +39,14 @@ follow traces in the terminal.
 ### Commissioning
 
 Read the
-[Open IoT SDK commissioning guide](../../../docs/guides/openiotsdk_commissioning.md)
+[Open IoT SDK commissioning guide](../../../docs/platforms/openiotsdk/openiotsdk_commissioning.md)
 to see how to use the Matter controller to commission and control the
 application.
 
 ### Device Firmware Upgrade
 
 Read the
-[Matter Open IoT SDK Example Device Firmware Upgrade](../../../docs/guides/openiotsdk_examples_software_update.md)
+[Matter Open IoT SDK Example Device Firmware Upgrade](../../../docs/platforms/openiotsdk/openiotsdk_examples_software_update.md)
 to see how to use Matter OTA for firmware update.
 
 ### OtaSoftwareUpdateRequestor cluster usage
@@ -78,4 +78,4 @@ downloading the update image. If this step is completed, a new image will be
 installed and the application will be reboot.
 
 More details about device firmware update over Matter can be found
-[here](../../../docs/guides/openiotsdk_examples_software_update.md).
+[here](../../../docs/platforms/openiotsdk/openiotsdk_examples_software_update.md).

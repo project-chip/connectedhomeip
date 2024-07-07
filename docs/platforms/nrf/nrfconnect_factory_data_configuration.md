@@ -813,8 +813,8 @@ Alternatively, you can add the relevant Kconfig option lines to the example's
 You can edit all configuration options using the interactive Kconfig interface.
 
 See the
-[Configuring nRF Connect examples](../guides/nrfconnect_examples_configuration.md)
-page for information about how to configure Kconfig options.
+[Configuring nRF Connect examples](./nrfconnect_examples_configuration.md) page
+for information about how to configure Kconfig options.
 
 In the configuration window, expand the items
 `Modules -> connectedhomeip (/home/arbl/matter/connectedhomeip/config/nrfconnect/chip-module) -> Connected Home over IP protocol stack`.

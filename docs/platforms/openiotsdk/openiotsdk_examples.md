@@ -22,7 +22,7 @@ You can use these examples as a reference for creating your own applications.
 The VSCode devcontainer has all the dependencies pre-installed. It is the
 recommended way to build, run and develop with the Open IoT SDK port of the
 Matter Project. Please read this
-[VSCode development guide](../VSCODE_DEVELOPMENT.md) for more information.
+[VSCode development guide](../../VSCODE_DEVELOPMENT.md) for more information.
 
 Before building the examples, check out the Matter repository and sync Open IoT
 SDK submodules using the following command:
@@ -347,11 +347,11 @@ provides the `-K,--kvsfile` option to use the persistence options listed above.
 
 Open IoT SDK port supports two crypto backend implementations:
 
--   [Mbed TLS](../guides/openiotsdk_platform_overview.md#mbed-tls) - it's the
-    default option
+-   [Mbed TLS](./openiotsdk_platform_overview.md#mbed-tls) - it's the default
+    option
 -   [PSA crypto service](https://tf-m-user-guide.trustedfirmware.org/integration_guide/services/tfm_crypto_integration_guide.html)
     from the
-    [TrustedFirmware-M (TF-M)](../guides/openiotsdk_platform_overview.md#trusted-firmware-m)
+    [TrustedFirmware-M (TF-M)](./openiotsdk_platform_overview.md#trusted-firmware-m)
     component
 
 The CMake variable `CONFIG_CHIP_CRYPTO` controls how cryptographic operations

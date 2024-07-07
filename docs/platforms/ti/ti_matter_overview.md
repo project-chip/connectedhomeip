@@ -103,7 +103,7 @@ by the platform implementation files.
 Below are several resources available for Matter development:
 
 -   [Matter Protocol Overview](https://handbook.buildwithmatter.com/howitworks/roles/)
--   [Matter Build Guide](../BUILDING.md)
+-   [Matter Build Guide](../../guides/BUILDING.md)
 -   [Matter over Thread Getting Started](https://dev.ti.com/tirex/explore/node?node=A__AciOYyNq9gli.nsvJzBtQg__com.ti.SIMPLELINK_ACADEMY_CC13XX_CC26XX_SDK__AfkT0vQ__LATEST)
 -   [TI Matter over Wi-Fi Getting Started](https://e2e.ti.com/support/wireless-connectivity/wi-fi-group/wifi/f/wi-fi-forum/1122413/faq-cc3235sf-matter----getting-started-guide)
 -   [TI Matter Application Development](https://dev.ti.com/tirex/explore/node?node=A__AXNOPYikmtBCHJ-L6eRivA__com.ti.SIMPLELINK_ACADEMY_CC13XX_CC26XX_SDK__AfkT0vQ__LATEST)

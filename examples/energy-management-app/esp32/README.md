@@ -4,9 +4,9 @@ This example demonstrates the Matter Electric Vehicle Supply Equipment
 application on ESP platforms.
 
 Please
-[setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
+[setup ESP-IDF and CHIP Environment](../../../docs/platforms/esp32/setup_idf_chip.md)
 and refer
-[building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
+[building and commissioning](../../../docs/platforms/esp32/build_app_and_commission.md)
 guides to get started.
 
 ### Enabling ESP-Insights:
@@ -31,7 +31,7 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/energy-management-app/
 ---
 
 -   [Cluster Control](#cluster-control)
--   [Matter OTA guide](../../../docs/guides/esp32/ota.md)
+-   [Matter OTA guide](../../../docs/platforms/esp32/ota.md)
 
 ---
 

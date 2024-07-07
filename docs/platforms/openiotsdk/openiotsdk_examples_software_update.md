@@ -19,12 +19,12 @@ The last required element is a Matter controller. This application controls both
 nodes and manages the entire software update process.
 
 In the procedure described below, the `OTA Provider` will be a
-[Linux application](../../examples/ota-provider-app/linux/README.md) and the
+[Linux application](../../../examples/ota-provider-app/linux/README.md) and the
 Open IoT SDK example with
 [DFU support](./openiotsdk_examples.md#device-firmware-update) will work as the
-OTA Requestor. The [chip-tool](../../examples/chip-tool/README.md) application
-used as the Matter controller. Each application should be launched in a separate
-terminal.
+OTA Requestor. The [chip-tool](../../../examples/chip-tool/README.md)
+application used as the Matter controller. Each application should be launched
+in a separate terminal.
 
 List of `OIS` examples that currently support the `DFU` over Matter:
 
@@ -41,7 +41,7 @@ List of `OIS` examples that currently support the `DFU` over Matter:
     ```
 
     More details about the `OTA provider` application can be found
-    [here](../../examples/ota-provider-app/linux/README.md).
+    [here](../../../examples/ota-provider-app/linux/README.md).
 
 3.  Build `chip-tool`:
 
@@ -50,7 +50,7 @@ List of `OIS` examples that currently support the `DFU` over Matter:
     ```
 
     More details about the `chip-tool` application can be found
-    [here](../../examples/chip-tool/README.md).
+    [here](../../../examples/chip-tool/README.md).
 
 4.  Build `OIS` example application
 
