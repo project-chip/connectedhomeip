@@ -2,6 +2,7 @@ package com.matter.tv.server.handlers;
 
 import android.content.Context;
 import android.util.Log;
+import com.matter.tv.app.api.Clusters;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
 import com.matter.tv.server.service.ContentAppAgentService;
@@ -18,6 +19,17 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
     this.context = context;
   }
 
+  private boolean isForegroundCommand(long clusterId, long commandId) {
+    switch (clusterId) {
+      case Clusters.ContentLauncher.Id:
+        return commandId == Clusters.ContentLauncher.Commands.LaunchContent.Id;
+      case Clusters.TargetNavigator.Id:
+        return commandId == Clusters.TargetNavigator.Commands.NavigateTarget.Id;
+      default:
+        return false;
+    }
+  }
+
   public String sendCommand(int endpointId, long clusterId, long commandId, String commandPayload) {
     Log.d(TAG, "Received a command for endpointId " + endpointId + ". Message " + commandPayload);
 
@@ -26,6 +38,14 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
             ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values(),
             endpointId);
     if (discoveredApp != null) {
+      // Intercept NavigateTarget and LaunchContent commands and launch content app if necessary
+      if (isForegroundCommand(clusterId, commandId)) {
+        // TODO: Check if contentapp main/launch activity is already in foreground before launching.
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(discoveredApp.getAppName());
+        if (launchIntent != null) {
+            startActivity(launchIntent);
+        }
+      }
       Log.d(TAG, "Sending a command for endpointId " + endpointId + ". Message " + commandPayload);
       return ContentAppAgentService.sendCommand(
           context, discoveredApp.getAppName(), clusterId, commandId, commandPayload);
