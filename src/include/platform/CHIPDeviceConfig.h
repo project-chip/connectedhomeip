@@ -428,7 +428,7 @@
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
  *
- * Enable support for the WiFiPAF commissioning function
+ * Enable support for commissioning using Wi-Fi Public Action Frame as the transport.
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
