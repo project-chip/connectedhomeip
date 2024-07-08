@@ -172,7 +172,7 @@ public:
                 snprintf(buf, bufSize, "TCP:[%s%s]:%d", ip_addr, interface, mPort);
             break;
         case Type::kWiFiPAF:
-            snprintf(buf, bufSize, "WiFiPAF");
+            snprintf(buf, bufSize, "Wi-Fi PAF");
             break;
         case Type::kBle:
             // Note that BLE does not currently use any specific address.
