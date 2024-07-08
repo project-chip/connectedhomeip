@@ -40,7 +40,7 @@ async def waitForActiveAndTriggerCheckIn(test, nodeid):
     return await coro
 
 
-def main():
+async def main():
     optParser = OptionParser()
     optParser.add_option(
         "-t",
@@ -120,20 +120,20 @@ def main():
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     logger.info("Testing discovery")
-    FailIfNot(test.TestDiscovery(discriminator=options.discriminator),
+    FailIfNot(await test.TestDiscovery(discriminator=options.discriminator),
               "Failed to discover any devices.")
 
     devCtrl = test.devCtrl
     devCtrl.EnableICDRegistration(devCtrl.GenerateICDRegistrationParameters())
     if options.deviceAddress:
         logger.info("Testing commissioning (IP)")
-        FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
+        FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
                                          setuppin=20202021,
                                          nodeid=options.nodeid),
                   "Failed to finish commissioning")
     elif options.setupPayload:
         logger.info("Testing commissioning (w/ Setup Payload)")
-        FailIfNot(test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
+        FailIfNot(await test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
                                                          nodeid=options.nodeid,
                                                          discoveryType=options.discoveryType),
                   "Failed to finish commissioning")
@@ -141,7 +141,7 @@ def main():
         TestFail("Must provide device address or setup payload to commissioning the device")
     logger.info("Commissioning completed")
     logger.info("Testing wait for active")
-    FailIfNot(asyncio.run(waitForActiveAndTriggerCheckIn(test, nodeid=options.nodeid)), "Failed to test wait for active")
+    FailIfNot(await waitForActiveAndTriggerCheckIn(test, nodeid=options.nodeid), "Failed to test wait for active")
     logger.info('Successfully handled wait-for-active')
 
     timeoutTicker.stop()
@@ -155,7 +155,9 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+        loop.close()
     except Exception as ex:
         logger.exception(ex)
         TestFail("Exception occurred when running tests.")
