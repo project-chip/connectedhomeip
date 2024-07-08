@@ -44,7 +44,8 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
             TestStep("3a", "TH reads HeatDemand attribute. Verify value is 0x00 (no demand on any source)"),
             TestStep("3b", "TH reads BoostState attribute. Verify value is 0 (Inactive)"),
             TestStep("3c", "TH reads TankPercentage attribute. Verify value is 0%"),
-            TestStep("3d", "TH reads HeaterTypes attribute. Verify value is greater than 0x00 (at least one type supported) and {storeValueAs} HeaterTypes"),
+            TestStep(
+                "3d", "TH reads HeaterTypes attribute. Verify value is greater than 0x00 (at least one type supported) and {storeValueAs} HeaterTypes"),
             TestStep("4", "TH sends Boost with Duration=600s,TargetPercentage=100%. Verify Command response is Success"),
             TestStep("4a", "TH reads HeatDemand attribute. Verify value is greater than 0x00 (demand on at least one source) and (HeaterDemand & (!HeaterTypes)) is zero (demand is only from declared supported types)"),
             TestStep("4b", "TH reads BoostState attribute. Verify value is 1 (Active)"),
@@ -222,6 +223,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
 
         self.step("13")
         await self.send_test_event_trigger_basic_installation_test_event_clear()
+
 
 if __name__ == "__main__":
     default_matter_test_main()

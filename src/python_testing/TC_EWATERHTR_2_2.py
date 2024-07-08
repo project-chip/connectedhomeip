@@ -44,7 +44,8 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER for Basic installation Test Event. Verify Command response is Success"),
             TestStep("3a", "TH reads HeatDemand attribute. Verify value is 0x00 (no demand on any source)"),
             TestStep("3b", "TH reads BoostState attribute. Verify value is 0 (Inactive)"),
-            TestStep("3c", "TH reads HeaterTypes attribute. Verify value is greater than 0x00 (at least one type supported) and {storeValueAs} HeaterTypes"),
+            TestStep(
+                "3c", "TH reads HeaterTypes attribute. Verify value is greater than 0x00 (at least one type supported) and {storeValueAs} HeaterTypes"),
             TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER for Manual mode Test Event. Verify Command response is Success"),
             TestStep("4a", "TH reads HeatDemand attribute. Verify value is greater than 0x00 (demand on at least one source) and (HeaterDemand & (!HeaterTypes)) is zero (demand is only from declared supported types)"),
             TestStep("5", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EWATERHTR.TEST_EVENT_TRIGGER for Water Temperature 61C Test Event. Verify Command response is Success"),
@@ -292,6 +293,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
 
         self.step("23")
         await self.send_test_event_trigger_basic_installation_test_event_clear()
+
 
 if __name__ == "__main__":
     default_matter_test_main()
