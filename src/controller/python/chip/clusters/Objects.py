@@ -26044,13 +26044,13 @@ class EnergyEvse(Cluster):
                         ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="state", Tag=1, Type=EnergyEvse.Enums.StateEnum),
                         ClusterObjectFieldDescriptor(Label="maximumCurrent", Tag=2, Type=int),
-                        ClusterObjectFieldDescriptor(Label="maximumDischargingCurrent", Tag=3, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="maximumDischargeCurrent", Tag=3, Type=typing.Optional[int]),
                     ])
 
             sessionID: 'uint' = 0
             state: 'EnergyEvse.Enums.StateEnum' = 0
             maximumCurrent: 'int' = 0
-            maximumDischargingCurrent: 'typing.Optional[int]' = None
+            maximumDischargeCurrent: 'typing.Optional[int]' = None
 
         @dataclass
         class EnergyTransferStopped(ClusterEvent):

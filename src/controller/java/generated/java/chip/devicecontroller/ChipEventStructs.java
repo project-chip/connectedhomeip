@@ -4323,22 +4323,22 @@ public static class EnergyEvseClusterEnergyTransferStartedEvent {
   public Long sessionID;
   public Integer state;
   public Long maximumCurrent;
-  public Optional<Long> maximumDischargingCurrent;
+  public Optional<Long> maximumDischargeCurrent;
   private static final long SESSION_I_D_ID = 0L;
   private static final long STATE_ID = 1L;
   private static final long MAXIMUM_CURRENT_ID = 2L;
-  private static final long MAXIMUM_DISCHARGING_CURRENT_ID = 3L;
+  private static final long MAXIMUM_DISCHARGE_CURRENT_ID = 3L;
 
   public EnergyEvseClusterEnergyTransferStartedEvent(
     Long sessionID,
     Integer state,
     Long maximumCurrent,
-    Optional<Long> maximumDischargingCurrent
+    Optional<Long> maximumDischargeCurrent
   ) {
     this.sessionID = sessionID;
     this.state = state;
     this.maximumCurrent = maximumCurrent;
-    this.maximumDischargingCurrent = maximumDischargingCurrent;
+    this.maximumDischargeCurrent = maximumDischargeCurrent;
   }
 
   public StructType encodeTlv() {
@@ -4346,7 +4346,7 @@ public static class EnergyEvseClusterEnergyTransferStartedEvent {
     values.add(new StructElement(SESSION_I_D_ID, new UIntType(sessionID)));
     values.add(new StructElement(STATE_ID, new UIntType(state)));
     values.add(new StructElement(MAXIMUM_CURRENT_ID, new IntType(maximumCurrent)));
-    values.add(new StructElement(MAXIMUM_DISCHARGING_CURRENT_ID, maximumDischargingCurrent.<BaseTLVType>map((nonOptionalmaximumDischargingCurrent) -> new IntType(nonOptionalmaximumDischargingCurrent)).orElse(new EmptyType())));
+    values.add(new StructElement(MAXIMUM_DISCHARGE_CURRENT_ID, maximumDischargeCurrent.<BaseTLVType>map((nonOptionalmaximumDischargeCurrent) -> new IntType(nonOptionalmaximumDischargeCurrent)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -4358,7 +4358,7 @@ public static class EnergyEvseClusterEnergyTransferStartedEvent {
     Long sessionID = null;
     Integer state = null;
     Long maximumCurrent = null;
-    Optional<Long> maximumDischargingCurrent = Optional.empty();
+    Optional<Long> maximumDischargeCurrent = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SESSION_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -4375,10 +4375,10 @@ public static class EnergyEvseClusterEnergyTransferStartedEvent {
           IntType castingValue = element.value(IntType.class);
           maximumCurrent = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == MAXIMUM_DISCHARGING_CURRENT_ID) {
+      } else if (element.contextTagNum() == MAXIMUM_DISCHARGE_CURRENT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          maximumDischargingCurrent = Optional.of(castingValue.value(Long.class));
+          maximumDischargeCurrent = Optional.of(castingValue.value(Long.class));
         }
       }
     }
@@ -4386,7 +4386,7 @@ public static class EnergyEvseClusterEnergyTransferStartedEvent {
       sessionID,
       state,
       maximumCurrent,
-      maximumDischargingCurrent
+      maximumDischargeCurrent
     );
   }
 
@@ -4403,8 +4403,8 @@ public static class EnergyEvseClusterEnergyTransferStartedEvent {
     output.append("\tmaximumCurrent: ");
     output.append(maximumCurrent);
     output.append("\n");
-    output.append("\tmaximumDischargingCurrent: ");
-    output.append(maximumDischargingCurrent);
+    output.append("\tmaximumDischargeCurrent: ");
+    output.append(maximumDischargeCurrent);
     output.append("\n");
     output.append("}\n");
     return output.toString();

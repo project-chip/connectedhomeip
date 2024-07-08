@@ -6851,10 +6851,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("MaximumDischargingCurrent", indent + 1, value.maximumDischargingCurrent);
+        CHIP_ERROR err = DataModelLogger::LogValue("MaximumDischargeCurrent", indent + 1, value.maximumDischargeCurrent);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MaximumDischargingCurrent'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MaximumDischargeCurrent'");
             return err;
         }
     }

@@ -5872,24 +5872,23 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                         value_maximumCurrentCtorSignature.c_str(),
                                                                         jnivalue_maximumCurrent, value_maximumCurrent);
 
-            jobject value_maximumDischargingCurrent;
-            if (!cppValue.maximumDischargingCurrent.HasValue())
+            jobject value_maximumDischargeCurrent;
+            if (!cppValue.maximumDischargeCurrent.HasValue())
             {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_maximumDischargingCurrent);
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_maximumDischargeCurrent);
             }
             else
             {
-                jobject value_maximumDischargingCurrentInsideOptional;
-                std::string value_maximumDischargingCurrentInsideOptionalClassName     = "java/lang/Long";
-                std::string value_maximumDischargingCurrentInsideOptionalCtorSignature = "(J)V";
-                jlong jnivalue_maximumDischargingCurrentInsideOptional =
-                    static_cast<jlong>(cppValue.maximumDischargingCurrent.Value());
+                jobject value_maximumDischargeCurrentInsideOptional;
+                std::string value_maximumDischargeCurrentInsideOptionalClassName     = "java/lang/Long";
+                std::string value_maximumDischargeCurrentInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_maximumDischargeCurrentInsideOptional = static_cast<jlong>(cppValue.maximumDischargeCurrent.Value());
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                    value_maximumDischargingCurrentInsideOptionalClassName.c_str(),
-                    value_maximumDischargingCurrentInsideOptionalCtorSignature.c_str(),
-                    jnivalue_maximumDischargingCurrentInsideOptional, value_maximumDischargingCurrentInsideOptional);
-                chip::JniReferences::GetInstance().CreateOptional(value_maximumDischargingCurrentInsideOptional,
-                                                                  value_maximumDischargingCurrent);
+                    value_maximumDischargeCurrentInsideOptionalClassName.c_str(),
+                    value_maximumDischargeCurrentInsideOptionalCtorSignature.c_str(),
+                    jnivalue_maximumDischargeCurrentInsideOptional, value_maximumDischargeCurrentInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_maximumDischargeCurrentInsideOptional,
+                                                                  value_maximumDischargeCurrent);
             }
 
             jclass energyTransferStartedStructClass;
@@ -5913,7 +5912,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(energyTransferStartedStructClass, energyTransferStartedStructCtor, value_sessionID,
-                                           value_state, value_maximumCurrent, value_maximumDischargingCurrent);
+                                           value_state, value_maximumCurrent, value_maximumDischargeCurrent);
 
             return value;
         }

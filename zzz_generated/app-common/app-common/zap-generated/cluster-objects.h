@@ -23765,10 +23765,10 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kSessionID                 = 0,
-    kState                     = 1,
-    kMaximumCurrent            = 2,
-    kMaximumDischargingCurrent = 3,
+    kSessionID               = 0,
+    kState                   = 1,
+    kMaximumCurrent          = 2,
+    kMaximumDischargeCurrent = 3,
 };
 
 struct Type
@@ -23782,7 +23782,7 @@ public:
     uint32_t sessionID     = static_cast<uint32_t>(0);
     StateEnum state        = static_cast<StateEnum>(0);
     int64_t maximumCurrent = static_cast<int64_t>(0);
-    Optional<int64_t> maximumDischargingCurrent;
+    Optional<int64_t> maximumDischargeCurrent;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -23797,7 +23797,7 @@ public:
     uint32_t sessionID     = static_cast<uint32_t>(0);
     StateEnum state        = static_cast<StateEnum>(0);
     int64_t maximumCurrent = static_cast<int64_t>(0);
-    Optional<int64_t> maximumDischargingCurrent;
+    Optional<int64_t> maximumDischargeCurrent;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

@@ -8029,13 +8029,13 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command EnableCharging
  *
- * Allows a client to enable the EVSE to charge an EV.
+ * This command allows a client to enable the EVSE to charge an EV,
  */
 - (void)enableChargingWithParams:(MTREnergyEVSEClusterEnableChargingParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command EnableDischarging
  *
- * Allows a client to enable the EVSE to discharge an EV.
+ * Upon receipt, this SHALL allow a client to enable the discharge of an EV,
  */
 - (void)enableDischargingWithParams:(MTREnergyEVSEClusterEnableDischargingParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -8055,7 +8055,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command GetTargets
  *
- * Allows a client to retrieve the user specified charging targets.
+ * Allows a client to retrieve the current set of charging targets.
  */
 - (void)getTargetsWithParams:(MTREnergyEVSEClusterGetTargetsParams * _Nullable)params completion:(void (^)(MTREnergyEVSEClusterGetTargetsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)getTargetsWithCompletion:(void (^)(MTREnergyEVSEClusterGetTargetsResponseParams * _Nullable data, NSError * _Nullable error))completion

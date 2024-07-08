@@ -3158,12 +3158,12 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.maximumDischargingCurrent.HasValue()) {
-                memberValue = [NSNumber numberWithLongLong:cppValue.maximumDischargingCurrent.Value()];
+            if (cppValue.maximumDischargeCurrent.HasValue()) {
+                memberValue = [NSNumber numberWithLongLong:cppValue.maximumDischargeCurrent.Value()];
             } else {
                 memberValue = nil;
             }
-            value.maximumDischargingCurrent = memberValue;
+            value.maximumDischargeCurrent = memberValue;
         } while (0);
 
         return value;

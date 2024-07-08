@@ -5788,7 +5788,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _maximumCurrent = @(0);
 
-        _maximumDischargingCurrent = nil;
+        _maximumDischargeCurrent = nil;
     }
     return self;
 }
@@ -5800,14 +5800,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.sessionID = self.sessionID;
     other.state = self.state;
     other.maximumCurrent = self.maximumCurrent;
-    other.maximumDischargingCurrent = self.maximumDischargingCurrent;
+    other.maximumDischargeCurrent = self.maximumDischargeCurrent;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; maximumCurrent:%@; maximumDischargingCurrent:%@; >", NSStringFromClass([self class]), _sessionID, _state, _maximumCurrent, _maximumDischargingCurrent];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; state:%@; maximumCurrent:%@; maximumDischargeCurrent:%@; >", NSStringFromClass([self class]), _sessionID, _state, _maximumCurrent, _maximumDischargeCurrent];
     return descriptionString;
 }
 
