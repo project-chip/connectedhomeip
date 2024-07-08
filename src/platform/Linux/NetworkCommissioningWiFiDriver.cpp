@@ -539,7 +539,7 @@ CHIP_ERROR LinuxWiFiDriver::AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan ne
         SuccessOrExit(err = CopySpanToMutableSpan(ByteSpan(network.clientIdentity, network.clientIdentityLen), outClientIdentity));
 
         mStagingNetworks[mCurrentNetId] = network;
-        outNetworkIndex                = 0;
+        outNetworkIndex                 = 0;
         mCurrentNetId++;
         outStatus = Status::kSuccess;
     }
@@ -553,7 +553,8 @@ CHIP_ERROR LinuxWiFiDriver::GetNetworkIdentity(uint8_t networkIndex, MutableByte
 {
     VerifyOrReturnError(!mStagingNetworks[networkIndex].Empty() && networkIndex < kMaxNetworks, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStagingNetworks[networkIndex].UsingPDC(), CHIP_ERROR_INVALID_ARGUMENT);
-    return CopySpanToMutableSpan(ByteSpan(mStagingNetworks.networkIdentity, mStagingNetworks.networkIdentityLen), outNetworkIdentity);
+    return CopySpanToMutableSpan(ByteSpan(mStagingNetworks.networkIdentity, mStagingNetworks.networkIdentityLen),
+                                 outNetworkIdentity);
 }
 
 CHIP_ERROR LinuxWiFiDriver::GetClientIdentity(uint8_t networkIndex, MutableByteSpan & outClientIdentity)
