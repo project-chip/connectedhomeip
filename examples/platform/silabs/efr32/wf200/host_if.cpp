@@ -99,12 +99,6 @@ bool hasNotifiedWifiConnectivity = false;
 static uint8_t retryJoin         = 0;
 bool retryInProgress             = false;
 
-/* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
-bool is_wifi_disconnection_event = false;
-
-/* Declare a variable to hold connection time intervals */
-uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
-
 #ifdef SL_WFX_CONFIG_SCAN
 static struct scan_result_holder
 {
@@ -401,14 +395,14 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     }
     }
 
-    if ((status != WFM_STATUS_SUCCESS) && (!is_wifi_disconnection_event ? (retryJoin < MAX_JOIN_RETRIES_COUNT) : true))
+    if (status != WFM_STATUS_SUCCESS)
     {
         retryJoin += 1;
         retryInProgress = false;
         SILABS_LOG("WFX Retry to connect to network count: %d", retryJoin);
         sl_wfx_context->state =
             static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_STARTED));
-        xEventGroupSetBits(sl_wfx_event_group, SL_WFX_RETRY_CONNECT);
+        wfx_retry_connection(retryJoin);
     }
 }
 
@@ -425,8 +419,7 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
     sl_wfx_context->state =
         static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
     retryInProgress             = false;
-    is_wifi_disconnection_event = true;
-    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_RETRY_CONNECT);
+    wfx_retry_connection(retryJoin);
 }
 
 #ifdef SL_WFX_CONFIG_SOFTAP
@@ -541,13 +534,8 @@ static void wfx_events_task(void * p_arg)
                                     pdTRUE, pdFALSE, pdMS_TO_TICKS(250)); /* 250 msec delay converted to ticks */
         if (flags & SL_WFX_RETRY_CONNECT)
         {
-            if (!retryInProgress)
-            {
-                retryInProgress = true;
-                wfx_retry_interval_handler(is_wifi_disconnection_event, retryJoin);
-                SILABS_LOG("WFX sending the connect command");
-                wfx_connect_to_ap();
-            }
+            SILABS_LOG("WFX sending the connect command");
+            wfx_connect_to_ap();
         }
 
         if (wifi_extra & WE_ST_STA_CONN)
@@ -600,7 +588,6 @@ static void wfx_events_task(void * p_arg)
             SILABS_LOG("WIFI: Connected to AP");
             wifi_extra |= WE_ST_STA_CONN;
             retryJoin     = 0;
-            retryInterval = WLAN_MIN_RETRY_TIMER_MS;
             wfx_lwip_set_sta_link_up();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
             if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))
@@ -750,6 +737,7 @@ static void wfx_wifi_hw_start(void)
         /* Initialize the LwIP stack */
         SILABS_LOG("WF200:Start LWIP");
         wfx_lwip_start();
+        wfx_started_notify();
         wifiContext.state = SL_WFX_STARTED; /* Really this is a bit mask */
         SILABS_LOG("WF200:ready..");
     }
