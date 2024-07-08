@@ -36,7 +36,7 @@
         ChipLogError(chipTool, "MTRCommissioningStatusDiscoveringMoreDevices: This should not happen.");
         break;
     case MTRCommissioningStatusUnknown:
-        ChipLogError(chipTool, "Uknown Pairing Status");
+        ChipLogError(chipTool, "Unknown Pairing Status");
         break;
     }
 }
