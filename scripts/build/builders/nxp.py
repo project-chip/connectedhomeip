@@ -19,9 +19,11 @@ from enum import Enum, auto
 from .builder import BuilderOutput
 from .gn import GnBuilder
 
+
 class NxpOsUsed(Enum):
     FREERTOS = auto()
     ZEPHYR = auto()
+
     def OsEnv(self):
         if self == NxpOsUsed.ZEPHYR:
             return 'zephyr'
@@ -29,6 +31,7 @@ class NxpOsUsed(Enum):
             return 'freertos'
         else:
             raise Exception('Unknown OS type: %r' % self)
+
 
 class NxpBoard(Enum):
     K32W0 = auto()
@@ -183,9 +186,9 @@ class NxpBuilder(GnBuilder):
             cmd += '''
             west build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_args}
             '''.format(
-                board_name = self.board.Name(),
-                out_folder = self.output_dir,
-                example_folder = self.app.BuildRoot(self.code_root, self.board),
+                board_name=self.board.Name(),
+                out_folder=self.output_dir,
+                example_folder=self.app.BuildRoot(self.code_root, self.board),
                 build_args=build_args).strip()
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
         else:
