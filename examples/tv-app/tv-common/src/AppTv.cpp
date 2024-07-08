@@ -684,7 +684,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
             nodeIds.insert(tempNodeIds.begin(), tempNodeIds.end());
         }
     }
-    
+
     // refresh ACLs
     for (const auto & nodeId : nodeIds)
     {
