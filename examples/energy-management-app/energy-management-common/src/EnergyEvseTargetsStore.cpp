@@ -92,9 +92,9 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
     uint16_t chargingTargetSchedulesIdx = 0;
     while ((err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
-        TLV::TLVType EvseTargetEntryType;
+        TLV::TLVType evseTargetEntryType;
 
-        ReturnErrorOnFailure(reader.EnterContainer(EvseTargetEntryType));
+        ReturnErrorOnFailure(reader.EnterContainer(evseTargetEntryType));
 
         // DayOfWeek bitmap
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TargetEntryTag::kDayOfWeek)));
@@ -169,7 +169,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
         }
 
         ReturnErrorOnFailure(reader.ExitContainer(chargingTargetsListType));
-        ReturnErrorOnFailure(reader.ExitContainer(EvseTargetEntryType));
+        ReturnErrorOnFailure(reader.ExitContainer(evseTargetEntryType));
 
         // Allocate an array for the chargingTargets loaded for this schedule and copy the chargingTargets into that array.
         // The allocated array will be pointed to in the List below.
@@ -377,8 +377,8 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
         ChipLogProgress(AppServer, "SaveTargets: DayOfWeekForSequence = 0x%02x",
                         chargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F)));
 
-        TLV::TLVType EvseTargetEntryType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, EvseTargetEntryType));
+        TLV::TLVType evseTargetEntryType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, evseTargetEntryType));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TargetEntryTag::kDayOfWeek), chargingTargetSchedule.dayOfWeekForSequence));
 
         TLV::TLVType chargingTargetsListType;
@@ -404,7 +404,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
             ReturnErrorOnFailure(writer.EndContainer(chargingTargetsStructType));
         }
         ReturnErrorOnFailure(writer.EndContainer(chargingTargetsListType));
-        ReturnErrorOnFailure(writer.EndContainer(EvseTargetEntryType));
+        ReturnErrorOnFailure(writer.EndContainer(evseTargetEntryType));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
