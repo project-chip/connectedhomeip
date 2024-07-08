@@ -27,15 +27,10 @@ using namespace chip::app::Clusters::WaterHeaterManagement;
 
 using Protocols::InteractionModel::Status;
 
-WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint):
-    mpWhmInstance(nullptr),
-    mpWhmManufacturer(nullptr),
-    mBoostTargetTemperatureReached(false),
-    mWaterHeaterModeInstance(this, clustersEndpoint, WaterHeaterMode::Id, 0),
-    mTankVolume(0),
-    mEstimatedHeatRequired(0),
-    mTankPercentage(0),
-    mBoostState(BoostStateEnum::kInactive)
+WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint) :
+    mpWhmInstance(nullptr), mpWhmManufacturer(nullptr), mBoostTargetTemperatureReached(false),
+    mWaterHeaterModeInstance(this, clustersEndpoint, WaterHeaterMode::Id, 0), mTankVolume(0), mEstimatedHeatRequired(0),
+    mTankPercentage(0), mBoostState(BoostStateEnum::kInactive)
 {
     // Initialise the WaterHeaterMode instance
     mWaterHeaterModeInstance.Init();
@@ -167,18 +162,20 @@ void WaterHeaterManagementDelegate::SetBoostState(BoostStateEnum boostState)
  * included), which in turn may cause a call for heat, even if the mode is OFF, or is TIMED and it is during one of
  * the Off periods.
  */
-Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat)
+Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                                  Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
+                                                  Optional<chip::Percent> targetReheat)
 {
     Status status = Status::Success;
 
     ChipLogProgress(AppServer, "HandleBoost");
 
     // Keep track of the boost command parameters
-    mBoostOneShot = oneShot;
-    mBoostEmergencyBoost = emergencyBoost;
+    mBoostOneShot           = oneShot;
+    mBoostEmergencyBoost    = emergencyBoost;
     mBoostTemporarySetpoint = temporarySetpoint;
-    mBoostTargetPercentage = targetPercentage;
-    mBoostTargetReheat = targetReheat;
+    mBoostTargetPercentage  = targetPercentage;
+    mBoostTargetReheat      = targetReheat;
 
     mBoostTargetTemperatureReached = false;
 
@@ -204,7 +201,8 @@ Status WaterHeaterManagementDelegate::HandleBoost(uint32_t durationS, Optional<b
 
     if (mpWhmManufacturer != nullptr)
     {
-        status = mpWhmManufacturer->BoostCommandStarted(durationS, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
+        status = mpWhmManufacturer->BoostCommandStarted(durationS, oneShot, emergencyBoost, temporarySetpoint, targetPercentage,
+                                                        targetReheat);
     }
     else
     {
@@ -294,8 +292,7 @@ CHIP_ERROR WaterHeaterManagementDelegate::Init()
     return CHIP_NO_ERROR;
 }
 
-void WaterHeaterManagementDelegate::HandleChangeToMode(uint8_t NewMode,
-                                                       ModeBase::Commands::ChangeToModeResponse::Type & response)
+void WaterHeaterManagementDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
 }
@@ -393,15 +390,18 @@ void WaterHeaterManagementDelegate::DrawOffHotWater(uint8_t percentageReplaced, 
 
 bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
 {
-    // Determine the target temperature. If a boost command is in progress and has a mBoostTemporarySetpoint value use that as the target temperature
-    uint16_t targetTemperature = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue()) ? mBoostTemporarySetpoint.Value() : mTargetWaterTemperature;
+    // Determine the target temperature. If a boost command is in progress and has a mBoostTemporarySetpoint value use that as the
+    // target temperature
+    uint16_t targetTemperature = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.HasValue())
+        ? mBoostTemporarySetpoint.Value()
+        : mTargetWaterTemperature;
     uint8_t targetPercentage;
 
     if (mBoostState == BoostStateEnum::kActive && mBoostTargetTemperatureReached && mBoostTargetReheat.HasValue())
     {
-        // If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because the TargetPercentage
-        // of the water in the tank has been heated to the set point (or TemporarySetpoint if included), this field indicates the
-        // percentage to which the hot water in the tank SHALL be allowed to fall before again beginning to reheat it.
+        // If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because the
+        // TargetPercentage of the water in the tank has been heated to the set point (or TemporarySetpoint if included), this field
+        // indicates the percentage to which the hot water in the tank SHALL be allowed to fall before again beginning to reheat it.
         //
         // For example if the TargetPercentage was 80%, and the TargetReheat was 40%, then after initial heating to 80% hot water,
         // the tank may have hot water drawn off until only 40% hot water remains. At this point the heater will begin to heat back
@@ -414,9 +414,10 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
     }
     else
     {
-        // Determine the target %. If a boost command is in progress and has a mBoostTargetPercentage value use that as the target %,
-        // otherwise 100% of the water in the tank must be at the target temperature
-        targetPercentage = (mBoostState == BoostStateEnum::kActive && mBoostTargetPercentage.HasValue()) ? mBoostTargetPercentage.Value() : 100;
+        // Determine the target %. If a boost command is in progress and has a mBoostTargetPercentage value use that as the target
+        // %, otherwise 100% of the water in the tank must be at the target temperature
+        targetPercentage =
+            (mBoostState == BoostStateEnum::kActive && mBoostTargetPercentage.HasValue()) ? mBoostTargetPercentage.Value() : 100;
     }
 
     // Return whether the water is at the target temperature
@@ -425,7 +426,7 @@ bool WaterHeaterManagementDelegate::HasWaterTemperatureReachedTarget() const
 
 Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
 {
-    Status status = Status::Success;
+    Status status       = Status::Success;
     bool turningHeatOff = false;
 
     if (!HasWaterTemperatureReachedTarget())
@@ -513,7 +514,8 @@ Status WaterHeaterManagementDelegate::CheckIfHeatNeedsToBeTurnedOnOrOff()
         else
         {
             status = Status::InvalidInState;
-            ChipLogError(AppServer, "CheckIfHeatNeedsToBeTurnedOnOrOff: Failed to turn the heating off as mpWhmManufacturer == nullptr");
+            ChipLogError(AppServer,
+                         "CheckIfHeatNeedsToBeTurnedOnOrOff: Failed to turn the heating off as mpWhmManufacturer == nullptr");
         }
     }
 

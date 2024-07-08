@@ -113,13 +113,11 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     {
     case Boost::Id:
         HandleCommand<Boost::DecodableType>(
-            handlerContext,
-            [this](HandlerContext & ctx, const auto & commandData) { HandleBoost(ctx, commandData); });
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleBoost(ctx, commandData); });
         return;
     case CancelBoost::Id:
         HandleCommand<CancelBoost::DecodableType>(
-           handlerContext,
-           [this](HandlerContext & ctx, const auto & commandData) { HandleCancelBoost(ctx, commandData); });
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleCancelBoost(ctx, commandData); });
         return;
     }
 }

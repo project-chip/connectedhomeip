@@ -35,10 +35,7 @@ namespace WaterHeaterManagement {
 class WhmManufacturer
 {
 public:
-    WhmManufacturer(WaterHeaterManagementInstance * whmInstance)
-    {
-        mWhmInstance = whmInstance;
-    }
+    WhmManufacturer(WaterHeaterManagementInstance * whmInstance) { mWhmInstance = whmInstance; }
 
     WaterHeaterManagementInstance * GetWhmInstance() { return mWhmInstance; }
 
@@ -80,16 +77,26 @@ public:
     /**
      * @brief Called to handle a boost command.
      *
-     * @param duration  Indicates the time period in seconds for which the BOOST state is activated before it automatically reverts to the previous mode (e.g. OFF, MANUAL or TIMED).
-     * @param oneShot  Indicates whether the BOOST state should be automatically canceled once the hot water has first reached the set point temperature (or the TemporarySetpoint temperature, if specified) for the TargetPercentage (if specified).
-     * @param emergencyBoost  Indicates that the consumer wants the water to be heated as quickly as practicable. This MAY cause multiple heat sources to be activated (e.g. a heat pump and direct electric heating element).
-     * @param temporarySetpoint  Indicates the target temperature to which to heat the hot water for this Boost command. It SHALL be used instead of the normal set point temperature whilst the BOOST state is active.
-     * @param targetPercentage  If the tank supports the TankPercent feature, this field indicates the amount of water that SHALL be heated by this Boost command before the heater is switched off.
-     * @param targetReheat  If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because the TargetPercentage of the water in the tank has been heated to the set point (or TemporarySetpoint if included), this field indicates the percentage to which the hot water in the tank SHALL be allowed to fall before again beginning to reheat it.
+     * @param duration  Indicates the time period in seconds for which the BOOST state is activated before it automatically reverts
+     * to the previous mode (e.g. OFF, MANUAL or TIMED).
+     * @param oneShot  Indicates whether the BOOST state should be automatically canceled once the hot water has first reached the
+     * set point temperature (or the TemporarySetpoint temperature, if specified) for the TargetPercentage (if specified).
+     * @param emergencyBoost  Indicates that the consumer wants the water to be heated as quickly as practicable. This MAY cause
+     * multiple heat sources to be activated (e.g. a heat pump and direct electric heating element).
+     * @param temporarySetpoint  Indicates the target temperature to which to heat the hot water for this Boost command. It SHALL be
+     * used instead of the normal set point temperature whilst the BOOST state is active.
+     * @param targetPercentage  If the tank supports the TankPercent feature, this field indicates the amount of water that SHALL be
+     * heated by this Boost command before the heater is switched off.
+     * @param targetReheat  If the tank supports the TankPercent feature, and the heating by this Boost command has ceased because
+     * the TargetPercentage of the water in the tank has been heated to the set point (or TemporarySetpoint if included), this field
+     * indicates the percentage to which the hot water in the tank SHALL be allowed to fall before again beginning to reheat it.
      *
      * @return  Success if the boost command is successful; otherwise return the appropriate error.
      */
-    Protocols::InteractionModel::Status BoostCommandStarted(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat);
+    Protocols::InteractionModel::Status BoostCommandStarted(uint32_t duration, Optional<bool> oneShot,
+                                                            Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint,
+                                                            Optional<chip::Percent> targetPercentage,
+                                                            Optional<chip::Percent> targetReheat);
 
     /**
      * @brief Called when the Boost command has been cancelled.
@@ -119,7 +126,7 @@ private:
  */
 WhmManufacturer * GetWhmManufacturer();
 
-} // namespace EnergyEvse
+} // namespace WaterHeaterManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <WhmManufacturer.h>
 #include <WhmInstance.h>
+#include <WhmManufacturer.h>
 
-#include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
+#include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
@@ -58,8 +58,7 @@ BitMask<WaterHeaterDemandBitmap> WhmManufacturer::DetermineHeatingSources()
     }
 
     // A list of valid heaterTypes
-    uint8_t waterHeaterTypeValues[] =
-    {
+    uint8_t waterHeaterTypeValues[] = {
         static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement1),
         static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement2),
         static_cast<uint8_t>(WaterHeaterTypeBitmap::kHeatPump),
@@ -68,8 +67,7 @@ BitMask<WaterHeaterDemandBitmap> WhmManufacturer::DetermineHeatingSources()
     };
 
     // The corresponding list of valid headerDemands
-    uint8_t waterHeaterDemandValues[] =
-    {
+    uint8_t waterHeaterDemandValues[] = {
         static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement1),
         static_cast<uint8_t>(WaterHeaterTypeBitmap::kImmersionElement2),
         static_cast<uint8_t>(WaterHeaterTypeBitmap::kHeatPump),
@@ -124,7 +122,9 @@ Status WhmManufacturer::TurnHeatingOff()
     return status;
 }
 
-Status WhmManufacturer::BoostCommandStarted(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage, Optional<chip::Percent> targetReheat)
+Status WhmManufacturer::BoostCommandStarted(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                            Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
+                                            Optional<chip::Percent> targetReheat)
 {
     return Status::Success;
 }
@@ -134,9 +134,7 @@ Status WhmManufacturer::BoostCommandCancelled()
     return Status::Success;
 }
 
-void WhmManufacturer::BoostCommandFinished()
-{
-}
+void WhmManufacturer::BoostCommandFinished() {}
 
 WaterHeaterManagementDelegate * GetWhmDelegate()
 {
@@ -160,9 +158,7 @@ void SetTestEventTrigger_BasicInstallationTestEvent()
     dg->DrawOffHotWater(100, 2000);
 }
 
-void SetTestEventTrigger_BasicInstallationTestEventClear()
-{
-}
+void SetTestEventTrigger_BasicInstallationTestEventClear() {}
 
 void SetTestEventTrigger_WaterTemperature20CTestEvent()
 {
@@ -219,7 +215,9 @@ bool HandleWaterHeaterManagementTestEventTrigger(uint64_t eventTrigger)
     switch (trigger)
     {
     case WaterHeaterManagementTrigger::kBasicInstallationTestEvent:
-        ChipLogProgress(Support, "[Whm::kBasicInstallationTestEvent] => Simulate installation in a 100L tank full of water at 20C, with a target temperature of 60C, in OFF mode");
+        ChipLogProgress(Support,
+                        "[Whm::kBasicInstallationTestEvent] => Simulate installation in a 100L tank full of water at 20C, with a "
+                        "target temperature of 60C, in OFF mode");
         SetTestEventTrigger_BasicInstallationTestEvent();
         break;
     case WaterHeaterManagementTrigger::kBasicInstallationTestEventClear:
@@ -247,7 +245,9 @@ bool HandleWaterHeaterManagementTestEventTrigger(uint64_t eventTrigger)
         SetTestEventTrigger_OffModeTestEvent();
         break;
     case WaterHeaterManagementTrigger::kDrawOffHotWaterTestEvent:
-        ChipLogProgress(Support, "[Whm::kDrawOffHotWaterTestEvent] => Simulate drawing off 25%% of the tank volume of hot water, replaced with water at 20C");
+        ChipLogProgress(Support,
+                        "[Whm::kDrawOffHotWaterTestEvent] => Simulate drawing off 25%% of the tank volume of hot water, replaced "
+                        "with water at 20C");
         SetTestEventTrigger_DrawOffHotWaterTestEvent();
         break;
     default:
