@@ -364,12 +364,10 @@ public:
         uint16_t productId;
         chip::NodeId nodeId;
 
-        CallbackContext(uint16_t vId, uint16_t pId, chip::NodeId nId)
-            : vendorId(vId), productId(pId), nodeId(nId) {}
+        CallbackContext(uint16_t vId, uint16_t pId, chip::NodeId nId) : vendorId(vId), productId(pId), nodeId(nId) {}
     };
     DevicePairedCommand(uint16_t vendorId, uint16_t productId, chip::NodeId nodeId) :
-        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
-        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
         mContext = std::make_shared<CallbackContext>(vendorId, productId, nodeId);
     }
@@ -378,25 +376,29 @@ public:
                                     const chip::SessionHandle & sessionHandle)
     {
         auto * pairingCommand = static_cast<DevicePairedCommand *>(context);
-        auto cbContext = pairingCommand->mContext;
+        auto cbContext        = pairingCommand->mContext;
 
         if (pairingCommand)
         {
-            ChipLogProgress(DeviceLayer, "OnDeviceConnectedFn - Updating ACL for node id: %llu and vendor id: %d and product id: %d", cbContext->nodeId, cbContext->vendorId, cbContext->productId);
+            ChipLogProgress(DeviceLayer,
+                            "OnDeviceConnectedFn - Updating ACL for node id: %llu and vendor id: %d and product id: %d",
+                            cbContext->nodeId, cbContext->vendorId, cbContext->productId);
 
-            GetCommissionerDiscoveryController()->CommissioningSucceeded(cbContext->vendorId, cbContext->productId, cbContext->nodeId, exchangeMgr, sessionHandle);
+            GetCommissionerDiscoveryController()->CommissioningSucceeded(cbContext->vendorId, cbContext->productId,
+                                                                         cbContext->nodeId, exchangeMgr, sessionHandle);
         }
     }
-
 
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
     {
         auto * pairingCommand = static_cast<DevicePairedCommand *>(context);
-        auto cbContext = pairingCommand->mContext;
+        auto cbContext        = pairingCommand->mContext;
 
         if (pairingCommand)
         {
-            ChipLogProgress(DeviceLayer, "OnDeviceConnectionFailureFn - Not updating ACL for node id: %llu and vendor id: %d and product id: %d", cbContext->nodeId, cbContext->vendorId, cbContext->productId);
+            ChipLogProgress(DeviceLayer,
+                            "OnDeviceConnectionFailureFn - Not updating ACL for node id: %llu and vendor id: %d and product id: %d",
+                            cbContext->nodeId, cbContext->vendorId, cbContext->productId);
             // TODO: Remove Node Id
         }
     }
@@ -405,8 +407,6 @@ public:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
     std::shared_ptr<CallbackContext> mContext;
 };
-
-
 
 EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
                                                 uint16_t productId, const char * szApplicationVersion,
@@ -425,13 +425,16 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
 
     std::set<NodeId> nodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForContentApp(vendorId, productId);
 
-    for (const auto& nodeId : nodeIds) {
+    for (const auto & nodeId : nodeIds)
+    {
 
-        ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: %llu and vendor id: %d and product id: %d", nodeId, vendorId, productId);
+        ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: %llu and vendor id: %d and product id: %d", nodeId,
+                        vendorId, productId);
 
         std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
 
-        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback, &pairingCommand->mOnDeviceConnectionFailureCallback);
+        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                    &pairingCommand->mOnDeviceConnectionFailureCallback);
     }
     return epId;
 }
@@ -454,13 +457,16 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
 
     std::set<NodeId> nodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForContentApp(vendorId, productId);
 
-    for (const auto& nodeId : nodeIds) {
+    for (const auto & nodeId : nodeIds)
+    {
 
-        ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: %llu and vendor id: %d and product id: %d", nodeId, vendorId, productId);
+        ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: %llu and vendor id: %d and product id: %d", nodeId,
+                        vendorId, productId);
 
         std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
 
-        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback, &pairingCommand->mOnDeviceConnectionFailureCallback);
+        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                    &pairingCommand->mOnDeviceConnectionFailureCallback);
     }
 
     return epId;
