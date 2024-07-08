@@ -334,7 +334,7 @@ menu "CHIP Device Layer"
             help
                 The maximum number of events that can be held in the CHIP Platform event queue.
                 Should be set greater than CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM. For SoCs other than
-                esp32c2, where the wifi buffer number is 8, recommended to use the default value.
+                ESP32-C2, where the Wi-Fi buffer number is 8, recommended to use the default value.
 
         config ENABLE_EXTENDED_DISCOVERY
             bool "Enable Extended discovery Support"
