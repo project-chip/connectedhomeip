@@ -71,6 +71,8 @@ public:
     static constexpr Key kConfigKey_DACKey                = CYW30739ConfigKey(kChipFactory_KeyBase, 0x21);
     static constexpr Key kConfigKey_PAICert               = CYW30739ConfigKey(kChipFactory_KeyBase, 0x22);
     static constexpr Key kConfigKey_CertDeclaration       = CYW30739ConfigKey(kChipFactory_KeyBase, 0x23);
+    static constexpr Key kConfigKey_SoftwareVersionString = CYW30739ConfigKey(kChipFactory_KeyBase, 0x24);
+
     // CHIP Config Keys
     static constexpr Key kConfigKey_ServiceConfig              = CYW30739ConfigKey(kChipConfig_KeyBase, 0x00);
     static constexpr Key kConfigKey_PairedAccountId            = CYW30739ConfigKey(kChipConfig_KeyBase, 0x01);

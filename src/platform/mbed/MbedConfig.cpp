@@ -90,11 +90,6 @@ const MbedConfig::Key MbedConfig::kConfigKey_ProductName           = { CONFIG_KE
 const MbedConfig::Key MbedConfig::kConfigKey_HardwareVersionString = { CONFIG_KEY("hardware-version-string") };
 const MbedConfig::Key MbedConfig::kConfigKey_SoftwareVersionString = { CONFIG_KEY("software-version-string") };
 
-static const Key kConfigKey_;
-static const Key kConfigKey_;
-static const Key kConfigKey_;
-static const Key kConfigKey_;
-
 // Keys stored in the Chip-counters namespace
 const MbedConfig::Key MbedConfig::kCounterKey_RebootCount           = { COUNTER_KEY("reboot-count") };
 const MbedConfig::Key MbedConfig::kCounterKey_UpTime                = { COUNTER_KEY("up-time") };

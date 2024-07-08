@@ -100,8 +100,8 @@ TEST_F(TestConfigurationMgr, SerialNumber)
     err = GetDeviceInstanceInfoProvider()->GetSerialNumber(buf, 64);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    EXPECT_EQ(strlen(buf), 5u);
-    EXPECT_STREQ(buf, "89051");
+    EXPECT_EQ(strlen(buf), 7u);
+    EXPECT_STREQ(buf, "AAZZ236");
 }
 
 TEST_F(TestConfigurationMgr, UniqueId)
