@@ -140,9 +140,9 @@ static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type OOexten
 static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type LCextensionFieldSet;
 static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type CCextensionFieldSet;
 
-static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type OOPairs[1];
-static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type LCPairs[2];
-static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type CCPairs[8];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type OOPairs[1];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type LCPairs[2];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type CCPairs[8];
 
 static uint8_t OO_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
 static uint8_t LC_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
@@ -535,30 +535,30 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     static const uint16_t LC_av_payload[2] = { 0x64, 0x01F0 };
     static const uint16_t CC_av_payload[8] = { 0 };
 
-    OOPairs[0].attributeID    = kOnOffAttId;
-    OOPairs[0].attributeValue = OO_av_payload;
+    OOPairs[0].attributeID = kOnOffAttId;
+    OOPairs[0].valueUnsigned8.SetValue(OO_av_payload);
 
-    LCPairs[0].attributeID    = kCurrentLevelId;
-    LCPairs[0].attributeValue = LC_av_payload[0];
-    LCPairs[1].attributeID    = kCurrentFrequencyId;
-    LCPairs[1].attributeValue = LC_av_payload[1];
+    LCPairs[0].attributeID = kCurrentLevelId;
+    LCPairs[0].valueUnsigned8.SetValue(static_cast<uint8_t>(LC_av_payload[0]));
+    LCPairs[1].attributeID = kCurrentFrequencyId;
+    LCPairs[1].valueUnsigned16.SetValue(LC_av_payload[1]);
 
-    CCPairs[0].attributeID    = kCurrentSaturationId;
-    CCPairs[0].attributeValue = CC_av_payload[0];
-    CCPairs[1].attributeID    = kCurrentXId;
-    CCPairs[1].attributeValue = CC_av_payload[1];
-    CCPairs[2].attributeID    = kCurrentYId;
-    CCPairs[2].attributeValue = CC_av_payload[2];
-    CCPairs[3].attributeID    = kColorTemperatureMiredsId;
-    CCPairs[3].attributeValue = CC_av_payload[3];
-    CCPairs[4].attributeID    = kEnhancedCurrentHueId;
-    CCPairs[4].attributeValue = CC_av_payload[4];
-    CCPairs[5].attributeID    = kColorLoopActiveId;
-    CCPairs[5].attributeValue = CC_av_payload[5];
-    CCPairs[6].attributeID    = kColorLoopDirectionId;
-    CCPairs[6].attributeValue = CC_av_payload[6];
-    CCPairs[7].attributeID    = kColorLoopTimeId;
-    CCPairs[7].attributeValue = CC_av_payload[7];
+    CCPairs[0].attributeID = kCurrentSaturationId;
+    CCPairs[0].valueUnsigned8.SetValue(static_cast<uint8_t>(CC_av_payload[0]));
+    CCPairs[1].attributeID = kCurrentXId;
+    CCPairs[1].valueUnsigned16.SetValue(CC_av_payload[1]);
+    CCPairs[2].attributeID = kCurrentYId;
+    CCPairs[2].valueUnsigned16.SetValue(CC_av_payload[2]);
+    CCPairs[3].attributeID = kColorTemperatureMiredsId;
+    CCPairs[3].valueUnsigned16.SetValue(CC_av_payload[3]);
+    CCPairs[4].attributeID = kEnhancedCurrentHueId;
+    CCPairs[4].valueUnsigned16.SetValue(CC_av_payload[4]);
+    CCPairs[5].attributeID = kColorLoopActiveId;
+    CCPairs[5].valueUnsigned8.SetValue(static_cast<uint8_t>(CC_av_payload[5]));
+    CCPairs[6].attributeID = kColorLoopDirectionId;
+    CCPairs[6].valueUnsigned8.SetValue(static_cast<uint8_t>(CC_av_payload[6]));
+    CCPairs[7].attributeID = kColorLoopTimeId;
+    CCPairs[7].valueUnsigned8.SetValue(static_cast<uint8_t>(CC_av_payload[7]));
 
     // Initialize Extension Field sets as if they were received by add commands
     OOextensionFieldSet.clusterID          = kOnOffClusterId;
@@ -667,12 +667,11 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     // To test failure on serialize and deserialize when too many pairs are in the field sets
     app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldFailTestOut;
     app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
-    app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type TooManyPairs[16];
+    app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type TooManyPairs[16];
 
-    uint8_t payloadOk = 0;
     for (uint8_t i = 0; i < 16; i++)
     {
-        TooManyPairs[i].attributeValue = payloadOk;
+        TooManyPairs[i].valueUnsigned8.SetValue(0);
     }
 
     extensionFieldFailTestOut.clusterID          = kColorControlClusterId;

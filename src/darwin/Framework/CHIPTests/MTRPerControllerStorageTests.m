@@ -2307,6 +2307,24 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
         [self commissionWithController:controller newNodeID:deviceID onboardingPayload:deviceOnboardingPayloads[deviceID]];
     }
 
+    // Shutdown and restart, to reset all existing sessions, so that the subscriptions and base device usage start after
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    controller = [self startControllerWithRootKeys:rootKeys
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error
+                                 certificateIssuer:&certificateIssuer
+                    concurrentSubscriptionPoolSize:subscriptionPoolSize];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
     // Set up expectations and delegates
 
     NSDictionary<NSNumber *, XCTestExpectation *> * subscriptionExpectations = @{
@@ -2329,6 +2347,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
     __block os_unfair_lock counterLock = OS_UNFAIR_LOCK_INIT;
     __block NSUInteger subscriptionRunningCount = 0;
     __block NSUInteger subscriptionDequeueCount = 0;
+    __block BOOL baseDeviceReadCompleted = NO;
 
     for (NSNumber * deviceID in orderedDeviceIDs) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
@@ -2347,6 +2366,14 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
             // Stop counting subscribing right before calling work item completion
             os_unfair_lock_lock(&counterLock);
             subscriptionRunningCount--;
+
+            // Given the base device read is happening on the 5th device, at the completion
+            // time of the first [pool size] subscriptions, the BaseDevice's request to
+            // read can't have completed, as it should be gated on its call to the
+            // MTRDeviceController's getSessionForNode: call.
+            if (subscriptionDequeueCount <= (orderedDeviceIDs.count - subscriptionPoolSize)) {
+                XCTAssertFalse(baseDeviceReadCompleted);
+            }
             os_unfair_lock_unlock(&counterLock);
         };
         __weak __auto_type weakDelegate = delegate;
@@ -2363,8 +2390,26 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
         [device setDelegate:deviceDelegates[deviceID] queue:queue];
     }
 
+    // Create the base device to attempt to read from the 5th device
+    __auto_type * baseDeviceReadExpectation = [self expectationWithDescription:@"BaseDevice read"];
+    // Dispatch async to get around XCTest, so that this runs after the above devices queue their subscriptions
+    dispatch_async(queue, ^{
+        __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:@(105) controller:controller];
+        __auto_type * onOffCluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
+        [onOffCluster readAttributeOnOffWithCompletion:^(NSNumber * value, NSError * _Nullable error) {
+            XCTAssertNil(error);
+            // We expect the device to be off.
+            XCTAssertEqualObjects(value, @(0));
+            [baseDeviceReadExpectation fulfill];
+            os_unfair_lock_lock(&counterLock);
+            baseDeviceReadCompleted = YES;
+            os_unfair_lock_unlock(&counterLock);
+        }];
+    });
+
     // Make the wait time depend on pool size and device count (can expand number of devices in the future)
-    [self waitForExpectations:subscriptionExpectations.allValues timeout:(kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count / subscriptionPoolSize)];
+    NSArray * expectationsToWait = [subscriptionExpectations.allValues arrayByAddingObject:baseDeviceReadExpectation];
+    [self waitForExpectations:expectationsToWait timeout:(kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count / subscriptionPoolSize)];
 
     XCTAssertEqual(subscriptionDequeueCount, orderedDeviceIDs.count);
 

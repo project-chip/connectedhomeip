@@ -40,7 +40,10 @@ namespace {
 constexpr char kInteractiveModePrompt[]          = ">>> ";
 constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
 constexpr char kInteractiveModeStopCommand[]     = "quit()";
-constexpr uint16_t kRetryIntervalS               = 5;
+
+#if defined(PW_RPC_ENABLED)
+constexpr uint16_t kRetryIntervalS = 5;
+#endif
 
 // File pointer for the log file
 FILE * sLogFile = nullptr;
@@ -148,8 +151,6 @@ char * InteractiveStartCommand::GetCommand(char * command)
 
     command = new char[cmd.length() + 1];
     strcpy(command, cmd.c_str());
-
-    ChipLogProgress(NotSpecified, "GetCommand: %s", command);
 
     // Do not save empty lines
     if (command != nullptr && *command)

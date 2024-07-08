@@ -15,7 +15,13 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/device.gni")
+
+declare_args() {
+  # Build monolithic test library.
+  chip_monolithic_tests = false
+}
 
 declare_args() {
   # Enable building tests.
@@ -40,6 +46,6 @@ declare_args() {
 }
 
 declare_args() {
-  # Enable use of nlfaultinjection.
-  chip_with_nlfaultinjection = chip_build_tests
+  # Enable use of nlfaultinjection when building tests or when building tools.
+  chip_with_nlfaultinjection = chip_build_tests || chip_build_tools
 }

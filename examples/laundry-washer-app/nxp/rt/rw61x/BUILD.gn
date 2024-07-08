@@ -49,7 +49,8 @@ declare_args() {
   setup_discriminator = 3840
 }
 
-example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
+example_platform_dir =
+    "${nxp_sdk_matter_support_root}/examples/platform/${nxp_platform}"
 common_example_dir = "${chip_root}/examples/platform/nxp/common"
 
 if (tcp_download == true && wifi_connect == true) {
@@ -169,10 +170,12 @@ rt_executable("laundry-washer") {
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
     "${common_example_dir}/matter_button/source/AppMatterButtonEmpty.cpp",
-    "${common_example_dir}/matter_cli/source/AppMatterCli.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/src/platform/logging:default",
+  ]
 
   sources += [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
@@ -189,6 +192,10 @@ rt_executable("laundry-washer") {
     deps += [
       "${chip_root}/examples/shell/shell_common:shell_common",
       "${chip_root}/src/lib/shell:shell",
+    ]
+    sources += [
+      "${common_example_dir}/matter_cli/source/AppCLIBase.cpp",
+      "${common_example_dir}/matter_cli/source/AppCLIFreeRTOS.cpp",
     ]
   }
 

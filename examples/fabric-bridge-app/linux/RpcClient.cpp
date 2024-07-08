@@ -65,7 +65,7 @@ CHIP_ERROR InitRpcClient(uint16_t rpcServerPort)
 
 CHIP_ERROR OpenCommissioningWindow(NodeId nodeId)
 {
-    ChipLogProgress(NotSpecified, "OpenCommissioningWindow\n");
+    ChipLogProgress(NotSpecified, "OpenCommissioningWindow with Node Id 0x:" ChipLogFormatX64, ChipLogValueX64(nodeId));
 
     if (openCommissioningWindowCall.active())
     {
