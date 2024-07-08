@@ -24,6 +24,7 @@ The example is based on:
 ## Supported devices
 
 -   [k32w1](k32w1/README.md)
+-   [mcxw71](mcxw71/README.md)
 
 ## Introduction
 
@@ -65,7 +66,6 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
 ```
 
 -   Step 1: checkout NXP specific submodules only
-
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
     ```
