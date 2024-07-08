@@ -30,6 +30,17 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
     }
   }
 
+  private boolean isAppInForeground(String contentAppPackageName) {
+    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(1);
+    if (tasks != null && !tasks.isEmpty()) {
+      ActivityManager.RunningTaskInfo taskInfo = tasks.get(0);
+      String packageName = taskInfo.topActivity.getPackageName();
+      return packageName.equals(contentAppPackageName);
+    }
+    return false;
+  }
+
   public String sendCommand(int endpointId, long clusterId, long commandId, String commandPayload) {
     Log.d(TAG, "Received a command for endpointId " + endpointId + ". Message " + commandPayload);
 
@@ -40,10 +51,12 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
     if (discoveredApp != null) {
       // Intercept NavigateTarget and LaunchContent commands and launch content app if necessary
       if (isForegroundCommand(clusterId, commandId)) {
-        // TODO: Check if contentapp main/launch activity is already in foreground before launching.
-        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(discoveredApp.getAppName());
-        if (launchIntent != null) {
-            startActivity(launchIntent);
+        // Check if contentapp main/launch activity is already in foreground before launching.
+        if (!isAppInForeground(discoveredApp.getAppName())) {
+          Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(discoveredApp.getAppName());
+          if (launchIntent != null) {
+              startActivity(launchIntent);
+          }  
         }
       }
       Log.d(TAG, "Sending a command for endpointId " + endpointId + ". Message " + commandPayload);
