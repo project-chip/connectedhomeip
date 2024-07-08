@@ -60,36 +60,37 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
                                                               Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                               SetupPayload & payload, bool readVIDPIDAttributes)
 {
-    CommissioningWindowPasscodeParams params = {
-        .common   = { .deviceId = deviceId, .timeout = timeout, .iteration = iteration, .discriminator = discriminator },
-        .setupPIN = setupPIN,
-        .salt     = salt,
-        .readVIDPIDAttributes = readVIDPIDAttributes,
-        .callback             = callback,
-    };
-
-    return OpenCommissioningWindow(params, payload);
+    return OpenCommissioningWindow(CommissioningWindowPasscodeParams()
+                                       .SetNodeId(deviceId)
+                                       .SetTimeout(timeout)
+                                       .SetIteration(iteration)
+                                       .SetDiscriminator(discriminator)
+                                       .SetSetupPIN(setupPIN)
+                                       .SetSalt(salt)
+                                       .SetReadVIDPIDAttributes(readVIDPIDAttributes),
+                                   callback, payload);
 }
 
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params,
+                                                              Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                               SetupPayload & payload)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= params.common.iteration &&
-                            params.common.iteration <= kSpake2p_Max_PBKDF_Iterations,
+    VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= params.GetIteration() &&
+                            params.GetIteration() <= kSpake2p_Max_PBKDF_Iterations,
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!params.salt.HasValue() ||
-                            (params.salt.Value().size() >= kSpake2p_Min_PBKDF_Salt_Length &&
-                             params.salt.Value().size() <= kSpake2p_Max_PBKDF_Salt_Length),
+    VerifyOrReturnError(!params.HasSalt() ||
+                            (params.GetSalt().size() >= kSpake2p_Min_PBKDF_Salt_Length &&
+                             params.GetSalt().size() <= kSpake2p_Max_PBKDF_Salt_Length),
                         CHIP_ERROR_INVALID_ARGUMENT);
 
     mSetupPayload = SetupPayload();
 
-    if (params.setupPIN.HasValue())
+    if (params.HasSetupPIN())
     {
-        VerifyOrReturnError(SetupPayload::IsValidSetupPIN(params.setupPIN.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(SetupPayload::IsValidSetupPIN(params.GetSetupPIN()), CHIP_ERROR_INVALID_ARGUMENT);
         mCommissioningWindowOption = CommissioningWindowOption::kTokenWithProvidedPIN;
-        mSetupPayload.setUpPINCode = params.setupPIN.Value();
+        mSetupPayload.setUpPINCode = params.GetSetupPIN();
     }
     else
     {
@@ -97,33 +98,33 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     }
 
     mSetupPayload.version = 0;
-    mSetupPayload.discriminator.SetLongValue(params.common.discriminator);
+    mSetupPayload.discriminator.SetLongValue(params.GetDiscriminator());
     mSetupPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
 
-    if (params.salt.HasValue())
+    if (params.HasSalt())
     {
-        memcpy(mPBKDFSaltBuffer, params.salt.Value().data(), params.salt.Value().size());
-        mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, params.salt.Value().size());
+        memcpy(mPBKDFSaltBuffer, params.GetSalt().data(), params.GetSalt().size());
+        mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, params.GetSalt().size());
     }
     else
     {
         ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFSaltBuffer, sizeof(mPBKDFSaltBuffer)));
         mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer);
     }
+    mPBKDFIterations = params.GetIteration();
 
-    bool randomSetupPIN = !params.setupPIN.HasValue();
+    bool randomSetupPIN = !params.HasSetupPIN();
     ReturnErrorOnFailure(
         PASESession::GeneratePASEVerifier(mVerifier, mPBKDFIterations, mPBKDFSalt, randomSetupPIN, mSetupPayload.setUpPINCode));
 
     payload                              = mSetupPayload;
-    mCommissioningWindowCallback         = params.callback;
+    mCommissioningWindowCallback         = callback;
     mBasicCommissioningWindowCallback    = nullptr;
     mCommissioningWindowVerifierCallback = nullptr;
-    mNodeId                              = params.common.deviceId;
-    mCommissioningWindowTimeout          = params.common.timeout;
-    mPBKDFIterations                     = params.common.iteration;
+    mNodeId                              = params.GetNodeId();
+    mCommissioningWindowTimeout          = params.GetTimeout();
 
-    if (params.readVIDPIDAttributes)
+    if (params.GetReadVIDPIDAttributes())
     {
         mNextStep = Step::kReadVID;
     }
@@ -135,25 +136,31 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     return mController->GetConnectedDevice(mNodeId, &mDeviceConnected, &mDeviceConnectionFailure);
 }
 
-CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowVerifierParams & params)
+CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowVerifierParams & params,
+                                                              Callback::Callback<OnOpenCommissioningWindowWithVerifier> * callback)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= params.common.iteration &&
-                            params.common.iteration <= kSpake2p_Max_PBKDF_Iterations,
+    VerifyOrReturnError(kSpake2p_Min_PBKDF_Iterations <= params.GetIteration() &&
+                            params.GetIteration() <= kSpake2p_Max_PBKDF_Iterations,
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(params.salt.size() >= kSpake2p_Min_PBKDF_Salt_Length &&
-                            params.salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
+    VerifyOrReturnError(params.GetSalt().size() >= kSpake2p_Min_PBKDF_Salt_Length &&
+                            params.GetSalt().size() <= kSpake2p_Max_PBKDF_Salt_Length,
                         CHIP_ERROR_INVALID_ARGUMENT);
-    memcpy(mPBKDFSaltBuffer, params.salt.data(), params.salt.size());
-    mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, params.salt.size());
+    memcpy(mPBKDFSaltBuffer, params.GetSalt().data(), params.GetSalt().size());
+    mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer, params.GetSalt().size());
 
-    ReturnErrorOnFailure(mVerifier.Deserialize(params.verifier));
-    mCommissioningWindowVerifierCallback = params.callback;
+    ReturnErrorOnFailure(mVerifier.Deserialize(params.GetVerifier()));
+    mCommissioningWindowVerifierCallback = callback;
     mBasicCommissioningWindowCallback    = nullptr;
     mCommissioningWindowCallback         = nullptr;
-    mNodeId                              = params.common.deviceId;
-    mCommissioningWindowTimeout          = params.common.timeout;
-    mPBKDFIterations                     = params.common.iteration;
+    mNodeId                              = params.GetNodeId();
+    mCommissioningWindowTimeout          = params.GetTimeout();
+    mPBKDFIterations                     = params.GetIteration();
+    mCommissioningWindowOption           = CommissioningWindowOption::kTokenWithProvidedPIN;
+    mSetupPayload                        = SetupPayload();
+    mSetupPayload.version                = 0;
+    mSetupPayload.discriminator.SetLongValue(params.GetDiscriminator());
+    mSetupPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
 
     mNextStep = Step::kOpenCommissioningWindow;
 

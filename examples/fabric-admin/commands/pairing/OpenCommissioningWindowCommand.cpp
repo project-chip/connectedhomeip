@@ -33,34 +33,29 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 
     if (mCommissioningWindowOption == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
     {
-        Controller::CommissioningWindowOpener::CommissioningWindowCommonParams common = { .deviceId = mNodeId,
-                                                                                          .timeout  = System::Clock::Seconds16(
-                                                                                              mCommissioningWindowTimeout),
-                                                                                          .iteration     = mIteration,
-                                                                                          .discriminator = mDiscriminator };
-
         if (mVerifier.HasValue())
         {
             VerifyOrReturnError(mSalt.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-            Controller::CommissioningWindowOpener::CommissioningWindowVerifierParams params = {
-                .common   = common,
-                .verifier = mVerifier.Value(),
-                .salt     = mSalt.Value(),
-                .callback = &mOnOpenCommissioningWindowVerifierCallback,
-            };
-            return mWindowOpener->OpenCommissioningWindow(params);
+            return mWindowOpener->OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
+                                                              .SetNodeId(mNodeId)
+                                                              .SetTimeout(mCommissioningWindowTimeout)
+                                                              .SetIteration(mIteration)
+                                                              .SetDiscriminator(mDiscriminator)
+                                                              .SetVerifier(mVerifier.Value())
+                                                              .SetSalt(mSalt.Value()),
+                                                          &mOnOpenCommissioningWindowVerifierCallback);
         }
         else
         {
             SetupPayload ignored;
-            Controller::CommissioningWindowOpener::CommissioningWindowPasscodeParams params = {
-                .common               = common,
-                .setupPIN             = NullOptional,
-                .salt                 = mSalt,
-                .readVIDPIDAttributes = true,
-                .callback             = &mOnOpenCommissioningWindowCallback,
-            };
-            return mWindowOpener->OpenCommissioningWindow(params, ignored);
+            return mWindowOpener->OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                              .SetNodeId(mNodeId)
+                                                              .SetTimeout(mCommissioningWindowTimeout)
+                                                              .SetIteration(mIteration)
+                                                              .SetDiscriminator(mDiscriminator)
+                                                              .SetSalt(mSalt)
+                                                              .SetReadVIDPIDAttributes(true),
+                                                          &mOnOpenCommissioningWindowCallback, ignored);
         }
     }
 

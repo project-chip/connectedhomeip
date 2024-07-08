@@ -69,10 +69,11 @@ void BridgePollingThread()
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
             else if (ch == 'o')
             {
-                CommissioningWindowParams params = {
-                    .nodeId = 0x1234, .commissioningTimeout = 300, .discriminator = 3840, .iterations = 1000
-                };
-                CHIP_ERROR err = OpenCommissioningWindow(params);
+                CHIP_ERROR err = OpenCommissioningWindow(chip::Controller::CommissioningWindowPasscodeParams()
+                                                             .SetNodeId(0x1234)
+                                                             .SetTimeout(300)
+                                                             .SetDiscriminator(3840)
+                                                             .SetIteration(1000));
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(NotSpecified, "Failed to call OpenCommissioningWindow RPC: %" CHIP_ERROR_FORMAT, err.Format());
@@ -118,7 +119,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     using Protocols::InteractionModel::Status;
 
     EndpointId endpointId = handlerContext.mRequestPath.mEndpointId;
-    ChipLogProgress(NotSpecified, "Received command to open commissioning window on Endpoind: %d", endpointId);
+    ChipLogProgress(NotSpecified, "Received command to open commissioning window on Endpoint: %d", endpointId);
 
     if (handlerContext.mRequestPath.mCommandId != Commands::OpenCommissioningWindow::Id || endpointId == kRootEndpointId)
     {
@@ -140,15 +141,15 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     Device * device = DeviceMgr().GetDevice(endpointId);
 
-    CommissioningWindowParams params = { .nodeId               = device->GetNodeId(),
-                                         .commissioningTimeout = commandData.commissioningTimeout,
-                                         .discriminator        = commandData.discriminator,
-                                         .iterations           = commandData.iterations,
-                                         .salt                 = chip::Optional<chip::ByteSpan>(commandData.salt),
-                                         .verifier             = chip::Optional<chip::ByteSpan>(commandData.PAKEPasscodeVerifier) };
-
     // TODO: issues:#33784, need to make OpenCommissioningWindow synchronous
-    if (device != nullptr && OpenCommissioningWindow(params) == CHIP_NO_ERROR)
+    if (device != nullptr &&
+        OpenCommissioningWindow(chip::Controller::CommissioningWindowVerifierParams()
+                                    .SetNodeId(device->GetNodeId())
+                                    .SetTimeout(commandData.commissioningTimeout)
+                                    .SetDiscriminator(commandData.discriminator)
+                                    .SetIteration(commandData.iterations)
+                                    .SetSalt(commandData.salt)
+                                    .SetVerifier(commandData.PAKEPasscodeVerifier)) == CHIP_NO_ERROR)
     {
         ChipLogProgress(NotSpecified, "Commissioning window is now open");
         status = Status::Success;

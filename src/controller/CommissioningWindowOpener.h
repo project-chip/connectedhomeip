@@ -20,13 +20,13 @@
 #include <app/OperationalSessionSetup.h>
 #include <app/data-model/NullObject.h>
 #include <controller/CHIPDeviceController.h>
+#include <controller/CommissioningWindowParams.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
 #include <setup_payload/SetupPayload.h>
-#include <system/SystemClock.h>
 
 namespace chip {
 namespace Controller {
@@ -47,61 +47,6 @@ public:
         mController(controller), mDeviceConnected(&OnDeviceConnectedCallback, this),
         mDeviceConnectionFailure(&OnDeviceConnectionFailureCallback, this)
     {}
-
-    struct CommissioningWindowCommonParams
-    {
-        // The device Id of the node.
-        NodeId deviceId;
-
-        // The duration for which the commissioning window should remain open.
-        System::Clock::Seconds16 timeout;
-
-        // The PAKE iteration count associated with the PAKE Passcode ID and ephemeral PAKE passcode verifier to be used for this
-        // commissioning.
-        uint32_t iteration;
-
-        // The long discriminator for the DNS-SD advertisement.
-        uint16_t discriminator;
-    };
-
-    struct CommissioningWindowPasscodeParams
-    {
-        // Common parameters for opening an enhanced commissioning window
-        CommissioningWindowCommonParams common;
-
-        // The setup PIN (Passcode) to use, or NullOptional to generate a random one.
-        Optional<uint32_t> setupPIN;
-
-        // The salt to use, or NullOptional to use a randomly-generated one.
-        // If provided, must be at least kSpake2p_Min_PBKDF_Salt_Length bytes
-        // and at most kSpake2p_Max_PBKDF_Salt_Length bytes in length.
-        Optional<ByteSpan> salt;
-
-        // Should the API internally read VID and PID from the device while opening the
-        // commissioning window.  If this argument is `true`, the API will read VID and PID
-        // from the device and include them in the setup payload passed to the callback.
-        bool readVIDPIDAttributes = false;
-
-        // The function to be called on success or failure of opening the commissioning window.
-        // This will include the SetupPayload generated from provided parameters.
-        Callback::Callback<OnOpenCommissioningWindow> * callback;
-    };
-
-    struct CommissioningWindowVerifierParams
-    {
-        // Common parameters for opening an enhanced commissioning window
-        CommissioningWindowCommonParams common;
-
-        // The PAKE passcode verifier generated with enclosed iterations, salt and not-enclosed passcode.
-        ByteSpan verifier;
-
-        // The salt that was used to generate the verifier. It must be at least kSpake2p_Min_PBKDF_Salt_Length bytes
-        ByteSpan salt;
-
-        // The function to be called on success or failure of opening the commissioning window.
-        // This will NOT include the SetupPayload.
-        Callback::Callback<OnOpenCommissioningWindowWithVerifier> * callback;
-    };
 
     enum class CommissioningWindowOption : uint8_t
     {
@@ -173,6 +118,9 @@ public:
      *
      * @param[in] params        The parameters required to open an enhanced commissioning window
      *                          with the provided or generated passcode.
+     * @param[in] callback      The function to be called on success or failure of opening the
+     *                          commissioning window. This will include the SetupPayload
+     *                          generated from provided parameters.
      * @param[out] payload      The setup payload, not including the VID/PID bits,
      *                          even if those were asked for, that is generated
      *                          based on the passed-in information.  The payload
@@ -180,7 +128,8 @@ public:
      *                          out parameter, will include the VID/PID bits if
      *                          readVIDPIDAttributes is true.
      */
-    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params, SetupPayload & payload);
+    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params,
+                                       Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload);
 
     /**
      * @brief
@@ -192,8 +141,11 @@ public:
      *
      * @param[in] params    The parameters required to open an enhanced commissioning window
      *                      with the provided PAKE passcode verifier.
+     * @param[in] callback  The function to be called on success or failure of opening the
+     *                      commissioning window. This will NOT include the SetupPayload.
      */
-    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowVerifierParams & params);
+    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowVerifierParams & params,
+                                       Callback::Callback<OnOpenCommissioningWindowWithVerifier> * callback);
 
 private:
     enum class Step : uint8_t
