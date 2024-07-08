@@ -18174,18 +18174,32 @@ public:
 } // namespace RvcOperationalState
 namespace ScenesManagement {
 namespace Structs {
-namespace AttributeValuePair {
+namespace AttributeValuePairStruct {
 enum class Fields : uint8_t
 {
-    kAttributeID    = 0,
-    kAttributeValue = 1,
+    kAttributeID     = 0,
+    kValueUnsigned8  = 1,
+    kValueSigned8    = 2,
+    kValueUnsigned16 = 3,
+    kValueSigned16   = 4,
+    kValueUnsigned32 = 5,
+    kValueSigned32   = 6,
+    kValueUnsigned64 = 7,
+    kValueSigned64   = 8,
 };
 
 struct Type
 {
 public:
     chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
-    uint32_t attributeValue       = static_cast<uint32_t>(0);
+    Optional<uint8_t> valueUnsigned8;
+    Optional<int8_t> valueSigned8;
+    Optional<uint16_t> valueUnsigned16;
+    Optional<int16_t> valueSigned16;
+    Optional<uint32_t> valueUnsigned32;
+    Optional<int32_t> valueSigned32;
+    Optional<uint64_t> valueUnsigned64;
+    Optional<int64_t> valueSigned64;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -18196,7 +18210,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace AttributeValuePair
+} // namespace AttributeValuePairStruct
 namespace ExtensionFieldSet {
 enum class Fields : uint8_t
 {
@@ -18208,7 +18222,7 @@ struct Type
 {
 public:
     chip::ClusterId clusterID = static_cast<chip::ClusterId>(0);
-    DataModel::List<const Structs::AttributeValuePair::Type> attributeValueList;
+    DataModel::List<const Structs::AttributeValuePairStruct::Type> attributeValueList;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -18219,7 +18233,7 @@ struct DecodableType
 {
 public:
     chip::ClusterId clusterID = static_cast<chip::ClusterId>(0);
-    DataModel::DecodableList<Structs::AttributeValuePair::DecodableType> attributeValueList;
+    DataModel::DecodableList<Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

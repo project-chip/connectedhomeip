@@ -15,22 +15,35 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
+source_set("nullable-primitives") {
+  sources = [
+    "attribute-storage-null-handling.h",
+    "odd-sized-integers.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 # These headers/cpp only depend on core/common
 source_set("types") {
   sources = [
     "att-storage.h",
     "attribute-metadata.cpp",
     "attribute-metadata.h",
-    "attribute-storage-null-handling.h",
     "basic-types.h",
     "ember-strings.cpp",
     "ember-strings.h",
     "endpoint-config-defines.h",
-    "odd-sized-integers.h",
     "types_stub.h",
   ]
 
   deps = [
+    ":nullable-primitives",
     "${chip_root}/src/app/common:attribute-type",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:encoding",
