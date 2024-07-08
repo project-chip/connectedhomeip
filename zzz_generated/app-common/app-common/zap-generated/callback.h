@@ -626,6 +626,11 @@ void emberAfContentAppObserverClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfCommissionerControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5207,6 +5212,44 @@ chip::Protocols::InteractionModel::Status MatterContentAppObserverClusterServerP
 void emberAfContentAppObserverClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Commissioner Control Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCommissionerControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterCommissionerControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCommissionerControlClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterCommissionerControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterCommissionerControlClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfCommissionerControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Electrical Measurement Cluster
 //
 
@@ -6630,6 +6673,18 @@ bool emberAfContentControlClusterSetScheduledContentRatingThresholdCallback(
 bool emberAfContentAppObserverClusterContentAppMessageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::DecodableType & commandData);
+/**
+ * @brief Commissioner Control Cluster RequestCommissioningApproval Command callback (from client)
+ */
+bool emberAfCommissionerControlClusterRequestCommissioningApprovalCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::DecodableType & commandData);
+/**
+ * @brief Commissioner Control Cluster CommissionNode Command callback (from client)
+ */
+bool emberAfCommissionerControlClusterCommissionNodeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommissionerControl::Commands::CommissionNode::DecodableType & commandData);
 /**
  * @brief Electrical Measurement Cluster GetProfileInfoCommand Command callback (from client)
  */

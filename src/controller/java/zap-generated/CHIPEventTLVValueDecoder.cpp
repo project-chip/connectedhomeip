@@ -7920,6 +7920,72 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::CommissionerControl::Id: {
+        using namespace app::Clusters::CommissionerControl;
+        switch (aPath.mEventId)
+        {
+        case Events::CommissioningRequestResult::Id: {
+            Events::CommissioningRequestResult::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_requestId;
+            std::string value_requestIdClassName     = "java/lang/Long";
+            std::string value_requestIdCtorSignature = "(J)V";
+            jlong jnivalue_requestId                 = static_cast<jlong>(cppValue.requestId);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_requestIdClassName.c_str(), value_requestIdCtorSignature.c_str(), jnivalue_requestId, value_requestId);
+
+            jobject value_clientNodeId;
+            std::string value_clientNodeIdClassName     = "java/lang/Long";
+            std::string value_clientNodeIdCtorSignature = "(J)V";
+            jlong jnivalue_clientNodeId                 = static_cast<jlong>(cppValue.clientNodeId);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_clientNodeIdClassName.c_str(),
+                                                                        value_clientNodeIdCtorSignature.c_str(),
+                                                                        jnivalue_clientNodeId, value_clientNodeId);
+
+            jobject value_statusCode;
+            std::string value_statusCodeClassName     = "java/lang/Integer";
+            std::string value_statusCodeCtorSignature = "(I)V";
+            jint jnivalue_statusCode                  = static_cast<jint>(cppValue.statusCode);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_statusCodeClassName.c_str(), value_statusCodeCtorSignature.c_str(), jnivalue_statusCode, value_statusCode);
+
+            jclass commissioningRequestResultStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$CommissionerControlClusterCommissioningRequestResultEvent",
+                commissioningRequestResultStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$CommissionerControlClusterCommissioningRequestResultEvent");
+                return nullptr;
+            }
+
+            jmethodID commissioningRequestResultStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, commissioningRequestResultStructClass, "<init>",
+                                                                "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;)V",
+                                                                &commissioningRequestResultStructCtor);
+            if (err != CHIP_NO_ERROR || commissioningRequestResultStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$CommissionerControlClusterCommissioningRequestResultEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(commissioningRequestResultStructClass, commissioningRequestResultStructCtor,
+                                           value_requestId, value_clientNodeId, value_statusCode);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::ElectricalMeasurement::Id: {
         using namespace app::Clusters::ElectricalMeasurement;
         switch (aPath.mEventId)

@@ -5133,6 +5133,15 @@ enum class StatusEnum : uint8_t
 };
 } // namespace ContentAppObserver
 
+namespace CommissionerControl {
+
+// Bitmap for SupportedDeviceCategoryBitmap
+enum class SupportedDeviceCategoryBitmap : uint32_t
+{
+    kFabricSynchronization = 0x1,
+};
+} // namespace CommissionerControl
+
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 
 namespace UnitTesting {

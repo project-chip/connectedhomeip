@@ -5946,6 +5946,82 @@ public static class ContentControlClusterRemainingScreenTimeExpiredEvent {
     return output.toString();
   }
 }
+public static class CommissionerControlClusterCommissioningRequestResultEvent {
+  public Long requestId;
+  public Long clientNodeId;
+  public Integer statusCode;
+  private static final long REQUEST_ID_ID = 0L;
+  private static final long CLIENT_NODE_ID_ID = 1L;
+  private static final long STATUS_CODE_ID = 2L;
+
+  public CommissionerControlClusterCommissioningRequestResultEvent(
+    Long requestId,
+    Long clientNodeId,
+    Integer statusCode
+  ) {
+    this.requestId = requestId;
+    this.clientNodeId = clientNodeId;
+    this.statusCode = statusCode;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(REQUEST_ID_ID, new UIntType(requestId)));
+    values.add(new StructElement(CLIENT_NODE_ID_ID, new UIntType(clientNodeId)));
+    values.add(new StructElement(STATUS_CODE_ID, new UIntType(statusCode)));
+
+    return new StructType(values);
+  }
+
+  public static CommissionerControlClusterCommissioningRequestResultEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long requestId = null;
+    Long clientNodeId = null;
+    Integer statusCode = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == REQUEST_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          requestId = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CLIENT_NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          clientNodeId = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == STATUS_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          statusCode = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CommissionerControlClusterCommissioningRequestResultEvent(
+      requestId,
+      clientNodeId,
+      statusCode
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommissionerControlClusterCommissioningRequestResultEvent {\n");
+    output.append("\trequestId: ");
+    output.append(requestId);
+    output.append("\n");
+    output.append("\tclientNodeId: ");
+    output.append(clientNodeId);
+    output.append("\n");
+    output.append("\tstatusCode: ");
+    output.append(statusCode);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class UnitTestingClusterTestEventEvent {
   public Integer arg1;
   public Integer arg2;

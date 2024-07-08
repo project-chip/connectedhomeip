@@ -153,6 +153,7 @@
 | AccountLogin                                                        | 0x050E |
 | ContentControl                                                      | 0x050F |
 | ContentAppObserver                                                  | 0x0510 |
+| CommissionerControl                                                 | 0x0751 |
 | ElectricalMeasurement                                               | 0x0B04 |
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
@@ -13652,6 +13653,108 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster CommissionerControl                                         | 0x0751 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RequestCommissioningApproval                                      |   0x00 |
+| * CommissionNode                                                    |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * SupportedDeviceCategories                                         | 0x0000 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * CommissioningRequestResult                                        | 0x0000 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command RequestCommissioningApproval
+ */
+class CommissionerControlRequestCommissioningApproval : public ClusterCommand
+{
+public:
+    CommissionerControlRequestCommissioningApproval(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("request-commissioning-approval", credsIssuerConfig)
+    {
+        AddArgument("RequestId", 0, UINT64_MAX, &mRequest.requestId);
+        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
+        AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
+        AddArgument("Label", &mRequest.label);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissionerControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissionerControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommissionerControl::Commands::RequestCommissioningApproval::Type mRequest;
+};
+
+/*
+ * Command CommissionNode
+ */
+class CommissionerControlCommissionNode : public ClusterCommand
+{
+public:
+    CommissionerControlCommissionNode(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("commission-node", credsIssuerConfig)
+    {
+        AddArgument("RequestId", 0, UINT64_MAX, &mRequest.requestId);
+        AddArgument("ResponseTimeoutSeconds", 0, UINT16_MAX, &mRequest.responseTimeoutSeconds);
+        AddArgument("IpAddress", &mRequest.ipAddress);
+        AddArgument("Port", 0, UINT16_MAX, &mRequest.port);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissionerControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissionerControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommissionerControl::Commands::CommissionNode::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster ElectricalMeasurement                                       | 0x0B04 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -26289,6 +26392,69 @@ void registerClusterContentAppObserver(Commands & commands, CredentialIssuerComm
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterCommissionerControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::CommissionerControl;
+
+    const char * clusterName = "CommissionerControl";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                              //
+        make_unique<CommissionerControlRequestCommissioningApproval>(credsIssuerConfig), //
+        make_unique<CommissionerControlCommissionNode>(credsIssuerConfig),               //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "supported-device-categories", Attributes::SupportedDeviceCategories::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap>>>(
+            Id, "supported-device-categories", 0, UINT32_MAX, Attributes::SupportedDeviceCategories::Id,
+            WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "supported-device-categories", Attributes::SupportedDeviceCategories::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                         //
+        make_unique<ReadEvent>(Id, "commissioning-request-result", Events::CommissioningRequestResult::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                    //
+        make_unique<SubscribeEvent>(Id, "commissioning-request-result", Events::CommissioningRequestResult::Id,
+                                    credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::ElectricalMeasurement;
@@ -27697,6 +27863,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterAccountLogin(commands, credsIssuerConfig);
     registerClusterContentControl(commands, credsIssuerConfig);
     registerClusterContentAppObserver(commands, credsIssuerConfig);
+    registerClusterCommissionerControl(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);

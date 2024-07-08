@@ -18339,6 +18339,87 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readCommissionerControlInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readCommissionerControlSupportedDeviceCategoriesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissionerControlSupportedDeviceCategoriesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissionerControlCluster) cluster).readSupportedDeviceCategoriesAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readCommissionerControlSupportedDeviceCategoriesCommandParams
+        );
+        result.put("readSupportedDeviceCategoriesAttribute", readCommissionerControlSupportedDeviceCategoriesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissionerControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissionerControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissionerControlCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.CommissionerControlCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissionerControlClusterGeneratedCommandListAttributeCallback(),
+          readCommissionerControlGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readCommissionerControlGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissionerControlAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissionerControlAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissionerControlCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.CommissionerControlCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissionerControlClusterAcceptedCommandListAttributeCallback(),
+          readCommissionerControlAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readCommissionerControlAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissionerControlEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissionerControlEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissionerControlCluster) cluster).readEventListAttribute(
+              (ChipClusters.CommissionerControlCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissionerControlClusterEventListAttributeCallback(),
+          readCommissionerControlEventListCommandParams
+        );
+        result.put("readEventListAttribute", readCommissionerControlEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissionerControlAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissionerControlAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissionerControlCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.CommissionerControlCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissionerControlClusterAttributeListAttributeCallback(),
+          readCommissionerControlAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readCommissionerControlAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissionerControlFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissionerControlFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissionerControlCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readCommissionerControlFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readCommissionerControlFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissionerControlClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissionerControlClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissionerControlCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissionerControlClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readCommissionerControlClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readElectricalMeasurementInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readElectricalMeasurementMeasurementTypeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readElectricalMeasurementMeasurementTypeAttributeInteractionInfo = new InteractionInfo(
@@ -21051,6 +21132,7 @@ public class ClusterReadMapping {
             put("accountLogin", readAccountLoginInteractionInfo());
             put("contentControl", readContentControlInteractionInfo());
             put("contentAppObserver", readContentAppObserverInteractionInfo());
+            put("commissionerControl", readCommissionerControlInteractionInfo());
             put("electricalMeasurement", readElectricalMeasurementInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
             put("faultInjection", readFaultInjectionInteractionInfo());
