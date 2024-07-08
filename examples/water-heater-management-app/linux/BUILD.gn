@@ -38,15 +38,15 @@ executable("chip-water-heater-management-app") {
   sources = [
     "${chip_root}/examples/water-heater-management-app/water-heater-management-common/src/WhmDelegateImpl.cpp",
     "${chip_root}/examples/water-heater-management-app/water-heater-management-common/src/WhmInstance.cpp",
-    "${chip_root}/examples/water-heater-management-app/water-heater-management-common/src/WhmManufacturer.cpp",
     "${chip_root}/examples/water-heater-management-app/water-heater-management-common/src/WhmMain.cpp",
+    "${chip_root}/examples/water-heater-management-app/water-heater-management-common/src/WhmManufacturer.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
 
   deps = [
-    "${chip_root}/examples/water-heater-management-app/water-heater-management-common",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/examples/water-heater-management-app/water-heater-management-common",
     "${chip_root}/src/lib",
   ]
 
