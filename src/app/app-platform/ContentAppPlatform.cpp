@@ -420,14 +420,17 @@ std::set<NodeId> ContentAppPlatform::GetNodeIdsForContentApp(uint16_t vendorId, 
     return {};
 }
 
-std::set<NodeId> ContentAppPlatform::GetNodeIdsForAllowVendorId(uint16_t vendorId) {
+std::set<NodeId> ContentAppPlatform::GetNodeIdsForAllowVendorId(uint16_t vendorId)
+{
     std::set<NodeId> result;
     std::string vendorPrefix = std::to_string(vendorId) + ":";
 
-    for (const auto& pair : mConnectedContentAppNodeIds) {
-        const std::string& key = pair.first;
-        if (key.find(vendorPrefix) == 0) {  // Check if the key starts with the vendor prefix
-            const std::set<NodeId>& nodeIds = pair.second;
+    for (const auto & pair : mConnectedContentAppNodeIds)
+    {
+        const std::string & key = pair.first;
+        if (key.find(vendorPrefix) == 0)
+        { // Check if the key starts with the vendor prefix
+            const std::set<NodeId> & nodeIds = pair.second;
             result.insert(nodeIds.begin(), nodeIds.end());
         }
     }
