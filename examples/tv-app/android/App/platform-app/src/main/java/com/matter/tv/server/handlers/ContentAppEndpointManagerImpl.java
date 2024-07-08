@@ -31,7 +31,8 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
   }
 
   private boolean isAppInForeground(String contentAppPackageName) {
-    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    ActivityManager activityManager =
+        (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(1);
     if (tasks != null && !tasks.isEmpty()) {
       ActivityManager.RunningTaskInfo taskInfo = tasks.get(0);
@@ -53,9 +54,10 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
       if (isForegroundCommand(clusterId, commandId)) {
         // Check if contentapp main/launch activity is already in foreground before launching.
         if (!isAppInForeground(discoveredApp.getAppName())) {
-          Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(discoveredApp.getAppName());
+          Intent launchIntent =
+              context.getPackageManager().getLaunchIntentForPackage(discoveredApp.getAppName());
           if (launchIntent != null) {
-              startActivity(launchIntent);
+            startActivity(launchIntent);
           }
         }
       }
