@@ -109,7 +109,7 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
-    ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
+    ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/laundry-washer-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-controls-delegate-impl.cpp
     ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/operational-state-delegate-impl.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
