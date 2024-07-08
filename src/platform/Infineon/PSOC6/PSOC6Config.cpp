@@ -88,6 +88,15 @@ const PSOC6Config::Key PSOC6Config::kConfigKey_YearDaySchedules = { kConfigNames
 const PSOC6Config::Key PSOC6Config::kConfigKey_HolidaySchedules = { kConfigNamespace_ChipConfig, "holiday-schedules" };
 ;
 
+const P6Config::Key P6Config::kConfigKey_VendorName = { kConfigNamespace_ChipConfig, "vendor-name" };
+;
+const P6Config::Key P6Config::kConfigKey_ProductName = { kConfigNamespace_ChipConfig, "product-name" };
+;
+const P6Config::Key P6Config::kConfigKey_HardwareVersionString = { kConfigNamespace_ChipConfig, "hardware-version-string" };
+;
+const P6Config::Key P6Config::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipConfig, "software-version-string" };
+;
+
 // Keys stored in the Chip-counters namespace
 const PSOC6Config::Key PSOC6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
 const PSOC6Config::Key PSOC6Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };

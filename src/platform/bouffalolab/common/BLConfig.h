@@ -77,10 +77,10 @@ public:
 
     static constexpr char kBLKey_factoryResetFlag[] = ("__factory_reset_pending");
 
-    static const Key kConfigKey_VendorName;
-    static const Key kConfigKey_ProductName;
-    static const Key kConfigKey_HardwareVersionString;
-    static const Key kConfigKey_SoftwareVersionString;
+    static constexpr char kConfigKey_VendorName[]            = ("vendor-name");
+    static constexpr char kConfigKey_ProductName[]           = ("product-name");
+    static constexpr char kConfigKey_HardwareVersionString[] = ("hardware-version-string");
+    static constexpr char kConfigKey_SoftwareVersionString[] = ("software-version-string");
 
     static void Init(void);
 

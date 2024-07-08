@@ -103,6 +103,8 @@ public:
     static const Key kConfigKey_YearDaySchedules;
     static const Key kConfigKey_HolidaySchedules;
 
+    static const Key kConfigKey_SoftwareVersionString;
+
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_UpTime;

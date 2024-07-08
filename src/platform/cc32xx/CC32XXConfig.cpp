@@ -318,6 +318,11 @@ const CC32XXConfig::Key CC32XXConfig::kConfigKey_Spake2pIterationCount = { "TI_k
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_Spake2pSalt           = { "TI_kConfigKey_Spake2pSalt" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_Spake2pVerifier       = { "TI_kConfigKey_Spake2pVerifier" };
 
+const CC32XXConfig::Key CC32XXConfig::kConfigKey_VendorName            = { "TI_kConfigKey_VendorName" };
+const CC32XXConfig::Key CC32XXConfig::kConfigKey_ProductName           = { "TI_kConfigKey_ProductName" };
+const CC32XXConfig::Key CC32XXConfig::kConfigKey_HardwareVersionString = { "TI_kConfigKey_HardwareVersionString" };
+const CC32XXConfig::Key CC32XXConfig::kConfigKey_SoftwareVersionString = { "TI_kConfigKey_SoftwareVersionString" };
+
 CC32XXKVSList * pList;
 
 CHIP_ERROR CC32XXConfig::Init()
