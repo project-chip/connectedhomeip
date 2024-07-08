@@ -2101,6 +2101,7 @@ endpoint 0 {
     callback attribute softwareVersion;
     callback attribute softwareVersionString;
     callback attribute serialNumber;
+    callback attribute uniqueID;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
