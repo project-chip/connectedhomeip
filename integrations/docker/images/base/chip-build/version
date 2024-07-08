@@ -1,1 +1,1 @@
-62 : Fix ESP32 qemu build
+64 : [NXP] Add `--break-system-packages` to pip install

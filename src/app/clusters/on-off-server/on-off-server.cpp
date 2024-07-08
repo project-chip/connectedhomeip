@@ -150,7 +150,7 @@ public:
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
-        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
         bool currentValue;
         // read current on/off value
@@ -163,8 +163,8 @@ public:
 
         AttributeValuePair pairs[scenableAttributeCount];
 
-        pairs[0].attributeID    = Attributes::OnOff::Id;
-        pairs[0].attributeValue = currentValue;
+        pairs[0].attributeID = Attributes::OnOff::Id;
+        pairs[0].valueUnsigned8.SetValue(currentValue);
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
 
@@ -180,7 +180,7 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
-        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
         VerifyOrReturnError(cluster == OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -195,8 +195,9 @@ public:
         {
             auto & decodePair = pair_iterator.GetValue();
             VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorOnFailure(
-                mSceneEndpointStatePairs.InsertPair(OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.attributeValue))));
+            VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(
+                OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.valueUnsigned8.Value()))));
         }
         // Verify that the EFS was completely read
         CHIP_ERROR err = pair_iterator.GetStatus();

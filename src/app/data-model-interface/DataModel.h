@@ -58,7 +58,7 @@ public:
     /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
     ///   ReadAttribute is REQUIRED to perform:
     ///     - ACL validation (see notes on OperationFlags::kInternal)
-    ///     - Validation of readability/writability
+    ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
     ///     - use request.path.mExpanded to skip encoding replies for data according
     ///       to 8.4.3.2 of the spec:
     ///         > If the path indicates attribute data that is not readable, then the path SHALL
@@ -84,8 +84,11 @@ public:
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - cluster `data version` has been checked for the incoming request if applicable
     ///
-    /// When `request.writeFlags.Has(WriteFlags::kForceInternal)` the request is from an internal app update
-    /// and SHOULD bypass some internal checks (like timed enforcement, potentially read-only restrictions)
+    /// TEMPORARY/TRANSITIONAL requirement for transitioning from ember-specific code
+    ///   WriteAttribute is REQUIRED to perform:
+    ///     - ACL validation (see notes on OperationFlags::kInternal)
+    ///     - Validation of readability/writability (also controlled by OperationFlags::kInternal)
+    ///     - Validation of timed interaction required (also controlled by OperationFlags::kInternal)
     ///
     /// Return codes
     ///   CHIP_IM_GLOBAL_STATUS(code):
