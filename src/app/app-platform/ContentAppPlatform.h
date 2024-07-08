@@ -164,8 +164,8 @@ public:
     // returns set of connected nodes for a given content app
     std::set<NodeId> GetNodeIdsForContentApp(uint16_t vendorId, uint16_t productId);
 
-    // store node id for content app after commissioning 
-    // node id can be used later on to update ACL 
+    // store node id for content app after commissioning
+    // node id can be used later on to update ACL
     // in case app is not installed
     void StoreNodeIdForContentApp(uint16_t vendorId, uint16_t productId, NodeId nodeId);
 
