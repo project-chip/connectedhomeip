@@ -486,26 +486,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace Reachable
 
-namespace DeviceLocation {
-Protocols::InteractionModel::Status
-Get(chip::EndpointId endpoint,
-    DataModel::Nullable<chip::app::Clusters::BasicInformation::Structs::HomeLocationStruct::Type> & value); // HomeLocationStruct
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::app::Clusters::BasicInformation::Structs::HomeLocationStruct::Type value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
-                                        chip::app::Clusters::BasicInformation::Structs::HomeLocationStruct::Type value,
-                                        MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(chip::EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::Structs::HomeLocationStruct::Type> & value);
-Protocols::InteractionModel::Status
-Set(chip::EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::Structs::HomeLocationStruct::Type> & value,
-    MarkAttributeDirty markDirty);
-} // namespace DeviceLocation
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
