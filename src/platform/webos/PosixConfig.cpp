@@ -78,6 +78,11 @@ const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNam
 const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability = { kConfigNamespace_ChipConfig, "location-capability" };
 const PosixConfig::Key PosixConfig::kConfigKey_UniqueId           = { kConfigNamespace_ChipFactory, "unique-id" };
 
+const PosixConfig::Key PosixConfig::kConfigKey_VendorName            = { kConfigNamespace_ChipFactory, "vendor-name" };
+const PosixConfig::Key PosixConfig::kConfigKey_ProductName           = { kConfigNamespace_ChipFactory, "product-name" };
+const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersionString = { kConfigNamespace_ChipFactory, "hardware-version-string" };
+const PosixConfig::Key PosixConfig::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipFactory, "software-version-string" };
+
 // Keys stored in the Chip-counters namespace
 const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
 const PosixConfig::Key PosixConfig::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };

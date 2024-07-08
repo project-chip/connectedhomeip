@@ -67,6 +67,12 @@ public:
     static constexpr Key kConfigKey_Breadcrumb         = 22;
     static constexpr Key kConfigKey_UniqueId           = 23;
     static constexpr Key kConfigKey_ProductRevision    = 24;
+
+    static constexpr Key kConfigKey_VendorName            = 25;
+    static constexpr Key kConfigKey_ProductName           = 26;
+    static constexpr Key kConfigKey_HardwareVersionString = 27;
+    static constexpr Key kConfigKey_SoftwareVersionString = 28;
+
     // Set key id limits for each group.
     static constexpr Key kConfigKey_Base = kConfigKey_SerialNum;
     static constexpr Key kConfigKey_Max  = kConfigKey_UniqueId;

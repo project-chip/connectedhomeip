@@ -66,6 +66,15 @@ const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNam
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
 
+const PosixConfig::Key PosixConfig::kConfigKey_VendorName            = { kConfigNamespace_ChipConfig, "vendor-name" };
+const PosixConfig::Key PosixConfig::kConfigKey_ProductName           = { kConfigNamespace_ChipConfig, "product-name" };
+const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersionString = { kConfigNamespace_ChipConfig, "hardware-version-string" };
+const PosixConfig::Key PosixConfig::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipConfig, "software-version-string" };
+
+static const Key kConfigKey_;
+static const Key kConfigKey_;
+static const Key kConfigKey_;
+static const Key kConfigKey_;
 // Keys stored in the Chip-counters namespace
 const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters,
                                                                           "total-operational-hours" };

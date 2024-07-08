@@ -79,6 +79,11 @@ const BekenConfig::Key BekenConfig::kConfigKey_RegulatoryLocation          = { k
 const BekenConfig::Key BekenConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
 const BekenConfig::Key BekenConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
+const BekenConfig::Key BekenConfig::kConfigKey_VendorName            = { kConfigNamespace_ChipConfig, "vendor-name" };
+const BekenConfig::Key BekenConfig::kConfigKey_ProductName           = { kConfigNamespace_ChipConfig, "product-name" };
+const BekenConfig::Key BekenConfig::kConfigKey_HardwareVersionString = { kConfigNamespace_ChipConfig, "hardware-version-string" };
+const BekenConfig::Key BekenConfig::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipConfig, "software-version-string" };
+
 // Keys stored in the Chip-counters namespace
 const BekenConfig::Key BekenConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
 const BekenConfig::Key BekenConfig::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };

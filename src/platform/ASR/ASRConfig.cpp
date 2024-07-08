@@ -80,6 +80,11 @@ const ASRConfig::Key ASRConfig::kConfigKey_WiFiSecurity       = { kConfigNamespa
 const ASRConfig::Key ASRConfig::kConfigKey_WiFiMode           = { kConfigNamespace_ChipConfig, "wifimode" };
 const ASRConfig::Key ASRConfig::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
 
+const ASRConfig::Key ASRConfig::kConfigKey_VendorName            = { kConfigNamespace_ChipConfig, "vendor-name" };
+const ASRConfig::Key ASRConfig::kConfigKey_ProductName           = { kConfigNamespace_ChipConfig, "product-name" };
+const ASRConfig::Key ASRConfig::kConfigKey_HardwareVersionString = { kConfigNamespace_ChipConfig, "hardware-version-string" };
+const ASRConfig::Key ASRConfig::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipConfig, "software-version-string" };
+
 // Keys stored in the Chip-counters namespace
 const ASRConfig::Key ASRConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
 const ASRConfig::Key ASRConfig::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };

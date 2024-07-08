@@ -97,6 +97,8 @@ const ESP32Config::Key ESP32Config::kConfigKey_WeekDaySchedules   = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_YearDaySchedules   = { kConfigNamespace_ChipConfig, "year-day-sched" };
 const ESP32Config::Key ESP32Config::kConfigKey_HolidaySchedules   = { kConfigNamespace_ChipConfig, "holiday-sched" };
 
+const ESP32Config::Key ESP32Config::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipConfig, "sw-ver-str" };
+
 // Keys stored in the Chip-counters namespace
 const ESP32Config::Key ESP32Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
 const ESP32Config::Key ESP32Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };

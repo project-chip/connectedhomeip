@@ -85,6 +85,16 @@ const MbedConfig::Key MbedConfig::kConfigKey_RegulatoryLocation = { CONFIG_KEY("
 const MbedConfig::Key MbedConfig::kConfigKey_CountryCode        = { CONFIG_KEY("country-code") };
 const MbedConfig::Key MbedConfig::kConfigKey_UniqueId           = { CONFIG_KEY("unique-id") };
 
+const MbedConfig::Key MbedConfig::kConfigKey_VendorName            = { CONFIG_KEY("vendor-name") };
+const MbedConfig::Key MbedConfig::kConfigKey_ProductName           = { CONFIG_KEY("product-name") };
+const MbedConfig::Key MbedConfig::kConfigKey_HardwareVersionString = { CONFIG_KEY("hardware-version-string") };
+const MbedConfig::Key MbedConfig::kConfigKey_SoftwareVersionString = { CONFIG_KEY("software-version-string") };
+
+static const Key kConfigKey_;
+static const Key kConfigKey_;
+static const Key kConfigKey_;
+static const Key kConfigKey_;
+
 // Keys stored in the Chip-counters namespace
 const MbedConfig::Key MbedConfig::kCounterKey_RebootCount           = { COUNTER_KEY("reboot-count") };
 const MbedConfig::Key MbedConfig::kCounterKey_UpTime                = { COUNTER_KEY("up-time") };

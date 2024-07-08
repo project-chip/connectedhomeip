@@ -123,6 +123,18 @@ const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_UniqueId = {
     { .systemID = kCC13XX_26XXMatter_SysID, .itemID = kCC13XX_26XXMatter_ItemID_ChipConfig, .subID = 0x0001d }
 };
 
+const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_VendorName = {
+    { .systemID = kCC13XX_26XXMatter_SysID, .itemID = kCC13XX_26XXMatter_ItemID_ChipConfig, .subID = 0x0001e }
+};
+const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_ProductName = {
+    { .systemID = kCC13XX_26XXMatter_SysID, .itemID = kCC13XX_26XXMatter_ItemID_ChipConfig, .subID = 0x0001f }
+};
+const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_HardwareVersionString = {
+    { .systemID = kCC13XX_26XXMatter_SysID, .itemID = kCC13XX_26XXMatter_ItemID_ChipConfig, .subID = 0x00020 }
+};
+const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_SoftwareVersionString = {
+    { .systemID = kCC13XX_26XXMatter_SysID, .itemID = kCC13XX_26XXMatter_ItemID_ChipConfig, .subID = 0x00021 }
+};
 /* Internal for the KVS interface. */
 const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_KVS_key   = { { .systemID = kCC13XX_26XXMatter_SysID,
                                                                            .itemID   = kCC13XX_26XXMatter_ItemID_ChipKVS_key } };
