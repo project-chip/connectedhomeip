@@ -21,6 +21,7 @@
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
+#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -29,19 +30,27 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
+#include <app/data-model-interface/OperationTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/Nullable.h>
+#include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
+#include <app/util/ember-io-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVReader.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/core/TLVWriter.h>
+#include <lib/support/Span.h>
 
 #include <gtest/gtest.h>
 #include <vector>
@@ -56,6 +65,9 @@ namespace {
 
 constexpr FabricIndex kTestFabrixIndex = kMinValidFabricIndex;
 constexpr NodeId kTestNodeId           = 0xFFFF'1234'ABCD'4321;
+
+constexpr AttributeId kAttributeIdReadOnly   = 0x3001;
+constexpr AttributeId kAttributeIdTimedWrite = 0x3002;
 
 constexpr EndpointId kEndpointIdThatIsMissing = kMockEndpointMin - 1;
 
@@ -106,6 +118,57 @@ bool operator==(const Access::SubjectDescriptor & a, const Access::SubjectDescri
     }
     return true;
 }
+
+class TestDataModelChangeListener : public DataModelChangeListener
+{
+public:
+    void MarkDirty(const ConcreteAttributePath & path) override { mDirtyList.push_back(path); }
+
+    std::vector<ConcreteAttributePath> & DirtyList() { return mDirtyList; }
+    const std::vector<ConcreteAttributePath> & DirtyList() const { return mDirtyList; }
+
+private:
+    std::vector<ConcreteAttributePath> mDirtyList;
+};
+
+class TestEventGenerator : public EventsGenerator
+{
+    CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
+                             EventNumber & generatedEventNumber) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+};
+
+class TestActionContext : public ActionContext
+{
+public:
+    Messaging::ExchangeContext * CurrentExchange() override { return nullptr; }
+};
+
+class CodegenDataModelWithContext : public CodegenDataModel
+{
+public:
+    CodegenDataModelWithContext()
+    {
+        InteractionModelContext context{
+            .eventsGenerator         = &mEventGenerator,
+            .dataModelChangeListener = &mChangeListener,
+            .actionContext           = &mActionContext,
+        };
+
+        Startup(context);
+    }
+    ~CodegenDataModelWithContext() { Shutdown(); }
+
+    TestDataModelChangeListener & ChangeListener() { return mChangeListener; }
+    const TestDataModelChangeListener & ChangeListener() const { return mChangeListener; }
+
+private:
+    TestEventGenerator mEventGenerator;
+    TestDataModelChangeListener mChangeListener;
+    TestActionContext mActionContext;
+};
 
 class MockAccessControl : public Access::AccessControl::Delegate, public Access::AccessControl::DeviceTypeResolver
 {
@@ -348,6 +411,10 @@ const MockNodeConfig gTestNodeConfig({
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_IPV6ADR_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_IPV6PRE_ATTRIBUTE_TYPE),
             MOCK_ATTRIBUTE_CONFIG_NULLABLE(ZCL_HWADR_ATTRIBUTE_TYPE),
+
+            // Special case handling
+            MockAttributeConfig(kAttributeIdReadOnly, ZCL_INT32S_ATTRIBUTE_TYPE, 0),
+            MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE),
         }),
     }),
 });
@@ -422,12 +489,56 @@ public:
         return encoder.Encode(mData);
     }
 
+    CHIP_ERROR Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override
+    {
+        if (static_cast<const ConcreteAttributePath &>(path) != mPath)
+        {
+            // returning without trying to handle means "I do not handle this"
+            return CHIP_NO_ERROR;
+        }
+
+        return decoder.Decode(mData);
+    }
+
     void SetReturnedData(const Clusters::UnitTesting::Structs::SimpleStruct::Type & data) { mData = data; }
-    Clusters::UnitTesting::Structs::SimpleStruct::Type simpleStruct;
+    const Clusters::UnitTesting::Structs::SimpleStruct::Type & GetData() const { return mData; }
 
 private:
     ConcreteAttributePath mPath;
     Clusters::UnitTesting::Structs::SimpleStruct::Type mData;
+};
+
+class ErrorAccessInterface : public AttributeAccessInterface
+{
+public:
+    ErrorAccessInterface(ConcreteAttributePath path, CHIP_ERROR err) :
+        AttributeAccessInterface(MakeOptional(path.mEndpointId), path.mClusterId), mPath(path), mError(err)
+    {}
+    ~ErrorAccessInterface() = default;
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder) override
+    {
+        if (static_cast<const ConcreteAttributePath &>(path) != mPath)
+        {
+            // returning without trying to handle means "I do not handle this"
+            return CHIP_NO_ERROR;
+        }
+        return mError;
+    }
+
+    CHIP_ERROR Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override
+    {
+        if (static_cast<const ConcreteAttributePath &>(path) != mPath)
+        {
+            // returning without trying to handle means "I do not handle this"
+            return CHIP_NO_ERROR;
+        }
+        return mError;
+    }
+
+private:
+    ConcreteAttributePath mPath;
+    CHIP_ERROR mError;
 };
 
 class ListAttributeAcessInterface : public AttributeAccessInterface
@@ -458,7 +569,6 @@ public:
 
     void SetReturnedData(const Clusters::UnitTesting::Structs::SimpleStruct::Type & data) { mData = data; }
     void SetReturnedDataCount(unsigned count) { mCount = count; }
-    Clusters::UnitTesting::Structs::SimpleStruct::Type simpleStruct;
 
 private:
     ConcreteAttributePath mPath;
@@ -508,7 +618,7 @@ struct TestReadRequest
         request.path              = path;
     }
 
-    std::unique_ptr<AttributeValueEncoder> StartEncoding(chip::app::InteractionModel::DataModel * model,
+    std::unique_ptr<AttributeValueEncoder> StartEncoding(InteractionModel::DataModel * model,
                                                          AttributeEncodeState state = AttributeEncodeState())
     {
         std::optional<ClusterInfo> info = model->GetClusterInfo(request.path);
@@ -538,11 +648,60 @@ struct TestReadRequest
     CHIP_ERROR FinishEncoding() { return encodedIBs.FinishEncoding(reportBuilder); }
 };
 
+// Sets up data for writing
+struct TestWriteRequest
+{
+    InteractionModel::WriteAttributeRequest request;
+    uint8_t tlvBuffer[128] = { 0 };
+    TLV::TLVReader
+        tlvReader; /// tlv reader used for the returned AttributeValueDecoder (since attributeValueDecoder uses references)
+
+    TestWriteRequest(const Access::SubjectDescriptor & subject, const ConcreteDataAttributePath & path)
+    {
+        request.subjectDescriptor = subject;
+        request.path              = path;
+    }
+
+    template <typename T>
+    TLV::TLVReader ReadEncodedValue(const T & value)
+    {
+        TLV::TLVWriter writer;
+        writer.Init(tlvBuffer);
+
+        // Encoding is within a structure:
+        //   - BEGIN_STRUCT
+        //     - 1: .....
+        //   - END_STRUCT
+        TLV::TLVType outerContainerType;
+        VerifyOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
+        VerifyOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
+        VerifyOrDie(writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
+        VerifyOrDie(writer.Finalize() == CHIP_NO_ERROR);
+
+        TLV::TLVReader reader;
+        reader.Init(tlvBuffer);
+
+        // position the reader inside the buffer, on the encoded value
+        VerifyOrDie(reader.Next() == CHIP_NO_ERROR);
+        VerifyOrDie(reader.EnterContainer(outerContainerType) == CHIP_NO_ERROR);
+        VerifyOrDie(reader.Next() == CHIP_NO_ERROR);
+
+        return reader;
+    }
+
+    template <class T>
+    AttributeValueDecoder DecoderFor(const T & value)
+    {
+        tlvReader = ReadEncodedValue(value);
+        return AttributeValueDecoder(tlvReader, request.subjectDescriptor.value_or(kDenySubjectDescriptor));
+    }
+};
+
 template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType value)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -577,7 +736,7 @@ template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarNullRead()
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -606,12 +765,128 @@ void TestEmberScalarNullRead()
     ASSERT_TRUE(actual.IsNull());
 }
 
+template <typename T, EmberAfAttributeType ZclType>
+void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingType value)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    // non-nullable test
+    {
+        TestWriteRequest test(
+            kAdminSubjectDescriptor,
+            ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZclType)));
+        AttributeValueDecoder decoder = test.DecoderFor(value);
+
+        // write should succeed
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+
+        // Validate data after write
+        chip::ByteSpan writtenData = Test::GetEmberBuffer();
+
+        typename NumericAttributeTraits<T>::StorageType storage;
+        ASSERT_GE(writtenData.size(), sizeof(storage));
+        memcpy(&storage, writtenData.data(), sizeof(storage));
+        typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
+
+        EXPECT_EQ(actual, value);
+        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
+
+        // reset for the next test
+        model.ChangeListener().DirtyList().clear();
+    }
+
+    // nullable test
+    {
+        TestWriteRequest test(
+            kAdminSubjectDescriptor,
+            ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZclType)));
+        AttributeValueDecoder decoder = test.DecoderFor(value);
+
+        // write should succeed
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+
+        // Validate data after write
+        chip::ByteSpan writtenData = Test::GetEmberBuffer();
+
+        typename NumericAttributeTraits<T>::StorageType storage;
+        ASSERT_GE(writtenData.size(), sizeof(storage));
+        memcpy(&storage, writtenData.data(), sizeof(storage));
+        typename NumericAttributeTraits<T>::WorkingType actual = NumericAttributeTraits<T>::StorageToWorking(storage);
+
+        ASSERT_EQ(actual, value);
+        ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(model.ChangeListener().DirtyList()[0], test.request.path);
+    }
+}
+
+template <typename T, EmberAfAttributeType ZclType>
+void TestEmberScalarNullWrite()
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZclType)));
+
+    using NumericType             = NumericAttributeTraits<T>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+    AttributeValueDecoder decoder = test.DecoderFor<NullableType>(NullableType());
+
+    // write should succeed
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+
+    // Validate data after write
+    chip::ByteSpan writtenData = Test::GetEmberBuffer();
+
+    using Traits = NumericAttributeTraits<T>;
+
+    typename Traits::StorageType storage;
+    ASSERT_GE(writtenData.size(), sizeof(storage));
+    memcpy(&storage, writtenData.data(), sizeof(storage));
+    ASSERT_TRUE(Traits::IsNullValue(storage));
+}
+
+template <typename T, EmberAfAttributeType ZclType>
+void TestEmberScalarTypeWriteNullValueToNullable()
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZclType)));
+
+    using NumericType             = NumericAttributeTraits<T>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+    AttributeValueDecoder decoder = test.DecoderFor<NullableType>(NullableType());
+
+    // write should fail: we are trying to write null
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_WRONG_TLV_TYPE);
+}
+
+uint16_t ReadLe16(const void * buffer)
+{
+    const uint8_t * p = reinterpret_cast<const uint8_t *>(buffer);
+    return chip::Encoding::LittleEndian::Read16(p);
+}
+
+void WriteLe16(void * buffer, uint16_t value)
+{
+    uint8_t * p = reinterpret_cast<uint8_t *>(buffer);
+    chip::Encoding::LittleEndian::Write16(p, value);
+}
+
 } // namespace
 
 TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
     EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
@@ -639,7 +914,7 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
 TEST(TestCodegenModelViaMocks, IterateOverClusters)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     chip::Test::ResetVersion();
 
@@ -702,7 +977,7 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
 {
 
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     chip::Test::ResetVersion();
 
@@ -727,7 +1002,7 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
 TEST(TestCodegenModelViaMocks, IterateOverAttributes)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
@@ -798,7 +1073,7 @@ TEST(TestCodegenModelViaMocks, IterateOverAttributes)
 TEST(TestCodegenModelViaMocks, GetAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // various non-existent or invalid paths should return no info data
     ASSERT_FALSE(
@@ -838,7 +1113,7 @@ TEST(TestCodegenModelViaMocks, GetAttributeInfo)
 TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     std::optional<AttributeInfo> info = model.GetAttributeInfo(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
@@ -853,7 +1128,7 @@ TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
 TEST(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.FirstAcceptedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
@@ -918,7 +1193,7 @@ TEST(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
 TEST(TestCodegenModelViaMocks, AcceptedCommandInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.GetAcceptedCommandInfo(ConcreteCommandPath(kEndpointIdThatIsMissing, MockClusterId(1), 1)).has_value());
@@ -950,7 +1225,7 @@ TEST(TestCodegenModelViaMocks, AcceptedCommandInfo)
 TEST(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.FirstGeneratedCommand(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).HasValidIds());
@@ -1009,20 +1284,20 @@ TEST(TestCodegenModelViaMocks, IterateOverGeneratedCommands)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kDenySubjectDescriptor,
                                 ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
-    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_ERROR_ACCESS_DENIED);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
 }
 
 TEST(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     {
@@ -1043,7 +1318,7 @@ TEST(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
 TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     // Invalid attribute
@@ -1077,7 +1352,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 TEST(TestCodegenModelViaMocks, EmberAttributePathExpansionAccessDeniedRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kDenySubjectDescriptor,
@@ -1095,7 +1370,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributePathExpansionAccessDeniedRead)
 TEST(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kTestPath(kMockEndpoint3, MockClusterId(4),
@@ -1199,7 +1474,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     {
@@ -1227,12 +1502,15 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
         std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
         ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(Busy));
     }
+
+    // reset things to success to not affect other tests
+    chip::Test::SetEmberReadOutput(ByteSpan());
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -1267,7 +1545,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -1277,9 +1555,8 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 
     // NOTE: This is a pascal string, so actual data is "test"
     //       the longer encoding is to make it clear we do not encode the overflow
-    char data[]  = "\0\0testing here with overflow";
-    uint16_t len = 4;
-    memcpy(data, &len, sizeof(uint16_t));
+    char data[] = "\0\0testing here with overflow";
+    WriteLe16(data, 4);
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
@@ -1307,7 +1584,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -1344,7 +1621,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -1353,9 +1630,8 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
 
     // NOTE: This is a pascal string, so actual data is "abcde"
     //       the longer encoding is to make it clear we do not encode the overflow
-    char data[]  = "\0abcdef...this is the alphabet";
-    uint16_t len = 5;
-    memcpy(data, &len, sizeof(uint8_t));
+    char data[] = "\0abcdef...this is the alphabet";
+    *data       = 5;
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
@@ -1381,7 +1657,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -1391,9 +1667,8 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 
     // NOTE: This is a pascal string, so actual data is "abcde"
     //       the longer encoding is to make it clear we do not encode the overflow
-    char data[]  = "\0\0abcdef...this is the alphabet";
-    uint16_t len = 5;
-    memcpy(data, &len, sizeof(uint16_t));
+    char data[] = "\0\0abcdef...this is the alphabet";
+    WriteLe16(data, 5);
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
@@ -1419,7 +1694,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1459,10 +1734,25 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
     ASSERT_TRUE(actual.e.data_equal("foo"_span));
 }
 
+TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceReadError)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor, kStructPath);
+    RegisteredAttributeAccessInterface<ErrorAccessInterface> aai(kStructPath, CHIP_ERROR_KEY_NOT_FOUND);
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_ERROR_KEY_NOT_FOUND);
+}
+
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1514,7 +1804,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1573,7 +1863,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1635,7 +1925,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
 TEST(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel model;
+    CodegenDataModelWithContext model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -1686,4 +1976,506 @@ TEST(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
     {
         EXPECT_EQ(items[i], expected[i]);
     }
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteAclDeny)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kDenySubjectDescriptor, ConcreteDataAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
+    AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
+    ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
+{
+    TestEmberScalarTypeWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>(0x12);
+    TestEmberScalarTypeWrite<uint16_t, ZCL_ENUM16_ATTRIBUTE_TYPE>(0x1234);
+    TestEmberScalarTypeWrite<OddSizedInteger<3, false>, ZCL_INT24U_ATTRIBUTE_TYPE>(0x112233);
+    TestEmberScalarTypeWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(0x11223344);
+    TestEmberScalarTypeWrite<OddSizedInteger<5, false>, ZCL_INT40U_ATTRIBUTE_TYPE>(0x1122334455ULL);
+    TestEmberScalarTypeWrite<OddSizedInteger<6, false>, ZCL_INT48U_ATTRIBUTE_TYPE>(0x112233445566ULL);
+    TestEmberScalarTypeWrite<OddSizedInteger<7, false>, ZCL_INT56U_ATTRIBUTE_TYPE>(0x11223344556677ULL);
+    TestEmberScalarTypeWrite<uint64_t, ZCL_INT64U_ATTRIBUTE_TYPE>(0x1122334455667788ULL);
+
+    TestEmberScalarTypeWrite<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>(-10);
+    TestEmberScalarTypeWrite<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>(-123);
+    TestEmberScalarTypeWrite<OddSizedInteger<3, true>, ZCL_INT24S_ATTRIBUTE_TYPE>(-1234);
+    TestEmberScalarTypeWrite<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE>(-12345);
+    TestEmberScalarTypeWrite<OddSizedInteger<5, true>, ZCL_INT40S_ATTRIBUTE_TYPE>(-123456);
+    TestEmberScalarTypeWrite<OddSizedInteger<6, true>, ZCL_INT48S_ATTRIBUTE_TYPE>(-1234567);
+    TestEmberScalarTypeWrite<OddSizedInteger<7, true>, ZCL_INT56S_ATTRIBUTE_TYPE>(-12345678);
+    TestEmberScalarTypeWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>(-123456789);
+
+    TestEmberScalarTypeWrite<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>(true);
+    TestEmberScalarTypeWrite<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>(false);
+    TestEmberScalarTypeWrite<float, ZCL_SINGLE_ATTRIBUTE_TYPE>(0.625);
+    TestEmberScalarTypeWrite<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>(0.625);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteInvalidValueToNullable)
+{
+    TestEmberScalarTypeWriteNullValueToNullable<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<uint16_t, ZCL_ENUM16_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<3, false>, ZCL_INT24U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<5, false>, ZCL_INT40U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<6, false>, ZCL_INT48U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<7, false>, ZCL_INT56U_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<uint64_t, ZCL_INT64U_ATTRIBUTE_TYPE>();
+
+    TestEmberScalarTypeWriteNullValueToNullable<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<3, true>, ZCL_INT24S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<5, true>, ZCL_INT40S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<6, true>, ZCL_INT48S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<OddSizedInteger<7, true>, ZCL_INT56S_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
+
+    TestEmberScalarTypeWriteNullValueToNullable<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<float, ZCL_SINGLE_ATTRIBUTE_TYPE>();
+    TestEmberScalarTypeWriteNullValueToNullable<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>();
+}
+
+TEST(TestCodegenModelViaMocks, EmberTestWriteReservedNullPlaceholderToNullable)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE)));
+
+    using NumericType             = NumericAttributeTraits<uint32_t>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+    AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0xFFFFFFFF);
+
+    // write should fail: we are trying to write null which is out of range
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNonNullable)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_INT24U_ATTRIBUTE_TYPE)));
+
+    using NumericType             = NumericAttributeTraits<uint32_t>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+    AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0x1223344);
+
+    // write should fail: written value is not in range
+    // NOTE: this matches legacy behaviour, however realistically maybe ConstraintError would be more correct
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestCodegenModelViaMocks, EmberTestWriteOutOfRepresentableRangeOddIntegerNullable)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_INT24U_ATTRIBUTE_TYPE)));
+
+    using NumericType             = NumericAttributeTraits<uint32_t>;
+    using NullableType            = chip::app::DataModel::Nullable<typename NumericType::WorkingType>;
+    AttributeValueDecoder decoder = test.DecoderFor<NullableType>(0x1223344);
+
+    // write should fail: written value is not in range
+    // NOTE: this matches legacy behaviour, however realistically maybe ConstraintError would be more correct
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestCodegenModelViaMoceNullValueToNullables, EmberAttributeWriteBasicTypesLowestValue)
+{
+    TestEmberScalarTypeWrite<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>(-127);
+    TestEmberScalarTypeWrite<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>(-32767);
+    TestEmberScalarTypeWrite<OddSizedInteger<3, true>, ZCL_INT24S_ATTRIBUTE_TYPE>(-8388607);
+    TestEmberScalarTypeWrite<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE>(-2147483647);
+    TestEmberScalarTypeWrite<OddSizedInteger<5, true>, ZCL_INT40S_ATTRIBUTE_TYPE>(-549755813887);
+    TestEmberScalarTypeWrite<OddSizedInteger<6, true>, ZCL_INT48S_ATTRIBUTE_TYPE>(-140737488355327);
+    TestEmberScalarTypeWrite<OddSizedInteger<7, true>, ZCL_INT56S_ATTRIBUTE_TYPE>(-36028797018963967);
+    TestEmberScalarTypeWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>(-9223372036854775807);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteNulls)
+{
+    TestEmberScalarNullWrite<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<uint16_t, ZCL_ENUM16_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<OddSizedInteger<3, false>, ZCL_INT24U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<OddSizedInteger<5, false>, ZCL_INT40U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<OddSizedInteger<6, false>, ZCL_INT48U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<OddSizedInteger<7, false>, ZCL_INT56U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<uint64_t, ZCL_INT64U_ATTRIBUTE_TYPE>();
+
+    TestEmberScalarNullWrite<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<OddSizedInteger<3, true>, ZCL_INT24S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<OddSizedInteger<5, true>, ZCL_INT40S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<OddSizedInteger<6, true>, ZCL_INT48S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<OddSizedInteger<7, true>, ZCL_INT56S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<float, ZCL_SINGLE_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullWrite<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>();
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortString)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_CHAR_STRING_ATTRIBUTE_TYPE)));
+    AttributeValueDecoder decoder = test.DecoderFor<CharSpan>("hello world"_span);
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+    chip::ByteSpan writtenData = GetEmberBuffer();
+    chip::CharSpan asCharSpan(reinterpret_cast<const char *>(writtenData.data()), writtenData[0] + 1);
+    ASSERT_TRUE(asCharSpan.data_equal("\x0Bhello world"_span));
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongStringOutOfBounds)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
+
+    // Mocks allow for 16 bytes only by default for string attributes
+    AttributeValueDecoder decoder = test.DecoderFor<CharSpan>(
+        "this is a very long string that will be longer than the default attribute size for our mocks"_span);
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(InvalidValue));
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongString)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
+    AttributeValueDecoder decoder = test.DecoderFor<CharSpan>("text"_span);
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+    chip::ByteSpan writtenData = GetEmberBuffer();
+
+    uint16_t len = ReadLe16(writtenData.data());
+    EXPECT_EQ(len, 4);
+    chip::CharSpan asCharSpan(reinterpret_cast<const char *>(writtenData.data() + 2), 4);
+
+    ASSERT_TRUE(asCharSpan.data_equal("text"_span));
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteNullableLongStringValue)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
+    AttributeValueDecoder decoder =
+        test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::MakeNullable("text"_span));
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+    chip::ByteSpan writtenData = GetEmberBuffer();
+
+    uint16_t len = ReadLe16(writtenData.data());
+    EXPECT_EQ(len, 4);
+    chip::CharSpan asCharSpan(reinterpret_cast<const char *>(writtenData.data() + 2), 4);
+
+    ASSERT_TRUE(asCharSpan.data_equal("text"_span));
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongNullableStringNull)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
+    AttributeValueDecoder decoder =
+        test.DecoderFor<chip::app::DataModel::Nullable<CharSpan>>(chip::app::DataModel::Nullable<CharSpan>());
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+    chip::ByteSpan writtenData = GetEmberBuffer();
+    ASSERT_EQ(writtenData[0], 0xFF);
+    ASSERT_EQ(writtenData[1], 0xFF);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteShortBytes)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_OCTET_STRING_ATTRIBUTE_TYPE)));
+    uint8_t buffer[] = { 11, 12, 13 };
+
+    AttributeValueDecoder decoder = test.DecoderFor<ByteSpan>(ByteSpan(buffer));
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+    chip::ByteSpan writtenData = GetEmberBuffer();
+
+    EXPECT_EQ(writtenData[0], 3u);
+    EXPECT_EQ(writtenData[1], 11u);
+    EXPECT_EQ(writtenData[2], 12u);
+    EXPECT_EQ(writtenData[3], 13u);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteLongBytes)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE)));
+    uint8_t buffer[] = { 11, 12, 13 };
+
+    AttributeValueDecoder decoder = test.DecoderFor<ByteSpan>(ByteSpan(buffer));
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+    chip::ByteSpan writtenData = GetEmberBuffer();
+
+    uint16_t len = ReadLe16(writtenData.data());
+    EXPECT_EQ(len, 3);
+
+    EXPECT_EQ(writtenData[2], 11u);
+    EXPECT_EQ(writtenData[3], 12u);
+    EXPECT_EQ(writtenData[4], 13u);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteTimedWrite)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor, ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), kAttributeIdTimedWrite));
+    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(NeedsTimedInteraction));
+
+    // writing as timed should be fine
+    test.request.writeFlags.Set(WriteFlags::kTimed);
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteReadOnlyAttribute)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor, ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), kAttributeIdReadOnly));
+    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+
+    // Internal writes bypass the read only requirement
+    test.request.operationFlags.Set(OperationFlags::kInternal);
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_INT32S_ATTRIBUTE_TYPE)));
+
+    // Initialize to some version
+    ResetVersion();
+    BumpVersion();
+    test.request.path.mDataVersion = MakeOptional(GetVersion());
+
+    // Make version invalid
+    BumpVersion();
+
+    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
+
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(DataVersionMismatch));
+
+    // Write passes if we set the right version for the data
+    test.request.path.mDataVersion = MakeOptional(GetVersion());
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+}
+
+TEST(TestCodegenModelViaMocks, WriteToInvalidPath)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    {
+        TestWriteRequest test(kAdminSubjectDescriptor, ConcreteAttributePath(kInvalidEndpointId, MockClusterId(1234), 1234));
+        AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    }
+    {
+        TestWriteRequest test(kAdminSubjectDescriptor, ConcreteAttributePath(kMockEndpoint1, MockClusterId(1234), 1234));
+        AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(UnsupportedCluster));
+    }
+
+    {
+        TestWriteRequest test(kAdminSubjectDescriptor, ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), 1234));
+        AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    }
+}
+
+TEST(TestCodegenModelViaMocks, WriteToGlobalAttribute)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor, ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), AttributeList::Id));
+    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+}
+
+TEST(TestCodegenModelViaMocks, EmberWriteFailure)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    TestWriteRequest test(kAdminSubjectDescriptor,
+                          ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_INT32S_ATTRIBUTE_TYPE)));
+
+    {
+        AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
+        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(Failure));
+    }
+    {
+        AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
+        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
+        ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(Busy));
+    }
+    // reset things to success to not affect other tests
+    chip::Test::SetEmberReadOutput(ByteSpan());
+}
+
+TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
+    RegisteredAttributeAccessInterface<StructAttributeAccessInterface> aai(kStructPath);
+
+    TestWriteRequest test(kAdminSubjectDescriptor, kStructPath);
+    Clusters::UnitTesting::Structs::SimpleStruct::Type testValue{
+        .a = 112,
+        .b = true,
+        .e = "aai_write_test"_span,
+        .g = 0.5,
+        .h = 0.125,
+    };
+
+    AttributeValueDecoder decoder = test.DecoderFor(testValue);
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_NO_ERROR);
+
+    EXPECT_EQ(aai->GetData().a, 112);
+    EXPECT_TRUE(aai->GetData().e.data_equal("aai_write_test"_span));
+
+    // AAI marks dirty paths
+    ASSERT_EQ(model.ChangeListener().DirtyList().size(), 1u);
+    EXPECT_EQ(model.ChangeListener().DirtyList()[0], kStructPath);
+
+    // AAI does not prevent read/write of regular attributes
+    // validate that once AAI is added, we still can go through writing regular bits (i.e.
+    // AAI returning "unknown" has fallback to ember)
+    TestEmberScalarTypeWrite<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(1234);
+    TestEmberScalarNullWrite<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
+}
+
+TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceReturningError)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
+    RegisteredAttributeAccessInterface<ErrorAccessInterface> aai(kStructPath, CHIP_ERROR_KEY_NOT_FOUND);
+
+    TestWriteRequest test(kAdminSubjectDescriptor, kStructPath);
+    Clusters::UnitTesting::Structs::SimpleStruct::Type testValue{
+        .a = 112,
+        .b = true,
+        .e = "aai_write_test"_span,
+        .g = 0.5,
+        .h = 0.125,
+    };
+
+    AttributeValueDecoder decoder = test.DecoderFor(testValue);
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_ERROR_KEY_NOT_FOUND);
+    ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
+}
+
+TEST(TestCodegenModelViaMocks, EmberWriteInvalidDataType)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelWithContext model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
+
+    TestWriteRequest test(kAdminSubjectDescriptor, kStructPath);
+    Clusters::UnitTesting::Structs::SimpleStruct::Type testValue{
+        .a = 112,
+        .b = true,
+        .e = "aai_write_test"_span,
+        .g = 0.5,
+        .h = 0.125,
+    };
+
+    AttributeValueDecoder decoder = test.DecoderFor(testValue);
+
+    // Embed specifically DOES NOT support structures.
+    // Without AAI, we expect a data type error (translated to failure)
+    ASSERT_EQ(model.WriteAttribute(test.request, decoder), CHIP_IM_GLOBAL_STATUS(Failure));
+    ASSERT_TRUE(model.ChangeListener().DirtyList().empty());
 }
