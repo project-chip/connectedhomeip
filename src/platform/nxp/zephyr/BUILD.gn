@@ -30,7 +30,6 @@ static_library("nxp_zephyr") {
     "../../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../../Zephyr/DiagnosticDataProviderImpl.h",
     "../../Zephyr/KeyValueStoreManagerImpl.cpp",
-    "../../Zephyr/Logging.cpp",
     "../../Zephyr/PlatformManagerImpl.cpp",
     "../../Zephyr/SysHeapMalloc.h",
     "../../Zephyr/SystemTimeSupport.cpp",

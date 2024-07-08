@@ -226,6 +226,22 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
     }
 }
 
+size_t CommandResponseSender::GetCommandResponseMaxBufferSize()
+{
+    if (!mExchangeCtx || !mExchangeCtx->HasSessionHandle())
+    {
+        ChipLogError(DataManagement, "Session not available. Unable to infer session-specific buffer capacities.");
+        return kMaxSecureSduLengthBytes;
+    }
+
+    if (mExchangeCtx->GetSessionHandle()->AllowsLargePayload())
+    {
+        return kMaxLargeSecureSduLengthBytes;
+    }
+
+    return kMaxSecureSduLengthBytes;
+}
+
 #if CHIP_WITH_NLFAULTINJECTION
 
 void CommandResponseSender::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,

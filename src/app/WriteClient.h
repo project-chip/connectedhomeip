@@ -228,12 +228,6 @@ public:
      */
     CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = System::Clock::kZero);
 
-    /**
-     *  Shutdown the WriteClient. This terminates this instance
-     *  of the object and releases all held resources.
-     */
-    void Shutdown();
-
 private:
     friend class TestWriteInteraction;
     friend class InteractionModelEngine;

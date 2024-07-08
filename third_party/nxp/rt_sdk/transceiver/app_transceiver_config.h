@@ -41,5 +41,6 @@
 #endif /* WIFI_TRANSCEIVER_SUPPORT */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#define CONFIG_BT_DEVICE_NAME "NXP BLE test"
 #include "edgefast_bluetooth_config.h"
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */

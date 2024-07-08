@@ -31,7 +31,6 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTest.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
@@ -42,9 +41,7 @@ const char TAG[] = "CHIP-tests";
 static void tester_task(void * pvParameters)
 {
     ESP_LOGI(TAG, "Starting CHIP tests!");
-    // TODO [PW_MIGRATION] Remove NLUnit tests call after migration
-    int status = RunRegisteredUnitTests();
-    status += chip::test::RunAllTests();
+    int status = chip::test::RunAllTests();
     ESP_LOGI(TAG, "CHIP test status: %d", status);
     exit(status);
 }
@@ -56,6 +53,13 @@ extern "C" void app_main()
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
+        exit(err);
+    }
+
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
         exit(err);
     }
 

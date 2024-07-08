@@ -80,7 +80,7 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    static void HandleC3ReadRequest(void);
+    static void HandleC3ReadRequest(rsi_ble_read_req_t * rsi_ble_read_req);
 #else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
@@ -119,10 +119,6 @@ private:
                         System::PacketBufferHandle pBuf) override;
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                           System::PacketBufferHandle pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBufferHandle pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
-                          const Ble::ChipBleUUID * charId) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 

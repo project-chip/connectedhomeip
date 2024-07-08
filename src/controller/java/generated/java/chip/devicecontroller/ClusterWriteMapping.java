@@ -2008,6 +2008,8 @@ public class ClusterWriteMapping {
     );
     writeBarrierControlInteractionInfo.put("writeBarrierClosePeriodAttribute", writeBarrierControlBarrierClosePeriodAttributeInteractionInfo);
     writeAttributeMap.put("barrierControl", writeBarrierControlInteractionInfo);
+    Map<String, InteractionInfo> writeServiceAreaInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("serviceArea", writeServiceAreaInteractionInfo);
     Map<String, InteractionInfo> writePumpConfigurationAndControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writePumpConfigurationAndControlLifetimeRunningHoursCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo pumpConfigurationAndControllifetimeRunningHoursCommandParameterInfo =
@@ -3417,6 +3419,28 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeRelativeHumidityMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("relativeHumidityMeasurement", writeRelativeHumidityMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeOccupancySensingInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeOccupancySensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo occupancySensingholdTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeOccupancySensingHoldTimeCommandParams.put(
+        "value",
+        occupancySensingholdTimeCommandParameterInfo
+    );
+    InteractionInfo writeOccupancySensingHoldTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OccupancySensingCluster) cluster).writeHoldTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeOccupancySensingHoldTimeCommandParams
+    );
+    writeOccupancySensingInteractionInfo.put("writeHoldTimeAttribute", writeOccupancySensingHoldTimeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeOccupancySensingPIROccupiedToUnoccupiedDelayCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo occupancySensingPIROccupiedToUnoccupiedDelayCommandParameterInfo =
         new CommandParameterInfo(
@@ -3638,6 +3662,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("radonConcentrationMeasurement", writeRadonConcentrationMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeWiFiNetworkManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wiFiNetworkManagement", writeWiFiNetworkManagementInteractionInfo);
+    Map<String, InteractionInfo> writeThreadBorderRouterManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("threadBorderRouterManagement", writeThreadBorderRouterManagementInteractionInfo);
     Map<String, InteractionInfo> writeThreadNetworkDirectoryInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeThreadNetworkDirectoryPreferredExtendedPanIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo threadNetworkDirectorypreferredExtendedPanIDCommandParameterInfo =

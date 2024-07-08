@@ -2497,6 +2497,7 @@
 					"-Wl,-unexported_symbol,\"__Unwind_*\"",
 					"-Wl,-unexported_symbol,\"_unw_*\"",
 					"-Wl,-hidden-lCHIP",
+					"-Wl,-no_inits",
 				);
 				"OTHER_LDFLAGS[sdk=macosx*]" = (
 					"-framework",
@@ -2515,6 +2516,7 @@
 					"-Wl,-unexported_symbol,\"__Unwind_*\"",
 					"-Wl,-unexported_symbol,\"_unw_*\"",
 					"-Wl,-hidden-lCHIP",
+					"-Wl,-no_inits",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";

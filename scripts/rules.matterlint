@@ -42,6 +42,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/flow-measurement-cluster.xml"
 load "../src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/global-attributes.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/global-structs.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml";
@@ -58,6 +59,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/media-playback-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/messages-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/mode-base-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/mode-select-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/network-commissioning-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml";
@@ -79,6 +81,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/refrigerator-and-temperature-
 load "../src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/service-area-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/scene.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml";
@@ -88,6 +91,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/temperature-measurement-clust
 load "../src/app/zap-templates/zcl/data-model/chip/test-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/thread-border-router-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml";

@@ -53,7 +53,6 @@ static_library("efr32") {
     "${silabs_platform_dir}/InetPlatformConfig.h",
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.cpp",
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.h",
-    "${silabs_platform_dir}/Logging.cpp",
     "${silabs_platform_dir}/MigrationManager.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
@@ -95,8 +94,12 @@ static_library("efr32") {
     ]
   }
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  public_deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  deps = [ "${silabs_platform_dir}/provision:provision-headers" ]
+  public_configs = []
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
@@ -134,8 +137,6 @@ static_library("efr32") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
-
-    public_configs = []
   }
 
   if (chip_enable_wifi) {
@@ -158,6 +159,14 @@ static_library("efr32") {
       ]
     }
 
-    public_configs = [ ":efr32-platform-wifi-config" ]
+    public_configs += [ ":efr32-platform-wifi-config" ]
   }
+}
+
+source_set("logging") {
+  sources = [ "${chip_root}/src/platform/silabs/Logging.cpp" ]
+  deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 }

@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ApplicationLauncherClusterApplicationEPStruct(
   val application: ApplicationLauncherClusterApplicationStruct,
-  val endpoint: Optional<UInt>
+  val endpoint: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("ApplicationLauncherClusterApplicationEPStruct {\n")
@@ -55,7 +55,7 @@ class ApplicationLauncherClusterApplicationEPStruct(
       val application =
         ApplicationLauncherClusterApplicationStruct.fromTlv(
           ContextSpecificTag(TAG_APPLICATION),
-          tlvReader
+          tlvReader,
         )
       val endpoint =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
