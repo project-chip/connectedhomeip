@@ -4064,6 +4064,7 @@ class ChipClusters:
                     "monitoredSubject": "int",
                     "key": "bytes",
                     "verificationKey": "bytes",
+                    "clientType": "int",
                 },
             },
             0x00000002: {
@@ -10427,6 +10428,19 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000003: {
+                "attributeName": "HoldTime",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000004: {
+                "attributeName": "HoldTimeLimits",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
             0x00000010: {
                 "attributeName": "PIROccupiedToUnoccupiedDelay",
                 "attributeId": 0x00000010,
@@ -14111,6 +14125,13 @@ class ChipClusters:
                     "sleepBeforeResponseTimeMs": "int",
                     "sizeOfResponseBuffer": "int",
                     "fillCharacter": "int",
+                },
+            },
+            0x00000018: {
+                "commandId": 0x00000018,
+                "commandName": "StringEchoRequest",
+                "args": {
+                    "payload": "bytes",
                 },
             },
             0xFFF200AA: {

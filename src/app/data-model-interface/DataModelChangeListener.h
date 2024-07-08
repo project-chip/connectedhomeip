@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 
 namespace chip {
 namespace app {
@@ -34,12 +34,12 @@ namespace InteractionModel {
 class DataModelChangeListener
 {
 public:
-    virtual ~DataModelChangeListener() = 0;
+    virtual ~DataModelChangeListener() = default;
 
     /// Mark all attributes matching the given path (which may be a wildcard) dirty.
     ///
     /// Wildcards are supported.
-    virtual void MarkDirty(const AttributePathParams & path) = 0;
+    virtual void MarkDirty(const ConcreteAttributePath & path) = 0;
 };
 
 } // namespace InteractionModel
