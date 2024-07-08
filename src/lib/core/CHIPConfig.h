@@ -1759,14 +1759,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
- *  @def CHIP_CONFIG_MAX_WIFI_NETWORK
+ *  @def CHIP_CONFIG_MAX_WIFI_NETWORKS
  *
  *  @brief
- *    Maximum number of wifi network
+ *    Maximum number of wifi networks
  */
-#ifndef CHIP_CONFIG_MAX_WIFI_NETWORK
-#define CHIP_CONFIG_MAX_WIFI_NETWORK 1
-#endif // CHIP_CONFIG_MAX_WIFI_NETWORK
+#ifndef CHIP_CONFIG_MAX_WIFI_NETWORKS
+#define CHIP_CONFIG_MAX_WIFI_NETWORKS 1
+#endif // CHIP_CONFIG_MAX_WIFI_NETWORKS
 
 /**
  * @}

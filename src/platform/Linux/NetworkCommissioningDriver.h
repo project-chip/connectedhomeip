@@ -25,13 +25,13 @@
 
 #include <vector>
 
-#define CAN_HAVE_MAX_NETWORK 10
+#define MAX_NETWORKS_MAXIMUM 10
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-static constexpr uint8_t kMaxNetworks = CHIP_CONFIG_MAX_WIFI_NETWORK;
-static_assert(kMaxNetworks <= CAN_HAVE_MAX_NETWORK, "Cannot have more than 10 networks");
+static constexpr uint8_t kMaxNetworks = CHIP_CONFIG_MAX_WIFI_NETWORKS;
+static_assert(kMaxNetworks <= MAX_NETWORKS_MAXIMUM, "Cannot have more than 10 networks");
 
 template <typename T>
 class LinuxScanResponseIterator : public Iterator<T>
@@ -153,10 +153,10 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
 
-    // Number of entries in mStagedNetwork
+    // Number of entries in mStagingNetworks
     uint8_t mCurrentNetId = 0;
-    WiFiNetwork mSavedNetwork[kMaxNetworks];
-    WiFiNetwork mStagingNetwork[kMaxNetworks];
+    WiFiNetwork mSavedNetworks[kMaxNetworks];
+    WiFiNetwork mStagingNetworks[kMaxNetworks];
     ConnectCallback * mpConnectCallback;
     // Index location of the network the device is connected to
     int8_t mStagedConnectedNetworkIndex = -1;
