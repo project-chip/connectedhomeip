@@ -305,7 +305,7 @@ static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
     WfxEvent_t WfxEvent;
     wfx_rsi.join_retries += 1;
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
-    WfxEvent.eventType          = WFX_EVT_STA_START_JOIN;
+    WfxEvent.eventType = WFX_EVT_STA_START_JOIN;
     WfxPostEvent(&WfxEvent);
 }
 /*************************************************************************************
@@ -579,9 +579,10 @@ static void wfx_rsi_do_join(void)
             wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
             SILABS_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status, wfx_rsi.join_retries);
             wfx_retry_connection(++wfx_rsi.join_retries);
-        } else {
-                SILABS_LOG("%s: starting JOIN to %s after %d tries\n", __func__, (char *) &wfx_rsi.sec.ssid[0],
-                           wfx_rsi.join_retries);
+        }
+        else
+        {
+            SILABS_LOG("%s: starting JOIN to %s after %d tries\n", __func__, (char *) &wfx_rsi.sec.ssid[0], wfx_rsi.join_retries);
         }
     }
 }

@@ -201,7 +201,8 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
         }
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
-    if(BaseApplication::GetProvisionStatus()) {
+    if (BaseApplication::GetProvisionStatus())
+    {
         // After the device is provisioned and the commissioning passed
         // resetting the isCommissioningStarted to false
         isComissioningStarted = false;

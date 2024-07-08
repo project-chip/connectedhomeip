@@ -418,7 +418,7 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
     SILABS_LOG("WFX Disconnected %d\r\n", reason);
     sl_wfx_context->state =
         static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
-    retryInProgress             = false;
+    retryInProgress = false;
     wfx_retry_connection(retryJoin);
 }
 
@@ -587,7 +587,7 @@ static void wfx_events_task(void * p_arg)
             hasNotifiedWifiConnectivity = false;
             SILABS_LOG("WIFI: Connected to AP");
             wifi_extra |= WE_ST_STA_CONN;
-            retryJoin     = 0;
+            retryJoin = 0;
             wfx_lwip_set_sta_link_up();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
             if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))

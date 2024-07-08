@@ -67,6 +67,7 @@ class BaseApplicationDelegate : public AppDelegate
 {
 public:
     bool isCommissioningInProgress() { return isComissioningStarted; }
+
 private:
     // AppDelegate
     bool isComissioningStarted = false;
