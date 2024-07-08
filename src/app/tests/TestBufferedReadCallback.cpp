@@ -268,11 +268,11 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
 
         auto iter = value.begin();
 
-        uint8_t index = 0;
+        uint32_t index = 0;
         while (iter.Next() && index < expectedListLength)
         {
             auto & iterValue = iter.GetValue();
-            EXPECT_EQ(iterValue, (index));
+            EXPECT_EQ(iterValue, (index % 256));
             index++;
         }
 
