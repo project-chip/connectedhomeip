@@ -161,9 +161,7 @@ Identify gIdentify = {
 bool BaseApplication::sIsProvisioned           = false;
 bool BaseApplication::sIsFactoryResetTriggered = false;
 LEDWidget * BaseApplication::sAppActionLed     = nullptr;
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate();
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 
 #ifdef DIC_ENABLE
 namespace {

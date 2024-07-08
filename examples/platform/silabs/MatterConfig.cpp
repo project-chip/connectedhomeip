@@ -304,9 +304,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     initParams.appDelegate = &BaseApplication::sAppDelegate;
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
 

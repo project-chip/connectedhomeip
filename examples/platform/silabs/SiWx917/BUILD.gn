@@ -204,7 +204,7 @@ source_set("siwx917-common") {
     "${silabs_plat_si91x_wifi_dir}/dhcp_client.cpp",
     "${silabs_plat_si91x_wifi_dir}/ethernetif.cpp",
     "${silabs_plat_si91x_wifi_dir}/lwip_netif.cpp",
-    "${silabs_plat_si91x_wifi_dir}/wfx_notify.cpp",
+    "${silabs_common_plat_dir}/wifi/wfx_notify.cpp",
     "SiWx917/sl_wifi_if.cpp",
     "SiWx917/wfx_rsi_host.cpp",
   ]

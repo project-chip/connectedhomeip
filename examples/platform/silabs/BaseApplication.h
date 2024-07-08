@@ -62,7 +62,6 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 class BaseApplicationDelegate : public AppDelegate
 {
 public:
@@ -75,7 +74,6 @@ private:
     void OnCommissioningSessionStopped() override;
     void OnCommissioningWindowClosed() override;
 };
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 
 /**********************************************************
  * BaseApplication Declaration
@@ -90,9 +88,7 @@ public:
     static bool sIsProvisioned;
     static bool sIsFactoryResetTriggered;
     static LEDWidget * sAppActionLed;
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     static BaseApplicationDelegate sAppDelegate;
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 
     /**
      * @brief Create AppTask task and Event Queue
