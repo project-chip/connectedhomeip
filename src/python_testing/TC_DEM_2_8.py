@@ -52,30 +52,42 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
             TestStep("3a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
             TestStep("3b", "TH reads Forecast attribute. {valincludes} valid slots[0].ManufacturerESAState"),
             TestStep("3c", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            TestStep("4", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()-10, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("5", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, LoadControl=0}, constraints[1].{StartTime=now()+20, Duration=20, LoadControl=0}, constraints[2].{StartTime=now()+50, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("6", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, LoadControl=0}, constraints[1].{StartTime=now()+30, Duration=20, LoadControl=0}, constraints[2].{StartTime=now()+40, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("7", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+30, Duration=20, LoadControl=0}, constraints[1].{StartTime=now()+10, Duration=20, LoadControl=0}, constraints[2].{StartTime=now()+50, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("8", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, LoadControl=0}, constraints[1].{StartTime=now()+50, Duration=20, LoadControl=0}, constraints[2].{StartTime=now()+30, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("9", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=101}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("10", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=-101}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "4", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()-10, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "5", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, LoadControl=0}, constraints[1].{StartTime=now()+20, Duration=20, LoadControl=0}, constraints[2].{StartTime=now()+50, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "6", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, LoadControl=0}, constraints[1].{StartTime=now()+30, Duration=20, LoadControl=0}, constraints[2].{StartTime=now()+40, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "7", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+30, Duration=20, LoadControl=0}, constraints[1].{StartTime=now()+10, Duration=20, LoadControl=0}, constraints[2].{StartTime=now()+50, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "8", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, LoadControl=0}, constraints[1].{StartTime=now()+50, Duration=20, LoadControl=0}, constraints[2].{StartTime=now()+30, Duration=20, LoadControl=0}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "9", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=101}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "10", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=-101}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
             TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event. Verify Command response is Success"),
             TestStep("11a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
             TestStep("11b", "TH reads OptOutState attribute. Verify value is 0x02 (LocalOptOut)"),
-            TestStep("12", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("13", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=GridOptimization. Verify Command response is Success"),
+            TestStep(
+                "12", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "13", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=GridOptimization. Verify Command response is Success"),
             TestStep("13a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=GridOptimization"),
             TestStep("14", "TH sends CancelRequest. Verify Command response is Success"),
             TestStep("14a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=InternalOptimization"),
-            TestStep("15", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=GridOptimization. Verify Command response is Success"),
+            TestStep(
+                "15", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=GridOptimization. Verify Command response is Success"),
             TestStep("15a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=GridOptimization"),
             TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event. Verify Command response is Success"),
             TestStep("16a", "TH reads OptOutState attribute. Verify value is 0x03 (OptOut)"),
             TestStep("16b", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=InternalOptimization"),
-            TestStep("17", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=GridOptimization. Verify Command response is ConstraintError"),
+            TestStep(
+                "17", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=GridOptimization. Verify Command response is ConstraintError"),
             TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear. Verify Command response is Success"),
             TestStep("18a", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            TestStep("19", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=LocalOptimization. Verify Command response is Success"),
+            TestStep(
+                "19", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=LocalOptimization. Verify Command response is Success"),
             TestStep("19a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=LocalOptimization"),
             TestStep("20", "TH sends CancelRequest. Verify Command response is Success"),
             TestStep("20a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=InternalOptimization"),
@@ -98,8 +110,6 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
                                     self.dut_node_id,
                                     self.matter_test_config.endpoint)
 
-
-
         self.step("2")
         await self.check_test_event_triggers_enabled()
 
@@ -120,7 +130,8 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
         # Matter UTC is time since 00:00:00 1/1/2000
         now = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.datetime(2000, 1, 1, 0, 0, 0, 0, datetime.timezone.utc)
 
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() - 10, duration=20, loadControl=0)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=now.total_seconds() - 10, duration=20, loadControl=0)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("5")
@@ -128,7 +139,8 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
         now = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.datetime(2000, 1, 1, 0, 0, 0, 0, datetime.timezone.utc)
 
         constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 10, duration=20, loadControl=0),
-                          Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 20, duration=20, loadControl=0),
+                          Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+                              startTime=now.total_seconds() + 20, duration=20, loadControl=0),
                           Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 50, duration=20, loadControl=0)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
@@ -137,7 +149,8 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
         now = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.datetime(2000, 1, 1, 0, 0, 0, 0, datetime.timezone.utc)
 
         constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 10, duration=20, loadControl=0),
-                          Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 30, duration=20, loadControl=0),
+                          Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+                              startTime=now.total_seconds() + 30, duration=20, loadControl=0),
                           Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 40, duration=20, loadControl=0)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
@@ -145,7 +158,8 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
         now = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.datetime(2000, 1, 1, 0, 0, 0, 0, datetime.timezone.utc)
 
         constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 30, duration=20, loadControl=0),
-                          Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 10, duration=20, loadControl=0),
+                          Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+                              startTime=now.total_seconds() + 10, duration=20, loadControl=0),
                           Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 50, duration=20, loadControl=0)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
@@ -153,17 +167,19 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
         now = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.datetime(2000, 1, 1, 0, 0, 0, 0, datetime.timezone.utc)
 
         constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 10, duration=20, loadControl=0),
-                          Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 50, duration=20, loadControl=0),
+                          Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+                              startTime=now.total_seconds() + 50, duration=20, loadControl=0),
                           Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=now.total_seconds() + 30, duration=20, loadControl=0)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("9")
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=101)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=101)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
-
         self.step("10")
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=-101)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=-101)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("11")
@@ -176,31 +192,37 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kLocalOptOut)
 
         self.step("12")
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("13")
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.Success)
 
         self.step("13a")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization)
+        asserts.assert_equal(forecast.forecastUpdateReason,
+                             Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization)
 
         self.step("14")
         await self.send_cancel_request_command()
 
         self.step("14a")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization)
+        asserts.assert_equal(forecast.forecastUpdateReason,
+                             Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization)
 
         self.step("15")
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.Success)
 
         self.step("15a")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization)
+        asserts.assert_equal(forecast.forecastUpdateReason,
+                             Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization)
 
         self.step("16")
         await self.send_test_event_trigger_user_opt_out_grid()
@@ -210,10 +232,12 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
 
         self.step("16b")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization)
+        asserts.assert_equal(forecast.forecastUpdateReason,
+                             Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization)
 
         self.step("17")
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.ConstraintError)
 
         self.step("18")
@@ -223,25 +247,29 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
 
         self.step("19")
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=1)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.Success)
 
         self.step("19a")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization)
+        asserts.assert_equal(forecast.forecastUpdateReason,
+                             Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization)
 
         self.step("20")
         await self.send_cancel_request_command()
 
         self.step("20a")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization)
+        asserts.assert_equal(forecast.forecastUpdateReason,
+                             Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization)
 
         self.step("21")
         await self.send_cancel_request_command(expected_status=Status.InvalidInState)
 
         self.step("22")
         await self.send_test_event_trigger_constraint_based_adjustment_clear()
+
 
 if __name__ == "__main__":
     default_matter_test_main()

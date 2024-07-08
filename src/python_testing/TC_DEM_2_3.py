@@ -111,7 +111,7 @@ class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
         asserts.assert_not_equal(forecast, NullValue)
         if forecast is not NullValue:
             asserts.assert_less_equal(forecast.earliestStartTime, forecast.startTime,
-                                         f"Expected forecast earliestStartTime {forecast.earliestStartTime} to be <= startTime {forecast.startTime}")
+                                      f"Expected forecast earliestStartTime {forecast.earliestStartTime} to be <= startTime {forecast.startTime}")
             asserts.assert_greater_equal(forecast.latestEndTime, forecast.endTime,
                                          f"Expected forecast latestEndTime {forecast.latestEndTime} to be >= endTime {forecast.endTime}")
             asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
@@ -198,7 +198,7 @@ class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
         asserts.assert_greater_equal(forecast4.latestEndTime, forecast4.endTime,
                                      f"Expected forecast latestEndTime {forecast4.latestEndTime} to be >= endTime {forecast4.endTime}")
         asserts.assert_equal(forecast4.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
-                                   f"Expected forecastUpdateReason {forecast4.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
+                             f"Expected forecastUpdateReason {forecast4.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
 
         self.step("9")
         await self.send_start_time_adjust_request_command(requestedStartTime=forecast4.startTime+forecast4.latestEndTime - forecast4.endTime,

@@ -48,7 +48,8 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event"),
             TestStep("3a", "TH reads Forecast attribute. Value has to include a valid slots[0].ManufacturerESAState"),
-            TestStep("3b", "TH reads Forecast attribute. Value has to include valid slots[0].NominalPower, slots[0].MinPower, slots[0].MaxPower, slots[0].NominalEnergy"),
+            TestStep(
+                "3b", "TH reads Forecast attribute. Value has to include valid slots[0].NominalPower, slots[0].MinPower, slots[0].MaxPower, slots[0].NominalEnergy"),
             TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event Clear"),
         ]
 
@@ -66,8 +67,6 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     self.matter_test_config.endpoint)
-
-
 
         self.step("2")
         await self.check_test_event_triggers_enabled()
@@ -91,6 +90,7 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
 
         self.step("4")
         await self.send_test_event_trigger_forecast_clear()
+
 
 if __name__ == "__main__":
     default_matter_test_main()
