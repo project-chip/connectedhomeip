@@ -34,10 +34,7 @@ class GenericOpenThreadBorderRouterDelegate : public Delegate
 public:
     static constexpr char kFailsafeThreadBorderRouterCommissioned[] = "g/fs/tbrc";
 
-    GenericOpenThreadBorderRouterDelegate(const char *name)
-    {
-        strncpy(mThreadBorderRouterName, name, kBorderRouterNameMaxLength);
-    }
+    GenericOpenThreadBorderRouterDelegate(const char * name) { strncpy(mThreadBorderRouterName, name, kBorderRouterNameMaxLength); }
     ~GenericOpenThreadBorderRouterDelegate() = default;
 
     CHIP_ERROR Init() override;
@@ -80,7 +77,7 @@ public:
 
 private:
     CHIP_ERROR SaveThreadBorderRouterCommissioned(bool commissioned);
-    ActivateDatasetCallback * mCallback        = nullptr;
+    ActivateDatasetCallback * mCallback = nullptr;
     uint32_t mSequenceNum;
     char mThreadBorderRouterName[kBorderRouterNameMaxLength + 1];
 };

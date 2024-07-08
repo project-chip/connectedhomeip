@@ -165,7 +165,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::CommitActiveDataset()
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
 {
     // The FailSafe Timer is triggered and the previous command request should be handled, so reset the callback.
-    mCallback = nullptr;
+    mCallback               = nullptr;
     bool threadCommissioned = true;
     DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadBorderRouterCommissioned, &threadCommissioned);
     if (!threadCommissioned)
