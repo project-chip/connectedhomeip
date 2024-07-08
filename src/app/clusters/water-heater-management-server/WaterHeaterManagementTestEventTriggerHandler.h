@@ -35,7 +35,7 @@ bool HandleWaterHeaterManagementTestEventTrigger(uint64_t eventTrigger);
 namespace chip {
 
 /*
- * These Test EventTrigger values can be used to produce artificial water heater configuration 
+ * These Test EventTrigger values can be used to produce artificial water heater configuration
  * and water temperatures.
  *
  * They are sent along with the enableKey (manufacturer defined secret)
