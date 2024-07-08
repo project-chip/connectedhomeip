@@ -20,7 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/platform/device.gni")
 
 chip_test_suite("data_model") {
-  output_name = "libDataModelTests"
+  output_name = "libControllerDataModelTests"
 
   sources = [
     "DataModelFixtures.cpp",

@@ -113,7 +113,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/RvcOperationalStateClusterOperationalStateStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/RvcRunModeClusterModeOptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/RvcRunModeClusterModeTagStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ScenesManagementClusterAttributeValuePair.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ScenesManagementClusterAttributeValuePairStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ScenesManagementClusterExtensionFieldSet.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ScenesManagementClusterSceneInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ServiceAreaClusterHomeLocationStruct.kt",

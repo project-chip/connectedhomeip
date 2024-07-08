@@ -19,6 +19,11 @@ Python tests located in src/python_testing
 
 ## Writing Python tests
 
+-   Defining arguments in the test script
+    -   In order to streamline the configuration and execution of tests, it is
+        essential to define arguments at the top of the test script. This
+        section should include various parameters and their respective values,
+        which will guide the test runner on how to execute the tests.
 -   All test classes inherit from MatterBaseTest in
     [matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
     -   support for commissioning using the python controller
@@ -36,11 +41,17 @@ Python tests located in src/python_testing
 -   Use Mobly assertions for failing tests
 -   self.step() along with a steps\_ function to mark test plan steps for cert
     tests
--
 
 ### A simple test
 
 ```
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+
 class TC_MYTEST_1_1(MatterBaseTest):
 
     @async_test_body
@@ -73,6 +84,59 @@ read_single_attribute_check_success, the test is decorated with the
 The default_matter_test_main() function is used to run the test on the command
 line. These two lines should appear verbatim at the bottom of every python test
 file.
+
+## Defining the test arguments
+
+Below is the format:
+
+```
+# test-runner-runs: <run_identifier>
+# test-runner-run/<run_identifier>/app: ${TYPE_OF_APP}
+# test-runner-run/<run_identifier>/factoryreset: <True|False>
+# test-runner-run/<run_identifier>/quiet: <True|False>
+# test-runner-run/<run_identifier>/app-args: <app_arguments>
+# test-runner-run/<run_identifier>/script-args: <script_arguments>
+```
+
+### Description of Parameters
+
+-   test-runner-runs: Specifies the identifier for the run. This can be any
+    unique identifier.
+
+    -   Example: run1
+
+-   test-runner-run/<run_identifier>/app: Indicates the application to be used
+    in the test. Different app types as needed could be referenced from section
+    [name: Generate an argument environment file ] of the file
+    [.github/workflows/tests.yaml](https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/tests.yaml)
+
+        -   Example: \${TYPE_OF_APP}
+
+-   test-runner-run/<run_identifier>/factoryreset: Determines whether a factory
+    reset should be performed before the test.
+
+    -   Example: True
+
+-   test-runner-run/<run_identifier>/quiet: Sets the verbosity level of the test
+    run. When set to True, the test run will be quieter.
+
+    -   Example: True
+
+-   test-runner-run/<run_identifier>/app-args: Specifies the arguments to be
+    passed to the application during the test.
+
+    -   Example: --discriminator 1234 --KVS kvs1 --trace-to
+        json:\${TRACE_APP}.json
+
+-   test-runner-run/<run_identifier>/script-args: Specifies the arguments to be
+    passed to the test script.
+    -   Example: --storage-path admin_storage.json --commissioning-method
+        on-network --discriminator 1234 --passcode 20202021 --trace-to
+        json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+
+This structured format ensures that all necessary configurations are clearly
+defined and easily understood, allowing for consistent and reliable test
+execution.
 
 ## Cluster Codegen
 
