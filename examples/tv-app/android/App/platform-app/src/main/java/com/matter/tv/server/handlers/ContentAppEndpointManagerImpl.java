@@ -56,7 +56,7 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
           Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(discoveredApp.getAppName());
           if (launchIntent != null) {
               startActivity(launchIntent);
-          }  
+          }
         }
       }
       Log.d(TAG, "Sending a command for endpointId " + endpointId + ". Message " + commandPayload);
