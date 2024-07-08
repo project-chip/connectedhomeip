@@ -2731,8 +2731,8 @@ cluster OvenMode = 73 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** This cluster supports remotely monitoring and controling the different typs of
-            functionality available to a drying device, such as a laundry dryer. */
+/** This cluster provides a way to access options associated with the operation of
+            a laundry dryer device type. */
 cluster LaundryDryerControls = 74 {
   revision 1;
 
