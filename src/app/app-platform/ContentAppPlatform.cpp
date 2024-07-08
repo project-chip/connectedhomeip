@@ -387,6 +387,37 @@ ContentApp * ContentAppPlatform::GetContentApp(EndpointId id)
     return nullptr;
 }
 
+// create a string key from vendorId and productId
+std::string createKey(uint16_t vendorId, uint16_t productId) {
+    return std::to_string(vendorId) + ":" + std::to_string(productId);
+}
+
+void ContentAppPlatform::StoreNodeIdForContentApp(uint16_t vendorId, uint16_t productId, NodeId nodeId)
+{
+    std::string key = createKey(vendorId, productId);
+
+    ChipLogProgress(DeviceLayer, "Stored node id: %llu for key: %s", nodeId, key.c_str());
+
+    mConnectedContentAppNodeIds[key].insert(nodeId);
+}
+
+std::set<NodeId> ContentAppPlatform::GetNodeIdsForContentApp(uint16_t vendorId, uint16_t productId)
+{
+    std::string key = createKey(vendorId, productId);
+
+    ChipLogProgress(DeviceLayer, "Retrieving node id for key: %s", key.c_str());
+
+    auto it = mConnectedContentAppNodeIds.find(key);
+    if (it != mConnectedContentAppNodeIds.end()) {
+        ChipLogProgress(DeviceLayer, "Found node id");
+        return it->second;
+    }
+
+    ChipLogProgress(DeviceLayer, "Didn't find node id");
+    // If key not found, return an empty set
+    return {};
+}
+
 void ContentAppPlatform::SetCurrentApp(ContentApp * app)
 {
     if (!HasCurrentApp())

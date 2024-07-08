@@ -161,6 +161,14 @@ public:
     bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId,
                              Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode);
 
+    // returns set of connected nodes for a given content app
+    std::set<NodeId> GetNodeIdsForContentApp(uint16_t vendorId, uint16_t productId);
+
+    // store node id for content app after commissioning 
+    // node id can be used later on to update ACL 
+    // in case app is not installed
+    void StoreNodeIdForContentApp(uint16_t vendorId, uint16_t productId, NodeId nodeId);
+
     /**
      * @brief
      *   Add ACLs on this device for the given client,
@@ -201,6 +209,8 @@ protected:
     EndpointId mCurrentEndpointId;
     EndpointId mFirstDynamicEndpointId;
     ContentApp * mContentApps[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+    // key is string -> vendorId:producTid
+    std::map<std::string, std::set<NodeId>> mConnectedContentAppNodeIds;
 
 private:
     void IncrementCurrentEndpointID();
