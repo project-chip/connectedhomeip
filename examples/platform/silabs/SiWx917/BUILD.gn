@@ -50,8 +50,6 @@ declare_args() {
 
 # Sanity check
 assert(chip_enable_wifi)
-
-silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
 import("${silabs_common_plat_dir}/args.gni")
 
