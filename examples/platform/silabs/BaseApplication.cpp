@@ -158,9 +158,9 @@ Identify gIdentify = {
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 } // namespace
 
-bool BaseApplication::sIsProvisioned           = false;
-bool BaseApplication::sIsFactoryResetTriggered = false;
-LEDWidget * BaseApplication::sAppActionLed     = nullptr;
+bool BaseApplication::sIsProvisioned                  = false;
+bool BaseApplication::sIsFactoryResetTriggered        = false;
+LEDWidget * BaseApplication::sAppActionLed            = nullptr;
 BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate();
 
 #ifdef DIC_ENABLE
