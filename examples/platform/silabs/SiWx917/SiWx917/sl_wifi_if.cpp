@@ -261,7 +261,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
      * Join was complete - Do the DHCP
      */
     ChipLogDetail(DeviceLayer, "join_callback_handler: success");
-    memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
+    memset(&temp_reset, 0, sizeof(temp_reset));
 
     WfxEvent.eventType = WFX_EVT_STA_CONN;
     WfxPostEvent(&WfxEvent);
@@ -547,7 +547,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
     wfx_wifi_scan_result_t cur_scan_result;
     for (int idx = 0; idx < (int) scan_result->scan_count; idx++)
     {
-        memset(&cur_scan_result, 0, sizeof(wfx_wifi_scan_result_t));
+        memset(&cur_scan_result, 0, sizeof(cur_scan_result));
         strncpy(cur_scan_result.ssid, (char *) &scan_result->scan_info[idx].ssid, WFX_MAX_SSID_LENGTH);
 
         // if user has provided ssid, then check if the current scan result ssid matches the user provided ssid
@@ -603,7 +603,7 @@ static void wfx_rsi_save_ap_info() // translation
     sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 #endif
     sl_wifi_ssid_t ssid_arg;
-    memset(&ssid_arg, 0, sizeof(sl_wifi_ssid_t));
+    memset(&ssid_arg, 0, sizeof(ssid_arg));
     ssid_arg.length = strnlen(wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
     strncpy((char *) &ssid_arg.value[0], wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
     sl_wifi_set_scan_callback(scan_callback_handler, NULL);
@@ -630,7 +630,7 @@ static sl_status_t wfx_rsi_do_join(void)
     ReturnErrorCodeIf((wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED)), SL_STATUS_IN_PROGRESS);
     sl_status_t status = SL_STATUS_OK;
     sl_wifi_client_configuration_t ap;
-    memset(&ap, 0, sizeof(sl_wifi_client_configuration_t));
+    memset(&ap, 0, sizeof(ap));
     WfxEvent_t event;
     switch (wfx_rsi.sec.security)
     {
@@ -832,7 +832,7 @@ void ProcessEvent(WfxEvent_t inEvent)
         {
             ChipLogDetail(DeviceLayer, "WFX_EVT_SCAN");
             sl_wifi_scan_configuration_t wifi_scan_configuration;
-            memset(&wifi_scan_configuration, 0, sizeof(sl_wifi_scan_configuration_t));
+            memset(&wifi_scan_configuration, 0, sizeof(wifi_scan_configuration));
 
             // TODO: Add scan logic
             sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = { 0 };
