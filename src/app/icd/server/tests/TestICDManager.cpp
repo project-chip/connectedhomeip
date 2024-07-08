@@ -25,6 +25,7 @@
 #include <app/icd/server/tests/ICDConfigurationDataTestAccess.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <gtest/gtest.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -35,6 +36,7 @@
 using namespace chip;
 using namespace chip::Test;
 using namespace chip::app;
+using namespace chip::AddressResolve;
 using namespace chip::System;
 using namespace chip::System::Clock;
 using namespace chip::System::Clock::Literals;

@@ -139,7 +139,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
     EXPECT_EQ(delegate.mError, CHIP_NO_ERROR);
 
     // Send an empty payload, which will error out but not with the
-    // UNSUPPORTED_ACCESS status we expect if we miss our timeout.
+    // TIMEOUT status we expect if we miss our timeout.
     payload = MessagePacketBuffer::New(0);
     ASSERT_FALSE(payload.IsNull());
 
@@ -151,7 +151,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(MsgType aMsgType)
     mpTestContext->DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
     EXPECT_TRUE(delegate.mLastMessageWasStatus);
-    EXPECT_NE(StatusIB(delegate.mError).mStatus, Status::UnsupportedAccess);
+    EXPECT_NE(StatusIB(delegate.mError).mStatus, Status::Timeout);
 }
 
 TEST_F(TestTimedHandler, TestInvokeFastEnough)
@@ -189,7 +189,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(MsgType aMsgType)
     chip::test_utils::SleepMillis(75);
 
     // Send an empty payload, which will error out but not with the
-    // UNSUPPORTED_ACCESS status we expect if we miss our timeout.
+    // TIMEOUT status we expect if we miss our timeout.
     payload = MessagePacketBuffer::New(0);
     EXPECT_FALSE(payload.IsNull());
 
@@ -201,7 +201,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(MsgType aMsgType)
     mpTestContext->DrainAndServiceIO();
     EXPECT_TRUE(delegate.mNewMessageReceived);
     EXPECT_TRUE(delegate.mLastMessageWasStatus);
-    EXPECT_EQ(StatusIB(delegate.mError).mStatus, Status::UnsupportedAccess);
+    EXPECT_EQ(StatusIB(delegate.mError).mStatus, Status::Timeout);
 }
 
 TEST_F(TestTimedHandler, TestInvokeTooSlow)

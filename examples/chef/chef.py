@@ -706,9 +706,13 @@ def main() -> int:
                 if sys.platform == "darwin":
                     shell.run_cmd(
                         "sed -i '' 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
+                    shell.run_cmd(
+                        "sed -i '' 's/CONFIG_LWIP_IPV4=y/#\\ CONFIG_LWIP_IPV4\\ is\\ not\\ set/g' sdkconfig ")
                 else:
                     shell.run_cmd(
                         "sed -i 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
+                    shell.run_cmd(
+                        "sed -i 's/CONFIG_LWIP_IPV4=y/#\\ CONFIG_LWIP_IPV4\\ is\\ not\\ set/g' sdkconfig ")
 
             shell.run_cmd("idf.py build")
             shell.run_cmd("idf.py build flashing_script")
@@ -878,7 +882,7 @@ def main() -> int:
                         """))
             if options.do_clean:
                 shell.run_cmd("rm -rf out")
-            shell.run_cmd("gn gen out")
+            shell.run_cmd("gn gen --export-compile-commands out")
             shell.run_cmd("ninja -C out")
 
     #

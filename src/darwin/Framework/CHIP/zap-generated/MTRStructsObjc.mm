@@ -2774,6 +2774,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _monitoredSubject = @(0);
 
+        _clientType = @(0);
+
         _fabricIndex = @(0);
     }
     return self;
@@ -2785,6 +2787,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.checkInNodeID = self.checkInNodeID;
     other.monitoredSubject = self.monitoredSubject;
+    other.clientType = self.clientType;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -2792,7 +2795,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; clientType:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, _clientType, _fabricIndex];
     return descriptionString;
 }
 
@@ -4021,31 +4024,52 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesManagementClusterAttributeValuePair
+@implementation MTRScenesManagementClusterAttributeValuePairStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _attributeID = @(0);
 
-        _attributeValue = @(0);
+        _valueUnsigned8 = nil;
+
+        _valueSigned8 = nil;
+
+        _valueUnsigned16 = nil;
+
+        _valueSigned16 = nil;
+
+        _valueUnsigned32 = nil;
+
+        _valueSigned32 = nil;
+
+        _valueUnsigned64 = nil;
+
+        _valueSigned64 = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRScenesManagementClusterAttributeValuePair alloc] init];
+    auto other = [[MTRScenesManagementClusterAttributeValuePairStruct alloc] init];
 
     other.attributeID = self.attributeID;
-    other.attributeValue = self.attributeValue;
+    other.valueUnsigned8 = self.valueUnsigned8;
+    other.valueSigned8 = self.valueSigned8;
+    other.valueUnsigned16 = self.valueUnsigned16;
+    other.valueSigned16 = self.valueSigned16;
+    other.valueUnsigned32 = self.valueUnsigned32;
+    other.valueSigned32 = self.valueSigned32;
+    other.valueUnsigned64 = self.valueUnsigned64;
+    other.valueSigned64 = self.valueSigned64;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; attributeValue:%@; >", NSStringFromClass([self class]), _attributeID, _attributeValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; valueUnsigned8:%@; valueSigned8:%@; valueUnsigned16:%@; valueSigned16:%@; valueUnsigned32:%@; valueSigned32:%@; valueUnsigned64:%@; valueSigned64:%@; >", NSStringFromClass([self class]), _attributeID, _valueUnsigned8, _valueSigned8, _valueUnsigned16, _valueSigned16, _valueUnsigned32, _valueSigned32, _valueUnsigned64, _valueSigned64];
     return descriptionString;
 }
 
@@ -7080,6 +7104,39 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic transitionTime;
 @dynamic heatSetpoint;
 @dynamic coolSetpoint;
+@end
+
+@implementation MTROccupancySensingClusterHoldTimeLimitsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _holdTimeMin = @(0);
+
+        _holdTimeMax = @(0);
+
+        _holdTimeDefault = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROccupancySensingClusterHoldTimeLimitsStruct alloc] init];
+
+    other.holdTimeMin = self.holdTimeMin;
+    other.holdTimeMax = self.holdTimeMax;
+    other.holdTimeDefault = self.holdTimeDefault;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: holdTimeMin:%@; holdTimeMax:%@; holdTimeDefault:%@; >", NSStringFromClass([self class]), _holdTimeMin, _holdTimeMax, _holdTimeDefault];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRThreadNetworkDirectoryClusterThreadNetworkStruct

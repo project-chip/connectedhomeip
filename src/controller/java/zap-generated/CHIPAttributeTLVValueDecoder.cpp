@@ -12306,6 +12306,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
                     newElement_0_monitoredSubjectClassName.c_str(), newElement_0_monitoredSubjectCtorSignature.c_str(),
                     jninewElement_0_monitoredSubject, newElement_0_monitoredSubject);
+                jobject newElement_0_clientType;
+                std::string newElement_0_clientTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_clientTypeCtorSignature = "(I)V";
+                jint jninewElement_0_clientType                  = static_cast<jint>(entry_0.clientType);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_clientTypeClassName.c_str(),
+                                                                           newElement_0_clientTypeCtorSignature.c_str(),
+                                                                           jninewElement_0_clientType, newElement_0_clientType);
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -12325,9 +12332,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jmethodID monitoringRegistrationStructStructCtor_1;
-                err = chip::JniReferences::GetInstance().FindMethod(env, monitoringRegistrationStructStructClass_1, "<init>",
-                                                                    "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;)V",
-                                                                    &monitoringRegistrationStructStructCtor_1);
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, monitoringRegistrationStructStructClass_1, "<init>",
+                    "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                    &monitoringRegistrationStructStructCtor_1);
                 if (err != CHIP_NO_ERROR || monitoringRegistrationStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$IcdManagementClusterMonitoringRegistrationStruct constructor");
@@ -12335,7 +12343,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 newElement_0 = env->NewObject(monitoringRegistrationStructStructClass_1, monitoringRegistrationStructStructCtor_1,
-                                              newElement_0_checkInNodeID, newElement_0_monitoredSubject, newElement_0_fabricIndex);
+                                              newElement_0_checkInNodeID, newElement_0_monitoredSubject, newElement_0_clientType,
+                                              newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -33982,6 +33991,77 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             jint jnivalue                  = static_cast<jint>(cppValue.Raw());
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
                                                                        value);
+            return value;
+        }
+        case Attributes::HoldTime::Id: {
+            using TypeInfo = Attributes::HoldTime::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
+                                                                       value);
+            return value;
+        }
+        case Attributes::HoldTimeLimits::Id: {
+            using TypeInfo = Attributes::HoldTimeLimits::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            jobject value_holdTimeMin;
+            std::string value_holdTimeMinClassName     = "java/lang/Integer";
+            std::string value_holdTimeMinCtorSignature = "(I)V";
+            jint jnivalue_holdTimeMin                  = static_cast<jint>(cppValue.holdTimeMin);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_holdTimeMinClassName.c_str(),
+                                                                       value_holdTimeMinCtorSignature.c_str(), jnivalue_holdTimeMin,
+                                                                       value_holdTimeMin);
+            jobject value_holdTimeMax;
+            std::string value_holdTimeMaxClassName     = "java/lang/Integer";
+            std::string value_holdTimeMaxCtorSignature = "(I)V";
+            jint jnivalue_holdTimeMax                  = static_cast<jint>(cppValue.holdTimeMax);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_holdTimeMaxClassName.c_str(),
+                                                                       value_holdTimeMaxCtorSignature.c_str(), jnivalue_holdTimeMax,
+                                                                       value_holdTimeMax);
+            jobject value_holdTimeDefault;
+            std::string value_holdTimeDefaultClassName     = "java/lang/Integer";
+            std::string value_holdTimeDefaultCtorSignature = "(I)V";
+            jint jnivalue_holdTimeDefault                  = static_cast<jint>(cppValue.holdTimeDefault);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_holdTimeDefaultClassName.c_str(),
+                                                                       value_holdTimeDefaultCtorSignature.c_str(),
+                                                                       jnivalue_holdTimeDefault, value_holdTimeDefault);
+
+            jclass holdTimeLimitsStructStructClass_0;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipStructs$OccupancySensingClusterHoldTimeLimitsStruct",
+                holdTimeLimitsStructStructClass_0);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$OccupancySensingClusterHoldTimeLimitsStruct");
+                return nullptr;
+            }
+
+            jmethodID holdTimeLimitsStructStructCtor_0;
+            err = chip::JniReferences::GetInstance().FindMethod(env, holdTimeLimitsStructStructClass_0, "<init>",
+                                                                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                                &holdTimeLimitsStructStructCtor_0);
+            if (err != CHIP_NO_ERROR || holdTimeLimitsStructStructCtor_0 == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$OccupancySensingClusterHoldTimeLimitsStruct constructor");
+                return nullptr;
+            }
+
+            value = env->NewObject(holdTimeLimitsStructStructClass_0, holdTimeLimitsStructStructCtor_0, value_holdTimeMin,
+                                   value_holdTimeMax, value_holdTimeDefault);
             return value;
         }
         case Attributes::PIROccupiedToUnoccupiedDelay::Id: {

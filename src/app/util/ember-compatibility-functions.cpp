@@ -570,7 +570,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         }
         default:
             ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-            status = Status::UnsupportedRead;
+            status = Status::Failure;
         }
     }
 

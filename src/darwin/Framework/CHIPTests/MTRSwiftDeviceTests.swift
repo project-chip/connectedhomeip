@@ -92,6 +92,14 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
       return 2; // seconds
     }
 
+    @objc func unitTestSuppressTimeBasedReachabilityChanges(_ device : MTRDevice) -> Bool
+    {
+      // Allowing time-based reachability changes just makes the tests
+      // non-deterministic and can lead to random failures.  Suppress them
+      // unconditionally for now.  If we ever add tests that try to exercise that
+      // codepath, we can make this configurable.
+      return true;
+    }
 }
 
 class MTRSwiftDeviceTests : XCTestCase {
