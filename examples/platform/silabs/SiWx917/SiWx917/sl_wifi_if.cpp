@@ -657,10 +657,6 @@ static sl_status_t wfx_rsi_do_join(void)
         ChipLogError(DeviceLayer, "wfx_rsi_do_join: unknown security type.");
         return status;
     }
-
-    ChipLogDetail(DeviceLayer, "wfx_rsi_do_join: SSID: %s, SECURITY: %d(%d)", &wfx_rsi.sec.ssid[0], ap.security,
-                  wfx_rsi.sec.security);
-
     /*
      * Join the network
      */
@@ -690,7 +686,7 @@ static sl_status_t wfx_rsi_do_join(void)
     ap.credential_id    = id;
     memset(&ap.ssid.value, 0, (sizeof(ap.ssid.value) / sizeof(ap.ssid.value[0])));
     strncpy((char *) &ap.ssid.value[0], wfx_rsi.sec.ssid, WFX_MAX_SSID_LENGTH);
-
+    ChipLogDetail(DeviceLayer, "wfx_rsi_do_join: SSID: %s, SECURITY: %d(%d)", ap.ssid.value, ap.security, wfx_rsi.sec.security);
     status = sl_wifi_connect(SL_WIFI_CLIENT_INTERFACE, &ap, timeout_ms);
     // sl_wifi_connect returns SL_STATUS_IN_PROGRESS if join is in progress
     // after the initial scan is done, the scan does not check for SSID
