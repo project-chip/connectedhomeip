@@ -59,7 +59,7 @@ class TestTestRunnerHooks(TestRunnerHooks):
     def stop(self, duration: int):
         self.stop_called = True
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         self.test_start_called = True
 
     def test_stop(self, exception: Exception, duration: int):

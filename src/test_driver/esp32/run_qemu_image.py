@@ -106,22 +106,23 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
 
             # Parse output of the unit test. Generally expect things like:
             # I (3034) CHIP-tests: Starting CHIP tests!
+            # INF  [==========] Running all tests.
+            # INF  [ RUN      ] TestASN1.NullWriter
+            # INF  [       OK ] TestASN1.NullWriter
             # ...
-            # Various test lines, none ending with "] : FAILED"
-            # ...
-            # Failed Tests:   0 / 5
-            # Failed Asserts: 0 / 77
-            # I (3034) CHIP-tests: CHIP test status: 0
+            # INF  [ RUN      ] TestASN1.ASN1UniversalTime
+            # ERR  src/lib/asn1/tests/TestASN1.cpp:366: Failure
+            # ERR        Expected: 1 == 5
+            # ERR          Actual: 1 == 5
+            # ERR  [  FAILED  ] TestASN1.ASN1UniversalTime
+            # INF  [==========] Done running all tests.
+            # INF  [  PASSED  ] 5 test(s).
+            # ERR  [  FAILED  ] 1 test(s).
+            # I (3034) CHIP-tests: CHIP test status: 1
             in_test = False
             for line in output.split('\n'):
-                if line.endswith('CHIP-tests: Starting CHIP tests!'):
+                if 'CHIP-tests: Starting CHIP tests!' in line:
                     in_test = True
-
-                if line.startswith('Failed Tests:') and not line.startswith('Failed Tests:   0 /'):
-                    raise Exception("Tests seem failed: %s" % line)
-
-                if line.startswith('Failed Asserts:') and not line.startswith('Failed Asserts: 0 /'):
-                    raise Exception("Asserts seem failed: %s" % line)
 
                 if 'CHIP-tests: CHIP test status: 0' in line:
                     in_test = False
@@ -129,8 +130,8 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                     raise Exception("CHIP test status is NOT 0: %s" % line)
 
                 # Ignore FAILED messages not in the middle of a test, to reduce
-                # the chance of false posisitves from other logging.
-                if in_test and re.match('.*] : FAILED$', line):
+                # the chance of false positives from other logging.
+                if in_test and re.search(r'  \[  FAILED  \] ', line):
                     raise Exception("Step failed: %s" % line)
 
                 # TODO: Figure out why exit(0) in man_app.cpp's tester_task is aborting and fix that.
@@ -150,6 +151,7 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
             # make sure output is visible in stdout
             print("========== TEST OUTPUT BEGIN ============")
             print(output)
+            print(status.stderr.decode('ascii'))
             print("========== TEST OUTPUT END   ============")
             raise
 
