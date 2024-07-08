@@ -17,7 +17,7 @@
 if [[ "$OSTYPE" == "darwin"* ]]; then
     PYTHON_VERSIONS=("3.12" "3.11")
     for version in "${PYTHON_VERSIONS[@]}"; do
-        _PYTHON_PATH="/usr/local/opt/python@$version/bin"
+        _PYTHON_PATH="/usr/local/opt/python@$version/libexec/bin/"
         if [ -d "$_PYTHON_PATH" ]; then
             PATH="$_PYTHON_PATH:$PATH"
             break
