@@ -114,7 +114,7 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
                     {
                         humanFlags.Add(", ");
                     }
-                    humanFlags.Add("WIFIPAF");
+                    humanFlags.Add("Wi-Fi PAF");
                 }
             }
             else
