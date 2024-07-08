@@ -388,7 +388,8 @@ ContentApp * ContentAppPlatform::GetContentApp(EndpointId id)
 }
 
 // create a string key from vendorId and productId
-std::string createKey(uint16_t vendorId, uint16_t productId) {
+std::string createKey(uint16_t vendorId, uint16_t productId)
+{
     return std::to_string(vendorId) + ":" + std::to_string(productId);
 }
 
@@ -408,7 +409,8 @@ std::set<NodeId> ContentAppPlatform::GetNodeIdsForContentApp(uint16_t vendorId, 
     ChipLogProgress(DeviceLayer, "Retrieving node id for key: %s", key.c_str());
 
     auto it = mConnectedContentAppNodeIds.find(key);
-    if (it != mConnectedContentAppNodeIds.end()) {
+    if (it != mConnectedContentAppNodeIds.end())
+    {
         ChipLogProgress(DeviceLayer, "Found node id");
         return it->second;
     }
