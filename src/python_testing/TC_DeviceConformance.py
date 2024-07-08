@@ -119,14 +119,14 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if cluster_id in ignore_features and f in ignore_features[cluster_id]:
                         continue
                     xml_feature = self.xml_clusters[cluster_id].features[f]
-                    conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
-                    if not conformance_allowed(conformance_decision, allow_provisional):
+                    conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
+                    if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
                         record_error(location=location, problem=f'Disallowed feature with mask 0x{f:02x}')
                 for feature_mask, xml_feature in self.xml_clusters[cluster_id].features.items():
                     if cluster_id in ignore_features and feature_mask in ignore_features[cluster_id]:
                         continue
-                    conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
-                    if conformance_decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
+                    conformance_decision_with_choice = xml_feature.conformance(feature_map, attribute_list, all_command_list)
+                    if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and feature_mask not in feature_masks:
                         record_error(
                             location=location, problem=f'Required feature with mask 0x{f:02x} is not present in feature map. {conformance_str(xml_feature.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
 
@@ -142,16 +142,16 @@ class DeviceConformanceTests(BasicCompositionTests):
                             record_error(location=location, problem='Standard attribute found on device, but not in spec')
                         continue
                     xml_attribute = self.xml_clusters[cluster_id].attributes[attribute_id]
-                    conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
-                    if not conformance_allowed(conformance_decision, allow_provisional):
+                    conformance_decision_with_choice = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
+                    if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         record_error(
                             location=location, problem=f'Attribute 0x{attribute_id:02x} is included, but is disallowed by conformance. {conformance_str(xml_attribute.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
                 for attribute_id, xml_attribute in self.xml_clusters[cluster_id].attributes.items():
                     if cluster_id in ignore_attributes and attribute_id in ignore_attributes[cluster_id]:
                         continue
-                    conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
-                    if conformance_decision == ConformanceDecision.MANDATORY and attribute_id not in cluster.keys():
+                    conformance_decision_with_choice = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
+                    if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and attribute_id not in cluster.keys():
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         record_error(
                             location=location, problem=f'Attribute 0x{attribute_id:02x} is required, but is not present on the DUT. {conformance_str(xml_attribute.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
@@ -170,13 +170,13 @@ class DeviceConformanceTests(BasicCompositionTests):
                             record_error(location=location, problem='Standard command found on device, but not in spec')
                             continue
                         xml_command = xml_commands_dict[command_id]
-                        conformance_decision = xml_command.conformance(feature_map, attribute_list, all_command_list)
-                        if not conformance_allowed(conformance_decision, allow_provisional):
+                        conformance_decision_with_choice = xml_command.conformance(feature_map, attribute_list, all_command_list)
+                        if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
                             record_error(
                                 location=location, problem=f'Command 0x{command_id:02x} is included, but disallowed by conformance. {conformance_str(xml_command.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
                     for command_id, xml_command in xml_commands_dict.items():
-                        conformance_decision = xml_command.conformance(feature_map, attribute_list, all_command_list)
-                        if conformance_decision == ConformanceDecision.MANDATORY and command_id not in command_list:
+                        conformance_decision_with_choice = xml_command.conformance(feature_map, attribute_list, all_command_list)
+                        if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and command_id not in command_list:
                             location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
                             record_error(
                                 location=location, problem=f'Command 0x{command_id:02x} is required, but is not present on the DUT. {conformance_str(xml_command.conformance, feature_map, self.xml_clusters[cluster_id].features)}')

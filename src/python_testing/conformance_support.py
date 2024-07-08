@@ -92,13 +92,6 @@ class ConformanceDecisionWithChoice:
     decision: ConformanceDecision
     choice: Optional[Choice] = None
 
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.decision == other.decision and self.choice == other.choice
-        if isinstance(other, ConformanceDecision):
-            return self.decision == other
-        return False
-
 
 @dataclass
 class ConformanceParseParameters:
@@ -108,16 +101,16 @@ class ConformanceParseParameters:
 
 
 def conformance_allowed(conformance_decision: ConformanceDecisionWithChoice, allow_provisional: bool):
-    if conformance_decision == ConformanceDecision.NOT_APPLICABLE or conformance_decision == ConformanceDecision.DISALLOWED:
+    if conformance_decision.decision in [ConformanceDecision.NOT_APPLICABLE, ConformanceDecision.DISALLOWED]:
         return False
-    if conformance_decision == ConformanceDecision.PROVISIONAL:
+    if conformance_decision.decision == ConformanceDecision.PROVISIONAL:
         return allow_provisional
     return True
 
 
 def is_disallowed(conformance: Callable):
     # Deprecated and disallowed conformances will come back as disallowed regardless of the implemented features / attributes / etc.
-    return conformance(0, [], []) == ConformanceDecision.DISALLOWED
+    return conformance(0, [], []).decision == ConformanceDecision.DISALLOWED
 
 
 @dataclass
@@ -276,14 +269,14 @@ class optional_wrapper(Conformance):
         self.choice = choice
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
-        decision = self.op(feature_map, attribute_list, all_command_list)
+        decision_with_choice = self.op(feature_map, attribute_list, all_command_list)
 
-        if decision in [ConformanceDecision.MANDATORY, ConformanceDecision.OPTIONAL]:
+        if decision_with_choice.decision in [ConformanceDecision.MANDATORY, ConformanceDecision.OPTIONAL]:
             return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL, self.choice)
-        elif decision == ConformanceDecision.NOT_APPLICABLE:
-            return decision
+        elif decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
+            return decision_with_choice
         else:
-            raise ConformanceException(f'Optional wrapping invalid op {decision}')
+            raise ConformanceException(f'Optional wrapping invalid op {decision_with_choice}')
 
     def __str__(self):
         return f'[{strip_outer_parentheses(str(self.op))}]' + (str(self.choice) if self.choice else '')
@@ -310,15 +303,15 @@ class not_operation(Conformance):
         # not operations can't be used with anything that returns DISALLOWED
         # not operations also can't be used with things that are optional
         # ie, ![AB] doesn't make sense, nor does !O
-        decision = self.op(feature_map, attribute_list, all_command_list)
-        if decision == ConformanceDecision.DISALLOWED or decision == ConformanceDecision.PROVISIONAL:
+        decision_with_choice = self.op(feature_map, attribute_list, all_command_list)
+        if decision_with_choice.decision in [ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
             raise ConformanceException('NOT operation on optional or disallowed item')
         # Features in device types degrade to optional so a not operation here is still optional because we don't have any way to verify the features since they're not exposed anywhere
-        elif decision == ConformanceDecision.OPTIONAL:
-            return decision
-        elif decision == ConformanceDecision.NOT_APPLICABLE:
+        elif decision_with_choice.decision == ConformanceDecision.OPTIONAL:
+            return decision_with_choice
+        elif decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
             return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
-        elif decision == ConformanceDecision.MANDATORY:
+        elif decision_with_choice.decision == ConformanceDecision.MANDATORY:
             return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
         else:
             raise ConformanceException('NOT called on item with non-conformance value')
@@ -336,13 +329,13 @@ class and_operation(Conformance):
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
         for op in self.op_list:
-            decision = op(feature_map, attribute_list, all_command_list)
+            decision_with_choice = op(feature_map, attribute_list, all_command_list)
             # and operations can't happen on optional or disallowed
-            if decision == ConformanceDecision.OPTIONAL or decision == ConformanceDecision.DISALLOWED or decision == ConformanceDecision.PROVISIONAL:
+            if decision_with_choice.decision in [ConformanceDecision.OPTIONAL, ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
                 raise ConformanceException('AND operation on optional or disallowed item')
-            elif decision == ConformanceDecision.NOT_APPLICABLE:
-                return decision
-            elif decision == ConformanceDecision.MANDATORY:
+            elif decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
+                return decision_with_choice
+            elif decision_with_choice.decision == ConformanceDecision.MANDATORY:
                 continue
             else:
                 raise ConformanceException('Oplist item returned non-conformance value')
@@ -362,13 +355,13 @@ class or_operation(Conformance):
 
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
         for op in self.op_list:
-            decision = op(feature_map, attribute_list, all_command_list)
-            if decision == ConformanceDecision.DISALLOWED or decision == ConformanceDecision.PROVISIONAL:
+            decision_with_choice = op(feature_map, attribute_list, all_command_list)
+            if decision_with_choice.decision in [ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
                 raise ConformanceException('OR operation on optional or disallowed item')
-            elif decision == ConformanceDecision.NOT_APPLICABLE:
+            elif decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
                 continue
-            elif decision in [ConformanceDecision.MANDATORY, ConformanceDecision.OPTIONAL]:
-                return decision
+            elif decision_with_choice.decision in [ConformanceDecision.MANDATORY, ConformanceDecision.OPTIONAL]:
+                return decision_with_choice
             else:
                 raise ConformanceException('Oplist item returned non-conformance value')
         return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
@@ -410,10 +403,10 @@ class otherwise(Conformance):
         # For O,D, optional applies (leftmost), but we should consider some way to warn here as well,
         # possibly in another function
         for op in self.op_list:
-            decision = op(feature_map, attribute_list, all_command_list)
-            if decision == ConformanceDecision.NOT_APPLICABLE:
+            decision_with_choice = op(feature_map, attribute_list, all_command_list)
+            if decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
                 continue
-            return decision
+            return decision_with_choice
         return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
 
     def __str__(self):
