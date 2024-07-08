@@ -82,6 +82,7 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pSalt           = { kCo
 const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_DeviceTypeId          = { kConfigNamespace_ChipFactory, "device-type-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_DeviceName            = { kConfigNamespace_ChipFactory, "device-name" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_VendorName            = { kConfigNamespace_ChipFactory, "vendor-name" };
 
 // Keys stored in the Chip-config namespace
 const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
