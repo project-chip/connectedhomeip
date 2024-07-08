@@ -2169,7 +2169,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ModeSelect::Structs::M
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type & request,
+                                        chip::app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2177,27 +2177,84 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AttributeValuePair.attributeID", "attributeID", value.isMember("attributeID")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AttributeValuePair.attributeValue", "attributeValue",
-                                                                  value.isMember("attributeValue")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AttributeValuePairStruct.attributeID", "attributeID",
+                                                                  value.isMember("attributeID")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeID");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.attributeID, value["attributeID"]));
     valueCopy.removeMember("attributeID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeValue");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.attributeValue, value["attributeValue"]));
-    valueCopy.removeMember("attributeValue");
+    if (value.isMember("valueUnsigned8"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "valueUnsigned8");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.valueUnsigned8, value["valueUnsigned8"]));
+    }
+    valueCopy.removeMember("valueUnsigned8");
+
+    if (value.isMember("valueSigned8"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "valueSigned8");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.valueSigned8, value["valueSigned8"]));
+    }
+    valueCopy.removeMember("valueSigned8");
+
+    if (value.isMember("valueUnsigned16"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "valueUnsigned16");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.valueUnsigned16, value["valueUnsigned16"]));
+    }
+    valueCopy.removeMember("valueUnsigned16");
+
+    if (value.isMember("valueSigned16"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "valueSigned16");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.valueSigned16, value["valueSigned16"]));
+    }
+    valueCopy.removeMember("valueSigned16");
+
+    if (value.isMember("valueUnsigned32"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "valueUnsigned32");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.valueUnsigned32, value["valueUnsigned32"]));
+    }
+    valueCopy.removeMember("valueUnsigned32");
+
+    if (value.isMember("valueSigned32"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "valueSigned32");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.valueSigned32, value["valueSigned32"]));
+    }
+    valueCopy.removeMember("valueSigned32");
+
+    if (value.isMember("valueUnsigned64"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "valueUnsigned64");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.valueUnsigned64, value["valueUnsigned64"]));
+    }
+    valueCopy.removeMember("valueUnsigned64");
+
+    if (value.isMember("valueSigned64"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "valueSigned64");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.valueSigned64, value["valueSigned64"]));
+    }
+    valueCopy.removeMember("valueSigned64");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.attributeID);
-    ComplexArgumentParser::Finalize(request.attributeValue);
+    ComplexArgumentParser::Finalize(request.valueUnsigned8);
+    ComplexArgumentParser::Finalize(request.valueSigned8);
+    ComplexArgumentParser::Finalize(request.valueUnsigned16);
+    ComplexArgumentParser::Finalize(request.valueSigned16);
+    ComplexArgumentParser::Finalize(request.valueUnsigned32);
+    ComplexArgumentParser::Finalize(request.valueSigned32);
+    ComplexArgumentParser::Finalize(request.valueUnsigned64);
+    ComplexArgumentParser::Finalize(request.valueSigned64);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

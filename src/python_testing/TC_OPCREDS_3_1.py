@@ -14,7 +14,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 import copy
 import logging
 import random
@@ -342,8 +347,8 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(33, "TH1 reconnects to the DUT over PASE")
         TH1.ExpireSessions(newNodeId)
-        self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
-                                  setupPinCode=params.setupPinCode, nodeid=newNodeId)
+        await self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
+                                        setupPinCode=params.setupPinCode, nodeid=newNodeId)
 
         self.print_step(34, "TH1 reads the TrustedRootCertificates list from DUT and verifies the TH1 root is not present")
         trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
