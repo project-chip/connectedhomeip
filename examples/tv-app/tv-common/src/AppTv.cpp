@@ -593,7 +593,8 @@ public:
         if (pairingCommand)
         {
             ChipLogProgress(DeviceLayer,
-                            "OnDeviceConnectedFn - Updating ACL for node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d",
+                            "OnDeviceConnectedFn - Updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
                             ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
 
             GetCommissionerDiscoveryController()->CommissioningSucceeded(cbContext->vendorId, cbContext->productId,
@@ -609,7 +610,8 @@ public:
         if (pairingCommand)
         {
             ChipLogProgress(DeviceLayer,
-                            "OnDeviceConnectionFailureFn - Not updating ACL for node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d",
+                            "OnDeviceConnectionFailureFn - Not updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
                             ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
             // TODO: Remove Node Id
         }
@@ -689,15 +691,15 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
     for (const auto & nodeId : nodeIds)
     {
 
-        ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d", ChipLogValueX64(nodeId),
-                        vendorId, productId);
+        ChipLogProgress(DeviceLayer,
+                        "Creating Pairing Command with node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d",
+                        ChipLogValueX64(nodeId), vendorId, productId);
 
         std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
 
         GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
                                                     &pairingCommand->mOnDeviceConnectionFailureCallback);
     }
-
 }
 
 bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)

@@ -381,7 +381,8 @@ public:
         if (pairingCommand)
         {
             ChipLogProgress(DeviceLayer,
-                            "OnDeviceConnectedFn - Updating ACL for node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d",
+                            "OnDeviceConnectedFn - Updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
                             ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
 
             GetCommissionerDiscoveryController()->CommissioningSucceeded(cbContext->vendorId, cbContext->productId,
@@ -397,7 +398,8 @@ public:
         if (pairingCommand)
         {
             ChipLogProgress(DeviceLayer,
-                            "OnDeviceConnectionFailureFn - Not updating ACL for node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d",
+                            "OnDeviceConnectionFailureFn - Not updating ACL for node id: " ChipLogFormatX64
+                            " and vendor id: %d and product id: %d",
                             ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
             // TODO: Remove Node Id
         }
@@ -408,7 +410,8 @@ public:
     std::shared_ptr<CallbackContext> mContext;
 };
 
-void refreshConnectedClientsAcl(uint16_t vendorId, uint16_t productId, ContentAppImpl * app) {
+void refreshConnectedClientsAcl(uint16_t vendorId, uint16_t productId, ContentAppImpl * app)
+{
 
     std::set<NodeId> nodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForContentApp(vendorId, productId);
 
@@ -422,8 +425,9 @@ void refreshConnectedClientsAcl(uint16_t vendorId, uint16_t productId, ContentAp
     for (const auto & nodeId : nodeIds)
     {
 
-        ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d", ChipLogValueX64(nodeId),
-                        vendorId, productId);
+        ChipLogProgress(DeviceLayer,
+                        "Creating Pairing Command with node id: " ChipLogFormatX64 " and vendor id: %d and product id: %d",
+                        ChipLogValueX64(nodeId), vendorId, productId);
 
         std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
 
