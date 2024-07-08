@@ -169,13 +169,13 @@ limitations under the License.
       <arg id="0" name="ChargingEnabledUntil" type="epoch_s" isNullable="true"/>
       <arg id="1" name="MinimumChargeCurrent" type="amperage_ma" min="0"/>
       <arg id="2" name="MaximumChargeCurrent" type="amperage_ma" min="0"/>
-      <description>Allows a client to enable the EVSE to charge an EV.</description>
+      <description>This command allows a client to enable the EVSE to charge an EV,</description>
     </command>
 
     <command source="client" code="0x03" name="EnableDischarging" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
       <arg id="0" name="DischargingEnabledUntil" type="epoch_s" isNullable="true"/>
       <arg id="1" name="MaximumDischargeCurrent" type="amperage_ma" min="0"/>
-      <description>Allows a client to enable the EVSE to discharge an EV.</description>
+      <description>Upon receipt, this SHALL allow a client to enable the discharge of an EV,</description>
     </command>
 
     <command source="client" code="0x04" name="StartDiagnostics" optional="true" mustUseTimedInvoke="true">
@@ -188,7 +188,7 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x06" name="GetTargets" optional="true" response="GetTargetsResponse" mustUseTimedInvoke="true" apiMaturity="provisional">
-      <description>Allows a client to retrieve the user specified charging targets.</description>
+      <description>Allows a client to retrieve the current set of charging targets.</description>
     </command>
 
     <command source="client" code="0x07" name="ClearTargets" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
@@ -219,7 +219,7 @@ limitations under the License.
       <field id="0" name="SessionID" type="int32u"/>
       <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
       <field id="2" name="MaximumCurrent" type="amperage_ma" min="0"/>
-      <field id="3" name="MaximumDischargingCurrent" type="amperage_ma" optional="true" min="0"/>
+      <field id="3" name="MaximumDischargeCurrent" type="amperage_ma" optional="true" min="0"/>
     </event>
 
     <event side="server" code="0x03" name="EnergyTransferStopped" priority="info">
