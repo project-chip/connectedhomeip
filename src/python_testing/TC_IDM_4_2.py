@@ -306,8 +306,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # message to subscribe to an attribute on that cluster for which it does not have access.
         self.step(3)
 
-        # Setting reportInterval values for steps 3-8
-        min_interval_floor_sec = 3
+        # Setting max_interval_ceiling_sec value for steps 3-8
         max_interval_ceiling_sec = 10
 
         # Limited ACE for controller 2 with single cluster access
@@ -568,8 +567,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # all clusters on all endpoints.
         self.step(11)
 
-        # Setting reportInterval values for steps 11-13
-        min_interval_floor_sec = 3
+        # Setting max_interval_ceiling_sec value for steps 11-13
         max_interval_ceiling_sec = 10
 
         # Omitting endpoint to indicate endpoint wildcard
