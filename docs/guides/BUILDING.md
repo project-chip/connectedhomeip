@@ -112,15 +112,8 @@ python3.11 using brew:
 
 ```sh
     brew install python@3.11
-    python3 -m pip install --upgrade setuptools
-    python3 -m pip install --upgrade pip
-    cd /usr/local/bin
-    ln -sf python3.11 python3
-    ln -sf python3 python
-    ln -sf pip3.11 pip3
-    ln -sf pip3 pip
-
-
+    python3.11 -m pip install --upgrade setuptools
+    python3.11 -m pip install --upgrade pip
 ```
 
 #### UI builds
