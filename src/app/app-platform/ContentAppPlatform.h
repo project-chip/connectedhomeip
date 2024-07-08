@@ -170,6 +170,7 @@ public:
     // store node id for content app after commissioning
     // node id can be used later on to update ACL
     // in case app is not installed
+    // Note: This is in memory storing, the values are deleted after reboot
     void StoreNodeIdForContentApp(uint16_t vendorId, uint16_t productId, NodeId nodeId);
 
     /**
