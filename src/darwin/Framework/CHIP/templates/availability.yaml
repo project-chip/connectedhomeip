@@ -9692,6 +9692,7 @@
   provisional:
       clusters:
           # Targeting Fall 2024
+          - ServiceArea
           - ThreadBorderRouterManagement
           - ThreadNetworkDirectory
           - WiFiNetworkManagement

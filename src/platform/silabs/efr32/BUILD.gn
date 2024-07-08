@@ -98,7 +98,8 @@ static_library("efr32") {
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",
   ]
-  deps = []
+  deps = [ "${silabs_platform_dir}/provision:provision-headers" ]
+  public_configs = []
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
@@ -136,8 +137,6 @@ static_library("efr32") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
-
-    public_configs = []
   }
 
   if (chip_enable_wifi) {
@@ -160,7 +159,7 @@ static_library("efr32") {
       ]
     }
 
-    public_configs = [ ":efr32-platform-wifi-config" ]
+    public_configs += [ ":efr32-platform-wifi-config" ]
   }
 }
 
