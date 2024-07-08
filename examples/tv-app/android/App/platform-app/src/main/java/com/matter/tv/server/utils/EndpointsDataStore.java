@@ -196,9 +196,11 @@ public class EndpointsDataStore {
 
   private void serializeIntArray(JsonWriter jsonWriter, int[] array) throws IOException {
     jsonWriter.beginArray();
-    for (int value : array) {
-      jsonWriter.value(value);
-    }
+      if (array != null) {
+        for (int value : array) {
+          jsonWriter.value(value);
+        }
+      }
     jsonWriter.endArray();
   }
 
