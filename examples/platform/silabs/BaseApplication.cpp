@@ -181,7 +181,6 @@ void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_
 } // namespace
 #endif // DIC_ENABLE
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
@@ -192,6 +191,7 @@ void BaseApplicationDelegate::OnCommissioningSessionStopped()
 }
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
 {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     if (!BaseApplication::GetProvisionStatus() && !isComissioningStarted)
     {
         int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
@@ -200,8 +200,13 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
             ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
         }
     }
-}
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+    if(BaseApplication::GetProvisionStatus()) {
+        // After the device is provisioned and the commissioning passed
+        // resetting the isCommissioningStarted to false
+        isComissioningStarted = false;
+    }
+}
 
 /**********************************************************
  * AppTask Definitions
