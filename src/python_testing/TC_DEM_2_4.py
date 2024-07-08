@@ -15,15 +15,15 @@
 #    limitations under the License.
 
 
-import time
 import logging
+import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
+from DEMTestBase import DEMTestBase
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from DEMTestBase import DEMTestBase
 
 logger = logging.getLogger(__name__)
 
