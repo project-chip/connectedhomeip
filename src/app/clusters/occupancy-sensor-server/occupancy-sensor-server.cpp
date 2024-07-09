@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +15,146 @@
  *    limitations under the License.
  */
 
+#include "occupancy-hal.h"
 #include "occupancy-sensor-server.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/data-model/Encode.h>
+#include <app/EventLogging.h>
+#include <app/util/attribute-storage.h>
+#include <lib/core/CHIPError.h>
 
-#include "occupancy-hal.h"
+
+
+using chip::Protocols::InteractionModel::Status;
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace OccupancySensing {
+
+Structs::HoldTimeLimitsStruct::Type * HoldTimeLimitsManager::HoldTimeLimits::GetHoldTimeLimitsStruct(EndpointId endpoint)
+{
+	size_t endpointIndex = 0;
+	Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct = nullptr;
+	CHIP_ERROR status = FindHoldTimeLimitsIndex(endpoint, endpointIndex);
+	if (CHIP_NO_ERROR == status)
+    {
+        holdTimeLimitsStruct = &mHoldTimeLimitsStructs[endpointIndex];
+    }
+    return holdTimeLimitsStruct;
+}
+
+
+CHIP_ERROR HoldTimeLimitsManager::HoldTimeLimits::SetHoldTimeLimitsStruct(EndpointId endpoint,
+                                                             Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct)
+{
+    VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
+
+    size_t endpointIndex = 0;
+    ReturnErrorOnFailure(FindHoldTimeLimitsIndex(endpoint, endpointIndex));
+
+    mHoldTimeLimitsStructs[endpointIndex] = holdTimeLimitsStruct;
+
+    return CHIP_NO_ERROR;
+}
+
+/// @brief Returns the index of the HoldTimeLimits associated to an endpoint
+/// @param[in] endpoint target endpoint
+/// @param[out] endpointIndex index of the corresponding HoldTimeLimits for an endpoint
+/// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid endpoint
+CHIP_ERROR HoldTimeLimitsManager::HoldTimeLimits::FindHoldTimeLimitsIndex(EndpointId endpoint, size_t & endpointIndex)
+{
+    VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
+
+    uint16_t index =
+        emberAfGetClusterServerEndpointIndex(endpoint, OccupancySensing::Id, MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (index < ArraySize(mHoldTimeLimitsStructs))
+    {
+        endpointIndex = index;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
+HoldTimeLimitsManager HoldTimeLimitsManager::mInstance;
+
+HoldTimeLimitsManager & HoldTimeLimitsManager::Instance()
+{
+    return mInstance;
+}
+
+CHIP_ERROR HoldTimeLimitsManager::Init()
+{
+    // Prevents re-initializing
+    VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+
+    for(size_t  i = 0; i <= kOccupancySensingServerMaxEndpointCount; i++)
+    {
+        if(emberAfContainsServer(EndpointId(i), OccupancySensing::Id))
+		{
+			Structs::HoldTimeLimitsStruct::Type holdTimeLimitsInit;
+
+      // Set up some sane initial values for hold time limits structures
+			holdTimeLimitsInit.holdTimeMin = 1;
+			holdTimeLimitsInit.holdTimeMax = 300;
+			holdTimeLimitsInit.holdTimeDefault = 10;
+
+			HoldTimeLimitsManager::Instance().SetHoldTimeLimitsStruct(EndpointId(i),holdTimeLimitsInit);
+		}
+	}
+
+    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+
+
+    mIsInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+//AttributeAccessInterface
+CHIP_ERROR HoldTimeLimitsManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::HoldTimeLimits::Id: {
+
+		Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct = HoldTimeLimitsManager::Instance().mHoldTimeLimits.GetHoldTimeLimitsStruct(aPath.mEndpointId);
+		Structs::HoldTimeLimitsStruct::Type res;
+		res.holdTimeMin = holdTimeLimitsStruct->holdTimeMin;
+		res.holdTimeMax = holdTimeLimitsStruct->holdTimeMax;
+		res.holdTimeDefault = holdTimeLimitsStruct->holdTimeDefault;
+		return aEncoder.Encode(res);
+    }
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+
+Structs::HoldTimeLimitsStruct::Type * HoldTimeLimitsManager::GetHoldTimeLimitsStruct(EndpointId endpoint)
+{
+    Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct = mHoldTimeLimits.GetHoldTimeLimitsStruct(endpoint);
+    return holdTimeLimitsStruct;
+}
+
+CHIP_ERROR HoldTimeLimitsManager::SetHoldTimeLimitsStruct(EndpointId endpoint,
+                                            Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct)
+{
+    ReturnErrorOnFailure(mHoldTimeLimits.SetHoldTimeLimitsStruct(endpoint, holdTimeLimitsStruct));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace OccupancySensing
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OccupancySensing;
+
+void chip::app::Clusters::OccupancySensing::emberAfPluginOccupancyClusterServerPostInitCallback(EndpointId endpoint) {}
 
 //******************************************************************************
 // Plugin init function
@@ -82,11 +214,17 @@ void halOccupancyStateChangedCallback(EndpointId endpoint, HalOccupancyState occ
     Attributes::Occupancy::Set(endpoint, occupancyState);
 }
 
-void emberAfPluginOccupancyClusterServerPostInitCallback(EndpointId endpoint) {}
 
 HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointId endpoint)
 {
     return HAL_OCCUPANCY_SENSOR_TYPE_PIR;
 }
 
-void MatterOccupancySensingPluginServerInitCallback() {}
+void MatterOccupancySensingPluginServerInitCallback()
+{
+	CHIP_ERROR err = HoldTimeLimitsManager::Instance().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HoldTimeLimitsManager::Instance().Init() error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
