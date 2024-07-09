@@ -60,6 +60,9 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 
 #define kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription 10
 
+// Disabling pending crashes
+#define ENABLE_CONNECTIVITY_MONITORING 0
+
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 
@@ -1381,7 +1384,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
     }
 
-    // Set up connectivity monitoring in case network routability changes for the positive, to accellerate resubscription
+    // Set up connectivity monitoring in case network routability changes for the positive, to accelerate resubscription
     [self _setupConnectivityMonitoring];
 }
 
@@ -1389,7 +1392,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     std::lock_guard lock(_lock);
 
-    // If we are here, then either we failed to establish initil CASE, or we
+    // If we are here, then either we failed to establish initial CASE, or we
     // failed to send the initial SubscribeRequest message, or our ReadClient
     // has given up completely.  Those all count as "we have tried and failed to
     // subscribe".
@@ -2253,6 +2256,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (void)_setupConnectivityMonitoring
 {
+#if ENABLE_CONNECTIVITY_MONITORING
     // Dispatch to own queue first to avoid deadlock with syncGetCompressedFabricID
     dispatch_async(self.queue, ^{
         // Get the required info before setting up the connectivity monitor
@@ -2277,6 +2281,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                                                    errorHandler:nil];
         } queue:self.queue];
     });
+#endif
 }
 
 - (void)_stopConnectivityMonitoring

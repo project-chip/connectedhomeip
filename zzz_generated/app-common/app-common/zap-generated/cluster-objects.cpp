@@ -12594,12 +12594,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 namespace ScenesManagement {
 namespace Structs {
 
-namespace AttributeValuePair {
+namespace AttributeValuePairStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kAttributeID), attributeID);
-    encoder.Encode(to_underlying(Fields::kAttributeValue), attributeValue);
+    encoder.Encode(to_underlying(Fields::kValueUnsigned8), valueUnsigned8);
+    encoder.Encode(to_underlying(Fields::kValueSigned8), valueSigned8);
+    encoder.Encode(to_underlying(Fields::kValueUnsigned16), valueUnsigned16);
+    encoder.Encode(to_underlying(Fields::kValueSigned16), valueSigned16);
+    encoder.Encode(to_underlying(Fields::kValueUnsigned32), valueUnsigned32);
+    encoder.Encode(to_underlying(Fields::kValueSigned32), valueSigned32);
+    encoder.Encode(to_underlying(Fields::kValueUnsigned64), valueUnsigned64);
+    encoder.Encode(to_underlying(Fields::kValueSigned64), valueSigned64);
     return encoder.Finalize();
 }
 
@@ -12621,9 +12628,37 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, attributeID);
         }
-        else if (__context_tag == to_underlying(Fields::kAttributeValue))
+        else if (__context_tag == to_underlying(Fields::kValueUnsigned8))
         {
-            err = DataModel::Decode(reader, attributeValue);
+            err = DataModel::Decode(reader, valueUnsigned8);
+        }
+        else if (__context_tag == to_underlying(Fields::kValueSigned8))
+        {
+            err = DataModel::Decode(reader, valueSigned8);
+        }
+        else if (__context_tag == to_underlying(Fields::kValueUnsigned16))
+        {
+            err = DataModel::Decode(reader, valueUnsigned16);
+        }
+        else if (__context_tag == to_underlying(Fields::kValueSigned16))
+        {
+            err = DataModel::Decode(reader, valueSigned16);
+        }
+        else if (__context_tag == to_underlying(Fields::kValueUnsigned32))
+        {
+            err = DataModel::Decode(reader, valueUnsigned32);
+        }
+        else if (__context_tag == to_underlying(Fields::kValueSigned32))
+        {
+            err = DataModel::Decode(reader, valueSigned32);
+        }
+        else if (__context_tag == to_underlying(Fields::kValueUnsigned64))
+        {
+            err = DataModel::Decode(reader, valueUnsigned64);
+        }
+        else if (__context_tag == to_underlying(Fields::kValueSigned64))
+        {
+            err = DataModel::Decode(reader, valueSigned64);
         }
         else
         {
@@ -12633,7 +12668,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace AttributeValuePair
+} // namespace AttributeValuePairStruct
 
 namespace ExtensionFieldSet {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const

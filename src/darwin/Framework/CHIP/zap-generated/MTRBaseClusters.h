@@ -4936,8 +4936,8 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster Laundry Dryer Controls
  *
- * This cluster supports remotely monitoring and controling the different typs of
-            functionality available to a drying device, such as a laundry dryer.
+ * This cluster provides a way to access options associated with the operation of
+            a laundry dryer device type.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterLaundryDryerControls : MTRGenericBaseCluster
@@ -6625,7 +6625,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command AddScene
  *
- * Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}'
+ * Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'
  */
 - (void)addSceneWithParams:(MTRScenesManagementClusterAddSceneParams *)params completion:(void (^)(MTRScenesManagementClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
