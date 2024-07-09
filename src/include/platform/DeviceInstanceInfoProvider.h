@@ -19,6 +19,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/Span.h>
+#include <app/data-model/Nullable.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -191,6 +193,24 @@ public:
      * ProductAppearance attribute), this should return CHIP_ERROR_NOT_IMPLEMENTED.
      */
     virtual CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * @brief Get the location inside the home where the device is located.
+     */
+    virtual CHIP_ERROR GetDeviceLocation(app::DataModel::Nullable<app::Clusters::detail::Structs::HomeLocationStruct::Type> &devLocation)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * @brief Set the location inside the home where the device is located.
+     *
+     * The caller ensures that if the device location is not null, at least one of the entries are not null or empty.
+     */
+    virtual CHIP_ERROR SetDeviceLocation(app::DataModel::Nullable<app::Clusters::detail::Structs::HomeLocationStruct::Type> devLocation)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
