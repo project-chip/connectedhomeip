@@ -26,7 +26,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, generate_random_nodeid
 from mobly import asserts
 
 
@@ -137,9 +137,24 @@ class TC_ACE_1_3(MatterBaseTest):
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
 
         TH0_nodeid = self.matter_test_config.controller_node_id
-        TH1_nodeid = self.matter_test_config.controller_node_id + 1
-        TH2_nodeid = self.matter_test_config.controller_node_id + 2
-        TH3_nodeid = self.matter_test_config.controller_node_id + 3
+        TH1_nodeid = generate_random_nodeid(
+            excluded_nodeid={
+                TH0_nodeid
+            }
+        )
+        TH2_nodeid = generate_random_nodeid(
+            excluded_nodeid={
+                TH0_nodeid,
+                TH1_nodeid
+            }
+        )
+        TH3_nodeid = generate_random_nodeid(
+            excluded_nodeid={
+                TH0_nodeid,
+                TH1_nodeid,
+                TH2_nodeid
+            }
+        )
 
         TH1 = fabric_admin.NewController(nodeId=TH1_nodeid,
                                          paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),

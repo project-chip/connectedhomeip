@@ -24,7 +24,7 @@ from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, generate_random_nodeid
 from mobly import asserts
 
 '''
@@ -134,7 +134,11 @@ class TC_IDM_4_2(MatterBaseTest):
         # Subscriber/client with limited access to the DUT
         # Will validate error status codes
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
-        CR2_nodeid = self.matter_test_config.controller_node_id + 1
+        CR2_nodeid = generate_random_nodeid(
+            excluded_nodeid={
+                self.matter_test_config.controller_node_id
+            }
+        )
         CR2: ChipDeviceController = fabric_admin.NewController(
             nodeId=CR2_nodeid,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),

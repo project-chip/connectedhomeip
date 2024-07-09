@@ -16,7 +16,7 @@ from chip.interaction_model import Status
 from chip.tlv import uint
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
-                                    default_matter_test_main)
+                                    default_matter_test_main, generate_random_nodeid)
 from spec_parsing_support import XmlCluster, build_xml_clusters
 
 
@@ -66,7 +66,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         self._record_errors()
         # We need to run this test from two controllers so we can test access to the ACL cluster while retaining access to the ACL cluster
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
-        self.TH2_nodeid = self.matter_test_config.controller_node_id + 1
+        self.TH2_nodeid = generate_random_nodeid(excluded_nodeid={self.matter_test_config.controller_node_id})
         self.TH2 = fabric_admin.NewController(nodeId=self.TH2_nodeid)
 
     # Both the tests in this suite are potentially long-running if there are a large number of attributes on the DUT
