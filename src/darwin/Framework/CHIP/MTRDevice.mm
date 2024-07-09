@@ -850,7 +850,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             _initialSubscribeStart = [NSDate now];
         }
         if ([self _deviceUsesThread]) {
-            MTR_LOG(" => %@ - device is a thread device, scheduling in pool");
+            MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
                 [self _setupSubscriptionWithReason:@"delegate is set and scheduled subscription is happening"];
@@ -1312,7 +1312,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // In the case where a resubscription triggering event happened and already established, running the work block should result in a no-op
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
-            MTR_LOG("%@ - work item is ready to attempt pooled subscription");
+            MTR_LOG("%@ - work item is ready to attempt pooled subscription", self);
             os_unfair_lock_lock(&self->_lock);
 #ifdef DEBUG
             [self _callDelegatesWithBlock:^(id testDelegate) {
