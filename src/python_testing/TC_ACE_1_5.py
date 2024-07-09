@@ -27,7 +27,7 @@ import logging
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, generate_random_nodeid
 from mobly import asserts
 
 
@@ -53,7 +53,7 @@ class TC_ACE_1_5(MatterBaseTest):
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
 
         TH1_nodeid = self.matter_test_config.controller_node_id
-        TH2_nodeid = self.matter_test_config.controller_node_id + 2
+        TH2_nodeid = generate_random_nodeid(excluded_nodeid={TH1_nodeid})
 
         self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
                                                   paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))

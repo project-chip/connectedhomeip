@@ -1499,6 +1499,13 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
 
 
+def generate_random_nodeid(excluded_nodeid: typing.Optional[typing.Set] = set()) -> int:
+    "Generate random complainat nodeid, excluding a set of provided nodeids."
+    nodeid = random.randint(1, 0xFFFF_FFEF_FFFF_FFFF)
+    if nodeid in excluded_nodeid:
+        return generate_random_nodeid(excluded_nodeid)
+    return nodeid
+
 def async_test_body(body):
     """Decorator required to be applied whenever a `test_*` method is `async def`.
 
@@ -1703,7 +1710,7 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
 
             try:
                 runner.run()
-                ok = runner.results.is_all_pass and ok
+                ok = runner.results.is_all_pass and ok      
             except TimeoutError:
                 ok = False
             except signals.TestAbortAll:

@@ -30,7 +30,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, generate_random_nodeid
 from mobly import asserts
 
 
@@ -87,7 +87,15 @@ class TC_ACE_1_2(MatterBaseTest):
         self.breadcrumb = 1
         self.breadcrumb_queue = queue.Queue()
         self.subscription_breadcrumb = None
+        self.subscriptions = []
         super().__init__(*args)
+
+
+    def teardown_class(self):
+        for subscription in self.subscriptions:
+            subscription.Shutdown()
+        if self.subscription_breadcrumb is not None:
+            self.subscription_breadcrumb.Shutdown()
 
     async def write_acl(self, acl):
         # This returns an attribute status
@@ -97,6 +105,9 @@ class TC_ACE_1_2(MatterBaseTest):
     async def steps_subscribe_breadcrumb(self, print_steps: bool):
         if print_steps:
             self.print_step(3, "TH2 subscribes to the Breadcrumb attribute")
+        if isinstance(self.subscription_breadcrumb, Clusters.Attribute.SubscriptionTransaction):
+            self.subscription_breadcrumb.Shutdown()
+
         self.subscription_breadcrumb = await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb)], reportInterval=(1, 5), keepSubscriptions=False, autoResubscribe=False)
         breadcrumb_cb = AttributeChangeCallback(Clusters.GeneralCommissioning.Attributes.Breadcrumb, self.breadcrumb_queue)
         self.subscription_breadcrumb.SetAttributeUpdateCallback(breadcrumb_cb)
@@ -136,7 +147,7 @@ class TC_ACE_1_2(MatterBaseTest):
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
 
         TH1_nodeid = self.matter_test_config.controller_node_id
-        TH2_nodeid = self.matter_test_config.controller_node_id + 1
+        TH2_nodeid = generate_random_nodeid(excluded_nodeid={TH1_nodeid})
 
         self.TH2 = fabric_admin.NewController(nodeId=TH2_nodeid,
                                               paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
@@ -157,6 +168,7 @@ class TC_ACE_1_2(MatterBaseTest):
         acl_queue = queue.Queue()
         acl_cb = AttributeChangeCallback(Clusters.AccessControl.Attributes.Acl, acl_queue)
         subscription_acl.SetAttributeUpdateCallback(acl_cb)
+        self.subscriptions.append(subscription_acl)
 
         self.print_step(5, "TH2 subscribes to the AccessControlEntryChanged event")
         urgent = 1
@@ -164,6 +176,7 @@ class TC_ACE_1_2(MatterBaseTest):
         ace_queue = queue.Queue()
         ace_cb = EventChangeCallback(Clusters.AccessControl.Events.AccessControlEntryChanged, ace_queue)
         subscription_ace.SetEventUpdateCallback(ace_cb)
+        self.subscriptions.append(subscription_ace)
 
         self.print_step(6, "TH1 writes ACL attribute")
         acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
