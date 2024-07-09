@@ -118,8 +118,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
-
     CHIP_ERROR RevertActiveDataset() override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override

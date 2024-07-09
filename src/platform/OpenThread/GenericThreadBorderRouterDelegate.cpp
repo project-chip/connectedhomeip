@@ -147,6 +147,7 @@ void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceL
             event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established)
         {
             delegate->mCallback->OnActivateDatasetComplete(delegate->mSequenceNum, CHIP_NO_ERROR);
+            SaveThreadBorderRouterCommissioned(true);
             delegate->mCallback = nullptr;
         }
     }
@@ -157,11 +158,6 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SaveThreadBorderRouterCommissi
     return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFailsafeThreadBorderRouterCommissioned, commissioned);
 }
 
-CHIP_ERROR GenericOpenThreadBorderRouterDelegate::CommitActiveDataset()
-{
-    return SaveThreadBorderRouterCommissioned(true);
-}
-
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
 {
     // The FailSafe Timer is triggered and the previous command request should be handled, so reset the callback.
@@ -170,8 +166,8 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
     DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadBorderRouterCommissioned, &threadCommissioned);
     if (!threadCommissioned)
     {
-        // If Thread is not commissioned, we will try to attach an empty Thread dataset and the Thread Border Router
-        // will stay uncommissioned
+        // If Thread is not commissioned, we will try to attach an empty Thread dataset and that will clear the one stored in the
+        // Thread stack since the SetActiveDataset operation fails and FailSafe timer is triggered.
         Thread::OperationalDataset emptyDataset = {};
         return DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(emptyDataset, nullptr);
     }

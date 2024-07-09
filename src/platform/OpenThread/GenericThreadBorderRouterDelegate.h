@@ -69,8 +69,6 @@ public:
 
     CHIP_ERROR RevertActiveDataset() override;
 
-    CHIP_ERROR CommitActiveDataset() override;
-
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
 
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
