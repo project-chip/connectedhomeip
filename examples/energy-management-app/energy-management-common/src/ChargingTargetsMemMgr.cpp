@@ -26,9 +26,9 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 
-ChargingTargetsMemMgr::ChargingTargetsMemMgr() : mChargingTargetSchedulesIdx(0), mNumChargingTargets(0)
+ChargingTargetsMemMgr::ChargingTargetsMemMgr() : mChargingTargetSchedulesIdx(0), mNumDailyChargingTargets(0)
 {
-    memset(mpChargingTargets, 0, sizeof(mpChargingTargets));
+    memset(mpListOfDays, 0, sizeof(mpListOfDays));
 }
 
 ChargingTargetsMemMgr::~ChargingTargetsMemMgr()
@@ -36,9 +36,9 @@ ChargingTargetsMemMgr::~ChargingTargetsMemMgr()
     // Free all memory allocated for the charging targets
     for (uint16_t idx = 0; idx < kEvseTargetsMaxNumberOfDays; idx++)
     {
-        if (mpChargingTargets[idx] != nullptr)
+        if (mpListOfDays[idx] != nullptr)
         {
-            chip::Platform::Delete(mpChargingTargets[idx]);
+            chip::Platform::Delete(mpListOfDays[idx]);
         }
     }
 }
@@ -46,72 +46,72 @@ ChargingTargetsMemMgr::~ChargingTargetsMemMgr()
 void ChargingTargetsMemMgr::Reset(uint16_t chargingTargetSchedulesIdx)
 {
     // MUST be called for each entry in DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules
-    mNumChargingTargets         = 0;
+    mNumDailyChargingTargets         = 0;
     mChargingTargetSchedulesIdx = chargingTargetSchedulesIdx;
 
     // Free up any memory associated with this targetSchedule
-    if (mpChargingTargets[mChargingTargetSchedulesIdx] != nullptr)
+    if (mpListOfDays[mChargingTargetSchedulesIdx] != nullptr)
     {
-        chip::Platform::MemoryFree(mpChargingTargets[mChargingTargetSchedulesIdx]);
-        mpChargingTargets[mChargingTargetSchedulesIdx] = nullptr;
+        chip::Platform::MemoryFree(mpListOfDays[mChargingTargetSchedulesIdx]);
+        mpListOfDays[mChargingTargetSchedulesIdx] = nullptr;
     }
 }
 
 void ChargingTargetsMemMgr::AddChargingTarget(EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget)
 {
-    if (mNumChargingTargets < kEvseTargetsMaxTargetsPerDay)
+    if (mNumDailyChargingTargets < kEvseTargetsMaxTargetsPerDay)
     {
-        mChargingTargets[mNumChargingTargets++] = chargingTarget;
+        mDailyChargingTargets[mNumDailyChargingTargets++] = chargingTarget;
     }
 }
 
 EnergyEvse::Structs::ChargingTargetStruct::Type * ChargingTargetsMemMgr::GetChargingTargets() const
 {
-    return mpChargingTargets[mChargingTargetSchedulesIdx];
+    return mpListOfDays[mChargingTargetSchedulesIdx];
 }
 
-uint16_t ChargingTargetsMemMgr::GetNumChargingTargets() const
+uint16_t ChargingTargetsMemMgr::GetNumDailyChargingTargets() const
 {
-    return mNumChargingTargets;
+    return mNumDailyChargingTargets;
 }
 
 void ChargingTargetsMemMgr::AllocAndCopy()
 {
-    if (mNumChargingTargets > 0)
+    if (mNumDailyChargingTargets > 0)
     {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
-        mpChargingTargets[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
-            chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumChargingTargets));
+        mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
+            chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
 
-        for (uint16_t idx = 0; idx < mNumChargingTargets; idx++)
+        for (uint16_t idx = 0; idx < mNumDailyChargingTargets; idx++)
         {
             // This will cause the ChargingTargetStruct constructor to be called and this element in the array
-            new (mpChargingTargets[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
+            new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
 
             // Now copy the chargingTarget
-            mpChargingTargets[mChargingTargetSchedulesIdx][idx] = mChargingTargets[idx];
+            mpListOfDays[mChargingTargetSchedulesIdx][idx] = mDailyChargingTargets[idx];
         }
     }
 }
 
 void ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
 {
-    mNumChargingTargets = static_cast<uint16_t>(chargingTargets.size());
+    mNumDailyChargingTargets = static_cast<uint16_t>(chargingTargets.size());
 
-    if (mNumChargingTargets > 0)
+    if (mNumDailyChargingTargets > 0)
     {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
-        mpChargingTargets[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
+        mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
             chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * chargingTargets.size()));
 
         uint16_t idx = 0;
         for (auto & chargingTarget : chargingTargets)
         {
             // This will cause the ChargingTargetStruct constructor to be called and this element in the array
-            new (mpChargingTargets[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
+            new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
 
             // Now copy the chargingTarget
-            mpChargingTargets[mChargingTargetSchedulesIdx][idx] = chargingTarget;
+            mpListOfDays[mChargingTargetSchedulesIdx][idx] = chargingTarget;
 
             idx++;
         }
@@ -121,17 +121,17 @@ void ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::Ch
 CHIP_ERROR
 ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets)
 {
-    size_t numChargingTargets = 0;
-    CHIP_ERROR err            = chargingTargets.ComputeSize(&numChargingTargets);
+    size_t numDailyChargingTargets = 0;
+    CHIP_ERROR err            = chargingTargets.ComputeSize(&numDailyChargingTargets);
     if (err == CHIP_NO_ERROR)
     {
-        mNumChargingTargets = static_cast<uint16_t>(numChargingTargets);
+        mNumDailyChargingTargets = static_cast<uint16_t>(numDailyChargingTargets);
 
-        if (mNumChargingTargets > 0)
+        if (mNumDailyChargingTargets > 0)
         {
             // Allocate the memory first and then use placement new to initialise the memory of each element in the array
-            mpChargingTargets[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
-                chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumChargingTargets));
+            mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
+                chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
 
             uint16_t idx = 0;
             auto it      = chargingTargets.begin();
@@ -140,10 +140,10 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Char
                 auto & chargingTarget = it.GetValue();
 
                 // This will cause the ChargingTargetStruct constructor to be called and this element in the array
-                new (mpChargingTargets[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
+                new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
 
                 // Now copy the chargingTarget
-                mpChargingTargets[mChargingTargetSchedulesIdx][idx] = chargingTarget;
+                mpListOfDays[mChargingTargetSchedulesIdx][idx] = chargingTarget;
 
                 idx++;
             }

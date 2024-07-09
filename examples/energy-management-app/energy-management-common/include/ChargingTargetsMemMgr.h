@@ -25,7 +25,7 @@
  * This means that somewhere the following memory needs to be allocated in the case where
  * the Target is at its maximum size:
  *
- * ChargingTargetStruct::Type mChargingTargets[kEvseTargetsMaxNumberOfDays][kEvseTargetsMaxTargetsPerDay]
+ * ChargingTargetStruct::Type mDailyChargingTargets[kEvseTargetsMaxNumberOfDays][kEvseTargetsMaxTargetsPerDay]
  *
  * This is 1680B.
  *
@@ -61,7 +61,7 @@
  * DataModel::List<const Structs::ChargingTargetStruct::Type as follows:
  *
  * chargingTargetsList = DataModel::List<Structs::ChargingTargetStruct::Type>(ChargingTargetsMemMgr::GetChargingTargets(),
- * ChargingTargetsMemMgr::GetNumChargingTargets());
+ * ChargingTargetsMemMgr::GetNumDailyChargingTargets());
  *
  * All memory allocated by this object is released When the ChargingTargetsMemMgr destructor is called.
  *
@@ -92,13 +92,13 @@ public:
     CHIP_ERROR AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets);
 
     EnergyEvse::Structs::ChargingTargetStruct::Type * GetChargingTargets() const;
-    uint16_t GetNumChargingTargets() const;
+    uint16_t GetNumDailyChargingTargets() const;
 
 private:
-    EnergyEvse::Structs::ChargingTargetStruct::Type * mpChargingTargets[kEvseTargetsMaxNumberOfDays];
-    EnergyEvse::Structs::ChargingTargetStruct::Type mChargingTargets[kEvseTargetsMaxTargetsPerDay];
+    EnergyEvse::Structs::ChargingTargetStruct::Type * mpListOfDays[kEvseTargetsMaxNumberOfDays];
+    EnergyEvse::Structs::ChargingTargetStruct::Type mDailyChargingTargets[kEvseTargetsMaxTargetsPerDay];
     uint16_t mChargingTargetSchedulesIdx;
-    uint16_t mNumChargingTargets;
+    uint16_t mNumDailyChargingTargets;
 };
 
 } // namespace EnergyEvse

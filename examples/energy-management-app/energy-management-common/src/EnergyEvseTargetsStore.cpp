@@ -157,7 +157,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
 
             ReturnErrorOnFailure(reader.ExitContainer(chargingTargetsStructType));
 
-            int64_t addedEnergy = chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0;
+            [[maybe_unused]] int64_t addedEnergy = chargingTarget.addedEnergy.HasValue() ? chargingTarget.addedEnergy.Value() : 0;
 
             ChipLogProgress(
                 AppServer, "LoadingTargets: targetTimeMinutesPastMidnight %u targetSoC %u addedEnergy 0x" ChipLogFormatX64,
@@ -179,7 +179,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
         // List<ChargingTargetScheduleStruct> mChargingTargetSchedulesList below
         mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].chargingTargets =
             chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(mChargingTargets.GetChargingTargets(),
-                                                                                        mChargingTargets.GetNumChargingTargets());
+                                                                                        mChargingTargets.GetNumDailyChargingTargets());
 
         chargingTargetSchedulesIdx++;
     }
@@ -309,7 +309,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 
             updatedChargingTargetSchedulesArray[updatedChargingTargetSchedulesIdx].chargingTargets =
                 chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
-                    updatedChargingTargets.GetChargingTargets(), updatedChargingTargets.GetNumChargingTargets());
+                    updatedChargingTargets.GetChargingTargets(), updatedChargingTargets.GetNumDailyChargingTargets());
 
             // Going to look at the next schedule entry
             updatedChargingTargetSchedulesIdx++;
@@ -332,7 +332,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 
             updatedChargingTargetSchedulesArray[updatedChargingTargetSchedulesIdx].chargingTargets =
                 chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
-                    updatedChargingTargets.GetChargingTargets(), updatedChargingTargets.GetNumChargingTargets());
+                    updatedChargingTargets.GetChargingTargets(), updatedChargingTargets.GetNumDailyChargingTargets());
 
             // We've added a new schedule entry
             updatedChargingTargetSchedulesIdx++;
