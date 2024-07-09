@@ -1,6 +1,8 @@
 package com.matter.tv.server.handlers;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import com.matter.tv.app.api.Clusters;
 import com.matter.tv.server.model.ContentApp;
@@ -9,6 +11,7 @@ import com.matter.tv.server.service.ContentAppAgentService;
 import com.matter.tv.server.tvapp.ContentAppEndpointManager;
 import com.matter.tv.server.utils.EndpointsDataStore;
 import java.util.Collection;
+import java.util.List;
 
 public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager {
 
@@ -20,25 +23,26 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
   }
 
   private boolean isForegroundCommand(long clusterId, long commandId) {
-    switch (clusterId) {
+    switch ((int)clusterId) {
       case Clusters.ContentLauncher.Id:
-        return commandId == Clusters.ContentLauncher.Commands.LaunchContent.Id;
+        return commandId == Clusters.ContentLauncher.Commands.LaunchContent.ID ||
+                commandId == Clusters.ContentLauncher.Commands.LaunchURL.ID;
       case Clusters.TargetNavigator.Id:
-        return commandId == Clusters.TargetNavigator.Commands.NavigateTarget.Id;
+        return commandId == Clusters.TargetNavigator.Commands.NavigateTarget.ID;
       default:
         return false;
     }
   }
 
   private boolean isAppInForeground(String contentAppPackageName) {
-    ActivityManager activityManager =
-        (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-    List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(1);
-    if (tasks != null && !tasks.isEmpty()) {
-      ActivityManager.RunningTaskInfo taskInfo = tasks.get(0);
-      String packageName = taskInfo.topActivity.getPackageName();
-      return packageName.equals(contentAppPackageName);
-    }
+      ActivityManager activityManager =
+              (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+      List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(1);
+      if (tasks != null && !tasks.isEmpty()) {
+        ActivityManager.RunningTaskInfo taskInfo = tasks.get(0);
+        String packageName = taskInfo.topActivity != null ? taskInfo.topActivity.getPackageName() : "";
+        return packageName.equals(contentAppPackageName);
+      }
     return false;
   }
 
@@ -57,7 +61,7 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
           Intent launchIntent =
               context.getPackageManager().getLaunchIntentForPackage(discoveredApp.getAppName());
           if (launchIntent != null) {
-            startActivity(launchIntent);
+            context.startActivity(launchIntent);
           }
         }
       }
