@@ -804,8 +804,13 @@ void SetTestEventTrigger_EVChargeDemandClear()
 }
 void SetTestEventTrigger_EVTimeOfUseMode()
 {
-    // TODO - what to do here?
+    // TODO - See #34249
 }
+void SetTestEventTrigger_EVTimeOfUseModeClear()
+{
+    // TODO - See #34249
+}
+
 void SetTestEventTrigger_EVSEGroundFault()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
@@ -924,6 +929,10 @@ bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
     case EnergyEvseTrigger::kEVSEDiagnosticsComplete:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Diagnostics Completed");
         SetTestEventTrigger_EVSEDiagnosticsComplete();
+        break;
+    case EnergyEvseTrigger::kEVTimeOfUseModeClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV TimeOfUse Mode clear");
+        SetTestEventTrigger_EVTimeOfUseModeClear();
         break;
 
     default:

@@ -67,6 +67,8 @@ enum class EnergyEvseTrigger : uint64_t
     kEVSEFaultClear = 0x0099000000000012,
     // EVSE Diagnostics Complete | Simulate diagnostics have been completed and return to normal
     kEVSEDiagnosticsComplete = 0x0099000000000020,
+    // EV Charge TimeOfUse Mode clear | Simulate clearing the EVSE Mode TimeOfUse tag
+    kEVTimeOfUseModeClear = 0x0099000000000021,
 };
 
 class EnergyEvseTestEventTriggerHandler : public TestEventTriggerHandler
