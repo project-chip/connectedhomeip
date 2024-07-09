@@ -44,6 +44,7 @@ static_library("nuttx") {
     public_deps += [
       "${chip_root}/examples/lighting-app/lighting-common",
       "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
+      "${chip_root}/src/platform/logging:default",
     ]
   }
 
