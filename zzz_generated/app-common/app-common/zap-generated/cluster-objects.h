@@ -40980,6 +40980,7 @@ enum class Fields : uint8_t
     kRequestId    = 0,
     kClientNodeId = 1,
     kStatusCode   = 2,
+    kFabricIndex  = 254,
 };
 
 struct Type
@@ -40988,11 +40989,14 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::CommissioningRequestResult::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
-    uint64_t requestId        = static_cast<uint64_t>(0);
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint8_t statusCode        = static_cast<uint8_t>(0);
+    uint64_t requestId            = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint8_t statusCode            = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -41004,9 +41008,10 @@ public:
     static constexpr EventId GetEventId() { return Events::CommissioningRequestResult::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
 
-    uint64_t requestId        = static_cast<uint64_t>(0);
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint8_t statusCode        = static_cast<uint8_t>(0);
+    uint64_t requestId            = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint8_t statusCode            = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

@@ -26,12 +26,14 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
   val requestId: ULong,
   val clientNodeId: ULong,
   val statusCode: UInt,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("CommissionerControlClusterCommissioningRequestResultEvent {\n")
     append("\trequestId : $requestId\n")
     append("\tclientNodeId : $clientNodeId\n")
     append("\tstatusCode : $statusCode\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -41,6 +43,7 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
       put(ContextSpecificTag(TAG_REQUEST_ID), requestId)
       put(ContextSpecificTag(TAG_CLIENT_NODE_ID), clientNodeId)
       put(ContextSpecificTag(TAG_STATUS_CODE), statusCode)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -49,6 +52,7 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
     private const val TAG_REQUEST_ID = 0
     private const val TAG_CLIENT_NODE_ID = 1
     private const val TAG_STATUS_CODE = 2
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -58,6 +62,7 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
       val requestId = tlvReader.getULong(ContextSpecificTag(TAG_REQUEST_ID))
       val clientNodeId = tlvReader.getULong(ContextSpecificTag(TAG_CLIENT_NODE_ID))
       val statusCode = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS_CODE))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -65,6 +70,7 @@ class CommissionerControlClusterCommissioningRequestResultEvent(
         requestId,
         clientNodeId,
         statusCode,
+        fabricIndex,
       )
     }
   }

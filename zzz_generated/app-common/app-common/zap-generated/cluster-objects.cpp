@@ -28006,6 +28006,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kRequestId), requestId));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kClientNodeId), clientNodeId));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStatusCode), statusCode));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kFabricIndex), fabricIndex));
     return aWriter.EndContainer(outer);
 }
 
@@ -28034,6 +28035,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kStatusCode))
         {
             err = DataModel::Decode(reader, statusCode);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {

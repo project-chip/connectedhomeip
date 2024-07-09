@@ -5950,18 +5950,22 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
   public Long requestId;
   public Long clientNodeId;
   public Integer statusCode;
+  public Integer fabricIndex;
   private static final long REQUEST_ID_ID = 0L;
   private static final long CLIENT_NODE_ID_ID = 1L;
   private static final long STATUS_CODE_ID = 2L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public CommissionerControlClusterCommissioningRequestResultEvent(
     Long requestId,
     Long clientNodeId,
-    Integer statusCode
+    Integer statusCode,
+    Integer fabricIndex
   ) {
     this.requestId = requestId;
     this.clientNodeId = clientNodeId;
     this.statusCode = statusCode;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -5969,6 +5973,7 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
     values.add(new StructElement(REQUEST_ID_ID, new UIntType(requestId)));
     values.add(new StructElement(CLIENT_NODE_ID_ID, new UIntType(clientNodeId)));
     values.add(new StructElement(STATUS_CODE_ID, new UIntType(statusCode)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -5980,6 +5985,7 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
     Long requestId = null;
     Long clientNodeId = null;
     Integer statusCode = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == REQUEST_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5996,12 +6002,18 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
           UIntType castingValue = element.value(UIntType.class);
           statusCode = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new CommissionerControlClusterCommissioningRequestResultEvent(
       requestId,
       clientNodeId,
-      statusCode
+      statusCode,
+      fabricIndex
     );
   }
 
@@ -6017,6 +6029,9 @@ public static class CommissionerControlClusterCommissioningRequestResultEvent {
     output.append("\n");
     output.append("\tstatusCode: ");
     output.append(statusCode);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();

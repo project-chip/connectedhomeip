@@ -46296,11 +46296,13 @@ class CommissionerControl(Cluster):
                         ClusterObjectFieldDescriptor(Label="requestId", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="clientNodeId", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="statusCode", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             requestId: 'uint' = 0
             clientNodeId: 'uint' = 0
             statusCode: 'uint' = 0
+            fabricIndex: 'uint' = 0
 
 
 @dataclass

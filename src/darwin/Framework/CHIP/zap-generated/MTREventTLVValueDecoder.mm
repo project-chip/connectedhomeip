@@ -4444,6 +4444,11 @@ static id _Nullable DecodeEventPayloadForCommissionerControlCluster(EventId aEve
             memberValue = [NSNumber numberWithUnsignedChar:cppValue.statusCode];
             value.statusCode = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
 
         return value;
     }

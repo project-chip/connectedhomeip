@@ -9135,20 +9135,21 @@ provisional cluster ContentAppObserver = 1296 {
 }
 
 /** Supports the ability for clients to request the commissioning of themselves or other nodes onto a fabric which the cluster server can commission onto. */
-cluster CommissionerControl = 1873 {
-  revision 1; // NOTE: Default/not specifically set
+provisional cluster CommissionerControl = 1873 {
+  revision 1;
 
   bitmap SupportedDeviceCategoryBitmap : bitmap32 {
     kFabricSynchronization = 0x1;
   }
 
-  info event CommissioningRequestResult = 0 {
+  fabric_sensitive info event access(read: manage) CommissioningRequestResult = 0 {
     int64u requestId = 0;
     node_id clientNodeId = 1;
     enum8 statusCode = 2;
+    fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute SupportedDeviceCategoryBitmap supportedDeviceCategories = 0;
+  readonly attribute access(read: manage) SupportedDeviceCategoryBitmap supportedDeviceCategories = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -9160,7 +9161,7 @@ cluster CommissionerControl = 1873 {
     int64u requestId = 0;
     vendor_id vendorId = 1;
     int16u productId = 2;
-    optional char_string label = 3;
+    optional char_string<64> label = 3;
   }
 
   request struct CommissionNodeRequest {

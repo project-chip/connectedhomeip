@@ -7953,6 +7953,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_statusCodeClassName.c_str(), value_statusCodeCtorSignature.c_str(), jnivalue_statusCode, value_statusCode);
 
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
+                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
+                                                                       value_fabricIndex);
+
             jclass commissioningRequestResultStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$CommissionerControlClusterCommissioningRequestResultEvent",
@@ -7965,9 +7973,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jmethodID commissioningRequestResultStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(env, commissioningRequestResultStructClass, "<init>",
-                                                                "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;)V",
-                                                                &commissioningRequestResultStructCtor);
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, commissioningRequestResultStructClass, "<init>",
+                "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V", &commissioningRequestResultStructCtor);
             if (err != CHIP_NO_ERROR || commissioningRequestResultStructCtor == nullptr)
             {
                 ChipLogError(
@@ -7976,7 +7984,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(commissioningRequestResultStructClass, commissioningRequestResultStructCtor,
-                                           value_requestId, value_clientNodeId, value_statusCode);
+                                           value_requestId, value_clientNodeId, value_statusCode, value_fabricIndex);
 
             return value;
         }
