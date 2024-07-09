@@ -28,13 +28,6 @@
 namespace chip {
 namespace app {
 
-// - If it has changed due to a change in the CurrentPhase or OperationalState attributes, or
-// - When it changes from 0 to any other value and vice versa, or
-// - When it changes from null to any other value and vice versa, or
-// - When it increases, or
-// - When there is any increase or decrease in the estimated time remaining that was due to progressing insight of the server's control logic, or
-// - When it changes at a rate significantly different from one unit per second.
-
 enum class QuieterReportingPolicyEnum
 {
     kMarkDirtyOnChangeToFromZero = (1u << 0),
@@ -74,6 +67,15 @@ using Nullable = chip::app::DataModel::Nullable<T>;
  * - Call `GetThenResetDirtyState()`. If it returns true, mark the attribute dirty, with the
  *   method most suitable at the call site (e.g. `MatterReportingAttributeChangeCallback` call
  *   or similar methods).
+ *
+ * Example of situations that require dirty, which are possible to support with this class:
+ *
+ * - If attribute has changed due to a change in the X or Y attributes, or
+ * - When it changes from 0 to any other value and vice versa, or
+ * - When it changes from null to any other value and vice versa, or
+ * - When it increases, or
+ * - When there is any increase or decrease in the estimated time remaining that was due to progressing insight of the server's control logic, or
+ * - When it changes at a rate significantly different from one unit per second.
  *
  * @tparam T - the type of underlying numerical value that will be held by the class.
  */
