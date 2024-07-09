@@ -90,7 +90,6 @@ class TC_ACE_1_2(MatterBaseTest):
         self.subscriptions = []
         super().__init__(*args)
 
-
     def teardown_class(self):
         for subscription in self.subscriptions:
             subscription.Shutdown()

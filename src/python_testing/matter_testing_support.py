@@ -1506,6 +1506,7 @@ def generate_random_nodeid(excluded_nodeid: typing.Optional[typing.Set] = set())
         return generate_random_nodeid(excluded_nodeid)
     return nodeid
 
+
 def async_test_body(body):
     """Decorator required to be applied whenever a `test_*` method is `async def`.
 
@@ -1710,7 +1711,7 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
 
             try:
                 runner.run()
-                ok = runner.results.is_all_pass and ok      
+                ok = runner.results.is_all_pass and ok
             except TimeoutError:
                 ok = False
             except signals.TestAbortAll:
