@@ -576,29 +576,25 @@ private:
     /**
      * @brief Reads AliroExpeditedTransactionSupportedProtocolVersions attribute for door lock
      *
-     * @param aPath         attribute path.
      * @param aEncoder      attribute value encoder.
      * @param delegate      door lock cluster delegate that will provide the value
      *
      * @return CHIP_NO_ERROR  on success
      * @return CHIP_ERROR     if attribute read failed
      */
-    CHIP_ERROR ReadAliroExpeditedTransactionSupportedProtocolVersions(const chip::app::ConcreteReadAttributePath & aPath,
-                                                                      chip::app::AttributeValueEncoder & aEncoder,
+    CHIP_ERROR ReadAliroExpeditedTransactionSupportedProtocolVersions(chip::app::AttributeValueEncoder & aEncoder,
                                                                       chip::app::Clusters::DoorLock::Delegate * delegate);
 
     /**
      * @brief Reads AliroSupportedBLEUWBProtocolVersions attribute for door lock
      *
-     * @param aPath         attribute path.
      * @param aEncoder      attribute value encoder.
      * @param delegate      door lock cluster delegate that will provide the value
      *
      * @return CHIP_NO_ERROR  on success
      * @return CHIP_ERROR     if attribute read failed
      */
-    CHIP_ERROR ReadAliroSupportedBLEUWBProtocolVersions(const chip::app::ConcreteReadAttributePath & aPath,
-                                                        chip::app::AttributeValueEncoder & aEncoder,
+    CHIP_ERROR ReadAliroSupportedBLEUWBProtocolVersions(chip::app::AttributeValueEncoder & aEncoder,
                                                         chip::app::Clusters::DoorLock::Delegate * delegate);
 
     /**
