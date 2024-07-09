@@ -541,7 +541,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     [[NSNotificationCenter defaultCenter] removeObserver:_systemTimeChangeObserverToken];
 
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
-    MTR_LOG("%@ dealloc called", self);
+    MTR_LOG("MTRDevice dealloc: %p", self);
 }
 
 - (NSString *)description
