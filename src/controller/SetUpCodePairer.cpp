@@ -378,7 +378,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverWifiPAF()
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
     auto param                              = SetUpCodePairerParameters();
     param.SetPeerAddress(Transport::PeerAddress(Transport::Type::kWiFiPAF, mRemoteId));
-    mDiscoveredParameters.emplace_front(param);
+    mDiscoveredParameters.emplace_back(param);
     ConnectToDiscoveredDevice();
 }
 
