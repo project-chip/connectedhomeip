@@ -51,8 +51,6 @@ public:
      */
     virtual NewSessionHandlingPolicy GetNewSessionHandlingPolicy() { return NewSessionHandlingPolicy::kShiftToNewSession; }
 
-    using Event = void (SessionDelegate::*)();
-
     /**
      * @brief
      *   Called when a session is releasing. Callees SHALL NOT make synchronous calls into SessionManager to allocate a new session.
@@ -66,6 +64,10 @@ public:
      * SessionManager to allocate a new session. If they desire to do so, it MUST be done asynchronously.
      */
     virtual void OnSessionHang() {}
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    virtual void OnSessionConnectionClosed(CHIP_ERROR conErr) {}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 } // namespace chip

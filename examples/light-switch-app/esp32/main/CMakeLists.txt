@@ -59,8 +59,8 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/group-key-mgmt-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-synchronization-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/icd-management-server"
-                      PRIV_REQUIRES chip QRCode bt app_update driver nvs_flash spi_flash)
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/icd-management-server")
+
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")

@@ -17,13 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0097"/>
-    <field name="ReceivedConfirmation" mask="0x1"/>
-    <field name="ConfirmationResponse" mask="0x2"/>
-    <field name="ConfirmationReply" mask="0x4"/>
-    <field name="ProtectedMessages" mask="0x8"/>
-  </bitmap>
 
   <bitmap name="MessageControlBitmap" type="bitmap8">
     <cluster code="0x0097"/>
@@ -78,6 +71,26 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/><!-- Revision   -->
+
+    <features>
+      <feature bit="0" code="CONF" name="ReceivedConfirmation">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="RESP" name="ConfirmationResponse">
+        <optionalConform>
+          <feature name="CONF"/>
+        </optionalConform>
+      </feature>
+      <feature bit="2" code="RPLY" name="ConfirmationReply">
+        <optionalConform>
+          <feature name="CONF"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="PROT" name="ProtectedMessages">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="LIST_MESSAGES" type="array" entryType="MessageStruct" length="8" writable="false" optional="false">Messages</attribute>
     <attribute side="server" code="0x0001" define="MESSAGES_CLUSTER_ACTIVE_MESSAGES_IDS" type="ARRAY" entryType="octet_string" max="8" writable="false" optional="false">ActiveMessageIDs</attribute>
     <command source="client" code="0x00" name="PresentMessagesRequest" isFabricScoped="true" optional="false">

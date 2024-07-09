@@ -92,6 +92,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & ke
     AesKeyAttributes attrs;
     psa_status_t status =
         psa_import_key(&attrs.Get(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray), &key.AsMutable<psa_key_id_t>());
+    LogPsaError(status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -105,7 +106,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & ke
     HmacKeyAttributes attrs;
     psa_status_t status =
         psa_import_key(&attrs.Get(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray), &key.AsMutable<psa_key_id_t>());
-
+    LogPsaError(status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -118,7 +119,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const ByteSpan & keyMaterial, HkdfKeyHa
 
     HkdfKeyAttributes attrs;
     psa_status_t status = psa_import_key(&attrs.Get(), keyMaterial.data(), keyMaterial.size(), &key.AsMutable<psa_key_id_t>());
-
+    LogPsaError(status);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -188,7 +189,7 @@ void PSASessionKeystore::DestroyKey(HkdfKeyHandle & key)
     auto & keyId = key.AsMutable<psa_key_id_t>();
 
     psa_destroy_key(keyId);
-    keyId = 0;
+    keyId = PSA_KEY_ID_NULL;
 }
 
 } // namespace Crypto

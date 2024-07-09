@@ -39,7 +39,6 @@ tests:
     - label:
           "Step 1: Factory Reset DUT (to ensure NOC list is empty at the
           beginning of the following steps)"
-      PICS: OPCREDS.S.A0000
       # verification: ""
       # Disabling this step, because the test starts with a DUT device that has just been commissioned by the TH1 commissioner
       disabled: true
@@ -56,7 +55,6 @@ tests:
     - label:
           "Step 3.1: Save the FabricIndex for TH1 as TH1_Fabric_Index for future
           use."
-      PICS: OPCREDS.S.A0001
       identity: "alpha"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -65,15 +63,14 @@ tests:
           saveAs: TH1_Fabric_Index
 
     - label:
-          "Step 3.2: TH1 does a non-fabric-filtered read of the Fabrics
-          attribute from the Node Operational Credentials cluster. Save the
-          FabricIndex for TH1 as TH1_Fabric_Index for future use."
-      PICS: OPCREDS.S.A0001
+          "Step 3.2: TH1 does a fabric-filtered read of the Fabrics attribute
+          from the Node Operational Credentials cluster. Save the FabricIndex
+          for TH1 as TH1_Fabric_Index for future use."
       identity: "alpha"
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
-      fabricFiltered: false
+      fabricFiltered: true
       response:
           value: [{ "FabricIndex": TH1_Fabric_Index, "Label": "" }]
           constraints:
@@ -83,7 +80,6 @@ tests:
     - label:
           "Step 4: TH1 sends ArmFailSafe command to the DUT with the
           ExpiryLengthSeconds field set to 60 seconds"
-      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       identity: "alpha"
       cluster: "General Commissioning"
       command: "ArmFailSafe"
@@ -100,7 +96,6 @@ tests:
 
       # verification: "Verify that the DUT sends ArmFailSafeResponse command to TH1 with field ErrorCode as OK(0)"
     - label: "Step 5: TH1 Sends CSRRequest command with a random 32-byte nonce."
-      PICS: OPCREDS.S.C04.Rsp
       identity: "alpha"
       command: "CSRRequest"
       cluster: "Operational Credentials"
@@ -119,7 +114,6 @@ tests:
     - label:
           "Step 6.1: Read the commissioner root certificate from TH2's fabric.
           Save RCAC as Root_CA_Certificate_TH2"
-      # PICS:
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "GetCommissionerRootCertificate"
@@ -135,7 +129,6 @@ tests:
           TH2. Save ICAC as Intermediate_Certificate_TH2. Save NOC as
           Node_Operational_Certificate_TH2. Save IPK as IPK_TH2. Extract the
           RCAC public key and save as Root_Public_Key_TH2."
-      # PICS:
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "IssueNocChain"
@@ -156,7 +149,6 @@ tests:
 
       # verification: ""
     - label: "Step 7.1: Read the commissioner node ID from TH2"
-      # PICS:
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "GetCommissionerNodeId"
@@ -169,7 +161,6 @@ tests:
     - label:
           "Step 7.2: TH1 sends AddTrustedRootCertificate command to DUT with
           RootCACertificate set to Root_CA_Certificate_TH2"
-      PICS: OPCREDS.S.C0b.Rsp
       identity: "alpha"
       command: "AddTrustedRootCertificate"
       cluster: "Operational Credentials"
@@ -184,7 +175,6 @@ tests:
           fields: NOCValue as Node_Operational_Certificate_TH2. ICACValue as
           Intermediate_Certificate_TH2. IpkValue as IPK_TH2. CaseAdminSubject as
           the NodeID of TH2. AdminVendorId as the Vendor ID of TH2."
-      PICS: OPCREDS.S.C06.Rsp && OPCREDS.S.C08.Tx
       identity: "alpha"
       command: "AddNOC"
       cluster: "Operational Credentials"
@@ -207,14 +197,12 @@ tests:
 
       # verification: "Verify that DUT responds with NOCResponse with status code OK"
     - label: "Step 9: TH2 starts discovery of DUT using Operational Discovery"
-      # PICS: ""
       # verification: ""
       # Disabling this step as this occurs from the AddNOC command being run
       disabled: true
 
     - label:
           "Step 10: TH2 opens a CASE session with DUT over operational network."
-      # PICS: ""
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -225,7 +213,6 @@ tests:
 
       # verification: "DUT is able to open the CASE session with TH2"
     - label: "Step 11: TH2 sends CommissioningComplete command"
-      PICS: CGEN.S.C05.Tx
       nodeId: 0x43211234
       identity: "beta"
       cluster: "General Commissioning"
@@ -240,7 +227,6 @@ tests:
           "Step 12: TH2 reads the Current Fabric Index attribute from the Node
           Operational Credentials cluster. Save the FabricIndex for TH2 as
           TH2_Fabric_Index."
-      PICS: OPCREDS.S.A0001
       identity: "beta"
       nodeId: 0x43211234
       command: "readAttribute"
@@ -251,21 +237,30 @@ tests:
 
       # verification: ""
     - label:
-          "Step 13: TH2 does a non-fabric-filtered read of the Fabrics attribute
+          "Step 13a: TH1 does a fabric-filtered read of the Fabrics attribute
           from the Node Operational Credentials cluster"
-      PICS: OPCREDS.S.A0001
+      nodeId: 0x43211234
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      fabricFiltered: true
+      response:
+          value: [{ "FabricIndex": TH1_Fabric_Index, "Label": "" }]
+          constraints:
+              type: list
+
+      # verification: ""
+    - label:
+          "Step 13b: TH2 does a fabric-filtered read of the Fabrics attribute
+          from the Node Operational Credentials cluster"
       identity: "beta"
       nodeId: 0x43211234
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
-      fabricFiltered: false
+      fabricFiltered: true
       response:
-          value:
-              [
-                  { "FabricIndex": TH1_Fabric_Index, "Label": "" },
-                  { "FabricIndex": TH2_Fabric_Index, "Label": "" },
-              ]
+          value: [{ "FabricIndex": TH2_Fabric_Index, "Label": "" }]
           constraints:
               type: list
 
@@ -273,7 +268,6 @@ tests:
     - label:
           "Step 14: TH1 sends RemoveFabric command to DUT with the FabricIndex
           field set to TH2_Fabric_Index."
-      PICS: OPCREDS.S.C0a.Rsp
       identity: "alpha"
       command: "RemoveFabric"
       cluster: "Operational Credentials"

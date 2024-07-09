@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -1035,6 +1036,16 @@ bool emberAfUnitTestingClusterSimpleStructEchoRequestCallback(CommandHandler * c
     response.arg1.f = commandData.arg1.f;
     response.arg1.g = commandData.arg1.g;
     response.arg1.h = commandData.arg1.h;
+
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
+bool emberAfUnitTestingClusterStringEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                        const Commands::StringEchoRequest::DecodableType & commandData)
+{
+    Commands::StringEchoResponse::Type response;
+    response.payload = commandData.payload;
 
     commandObj->AddResponse(commandPath, response);
     return true;

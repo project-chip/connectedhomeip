@@ -50,7 +50,7 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 
 CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
-#if CONFIG_ENABLE_SNTP_TIME_SYNC
+#ifdef CONFIG_ENABLE_SNTP_TIME_SYNC
     struct timeval tv;
     if (gettimeofday(&tv, nullptr) != 0)
     {
@@ -69,7 +69,7 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
     return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
+#endif // CONFIG_ENABLE_SNTP_TIME_SYNC
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)

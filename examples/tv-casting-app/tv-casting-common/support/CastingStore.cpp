@@ -182,6 +182,14 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                 continue;
             }
 
+            if (castingPlayerContainerTagNum == kCastingPlayerSupportsCommissionerGeneratedPasscodeTag)
+            {
+                err = reader.Get(attributes.supportsCommissionerGeneratedPasscode);
+                VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
+                                    ChipLogError(AppServer, "TLVReader.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
+                continue;
+            }
+
             if (castingPlayerContainerTagNum == kCastingPlayerPortTag)
             {
                 err = reader.Get(attributes.port);
@@ -390,6 +398,7 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
 
                         endpointAttributesList.push_back(endpointAttributes);
                         endpointServerListMap[endpointAttributes.mId] = serverList;
+                        serverList.clear();
                         continue;
                     }
                 }
@@ -413,14 +422,14 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                                 ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
 
             // create a castingPlayer with Endpoints and add it to the castingPlayers to be returned
-            core::CastingPlayer castingPlayer(attributes);
+            core::CastingPlayer * castingPlayer = new core::CastingPlayer(attributes);
             for (auto & endpointAttributes : endpointAttributesList)
             {
-                std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(&castingPlayer, endpointAttributes));
+                std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(castingPlayer, endpointAttributes));
                 endpoint->RegisterClusters(endpointServerListMap[endpointAttributes.mId]);
-                castingPlayer.RegisterEndpoint(endpoint);
+                castingPlayer->RegisterEndpoint(endpoint);
             }
-            castingPlayers.push_back(castingPlayer);
+            castingPlayers.push_back(*castingPlayer);
             continue;
         }
     }
@@ -471,6 +480,8 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerVendorIdTag), castingPlayer.GetVendorId()));
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerProductIdTag), castingPlayer.GetProductId()));
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerDeviceTypeIdTag), castingPlayer.GetDeviceType()));
+        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerSupportsCommissionerGeneratedPasscodeTag),
+                                           castingPlayer.GetSupportsCommissionerGeneratedPasscode()));
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerPortTag), castingPlayer.GetPort()));
         ReturnErrorOnFailure(tlvWriter.PutBytes(chip::TLV::ContextTag(kCastingPlayerInstanceNameTag),
                                                 (const uint8_t *) castingPlayer.GetInstanceName(),

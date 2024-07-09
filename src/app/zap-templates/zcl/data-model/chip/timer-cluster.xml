@@ -18,10 +18,6 @@ limitations under the License.
 <configurator>
     <domain name="CHIP" />
 
-    <bitmap name="Feature" type="bitmap32">
-        <cluster code="0x0047"/>
-        <field mask="0x01" name="Reset"/>
-    </bitmap>
 
     <enum name="TimerStatusEnum" type="enum8">
         <cluster code="0x0047" />
@@ -41,6 +37,13 @@ limitations under the License.
         <description>This cluster supports creating a simple timer functionality.</description>
 
         <globalAttribute side="either" code="0xFFFD" value="1" />
+
+        <features>
+            <feature bit="0" code="RESET" name="Reset" summary="Supports the ability to reset timer">
+                <optionalConform/>
+            </feature>
+        </features>
+
 
         <attribute side="server" code="0x0000" define="SET_TIME" type="elapsed_s"  writable="false" isNullable="false" optional="false">SetTime</attribute>
         <attribute side="server" code="0x0001" define="TIME_REMAINING" type="elapsed_s"  writable="false"  isNullable="false"   optional="false">TimeRemaining</attribute>

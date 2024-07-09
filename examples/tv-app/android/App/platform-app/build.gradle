@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.matter.tv.server"
-        minSdk 24
+        minSdk 26
         targetSdk 30
         versionCode 1
         versionName "1.0"
@@ -56,6 +56,9 @@ android {
 //                    '../../java/src',
 //            ]
         }
+    }
+    buildFeatures {
+        viewBinding = true
     }
 }
 

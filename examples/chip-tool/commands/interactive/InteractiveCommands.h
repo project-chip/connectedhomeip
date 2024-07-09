@@ -24,6 +24,8 @@
 
 #include <websocket-server/WebSocketServer.h>
 
+#include <string>
+
 class Commands;
 
 class InteractiveCommand : public CHIPCommand

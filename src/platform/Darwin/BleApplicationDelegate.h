@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <ble/BleApplicationDelegate.h>
+#include <ble/Ble.h>
 
 namespace chip {
 namespace DeviceLayer {

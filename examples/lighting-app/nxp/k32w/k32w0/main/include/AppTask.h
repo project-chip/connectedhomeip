@@ -112,7 +112,6 @@ private:
         kFunctionTurnOnTurnOff,
         kFunction_Identify,
         kFunction_TriggerEffect,
-
         kFunction_Invalid
     } Function;
 

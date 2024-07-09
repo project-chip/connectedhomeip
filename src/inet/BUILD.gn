@@ -185,4 +185,7 @@ static_library("inet") {
   }
 
   cflags = [ "-Wconversion" ]
+  if (current_os == "nuttx") {
+    cflags -= [ "-Wconversion" ]
+  }
 }

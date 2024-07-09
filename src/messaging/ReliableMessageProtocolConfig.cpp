@@ -32,30 +32,53 @@
 #include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
+#include <optional>
+
 namespace chip {
 
 using namespace System::Clock::Literals;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-static Optional<System::Clock::Timeout> idleRetransTimeoutOverride   = NullOptional;
-static Optional<System::Clock::Timeout> activeRetransTimeoutOverride = NullOptional;
-static Optional<System::Clock::Timeout> activeThresholdTimeOverride  = NullOptional;
+namespace {
+// Use std::optional for globals to avoid static initializers
+std::optional<System::Clock::Timeout> gIdleRetransTimeoutOverride;
+std::optional<System::Clock::Timeout> gActiveRetransTimeoutOverride;
+std::optional<System::Clock::Timeout> gActiveThresholdTimeOverride;
+} // namespace
 
 void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout,
                             System::Clock::Timeout activeThresholdTime)
 {
-    idleRetransTimeoutOverride.SetValue(idleRetransTimeout);
-    activeRetransTimeoutOverride.SetValue(activeRetransTimeout);
-    activeThresholdTimeOverride.SetValue(activeThresholdTime);
+    gIdleRetransTimeoutOverride   = idleRetransTimeout;
+    gActiveRetransTimeoutOverride = activeRetransTimeout;
+    gActiveThresholdTimeOverride  = activeThresholdTime;
 }
 
 void ClearLocalMRPConfigOverride()
 {
-    activeRetransTimeoutOverride.ClearValue();
-    idleRetransTimeoutOverride.ClearValue();
-    activeThresholdTimeOverride.ClearValue();
+    gActiveRetransTimeoutOverride = std::nullopt;
+    gIdleRetransTimeoutOverride   = std::nullopt;
+    gActiveThresholdTimeOverride  = std::nullopt;
 }
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+namespace {
+
+// This is not a static member of ReliableMessageProtocolConfig because the free
+// function GetLocalMRPConfig() needs access to it.
+// Use std::optional to avoid a static initializer
+std::optional<ReliableMessageProtocolConfig> sDynamicLocalMPRConfig;
+
+} // anonymous namespace
+
+bool ReliableMessageProtocolConfig::SetLocalMRPConfig(const Optional<ReliableMessageProtocolConfig> & localMRPConfig)
+{
+    auto oldConfig         = GetLocalMRPConfig();
+    sDynamicLocalMPRConfig = localMRPConfig.std_optional();
+    return oldConfig != GetLocalMRPConfig();
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
 
 ReliableMessageProtocolConfig GetDefaultMRPConfig()
 {
@@ -63,12 +86,21 @@ ReliableMessageProtocolConfig GetDefaultMRPConfig()
     static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 500_ms32;
     static constexpr const System::Clock::Milliseconds32 activeRetransTimeout = 300_ms32;
     static constexpr const System::Clock::Milliseconds16 activeThresholdTime  = 4000_ms16;
+    static_assert(activeThresholdTime == kDefaultActiveTime, "Different active defaults?");
     return ReliableMessageProtocolConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
 }
 
 Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
 {
     ReliableMessageProtocolConfig config(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL, CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+    if (sDynamicLocalMPRConfig.has_value())
+    {
+        config = sDynamicLocalMPRConfig.value();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // TODO ICD LIT shall not advertise the SII key
     // Increase local MRP retry intervals by ICD polling intervals. That is, intervals for
@@ -79,19 +111,19 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
 #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    if (idleRetransTimeoutOverride.HasValue())
+    if (gIdleRetransTimeoutOverride.has_value())
     {
-        config.mIdleRetransTimeout = idleRetransTimeoutOverride.Value();
+        config.mIdleRetransTimeout = gIdleRetransTimeoutOverride.value();
     }
 
-    if (activeRetransTimeoutOverride.HasValue())
+    if (gActiveRetransTimeoutOverride.has_value())
     {
-        config.mActiveRetransTimeout = activeRetransTimeoutOverride.Value();
+        config.mActiveRetransTimeout = gActiveRetransTimeoutOverride.value();
     }
 
-    if (activeThresholdTimeOverride.HasValue())
+    if (gActiveThresholdTimeOverride.has_value())
     {
-        config.mActiveThresholdTime = activeRetransTimeoutOverride.Value();
+        config.mActiveThresholdTime = gActiveThresholdTimeOverride.value();
     }
 #endif
 
@@ -99,9 +131,8 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
                                              : Optional<ReliableMessageProtocolConfig>::Value(config);
 }
 
-System::Clock::Timestamp GetRetransmissionTimeout(System::Clock::Timestamp activeInterval, System::Clock::Timestamp idleInterval,
-                                                  System::Clock::Timestamp lastActivityTime,
-                                                  System::Clock::Timestamp activityThreshold)
+System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInterval, System::Clock::Timeout idleInterval,
+                                                System::Clock::Timeout lastActivityTime, System::Clock::Timeout activityThreshold)
 {
     auto timeSinceLastActivity = (System::SystemClock().GetMonotonicTimestamp() - lastActivityTime);
 

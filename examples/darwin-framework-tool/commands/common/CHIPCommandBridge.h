@@ -34,8 +34,8 @@ inline constexpr char kIdentityGamma[] = "gamma";
 
 class CHIPCommandBridge : public Command {
 public:
-    CHIPCommandBridge(const char * commandName)
-        : Command(commandName)
+    CHIPCommandBridge(const char * commandName, const char * helpText = nullptr)
+        : Command(commandName, helpText)
     {
         AddArgument("commissioner-name", &mCommissionerName);
         AddArgument("commissioner-nodeId", 0, UINT64_MAX, &mCommissionerNodeId,

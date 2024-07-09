@@ -18,6 +18,7 @@
 #pragma once
 
 #include <fstream>
+#include <string>
 #include <tracing/backend.h>
 #include <unordered_map>
 

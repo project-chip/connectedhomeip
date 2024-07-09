@@ -34,7 +34,7 @@ CHIP_ERROR DiscoverCommissioners();
 
 CHIP_ERROR RequestCommissioning(int index);
 
-void PrepareForCommissioning(const chip::Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr);
+void PrepareForCommissioning(const chip::Dnssd::CommissionNodeData * selectedCommissioner = nullptr);
 
 void InitCommissioningFlow(intptr_t commandArg);
 

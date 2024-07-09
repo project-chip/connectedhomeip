@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,16 +27,13 @@
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/telink/ThreadStackManagerImpl.h>
 
-#include <inet/UDPEndPointImpl.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
 namespace chip {
 namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
-using namespace ::chip::Inet;
 
 ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
@@ -47,26 +44,6 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     otInstance * const instance = openthread_get_default_instance();
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
-
-    UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
-        const otIp6Address otAddress = ToOpenThreadIP6Address(address);
-
-        ThreadStackMgr().LockThreadStack();
-        const auto otError = otIp6SubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
-        ThreadStackMgr().UnlockThreadStack();
-
-        return MapOpenThreadError(otError);
-    });
-
-    UDPEndPointImplSockets::SetLeaveMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
-        const otIp6Address otAddress = ToOpenThreadIP6Address(address);
-
-        ThreadStackMgr().LockThreadStack();
-        const auto otError = otIp6UnsubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
-        ThreadStackMgr().UnlockThreadStack();
-
-        return MapOpenThreadError(otError);
-    });
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     k_sem_init(&mSrpClearAllSemaphore, 0, 1);

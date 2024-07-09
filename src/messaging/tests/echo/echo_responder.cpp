@@ -35,7 +35,9 @@
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/UDP.h>
 
 namespace {
@@ -49,7 +51,7 @@ chip::SessionHolder gSession;
 // Callback handler when a CHIP EchoRequest is received.
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    printf("Echo Request, len=%u ... sending response.\n", payload->DataLength());
+    printf("Echo Request, len=%" PRIu32 "... sending response.\n", static_cast<uint32_t>(payload->DataLength()));
 }
 
 } // namespace

@@ -25,6 +25,7 @@ class LEDWidget
 public:
     void Init(uint8_t gpioNum, bool inverted);
     void Set(bool state);
+    void SetLevel(uint8_t level);
     void Invert(void);
     void Blink(uint32_t changeRateMS);
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);

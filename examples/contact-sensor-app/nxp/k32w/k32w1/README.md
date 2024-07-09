@@ -32,7 +32,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Known issues](#known-issues)
 -   [Low power](#low-power)
 
-</hr>
+    </hr>
 
 ## Introduction
 
@@ -93,7 +93,7 @@ states are depicted:
     service connectivity.
 
 NOTE: LED2 will be disabled when CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR is
-enabled. On K32W1 EVK board, `PTB0` is wired to LED2 also is wired to CS (Chip
+enabled. On K32W1 EVK board, `PTB0` is wired to `LED2` also is wired to CS (Chip
 Select) External Flash Memory. OTA image is stored in external memory because of
 it's size. If LED2 is enabled then it will affect External Memory CS and OTA
 will not work.
@@ -131,8 +131,9 @@ In order to build the Matter example, we recommend using a Linux distribution
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w1
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=false chip_crypto=\"platform\""
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ gn gen out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ ninja -C out/debug
 ```
 
@@ -140,8 +141,6 @@ In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
 
 After a successful build, the `elf` and `srec` files are found in `out/debug/` -
-`see the files prefixed with chip-k32w1-contact-example`. After a successful
-build, the `elf` and `srec` files are found in `out/debug/` -
 `see the files prefixed with chip-k32w1-contact-example`.
 
 ## Long Idle Time ICD Support
@@ -186,7 +185,7 @@ using Fibonacci backoff for retries pacing.
 Use `chip_with_factory_data=1` in the gn build command to enable factory data.
 
 For a full guide on manufacturing flow, please see
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 
 ## Flashing
 
@@ -205,7 +204,7 @@ path -
 [K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK)
 can be used for updating the `NBU/radio` core:
 
--   Section 2.4 – Get Software – install `SPSDK` (Secure Provisioning Command
+-   Section 2.5 – Get Software – install `SPSDK` (Secure Provisioning Command
     Line Tool)
 -   Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding
     `.sb3` file found in the SDK package at path
@@ -308,7 +307,7 @@ In `OTAP` application
     the image only for the CM33 core
 -   keep other settings at default values
 
-### Convert sb3 into ota file
+### Convert `sb3` into `ota` file
 
 In order to build an OTA image, use NXP wrapper over the standard tool
 `src/app/ota_image_tool.py`:
@@ -325,7 +324,7 @@ Please see more in the
 [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
 
 Here is an example that generates an OTA image with application update TLV from
-a sb3 file:
+a `sb3` file:
 
 ```
 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 43033 -vs "1.0" -da sha256 --app-input-file ~/binaries/chip-k32w1-43033.sb3 ~/binaries/chip-k32w1-43033.ota

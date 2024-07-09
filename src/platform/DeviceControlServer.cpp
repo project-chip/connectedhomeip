@@ -36,11 +36,11 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
 
 CHIP_ERROR DeviceControlServer::PostCommissioningCompleteEvent(NodeId peerNodeId, FabricIndex accessingFabricIndex)
 {
-    ChipDeviceEvent event;
+    ChipDeviceEvent event{
 
-    event.Type                              = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.nodeId      = peerNodeId;
-    event.CommissioningComplete.fabricIndex = accessingFabricIndex;
+        .Type                  = DeviceEventType::kCommissioningComplete,
+        .CommissioningComplete = { .nodeId = peerNodeId, .fabricIndex = accessingFabricIndex }
+    };
 
     return PlatformMgr().PostEvent(&event);
 }
@@ -66,31 +66,27 @@ exit:
 
 CHIP_ERROR DeviceControlServer::PostConnectedToOperationalNetworkEvent(ByteSpan networkID)
 {
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kOperationalNetworkEnabled;
-    // TODO(cecille): This should be some way to specify thread or wifi.
-    event.OperationalNetwork.network = 0;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kOperationalNetworkEnabled,
+                           // TODO(cecille): This should be some way to specify thread or wifi.
+                           .OperationalNetwork = { .network = 0 } };
     return PlatformMgr().PostEvent(&event);
 }
 
 CHIP_ERROR DeviceControlServer::PostCloseAllBLEConnectionsToOperationalNetworkEvent()
 {
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kCloseAllBleConnections;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCloseAllBleConnections };
     return PlatformMgr().PostEvent(&event);
 }
 
 CHIP_ERROR DeviceControlServer::PostWiFiDeviceAvailableNetworkEvent()
 {
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kWiFiDeviceAvailable;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kWiFiDeviceAvailable };
     return PlatformMgr().PostEvent(&event);
 }
 
 CHIP_ERROR DeviceControlServer::PostOperationalNetworkStartedEvent()
 {
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kOperationalNetworkStarted;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kOperationalNetworkStarted };
     return PlatformMgr().PostEvent(&event);
 }
 

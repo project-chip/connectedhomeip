@@ -20,29 +20,11 @@
 
 if CHIP
 
-config LOG
-	bool
-	default y
-
-if LOG
-
-choice LOG_MODE
-	default LOG_MODE_MINIMAL
-endchoice
-
-choice MATTER_LOG_LEVEL_CHOICE
-	default MATTER_LOG_LEVEL_DBG
-endchoice
-
-config LOG_DEFAULT_LEVEL
-	int
-	default 2
-
-endif
-
+# disable synchronous printk to avoid blocking IRQs which
+# may affect time sensitive components
 config PRINTK_SYNC
 	bool
-	default y
+	default n
 
 config ASSERT
 	bool
@@ -117,58 +99,7 @@ config NET_BUF_TX_COUNT
 	int
 	default 80
 
-# Bluetooth Low Energy configs
-config BT
-	bool
-	default y
 
-config BT_PERIPHERAL
-	bool
-	default y
-
-config BT_PERIPHERAL_PREF_MIN_INT
-	int
-	default 36
-
-config BT_PERIPHERAL_PREF_MAX_INT
-	int
-	default 36
-
-config BT_GAP_AUTO_UPDATE_CONN_PARAMS
-	bool
-	default y
-
-config BT_GATT_DYNAMIC_DB
-	bool
-	default y
-
-config BT_DEVICE_NAME_DYNAMIC
-	bool
-	default y
-
-config BT_DEVICE_NAME_MAX
-	int
-	default 15
-
-config BT_MAX_CONN
-	int
-	default 1
-
-config BT_L2CAP_TX_MTU
-	int
-	default 247
-
-config BT_BUF_ACL_RX_SIZE
-	int
-	default 251
-
-config BT_BUF_ACL_TX_SIZE
-	int
-	default 251
-
-config BT_RX_STACK_SIZE
-	int
-	default 1200
 
 config CHIP_OTA_REQUESTOR
 	bool

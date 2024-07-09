@@ -40,6 +40,7 @@ typedef enum
     NVM_BLOCK_SIZE_OVERFLOW,
     NVM_ERROR_BLOCK_ALIGN,
     NVM_FLASH_CORRUPTION,
+    NVM_PARAM_ERROR,
     NVM_BUFFER_TOO_SMALL
 } NVM_StatusTypeDef;
 
@@ -57,18 +58,12 @@ typedef enum
  * @brief  Copy Flash to RAM NVM
  */
 
-void NM_Init(void);
+NVM_StatusTypeDef NM_Init(void);
 
 /**
  * @brief  Copy RAM NVM to Flash
  */
 NVM_StatusTypeDef NM_Dump(void);
-
-/**
- * @brief  check the nvm if it s corrupted or not
- * @retval return NVM_OK if nvm is empty or NVM_FLASH_CORRUPTION if it s not empty
- */
-NVM_StatusTypeDef NM_Check_Validity(void);
 
 /**
  * @brief   Get KeyName in RAM NVM and return the value of Key in KeyValue
@@ -86,7 +81,6 @@ NVM_StatusTypeDef NM_GetKeyValue(void * KeyValue, const char * KeyName, uint32_t
  *
  * @param  KeyValue:     Address of the buffer
  * @param  KeyName:  	  Name of Key needed
- * @param  KeyAddr:   	  TODO DELETED this param
  * @param  KeySize:   	  size of KeyValue
  * @param  read_by_size: return size of KeyValue found
  * @retval return state of function
@@ -103,11 +97,16 @@ NVM_StatusTypeDef NM_SetKeyValue(char * KeyValue, char * KeyName, uint32_t KeySi
 NVM_StatusTypeDef NM_DeleteKey(const char * Keyname, NVM_Sector sector);
 
 /**
+ * @brief  Get the address of the OT NVM buffer
+ * @param  Addr: return the Address of the OT buffer
+ * @retval return state of function
+ */
+NVM_StatusTypeDef NM_GetOtNVMAddr(uint32_t * NVMAddr);
+
+/**
  * @brief  Erase all persistent and reboot program
  */
-
 void NM_ResetFactory(void);
-void NM_FullErase(void);
 
 #ifdef __cplusplus
 }

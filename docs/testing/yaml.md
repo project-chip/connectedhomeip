@@ -279,6 +279,17 @@ function can be use. See
 [TestEqualities](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/TestEqualities.yaml)
 for an example of how to use this pseudo-cluster.
 
+#### Setting step timeouts
+
+The timeout argument can be used for each individual test step to set the time
+the runner will wait for a test step to complete before reporting a failure.
+
+Note that this timeout is different than the subscription report timeout and the
+subscription report timeout is not currently adjustable in YAML.
+
+There several other options for configuring test steps as shown in the
+[YAML schema](./yaml_schema.md) document.
+
 ## Running YAML tests
 
 YAML scripts are parsed and run using a python-based runner program that parses
@@ -293,11 +304,34 @@ All YAML tests assume that the DUT has previously been commissioned before
 running. DUTs should be commissioned using chip-tool. Use the same KVS file when
 running the test.
 
+By default, the tests use node ID 0x12344321. The easiest way to run the tests
+is to commission with this node ID. Alternately, you can change the target node
+ID on the command line, as shown in the [Running the tests](#running-the-tests)
+section.
+
 #### Running the tests
 
 There are several options for running tests locally. Because the YAML runner
 uses python, it is necessary to compile and install the chip python package
 before using any YAML runner script.
+
+First activate the matter environment using either
+
+```
+. ./scripts/bootstrap.sh
+```
+
+or
+
+```
+. ./scripts/activate.sh
+```
+
+bootstrap.sh should be used for for the first setup, activate.sh may be used for
+subsequent setups as it is faster.
+
+Next build the python wheels and create a venv (called `py` here, but any name
+may be used)
 
 ```
 ./scripts/build_python.sh -i py
@@ -313,12 +347,21 @@ Compile chip-tool:
 
 NOTE: use the target appropriate to your system
 
-[chiptool.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/yaml/chiptool.py)
+[chiptool.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/chipyaml/chiptool.py)
 can be used to run tests against a commissioned DUT (commissioned by chip-tool).
-This will start an interactive instance of chip-tool automatically.
+To commission a DUT using chip-tool use the pairing command. For example:
 
 ```
-./scripts/tests/yaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool
+./out/linux-x64-chip-tool/chip-tool pairing code 0x12344321 MT:-24J0AFN00KA0648G00
+```
+
+In this example, 0x12344321 is the node ID (0x12344321 is the test default) and
+MT:-24J0AFN00KA0648G00 is the QR code.
+
+The chiptool.py tool can then be used to run the tests. For example:
+
+```
+./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool
 
 ```
 
@@ -327,16 +370,20 @@ NOTE: substitute the appropriate test name and chip-tool path as appropriate.
 A list of available tests can be generated using:
 
 ```
-./scripts/tests/yaml/chiptool.py list
+./scripts/tests/chipyaml/chiptool.py list
 ```
 
 Config variables can be passed to chiptool.py after the script by separating
 with --
 
 ```
-./scripts/tests/yaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool -- nodeId 0x12344321
+./scripts/tests/chipyaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool -- nodeId 0x12344321
 
 ```
+
+Each test defines a default endpoint to target. Root node cluster tests run
+against endpoint 0 by default. Most other cluster tests run against endpoint 1.
+You can set the endpoint for the test using the `endpoint` config variable.
 
 #### Factory resetting the DUT
 

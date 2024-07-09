@@ -26,6 +26,7 @@
 #include "streamer.h"
 
 #include <lib/core/CHIPError.h>
+#include <lib/shell/Command.h>
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -48,40 +49,6 @@
 
 namespace chip {
 namespace Shell {
-
-/**
- * Callback to execute an individual shell command.
- *
- * @param argc                  Number of arguments passed.
- * @param argv                  Array of option strings. The command name is not included.
- *
- * @return                      0 on success; CHIP_ERROR[...] on failure.
- */
-typedef CHIP_ERROR shell_command_fn(int argc, char * argv[]);
-
-/**
- * Descriptor structure for a single command.
- *
- * Typically a set of commands are defined as an array of this structure
- * and passed to the `shell_register()` during application initialization.
- *
- * An example command set definition follows:
- *
- * static shell_command_t cmds[] = {
- *   { &cmd_echo, "echo", "Echo back provided inputs" },
- *   { &cmd_exit, "exit", "Exit the shell application" },
- *   { &cmd_help, "help", "List out all top level commands" },
- *   { &cmd_version, "version", "Output the software version" },
- * };
- */
-struct shell_command
-{
-    shell_command_fn * cmd_func;
-    const char * cmd_name;
-    const char * cmd_help;
-};
-
-typedef const struct shell_command shell_command_t;
 
 /**
  * Execution callback for a shell command.

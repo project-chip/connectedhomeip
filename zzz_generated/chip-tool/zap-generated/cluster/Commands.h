@@ -113,6 +113,7 @@
 | DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
 | BarrierControl                                                      | 0x0103 |
+| ServiceArea                                                         | 0x0150 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | Thermostat                                                          | 0x0201 |
 | FanControl                                                          | 0x0202 |
@@ -135,6 +136,9 @@
 | Pm10ConcentrationMeasurement                                        | 0x042D |
 | TotalVolatileOrganicCompoundsConcentrationMeasurement               | 0x042E |
 | RadonConcentrationMeasurement                                       | 0x042F |
+| WiFiNetworkManagement                                               | 0x0451 |
+| ThreadBorderRouterManagement                                        | 0x0452 |
+| ThreadNetworkDirectory                                              | 0x0453 |
 | WakeOnLan                                                           | 0x0503 |
 | Channel                                                             | 0x0504 |
 | TargetNavigator                                                     | 0x0505 |
@@ -4238,6 +4242,7 @@ public:
         AddArgument("MonitoredSubject", 0, UINT64_MAX, &mRequest.monitoredSubject);
         AddArgument("Key", &mRequest.key);
         AddArgument("VerificationKey", &mRequest.verificationKey);
+        AddArgument("ClientType", 0, UINT8_MAX, &mRequest.clientType);
         ClusterCommand::AddArguments();
     }
 
@@ -7148,7 +7153,7 @@ public:
     DeviceEnergyManagementModifyForecastRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("modify-forecast-request", credsIssuerConfig), mComplex_SlotAdjustments(&mRequest.slotAdjustments)
     {
-        AddArgument("ForecastId", 0, UINT32_MAX, &mRequest.forecastId);
+        AddArgument("ForecastID", 0, UINT32_MAX, &mRequest.forecastID);
         AddArgument("SlotAdjustments", &mComplex_SlotAdjustments);
         AddArgument("Cause", 0, UINT8_MAX, &mRequest.cause);
         ClusterCommand::AddArguments();
@@ -9057,6 +9062,106 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster ServiceArea                                                 | 0x0150 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * SelectLocations                                                   |   0x00 |
+| * SkipCurrentLocation                                               |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * SupportedLocations                                                | 0x0000 |
+| * SupportedMaps                                                     | 0x0001 |
+| * SelectedLocations                                                 | 0x0002 |
+| * CurrentLocation                                                   | 0x0003 |
+| * EstimatedEndTime                                                  | 0x0004 |
+| * Progress                                                          | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command SelectLocations
+ */
+class ServiceAreaSelectLocations : public ClusterCommand
+{
+public:
+    ServiceAreaSelectLocations(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("select-locations", credsIssuerConfig), mComplex_NewLocations(&mRequest.newLocations)
+    {
+        AddArgument("NewLocations", &mComplex_NewLocations);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectLocations::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SelectLocations::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ServiceArea::Commands::SelectLocations::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>> mComplex_NewLocations;
+};
+
+/*
+ * Command SkipCurrentLocation
+ */
+class ServiceAreaSkipCurrentLocation : public ClusterCommand
+{
+public:
+    ServiceAreaSkipCurrentLocation(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("skip-current-location", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ServiceArea::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ServiceArea::Commands::SkipCurrentLocation::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster PumpConfigurationAndControl                                 | 0x0200 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -10728,6 +10833,8 @@ private:
 | * Occupancy                                                         | 0x0000 |
 | * OccupancySensorType                                               | 0x0001 |
 | * OccupancySensorTypeBitmap                                         | 0x0002 |
+| * HoldTime                                                          | 0x0003 |
+| * HoldTimeLimits                                                    | 0x0004 |
 | * PIROccupiedToUnoccupiedDelay                                      | 0x0010 |
 | * PIRUnoccupiedToOccupiedDelay                                      | 0x0011 |
 | * PIRUnoccupiedToOccupiedThreshold                                  | 0x0012 |
@@ -11016,6 +11123,382 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster WiFiNetworkManagement                                       | 0x0451 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * NetworkPassphraseRequest                                          |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Ssid                                                              | 0x0001 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command NetworkPassphraseRequest
+ */
+class WiFiNetworkManagementNetworkPassphraseRequest : public ClusterCommand
+{
+public:
+    WiFiNetworkManagementNetworkPassphraseRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("network-passphrase-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::WiFiNetworkManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::WiFiNetworkManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseRequest::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster ThreadBorderRouterManagement                                | 0x0452 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * GetActiveDatasetRequest                                           |   0x00 |
+| * GetPendingDatasetRequest                                          |   0x01 |
+| * SetActiveDatasetRequest                                           |   0x03 |
+| * SetPendingDatasetRequest                                          |   0x04 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * BorderRouterName                                                  | 0x0000 |
+| * BorderAgentID                                                     | 0x0001 |
+| * ThreadVersion                                                     | 0x0002 |
+| * InterfaceEnabled                                                  | 0x0003 |
+| * ActiveDatasetTimestamp                                            | 0x0004 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command GetActiveDatasetRequest
+ */
+class ThreadBorderRouterManagementGetActiveDatasetRequest : public ClusterCommand
+{
+public:
+    ThreadBorderRouterManagementGetActiveDatasetRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("get-active-dataset-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::Type mRequest;
+};
+
+/*
+ * Command GetPendingDatasetRequest
+ */
+class ThreadBorderRouterManagementGetPendingDatasetRequest : public ClusterCommand
+{
+public:
+    ThreadBorderRouterManagementGetPendingDatasetRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("get-pending-dataset-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::Type mRequest;
+};
+
+/*
+ * Command SetActiveDatasetRequest
+ */
+class ThreadBorderRouterManagementSetActiveDatasetRequest : public ClusterCommand
+{
+public:
+    ThreadBorderRouterManagementSetActiveDatasetRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-active-dataset-request", credsIssuerConfig)
+    {
+        AddArgument("ActiveDataset", &mRequest.activeDataset);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Type mRequest;
+};
+
+/*
+ * Command SetPendingDatasetRequest
+ */
+class ThreadBorderRouterManagementSetPendingDatasetRequest : public ClusterCommand
+{
+public:
+    ThreadBorderRouterManagementSetPendingDatasetRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-pending-dataset-request", credsIssuerConfig)
+    {
+        AddArgument("PendingDataset", &mRequest.pendingDataset);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadBorderRouterManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster ThreadNetworkDirectory                                      | 0x0453 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddNetwork                                                        |   0x00 |
+| * RemoveNetwork                                                     |   0x01 |
+| * GetOperationalDataset                                             |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * PreferredExtendedPanID                                            | 0x0000 |
+| * ThreadNetworks                                                    | 0x0001 |
+| * ThreadNetworkTableSize                                            | 0x0002 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * NetworkChanged                                                    | 0x0000 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AddNetwork
+ */
+class ThreadNetworkDirectoryAddNetwork : public ClusterCommand
+{
+public:
+    ThreadNetworkDirectoryAddNetwork(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("add-network", credsIssuerConfig)
+    {
+        AddArgument("OperationalDataset", &mRequest.operationalDataset);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadNetworkDirectory::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ThreadNetworkDirectory::Commands::AddNetwork::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadNetworkDirectory::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ThreadNetworkDirectory::Commands::AddNetwork::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ThreadNetworkDirectory::Commands::AddNetwork::Type mRequest;
+};
+
+/*
+ * Command RemoveNetwork
+ */
+class ThreadNetworkDirectoryRemoveNetwork : public ClusterCommand
+{
+public:
+    ThreadNetworkDirectoryRemoveNetwork(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-network", credsIssuerConfig)
+    {
+        AddArgument("ExtendedPanID", 0, UINT64_MAX, &mRequest.extendedPanID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadNetworkDirectory::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ThreadNetworkDirectory::Commands::RemoveNetwork::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadNetworkDirectory::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ThreadNetworkDirectory::Commands::RemoveNetwork::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ThreadNetworkDirectory::Commands::RemoveNetwork::Type mRequest;
+};
+
+/*
+ * Command GetOperationalDataset
+ */
+class ThreadNetworkDirectoryGetOperationalDataset : public ClusterCommand
+{
+public:
+    ThreadNetworkDirectoryGetOperationalDataset(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("get-operational-dataset", credsIssuerConfig)
+    {
+        AddArgument("ExtendedPanID", 0, UINT64_MAX, &mRequest.extendedPanID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadNetworkDirectory::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ThreadNetworkDirectory::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster WakeOnLan                                                   | 0x0503 |
@@ -13421,6 +13904,7 @@ private:
 | * TestEmitTestFabricScopedEventRequest                              |   0x15 |
 | * TestBatchHelperRequest                                            |   0x16 |
 | * TestSecondBatchHelperRequest                                      |   0x17 |
+| * StringEchoRequest                                                 |   0x18 |
 | * TestDifferentVendorMeiRequest                                     |   0xFFF200AA|
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -14482,6 +14966,44 @@ public:
 
 private:
     chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Type mRequest;
+};
+
+/*
+ * Command StringEchoRequest
+ */
+class UnitTestingStringEchoRequest : public ClusterCommand
+{
+public:
+    UnitTestingStringEchoRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("string-echo-request", credsIssuerConfig)
+    {
+        AddArgument("Payload", &mRequest.payload);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UnitTesting::Commands::StringEchoRequest::Type mRequest;
 };
 
 /*
@@ -20600,7 +21122,7 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
         make_unique<WriteAttribute<int64_t>>(Id, "abs-max-power", INT64_MIN, INT64_MAX, Attributes::AbsMaxPower::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
-            chip::app::DataModel::List<const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>>>>(
+            chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>>>(
             Id, "power-adjustment-capability", Attributes::PowerAdjustmentCapability::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
@@ -21719,6 +22241,88 @@ void registerClusterBarrierControl(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "barrier-open-period", Attributes::BarrierOpenPeriod::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "barrier-close-period", Attributes::BarrierClosePeriod::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "barrier-position", Attributes::BarrierPosition::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterServiceArea(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ServiceArea;
+
+    const char * clusterName = "ServiceArea";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),             //
+        make_unique<ServiceAreaSelectLocations>(credsIssuerConfig),     //
+        make_unique<ServiceAreaSkipCurrentLocation>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "supported-locations", Attributes::SupportedLocations::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "supported-maps", Attributes::SupportedMaps::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "selected-locations", Attributes::SelectedLocations::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "current-location", Attributes::CurrentLocation::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "estimated-end-time", Attributes::EstimatedEndTime::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "progress", Attributes::Progress::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::LocationStruct::Type>>>(
+            Id, "supported-locations", Attributes::SupportedLocations::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::MapStruct::Type>>>>(
+            Id, "supported-maps", Attributes::SupportedMaps::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>>>(
+            Id, "selected-locations", Attributes::SelectedLocations::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "current-location", 0, UINT32_MAX,
+                                                                              Attributes::CurrentLocation::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "estimated-end-time", 0, UINT32_MAX,
+                                                                              Attributes::EstimatedEndTime::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::ServiceArea::Structs::ProgressStruct::Type>>>>(
+            Id, "progress", Attributes::Progress::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "supported-locations", Attributes::SupportedLocations::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "supported-maps", Attributes::SupportedMaps::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "selected-locations", Attributes::SelectedLocations::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "current-location", Attributes::CurrentLocation::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "estimated-end-time", Attributes::EstimatedEndTime::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "progress", Attributes::Progress::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -23312,7 +23916,9 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "occupancy", Attributes::Occupancy::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
-                                   credsIssuerConfig), //
+                                   credsIssuerConfig),                                                         //
+        make_unique<ReadAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "piroccupied-to-unoccupied-delay", Attributes::PIROccupiedToUnoccupiedDelay::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "pirunoccupied-to-occupied-delay", Attributes::PIRUnoccupiedToOccupiedDelay::Id,
@@ -23346,6 +23952,10 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>>(
             Id, "occupancy-sensor-type-bitmap", 0, UINT8_MAX, Attributes::OccupancySensorTypeBitmap::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "hold-time", 0, UINT16_MAX, Attributes::HoldTime::Id, WriteCommandType::kWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type>>(
+            Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "piroccupied-to-unoccupied-delay", 0, UINT16_MAX,
                                               Attributes::PIROccupiedToUnoccupiedDelay::Id, WriteCommandType::kWrite,
                                               credsIssuerConfig), //
@@ -23390,7 +24000,9 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "occupancy", Attributes::Occupancy::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
-                                        credsIssuerConfig), //
+                                        credsIssuerConfig),                                                         //
+        make_unique<SubscribeAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "piroccupied-to-unoccupied-delay", Attributes::PIROccupiedToUnoccupiedDelay::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "pirunoccupied-to-occupied-delay", Attributes::PIRUnoccupiedToOccupiedDelay::Id,
@@ -24503,6 +25115,211 @@ void registerClusterRadonConcentrationMeasurement(Commands & commands, Credentia
         //
         make_unique<ReadEvent>(Id, credsIssuerConfig),      //
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterWiFiNetworkManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::WiFiNetworkManagement;
+
+    const char * clusterName = "WiFiNetworkManagement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                            //
+        make_unique<WiFiNetworkManagementNetworkPassphraseRequest>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "ssid", Attributes::Ssid::Id, credsIssuerConfig),                                   //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::ByteSpan>>>(
+            Id, "ssid", Attributes::Ssid::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "ssid", Attributes::Ssid::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterThreadBorderRouterManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ThreadBorderRouterManagement;
+
+    const char * clusterName = "ThreadBorderRouterManagement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                   //
+        make_unique<ThreadBorderRouterManagementGetActiveDatasetRequest>(credsIssuerConfig),  //
+        make_unique<ThreadBorderRouterManagementGetPendingDatasetRequest>(credsIssuerConfig), //
+        make_unique<ThreadBorderRouterManagementSetActiveDatasetRequest>(credsIssuerConfig),  //
+        make_unique<ThreadBorderRouterManagementSetPendingDatasetRequest>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "border-router-name", Attributes::BorderRouterName::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "border-agent-id", Attributes::BorderAgentID::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "thread-version", Attributes::ThreadVersion::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "interface-enabled", Attributes::InterfaceEnabled::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "active-dataset-timestamp", Attributes::ActiveDatasetTimestamp::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::CharSpan>>(Id, "border-router-name", Attributes::BorderRouterName::Id,
+                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "border-agent-id", Attributes::BorderAgentID::Id,
+                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "thread-version", 0, UINT16_MAX, Attributes::ThreadVersion::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "interface-enabled", 0, 1, Attributes::InterfaceEnabled::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "active-dataset-timestamp", 0, UINT64_MAX,
+                                                                              Attributes::ActiveDatasetTimestamp::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeAttribute>(Id, "border-router-name", Attributes::BorderRouterName::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "border-agent-id", Attributes::BorderAgentID::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "thread-version", Attributes::ThreadVersion::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "interface-enabled", Attributes::InterfaceEnabled::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "active-dataset-timestamp", Attributes::ActiveDatasetTimestamp::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterThreadNetworkDirectory(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ThreadNetworkDirectory;
+
+    const char * clusterName = "ThreadNetworkDirectory";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
+        make_unique<ThreadNetworkDirectoryAddNetwork>(credsIssuerConfig),            //
+        make_unique<ThreadNetworkDirectoryRemoveNetwork>(credsIssuerConfig),         //
+        make_unique<ThreadNetworkDirectoryGetOperationalDataset>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
+        make_unique<ReadAttribute>(Id, "preferred-extended-pan-id", Attributes::PreferredExtendedPanID::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "thread-networks", Attributes::ThreadNetworks::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "thread-network-table-size", Attributes::ThreadNetworkTableSize::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "preferred-extended-pan-id", 0, UINT64_MAX,
+                                                                              Attributes::PreferredExtendedPanID::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type>>>(
+            Id, "thread-networks", Attributes::ThreadNetworks::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "thread-network-table-size", 0, UINT8_MAX, Attributes::ThreadNetworkTableSize::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "preferred-extended-pan-id", Attributes::PreferredExtendedPanID::Id,
+                                        credsIssuerConfig),                                                        //
+        make_unique<SubscribeAttribute>(Id, "thread-networks", Attributes::ThreadNetworks::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "thread-network-table-size", Attributes::ThreadNetworkTableSize::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                     //
+        make_unique<ReadEvent>(Id, "network-changed", Events::NetworkChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                //
+        make_unique<SubscribeEvent>(Id, "network-changed", Events::NetworkChanged::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -26203,6 +27020,7 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<UnitTestingTestEmitTestFabricScopedEventRequest>(credsIssuerConfig),    //
         make_unique<UnitTestingTestBatchHelperRequest>(credsIssuerConfig),                  //
         make_unique<UnitTestingTestSecondBatchHelperRequest>(credsIssuerConfig),            //
+        make_unique<UnitTestingStringEchoRequest>(credsIssuerConfig),                       //
         make_unique<UnitTestingTestDifferentVendorMeiRequest>(credsIssuerConfig),           //
         //
         // Attributes
@@ -26839,6 +27657,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterDoorLock(commands, credsIssuerConfig);
     registerClusterWindowCovering(commands, credsIssuerConfig);
     registerClusterBarrierControl(commands, credsIssuerConfig);
+    registerClusterServiceArea(commands, credsIssuerConfig);
     registerClusterPumpConfigurationAndControl(commands, credsIssuerConfig);
     registerClusterThermostat(commands, credsIssuerConfig);
     registerClusterFanControl(commands, credsIssuerConfig);
@@ -26861,6 +27680,9 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterPm10ConcentrationMeasurement(commands, credsIssuerConfig);
     registerClusterTotalVolatileOrganicCompoundsConcentrationMeasurement(commands, credsIssuerConfig);
     registerClusterRadonConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterWiFiNetworkManagement(commands, credsIssuerConfig);
+    registerClusterThreadBorderRouterManagement(commands, credsIssuerConfig);
+    registerClusterThreadNetworkDirectory(commands, credsIssuerConfig);
     registerClusterWakeOnLan(commands, credsIssuerConfig);
     registerClusterChannel(commands, credsIssuerConfig);
     registerClusterTargetNavigator(commands, credsIssuerConfig);

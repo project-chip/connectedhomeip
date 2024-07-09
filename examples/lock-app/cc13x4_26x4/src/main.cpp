@@ -48,13 +48,6 @@ uint32_t heapSize = TOTAL_ICALL_HEAP_SIZE;
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
-extern "C" void vApplicationStackOverflowHook(void)
-{
-    while (1)
-    {
-        ;
-    }
-}
 
 /* Wrapper functions for using the queue registry regardless of whether it is enabled or disabled */
 extern "C" void vQueueAddToRegistryWrapper(QueueHandle_t xQueue, const char * pcQueueName)

@@ -80,17 +80,26 @@ public:
         kMinRotatingDeviceIDUniqueIDLength = 16,
         kRotatingDeviceIDUniqueIDLength    = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH,
 #endif
+        kEthernetMACAddressLength = 6,
+        kThreadMACAddressLength   = 8,
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        kPrimaryMACAddressLength = 8,
+        kPrimaryMACAddressLength = kThreadMACAddressLength,
 #else
-        kPrimaryMACAddressLength = 6,
+        kPrimaryMACAddressLength = kEthernetMACAddressLength,
 #endif
         kMaxMACAddressLength  = 8,
         kMaxLanguageTagLength = 5 // ISO 639-1 standard language codes
     };
 
-    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                           = 0;
-    virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)                             = 0;
+    // Copies the primary MAC into a mutable span, which must be of size kPrimaryMACAddressLength.
+    // Upon success, the span will be reduced to the size of the MAC address being returned, which
+    // can be less than kPrimaryMACAddressLength on a device that supports Thread.
+    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) = 0;
+
+    // Copies the primary WiFi MAC into a buffer of size kEthernetMACAddressLength
+    virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) = 0;
+
+    // Copies the primary Thread (802.15.4) MAC into a buffer of size kThreadMACAddressLength
     virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                           = 0;
     virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)                = 0;
     virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)                          = 0;

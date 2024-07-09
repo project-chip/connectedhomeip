@@ -318,7 +318,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -705,9 +705,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1638,22 +1638,26 @@ endpoint 1 {
   }
 
   server cluster FanControl {
-    ram      attribute fanMode default = 0;
+    persist  attribute fanMode default = 0;
     ram      attribute fanModeSequence default = 2;
-    ram      attribute percentSetting default = 0;
-    ram      attribute percentCurrent default = 0;
-    ram      attribute speedMax default = 1;
-    ram      attribute speedSetting default = 0;
-    ram      attribute speedCurrent default = 0;
-    ram      attribute rockSupport default = 0x00;
-    ram      attribute rockSetting default = 0x00;
-    ram      attribute windSupport default = 0x00;
-    ram      attribute windSetting default = 0x00;
+    persist  attribute percentSetting default = 0x00;
+    ram      attribute percentCurrent default = 0x00;
+    ram      attribute speedMax default = 100;
+    persist  attribute speedSetting default = 0x00;
+    persist  attribute speedCurrent default = 0;
+    ram      attribute rockSupport default = 0x03;
+    persist  attribute rockSetting default = 0x00;
+    ram      attribute windSupport default = 0x03;
+    persist  attribute windSetting default = 0x00;
+    persist  attribute airflowDirection default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x3F;
     ram      attribute clusterRevision default = 1;
+
+    handle command Step;
   }
 }
 

@@ -62,7 +62,7 @@ CHIP_ERROR LightSwitchMgr::Init(EndpointId lightSwitchEndpoint, chip::EndpointId
     }
 
 #if defined(ENABLE_CHIP_SHELL)
-    LightSwtichCommands::RegisterSwitchCommands();
+    LightSwitchCommands::RegisterSwitchCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 
     return error;

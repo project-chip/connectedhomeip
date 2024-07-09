@@ -24,7 +24,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;

@@ -258,19 +258,8 @@ class OnboardingPayload(
   fun getRendezvousInformation(): Long {
     var rendezvousInfo: Long = 0
 
-    if (discoveryCapabilities.contains(DiscoveryCapability.SOFT_AP)) {
-      // set bit 0
-      rendezvousInfo = rendezvousInfo or (1L shl 0)
-    }
-
-    if (discoveryCapabilities.contains(DiscoveryCapability.BLE)) {
-      // set bit 1
-      rendezvousInfo = rendezvousInfo or (1L shl 1)
-    }
-
-    if (discoveryCapabilities.contains(DiscoveryCapability.ON_NETWORK)) {
-      // set bit 2
-      rendezvousInfo = rendezvousInfo or (1L shl 2)
+    for (capability in discoveryCapabilities) {
+      rendezvousInfo = rendezvousInfo or (1L shl capability.bitIndex)
     }
 
     return rendezvousInfo
@@ -280,20 +269,18 @@ class OnboardingPayload(
     // Removes all elements from discoveryCapabilities.
     discoveryCapabilities.clear()
 
-    // bit 0 is set
-    if (rendezvousInfo and (1L shl 0) != 0L) {
-      discoveryCapabilities.add(DiscoveryCapability.SOFT_AP)
+    for (info in DiscoveryCapability.values()) {
+      val bitmask = 1L shl info.bitIndex
+      if (rendezvousInfo and bitmask != 0L) {
+        discoveryCapabilities.add(info)
+      }
     }
+  }
 
-    // bit 1 is set
-    if (rendezvousInfo and (1L shl 1) != 0L) {
-      discoveryCapabilities.add(DiscoveryCapability.BLE)
-    }
-
-    // bit 2 is set
-    if (rendezvousInfo and (1L shl 2) != 0L) {
-      discoveryCapabilities.add(DiscoveryCapability.ON_NETWORK)
-    }
+  fun setRendezvousInformation(rendezvousInfo: Set<DiscoveryCapability>) {
+    // Removes all elements from discoveryCapabilities.
+    discoveryCapabilities.clear()
+    discoveryCapabilities.addAll(rendezvousInfo)
   }
 
   /**

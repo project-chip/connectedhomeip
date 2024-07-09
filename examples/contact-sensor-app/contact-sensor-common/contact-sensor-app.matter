@@ -318,7 +318,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
@@ -705,9 +705,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  provisional readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1616,6 +1616,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 3;
   }
 
+  bitmap Feature : bitmap32 {
+    kOther = 0x1;
+    kPassiveInfrared = 0x2;
+    kUltrasonic = 0x4;
+    kPhysicalContact = 0x8;
+    kActiveInfrared = 0x10;
+    kRadar = 0x20;
+    kRFSensing = 0x40;
+    kVision = 0x80;
+  }
+
   bitmap OccupancyBitmap : bitmap8 {
     kOccupied = 0x1;
   }
@@ -1626,9 +1637,17 @@ cluster OccupancySensing = 1030 {
     kPhysicalContact = 0x4;
   }
 
+  struct HoldTimeLimitsStruct {
+    int16u holdTimeMin = 0;
+    int16u holdTimeMax = 1;
+    int16u holdTimeDefault = 2;
+  }
+
   readonly attribute OccupancyBitmap occupancy = 0;
   readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
+  attribute access(write: manage) optional int16u holdTime = 3;
+  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;

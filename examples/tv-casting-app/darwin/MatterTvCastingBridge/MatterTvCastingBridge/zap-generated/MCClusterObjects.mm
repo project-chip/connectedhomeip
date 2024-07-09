@@ -35,6 +35,42 @@
 
 // OnOff cluster commands:
 
+- (id)offCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::OnOff::Commands::Off::Id);
+    return cppCommand != nil ? [[MCOnOffClusterOffCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)onCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::OnOff::Commands::On::Id);
+    return cppCommand != nil ? [[MCOnOffClusterOnCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)toggleCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::OnOff::Commands::Toggle::Id);
+    return cppCommand != nil ? [[MCOnOffClusterToggleCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)offWithEffectCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::OnOff::Commands::OffWithEffect::Id);
+    return cppCommand != nil ? [[MCOnOffClusterOffWithEffectCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)onWithRecallGlobalSceneCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id);
+    return cppCommand != nil ? [[MCOnOffClusterOnWithRecallGlobalSceneCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)onWithTimedOffCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Id);
+    return cppCommand != nil ? [[MCOnOffClusterOnWithTimedOffCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
 // OnOff cluster attributes:
 
 - (id)onOffAttribute
@@ -109,6 +145,60 @@
 @implementation MCLevelControlCluster
 
 // LevelControl cluster commands:
+
+- (id)moveToLevelCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::LevelControl::Commands::MoveToLevel::Id);
+    return cppCommand != nil ? [[MCLevelControlClusterMoveToLevelCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)moveCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::LevelControl::Commands::Move::Id);
+    return cppCommand != nil ? [[MCLevelControlClusterMoveCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)stepCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::LevelControl::Commands::Step::Id);
+    return cppCommand != nil ? [[MCLevelControlClusterStepCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)stopCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::LevelControl::Commands::Stop::Id);
+    return cppCommand != nil ? [[MCLevelControlClusterStopCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)moveToLevelWithOnOffCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id);
+    return cppCommand != nil ? [[MCLevelControlClusterMoveToLevelWithOnOffCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)moveWithOnOffCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Id);
+    return cppCommand != nil ? [[MCLevelControlClusterMoveWithOnOffCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)stepWithOnOffCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Id);
+    return cppCommand != nil ? [[MCLevelControlClusterStepWithOnOffCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)stopWithOnOffCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Id);
+    return cppCommand != nil ? [[MCLevelControlClusterStopWithOnOffCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)moveToClosestFrequencyCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Id);
+    return cppCommand != nil ? [[MCLevelControlClusterMoveToClosestFrequencyCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
 
 // LevelControl cluster attributes:
 
@@ -296,6 +386,12 @@
 
 // TargetNavigator cluster commands:
 
+- (id)navigateTargetCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Id);
+    return cppCommand != nil ? [[MCTargetNavigatorClusterNavigateTargetCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
 // TargetNavigator cluster attributes:
 
 - (id)targetListAttribute
@@ -352,6 +448,90 @@
 @implementation MCMediaPlaybackCluster
 
 // MediaPlayback cluster commands:
+
+- (id)playCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::Play::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterPlayCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)pauseCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::Pause::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterPauseCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)stopCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::Stop::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterStopCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)startOverCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::StartOver::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterStartOverCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)previousCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::Previous::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterPreviousCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)nextCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::Next::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterNextCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)rewindCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::Rewind::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterRewindCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)fastForwardCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::FastForward::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterFastForwardCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)skipForwardCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::SkipForward::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterSkipForwardCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)skipBackwardCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterSkipBackwardCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)seekCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::Seek::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterSeekCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)activateAudioTrackCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::ActivateAudioTrack::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterActivateAudioTrackCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)activateTextTrackCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::ActivateTextTrack::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterActivateTextTrackCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)deactivateTextTrackCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaPlayback::Commands::DeactivateTextTrack::Id);
+    return cppCommand != nil ? [[MCMediaPlaybackClusterDeactivateTextTrackCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
 
 // MediaPlayback cluster attributes:
 
@@ -464,6 +644,12 @@
 
 // KeypadInput cluster commands:
 
+- (id)sendKeyCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::KeypadInput::Commands::SendKey::Id);
+    return cppCommand != nil ? [[MCKeypadInputClusterSendKeyCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
 // KeypadInput cluster attributes:
 
 - (id)generatedCommandListAttribute
@@ -508,6 +694,12 @@
 @implementation MCContentLauncherCluster
 
 // ContentLauncher cluster commands:
+
+- (id)launchContentCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Id);
+    return cppCommand != nil ? [[MCContentLauncherClusterLaunchContentCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
 
 - (id)launchURLCommand
 {
@@ -571,6 +763,24 @@
 @implementation MCApplicationLauncherCluster
 
 // ApplicationLauncher cluster commands:
+
+- (id)launchAppCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Id);
+    return cppCommand != nil ? [[MCApplicationLauncherClusterLaunchAppCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)stopAppCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Id);
+    return cppCommand != nil ? [[MCApplicationLauncherClusterStopAppCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)hideAppCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Id);
+    return cppCommand != nil ? [[MCApplicationLauncherClusterHideAppCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
 
 // ApplicationLauncher cluster attributes:
 

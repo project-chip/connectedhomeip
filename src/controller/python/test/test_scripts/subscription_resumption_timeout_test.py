@@ -19,11 +19,13 @@
 
 # Commissioning test.
 
+import asyncio
 import os
 import sys
 from optparse import OptionParser
 
 from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger
+from chip import clusters as Clusters
 
 TEST_DISCRIMINATOR = 3840
 TEST_SETUPPIN = 20202021
@@ -31,7 +33,7 @@ TEST_SETUPPIN = 20202021
 TEST_ENDPOINT_ID = 0
 
 
-def main():
+async def main():
     optParser = OptionParser()
     optParser.add_option(
         "-t",
@@ -100,11 +102,13 @@ def main():
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     FailIfNot(
-        test.TestOnNetworkCommissioning(options.discriminator, options.setuppin, options.nodeid, options.deviceAddress),
-        "Failed on on-network commissioing")
+        await test.TestOnNetworkCommissioning(options.discriminator, options.setuppin, options.nodeid, options.deviceAddress),
+        "Failed on on-network commissioning")
+
     try:
-        test.devCtrl.ZCLSubscribeAttribute("BasicInformation", "NodeLabel", options.nodeid, TEST_ENDPOINT_ID, 1, 2,
-                                           keepSubscriptions=True, autoResubscribe=False)
+        await test.devCtrl.ReadAttribute(options.nodeid,
+                                         [(TEST_ENDPOINT_ID, Clusters.BasicInformation.Attributes.NodeLabel)],
+                                         None, False, reportInterval=(1, 2), keepSubscriptions=True, autoResubscribe=False)
     except Exception as ex:
         TestFail(f"Failed to subscribe attribute: {ex}")
 
@@ -119,7 +123,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        asyncio.run(main())
     except Exception as ex:
         logger.exception(ex)
         TestFail("Exception occurred when running tests.")

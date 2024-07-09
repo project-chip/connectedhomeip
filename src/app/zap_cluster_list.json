@@ -114,6 +114,7 @@
         "TEMPERATURE_MEASUREMENT_CLUSTER": [],
         "THERMOSTAT_CLUSTER": ["thermostat-client"],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [],
+        "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": [],
@@ -286,9 +287,11 @@
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"
         ],
+        "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [
             "thread-network-diagnostics-server"
         ],
+        "THREAD_NETWORK_DIRECTORY_CLUSTER": [],
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
@@ -306,6 +309,7 @@
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
+        "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
         "ZLL_COMMISSIONING_CLUSTER": []
     }

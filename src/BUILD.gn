@@ -22,11 +22,6 @@ import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
-declare_args() {
-  # Build monolithic test library.
-  chip_monolithic_tests = false
-}
-
 # chip_root relative to root_build_dir for macro-prefix-map.
 # "/." avoids trailing "/" in result when chip_root is "//"
 build_relative_chip_root = rebase_path("${chip_root}/.", root_build_dir)
@@ -55,6 +50,8 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
+      "${chip_root}/src/app/data-model/tests",
+      "${chip_root}/src/app/data-model-interface/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
@@ -66,6 +63,7 @@ if (chip_build_tests) {
       "${chip_root}/src/protocols/interaction_model/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
+      "${chip_root}/src/app/icd/server/tests",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
@@ -84,15 +82,23 @@ if (chip_build_tests) {
 
     if (current_os != "zephyr" && current_os != "mbed" &&
         chip_device_platform != "efr32") {
+      # Avoid these items from "one single binary" test executions. Once tests
+      # are split, we can re-visit this (and likely many others)
+      #
+      # In particular:
+      #   "app/codegen-data-model/tests" contains symbols for ember mocks which
+      #                                  are used by other tests
+
       tests += [
+        "${chip_root}/src/app/codegen-data-model/tests",
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]
     }
 
+    # Skip on efr32 due to flash and/or ram limitations.
     if (chip_device_platform != "efr32") {
       tests += [
-        # TODO(#10447): App test has HF on EFR32.
         "${chip_root}/src/app/tests",
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/format/tests",
@@ -103,7 +109,7 @@ if (chip_build_tests) {
       ]
 
       if (matter_enable_tracing_support &&
-          matter_trace_config == "multiplexed") {
+          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
         tests += [ "${chip_root}/src/tracing/tests" ]
       }
     }
@@ -125,7 +131,7 @@ if (chip_build_tests) {
     # https://github.com/project-chip/connectedhomeip/issues/9630
     if (chip_device_platform != "nrfconnect" &&
         chip_device_platform != "efr32") {
-      # TODO(#10447): Controller test has HF on EFR32.
+      # Doesn't compile on ef32. Multiple definitions issues with attribute storage and overflows flash memory.
       tests += [ "${chip_root}/src/controller/tests/data_model" ]
 
       # Skip controller test for Open IoT SDK
@@ -141,11 +147,7 @@ if (chip_build_tests) {
     }
 
     if (chip_monolithic_tests) {
-      # TODO [PW_MIGRATION] Remove this if after migartion to PW_TEST is completed for all platforms
-      # TODO [PW_MIGRATION] There will be a list of already migrated platforms
-      if (chip_device_platform == "esp32") {
-        deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
-      }
+      deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"

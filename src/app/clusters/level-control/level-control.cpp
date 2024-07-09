@@ -18,12 +18,14 @@
 // clusters specific header
 #include "level-control.h"
 
+#include <algorithm>
+
 // this file contains all the common includes for clusters in the util
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
 
@@ -158,7 +160,7 @@ public:
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
-        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
         app::DataModel::Nullable<uint8_t> level;
         VerifyOrReturnError(Status::Success == Attributes::CurrentLevel::Get(endpoint, level), CHIP_ERROR_READ_FAILED);
@@ -171,19 +173,19 @@ public:
         pairs[0].attributeID = Attributes::CurrentLevel::Id;
         if (!level.IsNull())
         {
-            pairs[0].attributeValue = level.Value();
+            pairs[0].valueUnsigned8.SetValue(level.Value());
         }
         else
         {
-            chip::app::NumericAttributeTraits<uint32_t>::SetNull(pairs[0].attributeValue);
+            pairs[0].valueUnsigned8.SetValue(app::NumericAttributeTraits<uint8_t>::kNullValue);
         }
         size_t attributeCount = 1;
         if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
         {
             uint16_t frequency;
             VerifyOrReturnError(Status::Success == Attributes::CurrentFrequency::Get(endpoint, &frequency), CHIP_ERROR_READ_FAILED);
-            pairs[attributeCount].attributeID    = Attributes::CurrentFrequency::Id;
-            pairs[attributeCount].attributeValue = frequency;
+            pairs[attributeCount].attributeID = Attributes::CurrentFrequency::Id;
+            pairs[attributeCount].valueUnsigned16.SetValue(frequency);
             attributeCount++;
         }
 
@@ -201,7 +203,7 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
-        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
@@ -223,11 +225,13 @@ public:
             switch (decodePair.attributeID)
             {
             case Attributes::CurrentLevel::Id:
-                level = static_cast<uint8_t>(decodePair.attributeValue);
+                VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                level = decodePair.valueUnsigned8.Value();
                 break;
             case Attributes::CurrentFrequency::Id:
                 // TODO : Uncomment when frequency is supported by the level control cluster
-                // frequency = static_cast<uint16_t>(decodePair.attributeValue);
+                // VerifyOrReturnError(decodePair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                // frequency = decodePair.valueUnsigned16.Value();
                 break;
             default:
                 return CHIP_ERROR_INVALID_ARGUMENT;
@@ -238,7 +242,13 @@ public:
         // TODO : Implement action on frequency when frequency not provisional anymore
         // if(LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency)){}
 
-        if (!chip::app::NumericAttributeTraits<uint8_t>::IsNullValue(level))
+        EmberAfLevelControlState * state = getState(endpoint);
+        if (level < state->minLevel || level > state->maxLevel)
+        {
+            chip::app::NumericAttributeTraits<uint8_t>::SetNull(level);
+        }
+
+        if (!app::NumericAttributeTraits<uint8_t>::IsNullValue(level))
         {
             CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
                                                                                                 : Commands::MoveToLevel::Id;
@@ -606,14 +616,16 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
                               INVALID_STORED_LEVEL); // Don't revert to the stored level
 }
 
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 chip::scenes::SceneHandler * GetSceneHandler()
 {
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sLevelControlSceneHandler;
 #else
     return nullptr;
-#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
+#endif // ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 } // namespace LevelControlServer
 
@@ -904,7 +916,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
-    state->eventDurationMs = state->transitionTimeMs / actualStepSize;
+    state->eventDurationMs = state->transitionTimeMs / std::max(static_cast<uint8_t>(1u), actualStepSize);
     state->elapsedTimeMs   = 0;
 
     state->storedLevel = storedLevel;
@@ -954,6 +966,14 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
 
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
+        status = Status::Success;
+        goto send_default_response;
+    }
+
+    if (!rate.IsNull() && (rate.Value() == 0))
+    {
+        // Move at a rate of zero is no move at all. Immediately succeed without touching anything.
+        ChipLogProgress(Zcl, "Immediate success due to move rate of 0 (would move at no rate).");
         status = Status::Success;
         goto send_default_response;
     }
@@ -1034,12 +1054,13 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
                 status = Status::Success;
                 goto send_default_response;
             }
+            // Already checked that defaultMoveRate.Value() != 0.
             state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / defaultMoveRate.Value();
         }
     }
     else
     {
-        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / rate.Value();
+        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / std::max(static_cast<uint8_t>(1u), rate.Value());
     }
 #else
     // Transition/rate is not supported so always use fastest transition time and ignore
@@ -1175,7 +1196,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
         // milliseconds to reduce rounding errors in integer division.
         if (stepSize != actualStepSize)
         {
-            state->transitionTimeMs = (state->transitionTimeMs * actualStepSize / stepSize);
+            state->transitionTimeMs = (state->transitionTimeMs * actualStepSize / std::max(static_cast<uint8_t>(1u), stepSize));
         }
     }
 #else
@@ -1187,7 +1208,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
-    state->eventDurationMs = state->transitionTimeMs / actualStepSize;
+    state->eventDurationMs = state->transitionTimeMs / std::max(static_cast<uint8_t>(1u), actualStepSize);
     state->elapsedTimeMs   = 0;
 
     // storedLevel is not used for Step commands

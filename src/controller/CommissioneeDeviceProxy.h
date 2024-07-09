@@ -105,6 +105,11 @@ public:
      */
     void CloseSession();
 
+    /**
+     *  Detaches the underlying session (if any) from this proxy and returns it.
+     */
+    chip::Optional<SessionHandle> DetachSecureSession();
+
     void Disconnect() override { CloseSession(); }
 
     /**

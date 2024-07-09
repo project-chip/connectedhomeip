@@ -69,7 +69,7 @@ private:
     static void ActionCompleted(LockManager::Action_t aAction);
 
     void DispatchEvent(AppEvent * event);
-
+    void uiInit(void);
     static void ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events);
     static void ButtonRightEventHandler(Button_Handle handle, Button_EventMask events);
     static void TimerEventHandler(void * p_context);

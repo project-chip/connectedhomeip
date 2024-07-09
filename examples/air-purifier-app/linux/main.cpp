@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/util/af.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #define AIR_PURIFIER_ENDPOINT 1

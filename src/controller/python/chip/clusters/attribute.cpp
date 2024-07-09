@@ -71,10 +71,10 @@ struct __attribute__((packed)) DataVersionFilter
 using OnReadAttributeDataCallback       = void (*)(PyObject * appContext, chip::DataVersion version, chip::EndpointId endpointId,
                                              chip::ClusterId clusterId, chip::AttributeId attributeId,
                                              std::underlying_type_t<Protocols::InteractionModel::Status> imstatus, uint8_t * data,
-                                             uint32_t dataLen);
+                                             size_t dataLen);
 using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                          chip::EventId eventId, chip::EventNumber eventNumber, uint8_t priority, uint64_t timestamp,
-                                         uint8_t timestampType, uint8_t * data, uint32_t dataLen,
+                                         uint8_t timestampType, uint8_t * data, size_t dataLen,
                                          std::underlying_type_t<Protocols::InteractionModel::Status> imstatus);
 using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, SubscriptionId subscriptionId);
 using OnResubscriptionAttemptedCallback = void (*)(PyObject * appContext, PyChipError aTerminationCause,
@@ -114,7 +114,7 @@ public:
         VerifyOrDie(!aPath.IsListItemOperation());
         size_t bufferLen                  = (apData == nullptr ? 0 : apData->GetRemainingLength() + apData->GetLengthRead());
         std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(apData == nullptr ? nullptr : new uint8_t[bufferLen]);
-        uint32_t size                     = 0;
+        size_t size                       = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (apData != nullptr)
@@ -166,7 +166,7 @@ public:
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
     {
         uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-        uint32_t size  = 0;
+        size_t size    = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
         // When the apData is nullptr, means we did not receive a valid event data from server, status will be some error
         // status.
@@ -464,12 +464,34 @@ void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_
     pReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(livenessTimeoutMs));
 }
 
+void pychip_ReadClient_TriggerResubscribeIfScheduled(ReadClient * pReadClient, const char * reason)
+{
+    VerifyOrDie(pReadClient != nullptr);
+    pReadClient->TriggerResubscribeIfScheduled(reason);
+}
+
 PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, uint16_t * minIntervalSec, uint16_t * maxIntervalSec)
 {
     VerifyOrDie(pReadClient != nullptr);
     CHIP_ERROR err = pReadClient->GetReportingIntervals(*minIntervalSec, *maxIntervalSec);
 
     return ToPyChipError(err);
+}
+
+void pychip_ReadClient_GetSubscriptionTimeoutMs(ReadClient * pReadClient, uint32_t * milliSec)
+{
+    VerifyOrDie(pReadClient != nullptr);
+
+    Optional<System::Clock::Timeout> duration = pReadClient->GetSubscriptionTimeout();
+
+    // The return value of GetSubscriptionTimeout cannot be 0
+    // so milliSec=0 can be considered as the subscription has been abnormal.
+    *milliSec = 0;
+    if (duration.HasValue())
+    {
+        System::Clock::Milliseconds32 msec = std::chrono::duration_cast<System::Clock::Milliseconds32>(duration.Value());
+        *milliSec                          = msec.count();
+    }
 }
 
 PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
@@ -561,11 +583,22 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
             params.mKeepSubscriptions         = pyParams.keepSubscriptions;
             callback->SetAutoResubscribe(pyParams.autoResubscribe);
 
-            dataVersionFilters.release();
-            attributePaths.release();
-            eventPaths.release();
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            if (!pyParams.autoResubscribe)
+            {
+                // We want to allow certain kinds of spec-invalid subscriptions so we
+                // can test how the server reacts to them.
+                err = readClient->SendSubscribeRequestWithoutValidation(params);
+            }
+            else
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            {
+                dataVersionFilters.release();
+                attributePaths.release();
+                eventPaths.release();
 
-            err = readClient->SendAutoResubscribeRequest(std::move(params));
+                err = readClient->SendAutoResubscribeRequest(std::move(params));
+            }
             SuccessOrExit(err);
         }
         else

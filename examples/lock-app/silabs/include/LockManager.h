@@ -24,9 +24,7 @@
 
 #include "AppEvent.h"
 
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
-
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
 struct WeekDaysScheduleInfo
@@ -121,6 +119,7 @@ public:
     {
         LOCK_ACTION = 0,
         UNLOCK_ACTION,
+        UNLATCH_ACTION,
 
         INVALID_ACTION
     } Action;
@@ -130,7 +129,9 @@ public:
         kState_LockInitiated = 0,
         kState_LockCompleted,
         kState_UnlockInitiated,
+        kState_UnlatchInitiated,
         kState_UnlockCompleted,
+        kState_UnlatchCompleted,
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
@@ -193,7 +194,30 @@ public:
 
     bool ReadConfigValues();
 
+    void UnlockAfterUnlatch();
+
 private:
+    struct UnlatchContext
+    {
+        chip::EndpointId mEndpointId;
+        Nullable<chip::FabricIndex> mFabricIdx;
+        Nullable<chip::NodeId> mNodeId;
+        Optional<chip::ByteSpan> mPin;
+        OperationErrorEnum mErr;
+
+        void Update(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                    const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+        {
+            mEndpointId = endpointId;
+            mFabricIdx  = fabricIdx;
+            mNodeId     = nodeId;
+            mPin        = pin;
+            mErr        = err;
+        }
+    };
+    UnlatchContext mUnlatchContext;
+    chip::EndpointId mCurrentEndpointId;
+
     friend LockManager & LockMgr();
     State_t mState;
 
@@ -203,10 +227,11 @@ private:
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 
-    static void TimerEventHandler(TimerHandle_t xTimer);
+    static void TimerEventHandler(void * timerCbArg);
     static void AutoLockTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
+    osTimerId_t mLockTimer;
     EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
     EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentials];
     WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];

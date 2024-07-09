@@ -127,7 +127,7 @@ choice NET_TC_THREAD_TYPE
 	default NET_TC_THREAD_PREEMPTIVE
 endchoice
 
-config NET_TCP_WORK_QUEUE_THREAD_PRIO
+config NET_TCP_WORKER_PRIO
 	default -16
 
 config NET_TC_TX_THREAD_BASE_PRIO
@@ -205,7 +205,7 @@ config BT_BUF_ACL_TX_SIZE
 
 config BT_RX_STACK_SIZE
 	default 2048 if NO_OPTIMIZATIONS && DEBUG
-	default 1536
+	default 1600
 
 config BT_DEVICE_NAME_GATT_WRITABLE
 	bool
@@ -217,6 +217,9 @@ config HCI_NXP_ENABLE_AUTO_SLEEP
 config CHIP_OTA_REQUESTOR
 	default n
 
+config CHIP_DEVICE_SOFTWARE_VERSION
+	default 1
+
 # Enable extended discovery
 config CHIP_EXTENDED_DISCOVERY
 	default y
@@ -225,7 +228,7 @@ config NVS_LOOKUP_CACHE
 	default y
 
 config NVS_LOOKUP_CACHE_SIZE
-	default 512
+	default 1024
 
 if CHIP_WIFI
 
@@ -406,6 +409,3 @@ config FLASH_SHELL
 endif # SHELL
 
 endif
-
-config NXP_FW_LOADER_MONOLITHIC
-	default y if NXP_FW_LOADER

@@ -25,8 +25,8 @@
 #include "dmd.h"
 #include "glib.h"
 
-#if (SIWX_917)
-#include "rsi_chip.h"
+#if (SLI_SI91X_MCU_INTERFACE)
+#include "sl_memlcd.h"
 #endif
 
 #ifdef QR_CODE_ENABLED
@@ -66,11 +66,8 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     }
 
     /* Enable the memory lcd */
-#if (SIWX_917)
-    RSI_NPSSGPIO_InputBufferEn(SL_BOARD_ENABLE_DISPLAY_PIN, 1U);
-    RSI_NPSSGPIO_SetPinMux(SL_BOARD_ENABLE_DISPLAY_PIN, 0);
-    RSI_NPSSGPIO_SetDir(SL_BOARD_ENABLE_DISPLAY_PIN, 0);
-    RSI_NPSSGPIO_SetPin(SL_BOARD_ENABLE_DISPLAY_PIN, 1U);
+#if (SLI_SI91X_MCU_INTERFACE)
+    sl_memlcd_display_enable();
 #else
     status = sl_board_enable_display();
     if (status != SL_STATUS_OK)

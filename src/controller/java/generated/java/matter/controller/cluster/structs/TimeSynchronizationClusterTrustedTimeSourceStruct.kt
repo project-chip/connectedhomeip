@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class TimeSynchronizationClusterTrustedTimeSourceStruct(
   val fabricIndex: UByte,
   val nodeID: ULong,
-  val endpoint: UShort
+  val endpoint: UShort,
 ) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterTrustedTimeSourceStruct {\n")
@@ -52,7 +52,7 @@ class TimeSynchronizationClusterTrustedTimeSourceStruct(
 
     fun fromTlv(
       tlvTag: Tag,
-      tlvReader: TlvReader
+      tlvReader: TlvReader,
     ): TimeSynchronizationClusterTrustedTimeSourceStruct {
       tlvReader.enterStructure(tlvTag)
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))

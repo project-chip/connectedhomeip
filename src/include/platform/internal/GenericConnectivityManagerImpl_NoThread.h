@@ -24,7 +24,6 @@
 
 #pragma once
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -44,10 +43,7 @@ class GenericConnectivityManagerImpl_NoThread
 protected:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
-    ConnectivityManager::ThreadMode _GetThreadMode(void);
-    CHIP_ERROR _SetThreadMode(ConnectivityManager::ThreadMode val);
     bool _IsThreadEnabled(void);
-    bool _IsThreadApplicationControlled(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
     bool _IsThreadAttached(void);
@@ -58,25 +54,7 @@ protected:
 };
 
 template <class ImplClass>
-inline ConnectivityManager::ThreadMode GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetThreadMode(void)
-{
-    return ConnectivityManager::kThreadMode_NotSupported;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadMode(ConnectivityManager::ThreadMode val)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_IsThreadEnabled(void)
-{
-    return false;
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_IsThreadApplicationControlled(void)
 {
     return false;
 }

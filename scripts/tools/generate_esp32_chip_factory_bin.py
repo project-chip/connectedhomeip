@@ -18,22 +18,19 @@
 
 import argparse
 import base64
-import enum
 import logging
 import os
 import sys
 from types import SimpleNamespace
 
 import cryptography.x509
-from bitarray import bitarray
-from bitarray.util import ba2int
 from esp_secure_cert.tlv_format import generate_partition_ds, generate_partition_no_ds, tlv_priv_key_t, tlv_priv_key_type_t
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
 from spake2p import generate_verifier  # noqa: E402 isort:skip
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
-from generate_setup_payload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
+from SetupPayload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
 
 if os.getenv('IDF_PATH'):
     sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
@@ -152,50 +149,7 @@ FACTORY_DATA = {
         'encoding': 'hex2bin',
         'value': None,
     },
-    # DeviceInfoProvider
-    'cal-types': {
-        'type': 'data',
-        'encoding': 'u32',
-        'value': None,
-    },
-    'locale-sz': {
-        'type': 'data',
-        'encoding': 'u32',
-        'value': None,
-    },
-
-    # Other device info provider keys are dynamically generated
-    # in the respective functions.
 }
-
-
-class CalendarTypes(enum.Enum):
-    Buddhist = 0
-    Chinese = 1
-    Coptic = 2
-    Ethiopian = 3
-    Gregorian = 4
-    Hebrew = 5
-    Indian = 6
-    Islamic = 7
-    Japanese = 8
-    Korean = 9
-    Persian = 10
-    Taiwanese = 11
-
-
-# Supported Calendar types is stored as a bit array in one uint32_t.
-def calendar_types_to_uint32(calendar_types):
-    result = bitarray(32, endian='little')
-    result.setall(0)
-    for calendar_type in calendar_types:
-        try:
-            result[CalendarTypes[calendar_type].value] = 1
-        except KeyError:
-            logging.error('Unknown calendar type: %s', calendar_type)
-            logging.error('Supported calendar types: %s', ', '.join(CalendarTypes.__members__))
-            sys.exit(1)
-    return ba2int(result)
 
 
 def ishex(s):
@@ -204,64 +158,6 @@ def ishex(s):
         return True
     except ValueError:
         return False
-
-# get_fixed_label_dict() converts the list of strings to per endpoint dictionaries.
-# example input  : ['0/orientation/up', '1/orientation/down', '2/orientation/down']
-# example output : {'0': [{'orientation': 'up'}], '1': [{'orientation': 'down'}], '2': [{'orientation': 'down'}]}
-
-
-def get_fixed_label_dict(fixed_labels):
-    fl_dict = {}
-    for fl in fixed_labels:
-        _l = fl.split('/')
-
-        if len(_l) != 3:
-            logging.error('Invalid fixed label: %s', fl)
-            sys.exit(1)
-
-        if not (ishex(_l[0]) and (len(_l[1]) > 0 and len(_l[1]) < 16) and (len(_l[2]) > 0 and len(_l[2]) < 16)):
-            logging.error('Invalid fixed label: %s', fl)
-            sys.exit(1)
-
-        if _l[0] not in fl_dict.keys():
-            fl_dict[_l[0]] = list()
-
-        fl_dict[_l[0]].append({_l[1]: _l[2]})
-
-    return fl_dict
-
-# get_supported_modes_dict() converts the list of strings to per endpoint dictionaries.
-# example with semantic tags
-# input  : ['0/label1/1/"1\0x8000, 2\0x8000" 1/label2/1/"1\0x8000, 2\0x8000"']
-# output : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}]}
-
-# example without semantic tags
-# input  : ['0/label1/1 1/label2/1']
-# output : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': []}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': []}]}
-
-
-def get_supported_modes_dict(supported_modes):
-    output_dict = {}
-
-    for mode_str in supported_modes:
-        mode_label_strs = mode_str.split('/')
-        mode = mode_label_strs[0]
-        label = mode_label_strs[1]
-        ep = mode_label_strs[2]
-
-        semantic_tags = ''
-        if (len(mode_label_strs) == 4):
-            semantic_tag_strs = mode_label_strs[3].split(', ')
-            semantic_tags = [{"value": int(v.split('\\')[0]), "mfgCode": int(v.split('\\')[1], 16)} for v in semantic_tag_strs]
-
-        mode_dict = {"Label": label, "Mode": int(mode), "Semantic_Tag": semantic_tags}
-
-        if ep in output_dict:
-            output_dict[ep].append(mode_dict)
-        else:
-            output_dict[ep] = [mode_dict]
-
-    return output_dict
 
 
 def check_str_range(s, min_len, max_len, name):
@@ -373,106 +269,6 @@ def populate_factory_data(args, spake2p_params):
     if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
 
-    if args.calendar_types:
-        FACTORY_DATA['cal-types']['value'] = calendar_types_to_uint32(args.calendar_types)
-
-    # Supported locale is stored as multiple entries, key format: "locale/<index>, example key: "locale/0"
-    if args.locales:
-        FACTORY_DATA['locale-sz']['value'] = len(args.locales)
-
-        for i in range(len(args.locales)):
-            _locale = {
-                'type': 'data',
-                'encoding': 'string',
-                'value': args.locales[i]
-            }
-            FACTORY_DATA.update({'locale/{:x}'.format(i): _locale})
-
-    # Each endpoint can contains the fixed lables
-    #  - fl-sz/<index>     : number of fixed labels for the endpoint
-    #  - fl-k/<ep>/<index> : fixed label key for the endpoint and index
-    #  - fl-v/<ep>/<index> : fixed label value for the endpoint and index
-    if args.fixed_labels:
-        dict = get_fixed_label_dict(args.fixed_labels)
-        for key in dict.keys():
-            _sz = {
-                'type': 'data',
-                'encoding': 'u32',
-                'value': len(dict[key])
-            }
-            FACTORY_DATA.update({'fl-sz/{:x}'.format(int(key)): _sz})
-
-            for i in range(len(dict[key])):
-                entry = dict[key][i]
-
-                _label_key = {
-                    'type': 'data',
-                    'encoding': 'string',
-                    'value': list(entry.keys())[0]
-                }
-                _label_value = {
-                    'type': 'data',
-                    'encoding': 'string',
-                    'value': list(entry.values())[0]
-                }
-
-                FACTORY_DATA.update({'fl-k/{:x}/{:x}'.format(int(key), i): _label_key})
-                FACTORY_DATA.update({'fl-v/{:x}/{:x}'.format(int(key), i): _label_value})
-
-    # SupportedModes are stored as multiple entries
-    #  - sm-sz/<ep>                 : number of supported modes for the endpoint
-    #  - sm-label/<ep>/<index>      : supported modes label key for the endpoint and index
-    #  - sm-mode/<ep>/<index>       : supported modes mode key for the endpoint and index
-    #  - sm-st-sz/<ep>/<index>      : supported modes SemanticTag key for the endpoint and index
-    #  - st-v/<ep>/<index>/<ind>    : semantic tag value key for the endpoint and index and ind
-    #  - st-mfg/<ep>/<index>/<ind>  : semantic tag mfg code key for the endpoint and index and ind
-    if (args.supported_modes is not None):
-        dictionary = get_supported_modes_dict(args.supported_modes)
-        for ep in dictionary.keys():
-            _sz = {
-                'type': 'data',
-                'encoding': 'u32',
-                'value': len(dictionary[ep])
-            }
-            FACTORY_DATA.update({'sm-sz/{:x}'.format(int(ep)): _sz})
-            for i in range(len(dictionary[ep])):
-                item = dictionary[ep][i]
-                _label = {
-                    'type': 'data',
-                    'encoding': 'string',
-                    'value': item["Label"]
-                }
-                _mode = {
-                    'type': 'data',
-                    'encoding': 'u32',
-                    'value': item["Mode"]
-                }
-                _st_sz = {
-                    'type': 'data',
-                    'encoding': 'u32',
-                    'value': len(item["Semantic_Tag"])
-                }
-                FACTORY_DATA.update({'sm-label/{:x}/{:x}'.format(int(ep), i): _label})
-                FACTORY_DATA.update({'sm-mode/{:x}/{:x}'.format(int(ep), i): _mode})
-                FACTORY_DATA.update({'sm-st-sz/{:x}/{:x}'.format(int(ep), i): _st_sz})
-
-                for j in range(len(item["Semantic_Tag"])):
-                    entry = item["Semantic_Tag"][j]
-
-                    _value = {
-                        'type': 'data',
-                        'encoding': 'u32',
-                        'value': entry["value"]
-                    }
-                    _mfg_code = {
-                        'type': 'data',
-                        'encoding': 'u32',
-                        'value': entry["mfgCode"]
-                    }
-
-                    FACTORY_DATA.update({'st-v/{:x}/{:x}/{:x}'.format(int(ep), i, j): _value})
-                    FACTORY_DATA.update({'st-mfg/{:x}/{:x}/{:x}'.format(int(ep), i, j): _mfg_code})
-
 
 def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
     with open(key_file, 'rb') as f:
@@ -499,7 +295,7 @@ def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
         f.write(public_number_y.to_bytes(32, byteorder='big'))
 
 
-def generate_nvs_csv(out_csv_filename):
+def generate_nvs_csv(output_dir, out_csv_filename):
     csv_content = 'key,type,encoding,value\n'
     csv_content += 'chip-factory,namespace,,\n'
 
@@ -508,10 +304,11 @@ def generate_nvs_csv(out_csv_filename):
             continue
         csv_content += f"{k},{v['type']},{v['encoding']},{v['value']}\n"
 
-    with open(out_csv_filename, 'w') as f:
+    with open(os.path.join(output_dir, out_csv_filename), 'w') as f:
         f.write(csv_content)
 
-    logging.info('Generated the factory partition csv file : {}'.format(os.path.abspath(out_csv_filename)))
+    logging.info('Generated the factory partition csv file : {}'.format(
+        os.path.abspath(os.path.join(output_dir, out_csv_filename))))
 
 
 def generate_nvs_bin(encrypt, size, csv_filename, bin_filename, output_dir):
@@ -529,13 +326,13 @@ def generate_nvs_bin(encrypt, size, csv_filename, bin_filename, output_dir):
         nvs_partition_gen.generate(nvs_args)
 
 
-def print_flashing_help(encrypt, bin_filename):
+def print_flashing_help(encrypt, output_dir,  bin_filename):
     logging.info('Run below command to flash {}'.format(bin_filename))
-    logging.info('esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) {}'.format(os.path.join(os.getcwd(), bin_filename)))
+    logging.info('esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) {}'.format(os.path.join(os.getcwd(), output_dir, bin_filename)))
     if (encrypt):
         logging.info('Run below command to flash {}'.format(NVS_KEY_PARTITION_BIN))
         logging.info('esptool.py -p (PORT) write_flash --encrypt (NVS_KEY_PARTITION_ADDR) {}'.format(
-            os.path.join(os.getcwd(), 'keys', NVS_KEY_PARTITION_BIN)))
+            os.path.join(os.getcwd(), output_dir, 'keys', NVS_KEY_PARTITION_BIN)))
 
 
 def clean_up():
@@ -584,16 +381,6 @@ def get_args():
                         help=('128-bit unique identifier for generating rotating device identifier, '
                               'provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"'))
 
-    # These will be used by DeviceInfoProvider
-    parser.add_argument('--calendar-types', nargs='+',
-                        help=('List of supported calendar types.\nSupported Calendar Types: Buddhist, Chinese, Coptic, Ethiopian, '
-                              'Gregorian, Hebrew, Indian, Islamic, Japanese, Korean, Persian, Taiwanese'))
-    parser.add_argument('--locales', nargs='+', help='List of supported locales, Language Tag as defined by BCP47, eg. en-US en-GB')
-    parser.add_argument('--fixed-labels', nargs='+',
-                        help='List of fixed labels, eg: "0/orientation/up" "1/orientation/down" "2/orientation/down"')
-    parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
-                        help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
-
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
     parser.add_argument('--target', default='esp32',
@@ -602,7 +389,7 @@ def get_args():
                         help='Encrypt the factory parititon NVS binary')
     parser.add_argument('--no-bin', action='store_false', dest='generate_bin',
                         help='Do not generate the factory partition binary')
-    parser.add_argument('--output_dir', type=str, default='bin', help='Created image output file path')
+    parser.add_argument('--output_dir', type=str, default='out', help='Created image output file path')
 
     parser.add_argument('-cf', '--commissioning-flow', type=any_base_int, default=0,
                         help='Device commissioning flow, 0:Standard, 1:User-Intent, 2:Custom. \
@@ -630,10 +417,11 @@ def set_up_factory_data(args):
 
 
 def generate_factory_partiton_binary(args):
-    generate_nvs_csv(FACTORY_PARTITION_CSV)
+    generate_nvs_csv(args.output_dir, FACTORY_PARTITION_CSV)
     if args.generate_bin:
-        generate_nvs_bin(args.encrypt, args.size, FACTORY_PARTITION_CSV, FACTORY_PARTITION_BIN, args.output_dir)
-        print_flashing_help(args.encrypt, FACTORY_PARTITION_BIN)
+        csv_file = os.path.join(args.output_dir, FACTORY_PARTITION_CSV)
+        generate_nvs_bin(args.encrypt, args.size, csv_file, FACTORY_PARTITION_BIN, args.output_dir)
+        print_flashing_help(args.encrypt, args.output_dir, FACTORY_PARTITION_BIN)
     clean_up()
 
 

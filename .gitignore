@@ -10,6 +10,7 @@
 
 # Build System
 out/
+/examples/virtual-device-app/android/App/buildSrc/build/
 /src/test_driver/nrfconnect/build/
 /src/darwin/Framework/build/
 

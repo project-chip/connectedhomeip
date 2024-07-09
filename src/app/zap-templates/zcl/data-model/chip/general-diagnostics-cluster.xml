@@ -17,11 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0033"/>
-    <field name="DataModelTest" mask="0x1"/>
-  </bitmap>
-
   <enum name="HardwareFaultEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
@@ -90,6 +85,13 @@ limitations under the License.
     <define>GENERAL_DIAGNOSTICS_CLUSTER</define>
     <description>The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
+
+    <features>
+      <feature bit="0" code="DMTEST" name="DataModelTest" summary="Support specific testing needs for extended Data Model features">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="array" entryType="NetworkInterface" length="8" writable="false" optional="false">NetworkInterfaces</attribute>
     <attribute side="server" code="0x01" define="REBOOT_COUNT" type="int16u" writable="false" default="0x0000" optional="false">RebootCount</attribute>
     <!-- ***NOTE***: UpTime attribute is mandatory starting at Rev >= 2, but because of backwards compatibility, has to be optional here.

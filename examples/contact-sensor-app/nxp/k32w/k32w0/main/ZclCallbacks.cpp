@@ -27,7 +27,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
 
 using namespace ::chip;
 using namespace ::chip::app;

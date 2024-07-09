@@ -801,14 +801,15 @@ class _ConstraintHasMaskClear(BaseConstraint):
 
 class _ConstraintNotValue(BaseConstraint):
     def __init__(self, context, not_value):
-        super().__init__(context, types=[], is_null_allowed=True)
+        # NOTE: do not use is_null_allowed=True here, because 'notValue: null' needs to work.
+        super().__init__(context, types=[])
         self._not_value = not_value
 
     def check_response(self, value, value_type_name) -> bool:
         return value != self._not_value
 
     def get_reason(self, value, value_type_name) -> str:
-        return f'The response value "{value}" should differs from the constraint.'
+        return f'The response value "{value}" should differ from the constraint.'
 
 
 class _ConstraintAnyOf(BaseConstraint):

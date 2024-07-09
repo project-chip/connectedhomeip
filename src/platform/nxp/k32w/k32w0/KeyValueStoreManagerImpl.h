@@ -37,6 +37,10 @@ public:
     static Internal::RamStorage sKeysStorage;
     /* Storage for KVS values. Cleared during factory reset. */
     static Internal::RamStorage sValuesStorage;
+    /* Storage for KVS subscription keys and values. Cleared during factory reset. */
+    static Internal::RamStorage sSubscriptionStorage;
+    /* Storage for KVS groups keys and values. Cleared during factory reset. */
+    static Internal::RamStorage sGroupsStorage;
 
     // Allow the KeyValueStoreManager interface class to delegate method calls to
     // the implementation methods provided by this class.

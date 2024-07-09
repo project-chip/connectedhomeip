@@ -14,6 +14,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 
 import time
 
@@ -30,7 +36,7 @@ class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
     def pics_TC_EEM_2_2(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["EEM.S", "EEM.S.F02(CUME)", "EEM.S.F00(IMPE)"]
+        return ["EEM.S", "EEM.S.F02", "EEM.S.F00"]
 
     def steps_TC_EEM_2_2(self) -> list[TestStep]:
         steps = [

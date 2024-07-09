@@ -38,6 +38,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
+  
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="array" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="int8u"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
@@ -62,9 +63,9 @@ limitations under the License.
   </cluster>
 
   <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0055"/>
-    <field name="NoFeatures" mask="0x0"/>
-    <!-- Feature OnOff with code 0x01 is deprecated -->
-  </bitmap>
+     <cluster code="0x0055"/>
+     <field name="NoFeatures" mask="0x0"/>
+     <!-- Feature OnOff with code 0x01 is deprecated -->
+   </bitmap>
 
 </configurator>

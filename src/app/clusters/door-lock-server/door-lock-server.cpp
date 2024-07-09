@@ -25,10 +25,11 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <cinttypes>
 
 #include <app/CommandHandler.h>
@@ -89,7 +90,7 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 {
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        for (auto endpointId : EnabledEndpointsWithServerCluster(chip::app::Clusters::DoorLock::Id))
+        for (auto endpointId : EnabledEndpointsWithServerCluster(Clusters::DoorLock::Id))
         {
             if (!DoorLockServer::Instance().OnFabricRemoved(endpointId, fabricIndex))
             {
@@ -950,7 +951,8 @@ void DoorLockServer::clearCredentialCommandHandler(
     }
 
     commandObj->AddStatus(commandPath,
-                          clearCredential(commandPath.mEndpointId, modifier, sourceNodeId, credentialType, credentialIndex, false));
+                          clearCredential(commandPath.mEndpointId, modifier, sourceNodeId, credentialType, credentialIndex,
+                                          /* sendUserChangeEvent = */ true));
 }
 
 void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
@@ -1003,17 +1005,10 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         return;
     }
 
-    // appclusters, 5.2.4.14 - spec does not allow setting the schedule for multiple days in the bitmask
-    int setBitsInDaysMask = 0;
-    uint8_t rawDaysMask   = daysMask.Raw();
-    for (size_t i = 0; i < sizeof(rawDaysMask) * 8; ++i)
-    {
-        setBitsInDaysMask += rawDaysMask & 0x1;
-        rawDaysMask = static_cast<uint8_t>(rawDaysMask >> 1);
-    }
+    uint8_t rawDaysMask = daysMask.Raw();
 
-    // TODO: Check that bits are within range
-    if (setBitsInDaysMask == 0 || setBitsInDaysMask > 1)
+    // Check that bits are within range
+    if ((0 == rawDaysMask) || (rawDaysMask & 0x80))
     {
         ChipLogProgress(Zcl,
                         "[SetWeekDaySchedule] Unable to add schedule - daysMask is out of range "
@@ -3044,6 +3039,24 @@ Status DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip::Fabri
         ChipLogProgress(Zcl, "[clearCredentials] All face credentials were cleared [endpointId=%d]", endpointId);
     }
 
+    if (SupportsAliroProvisioning(endpointId))
+    {
+        for (auto & credentialType :
+             { CredentialTypeEnum::kAliroEvictableEndpointKey, CredentialTypeEnum::kAliroCredentialIssuerKey,
+               CredentialTypeEnum::kAliroNonEvictableEndpointKey })
+        {
+            auto status = clearCredentials(endpointId, modifier, sourceNodeId, credentialType);
+            if (Status::Success != status)
+            {
+                ChipLogError(Zcl,
+                             "[clearCredentials] Unable to clear all Aliro credentials [endpointId=%d,credentialType=%d,status=%d]",
+                             endpointId, to_underlying(credentialType), to_underlying(status));
+                return status;
+            }
+        }
+        ChipLogProgress(Zcl, "[clearCredentials] All Aliro credentials were cleared [endpointId=%d]", endpointId);
+    }
+
     return Status::Success;
 }
 
@@ -3628,7 +3641,7 @@ void DoorLockServer::SendEvent(chip::EndpointId endpointId, T & event)
 
 template <typename T>
 bool DoorLockServer::GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                                  Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const
+                                  Status (*getFn)(chip::EndpointId endpointId, T * value), T & value)
 {
     Status status = getFn(endpointId, &value);
     bool success  = (Status::Success == status);
@@ -3905,21 +3918,27 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
     EndpointId endpointID = commandPath.mEndpointId;
     ChipLogProgress(Zcl, "[SetAliroReaderConfig] Incoming command [endpointId=%d]", endpointID);
 
-    // If Aliro Provisioning feature is not supported, return UNSUPPORTED_COMMAND.
-    if (!SupportsAliroProvisioning(endpointID))
+    Delegate * delegate = GetDelegate(endpointID);
+    if (!delegate)
     {
-        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Aliro Provisioning is not supported [endpointId=%d]", endpointID);
-        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+        ChipLogError(Zcl, "Door Lock delegate is null");
+        commandObj->AddStatus(commandPath, Status::Failure);
         return;
     }
 
-    Delegate * delegate = GetDelegate(endpointID);
-    VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is null"));
-
-    // If Aliro BLE UWB feature is supported and groupResolvingKey is not provided in the command, return INVALID_COMMAND.
-    if (SupportsAliroBLEUWB(endpointID) && !groupResolvingKey.HasValue())
+    // The GroupResolvingKey must be provided if and only if the Aliro BLE UWB
+    // feature is supported.  Otherwise, return INVALID_COMMAND
+    const bool supportsAliroBLEUWB = SupportsAliroBLEUWB(endpointID);
+    if (supportsAliroBLEUWB != groupResolvingKey.HasValue())
     {
-        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Aliro BLE UWB supported but Group Resolving Key is not provided");
+        if (supportsAliroBLEUWB)
+        {
+            ChipLogError(Zcl, "[SetAliroReaderConfig] Aliro BLE UWB supported but Group Resolving Key is not provided");
+        }
+        else
+        {
+            ChipLogError(Zcl, "[SetAliroReaderConfig] Aliro BLE UWB not supported but Group Resolving Key is provided");
+        }
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return;
     }
@@ -3946,19 +3965,24 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
     // INVALID_IN_STATE.
     if (err != CHIP_NO_ERROR || !readerVerificationKey.empty())
     {
-        ChipLogProgress(
-            Zcl, "[SetAliroReaderConfig] Aliro reader verification key was not read or is not null. Return INVALID_IN_STATE");
+        ChipLogError(Zcl, "[SetAliroReaderConfig] Aliro reader verification key was not read or is not null.");
         commandObj->AddStatus(commandPath, Status::InvalidInState);
         return;
     }
 
-    Status status = Status::Success;
-    if (!emberAfPluginDoorLockSetAliroReaderConfig(endpointID, signingKey, verificationKey, groupIdentifier, groupResolvingKey))
+    err = delegate->SetAliroReaderConfig(signingKey, verificationKey, groupIdentifier, groupResolvingKey);
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Zcl, "[SetAliroReaderConfig] Unable to set aliro reader config [endpointId=%d]", endpointID);
-        status = Status::Failure;
     }
-    sendClusterResponse(commandObj, commandPath, ClusterStatusCode(status));
+    else
+    {
+        // Various attributes changed; mark them dirty.
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderVerificationKey::Id);
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderGroupIdentifier::Id);
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
+    }
+    sendClusterResponse(commandObj, commandPath, ClusterStatusCode(StatusIB(err).mStatus));
 }
 
 void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
@@ -3974,13 +3998,38 @@ void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * comma
         return;
     }
 
-    Status status = Status::Success;
-    if (!emberAfPluginDoorLockClearAliroReaderConfig(endpointID))
+    Delegate * delegate = GetDelegate(endpointID);
+    if (!delegate)
     {
-        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Unable to set aliro reader config [endpointId=%d]", endpointID);
-        status = Status::Failure;
+        ChipLogError(Zcl, "Door Lock delegate is null");
+        commandObj->AddStatus(commandPath, Status::Failure);
+        return;
     }
-    sendClusterResponse(commandObj, commandPath, ClusterStatusCode(status));
+
+    uint8_t buffer[kAliroReaderVerificationKeySize];
+    MutableByteSpan readerVerificationKey(buffer);
+    CHIP_ERROR err = delegate->GetAliroReaderVerificationKey(readerVerificationKey);
+    if (err != CHIP_NO_ERROR && readerVerificationKey.empty())
+    {
+        // No reader config to start with.  Just return without marking any
+        // attributes as dirty.
+        commandObj->AddStatus(commandPath, Status::Success);
+        return;
+    }
+
+    err = delegate->ClearAliroReaderConfig();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "[SetAliroReaderConfig] Unable to set aliro reader config [endpointId=%d]", endpointID);
+    }
+    else
+    {
+        // Various attributes changed; mark them dirty.
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderVerificationKey::Id);
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderGroupIdentifier::Id);
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
+    }
+    sendClusterResponse(commandObj, commandPath, ClusterStatusCode(StatusIB(err).mStatus));
 }
 
 // =============================================================================
@@ -4140,8 +4189,7 @@ void DoorLockServer::DoorLockOnAutoRelockCallback(System::Layer *, void * callba
     }
 }
 
-CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersions(const ConcreteReadAttributePath & aPath,
-                                                                                  AttributeValueEncoder & aEncoder,
+CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersions(AttributeValueEncoder & aEncoder,
                                                                                   Delegate * delegate)
 {
     VerifyOrReturnValue(delegate != nullptr, aEncoder.EncodeEmptyList());
@@ -4162,8 +4210,7 @@ CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersion
     });
 }
 
-CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(const ConcreteReadAttributePath & aPath,
-                                                                    AttributeValueEncoder & aEncoder, Delegate * delegate)
+CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     VerifyOrReturnValue(delegate != nullptr, aEncoder.EncodeEmptyList());
 
@@ -4233,7 +4280,7 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
                                           AttributeNullabilityType::kNotNullable);
     }
     case AliroExpeditedTransactionSupportedProtocolVersions::Id: {
-        return ReadAliroExpeditedTransactionSupportedProtocolVersions(aPath, aEncoder, delegate);
+        return ReadAliroExpeditedTransactionSupportedProtocolVersions(aEncoder, delegate);
     }
     case AliroGroupResolvingKey::Id: {
         uint8_t buffer[kAliroGroupResolvingKeySize];
@@ -4242,7 +4289,7 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
                                           AttributeNullabilityType::kNullable);
     }
     case AliroSupportedBLEUWBProtocolVersions::Id: {
-        return ReadAliroSupportedBLEUWBProtocolVersions(aPath, aEncoder, delegate);
+        return ReadAliroSupportedBLEUWBProtocolVersions(aEncoder, delegate);
     }
     case AliroBLEAdvertisingVersion::Id: {
         uint8_t bleAdvertisingVersion = delegate->GetAliroBLEAdvertisingVersion();

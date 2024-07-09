@@ -44,7 +44,7 @@ CHIP_ERROR DiscoverCommissioners()
 CHIP_ERROR RequestCommissioning(int index)
 {
     chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
-    const Dnssd::DiscoveredNodeData * selectedCommissioner =
+    const Dnssd::CommissionNodeData * selectedCommissioner =
         CastingServer::GetInstance()->GetDiscoveredCommissioner(index, associatedConnectableVideoPlayer);
     if (selectedCommissioner == nullptr)
     {
@@ -60,7 +60,7 @@ CHIP_ERROR RequestCommissioning(int index)
  * If non-null selectedCommissioner is provided, sends user directed commissioning
  * request to the selectedCommissioner and advertises self as commissionable node over DNS-SD
  */
-void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner)
+void PrepareForCommissioning(const Dnssd::CommissionNodeData * selectedCommissioner)
 {
     CastingServer::GetInstance()->Init();
 
@@ -96,7 +96,7 @@ void InitCommissioningFlow(intptr_t commandArg)
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
         chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
-        const Dnssd::DiscoveredNodeData * commissioner =
+        const Dnssd::CommissionNodeData * commissioner =
             CastingServer::GetInstance()->GetDiscoveredCommissioner(i, associatedConnectableVideoPlayer);
         if (commissioner != nullptr)
         {
@@ -286,7 +286,7 @@ void HandleCommissioningCompleteCallback(CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
 {
-    Dnssd::DiscoveredNodeData * selectedCommissioner = (Dnssd::DiscoveredNodeData *) context;
+    Dnssd::CommissionNodeData * selectedCommissioner = (Dnssd::CommissionNodeData *) context;
 
     // Send User Directed commissioning request
     ReturnOnFailure(CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(selectedCommissioner));

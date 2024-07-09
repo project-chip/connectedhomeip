@@ -23,7 +23,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/endpoint-config-api.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
@@ -33,6 +35,8 @@
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <string>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -498,6 +502,12 @@ bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t product
         return true;
     }
 
+    if (!app->HasSupportedCluster(AccountLogin::Id))
+    {
+        ChipLogProgress(DeviceLayer, "AccountLogin cluster not supported for app with vendor id=%d \r\n", vendorId);
+        return true;
+    }
+
     static const size_t kSetupPasscodeSize = 12;
     char mSetupPasscode[kSetupPasscodeSize];
 
@@ -521,6 +531,12 @@ uint32_t ContentAppPlatform::GetPasscodeFromContentApp(uint16_t vendorId, uint16
     if (app->GetAccountLoginDelegate() == nullptr)
     {
         ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with vendor id=%d \r\n", vendorId);
+        return 0;
+    }
+
+    if (!app->HasSupportedCluster(AccountLogin::Id))
+    {
+        ChipLogProgress(DeviceLayer, "AccountLogin cluster not supported for app with vendor id=%d \r\n", vendorId);
         return 0;
     }
 

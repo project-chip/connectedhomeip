@@ -16,7 +16,7 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder
+from .builder import Builder, BuilderOutput
 
 
 class AndroidBoard(Enum):
@@ -108,12 +108,20 @@ class AndroidApp(Enum):
             return "tv-casting-app"
         elif self == AndroidApp.VIRTUAL_DEVICE_APP:
             return "virtual-device-app"
+        elif self == AndroidApp.CHIP_TEST:
+            return "chip-test"
         else:
             return None
 
     def Modules(self):
         if self == AndroidApp.TV_SERVER:
             return ["platform-app", "content-app"]
+        else:
+            return None
+
+    def BuildRoot(self, root):
+        if self == AndroidApp.CHIP_TEST:
+            return os.path.join(root, 'examples/android/CHIPTest')
         else:
             return None
 
@@ -235,6 +243,7 @@ class AndroidBuilder(Builder):
 
         jars = {
             "CHIPController.jar": "src/controller/java/CHIPController.jar",
+            "CHIPInteractionModel.jar": "src/controller/java/CHIPInteractionModel.jar",
             "OnboardingPayload.jar": "src/controller/java/OnboardingPayload.jar",
             "AndroidPlatform.jar": "src/platform/android/AndroidPlatform.jar",
             "libMatterJson.jar": "src/controller/java/libMatterJson.jar",
@@ -345,11 +354,23 @@ class AndroidBuilder(Builder):
             if not self._runner.dry_run:
                 self.validate_build_environment()
 
+            exampleName = self.app.ExampleName()
             gn_args = {}
             gn_args["target_os"] = "android"
             gn_args["target_cpu"] = self.board.TargetCpuName()
             gn_args["android_ndk_root"] = os.environ["ANDROID_NDK_HOME"]
             gn_args["android_sdk_root"] = os.environ["ANDROID_HOME"]
+            if exampleName == "chip-test":
+                gn_args["chip_build_test_static_libraries"] = False
+
+            if self.options.pw_command_launcher:
+                gn_args["pw_command_launcher"] = self.options.pw_command_launcher
+
+            if self.options.enable_link_map_file:
+                gn_args["chip_generate_link_map_file"] = True
+
+            if exampleName == "chip-test":
+                gn_args["chip_build_tests"] = True
             if self.profile != AndroidProfile.DEBUG:
                 gn_args["is_debug"] = False
             gn_args.update(self.app.AppGnArgs())
@@ -374,8 +395,10 @@ class AndroidBuilder(Builder):
                 args,
             ]
 
-            exampleName = self.app.ExampleName()
-            if exampleName is not None:
+            rootName = self.app.BuildRoot(self.root)
+            if rootName is not None:
+                gn_gen += ["--root=%s" % rootName]
+            elif exampleName is not None:
                 gn_gen += ["--root=%s/examples/%s/android/" %
                            (self.root, exampleName)]
 
@@ -470,6 +493,7 @@ class AndroidBuilder(Builder):
                 jars = {
                     "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
                     "CHIPAppServer.jar": "third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar",
+                    "CHIPInteractionModel.jar": "third_party/connectedhomeip/src/controller/java/CHIPInteractionModel.jar",
                     "TvCastingApp.jar": "TvCastingApp.jar",
                 }
 
@@ -499,6 +523,25 @@ class AndroidBuilder(Builder):
 
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
+            elif exampleName == "chip-test":
+                jnilibs_dir = os.path.join(
+                    self.root,
+                    "examples/android/CHIPTest/app/libs/jniLibs",
+                    self.board.AbiName(),
+                )
+
+                libs_dir = os.path.join(
+                    self.root, "examples/android/CHIPTest/app/libs"
+                )
+
+                libs = ["libc++_shared.so", "libCHIPTest.so"]
+
+                jars = {
+                    "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
+                    "CHIPTest.jar": "CHIPTest.jar",
+                }
+                self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
+                self.gradlewBuildSrcAndroid()
             elif exampleName == "virtual-device-app":
                 jnilibs_dir = os.path.join(
                     self.root,
@@ -529,82 +572,61 @@ class AndroidBuilder(Builder):
 
     def build_outputs(self):
         if self.board.IsIde():
-            outputs = {
-                self.app.AppName()
-                + "-debug.apk": os.path.join(
+            yield BuilderOutput(
+                os.path.join(
                     self.root,
                     "examples/android",
                     self.app.AppName(),
-                    "app/build/outputs/apk/debug/app-debug.apk",
-                )
-            }
+                    "app/build/outputs/apk/debug/app-debug.apk"),
+                self.app.AppName() + "-debug.apk")
         elif self.app.ExampleName() is not None:
             if self.app == AndroidApp.TV_SERVER:
-                outputs = {
-                    "tv-sever-platform-app-debug.apk": os.path.join(
-                        self.output_dir, "platform-app", "outputs", "apk", "debug", "platform-app-debug.apk"
-                    ),
-                    "tv-sever-content-app-debug.apk": os.path.join(
-                        self.output_dir, "content-app", "outputs", "apk", "debug", "content-app-debug.apk"
-                    )
-                }
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, "platform-app",
+                                 "outputs", "apk", "debug", "platform-app-debug.apk"),
+                    "tv-sever-platform-app-debug.apk")
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, "content-app",
+                                 "outputs", "apk", "debug", "content-app-debug.apk"),
+                    "tv-sever-content-app-debug.apk")
             elif self.app == AndroidApp.VIRTUAL_DEVICE_APP:
-                outputs = {
-                    self.app.AppName() + "app-debug.apk": os.path.join(
-                        self.output_dir, "VirtualDeviceApp", "app", "outputs", "apk", "debug", "app-debug.apk"
-                    )
-                }
+                yield BuilderOutput(
+                    os.path.join(self.output_dir, "VirtualDeviceApp", "app",
+                                 "outputs", "apk", "debug", "app-debug.apk"),
+                    self.app.AppName() + "app-debug.apk")
             else:
-                outputs = {
-                    self.app.AppName() + "app-debug.apk": os.path.join(
-                        self.output_dir, "outputs", "apk", "debug", "app-debug.apk"
-                    )
-                }
+                yield BuilderOutput(
+                    os.path.join(self.output_dir,
+                                 "outputs", "apk", "debug", "app-debug.apk"),
+                    self.app.AppName() + "app-debug.apk")
         else:
-            outputs = {
-                self.app.AppName() + "app-debug.apk": os.path.join(
-                    self.output_dir, "outputs", "apk", "debug", "app-debug.apk"
-                ),
-                "CHIPController.jar": os.path.join(
-                    self.output_dir, "lib", "src/controller/java/CHIPController.jar"
-                ),
-                "libMatterTlv.jar": os.path.join(
-                    self.output_dir, "lib", "src/controller/java/libMatterTlv.jar"
-                ),
-                "AndroidPlatform.jar": os.path.join(
-                    self.output_dir, "lib", "src/platform/android/AndroidPlatform.jar"
-                ),
-                "OnboardingPayload.jar": os.path.join(
-                    self.output_dir,
-                    "lib",
-                    "src/controller/java/OnboardingPayload.jar",
-                ),
-                "CHIPClusters.jar": os.path.join(
-                    self.output_dir,
-                    "lib",
-                    "src/controller/java/CHIPClusters.jar",
-                ),
-                "CHIPClusterID.jar": os.path.join(
-                    self.output_dir,
-                    "lib",
-                    "src/controller/java/CHIPClusterID.jar",
-                ),
-                "jni/%s/libCHIPController.so"
-                % self.board.AbiName(): os.path.join(
-                    self.output_dir,
-                    "lib",
-                    "jni",
-                    self.board.AbiName(),
-                    "libCHIPController.so",
-                ),
-                "jni/%s/libc++_shared.so"
-                % self.board.AbiName(): os.path.join(
-                    self.output_dir,
-                    "lib",
-                    "jni",
-                    self.board.AbiName(),
-                    "libc++_shared.so",
-                ),
-            }
-
-        return outputs
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "outputs", "apk", "debug", "app-debug.apk"),
+                self.app.AppName() + "app-debug.apk")
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "lib", "src", "controller", "java", "CHIPController.jar"),
+                "CHIPController.jar")
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "lib", "src", "controller", "java", "CHIPInteractionModel.jar"),
+                "CHIPInteractionModel.jar")
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "lib", "src", "controller", "java", "libMatterTlv.jar"),
+                "libMatterTlv.jar")
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "lib", "src", "platform", "android", "AndroidPlatform.jar"),
+                "AndroidPlatform.jar")
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "lib", "src", "controller", "java", "OnboardingPayload.jar"),
+                "OnboardingPayload.jar")
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "lib", "src", "controller", "java", "CHIPClusters.jar"),
+                "CHIPClusters.jar")
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "lib", "src", "controller", "java", "CHIPClusterID.jar"),
+                "CHIPClusterID.jar")
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "lib", "jni", self.board.AbiName(), "libCHIPController.so"),
+                "jni/%s/libCHIPController.so" % self.board.AbiName())
+            yield BuilderOutput(
+                os.path.join(self.output_dir, "lib", "jni", self.board.AbiName(), "libc++_shared.so"),
+                "jni/%s/libc++_shared.so" % self.board.AbiName())

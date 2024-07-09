@@ -14,6 +14,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ENERGY_MANAGEMENT_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+
 import logging
 
 import chip.clusters as Clusters
@@ -62,24 +69,29 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                              "Accuracy measurementType must be ElectricalEnergy")
 
         self.step("3")
-        cumulativeEnergyImported = await self.read_eem_attribute_expect_success("CumulativeEnergyImported")
-        logger.info(f"Rx'd CumulativeEnergyImported: {cumulativeEnergyImported}")
+        if self.pics_guard(self.check_pics("EEM.S.A0001")):
+            cumulativeEnergyImported = await self.read_eem_attribute_expect_success("CumulativeEnergyImported")
+            logger.info(f"Rx'd CumulativeEnergyImported: {cumulativeEnergyImported}")
 
         self.step("4")
-        cumulativeEnergyExported = await self.read_eem_attribute_expect_success("CumulativeEnergyExported")
-        logger.info(f"Rx'd CumulativeEnergyExported: {cumulativeEnergyExported}")
+        if self.pics_guard(self.check_pics("EEM.S.A0002")):
+            cumulativeEnergyExported = await self.read_eem_attribute_expect_success("CumulativeEnergyExported")
+            logger.info(f"Rx'd CumulativeEnergyExported: {cumulativeEnergyExported}")
 
         self.step("5")
-        periodicEnergyImported = await self.read_eem_attribute_expect_success("PeriodicEnergyImported")
-        logger.info(f"Rx'd PeriodicEnergyImported: {periodicEnergyImported}")
+        if self.pics_guard(self.check_pics("EEM.S.A0003")):
+            periodicEnergyImported = await self.read_eem_attribute_expect_success("PeriodicEnergyImported")
+            logger.info(f"Rx'd PeriodicEnergyImported: {periodicEnergyImported}")
 
         self.step("6")
-        periodicEnergyExported = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
-        logger.info(f"Rx'd PeriodicEnergyExported: {periodicEnergyExported}")
+        if self.pics_guard(self.check_pics("EEM.S.A0004")):
+            periodicEnergyExported = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
+            logger.info(f"Rx'd PeriodicEnergyExported: {periodicEnergyExported}")
 
         self.step("7")
-        cumulativeEnergyReset = await self.read_eem_attribute_expect_success("CumulativeEnergyReset")
-        logger.info(f"Rx'd CumulativeEnergyReset: {cumulativeEnergyReset}")
+        if self.pics_guard(self.check_pics("EEM.S.A0005")):
+            cumulativeEnergyReset = await self.read_eem_attribute_expect_success("CumulativeEnergyReset")
+            logger.info(f"Rx'd CumulativeEnergyReset: {cumulativeEnergyReset}")
 
 
 if __name__ == "__main__":

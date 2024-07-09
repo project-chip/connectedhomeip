@@ -133,6 +133,14 @@ groups:
             teams: [reviewers-google]
         reviews:
             request: 10
+    shared-reviewers-grundfos:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-grundfos]
+        reviews:
+            request: 10
     shared-reviewers-irobot:
         type: optional
         conditions:
@@ -165,12 +173,28 @@ groups:
             teams: [reviewers-nordic]
         reviews:
             request: 10
+    shared-reviewers-nxp:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-nxp]
+        reviews:
+            request: 10
     shared-reviewers-samsung:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
             teams: [reviewers-samsung]
+        reviews:
+            request: 10
+    shared-reviewers-eve:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-eve]
         reviews:
             request: 10
     # shared-reviewers-signify disabled for now, because the reviewers-signify

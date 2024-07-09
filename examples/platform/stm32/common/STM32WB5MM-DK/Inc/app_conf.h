@@ -87,109 +87,10 @@ extern "C" {
 #define RX_1M 0x01
 #define RX_2M 0x02
 
-/* freertos defines */
-#define CFG_SHCI_USER_EVT_PROCESS_NAME "SHCI_USER_EVT_PROCESS"
-#define CFG_SHCI_USER_EVT_PROCESS_ATTR_BITS (0)
-#define CFG_SHCI_USER_EVT_PROCESS_CB_MEM (0)
-#define CFG_SHCI_USER_EVT_PROCESS_CB_SIZE (0)
-#define CFG_SHCI_USER_EVT_PROCESS_STACK_MEM (0)
-#define CFG_SHCI_USER_EVT_PROCESS_PRIORITY osPriorityNormal
-#define CFG_SHCI_USER_EVT_PROCESS_STACK_SIZE (128 * 20)
-
-#define CFG_PUSH_BUTTON_EVT_PROCESS_NAME "PUSH_BUTTON_EVT_PROCESS"
-#define CFG_PUSH_BUTTON_EVT_PROCESS_ATTR_BITS (0)
-#define CFG_PUSH_BUTTON_EVT_PROCESS_CB_MEM (0)
-#define CFG_PUSH_BUTTON_EVT_PROCESS_CB_SIZE (0)
-#define CFG_PUSH_BUTTON_EVT_PROCESS_STACK_MEM (0)
-#define CFG_PUSH_BUTTON_EVT_PROCESS_PRIORITY osPriorityNormal
-#define CFG_PUSH_BUTTON_EVT_PROCESS_STACK_SIZE (128 * 4)
-
-#define CFG_SEND_COAP_NAME "SEND_COAP_EVT_PROCESS"
-
-#define CFG_SWITCH_PROTOCOL_EVT_PROCESS_NAME "SWITCH_PROTCOL_EVT_PROCESS"
-#define CFG_SWITCH_PROTOCOL_EVT_PROCESS_ATTR_BITS (0)
-#define CFG_SWITCH_PROTOCOL_EVT_PROCESS_CB_MEM (0)
-#define CFG_SWITCH_PROTOCOL_EVT_PROCESS_CB_SIZE (0)
-#define CFG_SWITCH_PROTOCOL_EVT_PROCESS_STACK_MEM (0)
-#define CFG_SWITCH_PROTOCOL_EVT_PROCESS_PRIORITY osPriorityNormal
-#define CFG_SWITCH_PROTOCOL_EVT_PROCESS_STACK_SIZE (128 * 8)
-
-#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME "THREAD_MSG_M0_TO_M4_PROCESS"
-#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_ATTR_BITS (0)
-#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_MEM (0)
-#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_SIZE (0)
-#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_MEM (0)
-#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_PRIORITY osPriorityNormal
-#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_SIZE (128 * 8)
-
-#define CFG_THREAD_CLI_PROCESS_NAME "THREAD_CLI_PROCESS"
-#define CFG_THREAD_CLI_PROCESS_ATTR_BITS (0)
-#define CFG_THREAD_CLI_PROCESS_CB_MEM (0)
-#define CFG_THREAD_CLI_PROCESS_CB_SIZE (0)
-#define CFG_THREAD_CLI_PROCESS_STACK_MEM (0)
-#define CFG_THREAD_CLI_PROCESS_PRIORITY osPriorityNormal
-#define CFG_THREAD_CLI_PROCESS_STACK_SIZE (128 * 8)
-
-#define CFG_THREAD_SEND_COAP_MSG_PROCESS_NAME "THREAD_SEND_COAP_MSG_PROCESS"
-#define CFG_THREAD_SEND_COAP_MSG_PROCESS_ATTR_BITS (0)
-#define CFG_THREAD_SEND_COAP_MSG_PROCESS_CB_MEM (0)
-#define CFG_THREAD_SEND_COAP_MSG_PROCESS_CB_SIZE (0)
-#define CFG_THREAD_SEND_COAP_MSG_PROCESS_STACK_MEM (0)
-#define CFG_THREAD_SEND_COAP_MSG_PROCESS_PRIORITY osPriorityNormal
-#define CFG_THREAD_SEND_COAP_MSG_PROCESS_STACk_SIZE (128 * 8)
-
-#define CFG_THREAD_SET_SED_MODE_PROCESS_NAME "THREAD_SET_SED_MODE_PROCESS"
-#define CFG_THREAD_SET_SED_MODE_PROCESS_ATTR_BITS (0)
-#define CFG_THREAD_SET_SED_MODE_PROCESS_CB_MEM (0)
-#define CFG_THREAD_SET_SED_MODE_PROCESS_CB_SIZE (0)
-#define CFG_THREAD_SET_SED_MODE_PROCESS_STACK_MEM (0)
-#define CFG_THREAD_SET_SED_MODE_PROCESS_PRIORITY osPriorityNormal
-#define CFG_THREAD_SET_SED_MODE_PROCESS_STACk_SIZE (128 * 8)
-
-#define CFG_HCI_USER_EVT_PROCESS_NAME "HCI_USER_EVT_PROCESS"
-#define CFG_HCI_USER_EVT_PROCESS_ATTR_BITS (0)
-#define CFG_HCI_USER_EVT_PROCESS_CB_MEM (0)
-#define CFG_HCI_USER_EVT_PROCESS_CB_SIZE (0)
-#define CFG_HCI_USER_EVT_PROCESS_STACK_MEM (0)
-#define CFG_HCI_USER_EVT_PROCESS_PRIORITY osPriorityNormal
-#define CFG_HCI_USER_EVT_PROCESS_STACK_SIZE (128 * 40)
-
-#define CFG_ADV_UPDATE_PROCESS_NAME "ADV_UPDATE_PROCESS"
-#define CFG_ADV_UPDATE_PROCESS_ATTR_BITS (0)
-#define CFG_ADV_UPDATE_PROCESS_CB_MEM (0)
-#define CFG_ADV_UPDATE_PROCESS_CB_SIZE (0)
-#define CFG_ADV_UPDATE_PROCESS_STACK_MEM (0)
-#define CFG_ADV_UPDATE_PROCESS_PRIORITY osPriorityNormal
-#define CFG_ADV_UPDATE_PROCESS_STACK_SIZE (128 * 20)
-
-#define CFG_P2P_SERVER_PROCESS_NAME "P2P_SERVER_PROCESS"
-#define CFG_P2P_SERVER_PROCESS_ATTR_BITS (0)
-#define CFG_P2P_SERVER_PROCESS_CB_MEM (0)
-#define CFG_P2P_SERVER_PROCESS_CB_SIZE (0)
-#define CFG_P2P_SERVER_PROCESS_STACK_MEM (0)
-#define CFG_P2P_SERVER_PROCESS_PRIORITY osPriorityNormal
-#define CFG_P2P_SERVER_PROCESS_STACK_SIZE (128 * 20)
-
-#define LED_PROCESS_NAME "LED_CUBE_PROCESS"
-#define LED_PROCESS_ATTR_BITS (0)
-#define LED_PROCESS_CB_MEM (0)
-#define LED_PROCESS_CB_SIZE (0)
-#define LED_PROCESS_STACK_MEM (0)
-#define LED_PROCESS_PRIORITY osPriorityNormal
-#define LED_PROCESS_STACK_SIZE (128 * 10)
-
-#define APPTASK_NAME "APPTASK"
-#define APP_ATTR_BITS (0)
-#define APP_CB_MEM (0)
-#define APP_CB_SIZE (0)
-#define APP_STACK_MEM (0)
-#define APP_PRIORITY osPriorityNormal
-#define APP_STACK_SIZE (1024 * 6)
-
 /**
  *   Identity root key used to derive LTK and CSRK
  */
-#define CFG_BLE_IRK                                                                                                                \
+#define CFG_BLE_IR                                                                                                                 \
     {                                                                                                                              \
         0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0                             \
     }
@@ -197,7 +98,7 @@ extern "C" {
 /**
  * Encryption root key used to derive LTK and CSRK
  */
-#define CFG_BLE_ERK                                                                                                                \
+#define CFG_BLE_ER                                                                                                                 \
     {                                                                                                                              \
         0xfe, 0xdc, 0xba, 0x09, 0x87, 0x65, 0x43, 0x21, 0xfe, 0xdc, 0xba, 0x09, 0x87, 0x65, 0x43, 0x21                             \
     }
@@ -236,11 +137,11 @@ extern "C" {
 #define CONN_P(x) ((int) ((x) / 1.25f))
 
 /*  L2CAP Connection Update request parameters used for test only with smart Phone */
-#define L2CAP_REQUEST_NEW_CONN_PARAM 1
+#define L2CAP_REQUEST_NEW_CONN_PARAM 0
 
 #define L2CAP_INTERVAL_MIN CONN_P(1000) /* 1s */
 #define L2CAP_INTERVAL_MAX CONN_P(1000) /* 1s */
-#define L2CAP_SLAVE_LATENCY 0x0000
+#define L2CAP_PERIPHERAL_LATENCY 0x0000
 #define L2CAP_TIMEOUT_MULTIPLIER 0x1F4
 
 /******************************************************************************
@@ -301,12 +202,12 @@ extern "C" {
 #define CFG_BLE_DATA_LENGTH_EXTENSION 1
 
 /**
- * Sleep clock accuracy in Slave mode (ppm value)
+ * Sleep clock accuracy in Peripheral mode (ppm value)
  */
-#define CFG_BLE_SLAVE_SCA 500
+#define CFG_BLE_PERIPHERAL_SCA 500
 
 /**
- * Sleep clock accuracy in Master mode
+ * Sleep clock accuracy in Central mode
  * 0 : 251 ppm to 500 ppm
  * 1 : 151 ppm to 250 ppm
  * 2 : 101 ppm to 150 ppm
@@ -316,14 +217,14 @@ extern "C" {
  * 6 : 21 ppm to 30 ppm
  * 7 : 0 ppm to 20 ppm
  */
-#define CFG_BLE_MASTER_SCA 0
+#define CFG_BLE_CENTRAL_SCA 0
 
 /**
  *  Source for the 32 kHz slow speed clock
  *  1 : internal RO
  *  0 : external crystal ( no calibration )
  */
-#define CFG_BLE_LSE_SOURCE 0
+#define CFG_BLE_LS_SOURCE 0
 
 /**
  * Start up time of the high speed (16 or 32 MHz) crystal oscillator in units of 625/256 us (~2.44 us)
@@ -331,7 +232,7 @@ extern "C" {
 #define CFG_BLE_HSE_STARTUP_TIME 0x148
 
 /**
- * Maximum duration of the connection event when the device is in Slave mode in units of 625/256 us (~2.44 us)
+ * Maximum duration of the connection event when the device is in Peripheral mode in units of 625/256 us (~2.44 us)
  */
 #define CFG_BLE_MAX_CONN_EVENT_LENGTH (0xFFFFFFFF)
 
@@ -512,6 +413,7 @@ extern "C" {
 
 /** tick timer value in us */
 #define CFG_TS_TICK_VAL DIVR((CFG_RTCCLK_DIV * 1000000), LSE_VALUE)
+#define CFG_TS_TICK_VAL_PS DIVR(((uint64_t) CFG_RTCCLK_DIV * 1e12), (uint64_t) LSE_VALUE)
 
 typedef enum
 {
@@ -631,6 +533,16 @@ typedef enum
 #endif /* CFG_FULL_LOW_POWER */
 /* USER CODE END Defines */
 
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_NAME "CONN_INT_UPD_REQ"
+#define CFG_CONN_INT_UPD_REQ_PROCESS_ATTR_BITS (0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_CB_MEM (0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_CB_SIZE (0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_STACK_MEM (0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_PRIORITY osPriorityNormal
+#define CFG_CONN_INT_UPD_REQ_PROCESS_STACK_SIZE (128 * 8)
+#endif
+
 /******************************************************************************
  * LOW POWER
  ******************************************************************************/
@@ -649,11 +561,123 @@ typedef enum
 } CFG_LPM_Id_t;
 
 /******************************************************************************
+ * FreeRTOS
+ ******************************************************************************/
+/* USER CODE BEGIN FreeRTOS */
+
+#define CFG_SHCI_USER_EVT_PROCESS_NAME "SHCI_USER_EVT_PROCESS"
+#define CFG_SHCI_USER_EVT_PROCESS_ATTR_BITS (0)
+#define CFG_SHCI_USER_EVT_PROCESS_CB_MEM (0)
+#define CFG_SHCI_USER_EVT_PROCESS_CB_SIZE (0)
+#define CFG_SHCI_USER_EVT_PROCESS_STACK_MEM (0)
+#define CFG_SHCI_USER_EVT_PROCESS_PRIORITY osPriorityNone
+#define CFG_SHCI_USER_EVT_PROCESS_STACK_SIZE (128 * 20)
+
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME "THREAD_MSG_M0_TO_M4_PROCESS"
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_ATTR_BITS (0)
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_MEM (0)
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_SIZE (0)
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_MEM (0)
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_PRIORITY osPriorityLow
+#define CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_SIZE (128 * 8)
+
+#define CFG_THREAD_CLI_PROCESS_NAME "THREAD_CLI_PROCESS"
+#define CFG_THREAD_CLI_PROCESS_ATTR_BITS (0)
+#define CFG_THREAD_CLI_PROCESS_CB_MEM (0)
+#define CFG_THREAD_CLI_PROCESS_CB_SIZE (0)
+#define CFG_THREAD_CLI_PROCESS_STACK_MEM (0)
+#define CFG_THREAD_CLI_PROCESS_PRIORITY osPriorityNormal
+#define CFG_THREAD_CLI_PROCESS_STACK_SIZE (128 * 8)
+
+#define CFG_HCI_USER_EVT_PROCESS_NAME "HCI_USER_EVT_PROCESS"
+#define CFG_HCI_USER_EVT_PROCESS_ATTR_BITS (0)
+#define CFG_HCI_USER_EVT_PROCESS_CB_MEM (0)
+#define CFG_HCI_USER_EVT_PROCESS_CB_SIZE (0)
+#define CFG_HCI_USER_EVT_PROCESS_STACK_MEM (0)
+#define CFG_HCI_USER_EVT_PROCESS_PRIORITY osPriorityNone
+#define CFG_HCI_USER_EVT_PROCESS_STACK_SIZE (128 * 40)
+
+#define CFG_ADV_CANCEL_PROCESS_NAME "ADV_CANCEL_PROCESS"
+#define CFG_ADV_CANCEL_PROCESS_ATTR_BITS (0)
+#define CFG_ADV_CANCEL_PROCESS_CB_MEM (0)
+#define CFG_ADV_CANCEL_PROCESS_CB_SIZE (0)
+#define CFG_ADV_CANCEL_PROCESS_STACK_MEM (0)
+#define CFG_ADV_CANCEL_PROCESS_PRIORITY osPriorityNormal
+#define CFG_ADV_CANCEL_PROCESS_STACK_SIZE (128 * 8)
+
+#define CFG_P2PS_SEND_NOTIF_PROCESS_NAME "P2PS_SEND_NOTIF_PROCESS"
+#define CFG_P2PS_SEND_NOTIF_PROCESS_ATTR_BITS (0)
+#define CFG_P2PS_SEND_NOTIF_PROCESS_CB_MEM (0)
+#define CFG_P2PS_SEND_NOTIF_PROCESS_CB_SIZE (0)
+#define CFG_P2PS_SEND_NOTIF_PROCESS_STACK_MEM (0)
+#define CFG_P2PS_SEND_NOTIF_PROCESS_PRIORITY osPriorityNormal
+#define CFG_P2PS_SEND_NOTIF_PROCESS_STACK_SIZE (128 * 8)
+
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_NAME "CONN_INT_UPD_REQ"
+#define CFG_CONN_INT_UPD_REQ_PROCESS_ATTR_BITS (0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_CB_MEM (0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_CB_SIZE (0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_STACK_MEM (0)
+#define CFG_CONN_INT_UPD_REQ_PROCESS_PRIORITY osPriorityNormal
+#define CFG_CONN_INT_UPD_REQ_PROCESS_STACK_SIZE (128 * 8)
+#endif
+
+#define APPTASK_NAME "APPTASK"
+#define APP_ATTR_BITS (0)
+#define APP_CB_MEM (0)
+#define APP_CB_SIZE (0)
+#define APP_STACK_MEM (0)
+#define APP_PRIORITY osPriorityNormal
+#define APP_STACK_SIZE (1024 * 6)
+
+#define CFG_PUSH_BUTTON_EVT_PROCESS_NAME "PUSH_BUTTON_EVT_PROCESS"
+#define CFG_PUSH_BUTTON_EVT_PROCESS_ATTR_BITS (0)
+#define CFG_PUSH_BUTTON_EVT_PROCESS_CB_MEM (0)
+#define CFG_PUSH_BUTTON_EVT_PROCESS_CB_SIZE (0)
+#define CFG_PUSH_BUTTON_EVT_PROCESS_STACK_MEM (0)
+#define CFG_PUSH_BUTTON_EVT_PROCESS_PRIORITY osPriorityNormal
+#define CFG_PUSH_BUTTON_EVT_PROCESS_STACK_SIZE (128 * 4)
+/* USER CODE END FreeRTOS_Defines */
+
+/******************************************************************************
  * OTP manager
  ******************************************************************************/
 #define CFG_OTP_BASE_ADDRESS OTP_AREA_BASE
 
-#define CFG_OTP_END_ADDRESS OTP_AREA_END_ADDR
+#define CFG_OTP_END_ADRESS OTP_AREA_END_ADDR
+
+/******************************************************************************
+ * OTA support
+ ******************************************************************************/
+#define OTA_SUPPORT 0
+
+/******************************************************************************
+ * LCD support
+ ******************************************************************************/
+#define CFG_LCD_SUPPORTED 1
+
+#if ((OTA_SUPPORT == 1) || (CFG_FULL_LOW_POWER == 1))
+/******************************************************************************
+ * LCD support
+ ******************************************************************************/
+#undef CFG_LCD_SUPPORTED
+#define CFG_LCD_SUPPORTED 0
+#endif
+
+/******************************************************************************
+ * versions
+ ******************************************************************************/
+#define X_CUBE_MATTER_VERSION "1.0.3"
+#define PRODUCT_NAME "Dimmable Light"
+#define VENDOR_NAME "STMicroelectronics"
+#define HARDWARE_VERSION "STM32WB5MM-DK"
+#define MATTER_SDK_VERSION "github CSA"
+
+/******************************************************************************
+ * Matter Factory data
+ ******************************************************************************/
+#define CONFIG_STM32_FACTORY_DATA_ENABLE 0
 
 typedef enum
 {

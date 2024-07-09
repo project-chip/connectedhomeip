@@ -157,11 +157,3 @@ tests:
           [1653636406.637617][11116:11121] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_000A DataVersion: 1527020963
           [1653636406.637708][11116:11121] CHIP:TOO:   SoftwareVersion: 1
       disabled: true
-
-    - label:
-          "Step 6: Apply the OTA Update on DUT using vendor specific mechanism."
-      PICS: MCORE.OTA.VendorSpecific
-      verification: |
-          Use vendor specific steps to apply OTA Update and verify that the DUT starts updating its software.
-          Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
-      disabled: true

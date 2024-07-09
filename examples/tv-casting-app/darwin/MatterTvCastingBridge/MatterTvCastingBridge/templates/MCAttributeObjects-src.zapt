@@ -14,13 +14,11 @@
 #import <Foundation/Foundation.h>
 
 {{#zcl_clusters}}
-{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 {{#if (isInConfigList name "MatterCastingClusters")}}
 
 // {{asUpperCamelCase name}} cluster attributes:
 
 {{#zcl_attributes_server removeKeys='isOptional'}}
-{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Attribute
 - (void)read:(void * _Nullable)context
     completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
@@ -57,7 +55,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        //auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         {{asObjectiveCType type parent.name structTypePrefix="MC"}} value;
         {{>decode_value target="value" source="_cppValue" cluster=parent.name errorCode="*aError = err; return nil;" depth=0}}
@@ -68,8 +65,6 @@
 }
 @end
 
-{{/if}}
 {{/zcl_attributes_server}}
-{{/if}}
 {{/if}}
 {{/zcl_clusters}}

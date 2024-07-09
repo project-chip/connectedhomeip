@@ -24,6 +24,7 @@
 #include "CastingServer.h"
 #include "CastingUtils.h"
 #include "app/clusters/bindings/BindingManager.h"
+#include <CommissionableInit.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
@@ -33,6 +34,13 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+
+using namespace chip;
+using namespace chip::DeviceLayer;
+
+namespace {
+LinuxCommissionableDataProvider gCommissionableDataProvider;
+}
 
 namespace chip {
 namespace Shell {
@@ -83,7 +91,7 @@ void PrintBindings()
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                        binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
     }
 }
 
@@ -119,6 +127,17 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         char * eptr;
         int index = (int) strtol(argv[1], &eptr, 10);
         return RequestCommissioning(index);
+    }
+    if (strcmp(argv[0], "setusecommissionerpasscode") == 0)
+    {
+        ChipLogProgress(DeviceLayer, "setusecommissionerpasscode");
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+        int useCP = (int) strtol(argv[1], &eptr, 10);
+        CastingServer::GetInstance()->SetCommissionerPasscodeEnabled(useCP == 1);
     }
     if (strcmp(argv[0], "launch") == 0)
     {
@@ -179,6 +198,8 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
 
         Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
         id.SetCommissionerPasscode(true);
+        id.SetVendorId(1244); // set non-standard vid-pid to prevent dummy content apps from returning a passcode
+        id.SetProductId(2234);
         if (argc > 3)
         {
             id.SetCommissionerPasscodeReady(strcmp(argv[3], "t") == 0);
@@ -201,6 +222,20 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         }
         return Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(commissioner, port),
                                                                           id);
+    }
+    if (strcmp(argv[0], "setcommissionerpasscode") == 0)
+    {
+
+        char * eptr;
+        uint32_t passcode                                      = (uint32_t) strtol(argv[1], &eptr, 10);
+        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = passcode;
+
+        VerifyOrDie(chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider,
+                                                                   LinuxDeviceOptions::GetInstance()) == CHIP_NO_ERROR);
+
+        DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
+
+        CastingServer::GetInstance()->SetCommissionerPasscodeReady();
     }
     if (strcmp(argv[0], "testudc") == 0)
     {

@@ -66,7 +66,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val arg3: List<UByte>,
     val arg4: List<Boolean>,
     val arg5: UByte,
-    val arg6: Boolean
+    val arg6: Boolean,
   )
 
   class BooleanResponse(val value: Boolean)
@@ -79,7 +79,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val wasPresent: Boolean,
     val wasNull: Boolean?,
     val value: UByte?,
-    val originalValue: UByte?
+    val originalValue: UByte?,
   )
 
   class TestComplexNullableOptionalResponse(
@@ -110,7 +110,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val optionalListValue: List<UByte>?,
     val nullableOptionalListWasPresent: Boolean,
     val nullableOptionalListWasNull: Boolean?,
-    val nullableOptionalListValue: List<UByte>?
+    val nullableOptionalListValue: List<UByte>?,
   )
 
   class SimpleStructResponse(val arg1: UnitTestingClusterSimpleStruct)
@@ -120,6 +120,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   class TestEmitTestFabricScopedEventResponse(val value: ULong)
 
   class TestBatchHelperResponse(val buffer: ByteArray)
+
+  class StringEchoResponse(val payload: ByteArray)
 
   class TestDifferentVendorMeiResponse(val arg1: UByte, val eventNumber: ULong)
 
@@ -590,7 +592,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -608,7 +610,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -626,7 +628,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -667,7 +669,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -677,7 +679,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   suspend fun testAddArguments(
     arg1: UByte,
     arg2: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestAddArgumentsResponse {
     val commandId: UInt = 4u
 
@@ -695,7 +697,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -727,7 +729,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testSimpleArgumentRequest(
     arg1: Boolean,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestSimpleArgumentResponse {
     val commandId: UInt = 5u
 
@@ -742,7 +744,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -779,7 +781,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     arg4: List<Boolean>,
     arg5: UByte,
     arg6: Boolean,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestStructArrayArgumentResponse {
     val commandId: UInt = 6u
 
@@ -825,7 +827,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -941,13 +943,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       arg3_decoded,
       arg4_decoded,
       arg5_decoded,
-      arg6_decoded
+      arg6_decoded,
     )
   }
 
   suspend fun testStructArgumentRequest(
     arg1: UnitTestingClusterSimpleStruct,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): BooleanResponse {
     val commandId: UInt = 7u
 
@@ -962,7 +964,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -994,7 +996,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testNestedStructArgumentRequest(
     arg1: UnitTestingClusterNestedStruct,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): BooleanResponse {
     val commandId: UInt = 8u
 
@@ -1009,7 +1011,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1041,7 +1043,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListStructArgumentRequest(
     arg1: List<UnitTestingClusterSimpleStruct>,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): BooleanResponse {
     val commandId: UInt = 9u
 
@@ -1060,7 +1062,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1092,7 +1094,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListInt8UArgumentRequest(
     arg1: List<UByte>,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): BooleanResponse {
     val commandId: UInt = 10u
 
@@ -1111,7 +1113,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1143,7 +1145,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testNestedStructListArgumentRequest(
     arg1: UnitTestingClusterNestedStructList,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): BooleanResponse {
     val commandId: UInt = 11u
 
@@ -1158,7 +1160,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1190,7 +1192,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListNestedStructListArgumentRequest(
     arg1: List<UnitTestingClusterNestedStructList>,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): BooleanResponse {
     val commandId: UInt = 12u
 
@@ -1209,7 +1211,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1241,7 +1243,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListInt8UReverseRequest(
     arg1: List<UByte>,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestListInt8UReverseResponse {
     val commandId: UInt = 13u
 
@@ -1260,7 +1262,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1300,7 +1302,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   suspend fun testEnumsRequest(
     arg1: UShort,
     arg2: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestEnumsResponse {
     val commandId: UInt = 14u
 
@@ -1318,7 +1320,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1361,7 +1363,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testNullableOptionalRequest(
     arg1: UByte?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestNullableOptionalResponse {
     val commandId: UInt = 15u
 
@@ -1376,7 +1378,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1463,7 +1465,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       wasPresent_decoded,
       wasNull_decoded,
       value_decoded,
-      originalValue_decoded
+      originalValue_decoded,
     )
   }
 
@@ -1480,7 +1482,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     nullableList: List<UByte>?,
     optionalList: List<UByte>?,
     nullableOptionalList: List<UByte>?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestComplexNullableOptionalResponse {
     val commandId: UInt = 16u
 
@@ -1560,7 +1562,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2026,13 +2028,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       optionalListValue_decoded,
       nullableOptionalListWasPresent_decoded,
       nullableOptionalListWasNull_decoded,
-      nullableOptionalListValue_decoded
+      nullableOptionalListValue_decoded,
     )
   }
 
   suspend fun simpleStructEchoRequest(
     arg1: UnitTestingClusterSimpleStruct,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): SimpleStructResponse {
     val commandId: UInt = 17u
 
@@ -2047,7 +2049,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2088,7 +2090,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2097,7 +2099,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testSimpleOptionalArgumentRequest(
     arg1: Boolean?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 19u
 
@@ -2112,7 +2114,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2123,7 +2125,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     arg1: UByte,
     arg2: UByte,
     arg3: Boolean,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestEmitTestEventResponse {
     val commandId: UInt = 20u
 
@@ -2144,7 +2146,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2176,7 +2178,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testEmitTestFabricScopedEventRequest(
     arg1: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestEmitTestFabricScopedEventResponse {
     val commandId: UInt = 21u
 
@@ -2191,7 +2193,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2225,7 +2227,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     sleepBeforeResponseTimeMs: UShort,
     sizeOfResponseBuffer: UShort,
     fillCharacter: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestBatchHelperResponse {
     val commandId: UInt = 22u
 
@@ -2235,7 +2237,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ: Int = 0
     tlvWriter.put(
       ContextSpecificTag(TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ),
-      sleepBeforeResponseTimeMs
+      sleepBeforeResponseTimeMs,
     )
 
     val TAG_SIZE_OF_RESPONSE_BUFFER_REQ: Int = 1
@@ -2249,7 +2251,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2283,7 +2285,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     sleepBeforeResponseTimeMs: UShort,
     sizeOfResponseBuffer: UShort,
     fillCharacter: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestBatchHelperResponse {
     val commandId: UInt = 23u
 
@@ -2293,7 +2295,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ: Int = 0
     tlvWriter.put(
       ContextSpecificTag(TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ),
-      sleepBeforeResponseTimeMs
+      sleepBeforeResponseTimeMs,
     )
 
     val TAG_SIZE_OF_RESPONSE_BUFFER_REQ: Int = 1
@@ -2307,7 +2309,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2337,9 +2339,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return TestBatchHelperResponse(buffer_decoded)
   }
 
+  suspend fun stringEchoRequest(
+    payload: ByteArray,
+    timedInvokeTimeout: Duration? = null,
+  ): StringEchoResponse {
+    val commandId: UInt = 24u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_PAYLOAD_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_PAYLOAD_REQ), payload)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_PAYLOAD: Int = 0
+    var payload_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_PAYLOAD)) {
+        payload_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (payload_decoded == null) {
+      throw IllegalStateException("payload not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return StringEchoResponse(payload_decoded)
+  }
+
   suspend fun testDifferentVendorMeiRequest(
     arg1: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): TestDifferentVendorMeiResponse {
     val commandId: UInt = 4294049962u
 
@@ -2354,7 +2403,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2439,10 +2488,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2468,7 +2517,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeBooleanAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -2481,7 +2530,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2560,10 +2609,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2589,7 +2638,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeBitmap8Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -2602,7 +2651,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2681,10 +2730,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2710,7 +2759,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeBitmap16Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
@@ -2723,7 +2772,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2802,10 +2851,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2831,7 +2880,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeBitmap32Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
@@ -2844,7 +2893,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -2923,10 +2972,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2952,7 +3001,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeBitmap64Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ULongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
@@ -2965,7 +3014,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3044,10 +3093,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3073,7 +3122,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt8uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
@@ -3086,7 +3135,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3165,10 +3214,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3194,7 +3243,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt16uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
@@ -3207,7 +3256,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3286,10 +3335,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3315,7 +3364,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt24uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
@@ -3328,7 +3377,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3407,10 +3456,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3436,7 +3485,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt32uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
@@ -3449,7 +3498,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3528,10 +3577,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3557,7 +3606,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt40uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ULongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
@@ -3570,7 +3619,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3649,10 +3698,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3678,7 +3727,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt48uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ULongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
@@ -3691,7 +3740,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3770,10 +3819,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3799,7 +3848,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt56uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ULongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 11u
     val attributePaths =
@@ -3812,7 +3861,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -3891,10 +3940,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3920,7 +3969,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt64uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ULongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 12u
     val attributePaths =
@@ -3933,7 +3982,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4012,10 +4061,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4041,7 +4090,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt8sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 13u
     val attributePaths =
@@ -4054,7 +4103,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4133,10 +4182,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4162,7 +4211,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt16sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 14u
     val attributePaths =
@@ -4175,7 +4224,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4254,10 +4303,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4283,7 +4332,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt24sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<IntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 15u
     val attributePaths =
@@ -4296,7 +4345,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4375,10 +4424,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4404,7 +4453,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt32sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<IntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16u
     val attributePaths =
@@ -4417,7 +4466,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4496,10 +4545,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4525,7 +4574,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt40sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 17u
     val attributePaths =
@@ -4538,7 +4587,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4617,10 +4666,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4646,7 +4695,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt48sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 18u
     val attributePaths =
@@ -4659,7 +4708,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4738,10 +4787,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4767,7 +4816,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt56sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 19u
     val attributePaths =
@@ -4780,7 +4829,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4859,10 +4908,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4888,7 +4937,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeInt64sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<LongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 20u
     val attributePaths =
@@ -4901,7 +4950,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -4980,10 +5029,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5009,7 +5058,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeEnum8Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 21u
     val attributePaths =
@@ -5022,7 +5071,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5101,10 +5150,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5130,7 +5179,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeEnum16Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 22u
     val attributePaths =
@@ -5143,7 +5192,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5222,10 +5271,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5251,7 +5300,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeFloatSingleAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<FloatSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 23u
     val attributePaths =
@@ -5264,7 +5313,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5343,10 +5392,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5372,7 +5421,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeFloatDoubleAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<DoubleSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 24u
     val attributePaths =
@@ -5385,7 +5434,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5464,10 +5513,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5493,7 +5542,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeOctetStringAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ByteArraySubscriptionState> {
     val ATTRIBUTE_ID: UInt = 25u
     val attributePaths =
@@ -5506,7 +5555,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5596,10 +5645,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5625,7 +5674,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeListInt8uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ListInt8uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 26u
     val attributePaths =
@@ -5638,7 +5687,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5720,7 +5769,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListOctetStringAttribute(
     value: List<ByteArray>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 27u
 
@@ -5738,10 +5787,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5767,7 +5816,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeListOctetStringAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ListOctetStringAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 27u
     val attributePaths =
@@ -5780,7 +5829,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -5864,7 +5913,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListStructOctetStringAttribute(
     value: List<UnitTestingClusterTestListStructOctet>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 28u
 
@@ -5882,10 +5931,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5911,7 +5960,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeListStructOctetStringAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ListStructOctetStringAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 28u
     val attributePaths =
@@ -5924,7 +5973,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6012,10 +6061,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6041,7 +6090,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeLongOctetStringAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ByteArraySubscriptionState> {
     val ATTRIBUTE_ID: UInt = 29u
     val attributePaths =
@@ -6054,7 +6103,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6135,10 +6184,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6164,7 +6213,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeCharStringAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<StringSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 30u
     val attributePaths =
@@ -6177,7 +6226,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6256,10 +6305,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6285,7 +6334,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeLongCharStringAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<StringSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 31u
     val attributePaths =
@@ -6298,7 +6347,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6379,10 +6428,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6408,7 +6457,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeEpochUsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ULongSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 32u
     val attributePaths =
@@ -6421,7 +6470,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6500,10 +6549,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6529,7 +6578,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeEpochSAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 33u
     val attributePaths =
@@ -6542,7 +6591,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6621,10 +6670,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6650,7 +6699,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeVendorIdAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 34u
     val attributePaths =
@@ -6663,7 +6712,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6741,7 +6790,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListNullablesAndOptionalsStructAttribute(
     value: List<UnitTestingClusterNullablesAndOptionalsStruct>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 35u
 
@@ -6759,10 +6808,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6788,7 +6837,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeListNullablesAndOptionalsStructAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ListNullablesAndOptionalsStructAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 35u
     val attributePaths =
@@ -6801,7 +6850,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -6889,10 +6938,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6918,7 +6967,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeEnumAttrAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 36u
     val attributePaths =
@@ -6931,7 +6980,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7000,7 +7049,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeStructAttrAttribute(
     value: UnitTestingClusterSimpleStruct,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 37u
 
@@ -7014,10 +7063,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7043,7 +7092,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeStructAttrAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<StructAttrAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 37u
     val attributePaths =
@@ -7056,7 +7105,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7125,7 +7174,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeRangeRestrictedInt8uAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 38u
 
@@ -7139,10 +7188,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7168,7 +7217,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeRangeRestrictedInt8uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 38u
     val attributePaths =
@@ -7181,7 +7230,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7262,10 +7311,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7291,7 +7340,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeRangeRestrictedInt8sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 39u
     val attributePaths =
@@ -7304,7 +7353,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7374,7 +7423,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeRangeRestrictedInt16uAttribute(
     value: UShort,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 40u
 
@@ -7388,10 +7437,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7417,7 +7466,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeRangeRestrictedInt16uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 40u
     val attributePaths =
@@ -7430,7 +7479,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7500,7 +7549,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeRangeRestrictedInt16sAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 41u
 
@@ -7514,10 +7563,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7543,7 +7592,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeRangeRestrictedInt16sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 41u
     val attributePaths =
@@ -7556,7 +7605,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7633,7 +7682,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListLongOctetStringAttribute(
     value: List<ByteArray>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 42u
 
@@ -7651,10 +7700,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7680,7 +7729,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeListLongOctetStringAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ListLongOctetStringAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 42u
     val attributePaths =
@@ -7693,7 +7742,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7777,7 +7826,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListFabricScopedAttribute(
     value: List<UnitTestingClusterTestFabricScoped>,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 43u
 
@@ -7795,10 +7844,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7824,7 +7873,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeListFabricScopedAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<ListFabricScopedAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 43u
     val attributePaths =
@@ -7837,7 +7886,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -7925,10 +7974,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7954,7 +8003,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeTimedWriteBooleanAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 48u
     val attributePaths =
@@ -7967,7 +8016,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8037,7 +8086,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeGeneralErrorBooleanAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 49u
 
@@ -8051,10 +8100,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8080,7 +8129,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeGeneralErrorBooleanAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 49u
     val attributePaths =
@@ -8093,7 +8142,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8163,7 +8212,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeClusterErrorBooleanAttribute(
     value: Boolean,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 50u
 
@@ -8177,10 +8226,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8206,7 +8255,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeClusterErrorBooleanAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 50u
     val attributePaths =
@@ -8219,7 +8268,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8305,10 +8354,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8334,7 +8383,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeUnsupportedAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 255u
     val attributePaths =
@@ -8347,7 +8396,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8437,10 +8486,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8466,7 +8515,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableBooleanAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableBooleanAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16384u
     val attributePaths =
@@ -8479,7 +8528,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8572,10 +8621,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8601,7 +8650,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableBitmap8Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableBitmap8AttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16385u
     val attributePaths =
@@ -8614,7 +8663,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8707,10 +8756,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8736,7 +8785,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableBitmap16Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableBitmap16AttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16386u
     val attributePaths =
@@ -8749,7 +8798,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8842,10 +8891,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8871,7 +8920,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableBitmap32Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableBitmap32AttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16387u
     val attributePaths =
@@ -8884,7 +8933,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -8977,10 +9026,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -9006,7 +9055,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableBitmap64Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableBitmap64AttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16388u
     val attributePaths =
@@ -9019,7 +9068,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -9112,10 +9161,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -9141,7 +9190,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt8uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt8uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16389u
     val attributePaths =
@@ -9154,7 +9203,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -9245,10 +9294,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -9274,7 +9323,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt16uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt16uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16390u
     val attributePaths =
@@ -9287,7 +9336,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -9380,10 +9429,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -9409,7 +9458,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt24uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt24uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16391u
     val attributePaths =
@@ -9422,7 +9471,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -9515,10 +9564,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -9544,7 +9593,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt32uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt32uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16392u
     val attributePaths =
@@ -9557,7 +9606,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -9650,10 +9699,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -9679,7 +9728,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt40uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt40uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16393u
     val attributePaths =
@@ -9692,7 +9741,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -9785,10 +9834,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -9814,7 +9863,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt48uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt48uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16394u
     val attributePaths =
@@ -9827,7 +9876,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -9920,10 +9969,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -9949,7 +9998,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt56uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt56uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16395u
     val attributePaths =
@@ -9962,7 +10011,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -10055,10 +10104,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -10084,7 +10133,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt64uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt64uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16396u
     val attributePaths =
@@ -10097,7 +10146,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -10190,10 +10239,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -10219,7 +10268,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt8sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt8sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16397u
     val attributePaths =
@@ -10232,7 +10281,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -10323,10 +10372,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -10352,7 +10401,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt16sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt16sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16398u
     val attributePaths =
@@ -10365,7 +10414,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -10458,10 +10507,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -10487,7 +10536,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt24sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt24sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16399u
     val attributePaths =
@@ -10500,7 +10549,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -10593,10 +10642,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -10622,7 +10671,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt32sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt32sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16400u
     val attributePaths =
@@ -10635,7 +10684,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -10728,10 +10777,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -10757,7 +10806,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt40sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt40sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16401u
     val attributePaths =
@@ -10770,7 +10819,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -10863,10 +10912,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -10892,7 +10941,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt48sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt48sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16402u
     val attributePaths =
@@ -10905,7 +10954,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -10998,10 +11047,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -11027,7 +11076,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt56sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt56sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16403u
     val attributePaths =
@@ -11040,7 +11089,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -11133,10 +11182,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -11162,7 +11211,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableInt64sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableInt64sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16404u
     val attributePaths =
@@ -11175,7 +11224,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -11268,10 +11317,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -11297,7 +11346,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableEnum8Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableEnum8AttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16405u
     val attributePaths =
@@ -11310,7 +11359,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -11401,10 +11450,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -11430,7 +11479,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableEnum16Attribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableEnum16AttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16406u
     val attributePaths =
@@ -11443,7 +11492,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -11536,10 +11585,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -11565,7 +11614,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableFloatSingleAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableFloatSingleAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16407u
     val attributePaths =
@@ -11578,7 +11627,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -11660,7 +11709,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableFloatDoubleAttribute(
     value: Double,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 16408u
 
@@ -11674,10 +11723,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -11703,7 +11752,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableFloatDoubleAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableFloatDoubleAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16408u
     val attributePaths =
@@ -11716,7 +11765,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -11798,7 +11847,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableOctetStringAttribute(
     value: ByteArray,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 16409u
 
@@ -11812,10 +11861,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -11841,7 +11890,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableOctetStringAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableOctetStringAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16409u
     val attributePaths =
@@ -11854,7 +11903,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -11947,10 +11996,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -11976,7 +12025,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableCharStringAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableCharStringAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16414u
     val attributePaths =
@@ -11989,7 +12038,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -12082,10 +12131,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -12111,7 +12160,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableEnumAttrAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableEnumAttrAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16420u
     val attributePaths =
@@ -12124,7 +12173,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -12206,7 +12255,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableStructAttribute(
     value: UnitTestingClusterSimpleStruct,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 16421u
 
@@ -12220,10 +12269,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -12249,7 +12298,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableStructAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableStructAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16421u
     val attributePaths =
@@ -12262,7 +12311,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -12344,7 +12393,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt8uAttribute(
     value: UByte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 16422u
 
@@ -12358,10 +12407,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -12387,7 +12436,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableRangeRestrictedInt8uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableRangeRestrictedInt8uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16422u
     val attributePaths =
@@ -12400,7 +12449,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -12484,7 +12533,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt8sAttribute(
     value: Byte,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 16423u
 
@@ -12498,10 +12547,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -12527,7 +12576,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableRangeRestrictedInt8sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableRangeRestrictedInt8sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16423u
     val attributePaths =
@@ -12540,7 +12589,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -12626,7 +12675,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt16uAttribute(
     value: UShort,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 16424u
 
@@ -12640,10 +12689,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -12669,7 +12718,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableRangeRestrictedInt16uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableRangeRestrictedInt16uAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16424u
     val attributePaths =
@@ -12682,7 +12731,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -12768,7 +12817,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt16sAttribute(
     value: Short,
-    timedWriteTimeout: Duration? = null
+    timedWriteTimeout: Duration? = null,
   ) {
     val ATTRIBUTE_ID: UInt = 16425u
 
@@ -12782,10 +12831,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -12811,7 +12860,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeNullableRangeRestrictedInt16sAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<NullableRangeRestrictedInt16sAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16425u
     val attributePaths =
@@ -12824,7 +12873,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -12918,10 +12967,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -12947,7 +12996,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeWriteOnlyInt8uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 16426u
     val attributePaths =
@@ -12960,7 +13009,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -13046,10 +13095,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             WriteRequest(
               attributePath =
                 AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
+              tlvPayload = tlvWriter.getEncoded(),
             )
           ),
-        timedRequest = timedWriteTimeout
+        timedRequest = timedWriteTimeout,
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -13075,7 +13124,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeMeiInt8uAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4294070017u
     val attributePaths =
@@ -13088,7 +13137,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -13163,7 +13212,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -13176,7 +13225,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -13260,7 +13309,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -13273,7 +13322,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -13357,7 +13406,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeEventListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<EventListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65530u
     val attributePaths =
@@ -13370,7 +13419,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -13452,7 +13501,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -13465,7 +13514,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -13540,7 +13589,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -13553,7 +13602,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
@@ -13621,7 +13670,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -13634,7 +13683,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         eventPaths = emptyList(),
         attributePaths = attributePaths,
         minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->

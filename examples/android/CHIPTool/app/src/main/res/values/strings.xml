@@ -10,8 +10,9 @@
     <string name="chip_device_info_product_id_label">Product ID:</string>
     <string name="chip_device_info_discriminator_label">Discriminator:</string>
     <string name="chip_device_info_setup_code_label">Setup PIN Code:</string>
+    <string name="chip_device_info_serial_number_label">Serial Number:</string>
+    <string name="chip_device_info_discovery_capabilities_label">Discovery capabilities:</string>
     <string name="chip_device_info_optional_vendor_tags_label">Optional Vendor tags:</string>
-    <string name="chip_device_info_discovery_capabilities_text">Discovery capabilities: %1s</string>
     <string name="camera_permission_missing_alert_title">Camera permission missing</string>
     <string name="camera_permission_missing_alert_subtitle">Camera permission required to be able to scan the QR code.</string>
     <string name="camera_permission_missing_alert_try_again">Try again</string>
@@ -31,6 +32,8 @@
     <string name="update_device_address_btn_text">Update address</string>
     <string name="update_device_address_failure">Device address update failed: %1$s</string>
     <string name="commissioned_device_id_text">Commissioned Device ID :</string>
+    <string name="icd_interaction_text">ICD Stay Active : </string>
+    <string name="icd_active_duration_hint_text">Duration</string>
 
     <string name="address_commissioning_title_text">Commission with IP address</string>
     <string name="default_discriminator">3840</string>
@@ -189,6 +192,8 @@
     <string name="wildcard_add_btn_text">Add</string>
     <string name="wildcard_reset_btn_text">Reset</string>
     <string name="wildcard_send_btn_text">Send</string>
+    <string name="wildcard_wait_check_in_message_btn_text">Wait Check In\nexperimental ICD Queue</string>
+    <string name="wildcard_send_when_check_in_message_btn_text">Set Send\nexperimental ICD Queue</string>
     <string name="wildcard_shutdown_subscription_btn_text">Shutdown Subscription</string>
     <string name="wildcard_subscribe_event_btn_text">Subscribe Event</string>
     <string name="wildcard_read_event_btn_text">Read Event</string>
@@ -204,6 +209,9 @@
     <string name="provision_custom_flow_btn_text">Provision CHIP device with Custom Flow</string>
     <string name="chip_device_info_commissioning_flow_label">Commissioning Flow:</string>
     <string name="chip_device_info_custom_flow_btn_text">Read from Ledger</string>
+    <string name="chip_device_info_show_qr_code_btn_text">Show QR Code Value</string>
+    <string name="chip_device_info_show_qr_code_uri_btn_text">Show QR Code</string>
+    <string name="chip_device_info_qrcode_uri">https://project-chip.github.io/connectedhomeip/qrcode.html?data=%1$s</string>
     <string name="chip_ledger_info_title">Device Model Info</string>
     <string name="chip_ledger_info_commissioning_flow_url_label">Commissioning Url:</string>
     <string name="chip_ledger_info_commissioning_flow_url_text">Loading...</string>

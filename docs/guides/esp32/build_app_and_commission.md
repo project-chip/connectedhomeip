@@ -31,8 +31,8 @@ and the ESP32S3.
 
 All the applications support variants of ESP32, ESP32C3, ESP32S3 chips.
 
-ESP32H2 and ESP32C6 are only supported and tested with lighting-app and
-all-clusters-app.
+ESP32H2 and ESP32C6 are only supported and tested with lighting-app,
+lit-icd-app, and all-clusters-app.
 
 Note: M5Stack Core 2 display is not supported in the tft component, while other
 functionality can still work fine.
@@ -83,15 +83,6 @@ functionality can still work fine.
 
     ```
     $ idf.py set-target (target chip)
-    ```
-
-    All the example applications supports target chips: esp32, esp32s3, esp32c3
-
-    ESP32H2 and ESP32C6 are only supported in lighting-app, to set it as target
-
-    ```
-    $ idf.py --preview set-target esp32h2
-    $ idf.py --preview set-target esp32c6
     ```
 
 -   Configuration Options

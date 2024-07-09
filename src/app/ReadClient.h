@@ -339,6 +339,9 @@ public:
      *  This will send either a Read Request or a Subscribe Request depending on
      *  the InteractionType this read client was initialized with.
      *
+     *  If the params contain more data version filters than can fit in the request packet
+     *  the list will be truncated as needed, i.e. filter inclusion is on a best effort basis.
+     *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
@@ -559,6 +562,8 @@ private:
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
                                           const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
+    CHIP_ERROR EncodeDataVersionFilter(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                       DataVersionFilter const & aFilter);
     CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
@@ -612,7 +617,7 @@ private:
 
     static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                       const SessionHandle & sessionHandle);
-    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+    static void HandleDeviceConnectionFailure(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo);
 
     CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
 
@@ -642,8 +647,12 @@ private:
     bool mForceCaseOnNextResub      = true;
     bool mIsResubscriptionScheduled = false;
 
+    // mMinimalResubscribeDelay is used to store the delay returned with a BUSY
+    // response to a Sigma1 message.
+    System::Clock::Milliseconds16 mMinimalResubscribeDelay = System::Clock::kZero;
+
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
-    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> mOnConnectionFailureCallback;
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;

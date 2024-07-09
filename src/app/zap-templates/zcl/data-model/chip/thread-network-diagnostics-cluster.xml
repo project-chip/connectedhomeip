@@ -92,6 +92,22 @@ limitations under the License.
     <define>THREAD_NETWORK_DIAGNOSTICS_CLUSTER</define>
     <description>The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems</description>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
+
+    <features>
+      <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Server supports the counts for the number of received and transmitted packets on the Thread interface.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Server supports the counts for the number of errors that have occurred during the reception and transmission of packets on the Thread interface.">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="MLECNT" name="MLECounts" summary="Server supports the counts for various MLE layer happenings.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="MACCNT" name="MACCounts" summary="Server supports the counts for various MAC layer happenings.">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x00" define="CHANNEL" type="int16u" min="0x00" max="0xFFFF" writable="false" isNullable="true" optional="false">Channel</attribute>
     <attribute side="server" code="0x01" define="ROUTING_ROLE" type="RoutingRoleEnum" writable="false" isNullable="true" optional="false">RoutingRole</attribute>
     <attribute side="server" code="0x02" define="NETWORK_NAME" type="char_string" length="16" writable="false" default="" isNullable="true" optional="false">NetworkName</attribute>
@@ -169,11 +185,5 @@ limitations under the License.
       <field id="1" name="Previous" type="NetworkFaultEnum" array="true"/>
     </event>    
   </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0035"/>
-    <field name="PacketCounts" mask="0x1"/>
-    <field name="ErrorCounts" mask="0x2"/>
-    <field name="MLECounts" mask="0x4"/>
-    <field name="MACCounts" mask="0x8"/>
-  </bitmap>  
+
 </configurator>

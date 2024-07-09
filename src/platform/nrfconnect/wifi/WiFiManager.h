@@ -88,16 +88,16 @@ private:
 class WiFiManager
 {
 public:
-    enum WiFiRequestStatus : int
-    {
-        SUCCESS    = 0,
-        FAILURE    = 1,
-        TERMINATED = 2
-    };
+    /* No copy, nor move. */
+    WiFiManager(const WiFiManager &)             = delete;
+    WiFiManager & operator=(const WiFiManager &) = delete;
+    WiFiManager(WiFiManager &&)                  = delete;
+    WiFiManager & operator=(WiFiManager &&)      = delete;
 
+    using ScanDoneStatus     = decltype(wifi_status::status);
     using ScanResultCallback = void (*)(const NetworkCommissioning::WiFiScanResponse &);
-    using ScanDoneCallback   = void (*)(WiFiRequestStatus);
-    using ConnectionCallback = void (*)();
+    using ScanDoneCallback   = void (*)(const ScanDoneStatus &);
+    using ConnectionCallback = void (*)(const wifi_conn_status &);
 
     enum class StationStatus : uint8_t
     {
@@ -120,8 +120,7 @@ public:
 
     struct ConnectionHandling
     {
-        ConnectionCallback mOnConnectionSuccess{};
-        ConnectionCallback mOnConnectionFailed{};
+        ConnectionCallback mOnConnectionDone{};
         System::Clock::Seconds32 mConnectionTimeout{};
     };
 
@@ -182,12 +181,18 @@ public:
     CHIP_ERROR ClearStationProvisioningData();
     CHIP_ERROR Disconnect();
     CHIP_ERROR GetWiFiInfo(WiFiInfo & info) const;
+    const WiFiNetwork & GetWantedNetwork() const { return mWantedNetwork; }
     CHIP_ERROR GetNetworkStatistics(NetworkStatistics & stats) const;
     void AbortConnectionRecovery();
     CHIP_ERROR SetLowPowerMode(bool onoff);
+    void SetLastDisconnectReason(uint16_t reason);
+    uint16_t GetLastDisconnectReason();
 
 private:
-    using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>);
+    using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>, size_t);
+
+    WiFiManager()  = default;
+    ~WiFiManager() = default;
 
     struct ConnectionParams
     {
@@ -198,14 +203,18 @@ private:
     constexpr static uint32_t kWifiManagementEvents = NET_EVENT_WIFI_SCAN_RESULT | NET_EVENT_WIFI_SCAN_DONE |
         NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT | NET_EVENT_WIFI_IFACE_STATUS;
 
+    constexpr static uint32_t kIPv6ManagementEvents = NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL;
+
     // Event handling
     static void WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
-    static void ScanResultHandler(Platform::UniquePtr<uint8_t> data);
-    static void ScanDoneHandler(Platform::UniquePtr<uint8_t> data);
-    static void ConnectHandler(Platform::UniquePtr<uint8_t> data);
-    static void DisconnectHandler(Platform::UniquePtr<uint8_t> data);
+    static void IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
+    static void ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t length);
+    static void ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t length);
+    static void ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t length);
+    static void DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t length);
     static void PostConnectivityStatusChange(ConnectivityChange changeType);
     static void SendRouterSolicitation(System::Layer * layer, void * param);
+    static void IPv6AddressChangeHandler(const void * data);
 
     // Connection Recovery feature
     // This feature allows re-scanning and re-connecting the connection to the known network after
@@ -220,11 +229,15 @@ private:
     void ResetRecoveryTime();
     System::Clock::Milliseconds32 CalculateNextRecoveryTime();
 
+    net_if * mNetIf{ nullptr };
     ConnectionParams mWiFiParams{};
-    ConnectionHandling mHandling;
+    ConnectionHandling mHandling{};
+    wifi_scan_params mScanParams{};
+    char mScanSsidBuffer[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1] = { 0 };
     wifi_iface_state mWiFiState;
     wifi_iface_state mCachedWiFiState;
     net_mgmt_event_callback mWiFiMgmtClbk{};
+    net_mgmt_event_callback mIPv6MgmtClbk{};
     ScanResultCallback mScanResultCallback{ nullptr };
     ScanDoneCallback mScanDoneCallback{ nullptr };
     WiFiNetwork mWantedNetwork{};
@@ -234,6 +247,7 @@ private:
     uint32_t mConnectionRecoveryCounter{ 0 };
     uint32_t mConnectionRecoveryTimeMs{ kConnectionRecoveryMinIntervalMs };
     bool mApplicationDisconnectRequested{ false };
+    uint16_t mLastDisconnectedReason = WLAN_REASON_UNSPECIFIED;
 
     static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;
     static const Map<uint32_t, NetEventHandler, 5> sEventHandlerMap;

@@ -21,6 +21,8 @@
 #include "../common/Command.h"
 #include <setup_payload/SetupPayload.h>
 
+#include <string>
+
 class SetupPayloadVerhoeffVerify : public Command
 {
 public:

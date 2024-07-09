@@ -71,7 +71,7 @@ private:
     CHIP_ERROR Init();
 
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(LightingManager::Action_t aAction);
+    static void ActionCompleted(LightingManager::Action_t aAction, uint8_t level);
 
     void CancelTimer(void);
 

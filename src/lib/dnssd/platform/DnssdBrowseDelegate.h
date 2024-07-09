@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
+#include <lib/support/DLLUtil.h>
+
 namespace chip {
 namespace Dnssd {
 

@@ -39,7 +39,6 @@ static_library("BL702L") {
     "../common/ConnectivityManagerImpl.cpp",
     "../common/DiagnosticDataProviderImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
-    "../common/Logging.cpp",
     "../common/PlatformManagerImpl.cpp",
   ]
 

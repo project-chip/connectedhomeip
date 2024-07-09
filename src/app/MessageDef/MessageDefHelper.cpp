@@ -140,7 +140,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
 
         // TODO: Figure out how to not use PRId64 here, since it's not supported
         // on all libcs.
-        PRETTY_PRINT_SAMELINE("%" PRId64 ", ", value_s64);
+        PRETTY_PRINT_SAMELINE("%" PRId64 " (signed), ", value_s64);
         break;
     }
 
@@ -151,7 +151,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
 
         // TODO: Figure out how to not use PRIu64 here, since it's not supported
         // on all libcs.
-        PRETTY_PRINT_SAMELINE("%" PRIu64 ", ", value_u64);
+        PRETTY_PRINT_SAMELINE("%" PRIu64 " (unsigned), ", value_u64);
         break;
     }
 

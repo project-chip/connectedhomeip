@@ -19,6 +19,8 @@
 #include "rvc-device.h"
 #include <AppMain.h>
 
+#include <string>
+
 #define RVC_ENDPOINT 1
 
 using namespace chip;

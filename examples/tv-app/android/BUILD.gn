@@ -88,6 +88,7 @@ shared_library("jni") {
     "${chip_root}/src/app/server/java:jni",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/inipp",
   ]
 
@@ -122,6 +123,7 @@ android_library("java") {
     "java/src/com/matter/tv/server/tvapp/ChannelProgramResponse.java",
     "java/src/com/matter/tv/server/tvapp/Clusters.java",
     "java/src/com/matter/tv/server/tvapp/ContentAppEndpointManager.java",
+    "java/src/com/matter/tv/server/tvapp/ContentAppSupportedCluster.java",
     "java/src/com/matter/tv/server/tvapp/ContentLaunchBrandingInformation.java",
     "java/src/com/matter/tv/server/tvapp/ContentLaunchEntry.java",
     "java/src/com/matter/tv/server/tvapp/ContentLaunchManager.java",

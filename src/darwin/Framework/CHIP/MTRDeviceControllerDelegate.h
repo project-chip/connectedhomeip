@@ -95,7 +95,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
                    nodeID:(NSNumber * _Nullable)nodeID
-                  metrics:(MTRMetrics *)metrics MTR_NEWLY_AVAILABLE;
+                  metrics:(MTRMetrics *)metrics MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Notify the delegate when commissioning infomation has been read from the Basic

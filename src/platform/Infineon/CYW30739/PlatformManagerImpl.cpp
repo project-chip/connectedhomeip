@@ -29,7 +29,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <hal/wiced_memory.h>
-#include <wiced_platform.h>
+#include <wiced_hal_platform.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -218,12 +218,11 @@ void PlatformManagerImpl::TimerCallback(WICED_TIMER_PARAM_TYPE params)
 
 int PlatformManagerImpl::GetEntropy(void * data, unsigned char * output, size_t len, size_t * olen)
 {
-    const wiced_result_t result = wiced_platform_entropy_get(output, static_cast<uint16_t>(len));
+    const wiced_result_t result = wiced_hal_platform_random_get(output, len, olen);
     if (result != WICED_SUCCESS)
     {
         return -1;
     }
-    *olen = len;
     return 0;
 }
 

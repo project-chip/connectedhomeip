@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include <esp_err.h>
 #include <esp_heap_caps.h>
 #include <esp_insights.h>
 #include <esp_log.h>
@@ -31,7 +32,7 @@ namespace Tracing {
 namespace Insights {
 namespace {
 
-constexpr size_t kPermitListMaxSize = 20;
+constexpr size_t kPermitListMaxSize = CONFIG_MAX_PERMIT_LIST_SIZE;
 using HashValue                     = uint32_t;
 
 // Implements a murmurhash with 0 seed.
@@ -134,10 +135,7 @@ void RemoveHashFromPermitlist(const char * str)
 #define LOG_HEAP_INFO(label, group, entry_exit)                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        ESP_DIAG_EVENT("MTR_TRC", "%s - %s - %s Min Free heap - %u - LFB - %u Start free heap - %u", entry_exit, label, group,     \
-                       heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT),                                                           \
-                       heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT),                                    \
-                       heap_caps_get_free_size(MALLOC_CAP_8BIT));                                                                  \
+        ESP_DIAG_EVENT("MTR_TRC", "%s - %s - %s", entry_exit, label, group);                                                       \
     } while (0)
 
 void ESP32Backend::LogMessageReceived(MessageReceivedInfo & info) {}
@@ -155,34 +153,71 @@ void ESP32Backend::TraceCounter(const char * label)
     ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
 }
 
-void ESP32Backend::LogMetricEvent(const MetricEvent & event)
+void ESP32Backend::RegisterMetric(const char * key, ValueType type)
 {
-    if (!mRegistered)
+    // Check for the same key will not have two different types.
+    if (mRegisteredMetrics.find(key) != mRegisteredMetrics.end())
     {
-        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key() /* Unique key 8 */,
-                                  event.key() /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
-                                  ESP_DIAG_DATA_TYPE_INT /* data_type */);
-        mRegistered = true;
+        if (mRegisteredMetrics[key] != type)
+        {
+            ESP_LOGE("SYS.MTR", "Type mismatch for metric key %s", key);
+            return;
+        }
     }
 
-    using ValueType = MetricEvent::Value::Type;
+    switch (type)
+    {
+    case ValueType::kUInt32:
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
+                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+        break;
+
+    case ValueType::kInt32:
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
+                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
+        break;
+
+    case ValueType::kChipErrorCode:
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
+                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+        break;
+
+    case ValueType::kUndefined:
+        ESP_LOGE("mtr", "failed to register %s as its value is undefined", key);
+        break;
+    }
+
+    mRegisteredMetrics[key] = type;
+}
+
+void ESP32Backend::LogMetricEvent(const MetricEvent & event)
+{
+    if (mRegisteredMetrics.find(event.key()) == mRegisteredMetrics.end())
+    {
+        RegisterMetric(event.key(), event.ValueType());
+    }
+
     switch (event.ValueType())
     {
     case ValueType::kInt32:
         ESP_LOGI("mtr", "The value of %s is %ld ", event.key(), event.ValueInt32());
         esp_diag_metrics_add_int(event.key(), event.ValueInt32());
         break;
+
     case ValueType::kUInt32:
         ESP_LOGI("mtr", "The value of %s is %lu ", event.key(), event.ValueUInt32());
         esp_diag_metrics_add_uint(event.key(), event.ValueUInt32());
         break;
+
     case ValueType::kChipErrorCode:
         ESP_LOGI("mtr", "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
         esp_diag_metrics_add_uint(event.key(), event.ValueErrorCode());
         break;
+
     case ValueType::kUndefined:
         ESP_LOGI("mtr", "The value of %s is undefined", event.key());
         break;
+
     default:
         ESP_LOGI("mtr", "The value of %s is of an UNKNOWN TYPE", event.key());
         break;
@@ -211,6 +246,7 @@ void ESP32Backend::TraceInstant(const char * label, const char * group)
 {
     ESP_DIAG_EVENT("MTR_TRC", "Instant : %s -%s", label, group);
 }
+
 } // namespace Insights
 } // namespace Tracing
 } // namespace chip

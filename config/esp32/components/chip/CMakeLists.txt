@@ -118,7 +118,11 @@ chip_gn_arg_append("chip_config_network_layer_ble"           "false")
 endif()
 
 if(CONFIG_DISABLE_IPV4)
-    chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+    if(NOT CONFIG_LWIP_IPV4)
+        chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
+    else()
+	message(FATAL_ERROR "Please also disable config option CONFIG_LWIP_IPV4")
+    endif()
 endif()
 
 if(CONFIG_DISABLE_READ_CLIENT)
@@ -441,16 +445,17 @@ if(CONFIG_OPENTHREAD_ENABLED)
     endif()
 endif()
 
-if((NOT CONFIG_USE_MINIMAL_MDNS) AND (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABLE_WIFI_AP))
+if(NOT CONFIG_USE_MINIMAL_MDNS)
     idf_build_get_property(build_components BUILD_COMPONENTS)
     # For IDF v5.x, the mdns component was moved to idf_managed_components.
     # We should use 'espressif__mdns' for 'idf_component_get_property'.
     if("espressif__mdns" IN_LIST build_components)
         idf_component_get_property(mdns_lib espressif__mdns COMPONENT_LIB)
+        list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
     elseif("mdns" IN_LIST build_components)
         idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
+        list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
     endif()
-    list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
 
 if (CONFIG_ENABLE_ENCRYPTED_OTA)

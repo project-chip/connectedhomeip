@@ -146,7 +146,7 @@ public:
      * @param session     Reference to the secure session that will be initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) override;
 
     //// UnsolicitedMessageHandler Implementation ////
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
@@ -272,7 +272,8 @@ private:
                                       const ByteSpan & skInfo, const ByteSpan & nonce);
 
     void OnSuccessStatusReport() override;
-    CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
+    CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
+                                     Optional<uintptr_t> protocolData) override;
 
     void AbortPendingEstablish(CHIP_ERROR err);
 
@@ -284,6 +285,22 @@ private:
                                        const System::PacketBufferHandle & msg);
 
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    static void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    static void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+
+    // Context to pass down when connecting to peer
+    Transport::AppTCPConnectionCallbackCtxt mTCPConnCbCtxt;
+    // Pointer to the underlying TCP connection state. Returned by the
+    // TCPConnect() method (on the connection Initiator side) when an
+    // ActiveTCPConnectionState object is allocated. This connection
+    // context is used on the CASE Initiator side to facilitate the
+    // invocation of the callbacks when the connection is established/closed.
+    //
+    // This pointer must be nulled out when the connection is closed.
+    Transport::ActiveTCPConnectionState * mPeerConnState = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetStopSigmaHandshakeAt(Optional<State> state) { mStopHandshakeAtState = state; }
@@ -300,6 +317,7 @@ private:
     uint8_t mIPK[kIPKSize];
 
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
+    SessionManager * mSessionManager                     = nullptr;
 
     FabricTable * mFabricsTable = nullptr;
     FabricIndex mFabricIndex    = kUndefinedFabricIndex;

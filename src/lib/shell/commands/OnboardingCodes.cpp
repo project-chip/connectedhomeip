@@ -20,7 +20,6 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -170,14 +169,12 @@ static CHIP_ERROR OnboardingHandler(int argc, char ** argv)
 
 void RegisterOnboardingCodesCommands()
 {
-
-    static const shell_command_t sDeviceComand = {
+    static constexpr Command deviceComand = {
         &OnboardingHandler, "onboardingcodes",
         "Dump device onboarding codes. Usage: onboardingcodes none|softap|ble|onnetwork [qrcode|qrcodeurl|manualpairingcode]"
     };
 
-    // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1);
+    Engine::Root().RegisterCommands(&deviceComand, 1);
 }
 
 } // namespace Shell

@@ -26,6 +26,7 @@
 #include <platform/Darwin/ConfigurationManagerImpl.h>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/Global.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
@@ -93,7 +94,7 @@ exit:
 
 CHIP_ERROR GetMACAddressFromInterfaces(io_iterator_t primaryInterfaceIterator, uint8_t * buf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
 
     kern_return_t kernResult;
     io_object_t interfaceService;
@@ -101,12 +102,12 @@ CHIP_ERROR GetMACAddressFromInterfaces(io_iterator_t primaryInterfaceIterator, u
 
     while ((interfaceService = IOIteratorNext(primaryInterfaceIterator)))
     {
-        CFTypeRef MACAddressAsCFData   = nullptr;
-        CFTypeRef linkStatusAsCFNumber = nullptr;
-        kernResult                     = IORegistryEntryGetParentEntry(interfaceService, kIOServicePlane, &controllerService);
+        kernResult = IORegistryEntryGetParentEntry(interfaceService, kIOServicePlane, &controllerService);
+        IOObjectRelease(interfaceService);
         VerifyOrExit(KERN_SUCCESS == kernResult, err = CHIP_ERROR_INTERNAL);
 
-        linkStatusAsCFNumber = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOLinkStatus), kCFAllocatorDefault, 0);
+        CFTypeRef linkStatusAsCFNumber =
+            IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOLinkStatus), kCFAllocatorDefault, 0);
         VerifyOrExit(linkStatusAsCFNumber != nullptr, err = CHIP_ERROR_INTERNAL);
 
         uint64_t linkStatus;
@@ -115,27 +116,21 @@ CHIP_ERROR GetMACAddressFromInterfaces(io_iterator_t primaryInterfaceIterator, u
 
         if ((linkStatus & kIONetworkLinkValid) && (linkStatus & kIONetworkLinkActive))
         {
-            MACAddressAsCFData = IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOMACAddress), kCFAllocatorDefault, 0);
+            CFTypeRef MACAddressAsCFData =
+                IORegistryEntryCreateCFProperty(controllerService, CFSTR(kIOMACAddress), kCFAllocatorDefault, 0);
             VerifyOrExit(MACAddressAsCFData != nullptr, err = CHIP_ERROR_INTERNAL);
 
             CFDataGetBytes((CFDataRef) MACAddressAsCFData, CFRangeMake(0, kIOEthernetAddressSize), buf);
             CFRelease(MACAddressAsCFData);
+            ExitNow(err = CHIP_NO_ERROR);
         }
 
-        kernResult = IOObjectRelease(controllerService);
-        VerifyOrExit(KERN_SUCCESS == kernResult, err = CHIP_ERROR_INTERNAL);
-
-        kernResult = IOObjectRelease(interfaceService);
-        VerifyOrExit(KERN_SUCCESS == kernResult, err = CHIP_ERROR_INTERNAL);
+        IOObjectRelease(controllerService);
+        controllerService = 0;
     }
 
 exit:
-    if (IOObjectGetRetainCount(interfaceService))
-    {
-        IOObjectRelease(interfaceService);
-    }
-
-    if (IOObjectGetRetainCount(controllerService))
+    if (controllerService)
     {
         IOObjectRelease(controllerService);
     }
@@ -144,10 +139,13 @@ exit:
 }
 #endif // TARGET_OS_OSX
 
+namespace {
+AtomicGlobal<ConfigurationManagerImpl> gInstance;
+}
+
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
-    static ConfigurationManagerImpl sInstance;
-    return sInstance;
+    return gInstance.get();
 }
 
 CHIP_ERROR ConfigurationManagerImpl::Init()

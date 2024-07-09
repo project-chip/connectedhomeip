@@ -28,6 +28,7 @@ limitations under the License.
     <define>REFRIGERATOR_ALARM_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
     <attribute side="server" code="0x0000" define="MASK" type="AlarmBitmap" default="0" writable="false" optional="false">Mask</attribute>
     <attribute side="server" code="0x0002" define="STATE" type="AlarmBitmap" default="0" writable="false" optional="false">State</attribute>
     <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">Supported</attribute>

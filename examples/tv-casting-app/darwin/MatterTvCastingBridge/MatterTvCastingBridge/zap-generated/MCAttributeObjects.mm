@@ -68,7 +68,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithBool:_cppValue];
@@ -115,7 +114,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithBool:_cppValue];
@@ -162,7 +160,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -209,7 +206,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -256,7 +252,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -307,7 +302,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -369,7 +363,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -431,7 +424,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::EventList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::EventList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::EventList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -493,7 +485,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -555,7 +546,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue];
@@ -602,7 +592,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -651,7 +640,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -702,7 +690,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -749,7 +736,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:_cppValue];
@@ -796,7 +782,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:_cppValue];
@@ -843,7 +828,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -890,7 +874,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -937,7 +920,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -984,7 +966,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:_cppValue.Raw()];
@@ -1031,7 +1012,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -1078,7 +1058,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -1129,7 +1108,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -1180,7 +1158,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -1231,7 +1208,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -1282,7 +1258,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -1333,7 +1308,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -1395,7 +1369,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -1457,7 +1430,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::EventList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::EventList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::EventList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -1519,7 +1491,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -1581,7 +1552,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue];
@@ -1628,7 +1598,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -1677,7 +1646,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::MACAddress::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::MACAddress::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::MACAddress::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::WakeOnLan::Attributes::MACAddress::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSString * _Nonnull value;
         value = AsString(_cppValue);
@@ -1729,7 +1697,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::LinkLocalAddress::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::LinkLocalAddress::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::LinkLocalAddress::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::WakeOnLan::Attributes::LinkLocalAddress::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSData * _Nonnull value;
         value = AsData(_cppValue);
@@ -1776,7 +1743,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::WakeOnLan::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -1838,7 +1804,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::WakeOnLan::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -1900,7 +1865,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::EventList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::EventList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::EventList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::WakeOnLan::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -1962,7 +1926,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::AttributeList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::WakeOnLan::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -2024,7 +1987,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::WakeOnLan::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue];
@@ -2071,7 +2033,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::WakeOnLan::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::WakeOnLan::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -2120,7 +2081,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -2189,7 +2149,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:_cppValue];
@@ -2236,7 +2195,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::TargetNavigator::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -2298,7 +2256,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::TargetNavigator::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -2360,7 +2317,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::EventList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::EventList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::EventList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::TargetNavigator::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -2422,7 +2378,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -2484,7 +2439,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::TargetNavigator::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue];
@@ -2531,7 +2485,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::TargetNavigator::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::TargetNavigator::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -2580,7 +2533,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(_cppValue)];
@@ -2627,7 +2579,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -2678,7 +2629,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -2729,7 +2679,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCMediaPlaybackClusterPlaybackPositionStruct * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -2786,7 +2735,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithFloat:_cppValue];
@@ -2833,7 +2781,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -2884,7 +2831,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -2935,7 +2881,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCMediaPlaybackClusterTrackStruct * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -3017,7 +2962,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -3114,7 +3058,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCMediaPlaybackClusterTrackStruct * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -3196,7 +3139,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -3293,7 +3235,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -3355,7 +3296,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -3417,7 +3357,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::EventList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::EventList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::EventList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -3479,7 +3418,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AttributeList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -3541,7 +3479,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue];
@@ -3588,7 +3525,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -3637,7 +3573,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::KeypadInput::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -3699,7 +3634,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::KeypadInput::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -3761,7 +3695,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::EventList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::EventList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::EventList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::KeypadInput::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -3823,7 +3756,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::AttributeList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::KeypadInput::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -3885,7 +3817,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::KeypadInput::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue];
@@ -3932,7 +3863,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -3981,7 +3911,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4048,7 +3977,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue.Raw()];
@@ -4095,7 +4023,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ContentLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4157,7 +4084,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4219,7 +4145,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::EventList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::EventList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::EventList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ContentLauncher::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4281,7 +4206,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4343,7 +4267,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ContentLauncher::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue];
@@ -4390,7 +4313,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ContentLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ContentLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -4439,7 +4361,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationLauncher::Attributes::CatalogList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4501,7 +4422,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCApplicationLauncherClusterApplicationEPStruct * _Nullable value;
         if (_cppValue.IsNull()) {
@@ -4565,7 +4485,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationLauncher::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4627,7 +4546,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationLauncher::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4689,7 +4607,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::EventList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::EventList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::EventList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationLauncher::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4751,7 +4668,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -4813,7 +4729,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationLauncher::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue];
@@ -4860,7 +4775,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -4909,7 +4823,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSString * _Nonnull value;
         value = AsString(_cppValue);
@@ -4961,7 +4874,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:chip::to_underlying(_cppValue)];
@@ -5008,7 +4920,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSString * _Nonnull value;
         value = AsString(_cppValue);
@@ -5060,7 +4971,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];
@@ -5107,7 +5017,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         MCApplicationBasicClusterApplicationStruct * _Nonnull value;
         value = [MCApplicationBasicClusterApplicationStruct new];
@@ -5161,7 +5070,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(_cppValue)];
@@ -5208,7 +5116,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSString * _Nonnull value;
         value = AsString(_cppValue);
@@ -5260,7 +5167,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -5322,7 +5228,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::GeneratedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::GeneratedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::GeneratedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::GeneratedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -5384,7 +5289,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::AcceptedCommandList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::AcceptedCommandList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::AcceptedCommandList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::AcceptedCommandList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -5446,7 +5350,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::EventList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::EventList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::EventList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::EventList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -5508,7 +5411,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSArray * _Nonnull value;
         { // Scope for our temporary variables
@@ -5570,7 +5472,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::FeatureMap::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::FeatureMap::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::FeatureMap::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::FeatureMap::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:_cppValue];
@@ -5617,7 +5518,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        // auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:_cppValue];

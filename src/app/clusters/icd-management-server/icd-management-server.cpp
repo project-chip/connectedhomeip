@@ -23,9 +23,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
@@ -202,6 +202,7 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
 
                 Structs::MonitoringRegistrationStruct::Type s{ .checkInNodeID    = e.checkInNodeID,
                                                                .monitoredSubject = e.monitoredSubject,
+                                                               .clientType       = e.clientType,
                                                                .fabricIndex      = e.fabricIndex };
                 ReturnErrorOnFailure(subEncoder.Encode(s));
             }
@@ -252,9 +253,13 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
     FabricIndex fabricIndex            = commandObj->GetAccessingFabricIndex();
     NodeId nodeId                      = commandData.checkInNodeID;
     uint64_t monitoredSubject          = commandData.monitoredSubject;
+    ClientTypeEnum clientType          = commandData.clientType;
     ByteSpan key                       = commandData.key;
     Optional<ByteSpan> verificationKey = commandData.verificationKey;
     bool isClientAdmin                 = false;
+
+    // Check if ClientType is valid
+    VerifyOrReturnError(clientType != ClientTypeEnum::kUnknownEnumValue, InteractionModel::Status::ConstraintError);
 
     // Check if client is admin
     VerifyOrReturnError(CHIP_NO_ERROR == CheckAdmin(commandObj, commandPath, isClientAdmin), InteractionModel::Status::Failure);
@@ -291,6 +296,8 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
     // Save
     entry.checkInNodeID    = nodeId;
     entry.monitoredSubject = monitoredSubject;
+    entry.clientType       = clientType;
+
     if (entry.keyHandleValid)
     {
         entry.DeleteKey();

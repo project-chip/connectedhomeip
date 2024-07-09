@@ -57,6 +57,10 @@
 #include "fsl_component_button.h"
 #include "fwk_platform.h"
 
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+#include "LED_Dimmer.h"
+#endif
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 6000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_PRIORITY 2
@@ -165,7 +169,13 @@ CHIP_ERROR AppTask::Init()
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     sStatusLED.Init(SYSTEM_STATE_LED, false);
 #endif
+
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+    init_dimmable();
+#else
     sLightLED.Init(LIGHT_STATE_LED, false);
+#endif
+
     UpdateDeviceState();
 
     /* intialize the Keyboard and button press callback */
@@ -226,7 +236,7 @@ void AppTask::InitServer(intptr_t arg)
 #endif
 
 #if defined(USE_SMU2_DYNAMIC)
-    VerifyOrDie(SMU2::Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
+    VerifyOrDie(SMU2::Init() == CHIP_NO_ERROR);
 #endif
 
     // Init ZCL Data Model and start server
@@ -487,7 +497,12 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         sStatusLED.Set(false);
 #endif
+
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+        sLightLED.SetLevel(0);
+#else
         sLightLED.Set(false);
+#endif
 
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         sStatusLED.Blink(500);
@@ -537,7 +552,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = LightingMgr().InitiateAction(actor, action);
+        initiated = LightingMgr().InitiateAction(actor, action, LightingMgr().IsTurnedOff() ? 0 : 1);
 
         if (!initiated)
         {
@@ -644,6 +659,10 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     {
         K32W_LOG("Turn off Action has been initiated")
     }
+    else if (aAction == LightingManager::DIM_ACTION)
+    {
+        K32W_LOG("Dim Action has been initiated");
+    }
 
     if (aActor == AppEvent::kEventType_Button)
     {
@@ -653,20 +672,33 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     sAppTask.mFunction = kFunctionTurnOnTurnOff;
 }
 
-void AppTask::ActionCompleted(LightingManager::Action_t aAction)
+void AppTask::ActionCompleted(LightingManager::Action_t aAction, uint8_t level)
 {
     // Turn on the light LED if in a TURNON state OR
     // Turn off the light LED if in a TURNOFF state.
     if (aAction == LightingManager::TURNON_ACTION)
     {
         K32W_LOG("Turn on action has been completed")
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+#else
         sLightLED.Set(true);
+#endif
     }
     else if (aAction == LightingManager::TURNOFF_ACTION)
     {
         K32W_LOG("Turn off action has been completed")
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+#else
         sLightLED.Set(false);
+#endif
     }
+    else if (aAction == LightingManager::DIM_ACTION)
+    {
+        K32W_LOG("Move to level %d completed", level);
+    }
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+    sLightLED.SetLevel(LightingMgr().IsTurnedOff() ? 1 : LightingMgr().GetDimLevel());
+#endif
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
@@ -679,6 +711,9 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 
 void AppTask::RestoreLightingState(void)
 {
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+    LightingMgr().SetState(!LightingMgr().IsTurnedOff());
+#else
     /* restore initial state for the LED indicating Lighting state */
     if (LightingMgr().IsTurnedOff())
     {
@@ -688,6 +723,7 @@ void AppTask::RestoreLightingState(void)
     {
         sLightLED.Set(true);
     }
+#endif
 }
 
 void AppTask::OnIdentifyStart(Identify * identify)
@@ -706,7 +742,11 @@ void AppTask::OnIdentifyStart(Identify * identify)
 
     ChipLogProgress(Zcl, "Identify process has started. Status LED should blink with a period of 0.5 seconds.");
     sAppTask.mFunction = kFunction_Identify;
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+    sLightLED.SetLevel(0);
+#else
     sLightLED.Set(false);
+#endif
     sLightLED.Blink(250);
 }
 
@@ -790,7 +830,11 @@ void AppTask::OnTriggerEffect(Identify * identify)
 
     if (timerDelay)
     {
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+        sLightLED.SetLevel(0);
+#else
         sLightLED.Set(false);
+#endif
         sLightLED.Blink(500);
 
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timerDelay), OnTriggerEffectComplete, identify);
@@ -873,7 +917,10 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     (void) app::Clusters::OnOff::Attributes::OnOff::Get(1, &onoffAttrValue);
 
     /* set the device state */
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+#else
     sLightLED.Set(onoffAttrValue);
+#endif
     LightingMgr().SetState(onoffAttrValue);
 }
 

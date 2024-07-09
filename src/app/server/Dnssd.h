@@ -126,11 +126,25 @@ public:
      */
     CHIP_ERROR SetEphemeralDiscriminator(Optional<uint16_t> discriminator);
 
-    // ICDStateObserver
-    // No action is needed by the DnssdServer on active or idle state entries
-    void OnEnterActiveMode() override{};
-    void OnTransitionToIdle() override{};
+    /**
+     * @brief When the ICD changes operating mode, the dnssd server needs to restart its DNS-SD advertising to update the TXT keys.
+     */
     void OnICDModeChange() override;
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnEnterActiveMode() override{};
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnTransitionToIdle() override{};
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnEnterIdleMode() override{};
 
 private:
     /// Overloaded utility method for commissioner and commissionable advertisement
@@ -145,6 +159,11 @@ private:
 
     /// Set MDNS commissionable node advertisement
     CHIP_ERROR AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode mode);
+
+    // Our randomly-generated fallback "MAC address", in case we don't have a real one.
+    uint8_t mFallbackMAC[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength] = { 0 };
+
+    void GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac);
 
     //
     // Check if we have any valid operational credentials present in the fabric table and return true

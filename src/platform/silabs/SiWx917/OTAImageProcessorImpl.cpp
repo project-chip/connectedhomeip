@@ -38,6 +38,7 @@ extern "C" {
 
 #define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_NO_AP_FOUND
 uint8_t flag = RPS_HEADER;
+static chip::OTAImageProcessorImpl gImageProcessor;
 
 namespace chip {
 
@@ -47,6 +48,15 @@ uint8_t OTAImageProcessorImpl::mSlotId                                          
 uint32_t OTAImageProcessorImpl::mWriteOffset                                            = 0;
 uint16_t OTAImageProcessorImpl::writeBufOffset                                          = 0;
 uint8_t OTAImageProcessorImpl::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
+
+CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
+{
+    ReturnErrorCodeIf(downloader == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    gImageProcessor.SetOTADownloader(downloader);
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -384,6 +394,11 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
+}
+
+OTAImageProcessorImpl & OTAImageProcessorImpl::GetDefaultInstance()
+{
+    return gImageProcessor;
 }
 
 } // namespace chip

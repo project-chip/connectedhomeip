@@ -7,7 +7,8 @@ def main(args):
     if "NXP_K32W0_SDK_ROOT" in os.environ and os.environ["NXP_K32W0_SDK_ROOT"] != "":
         sign_images_path = os.environ["NXP_K32W0_SDK_ROOT"] + "/tools/imagetool/sign_images.sh"
     else:
-        sign_images_path = os.getcwd() + "/../../../../../../../third_party/nxp/k32w0_sdk/repo/core/tools/imagetool/sign_images.sh"
+        sign_images_path = os.path.abspath(
+            __file__ + "/../../../../../../../third_party/nxp/k32w0_sdk/repo/core/tools/imagetool/sign_images.sh")
 
     # Give execute permission if needed
     if os.access(sign_images_path, os.X_OK) is False:

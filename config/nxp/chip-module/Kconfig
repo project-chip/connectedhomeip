@@ -256,3 +256,23 @@ config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 	  Reboots the device automatically after downloading a new firmware update
 	  to swap the old and the new firmware images. The reboot happens only when
 	  a user consents to apply the firmware update.
+
+choice CHIP_OTA_REQUEST_UPGRADE_TYPE
+	prompt "Type of the upgrade to apply on new images"
+	default CHIP_OTA_REQUEST_UPGRADE_TEST
+	depends on CHIP_OTA_REQUESTOR
+
+	config CHIP_OTA_REQUEST_UPGRADE_PERMANENT
+		bool "Mark the image as permanent"
+		help
+		  The upgrade will be permanent on the next reboot.
+		  No coming back to the old image.
+
+	config CHIP_OTA_REQUEST_UPGRADE_TEST
+		bool "Mark the image as a test"
+		help
+		  The upgrade will be marked as a test.
+		  Image will be run on the next reboot, if confirmed it
+		  becomes permanent, otherwise the new image is reverted.
+
+endchoice

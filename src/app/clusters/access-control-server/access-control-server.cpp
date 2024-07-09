@@ -20,13 +20,13 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
 #include <app/server/AclStorage.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;

@@ -164,5 +164,10 @@ ConfigurationManager & ConfigurationMgrImpl()
     return ConfigurationManagerImpl::GetDefaultInstance();
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
+{
+    return STM32Config::ReadConfigValueStr(STM32Config::kConfigKey_CountryCode, buf, bufSize, codeLen);
+}
+
 } // namespace DeviceLayer
 } // namespace chip

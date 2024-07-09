@@ -24,18 +24,17 @@
 #include <glib-object.h>
 #include <glib.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
+#include "BluezEndpoint.h"
 #include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-class BluezEndpoint;
 
 class BluezAdvertisement
 {
@@ -47,10 +46,10 @@ public:
     static constexpr ServiceDataFlags kServiceDataNone                 = 0;
     static constexpr ServiceDataFlags kServiceDataExtendedAnnouncement = 1 << 0;
 
-    BluezAdvertisement() = default;
+    BluezAdvertisement(BluezEndpoint & aEndpoint) : mEndpoint(aEndpoint) {}
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, const char * aAdvName);
+    CHIP_ERROR Init(BluezAdapter1 * apAdapter, const char * aAdvUUID, const char * aAdvName);
     CHIP_ERROR SetupServiceData(ServiceDataFlags aFlags);
     CHIP_ERROR SetIntervals(AdvertisingIntervals aAdvIntervals);
     void Shutdown();
@@ -82,8 +81,7 @@ private:
     void StopDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR StopImpl();
 
-    // Objects (interfaces) used by LE advertisement
-    GAutoPtr<GDBusObjectManagerServer> mRoot;
+    BluezEndpoint & mEndpoint;
     GAutoPtr<BluezAdapter1> mAdapter;
     GAutoPtr<BluezLEAdvertisement1> mAdv;
 
