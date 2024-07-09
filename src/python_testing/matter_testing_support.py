@@ -34,7 +34,7 @@ from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 
 from chip.tlv import float32, uint
 
@@ -417,7 +417,13 @@ class CustomCommissioningParameters:
 
 
 @dataclass
-class AttributePathLocation:
+class ProblemLocation:
+    def __str__(self):
+        return "UNKNOWN"
+
+
+@dataclass
+class AttributePathLocation(ProblemLocation):
     endpoint_id: int
     cluster_id: Optional[int] = None
     attribute_id: Optional[int] = None
@@ -442,7 +448,7 @@ class AttributePathLocation:
 
 
 @dataclass
-class EventPathLocation:
+class EventPathLocation(ProblemLocation):
     endpoint_id: int
     cluster_id: int
     event_id: int
@@ -454,7 +460,7 @@ class EventPathLocation:
 
 
 @dataclass
-class CommandPathLocation:
+class CommandPathLocation(ProblemLocation):
     endpoint_id: int
     cluster_id: int
     command_id: int
@@ -466,7 +472,7 @@ class CommandPathLocation:
 
 
 @dataclass
-class ClusterPathLocation:
+class ClusterPathLocation(ProblemLocation):
     endpoint_id: int
     cluster_id: int
 
@@ -476,7 +482,7 @@ class ClusterPathLocation:
 
 
 @dataclass
-class FeaturePathLocation:
+class FeaturePathLocation(ProblemLocation):
     endpoint_id: int
     cluster_id: int
     feature_code: str
@@ -500,7 +506,7 @@ class ProblemSeverity(str, Enum):
 @dataclass
 class ProblemNotice:
     test_name: str
-    location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation]
+    location: ProblemLocation
     severity: ProblemSeverity
     problem: str
     spec_location: str = ""
@@ -896,13 +902,13 @@ class MatterBaseTest(base_test.BaseTestClass):
     def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
         logging.info(f'***** Test Step {stepnum} : {title}')
 
-    def record_error(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
+    def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
 
-    def record_warning(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
+    def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.WARNING, problem, spec_location))
 
-    def record_note(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
+    def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
 
     def on_fail(self, record):
