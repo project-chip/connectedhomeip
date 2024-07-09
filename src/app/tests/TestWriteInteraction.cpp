@@ -328,7 +328,7 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
             }
             else
             {
-                EXPECT_EQ(status, Status::UnsupportedAccess);
+                EXPECT_EQ(status, Status::TimedRequestMismatch);
             }
 
             mpTestContext->DrainAndServiceIO();

@@ -90,6 +90,7 @@ Generally regenerate using one of:
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        259 |      0x103 | BarrierControl                                          |
+|        336 |      0x150 | ServiceArea                                             |
 |        512 |      0x200 | PumpConfigurationAndControl                             |
 |        513 |      0x201 | Thermostat                                              |
 |        514 |      0x202 | FanControl                                              |

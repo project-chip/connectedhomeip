@@ -189,6 +189,7 @@ def BuildHostTarget():
     target.AppendModifier('evse-test-event', enable_test_event_triggers=['EVSE']).OnlyIfRe('-energy-management')
     target.AppendModifier('enable-dnssd-tests', enable_dnssd_tests=True).OnlyIfRe('-tests')
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
+    target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
 
     return target
 
