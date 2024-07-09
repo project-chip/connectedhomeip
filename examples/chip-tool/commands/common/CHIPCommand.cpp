@@ -90,6 +90,21 @@ CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR GetAttestationRevocationDelegate(const char * revocationSetPath, chip::Credentials::DeviceAttestationRevocationDelegate ** revocationDelegate)
+{
+    if (revocationSetPath == nullptr)
+    {
+        *revocationDelegate = sRevocationDelegate;
+        return CHIP_NO_ERROR;
+    }
+
+    static chip::Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
+
+    ReturnErrorOnFailure(testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(revocationSetPath));
+    *revocationDelegate = &testDacRevocationDelegate;
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 CHIP_ERROR CHIPCommand::MaybeSetUpStack()
@@ -153,6 +168,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     server->SetDelegate(&BDXDiagnosticLogsServerDelegate::GetInstance());
 
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
+
+    ReturnLogErrorOnFailure(GetAttestationRevocationDelegate(mDacRevocationSetPath.ValueOr(nullptr), &sRevocationDelegate));
 
     auto engine = chip::app::InteractionModelEngine::GetInstance();
     VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -452,13 +469,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 {
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
     chip::Controller::SetupParams commissionerParams;
-
-    if (mDacRevocationSetPath.HasValue())
-    {
-        static chip::Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
-        ReturnErrorOnFailure(testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(mDacRevocationSetPath.Value()));
-        sRevocationDelegate = &testDacRevocationDelegate;
-    }
 
     ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore, sRevocationDelegate));
 
