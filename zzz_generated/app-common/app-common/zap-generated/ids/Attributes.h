@@ -6699,7 +6699,7 @@ static constexpr AttributeId Id = 0x00000003;
 } // namespace InterfaceEnabled
 
 namespace ActiveDatasetTimestamp {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace ActiveDatasetTimestamp
 
 namespace GeneratedCommandList {

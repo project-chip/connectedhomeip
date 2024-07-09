@@ -1429,15 +1429,15 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace GetPendingDatasetRequest
 
 namespace DatasetResponse {
-static constexpr CommandId Id = 0x00000003;
+static constexpr CommandId Id = 0x00000002;
 } // namespace DatasetResponse
 
 namespace SetActiveDatasetRequest {
-static constexpr CommandId Id = 0x00000004;
+static constexpr CommandId Id = 0x00000003;
 } // namespace SetActiveDatasetRequest
 
 namespace SetPendingDatasetRequest {
-static constexpr CommandId Id = 0x00000005;
+static constexpr CommandId Id = 0x00000004;
 } // namespace SetPendingDatasetRequest
 
 } // namespace Commands
