@@ -58,7 +58,7 @@ logic is handled in the run-time installed interface layers.
 -   examples
     -   [examples/chip-tool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool) -
         main controller example
-    -   [examples/all-clusters-app](https://github.com/project-chip/connectedhomeip/blob/master/examples/all-cluster-app) -
+    -   [examples/all-clusters-app](https://github.com/project-chip/connectedhomeip/blob/master/examples/all-clusters-app) -
         QA app
     -   [examples/\<others\>](https://github.com/project-chip/connectedhomeip/blob/master/examples) -
         Specific Device examples
