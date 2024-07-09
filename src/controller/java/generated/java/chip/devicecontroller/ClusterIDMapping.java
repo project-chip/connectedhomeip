@@ -14565,7 +14565,7 @@ public class ClusterIDMapping {
             BorderAgentID(1L),
             ThreadVersion(2L),
             InterfaceEnabled(3L),
-            ActiveDatasetTimestamp(5L),
+            ActiveDatasetTimestamp(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -14614,8 +14614,8 @@ public class ClusterIDMapping {
         public enum Command {
             GetActiveDatasetRequest(0L),
             GetPendingDatasetRequest(1L),
-            SetActiveDatasetRequest(4L),
-            SetPendingDatasetRequest(5L),;
+            SetActiveDatasetRequest(3L),
+            SetPendingDatasetRequest(4L),;
             private final long id;
             Command(long id) {
                 this.id = id;

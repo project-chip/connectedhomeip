@@ -11185,15 +11185,15 @@ private:
 | Commands:                                                           |        |
 | * GetActiveDatasetRequest                                           |   0x00 |
 | * GetPendingDatasetRequest                                          |   0x01 |
-| * SetActiveDatasetRequest                                           |   0x04 |
-| * SetPendingDatasetRequest                                          |   0x05 |
+| * SetActiveDatasetRequest                                           |   0x03 |
+| * SetPendingDatasetRequest                                          |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * BorderRouterName                                                  | 0x0000 |
 | * BorderAgentID                                                     | 0x0001 |
 | * ThreadVersion                                                     | 0x0002 |
 | * InterfaceEnabled                                                  | 0x0003 |
-| * ActiveDatasetTimestamp                                            | 0x0005 |
+| * ActiveDatasetTimestamp                                            | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |

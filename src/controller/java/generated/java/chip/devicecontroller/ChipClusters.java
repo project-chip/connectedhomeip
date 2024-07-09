@@ -53618,7 +53618,7 @@ public class ChipClusters {
     private static final long BORDER_AGENT_I_D_ATTRIBUTE_ID = 1L;
     private static final long THREAD_VERSION_ATTRIBUTE_ID = 2L;
     private static final long INTERFACE_ENABLED_ATTRIBUTE_ID = 3L;
-    private static final long ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID = 5L;
+    private static final long ACTIVE_DATASET_TIMESTAMP_ATTRIBUTE_ID = 4L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -53693,7 +53693,7 @@ public class ChipClusters {
     }
 
     public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Optional<Long> breadcrumb, int timedInvokeTimeoutMs) {
-      final long commandId = 4L;
+      final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long activeDatasetFieldID = 0L;
@@ -53717,7 +53717,7 @@ public class ChipClusters {
     }
 
     public void setPendingDatasetRequest(DefaultClusterCallback callback, byte[] pendingDataset, int timedInvokeTimeoutMs) {
-      final long commandId = 5L;
+      final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long pendingDatasetFieldID = 0L;
