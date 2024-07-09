@@ -238,6 +238,8 @@ CHIP_ERROR CodegenDataModel::Invoke(const InteractionModel::InvokeRequest & requ
     // TODO: CommandHandlerInterface support is currently
     //       residing in InteractionModelEngine itself. We may want to separate this out
     //       into its own registry, similar to attributes, so that IM is decoupled from actual storage of things.
+    //
+    //       Open issue at https://github.com/project-chip/connectedhomeip/issues/34258
 
     // Ember dispatching automatically uses `handler` to set an appropriate result or status
     // This never fails (as handler error is encoded as needed).

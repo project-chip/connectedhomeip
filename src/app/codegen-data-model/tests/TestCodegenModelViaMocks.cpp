@@ -2437,8 +2437,12 @@ TEST(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
 
 TEST(TestCodegenModelViaMocks, EmberInvokeTest)
 {
-    // Ember invoke is extrealy hard-coded, so generally we just need to validate that
-    // correct paths are invoked.
+    // Ember invoke is fully code-generated - there is a single function for Dispatch
+    // that will do a `switch` on the path elements and invoke a corresponding `emberAf*`
+    // callback.
+    //
+    // The only thing that can be validated is that this `DispatchSingleClusterCommand`
+    // is actually invoked.
 
     UseMockNodeConfig config(gTestNodeConfig);
     chip::app::CodegenDataModel model;
@@ -2450,7 +2454,8 @@ TEST(TestCodegenModelViaMocks, EmberInvokeTest)
 
         const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
 
-        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, nullptr /* handler, NOT used by impl*/), CHIP_NO_ERROR);
+        // Using a handler set to nullpotr as it is not used by the impl
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), CHIP_NO_ERROR);
 
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
         EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
@@ -2463,7 +2468,8 @@ TEST(TestCodegenModelViaMocks, EmberInvokeTest)
 
         const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
 
-        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, nullptr /* handler, NOT used by impl*/), CHIP_NO_ERROR);
+        // Using a handler set to nullpotr as it is not used by the impl
+        ASSERT_EQ(model.Invoke(kInvokeRequest, tlvReader, /* handler = */ nullptr), CHIP_NO_ERROR);
 
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
         EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
