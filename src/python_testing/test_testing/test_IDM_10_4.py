@@ -38,40 +38,48 @@ from MockTestRunner import MockTestRunner
 def create_read(include_reachable: bool = False, include_max_paths: bool = False, include_vendor_id: bool = True) -> Attribute.AsyncReadTransaction.ReadResponse:
     # Attribute read here is set to match the example_pics_xml_basic_info.xml in this directory
     bi = Clusters.BasicInformation.Attributes
-    attrs = {bi.DataModelRevision: 1,
-             bi.VendorName: 'testVendor',
-             bi.ProductName: 'testProduct',
-             bi.ProductID: 0x8000,
-             bi.NodeLabel: 'label',
-             bi.Location: 'XX',
-             bi.HardwareVersion: 1,
-             bi.HardwareVersionString: 'one',
-             bi.SoftwareVersion: 2,
-             bi.SoftwareVersionString: 'two',
-             bi.ManufacturingDate: 'today',
-             bi.PartNumber: 'three',
-             bi.ProductURL: 'example.com',
-             bi.ProductLabel: 'myProduct',
-             bi.SerialNumber: 'ABCD1234',
-             bi.LocalConfigDisabled: False,
-             bi.UniqueID: 'Hashy-McHashface'}
+    lvl = Clusters.LevelControl.Attributes
+    attrs_bi = {bi.DataModelRevision: 1,
+                bi.VendorName: 'testVendor',
+                bi.ProductName: 'testProduct',
+                bi.ProductID: 0x8000,
+                bi.NodeLabel: 'label',
+                bi.Location: 'XX',
+                bi.HardwareVersion: 1,
+                bi.HardwareVersionString: 'one',
+                bi.SoftwareVersion: 2,
+                bi.SoftwareVersionString: 'two',
+                bi.ManufacturingDate: 'today',
+                bi.PartNumber: 'three',
+                bi.ProductURL: 'example.com',
+                bi.ProductLabel: 'myProduct',
+                bi.SerialNumber: 'ABCD1234',
+                bi.LocalConfigDisabled: False,
+                bi.UniqueID: 'Hashy-McHashface'}
     if include_reachable:
-        attrs[bi.Reachable] = True
+        attrs_bi[bi.Reachable] = True
     if include_max_paths:
-        attrs[bi.MaxPathsPerInvoke] = 2
+        attrs_bi[bi.MaxPathsPerInvoke] = 2
     if include_vendor_id:
-        attrs[bi.VendorID] = 0xFFF1
+        attrs_bi[bi.VendorID] = 0xFFF1
 
-    attrs[bi.AttributeList] = [a.attribute_id for a in attrs.keys()]
-    attrs[bi.AcceptedCommandList] = []
-    attrs[bi.GeneratedCommandList] = []
-    attrs[bi.FeatureMap] = 0
+    attrs_bi[bi.AttributeList] = [a.attribute_id for a in attrs_bi.keys()]
+    attrs_bi[bi.AcceptedCommandList] = []
+    attrs_bi[bi.GeneratedCommandList] = []
+    attrs_bi[bi.FeatureMap] = 0
+
+    attrs_lvl = {}
+    attrs_lvl[lvl.AttributeList] = []
+    attrs_lvl[lvl.AcceptedCommandList] = []
+    attrs_lvl[lvl.GeneratedCommandList] = []
+    attrs_lvl[lvl.FeatureMap] = 0
 
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
-    resp.attributes = {0: {Clusters.BasicInformation: attrs}}
+    resp.attributes = {0: {Clusters.BasicInformation: attrs_bi, Clusters.LevelControl: attrs_lvl}}
 
-    tlv_attrs = {a.attribute_id: value for a, value in attrs.items()}
-    resp.tlvAttributes = {0: {Clusters.BasicInformation.id: tlv_attrs}}
+    tlv_attrs_bi = {a.attribute_id: value for a, value in attrs_bi.items()}
+    tlv_attrs_lvl = {a.attribute_id: value for a, value in attrs_lvl.items()}
+    resp.tlvAttributes = {0: {Clusters.BasicInformation.id: tlv_attrs_bi, Clusters.LevelControl.id: tlv_attrs_lvl}}
 
     return resp
 
