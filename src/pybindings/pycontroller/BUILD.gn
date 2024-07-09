@@ -45,17 +45,10 @@ shared_library("CHIPController") {
 
   # TODO: Update to use GN tools to get actual paths
   include_dirs = [ "${chip_root}/third_party/pybind11/repo/include" ]
-  version = python_config.version
-  if (current_os == "mac") {
-    include_dirs +=
-        [ "${chip_root}/.environment/cipd/packages/python/include/python" +
-          version.major + "." + version.minor ]
-  } else if (current_os == "linux") {
-    include_dirs +=
-        [ "/usr/include/python" + version.major + "." + version.minor ]
-  } else {
+  if (current_os != "mac" && current_os != "linux") {
     assert(false, "OS not supported.")
-  }
+  } 
+  include_dirs += [ python_config.include ]
 
   sources = [
     "ControllerBindings/PyChip_ChipError.cpp",
@@ -91,6 +84,7 @@ shared_library("CHIPController") {
     ]
   }
   if (current_os == "linux") {
+    version = python_config.version
     libs = [ "python" + version.major + "." + version.minor ]
   }
 }
