@@ -37,7 +37,6 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-using TestContext = chip::Test::AppContext;
 using namespace chip::app;
 using namespace chip;
 
@@ -113,26 +112,7 @@ uint8_t AttributeInstruction::sInstructionId = 0;
 
 using AttributeInstructionListType = std::vector<AttributeInstruction>;
 
-class TestClusterStateCache : public ::testing::Test
-{
-public:
-    static void SetUpTestSuite()
-    {
-        mpTestContext = new TestContext;
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        delete mpTestContext;
-    }
-
-    void SetUp() override { mpTestContext->SetUp(); }
-    void TearDown() override { mpTestContext->TearDown(); }
-
-    static TestContext * mpTestContext;
-};
-TestContext * TestClusterStateCache::mpTestContext = nullptr;
+using TestClusterStateCache = chip::Test::AppContext;
 
 class ForwardedDataCallbackValidator final
 {
