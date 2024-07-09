@@ -90,7 +90,8 @@ CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GetAttestationRevocationDelegate(const char * revocationSetPath, chip::Credentials::DeviceAttestationRevocationDelegate ** revocationDelegate)
+CHIP_ERROR GetAttestationRevocationDelegate(const char * revocationSetPath,
+                                            chip::Credentials::DeviceAttestationRevocationDelegate ** revocationDelegate)
 {
     if (revocationSetPath == nullptr)
     {
