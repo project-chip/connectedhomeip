@@ -611,6 +611,10 @@ Note that the application needs to be built using the `chip_enable_ota_requestor
 This is enabled in the configuration by default if no `chip_enable_ota_requestor` explicit setting
 is done.
 
+Please also note that, by default, the device expects the OTA image
+to be encrypted with the same key specified by `chip_with_ota_key`.
+See `args.gni` for the default gn configuration.
+
 ### OTA Testing
 
 The OTA topology used for OTA testing is illustrated in the figure below.
@@ -701,10 +705,9 @@ Here is an example that generates an OTA image with application update TLV:
 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 2 -vs "2.0" -da sha256 --enc_enable --input_ota_key "1234567890ABCDEFA1B2C3D4E5F6F1B4" --app-input-file chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota
 ```
 
-Please note the two options `--enc_enable` and `--input_ota_key`, which are
-mandatory when `chip_with_ota_encryption=1`. The value of `--input_ota_key` must
-match the value of `chip_with_ota_key`. See `args.gni` for the default gn
-configuration.
+Please note the two options `--enc_enable` and `--input_ota_key`,
+which are mandatory when `chip_with_ota_encryption=1`. The value
+of `--input_ota_key` must match the value of `chip_with_ota_key`.
 
 A note regarding OTA image header version (`-vn` option). An application binary
 has its own software version, given by
