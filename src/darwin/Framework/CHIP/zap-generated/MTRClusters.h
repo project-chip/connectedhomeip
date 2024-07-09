@@ -2301,8 +2301,8 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Laundry Dryer Controls
- *    This cluster supports remotely monitoring and controling the different typs of
-            functionality available to a drying device, such as a laundry dryer.
+ *    This cluster provides a way to access options associated with the operation of
+            a laundry dryer device type.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterLaundryDryerControls : MTRGenericCluster
