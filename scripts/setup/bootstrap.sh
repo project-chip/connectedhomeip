@@ -14,6 +14,11 @@
 # limitations under the License.
 #
 
+# Installation of python using brew without specifying the version will add the python
+# and python3 executables to the PATH. However, installation of specific version
+# of python on macOS using brew will not add the
+# python/python3 executable to the PATH. To make pigweed use brew installed python
+# on macOS, we need to add `/usr/local/opt/python@$version/libexec/bin/` to the PATH.
 if [ "$(uname)" = "Darwin" ]; then
     PYTHON_VERSIONS=("3.12" "3.11")
     for version in "${PYTHON_VERSIONS[@]}"; do
