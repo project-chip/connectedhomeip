@@ -23,10 +23,10 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
   }
 
   private boolean isForegroundCommand(long clusterId, long commandId) {
-    switch ((int)clusterId) {
+    switch ((int) clusterId) {
       case Clusters.ContentLauncher.Id:
-        return commandId == Clusters.ContentLauncher.Commands.LaunchContent.ID ||
-                commandId == Clusters.ContentLauncher.Commands.LaunchURL.ID;
+        return commandId == Clusters.ContentLauncher.Commands.LaunchContent.ID
+            || commandId == Clusters.ContentLauncher.Commands.LaunchURL.ID;
       case Clusters.TargetNavigator.Id:
         return commandId == Clusters.TargetNavigator.Commands.NavigateTarget.ID;
       default:
@@ -35,14 +35,15 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
   }
 
   private boolean isAppInForeground(String contentAppPackageName) {
-      ActivityManager activityManager =
-              (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-      List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(1);
-      if (tasks != null && !tasks.isEmpty()) {
-        ActivityManager.RunningTaskInfo taskInfo = tasks.get(0);
-        String packageName = taskInfo.topActivity != null ? taskInfo.topActivity.getPackageName() : "";
-        return packageName.equals(contentAppPackageName);
-      }
+    ActivityManager activityManager =
+        (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    List<ActivityManager.RunningTaskInfo> tasks = activityManager.getRunningTasks(1);
+    if (tasks != null && !tasks.isEmpty()) {
+      ActivityManager.RunningTaskInfo taskInfo = tasks.get(0);
+      String packageName =
+          taskInfo.topActivity != null ? taskInfo.topActivity.getPackageName() : "";
+      return packageName.equals(contentAppPackageName);
+    }
     return false;
   }
 
