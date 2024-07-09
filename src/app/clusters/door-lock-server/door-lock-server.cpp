@@ -3990,14 +3990,6 @@ void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * comma
     EndpointId endpointID = commandPath.mEndpointId;
     ChipLogProgress(Zcl, "[ClearAliroReaderConfig] Incoming command [endpointId=%d]", endpointID);
 
-    // If Aliro Provisioning feature is not supported, return UNSUPPORTED_COMMAND.
-    if (!SupportsAliroProvisioning(endpointID))
-    {
-        ChipLogProgress(Zcl, "[ClearAliroReaderConfig] Aliro Provisioning is not supported [endpointId=%d]", endpointID);
-        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
-        return;
-    }
-
     Delegate * delegate = GetDelegate(endpointID);
     if (!delegate)
     {
