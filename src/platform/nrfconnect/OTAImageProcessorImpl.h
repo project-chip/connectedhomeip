@@ -57,6 +57,7 @@ protected:
 
 private:
     bool mImageConfirmed = false;
+    uint32_t mDfuSyncMutexId;
 };
 
 } // namespace DeviceLayer
