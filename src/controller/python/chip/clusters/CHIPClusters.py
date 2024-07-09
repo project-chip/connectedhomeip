@@ -11714,16 +11714,16 @@ class ChipClusters:
                 "args": {
                 },
             },
-            0x00000004: {
-                "commandId": 0x00000004,
+            0x00000003: {
+                "commandId": 0x00000003,
                 "commandName": "SetActiveDatasetRequest",
                 "args": {
                     "activeDataset": "bytes",
                     "breadcrumb": "int",
                 },
             },
-            0x00000005: {
-                "commandId": 0x00000005,
+            0x00000004: {
+                "commandId": 0x00000004,
                 "commandName": "SetPendingDatasetRequest",
                 "args": {
                     "pendingDataset": "bytes",
@@ -11755,9 +11755,9 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
-            0x00000005: {
+            0x00000004: {
                 "attributeName": "ActiveDatasetTimestamp",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },

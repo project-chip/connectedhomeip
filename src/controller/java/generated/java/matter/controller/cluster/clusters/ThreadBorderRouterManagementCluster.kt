@@ -185,7 +185,7 @@ class ThreadBorderRouterManagementCluster(
     breadcrumb: ULong?,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 4u
+    val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -212,7 +212,7 @@ class ThreadBorderRouterManagementCluster(
     pendingDataset: ByteArray,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 5u
+    val commandId: UInt = 4u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -561,7 +561,7 @@ class ThreadBorderRouterManagementCluster(
   }
 
   suspend fun readActiveDatasetTimestampAttribute(): ActiveDatasetTimestampAttribute {
-    val ATTRIBUTE_ID: UInt = 5u
+    val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -601,7 +601,7 @@ class ThreadBorderRouterManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<ActiveDatasetTimestampAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 5u
+    val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
