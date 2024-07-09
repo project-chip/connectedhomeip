@@ -23,7 +23,7 @@
 #include <errno.h>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
@@ -47,12 +47,8 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-struct TestExchangeMgr : public chip::Test::LoopbackMessagingContext, public ::testing::Test
+struct TestExchangeMgr : public chip::Test::LoopbackMessagingContext
 {
-    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
-
-    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
-
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
@@ -60,8 +56,6 @@ struct TestExchangeMgr : public chip::Test::LoopbackMessagingContext, public ::t
 #endif
         chip::Test::LoopbackMessagingContext::SetUp();
     }
-
-    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
 };
 
 enum : uint8_t
