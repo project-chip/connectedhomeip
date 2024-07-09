@@ -21,8 +21,8 @@
 #include <functional>
 #include <stdbool.h>
 
-#include <lib/support/BitFlags.h>
 #include <app/data-model/Nullable.h>
+#include <lib/support/BitFlags.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -31,8 +31,8 @@ namespace app {
 enum class QuieterReportingPolicyEnum
 {
     kMarkDirtyOnChangeToFromZero = (1u << 0),
-    kMarkDirtyOnDecrement = (1u << 1),
-    kMarkDirtyOnIncrement = (1u << 2),
+    kMarkDirtyOnDecrement        = (1u << 1),
+    kMarkDirtyOnIncrement        = (1u << 2),
 };
 
 using QuieterReportingPolicyFlags = ::chip::BitFlags<QuieterReportingPolicyEnum>;
@@ -74,7 +74,8 @@ using Nullable = chip::app::DataModel::Nullable<T>;
  * - When it changes from 0 to any other value and vice versa, or
  * - When it changes from null to any other value and vice versa, or
  * - When it increases, or
- * - When there is any increase or decrease in the estimated time remaining that was due to progressing insight of the server's control logic, or
+ * - When there is any increase or decrease in the estimated time remaining that was due to progressing insight of the server's
+ * control logic, or
  * - When it changes at a rate significantly different from one unit per second.
  *
  * @tparam T - the type of underlying numerical value that will be held by the class.
@@ -82,10 +83,14 @@ using Nullable = chip::app::DataModel::Nullable<T>;
 template <typename T>
 class QuieterReportingAttribute
 {
-  public:
-    explicit QuieterReportingAttribute(const chip::app::DataModel::Nullable<T>& initialValue) : mValue(initialValue), mLastDirtyValue(initialValue) {}
+public:
+    explicit QuieterReportingAttribute(const chip::app::DataModel::Nullable<T> & initialValue) :
+        mValue(initialValue), mLastDirtyValue(initialValue)
+    {}
 
-    using SufficientChangePredicate = std::function<bool(Timestamp /* previousDirtyTime */, Timestamp /* now */, const Nullable<T> & /* previousDirtyValue */, const Nullable<T> & /* newValue */)>;
+    using SufficientChangePredicate =
+        std::function<bool(Timestamp /* previousDirtyTime */, Timestamp /* now */, const Nullable<T> & /* previousDirtyValue */,
+                           const Nullable<T> & /* newValue */)>;
 
     /**
      * @brief Factory to generate a functor for "attribute was last reported" at least `minimumDurationMillis` ago.
@@ -93,11 +98,13 @@ class QuieterReportingAttribute
      * @param minimumDurationMillis - number of millis needed since last marked as dirty before we mark dirty again.
      * @return a functor usable for the `changedPredicate` arg of `SetValue()`
      */
-    static SufficientChangePredicate GetPredicateForSufficientTimeSinceLastDirty(chip::System::Clock::Milliseconds64 minimumDurationMillis)
+    static SufficientChangePredicate
+    GetPredicateForSufficientTimeSinceLastDirty(chip::System::Clock::Milliseconds64 minimumDurationMillis)
     {
-      return [minimumDurationMillis](Timestamp previousDirtyTime, Timestamp now, const Nullable<T> &oldDirtyValue, const Nullable<T> &newValue) -> bool {
-        return (oldDirtyValue != newValue) && ((now - previousDirtyTime) >= minimumDurationMillis);
-      };
+        return [minimumDurationMillis](Timestamp previousDirtyTime, Timestamp now, const Nullable<T> & oldDirtyValue,
+                                       const Nullable<T> & newValue) -> bool {
+            return (oldDirtyValue != newValue) && ((now - previousDirtyTime) >= minimumDurationMillis);
+        };
     }
 
     chip::app::DataModel::Nullable<T> value() const { return mValue; }
@@ -111,7 +118,7 @@ class QuieterReportingAttribute
     bool GetThenResetDirtyState()
     {
         bool wasDirty = mIsDirty;
-        mIsDirty = false;
+        mIsDirty      = false;
         return wasDirty;
     }
 
@@ -122,13 +129,14 @@ class QuieterReportingAttribute
      */
     void ForceMarkAsDirty(Timestamp now)
     {
-        mIsDirty = true;
+        mIsDirty                  = true;
         mLastDirtyTimestampMillis = now;
-        mLastDirtyValue = mValue;
+        mLastDirtyValue           = mValue;
     }
 
     /**
-     * Set the updated value of the attribute, computing whether it needs to be reported according to `changedPredicate` and policies.
+     * Set the updated value of the attribute, computing whether it needs to be reported according to `changedPredicate` and
+     * policies.
      *
      * - Any change of nullability between `newValue` and the old value will be considered dirty.
      * - The policies from `QuieterReportingPolicyEnum` and set via `SetPolicy()` are self-explanatory by name.
@@ -141,14 +149,14 @@ class QuieterReportingAttribute
      * @param now - system monotonic timestamp at the time of the call
      * @param changedPredicate - functor to possibly override dirty state
      */
-    void SetValue(const chip::app::DataModel::Nullable<T>& newValue, Timestamp now, SufficientChangePredicate changedPredicate)
+    void SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now, SufficientChangePredicate changedPredicate)
     {
-        bool isChangeOfNull = newValue.IsNull() ^ mValue.IsNull();
+        bool isChangeOfNull       = newValue.IsNull() ^ mValue.IsNull();
         bool areBothValuesNonNull = !newValue.IsNull() && !mValue.IsNull();
 
         bool changeToFromZero = areBothValuesNonNull && (*newValue == 0 || *mValue == 0);
-        bool isIncrement = areBothValuesNonNull && (*newValue > *mValue);
-        bool isDecrement = areBothValuesNonNull && (*newValue < *mValue);
+        bool isIncrement      = areBothValuesNonNull && (*newValue > *mValue);
+        bool isDecrement      = areBothValuesNonNull && (*newValue < *mValue);
 
         bool wasDirty = mIsDirty;
 
@@ -162,7 +170,7 @@ class QuieterReportingAttribute
 
         if (!wasDirty && mIsDirty)
         {
-            mLastDirtyValue = newValue;
+            mLastDirtyValue           = newValue;
             mLastDirtyTimestampMillis = now;
         }
     }
@@ -175,16 +183,16 @@ class QuieterReportingAttribute
      * @param newValue - new value to set for the attribute
      * @param now - system monotonic timestamp at the time of the call
      */
-    void SetValue(const chip::app::DataModel::Nullable<T>& newValue, Timestamp now)
+    void SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now)
     {
         SetValue(newValue, now, [](Timestamp, Timestamp, const Nullable<T> &, const Nullable<T> &) -> bool { return false; });
     }
 
-  protected:
+protected:
     chip::app::DataModel::Nullable<T> mValue;
     chip::app::DataModel::Nullable<T> mLastDirtyValue;
     bool mIsDirty = false;
-    QuieterReportingPolicyFlags mPolicyFlags{0};
+    QuieterReportingPolicyFlags mPolicyFlags{ 0 };
     chip::System::Clock::Milliseconds64 mLastDirtyTimestampMillis{};
 };
 

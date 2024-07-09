@@ -34,7 +34,7 @@ using namespace chip::System::Clock::Literals;
 
 class FakeClock
 {
-  public:
+public:
     FakeClock() = default;
 
     Timestamp Advance(Milliseconds64 numMillis)
@@ -43,17 +43,11 @@ class FakeClock
         return mCurrentTimestamp;
     }
 
-    void SetMonotonic(Timestamp now)
-    {
-        mCurrentTimestamp = now;
-    }
+    void SetMonotonic(Timestamp now) { mCurrentTimestamp = now; }
 
-    Timestamp now() const
-    {
-      return mCurrentTimestamp;
-    }
+    Timestamp now() const { return mCurrentTimestamp; }
 
-  private:
+private:
     Timestamp mCurrentTimestamp{};
 };
 
@@ -62,7 +56,7 @@ TEST(TestQuieterReporting, ChangeToFromZeroPolicyWorks)
     FakeClock fakeClock;
     fakeClock.SetMonotonic(100_ms);
 
-    QuieterReportingAttribute<int> attribute{MakeNullable<int>(10)};
+    QuieterReportingAttribute<int> attribute{ MakeNullable<int>(10) };
     // Always start not dirty (because first sub priming always just read value anyway).
     ASSERT_FALSE(attribute.GetThenResetDirtyState());
 
@@ -71,8 +65,8 @@ TEST(TestQuieterReporting, ChangeToFromZeroPolicyWorks)
 
     auto now = fakeClock.now();
 
-    attribute.SetPolicy(QuieterReportingPolicyFlags{QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero});
-    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero});
+    attribute.SetPolicy(QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero });
+    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero });
 
     // 10 --> 11, expect not marked dirty yet.
     attribute.SetValue(11, now);
@@ -108,7 +102,7 @@ TEST(TestQuieterReporting, ChangeOnIncrementPolicyWorks)
     FakeClock fakeClock;
     fakeClock.SetMonotonic(100_ms);
 
-    QuieterReportingAttribute<int> attribute{MakeNullable<int>(10)};
+    QuieterReportingAttribute<int> attribute{ MakeNullable<int>(10) };
 
     // Always start not dirty (because first sub priming always just read value anyway).
     ASSERT_FALSE(attribute.GetThenResetDirtyState());
@@ -116,8 +110,8 @@ TEST(TestQuieterReporting, ChangeOnIncrementPolicyWorks)
 
     auto now = fakeClock.now();
 
-    attribute.SetPolicy(QuieterReportingPolicyFlags{QuieterReportingPolicyEnum::kMarkDirtyOnIncrement});
-    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{QuieterReportingPolicyEnum::kMarkDirtyOnIncrement});
+    attribute.SetPolicy(QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnIncrement });
+    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnIncrement });
 
     // 10 --> 9, expect not marked dirty yet.
     attribute.SetValue(9, now);
@@ -168,7 +162,7 @@ TEST(TestQuieterReporting, ChangeOnDecrementPolicyWorks)
     FakeClock fakeClock;
     fakeClock.SetMonotonic(100_ms);
 
-    QuieterReportingAttribute<int> attribute{MakeNullable<int>(9)};
+    QuieterReportingAttribute<int> attribute{ MakeNullable<int>(9) };
 
     // Always start not dirty (because first sub priming always just read value anyway).
     ASSERT_FALSE(attribute.GetThenResetDirtyState());
@@ -176,8 +170,8 @@ TEST(TestQuieterReporting, ChangeOnDecrementPolicyWorks)
 
     auto now = fakeClock.now();
 
-    attribute.SetPolicy(QuieterReportingPolicyFlags{QuieterReportingPolicyEnum::kMarkDirtyOnDecrement});
-    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{QuieterReportingPolicyEnum::kMarkDirtyOnDecrement});
+    attribute.SetPolicy(QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnDecrement });
+    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnDecrement });
 
     // 9 --> 10, expect not marked dirty yet.
     attribute.SetValue(10, now);
@@ -231,7 +225,7 @@ TEST(TestQuieterReporting, SufficientChangePredicateWorks)
     FakeClock fakeClock;
     fakeClock.SetMonotonic(100_ms);
 
-    QuieterReportingAttribute<int> attribute{MakeNullable<int>(9)};
+    QuieterReportingAttribute<int> attribute{ MakeNullable<int>(9) };
 
     // Always start not dirty (because first sub priming always just read value anyway).
     ASSERT_FALSE(attribute.GetThenResetDirtyState());
