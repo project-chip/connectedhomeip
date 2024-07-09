@@ -6,8 +6,24 @@
 
 ## Fabric Sync Example Applications
 
-Fabric-Admin and Fabric-Bridge applications are provided to demonstrate Fabric
-Synchronization feature. You can find them in the examples.
+Fabric-Admin and Fabric-Bridge example applications are provided to demonstrate
+Fabric Synchronization feature. You can find them in the examples.
+
+![matter_fabric_synchronization](images/matter_fabric_synchronization.png)
+
+Fabric-Admin example app implements the Fabric Administrator role and
+communicate with the Fabric-Bridge-App on the other side, facilitating the
+Fabric Synchronization process.
+
+Fabric-Bridge-App example app implements the Aggregator device type with Fabric
+Synchronization condition met and demonstrates the end-to-end Fabric
+Synchronization feature using dynamic endpoints.
+
+Fabric Synchronization can be triggered from either side. The initiator of the
+Fabric Synchronization process, who shares their devices, takes on the
+Commissioner role. The recipient of the Fabric Synchronization request, who
+receives the shared devices, assumes the Commissionee role. This flexibility
+enables a seamless and efficient synchronization process.
 
 ### Building the Example Application
 
