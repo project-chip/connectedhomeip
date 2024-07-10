@@ -4064,6 +4064,7 @@ class ChipClusters:
                     "monitoredSubject": "int",
                     "key": "bytes",
                     "verificationKey": "bytes",
+                    "clientType": "int",
                 },
             },
             0x00000002: {
@@ -6539,6 +6540,104 @@ class ChipClusters:
                 "attributeName": "CumulativeEnergyReset",
                 "attributeId": 0x00000005,
                 "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _WATER_HEATER_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "WaterHeaterManagement",
+        "clusterId": 0x00000094,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Boost",
+                "args": {
+                    "duration": "int",
+                    "oneShot": "bool",
+                    "emergencyBoost": "bool",
+                    "temporarySetpoint": "int",
+                    "targetPercentage": "int",
+                    "targetReheat": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "CancelBoost",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "HeaterTypes",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "HeatDemand",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "TankVolume",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "EstimatedHeatRequired",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "TankPercentage",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "BoostState",
+                "attributeId": 0x00000005,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -10427,6 +10526,19 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000003: {
+                "attributeName": "HoldTime",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000004: {
+                "attributeName": "HoldTimeLimits",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
             0x00000010: {
                 "attributeName": "PIROccupiedToUnoccupiedDelay",
                 "attributeId": 0x00000010,
@@ -11700,16 +11812,16 @@ class ChipClusters:
                 "args": {
                 },
             },
-            0x00000004: {
-                "commandId": 0x00000004,
+            0x00000003: {
+                "commandId": 0x00000003,
                 "commandName": "SetActiveDatasetRequest",
                 "args": {
                     "activeDataset": "bytes",
                     "breadcrumb": "int",
                 },
             },
-            0x00000005: {
-                "commandId": 0x00000005,
+            0x00000004: {
+                "commandId": 0x00000004,
                 "commandName": "SetPendingDatasetRequest",
                 "args": {
                     "pendingDataset": "bytes",
@@ -11741,9 +11853,9 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
-            0x00000005: {
+            0x00000004: {
                 "attributeName": "ActiveDatasetTimestamp",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -14113,6 +14225,13 @@ class ChipClusters:
                     "fillCharacter": "int",
                 },
             },
+            0x00000018: {
+                "commandId": 0x00000018,
+                "commandName": "StringEchoRequest",
+                "args": {
+                    "payload": "bytes",
+                },
+            },
             0xFFF200AA: {
                 "commandId": 0xFFF200AA,
                 "commandName": "TestDifferentVendorMeiRequest",
@@ -14939,6 +15058,7 @@ class ChipClusters:
         0x00000081: _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         0x00000090: _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,
         0x00000091: _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
+        0x00000094: _WATER_HEATER_MANAGEMENT_CLUSTER_INFO,
         0x00000096: _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         0x00000097: _MESSAGES_CLUSTER_INFO,
         0x00000098: _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
@@ -15064,6 +15184,7 @@ class ChipClusters:
         "ValveConfigurationAndControl": _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "ElectricalPowerMeasurement": _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,
         "ElectricalEnergyMeasurement": _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
+        "WaterHeaterManagement": _WATER_HEATER_MANAGEMENT_CLUSTER_INFO,
         "DemandResponseLoadControl": _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         "Messages": _MESSAGES_CLUSTER_INFO,
         "DeviceEnergyManagement": _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,

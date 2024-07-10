@@ -127,6 +127,7 @@
         "valve-configuration-and-control-cluster.xml",
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
+        "water-heater-management-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "wifi-network-management-cluster.xml",
         "window-covering.xml",
@@ -275,6 +276,7 @@
             "ICDCounter",
             "ClientsSupportedPerFabric"
         ],
+        "Occupancy Sensing": ["HoldTimeLimits"],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",

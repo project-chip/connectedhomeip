@@ -191,6 +191,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/water-heater-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
@@ -529,6 +530,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDManagementCluster.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_IDM_1_2.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_IDM_1_4.py'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_IDM_4_2.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_PWRTL_2_1.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_RR_1_1.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_SC_3_6.py'
@@ -548,6 +550,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_TestEventTrigger.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TestBatchInvoke.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TestGroupTableReports.py'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_OPCREDS_3_1.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_OPCREDS_3_2.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_OPSTATE_2_1.py'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_OPSTATE_2_2.py'
@@ -576,9 +579,9 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestMatterTestingSupport.py" --script-args "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestSpecParsingSupport.py" --script-args "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py'
-                  scripts/run_in_python_env.sh out/venv './src/python_testing/test_testing/test_TC_DA_1_2.py'
                   scripts/run_in_python_env.sh out/venv './src/python_testing/test_testing/test_TC_ICDM_2_1.py'
                   scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/TestIdChecks.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 ./src/python_testing/test_testing/test_IDM_10_4.py'
 
             - name: Uploading core files
               uses: actions/upload-artifact@v4

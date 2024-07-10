@@ -1194,6 +1194,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("electricalPowerMeasurement", writeElectricalPowerMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeElectricalEnergyMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("electricalEnergyMeasurement", writeElectricalEnergyMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeWaterHeaterManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("waterHeaterManagement", writeWaterHeaterManagementInteractionInfo);
     Map<String, InteractionInfo> writeDemandResponseLoadControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDemandResponseLoadControlDefaultRandomStartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo demandResponseLoadControldefaultRandomStartCommandParameterInfo =
@@ -3419,6 +3421,28 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeRelativeHumidityMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("relativeHumidityMeasurement", writeRelativeHumidityMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeOccupancySensingInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeOccupancySensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo occupancySensingholdTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeOccupancySensingHoldTimeCommandParams.put(
+        "value",
+        occupancySensingholdTimeCommandParameterInfo
+    );
+    InteractionInfo writeOccupancySensingHoldTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.OccupancySensingCluster) cluster).writeHoldTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeOccupancySensingHoldTimeCommandParams
+    );
+    writeOccupancySensingInteractionInfo.put("writeHoldTimeAttribute", writeOccupancySensingHoldTimeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeOccupancySensingPIROccupiedToUnoccupiedDelayCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo occupancySensingPIROccupiedToUnoccupiedDelayCommandParameterInfo =
         new CommandParameterInfo(
