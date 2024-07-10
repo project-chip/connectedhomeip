@@ -254,7 +254,12 @@ Davis, CA 95616, USA
         </otherwiseConform>
       </field>
       <field id="2" name="AddedEnergy" type="energy-mWh" default="0">
-        <optionalConform choice="a" more="true"/>
+        <otherwiseConform>
+          <optionalConform>
+            <feature name="SOC"/>
+          </optionalConform>
+          <optionalConform choice="a" more="true"/>
+        </otherwiseConform>
         <constraint type="min" value="0"/>
       </field>
     </struct>
@@ -525,7 +530,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="min" value="0"/>
       </field>
-      <field id="3" name="MaximumDischargingCurrent" type="amperage-mA">
+      <field id="3" name="MaximumDischargeCurrent" type="amperage-mA">
         <mandatoryConform>
           <feature name="V2X"/>
         </mandatoryConform>

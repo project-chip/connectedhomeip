@@ -125,22 +125,22 @@ Davis, CA 95616, USA
     </enum>
     <enum name="WiFiBandEnum">
       <item value="0" name="2G4" summary="2.4GHz - 2.401GHz to 2.495GHz (802.11b/g/n/ax)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="1" name="3G65" summary="3.65GHz - 3.655GHz to 3.695GHz (802.11y)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="2" name="5G" summary="5GHz - 5.150GHz to 5.895GHz (802.11a/n/ac/ax)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="3" name="6G" summary="6GHz - 5.925GHz to 7.125GHz (802.11ax / Wi-Fi 6E)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="4" name="60G" summary="60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
       <item value="5" name="1G" summary="Sub-1GHz - 755MHz to 931MHz (802.11ah)">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </item>
     </enum>
     <bitmap name="ThreadCapabilitiesBitmap">

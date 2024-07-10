@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="TBRM" scope="Node"/>
   <features>
-    <feature bit="0" code="PC" name="PAN" summary="The ability to change PAN configuration with pending dataset setting request.">
+    <feature bit="0" code="PC" name="PANChange" summary="The ability to change PAN configuration with pending dataset setting request.">
       <optionalConform/>
     </feature>
   </features>
@@ -79,6 +79,7 @@ Davis, CA 95616, USA
     <attribute id="0x0001" name="BorderAgentID" type="octstr">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
+      <constraint type="maxLength" value="16"/>
     </attribute>
     <attribute id="0x0002" name="ThreadVersion" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -95,6 +96,11 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
+    <attribute id="0x0005" name="PendingDatasetTimestamp" type="uint64" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform/>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="GetActiveDatasetRequest" direction="commandToServer" response="DatasetResponse">
@@ -105,14 +111,14 @@ Davis, CA 95616, USA
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
     </command>
-    <command id="0x03" name="DatasetResponse" direction="responseFromServer">
+    <command id="0x02" name="DatasetResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="Dataset" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="254"/>
       </field>
     </command>
-    <command id="0x04" name="SetActiveDatasetRequest" direction="commandToServer" response="Y">
+    <command id="0x03" name="SetActiveDatasetRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
       <field id="0" name="ActiveDataset" type="octstr">
@@ -123,7 +129,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x05" name="SetPendingDatasetRequest" direction="commandToServer" response="Y">
+    <command id="0x04" name="SetPendingDatasetRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="PC"/>

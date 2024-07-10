@@ -115,7 +115,7 @@ Davis, CA 95616, USA
       <field id="3" name="Key">
         <deprecateConform/>
       </field>
-      <field id="4" name="ClientType" type="ClientTypeEnum Field" default="0">
+      <field id="4" name="ClientType" type="ClientTypeEnum" default="0">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>

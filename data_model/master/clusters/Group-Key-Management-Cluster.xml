@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="GRPKEY" scope="Node"/>
   <features>
     <feature bit="0" code="CS" name="CacheAndSync" summary="The ability to support CacheAndSync security policy and MCSP.">
-      <optionalConform/>
+      <provisionalConform/>
     </feature>
   </features>
   <dataTypes>

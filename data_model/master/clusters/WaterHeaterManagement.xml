@@ -74,6 +74,14 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
+    <enum name="BoostStateEnum">
+      <item value="0" name="Inactive" summary="Boost is not currently active">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Active" summary="Boost is currently active">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <bitmap name="WaterHeaterDemandBitmap">
       <bitfield name="ImmersionElement1" bit="0" summary="Immersion Heating Element1 State On">
         <mandatoryConform/>
@@ -137,7 +145,7 @@ Davis, CA 95616, USA
         <feature name="TP"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0005" name="BoostState" type="bool" default="False">
+    <attribute id="0x0005" name="BoostState" type="BoostStateEnum" default="Inactive">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>

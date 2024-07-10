@@ -65,7 +65,8 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes"/>
     <revision revision="5" summary="New data model format and notation, FeatureMap support"/>
     <revision revision="6" summary="Added clarifications to Scenes support for Matter"/>
-    <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, EnhancedCurrentHue and RemainingTime attributes"/>
+    <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, EnhancedCurrentHue and RemainingTime attributes +
+             and added clarifications for behavior related to Step values"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0300" name="Color Control"/>
@@ -111,19 +112,10 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="ColorLoopDirectionEnum">
-      <item value="0" name="Decrement">
+      <item value="0" name="Decrement" summary="Decrement the hue in the color loop.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Increment">
-        <mandatoryConform/>
-      </item>
-      <item value="Decrement the hue in the color loop." name="M">
-        <mandatoryConform/>
-      </item>
-      <item value="Increment the hue in the color loop." name="M">
-        <mandatoryConform/>
-      </item>
-      <item value="Summary" name="Conformance">
+      <item value="1" name="Increment" summary="Increment the hue in the color loop.">
         <mandatoryConform/>
       </item>
     </enum>

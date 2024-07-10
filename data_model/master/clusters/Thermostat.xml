@@ -113,11 +113,6 @@ Davis, CA 95616, USA
     <feature bit="8" code="PRES" name="Presets" summary="Thermostat supports setpoint presets">
       <optionalConform/>
     </feature>
-    <feature bit="9" code="QDPRES" name="QueuedPresetsSupported" summary="Thermostat supports queued Presets with a delay">
-      <optionalConform>
-        <feature name="PRES"/>
-      </optionalConform>
-    </feature>
   </features>
   <dataTypes>
     <number name="SignedTemperature" type=""/>
@@ -503,12 +498,12 @@ Davis, CA 95616, USA
     </bitmap>
     <bitmap name="ScheduleTypeFeaturesBitmap">
       <bitfield name="SupportsPresets" bit="0" summary="Supports presets">
-        <optionalConform choice="a" more="true">
+        <optionalConform choice="b" more="true">
           <feature name="PRES"/>
         </optionalConform>
       </bitfield>
       <bitfield name="SupportsSetpoints" bit="1" summary="Supports setpoints">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="b" more="true"/>
       </bitfield>
       <bitfield name="SupportsNames" bit="2" summary="Supports user-provided names">
         <optionalConform/>
@@ -556,15 +551,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="2" name="PresetTypeFeatures" type="PresetTypeFeaturesBitmap" default="0">
-        <mandatoryConform/>
-      </field>
-    </struct>
-    <struct name="QueuedPresetStruct">
-      <field id="0" name="PresetHandle" type="octstr">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
-      </field>
-      <field id="1" name="TransitionTimestamp" type="epoch-s">
         <mandatoryConform/>
       </field>
     </struct>
@@ -1107,13 +1093,6 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0054" name="QueuedPreset" type="QueuedPresetStruct" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform>
-        <feature name="QDPRES"/>
-      </mandatoryConform>
-    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="SetpointRaiseLower" direction="commandToServer" response="Y">
@@ -1243,11 +1222,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="1" name="DelaySeconds" type="uint32" default="0">
-        <optionalConform>
-          <feature name="QDPRES"/>
-        </optionalConform>
-      </field>
     </command>
     <command id="0x07" name="StartPresetsSchedulesEditRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
@@ -1278,12 +1252,6 @@ Davis, CA 95616, USA
           <feature name="MSCH"/>
           <feature name="PRES"/>
         </orTerm>
-      </mandatoryConform>
-    </command>
-    <command id="0x0A" name="CancelSetActivePresetRequest" direction="commandToServer" response="Y">
-      <access invokePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="QDPRES"/>
       </mandatoryConform>
     </command>
   </commands>

@@ -66,7 +66,7 @@ Davis, CA 95616, USA
     <revision revision="5" summary="CCB 3472 3474 3338"/>
     <revision revision="6" summary="New data model format and notation. Added User features. General cleanup of functionality"/>
     <revision revision="7" summary="Added support for European door locks (unbolt feature)"/>
-    <revision revision="8" summary="Removed LOG feature
+    <revision revision="8" summary="Removed LOG feature, fixed constraints on NumberOf*Schedules attributes.
              and added support for Aliro credential provisioning"/>
   </revisionHistory>
   <clusterIds>
@@ -937,6 +937,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="WDSCH"/>
       </mandatoryConform>
+      <constraint type="max" value="0xFD"/>
     </attribute>
     <attribute id="0x0015" name="NumberOfYearDaySchedulesSupportedPerUser" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
@@ -944,6 +945,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="YDSCH"/>
       </mandatoryConform>
+      <constraint type="max" value="0xFD"/>
     </attribute>
     <attribute id="0x0016" name="NumberOfHolidaySchedulesSupported" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
@@ -951,6 +953,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="HDSCH"/>
       </mandatoryConform>
+      <constraint type="max" value="0xFD"/>
     </attribute>
     <attribute id="0x0017" name="MaxPINCodeLength" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
