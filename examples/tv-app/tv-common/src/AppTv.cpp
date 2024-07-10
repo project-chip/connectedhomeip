@@ -688,7 +688,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
             nodeIds.insert(tempNodeIds.begin(), tempNodeIds.end());
         }
     }
-    #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     // refresh ACLs
     for (const auto & nodeId : nodeIds)
     {
@@ -702,7 +702,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
         GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
                                                     &pairingCommand->mOnDeviceConnectionFailureCallback);
     }
-    #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 }
 
 bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)
