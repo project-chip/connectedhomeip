@@ -15,11 +15,18 @@
 #    limitations under the License.
 #
 
+# test-runner-runs: run1
+# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
+# test-runner-run/run1/factoryreset: True
+# test-runner-run/run1/quiet: True
+# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+
 import ipaddress
 import logging
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, TestStep
 from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
 
 # from mobly import asserts
@@ -38,6 +45,27 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 
 
 class TC_SC_4_3(MatterBaseTest):
+
+    def steps_TC_SC_4_3(self):
+        return [TestStep(1, "DUT is commissioned on the same fabric as TH."),
+                TestStep(2, "TH reads ServerList attribute from the Descriptor cluster on EP0. ",
+                         "If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false."),
+                TestStep(3, "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.", ""),
+                TestStep(4, "If supports_icd is true, TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature is set, set supports_lit to true. Otherwise set supports_lit to false.", ""),
+                TestStep(5, "TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.", ""),
+                TestStep(6, "TH performs a query for the SRV record against the qname instance_qname.",
+                         "Verify SRV record is returned"),
+                TestStep(7, "TH performs a query for the TXT record against the qname instance_qname.",
+                         "Verify TXT record is returned"),
+                TestStep(8, "TH performs a query for the AAAA record against the target listed in the SRV record",
+                         "Verify AAAA record is returned"),
+                TestStep(9, "TH verifies the following from the returned records:",
+                         "Hostname: • If (MCORE.COM.WIFI OR MCORE.COM.ETH) target, the hostname must be a 12-character uppercase hexadecimal string. • If (MCORE.COM.THR) target, the hostname must be a 16-character hex string using capital letters. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0 otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)"),
+                TestStep(10, "TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.",
+                         "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
+                TestStep(11, "TH performs a DNS-SD browse for _matter._tcp.local",
+                         "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
+                ]
 
     ONE_HOUR_IN_MS = 3600000
     MAX_SAT_VALUE = 65535
@@ -141,10 +169,13 @@ class TC_SC_4_3(MatterBaseTest):
         # sit_mode = None
 
         # *** STEP 1 ***
-        self.print_step("1", "DUT is commissioned on the same fabric as TH.")
+        # DUT is commissioned on the same fabric as TH.
+        self.step(1)
 
         # *** STEP 2 ***
-        self.print_step("2", "TH reads ServerList attribute from the Descriptor cluster on EP0. If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false.")
+        # TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0. If the ICD Management
+        # cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false.
+        self.step(2)
         ep0_servers = await self.get_descriptor_server_list()
 
         # Check if ep0_servers contains the ICD Management cluster ID (0x0046)
@@ -152,14 +183,17 @@ class TC_SC_4_3(MatterBaseTest):
         logging.info(f"\n\n\tsupports_icd: {supports_icd}\n\n")
 
         # *** STEP 3 ***
-        self.print_step(
-            "3", "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.")
+        # If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves
+        # as active_mode_threshold.
+        self.step(3)
         if supports_icd:
             active_mode_threshold_ms = await self.get_idle_mode_threshhold_ms()
         logging.info(f"\n\n\tactive_mode_threshold_ms: {active_mode_threshold_ms}\n\n")
 
         # *** STEP 4 ***
-        self.print_step("4", "If supports_icd is true, TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature is set, set supports_lit to true. Otherwise set supports_lit to false.")
+        # If supports_icd is true, TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature
+        # is set, set supports_lit to true. Otherwise set supports_lit to false.
+        self.step(4)
         if supports_icd:
             feature_map = await self.get_icd_feature_map()
             LITS = Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
@@ -167,22 +201,55 @@ class TC_SC_4_3(MatterBaseTest):
             logging.info(f"\n\n\tkLongIdleTimeSupport set: {supports_lit}\n\n")
 
         # *** STEP 5 ***
-        self.print_step("5", "TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.")
+        # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
+        # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
+        # string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.
+        self.step(5)
         instance_name = self.get_dut_instance_name()
 
-        # PENDING STEPS 6-8
 
+
+        # *** STEP 6 ***
+        # TH performs a query for the SRV record against the qname instance_qname.
+        # Verify SRV record is returned
+        self.step(6)
+
+        # *** STEP 7 ***
+        # TH performs a query for the TXT record against the qname instance_qname.
+        # Verify TXT record is returned
+        self.step(7)
+
+        # *** STEP 8 ***
+        # TH performs a query for the AAAA record against the target listed in the SRV record.
+        # Verify AAAA record is returned
+        self.step(8)  
+
+
+
+        print("\n"*10)
         mdns = MdnsDiscovery()
         await mdns.get_service_by_record_type(
             service_name=f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}",
             service_type=MdnsServiceType.OPERATIONAL.value,
-            record_type=DNSRecordType.SRV,
+            record_type=DNSRecordType.TXT,
             log_output=True,
             load_from_cache=False
         )
+        print("\n"*10)
+
+
 
         # # *** STEP 9 ***
-        # self.print_step("9", "TH verifies ICD, SII, SAI, SAT, and T TXT record keys/vales of the returned record.")
+        # TH verifies the following from the returned records: Hostname: • If (MCORE.COM.WIFI OR MCORE.COM.ETH) target, the hostname must be a
+        # 12-character uppercase hexadecimal string. • If (MCORE.COM.THR) target, the hostname must be a 16-character hex string using capital
+        # letters. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true,
+        # verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and
+        # supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0
+        # otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS
+        # present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal
+        # to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key
+        # is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)
+        self.step(9)
 
         # # ICD TXT KEY
         # if supports_lit:
@@ -255,12 +322,20 @@ class TC_SC_4_3(MatterBaseTest):
         # asserts.assert_true(result, message)
 
         # # *** STEP 10 ***
-        # self.print_step("10", "Verify DUT returns a PTR record with DNS-SD instance name set instance_name.")
+        # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as
+        # ASCII (UTF-8) text using capital letters. Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
+        self.step(10)
         # service_types = await mdns.get_service_types(log_output=True)
         # op_sub_type = self.get_operational_subtype()
         # asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}'")
 
-        print("\n"*10)
+        # # *** STEP 11 ***
+        # TH performs a DNS-SD browse for _matter._tcp.local
+        # Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
+        self.step(11)
+
+
+        
 
         # input()
 
