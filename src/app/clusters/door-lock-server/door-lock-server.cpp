@@ -957,7 +957,18 @@ void DoorLockServer::clearCredentialCommandHandler(
     }
 
     // Remove all the credentials of the particular type.
-    auto credentialType  = credential.Value().credentialType;
+    auto credentialType = credential.Value().credentialType;
+
+    if (!credentialTypeSupported(commandPath.mEndpointId, credentialType))
+    {
+        ChipLogProgress(Zcl,
+                        "[ClearCredential] Credential type is not supported [endpointId=%d,credentialType=%u"
+                        "]",
+                        commandPath.mEndpointId, to_underlying(credentialType));
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return;
+    }
+
     auto credentialIndex = credential.Value().credentialIndex;
     if (0xFFFE == credentialIndex)
     {
@@ -2410,6 +2421,42 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Fab
         return DlStatus::kInvalidField;
     }
 
+    // For Aliro endpoint keys, there is a single shared count for the total
+    // count of evictable and non-evictable keys that can be stored.  This needs
+    // to be enforced specially, because none of the other logic we have handles that.
+    if (credentialType == CredentialTypeEnum::kAliroEvictableEndpointKey ||
+        credentialType == CredentialTypeEnum::kAliroNonEvictableEndpointKey)
+    {
+        Delegate * delegate = GetDelegate(endpointId);
+        if (delegate == nullptr)
+        {
+            ChipLogError(Zcl, "Door lock delegate is null, can't handle Aliro credentials");
+            return DlStatus::kFailure;
+        }
+
+        size_t maxEndpointKeys = delegate->GetNumberOfAliroEndpointKeysSupported();
+        size_t evictableEndpointKeys, nonEvictableEndpointKeys;
+
+        if (!countOccupiedCredentials(endpointId, CredentialTypeEnum::kAliroEvictableEndpointKey, evictableEndpointKeys))
+        {
+            ChipLogError(Zcl, "Unable to count Aliro evictable endpoint keys.");
+            return DlStatus::kFailure;
+        }
+
+        if (!countOccupiedCredentials(endpointId, CredentialTypeEnum::kAliroNonEvictableEndpointKey, nonEvictableEndpointKeys))
+        {
+            ChipLogError(Zcl, "Unable to count Aliro non-evictable endpoint keys.");
+            return DlStatus::kFailure;
+        }
+
+        if (evictableEndpointKeys + nonEvictableEndpointKeys >= maxEndpointKeys)
+        {
+            // We have no space for another credential here.
+            ChipLogError(Zcl, "Unable to create Aliro endpoint key credential; too many exist already [endpointId=%d]", endpointId);
+            return DlStatus::kResourceExhausted;
+        }
+    }
+
     CredentialStruct credential{ credentialType, credentialIndex };
     // appclusters, 5.2.4.40: if userIndex is not provided we should create new user
     DlStatus status = DlStatus::kSuccess;
@@ -2445,6 +2492,42 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Fab
     }
 
     return status;
+}
+
+bool DoorLockServer::countOccupiedCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
+                                              size_t & occupiedCount)
+{
+    uint16_t maxCredentialCount;
+
+    if (!getMaxNumberOfCredentials(endpointId, credentialType, maxCredentialCount))
+    {
+        return false;
+    }
+
+    uint16_t startIndex = 1;
+    // Programming PIN is a special case -- it is unique and its index assumed to be 0.
+    if (CredentialTypeEnum::kProgrammingPIN == credentialType)
+    {
+        startIndex = 0;
+        maxCredentialCount--;
+    }
+
+    occupiedCount = 0;
+    for (uint16_t credentialIndex = startIndex; credentialIndex <= maxCredentialCount; ++credentialIndex)
+    {
+        EmberAfPluginDoorLockCredentialInfo credential;
+        if (!emberAfPluginDoorLockGetCredential(endpointId, credentialIndex, credentialType, credential))
+        {
+            return false;
+        }
+
+        if (credential.status == DlCredentialStatus::kOccupied)
+        {
+            ++occupiedCount;
+        }
+    }
+
+    return true;
 }
 
 DlStatus DoorLockServer::modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex,
