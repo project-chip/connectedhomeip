@@ -142,7 +142,9 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         {
             jsonVal["mrpRetryActiveThreshold"] = activeThreshold->count();
         }
-        jsonVal["supportsTcp"] = dnsSdInfo->supportsTcp;
+
+        jsonVal["supportsTcpClient"] = dnsSdInfo->supportsTcpClient;
+        jsonVal["supportsTcpServer"] = dnsSdInfo->supportsTcpServer;
         {
             Json::Value addresses;
             for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)

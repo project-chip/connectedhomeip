@@ -1000,6 +1000,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRWaterHeaterManagementClusterBoostParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWaterHeaterManagementClusterCancelBoostParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

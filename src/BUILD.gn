@@ -50,6 +50,7 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
+      "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/data-model-interface/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",

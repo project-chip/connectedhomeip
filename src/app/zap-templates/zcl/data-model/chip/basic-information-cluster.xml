@@ -104,7 +104,7 @@ limitations under the License.
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                  optional="true">Reachable</attribute>
-    <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                               optional="true">UniqueID</attribute>
+    <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                               optional="false">UniqueID</attribute>
     <attribute side="server" code="19" define="CAPABILITY_MINIMA"         type="CapabilityMinimaStruct"                              writable="false"               >CapabilityMinima</attribute>
     <attribute side="server" code="20" define="PRODUCT_APPEARANCE"        type="ProductAppearanceStruct"                                             optional="true">ProductAppearance</attribute>
     <attribute side="server" code="21" define="SPECIFICATION_VERSION"     type="int32u"                                                                             >SpecificationVersion</attribute>
