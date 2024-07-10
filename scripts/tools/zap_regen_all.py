@@ -503,7 +503,7 @@ def main():
     #    - scripts/codegen.py uses click (can be in current pyenv, but guaranteed in bootstrap)
     #    - formatting is using bootstrapped clang-format
     # Figure out if bootstrapped. For now assume `PW_ROOT` is such a marker in the environment
-    if not "PW_ROOT" in os.environ:
+    if "PW_ROOT" not in os.environ:
         logging.error("Script MUST be run in a bootstrapped environment.")
 
         # using the `--no-rerun-in-env` to avoid recursive infinite calls
