@@ -20,7 +20,7 @@
 import logging
 
 import chip.clusters as Clusters
-from DEMTestBase import DEMTestBase
+from TC_DEMTestBase import DEMTestBase
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -32,25 +32,31 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
 
     def desc_TC_DEM_2_9(self) -> str:
         """Return a description of this test."""
-        return "4.1.3. [TC-DEM-2.2] Power Adjustment feature functionality with DUT as Server"
+        return "4.1.3. [TC-DEM-2.2] Power or State Forecast Reporting feature functionality with DUT as Server"
 
     def pics_TC_DEM_2_9(self):
         """Return the PICS definitions associated with this test."""
         pics = [
-            "DEM.S.F00",  # Depends on Feature 00 (PowerAdjustment)
+            # Depends on Feature 01 (PowerForecastReporting) | Feature 2 (StateForecastReporting)
+            "DEM.S.F01 | DEM.S.F02",
         ]
         return pics
 
     def steps_TC_DEM_2_9(self) -> list[TestStep]:
         """Execute the test steps."""
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event"),
-            TestStep("3a", "TH reads Forecast attribute. Value has to include a valid slots[0].ManufacturerESAState"),
-            TestStep(
-                "3b", "TH reads Forecast attribute. Value has to include valid slots[0].NominalPower, slots[0].MinPower, slots[0].MaxPower, slots[0].NominalEnergy"),
-            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event Clear"),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
+                     "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("3a", "TH reads Forecast attribute.",
+                     "Value has to include a valid slots[0].ManufacturerESAState"),
+            TestStep("3b", "TH reads Forecast attribute.",
+                     "Value has to include valid slots[0].NominalPower, slots[0].MinPower, slots[0].MaxPower, slots[0].NominalEnergy"),
+            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Test Event Clear",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
         ]
 
         return steps
@@ -75,6 +81,7 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
         await self.send_test_event_trigger_forecast()
 
         self.step("3a")
+
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
         asserts.assert_greater_equal(len(forecast.slots), 1)
         asserts.assert_is_not_none(forecast.slots[0].manufacturerESAState)
