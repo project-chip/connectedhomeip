@@ -65,8 +65,8 @@ TEST(TestQuieterReporting, ChangeToFromZeroPolicyWorks)
 
     auto now = fakeClock.now();
 
-    attribute.SetPolicy(QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero });
-    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero });
+    attribute.policy().Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
+    EXPECT_TRUE(attribute.policy().HasOnly(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero));
 
     // 10 --> 11, expect not marked dirty yet.
     attribute.SetValue(11, now);
@@ -89,8 +89,8 @@ TEST(TestQuieterReporting, ChangeToFromZeroPolicyWorks)
     EXPECT_FALSE(attribute.WasJustMarkedDirty());
 
     // Reset policy, expect 12 --> 0 does not mark dirty due to no longer having the policy that causes it.
-    attribute.SetPolicy(QuieterReportingPolicyFlags{});
-    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{});
+    attribute.policy().ClearAll();
+    EXPECT_FALSE(attribute.policy().HasAny());
 
     attribute.SetValue(0, now);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 0);
@@ -110,8 +110,8 @@ TEST(TestQuieterReporting, ChangeOnIncrementPolicyWorks)
 
     auto now = fakeClock.now();
 
-    attribute.SetPolicy(QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnIncrement });
-    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnIncrement });
+    attribute.policy().Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement);
+    EXPECT_TRUE(attribute.policy().HasOnly(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement));
 
     // 10 --> 9, expect not marked dirty yet.
     attribute.SetValue(9, now);
@@ -149,8 +149,8 @@ TEST(TestQuieterReporting, ChangeOnIncrementPolicyWorks)
     EXPECT_TRUE(attribute.WasJustMarkedDirty());
 
     // Reset policy, expect 11 --> 12 does not mark dirty due to no longer having the policy that causes it.
-    attribute.SetPolicy(QuieterReportingPolicyFlags{});
-    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{});
+    attribute.policy().ClearAll();
+    EXPECT_FALSE(attribute.policy().HasAny());
 
     attribute.SetValue(12, now);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 12);
@@ -170,8 +170,8 @@ TEST(TestQuieterReporting, ChangeOnDecrementPolicyWorks)
 
     auto now = fakeClock.now();
 
-    attribute.SetPolicy(QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnDecrement });
-    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{ QuieterReportingPolicyEnum::kMarkDirtyOnDecrement });
+    attribute.policy().Set(QuieterReportingPolicyEnum::kMarkDirtyOnDecrement);
+    EXPECT_TRUE(attribute.policy().HasOnly(QuieterReportingPolicyEnum::kMarkDirtyOnDecrement));
 
     // 9 --> 10, expect not marked dirty yet.
     attribute.SetValue(10, now);
@@ -212,8 +212,8 @@ TEST(TestQuieterReporting, ChangeOnDecrementPolicyWorks)
     EXPECT_TRUE(attribute.WasJustMarkedDirty());
 
     // Reset policy, expect 11 --> 10 does not mark dirty due to no longer having the policy that causes it.
-    attribute.SetPolicy(QuieterReportingPolicyFlags{});
-    EXPECT_EQ(attribute.policy(), QuieterReportingPolicyFlags{});
+    attribute.policy().ClearAll();
+    EXPECT_FALSE(attribute.policy().HasAny());
 
     attribute.SetValue(10, now);
     EXPECT_EQ(attribute.value().ValueOr(INT_MAX), 10);

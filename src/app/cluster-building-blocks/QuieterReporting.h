@@ -19,6 +19,7 @@
 #pragma once
 
 #include <functional>
+#include <type_traits>
 #include <stdbool.h>
 
 #include <app/data-model/Nullable.h>
@@ -43,53 +44,88 @@ using Timestamp = System::Clock::Milliseconds64;
 template <typename T>
 using Nullable = DataModel::Nullable<T>;
 
+
 /**
  * This class helps track reporting state of an attribute to properly keep track of whether
  * it needs to be marked as dirty or not for purposes of reporting using
  * "7.7.9 Quieter Reporting Quality" (Q quality)
  *
- * The class can be configured via `SetPolicy` to have some/all of the common reasons
+ * The class can be configured via `policy()` to have some/all of the common reasons
  * for reporting (e.g. increment only, decrement only, change to/from zero).
  *
  * Changes of null to non-null or non-null to null are always considered dirty.
  *
- * It is possible to force mark the attribute as dirty (see `ForceDirty`) such as
+ * It is possible to force mark the attribute as dirty (see `ForceDirty()`) such as
  * for conditions like "When there is any increase or decrease in the estimated time
  * remaining that was due to progressing insight of the server's control logic".
  *
- * Usage:
+ * Class maintains a `current value` and a timestamped `dirty` state. The value is
+ * marked as dirty if it considered sufficiently changed.
  *
- * - Call `SetValue()` with the new value and current monotonic system timestamp
- *   - There is an overload with a `SufficientChangePredicate` which will apply externally
- *     provided checks between old/new value and time last marked dirty to allow for complex
- *     rules like marking dirty less than once per second, etc.
- * - *Maybe* call `ForceDirty()` in some choice situations (e.g. know for sure it's
- *    an important update, like at the edge of an operational state change).
- * - Call `WasJustMarkedDirty()`. If it returns true, mark the attribute dirty, with the
- *   method most suitable at the call site (e.g. `MatterReportingAttributeChangeCallback` call
- *   or similar methods).
+ * - `SetValue()` has internal rules for null/non-null changes and policy-based rules
+ * - `SetValue()` with a `SufficientChangePredicate` uses the internal rules in addition to
+ *    the predicate to determine dirty state
+ * - `ForceDirty()` marks it immediately dirty and sets the current timestamp provided as last
+ *    dirty time.
+ * - `WasJustMarkedDirty()` is a getter that will set the dirty state back to false.
  *
- * Example of situations that require dirty, which are possible to support with this class:
+ * See [QuieterReportingPolicyEnum] for policy flags on when a value is considered dirty
+ * beyond non/non-null changes.
  *
- * - If attribute has changed due to a change in the X or Y attributes, or
- * - When it changes from 0 to any other value and vice versa, or
- * - When it changes from null to any other value and vice versa, or
- * - When it increases, or
- * - When there is any increase or decrease in the estimated time remaining that was due to progressing insight of the server's
- * control logic, or
+ * Common quieter reporting usecases that can be supported by this class are:
+ * - If attribute has changed due to a change in the X or Y attributes
+ *   - Use SufficientChangePredicate version
+ * - When it changes from 0 to any other value and vice versa
+ *   - Use `kMarkDirtyOnChangeToFromZero` internal policy.
+ * - When it changes from null to any other value and vice versa
+ *   - Built-in rule.
+ * - When it increases
+ *   - Use `kMarkDirtyOnIncrement` internal policy.
+ * - When it decreases
+ *   - Use `kMarkDirtyOnDecrement` internal policy.
+ * - When there is any increase or decrease in the estimated time remaining that was
+ *   due to progressing insight of the server's control logic
+ *   - Use `ForceDirty()`
  * - When it changes at a rate significantly different from one unit per second.
+ *   - Use SufficientChangePredicate version
+ *
+ * Example usage in-situ:
+ *
+ * Class has:
+ *     QuieterReportingAttribute<uint8_t> mAttrib;
+ *
+ * Code at time of setting new value has:
+ *
+ *     uint8_t newValue = driver.GetNewValue();
+ *     auto now = SystemClock().GetMonotonicTimestamp();
+ *     mAttrib.SetValue(newValue, now);
+ *     bool dirty = mAttrib.WasJustMarkedDirty();
+ *     if (dirty)
+ *     {
+ *         MatterReportingAttributeChangeCallback(path_for_attribute);
+ *     }
  *
  * @tparam T - the type of underlying numerical value that will be held by the class.
  */
-template <typename T>
+template <typename T, std::enable_if_t<std::is_arithmetic<T>::value, bool> = true>
 class QuieterReportingAttribute
 {
 public:
     explicit QuieterReportingAttribute(const Nullable<T> & initialValue) : mValue(initialValue), mLastDirtyValue(initialValue) {}
 
-    using SufficientChangePredicate =
-        std::function<bool(Timestamp /* previousDirtyTime */, Timestamp /* now */, const Nullable<T> & /* previousDirtyValue */,
-                           const Nullable<T> & /* newValue */)>;
+    struct SufficientChangePredicateCandidate
+    {
+        // Timestamp of last time attribute was marked dirty.
+        Timestamp lastDirtyTimestamp;
+        // New (`now`) timestamp passed in `SetValue()`.
+        Timestamp nowTimestamp;
+        // Value last marked as dirty.
+        const Nullable<T>& lastDirtyValue;
+        // New value passed in `SetValue()`, to compare against lastDirtyValue for sufficient change if needed.
+        const Nullable<T>& newValue;
+    };
+
+    using SufficientChangePredicate = std::function<bool(const SufficientChangePredicateCandidate&)>;
 
     /**
      * @brief Factory to generate a functor for "attribute was last reported" at least `minimumDurationMillis` ago.
@@ -100,17 +136,14 @@ public:
     static SufficientChangePredicate
     GetPredicateForSufficientTimeSinceLastDirty(System::Clock::Milliseconds64 minimumDurationMillis)
     {
-        return [minimumDurationMillis](Timestamp previousDirtyTime, Timestamp now, const Nullable<T> & oldDirtyValue,
-                                       const Nullable<T> & newValue) -> bool {
-            return (oldDirtyValue != newValue) && ((now - previousDirtyTime) >= minimumDurationMillis);
+        return [minimumDurationMillis](const SufficientChangePredicateCandidate& candidate) -> bool {
+            return (candidate.lastDirtyValue != candidate.newValue) && ((candidate.nowTimestamp - candidate.lastDirtyTimestamp) >= minimumDurationMillis);
         };
     }
 
     Nullable<T> value() const { return mValue; }
     QuieterReportingPolicyFlags & policy() { return mPolicyFlags; }
     const QuieterReportingPolicyFlags & policy() const { return mPolicyFlags; }
-
-    void SetPolicy(QuieterReportingPolicyFlags policyFlags) { mPolicyFlags = policyFlags; }
 
     /**
      * When this returns true, attribute should be marked for reporting. Auto-resets to false after call.
@@ -164,7 +197,14 @@ public:
         mIsDirty = mIsDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero) && changeToFromZero);
         mIsDirty = mIsDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnDecrement) && isDecrement);
         mIsDirty = mIsDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement) && isIncrement);
-        mIsDirty = mIsDirty || changedPredicate(mLastDirtyTimestampMillis, now, mLastDirtyValue, newValue);
+
+        SufficientChangePredicateCandidate candidate{
+          mLastDirtyTimestampMillis, // lastDirtyTimestamp
+          now, // nowTimestamp
+          mLastDirtyValue, // lastDirtyValue
+          newValue // newValue
+        };
+        mIsDirty = mIsDirty || changedPredicate(candidate);
 
         mValue = newValue;
 
@@ -185,14 +225,19 @@ public:
      */
     void SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now)
     {
-        SetValue(newValue, now, [](Timestamp, Timestamp, const Nullable<T> &, const Nullable<T> &) -> bool { return false; });
+        SetValue(newValue, now, [](const SufficientChangePredicateCandidate&) -> bool { return false; });
     }
 
 protected:
+    // Current value of the attribute.
     chip::app::DataModel::Nullable<T> mValue;
+    // Last value that was marked as dirty (to use in comparisons for change, e.g. by SufficientChangePredicate).
     chip::app::DataModel::Nullable<T> mLastDirtyValue;
+    // Whether the attribute is currently considered "just dirty". This is cleared on read by `WasJustMarkedDirty()`.
     bool mIsDirty = false;
+    // Enabled internal change detection policies.
     QuieterReportingPolicyFlags mPolicyFlags{ 0 };
+    // Timestamp associated with the last time the attribute was marked dirty (to use in comparisons for change).
     chip::System::Clock::Milliseconds64 mLastDirtyTimestampMillis{};
 };
 
