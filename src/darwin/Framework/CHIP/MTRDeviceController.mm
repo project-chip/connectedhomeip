@@ -605,11 +605,23 @@ using namespace chip::Tracing::DarwinFramework;
             MTR_LOG("Loaded attribute values for %lu nodes from storage for controller uuid %@", static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
 
             std::lock_guard lock(self->_deviceMapLock);
+            NSMutableArray * deviceList = [NSMutableArray array];
             for (NSNumber * nodeID in clusterDataByNode) {
                 NSDictionary * clusterData = clusterDataByNode[nodeID];
                 MTRDevice * device = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:clusterData];
                 MTR_LOG("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), device);
+
+                [deviceList addObject:device];
             }
+
+#define kSecondsToWaitBeforeAPIClientRetainsMTRDevice 60
+            // Keep the devices retained for a while, in case API client doesn't immediately retain them.
+            //
+            // Note that this is just an optimization to avoid throwing the information away and immediately
+            // re-reading it from storage.
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                MTR_LOG("MTRDeviceController: un-retain devices loaded at startup %lu", static_cast<unsigned long>(deviceList.count));
+            });
         }];
     }
 
@@ -1257,15 +1269,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
-    // First check if MTRDevice exists from having loaded from storage, or created by a client.
-    // Do not use deviceForNodeID here, because we don't want to create the device if it does not already exist.
-    os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice * device = [_nodeIDToDeviceMap objectForKey:@(nodeID)];
-    os_unfair_lock_unlock(&_deviceMapLock);
+    // Get the corresponding MTRDevice object to determine if the case/subscription pool is to be used
+    MTRDevice * device = [self deviceForNodeID:@(nodeID)];
 
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
-    if (device && [device deviceUsesThread]) {
+    if ([device deviceUsesThread]) {
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
