@@ -55,7 +55,6 @@ exclude:
     - "third_party/nlassert/repo/**/*" # from here down built with $ awk '/path =/ {print $3 "/**/*"}' .gitmodules
     - "third_party/nlfaultinjection/repo/**/*"
     - "third_party/nlio/repo/**/*"
-    - "third_party/nlunit-test/repo/**/*"
     - "third_party/mbedtls/repo/**/*"
     - "examples/common/QRCode/repo/**/*"
     - "examples/common/m5stack-tft/repo/**/*"

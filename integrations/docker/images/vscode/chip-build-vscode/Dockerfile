@@ -11,6 +11,7 @@ FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM ghcr.io/project-chip/chip-build-ameba:${VERSION} AS ameba
 FROM ghcr.io/project-chip/chip-build-k32w:${VERSION} AS k32w
 FROM ghcr.io/project-chip/chip-build-rw61x:${VERSION} AS rw61x
+FROM ghcr.io/project-chip/chip-build-nxp-zephyr:${VERSION} AS nxpzephyr
 FROM ghcr.io/project-chip/chip-build-imx:${VERSION} AS imx
 FROM ghcr.io/project-chip/chip-build-ti:${VERSION} AS ti
 FROM ghcr.io/project-chip/chip-build-openiotsdk:${VERSION} AS openiotsdk
@@ -50,6 +51,9 @@ COPY --from=k32w /opt/sdk /opt/k32w
 
 COPY --from=rw61x /opt/sdk /opt/nxp-sdk
 
+COPY --from=nxpzephyr /opt/nxp-zephyr/zephyr-sdk-0.16.5/ /opt/nxp-zephyr/zephyr-sdk-0.16.5/
+COPY --from=nxpzephyr /opt/nxp-zephyr/zephyrproject/ /opt/nxp-zephyr/zephyrproject/
+
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
 COPY --from=ti /opt/ti/sysconfig_1.18.1 /opt/ti/sysconfig_1.18.1
@@ -60,7 +64,7 @@ COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 
 COPY --from=asr /opt/asr /opt/asr
 
-COPY --from=efr32 /opt/silabs/gecko_sdk /opt/silabs/gecko_sdk
+COPY --from=efr32 /opt/silabs/simplicity_sdk /opt/silabs/simplicity_sdk
 COPY --from=efr32 /opt/silabs/wiseconnect-wifi-bt-sdk /opt/silabs/wiseconnect-wifi-bt-sdk
 COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
 
@@ -113,8 +117,10 @@ ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
 ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
-ENV SILABS_BOARD=BRD4161A
-ENV GSDK_ROOT=/opt/silabs/gecko_sdk/
+ENV SILABS_BOARD=BRD4186C
+# Keep GSDK_ROOT name until rename transition to SISDK is completed
+ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
+ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
@@ -127,7 +133,7 @@ ENV NXP_K32W1_SDK_ROOT=/opt/k32w/k32w1
 ENV NXP_SDK_ROOT=/opt/nxp-sdk/rw61x
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
-ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
+ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
@@ -136,6 +142,8 @@ ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.18.1
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.16.5
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
+ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
+ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.16.5
 
 ENV TIZEN_VERSION 7.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk

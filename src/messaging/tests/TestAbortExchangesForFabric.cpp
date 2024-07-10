@@ -21,7 +21,7 @@
  *      one) for a fabric.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <messaging/ExchangeContext.h>
@@ -48,12 +48,8 @@ using namespace chip::System;
 using namespace chip::System::Clock::Literals;
 using namespace chip::Protocols;
 
-struct TestAbortExchangesForFabric : public chip::Test::LoopbackMessagingContext, public ::testing::Test
+struct TestAbortExchangesForFabric : public chip::Test::LoopbackMessagingContext
 {
-    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
-
-    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
-
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
@@ -61,8 +57,6 @@ struct TestAbortExchangesForFabric : public chip::Test::LoopbackMessagingContext
 #endif
         chip::Test::LoopbackMessagingContext::SetUp();
     }
-
-    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
 
     void CommonCheckAbortAllButOneExchange(bool dropResponseMessages);
 };

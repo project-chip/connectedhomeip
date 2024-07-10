@@ -226,6 +226,9 @@ static constexpr ClusterId Id = 0x00000090;
 namespace ElectricalEnergyMeasurement {
 static constexpr ClusterId Id = 0x00000091;
 } // namespace ElectricalEnergyMeasurement
+namespace WaterHeaterManagement {
+static constexpr ClusterId Id = 0x00000094;
+} // namespace WaterHeaterManagement
 namespace DemandResponseLoadControl {
 static constexpr ClusterId Id = 0x00000096;
 } // namespace DemandResponseLoadControl
@@ -259,6 +262,9 @@ static constexpr ClusterId Id = 0x00000102;
 namespace BarrierControl {
 static constexpr ClusterId Id = 0x00000103;
 } // namespace BarrierControl
+namespace ServiceArea {
+static constexpr ClusterId Id = 0x00000150;
+} // namespace ServiceArea
 namespace PumpConfigurationAndControl {
 static constexpr ClusterId Id = 0x00000200;
 } // namespace PumpConfigurationAndControl

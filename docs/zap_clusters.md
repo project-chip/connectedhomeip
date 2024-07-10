@@ -79,6 +79,7 @@ Generally regenerate using one of:
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        144 |       0x90 | ElectricalPowerMeasurement                              |
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
+|        148 |       0x94 | WaterHeaterManagement                                   |
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        151 |       0x97 | Messages                                                |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
@@ -90,6 +91,7 @@ Generally regenerate using one of:
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        259 |      0x103 | BarrierControl                                          |
+|        336 |      0x150 | ServiceArea                                             |
 |        512 |      0x200 | PumpConfigurationAndControl                             |
 |        513 |      0x201 | Thermostat                                              |
 |        514 |      0x202 | FanControl                                              |

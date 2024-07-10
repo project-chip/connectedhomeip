@@ -929,6 +929,20 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
 
+namespace WaterHeaterManagement {
+namespace Commands {
+
+namespace Boost {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Boost
+
+namespace CancelBoost {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CancelBoost
+
+} // namespace Commands
+} // namespace WaterHeaterManagement
+
 namespace DemandResponseLoadControl {
 namespace Commands {
 
@@ -1235,6 +1249,28 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace BarrierControl
 
+namespace ServiceArea {
+namespace Commands {
+
+namespace SelectLocations {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SelectLocations
+
+namespace SelectLocationsResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SelectLocationsResponse
+
+namespace SkipCurrentLocation {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SkipCurrentLocation
+
+namespace SkipCurrentLocationResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace SkipCurrentLocationResponse
+
+} // namespace Commands
+} // namespace ServiceArea
+
 namespace Thermostat {
 namespace Commands {
 
@@ -1407,15 +1443,15 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace GetPendingDatasetRequest
 
 namespace DatasetResponse {
-static constexpr CommandId Id = 0x00000003;
+static constexpr CommandId Id = 0x00000002;
 } // namespace DatasetResponse
 
 namespace SetActiveDatasetRequest {
-static constexpr CommandId Id = 0x00000004;
+static constexpr CommandId Id = 0x00000003;
 } // namespace SetActiveDatasetRequest
 
 namespace SetPendingDatasetRequest {
-static constexpr CommandId Id = 0x00000005;
+static constexpr CommandId Id = 0x00000004;
 } // namespace SetPendingDatasetRequest
 
 } // namespace Commands
@@ -1880,6 +1916,10 @@ namespace TestListInt8UReverseRequest {
 static constexpr CommandId Id = 0x0000000D;
 } // namespace TestListInt8UReverseRequest
 
+namespace StringEchoResponse {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace StringEchoResponse
+
 namespace TestEnumsRequest {
 static constexpr CommandId Id = 0x0000000E;
 } // namespace TestEnumsRequest
@@ -1919,6 +1959,10 @@ static constexpr CommandId Id = 0x00000016;
 namespace TestSecondBatchHelperRequest {
 static constexpr CommandId Id = 0x00000017;
 } // namespace TestSecondBatchHelperRequest
+
+namespace StringEchoRequest {
+static constexpr CommandId Id = 0x00000018;
+} // namespace StringEchoRequest
 
 namespace TestDifferentVendorMeiRequest {
 static constexpr CommandId Id = 0xFFF200AA;

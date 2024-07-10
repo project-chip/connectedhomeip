@@ -3053,6 +3053,51 @@ static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId
     }
     }
 }
+static BOOL AttributeIsSpecifiedInWaterHeaterManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterHeaterManagement;
+    switch (aAttributeId) {
+    case Attributes::HeaterTypes::Id: {
+        return YES;
+    }
+    case Attributes::HeatDemand::Id: {
+        return YES;
+    }
+    case Attributes::TankVolume::Id: {
+        return YES;
+    }
+    case Attributes::EstimatedHeatRequired::Id: {
+        return YES;
+    }
+    case Attributes::TankPercentage::Id: {
+        return YES;
+    }
+    case Attributes::BoostState::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -3724,6 +3769,51 @@ static BOOL AttributeIsSpecifiedInBarrierControlCluster(AttributeId aAttributeId
         return YES;
     }
     case Attributes::BarrierPosition::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInServiceAreaCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ServiceArea;
+    switch (aAttributeId) {
+    case Attributes::SupportedLocations::Id: {
+        return YES;
+    }
+    case Attributes::SupportedMaps::Id: {
+        return YES;
+    }
+    case Attributes::SelectedLocations::Id: {
+        return YES;
+    }
+    case Attributes::CurrentLocation::Id: {
+        return YES;
+    }
+    case Attributes::EstimatedEndTime::Id: {
+        return YES;
+    }
+    case Attributes::Progress::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -4636,6 +4726,12 @@ static BOOL AttributeIsSpecifiedInOccupancySensingCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::OccupancySensorTypeBitmap::Id: {
+        return YES;
+    }
+    case Attributes::HoldTime::Id: {
+        return YES;
+    }
+    case Attributes::HoldTimeLimits::Id: {
         return YES;
     }
     case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
@@ -6813,6 +6909,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(aAttributeId);
     }
+    case Clusters::WaterHeaterManagement::Id: {
+        return AttributeIsSpecifiedInWaterHeaterManagementCluster(aAttributeId);
+    }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
     }
@@ -6845,6 +6944,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::BarrierControl::Id: {
         return AttributeIsSpecifiedInBarrierControlCluster(aAttributeId);
+    }
+    case Clusters::ServiceArea::Id: {
+        return AttributeIsSpecifiedInServiceAreaCluster(aAttributeId);
     }
     case Clusters::PumpConfigurationAndControl::Id: {
         return AttributeIsSpecifiedInPumpConfigurationAndControlCluster(aAttributeId);

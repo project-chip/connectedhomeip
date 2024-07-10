@@ -3918,14 +3918,6 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
     EndpointId endpointID = commandPath.mEndpointId;
     ChipLogProgress(Zcl, "[SetAliroReaderConfig] Incoming command [endpointId=%d]", endpointID);
 
-    // If Aliro Provisioning feature is not supported, return UNSUPPORTED_COMMAND.
-    if (!SupportsAliroProvisioning(endpointID))
-    {
-        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Aliro Provisioning is not supported [endpointId=%d]", endpointID);
-        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
-        return;
-    }
-
     Delegate * delegate = GetDelegate(endpointID);
     if (!delegate)
     {
@@ -3988,10 +3980,7 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
         // Various attributes changed; mark them dirty.
         MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderVerificationKey::Id);
         MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderGroupIdentifier::Id);
-        if (supportsAliroBLEUWB)
-        {
-            MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
-        }
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
     }
     sendClusterResponse(commandObj, commandPath, ClusterStatusCode(StatusIB(err).mStatus));
 }
@@ -4000,14 +3989,6 @@ void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * comma
 {
     EndpointId endpointID = commandPath.mEndpointId;
     ChipLogProgress(Zcl, "[ClearAliroReaderConfig] Incoming command [endpointId=%d]", endpointID);
-
-    // If Aliro Provisioning feature is not supported, return UNSUPPORTED_COMMAND.
-    if (!SupportsAliroProvisioning(endpointID))
-    {
-        ChipLogProgress(Zcl, "[ClearAliroReaderConfig] Aliro Provisioning is not supported [endpointId=%d]", endpointID);
-        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
-        return;
-    }
 
     Delegate * delegate = GetDelegate(endpointID);
     if (!delegate)
@@ -4038,10 +4019,7 @@ void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * comma
         // Various attributes changed; mark them dirty.
         MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderVerificationKey::Id);
         MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroReaderGroupIdentifier::Id);
-        if (SupportsAliroBLEUWB(endpointID))
-        {
-            MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
-        }
+        MatterReportingAttributeChangeCallback(endpointID, Clusters::DoorLock::Id, AliroGroupResolvingKey::Id);
     }
     sendClusterResponse(commandObj, commandPath, ClusterStatusCode(StatusIB(err).mStatus));
 }
@@ -4203,8 +4181,7 @@ void DoorLockServer::DoorLockOnAutoRelockCallback(System::Layer *, void * callba
     }
 }
 
-CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersions(const ConcreteReadAttributePath & aPath,
-                                                                                  AttributeValueEncoder & aEncoder,
+CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersions(AttributeValueEncoder & aEncoder,
                                                                                   Delegate * delegate)
 {
     VerifyOrReturnValue(delegate != nullptr, aEncoder.EncodeEmptyList());
@@ -4225,8 +4202,7 @@ CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersion
     });
 }
 
-CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(const ConcreteReadAttributePath & aPath,
-                                                                    AttributeValueEncoder & aEncoder, Delegate * delegate)
+CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     VerifyOrReturnValue(delegate != nullptr, aEncoder.EncodeEmptyList());
 
@@ -4296,7 +4272,7 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
                                           AttributeNullabilityType::kNotNullable);
     }
     case AliroExpeditedTransactionSupportedProtocolVersions::Id: {
-        return ReadAliroExpeditedTransactionSupportedProtocolVersions(aPath, aEncoder, delegate);
+        return ReadAliroExpeditedTransactionSupportedProtocolVersions(aEncoder, delegate);
     }
     case AliroGroupResolvingKey::Id: {
         uint8_t buffer[kAliroGroupResolvingKeySize];
@@ -4305,7 +4281,7 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
                                           AttributeNullabilityType::kNullable);
     }
     case AliroSupportedBLEUWBProtocolVersions::Id: {
-        return ReadAliroSupportedBLEUWBProtocolVersions(aPath, aEncoder, delegate);
+        return ReadAliroSupportedBLEUWBProtocolVersions(aEncoder, delegate);
     }
     case AliroBLEAdvertisingVersion::Id: {
         uint8_t bleAdvertisingVersion = delegate->GetAliroBLEAdvertisingVersion();

@@ -31,6 +31,12 @@ namespace Test {
 
 namespace internal {
 
+constexpr uint16_t kDefaultStringSize = 16; // note: this is INCLUDING the length byte(s)
+
+// Determine an appropriate size for the given type.
+// NOTE: this is for test only, not all types are included
+uint16_t SizeForType(EmberAfAttributeType type);
+
 constexpr EmberAfAttributeMetadata DefaultAttributeMetadata(chip::AttributeId id)
 {
     return EmberAfAttributeMetadata{
@@ -54,6 +60,7 @@ struct MockAttributeConfig
     {
         attributeMetaData.attributeType = type;
         attributeMetaData.mask          = mask;
+        attributeMetaData.size          = internal::SizeForType(type);
     }
 
     const AttributeId id;

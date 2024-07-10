@@ -1,1 +1,1 @@
-55 : Update to Ubuntu 24.04 as the base build image
+64 : [NXP] Add `--break-system-packages` to pip install

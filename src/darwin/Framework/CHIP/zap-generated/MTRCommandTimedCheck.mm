@@ -608,6 +608,15 @@ static BOOL CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(Attribut
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInWaterHeaterManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterHeaterManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -752,6 +761,15 @@ static BOOL CommandNeedsTimedInvokeInWindowCoveringCluster(AttributeId aAttribut
 static BOOL CommandNeedsTimedInvokeInBarrierControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BarrierControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInServiceAreaCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ServiceArea;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1356,6 +1374,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(commandID);
     }
+    case Clusters::WaterHeaterManagement::Id: {
+        return CommandNeedsTimedInvokeInWaterHeaterManagementCluster(commandID);
+    }
     case Clusters::DemandResponseLoadControl::Id: {
         return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
     }
@@ -1388,6 +1409,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::BarrierControl::Id: {
         return CommandNeedsTimedInvokeInBarrierControlCluster(commandID);
+    }
+    case Clusters::ServiceArea::Id: {
+        return CommandNeedsTimedInvokeInServiceAreaCluster(commandID);
     }
     case Clusters::PumpConfigurationAndControl::Id: {
         return CommandNeedsTimedInvokeInPumpConfigurationAndControlCluster(commandID);

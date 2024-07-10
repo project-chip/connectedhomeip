@@ -2325,6 +2325,7 @@ limitations under the License.
             <include cluster="RVC Run Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="RVC Clean Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="RVC Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Service Area" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>

@@ -48,7 +48,7 @@ public:
         kDefinitelyUsed
     };
 
-    AttributeAccessInterfaceCache() { Invalidate(); }
+    constexpr AttributeAccessInterfaceCache() = default;
 
     /**
      * @brief Invalidate the whole cache. Must be called every time list of AAI registrations changes.
@@ -106,6 +106,8 @@ public:
 private:
     struct AttributeAccessCacheEntry
     {
+        constexpr AttributeAccessCacheEntry() = default;
+
         EndpointId endpointId               = kInvalidEndpointId;
         ClusterId clusterId                 = kInvalidClusterId;
         AttributeAccessInterface * accessor = nullptr;
@@ -137,8 +139,8 @@ private:
         return &mCacheSlots[0];
     }
 
-    AttributeAccessCacheEntry mCacheSlots[1];
-    AttributeAccessCacheEntry mLastUnusedEntry;
+    AttributeAccessCacheEntry mCacheSlots[1] = {};
+    AttributeAccessCacheEntry mLastUnusedEntry{};
 };
 
 } // namespace app

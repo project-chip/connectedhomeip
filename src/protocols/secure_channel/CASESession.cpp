@@ -47,6 +47,7 @@
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <tracing/macros.h>
+#include <tracing/metric_event.h>
 #include <transport/SessionManager.h>
 
 namespace {
@@ -101,6 +102,7 @@ using namespace Credentials;
 using namespace Messaging;
 using namespace Encoding;
 using namespace Protocols::SecureChannel;
+using namespace Tracing;
 
 constexpr uint8_t kKDFSR2Info[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x32 };
 constexpr uint8_t kKDFSR3Info[] = { 0x53, 0x69, 0x67, 0x6d, 0x61, 0x33 };
@@ -521,14 +523,15 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Return early on error here, as we have not initialized any state yet
-    ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, fabricTable == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Use FabricTable directly to avoid situation of dangling index from stale FabricInfo
     // until we factor-out any FabricInfo direct usage.
-    ReturnErrorCodeIf(peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex,
+                                CHIP_ERROR_INVALID_ARGUMENT);
     const auto * fabricInfo = fabricTable->FindFabricWithIndex(peerScopedNodeId.GetFabricIndex());
-    ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeWithMetricIf(kMetricDeviceCASESession, fabricInfo == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     err = Init(sessionManager, policy, delegate, peerScopedNodeId);
 
@@ -542,9 +545,11 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
 
     // From here onwards, let's go to exit on error, as some state might have already
     // been initialized
-    SuccessOrExit(err);
+    SuccessOrExitWithMetric(kMetricDeviceCASESession, err);
 
-    SuccessOrExit(err = fabricTable->AddFabricDelegate(this));
+    SuccessOrExitWithMetric(kMetricDeviceCASESession, err = fabricTable->AddFabricDelegate(this));
+
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESession);
 
     // Set the PeerAddress in the secure session up front to indicate the
     // Transport Type of the session that is being set up.
@@ -571,6 +576,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     }
     else
     {
+        MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma1);
         err = SendSigma1();
         SuccessOrExit(err);
     }
@@ -578,6 +584,8 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
+        MATTER_LOG_METRIC_END(kMetricDeviceCASESession, err);
         Clear();
     }
     return err;
@@ -591,7 +599,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
                    ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel,
                  "CASESession timed out while waiting for a response from peer " ChipLogFormatScopedNodeId ". Current state was %u",
-                 ChipLogValueScopedNodeId(ScopedNodeId(mPeerNodeId, mFabricIndex)), to_underlying(mState));
+                 ChipLogValueScopedNodeId(GetPeer()), to_underlying(mState));
     MATTER_TRACE_COUNTER("CASETimeout");
     // Discard the exchange so that Clear() doesn't try aborting it.  The
     // exchange will handle that.
@@ -601,6 +609,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 
 void CASESession::AbortPendingEstablish(CHIP_ERROR err)
 {
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESession, err);
     MATTER_TRACE_SCOPE("AbortPendingEstablish", "CASESession");
     // This needs to come before Clear() which will reset mState.
     SessionEstablishmentStage state = MapCASEStateToSessionEstablishmentStage(mState);
@@ -851,9 +860,19 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(mExchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msg_R1),
                                                             SendFlags(SendMessageFlags::kExpectResponse)));
 
-    mState = resuming ? State::kSentSigma1Resume : State::kSentSigma1;
+    if (resuming)
+    {
+        mState = State::kSentSigma1Resume;
 
-    ChipLogProgress(SecureChannel, "Sent Sigma1 msg");
+        // Flags that Resume is being attempted
+        MATTER_LOG_METRIC(kMetricDeviceCASESessionSigma1Resume);
+    }
+    else
+    {
+        mState = State::kSentSigma1;
+    }
+
+    ChipLogProgress(SecureChannel, "Sent Sigma1 msg to " ChipLogFormatScopedNodeId, ChipLogValueScopedNodeId(GetPeer()));
 
     mDelegate->OnSessionEstablishmentStarted();
 
@@ -984,7 +1003,13 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
         std::copy(resumptionId.begin(), resumptionId.end(), mResumeResumptionId.begin());
 
         // Send Sigma2Resume message to the initiator
-        SuccessOrExit(err = SendSigma2Resume());
+        MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma2Resume);
+        err = SendSigma2Resume();
+        if (CHIP_NO_ERROR != err)
+        {
+            MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma2Resume, err);
+        }
+        SuccessOrExit(err);
 
         mDelegate->OnSessionEstablishmentStarted();
 
@@ -1013,7 +1038,13 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     // mRemotePubKey.Length() == initiatorPubKey.size() == kP256_PublicKey_Length.
     memcpy(mRemotePubKey.Bytes(), initiatorPubKey.data(), mRemotePubKey.Length());
 
-    SuccessOrExit(err = SendSigma2());
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma2);
+    err = SendSigma2();
+    if (CHIP_NO_ERROR != err)
+    {
+        MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma2, err);
+    }
+    SuccessOrExit(err);
 
     mDelegate->OnSessionEstablishmentStarted();
 
@@ -1236,6 +1267,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     ChipLogDetail(SecureChannel, "Received Sigma2Resume msg");
     MATTER_TRACE_COUNTER("Sigma2Resume");
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
 
     uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
 
@@ -1278,6 +1310,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
             ChipLogError(SecureChannel, "Unable to save session resumption state: %" CHIP_ERROR_FORMAT, err2.Format());
     }
 
+    MATTER_LOG_METRIC(kMetricDeviceCASESessionSigmaFinished);
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
     mState = State::kFinishedViaResume;
@@ -1294,10 +1327,17 @@ exit:
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
-    ReturnErrorOnFailure(HandleSigma2(std::move(msg)));
-    ReturnErrorOnFailure(SendSigma3a());
+    CHIP_ERROR err = HandleSigma2(std::move(msg));
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
+    ReturnErrorOnFailure(err);
 
-    return CHIP_NO_ERROR;
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma3);
+    err = SendSigma3a();
+    if (CHIP_NO_ERROR != err)
+    {
+        MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma3, err);
+    }
+    return err;
 }
 
 CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
@@ -1708,6 +1748,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
     MATTER_TRACE_COUNTER("Sigma3");
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma2, err);
 
     auto helper = WorkHelper<HandleSigma3Data>::Create(*this, &HandleSigma3b, &CASESession::HandleSigma3c);
     VerifyOrExit(helper, err = CHIP_ERROR_NO_MEMORY);
@@ -1888,6 +1929,7 @@ CHIP_ERROR CASESession::HandleSigma3c(HandleSigma3Data & data, CHIP_ERROR status
         }
     }
 
+    MATTER_LOG_METRIC(kMetricDeviceCASESessionSigmaFinished);
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
     mState = State::kFinished;
@@ -2288,6 +2330,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
 
         case MsgType::StatusReport:
             err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
+            MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
             break;
 
         default:
@@ -2308,6 +2351,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
 
         case MsgType::StatusReport:
             err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
+            MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
             break;
 
         default:
@@ -2324,6 +2368,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
 
         case MsgType::StatusReport:
             err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
+            MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma2, err);
             break;
 
         default:
@@ -2335,7 +2380,11 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     case State::kSentSigma2Resume:
         if (msgType == Protocols::SecureChannel::MsgType::StatusReport)
         {
-            err = HandleStatusReport(std::move(msg), /* successExpected*/ true);
+            // Need to capture before invoking status report since 'this' might be deallocated on successful completion of sigma3
+            MetricKey key = (mState == State::kSentSigma3) ? kMetricDeviceCASESessionSigma3 : kMetricDeviceCASESessionSigma2Resume;
+            err           = HandleStatusReport(std::move(msg), /* successExpected*/ true);
+            MATTER_LOG_METRIC_END(key, err);
+            IgnoreUnusedVariable(key);
         }
         break;
     default:
