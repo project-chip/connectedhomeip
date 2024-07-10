@@ -797,8 +797,8 @@ template("siwx917_sdk") {
     if (chip_enable_icd_server || !disable_lcd) {
       sources += [
         "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
       ]
     }
 
