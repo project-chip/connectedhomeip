@@ -2719,6 +2719,18 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForWaterHeaterManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WaterHeaterManagement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -3144,6 +3156,15 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
             memberValue = [NSNumber numberWithLongLong:cppValue.maximumCurrent];
             value.maximumCurrent = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.maximumDischargeCurrent.HasValue()) {
+                memberValue = [NSNumber numberWithLongLong:cppValue.maximumDischargeCurrent.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.maximumDischargeCurrent = memberValue;
+        } while (0);
 
         return value;
     }
@@ -3175,6 +3196,15 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
             NSNumber * _Nonnull memberValue;
             memberValue = [NSNumber numberWithLongLong:cppValue.energyTransferred];
             value.energyTransferred = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.energyDischarged.HasValue()) {
+                memberValue = [NSNumber numberWithLongLong:cppValue.energyDischarged.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.energyDischarged = memberValue;
         } while (0);
 
         return value;
@@ -4801,6 +4831,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return DecodeEventPayloadForElectricalEnergyMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::WaterHeaterManagement::Id: {
+        return DecodeEventPayloadForWaterHeaterManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return DecodeEventPayloadForDemandResponseLoadControlCluster(aPath.mEventId, aReader, aError);

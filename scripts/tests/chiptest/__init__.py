@@ -188,6 +188,7 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "TestIcdManagementCluster",  # darwin-framework-tool does not support ICD registration
         "TestUnitTestingClusterMei",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "TestReadNoneSubscribeNone",  # darwin-framework-tool does not supports those commands.
+        "TestDiagnosticLogsDownloadCommand",  # test is flaky in darwin. Please see #32636
 
         "Test_TC_ACE_1_6",  # darwin-framework-tool does not support group commands.
         "Test_TC_ACL_2_5",  # darwin-framework-tool does not currently support reading or subscribing to Events
