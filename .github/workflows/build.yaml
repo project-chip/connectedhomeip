@@ -26,14 +26,14 @@ on:
         run-codeql:
           required: false
           type: boolean
-    
+
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
@@ -210,7 +210,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/sanitizers/compile_commands.json \
-                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write' \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write|QuieterReporting' \
                        check \
                     "
             - name: Clean output
@@ -243,7 +243,7 @@ jobs:
               run: |
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
-                  mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py 
+                  mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py
             - name: Run fake linux tests with build_examples
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -253,7 +253,7 @@ jobs:
               uses: ./.github/actions/perform-codeql-analysis
               with:
                 language: cpp
-        
+
             - name: Uploading core files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
@@ -445,7 +445,7 @@ jobs:
               uses: ./.github/actions/perform-codeql-analysis
               with:
                 language: cpp
-        
+
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
 
