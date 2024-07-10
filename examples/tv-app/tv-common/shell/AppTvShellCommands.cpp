@@ -209,7 +209,9 @@ static CHIP_ERROR PrintAllCommands()
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "  print-app-access     Print all ACLs for app platform fabric. Usage: app print-app-access\r\n");
     streamer_printf(sout, "  remove-app-access    Remove all ACLs for app platform fabric. Usage: app remove-app-access\r\n");
-    streamer_printf(sout, "  print-installed-apps   Print all installed content apps with their endpoints. Usage: app print-installed-apps\r\n");
+    streamer_printf(
+        sout,
+        "  print-installed-apps   Print all installed content apps with their endpoints. Usage: app print-installed-apps\r\n");
 
     streamer_printf(sout,
                     "  commission <udc-entry>     Commission given udc-entry using given pincode from corresponding app. Usage: "
