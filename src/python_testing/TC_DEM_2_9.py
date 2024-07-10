@@ -20,9 +20,9 @@
 import logging
 
 import chip.clusters as Clusters
-from TC_DEMTestBase import DEMTestBase
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from TC_DEMTestBase import DEMTestBase
 
 logger = logging.getLogger(__name__)
 
