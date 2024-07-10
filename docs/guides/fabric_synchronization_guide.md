@@ -12,7 +12,7 @@ Fabric Synchronization feature. You can find them in the examples.
 ![matter_fabric_synchronization](images/matter_fabric_synchronization.png)
 
 Fabric-Admin example app implements the Fabric Administrator role and
-communicate with the Fabric-Bridge-App on the other side, facilitating the
+communicates with the Fabric-Bridge-App on the other side, facilitating the
 Fabric Synchronization process.
 
 Fabric-Bridge-App example app implements the Aggregator device type with Fabric
