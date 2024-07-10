@@ -33,8 +33,6 @@
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 
-using TestContext = chip::Test::AppContext;
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -84,31 +82,9 @@ private:
     StatusIB mPathStatus;
 };
 
-class TestWrite : public ::testing::Test
+class TestWrite : public chip::Test::AppContext
 {
 public:
-    // Performs shared setup for all tests in the test suite
-    static void SetUpTestSuite()
-    {
-        if (mpContext == nullptr)
-        {
-            mpContext = new TestContext();
-            ASSERT_NE(mpContext, nullptr);
-        }
-        mpContext->SetUpTestSuite();
-    }
-
-    // Performs shared teardown for all tests in the test suite
-    static void TearDownTestSuite()
-    {
-        mpContext->TearDownTestSuite();
-        if (mpContext != nullptr)
-        {
-            delete mpContext;
-            mpContext = nullptr;
-        }
-    }
-
     void ResetCallback() { mSingleWriteCallback.reset(); }
 
     void PrepareWriteCallback(ConcreteAttributePath path) { mSingleWriteCallback = std::make_unique<SingleWriteCallback>(path); }
@@ -116,22 +92,12 @@ public:
     SingleWriteCallback * GetWriteCallback() { return mSingleWriteCallback.get(); }
 
 protected:
-    // Performs setup for each individual test in the test suite
-    void SetUp() { mpContext->SetUp(); }
-
-    // Performs teardown for each individual test in the test suite
-    void TearDown() { mpContext->TearDown(); }
-
-    static TestContext * mpContext;
-
     std::unique_ptr<SingleWriteCallback> mSingleWriteCallback;
 };
 
-TestContext * TestWrite::mpContext = nullptr;
-
 TEST_F(TestWrite, TestDataResponse)
 {
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    auto sessionHandle      = GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
     Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
@@ -160,16 +126,16 @@ TEST_F(TestWrite, TestDataResponse)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
     EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
 {
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    auto sessionHandle      = GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
     Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
@@ -200,16 +166,16 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
     EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
 {
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    auto sessionHandle      = GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
     Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
@@ -239,16 +205,16 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
     EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestWrite, TestAttributeError)
 {
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    auto sessionHandle      = GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Attributes::ListStructOctetString::TypeInfo::Type value;
     Structs::TestListStructOctet::Type valueBuf[4];
@@ -278,16 +244,16 @@ TEST_F(TestWrite, TestAttributeError)
     Controller::WriteAttribute<Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId, value, onSuccessCb,
                                                                             onFailureCb);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestWrite, TestFabricScopedAttributeWithoutFabricIndex)
 {
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    auto sessionHandle      = GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Clusters::UnitTesting::Structs::TestFabricScoped::Type valueBuf[4];
     Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo::Type value;
@@ -315,16 +281,16 @@ TEST_F(TestWrite, TestFabricScopedAttributeWithoutFabricIndex)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
     EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestWrite, TestMultipleSuccessResponses)
 {
-    auto sessionHandle  = mpContext->GetSessionBobToAlice();
+    auto sessionHandle  = GetSessionBobToAlice();
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
@@ -341,17 +307,17 @@ TEST_F(TestWrite, TestMultipleSuccessResponses)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
                                                                                            onSuccessCb, onFailureCb);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(successCalls, 1u);
     EXPECT_EQ(failureCalls, 0u);
     EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestWrite, TestMultipleFailureResponses)
 {
-    auto sessionHandle  = mpContext->GetSessionBobToAlice();
+    auto sessionHandle  = GetSessionBobToAlice();
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
@@ -368,17 +334,17 @@ TEST_F(TestWrite, TestMultipleFailureResponses)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
                                                                                            onSuccessCb, onFailureCb);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(successCalls, 0u);
     EXPECT_EQ(failureCalls, 1u);
     EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 {
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     // Cluster-specific success code case
     {
@@ -390,14 +356,14 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         SingleWriteCallback * writeCb = this->GetWriteCallback();
 
-        WriteClient writeClient(&mpContext->GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
+        WriteClient writeClient(&GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
         AttributePathParams attributePath{ kTestEndpointId, Clusters::UnitTesting::Id,
                                            Clusters::UnitTesting::Attributes::Int8u::Id };
         constexpr uint8_t attributeValue = 1u;
         ASSERT_EQ(writeClient.EncodeAttribute(attributePath, attributeValue), CHIP_NO_ERROR);
         ASSERT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         EXPECT_TRUE(writeCb->WasDone());
         EXPECT_TRUE(writeCb->PathWasResponded());
@@ -409,7 +375,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
         EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificSuccess);
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
     }
 
     // Cluster-specific failure code case
@@ -422,7 +388,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         SingleWriteCallback * writeCb = this->GetWriteCallback();
 
-        WriteClient writeClient(&mpContext->GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
+        WriteClient writeClient(&GetExchangeManager(), this->GetWriteCallback(), Optional<uint16_t>::Missing());
         AttributePathParams attributePath{ kTestEndpointId, Clusters::UnitTesting::Id,
                                            Clusters::UnitTesting::Attributes::Int8u::Id };
 
@@ -430,7 +396,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
         ASSERT_EQ(writeClient.EncodeAttribute(attributePath, attributeValue), CHIP_NO_ERROR);
         ASSERT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
 
-        mpContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         EXPECT_TRUE(writeCb->WasDone());
         EXPECT_TRUE(writeCb->PathWasResponded());
@@ -442,7 +408,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
         EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificFailure);
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
     }
 }
 
