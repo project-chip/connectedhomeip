@@ -81,6 +81,8 @@ public:
 #endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
     CHIP_ERROR SetFailSafeArmed(bool val) override;
+    CHIP_ERROR GetDeviceLocation(DeviceLocatioType &location) override;
+    CHIP_ERROR SetDeviceLocation(DeviceLocatioType location) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
     bool IsCommissionableDeviceTypeEnabled() override;
     CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;

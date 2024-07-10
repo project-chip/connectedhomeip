@@ -196,24 +196,6 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-
-    /**
-     * @brief Get the location inside the home where the device is located.
-     */
-    virtual CHIP_ERROR GetDeviceLocation(app::DataModel::Nullable<app::Clusters::detail::Structs::HomeLocationStruct::Type> &devLocation)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * @brief Set the location inside the home where the device is located.
-     *
-     * The caller ensures that if the device location is not null, at least one of the entries are not null or empty.
-     */
-    virtual CHIP_ERROR SetDeviceLocation(app::DataModel::Nullable<app::Clusters::detail::Structs::HomeLocationStruct::Type> devLocation)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
 };
 
 /**

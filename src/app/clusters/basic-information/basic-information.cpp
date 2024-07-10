@@ -423,28 +423,25 @@ CHIP_ERROR BasicAttrAccess::ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncod
 
 CHIP_ERROR BasicAttrAccess::ReadDeviceLocation(AttributeValueEncoder & aEncoder)
 {
-    char locationNameBuffer[kMaxDeviceLocationNameLength] = { 0 };
 
-    Clusters::detail::Structs::HomeLocationStruct::Type deviceLocationStruct{
+    char locationNameBuffer[DeviceLayer::ConfigurationManager::kMaxDeviceLocationNameLength] = { 0 };
+
+    DeviceLocatioType deviceLocation({
         .locationName = MutableCharSpan(locationNameBuffer),
-    };
+    });
 
-    auto deviceLocation = DataModel::Nullable<Clusters::detail::Structs::HomeLocationStruct::Type>(deviceLocationStruct);
-
-    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetDeviceLocation(deviceLocation));
+    ReturnErrorOnFailure(ConfigurationMgr().GetDeviceLocation(deviceLocation));
 
     return aEncoder.Encode(deviceLocation);
 }
 
 CHIP_ERROR BasicAttrAccess::WriteDeviceLocation(AttributeValueDecoder & aDecoder)
 {
-    char locationNameBuffer[kMaxDeviceLocationNameLength] = { 0 };
+    char locationNameBuffer[DeviceLayer::ConfigurationManager::kMaxDeviceLocationNameLength] = { 0 };
 
-    Clusters::detail::Structs::HomeLocationStruct::Type deviceLocationStruct{
+    DeviceLocatioType deviceLocation({
         .locationName = MutableCharSpan(locationNameBuffer),
-    };
-
-    auto deviceLocation = DataModel::Nullable<Clusters::detail::Structs::HomeLocationStruct::Type>(deviceLocationStruct);
+    });
 
     ReturnErrorOnFailure(aDecoder.Decode(deviceLocation));
 
@@ -456,7 +453,7 @@ CHIP_ERROR BasicAttrAccess::WriteDeviceLocation(AttributeValueDecoder & aDecoder
         }
     }
 
-    return GetDeviceInstanceInfoProvider()->SetDeviceLocation(deviceLocation);
+    return ConfigurationMgr().SetDeviceLocation(deviceLocation);
 }
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate

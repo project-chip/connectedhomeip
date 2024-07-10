@@ -36,6 +36,10 @@
 #include <lib/support/Span.h>
 #include <platform/PersistedStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <app/data-model/Nullable.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+using DeviceLocatioType = chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::TypeInfo::Type;
 
 namespace chip {
 namespace Ble {
@@ -76,6 +80,7 @@ public:
         kMaxProductLabelLength          = 64,
         kMaxSerialNumberLength          = 32,
         kMaxUniqueIDLength              = 32,
+        kMaxDeviceLocationNameLength    = 128,
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
         kMinRotatingDeviceIDUniqueIDLength = 16,
         kRotatingDeviceIDUniqueIDLength    = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH,
@@ -131,6 +136,8 @@ public:
     virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;
     virtual CHIP_ERROR GetFailSafeArmed(bool & val)                                    = 0;
     virtual CHIP_ERROR SetFailSafeArmed(bool val)                                      = 0;
+    virtual CHIP_ERROR GetDeviceLocation(DeviceLocatioType &location)  = 0;
+    virtual CHIP_ERROR SetDeviceLocation(DeviceLocatioType location)  = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 

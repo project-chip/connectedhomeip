@@ -586,6 +586,55 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFailSafeArmed(bool v
     return WriteConfigValue(ConfigClass::kConfigKey_FailSafeArmed, val);
 }
 
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceLocation(DeviceLocatioType &location)
+{
+    char locationNameBuffer[kMaxDeviceLocationNameLength] = { 0 };
+    CharSpan locationName(locationNameBuffer);
+
+    chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::TypeInfo::DecodableType loc({
+        .locationName = locationName,
+        .floorNumber = app::DataModel::NullNullable,
+        .areaType = app::DataModel::NullNullable});
+
+    uint8_t locationData[128 + 8 + 10];
+    MutableByteSpan locationSpan(locationData);
+
+    size_t outLen = 0;
+    ReadConfigValueBin(
+        ConfigClass::kConfigKey_DeviceLocation, 
+        locationSpan.data(), 
+        locationSpan.size(),
+        outLen
+        );
+
+    TLV::TLVReader tlvReader;
+    tlvReader.Init(locationSpan);
+
+    loc->Decode(tlvReader);
+
+    location = loc;
+
+    return CHIP_NO_ERROR;
+}
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetDeviceLocation(DeviceLocatioType location)
+{
+    uint8_t locationData[128 + 8 + 10];
+    MutableByteSpan locationSpan(locationData);
+    const uint8_t* p = locationSpan.data();
+
+    TLV::TLVWriter tlvWriter;
+    tlvWriter.Init(locationSpan);
+
+    location->Encode(tlvWriter, TLV::AnonymousTag());
+
+    WriteConfigValueBin(ConfigClass::kConfigKey_DeviceLocation, p, sizeof(locationData));
+
+    return CHIP_NO_ERROR;
+}
+
 template <class ConfigClass>
 CHIP_ERROR
 GenericConfigurationManagerImpl<ConfigClass>::GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo)
