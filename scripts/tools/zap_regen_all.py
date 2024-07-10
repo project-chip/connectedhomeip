@@ -513,10 +513,6 @@ def main():
 
             what_to_run = sys.argv + ['--no-rerun-in-env']
             launcher = os.path.join(CHIP_ROOT_DIR, 'scripts', 'run_in_build_env.sh')
-
-            logging.error("ARGV:    %r", sys.argv)
-            logging.error("Running: %r", shlex.join(what_to_run))
-
             os.execv(launcher, [launcher, shlex.join(what_to_run)])
         sys.exit(1)
 
