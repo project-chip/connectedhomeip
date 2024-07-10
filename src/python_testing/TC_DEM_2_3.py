@@ -28,13 +28,14 @@ logger = logging.getLogger(__name__)
 
 
 class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
+    """Implementation of test case TC_DEM_2_3."""
 
     def desc_TC_DEM_2_3(self) -> str:
         """Returns a description of this test"""
         return "4.1.3. [TC-DEM-2.3] Start Time Adjustment feature functionality with DUT as Server"
 
     def pics_TC_DEM_2_3(self):
-        """This test case verifies the primary functionality of the Device Energy Management cluster server with Start Time Adjustment feature."""
+        """Return the PICS definitions associated with this test."""
         pics = [
             "DEM.S.F03",  # Depends on F03(StartTimeAdjustment)
         ]

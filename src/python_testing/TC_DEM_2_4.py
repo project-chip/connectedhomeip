@@ -21,7 +21,7 @@ import time
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from DEMTestBase import DEMTestBase
+from TC_DEMTestBase import DEMTestBase
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -29,77 +29,113 @@ logger = logging.getLogger(__name__)
 
 
 class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
+    """Implementation of test case TC_DEM_2_4."""
 
     def desc_TC_DEM_2_4(self) -> str:
         """Returns a description of this test"""
-        return "4.1.3. [TC-DEM-2.4] Start Time Adjustment feature functionality with DUT as Server"
+        return "4.1.3. [TC-DEM-2.4] Pausable feature functionality with DUT as Server"
 
     def pics_TC_DEM_2_4(self):
-        """This test case verifies the primary functionality of the Device Energy Management cluster server with Start Time Adjustment feature."""
+        """Return the PICS definitions associated with this test."""
         pics = [
-            "DEM.S.F03",  # Depends on F03(StartTimeAdjustment)
+            "DEM.S.F04",  # Depends on F04(Pausable)
         ]
         return pics
 
     def steps_TC_DEM_2_4(self) -> list[TestStep]:
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Pausable Test Event"),
-            TestStep("3a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep(
-                "3b", "TH reads Forecast. Value has to include IsPausable=True, slot[0].SlotIsPausable=True, slot[0].MinPauseDuration>1, slot[0].MaxPauseDuration>1, slot[1].SlotIsPausable=False, ActiveSlotNumber=0, and ForecastUpdateReason=Internal Optimization"),
-            TestStep("3c", "TH reads OptOutState. Verify value is 0x00 (NoOptOut)"),
-            TestStep(
-                "4", "TH sends PauseRequest with Duration=MinPauseDuration-1 from Forecast for slot[0], Cause=LocalOptimization. Command rejected"),
-            TestStep("4a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep(
-                "5", "TH sends PauseRequest with Duration=MaxPauseDuration+1 from Forecast for slot[0], Cause=LocalOptimization. Command rejected"),
-            TestStep("5a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep("6", "DGGEN.S.C00.Rsp(TestEventTrigger). TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event"),
-            TestStep("6a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep("6b", "TH reads OptOutState. Verify value is 0x02 (GridOptOut)"),
-            TestStep(
-                "7", "TH sends PauseRequest with Duration=MinPauseDuration from Forecast for slot[0], Cause=GridOptimization. Command rejected"),
-            TestStep("7a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep(
-                "8", "TH sends PauseRequest with Duration=MinPauseDuration from Forecast for slot[0], Cause=LocalOptimization. Event {PICS_S}.E02(Paused) sent"),
-            TestStep("8a", "TH reads ESAState. Verify value is 0x05 (Paused)"),
-            TestStep(
-                "9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event. Event {PICS_S}.E03(Resumed) sent with Cause=3 (UserOptOut)"),
-            TestStep("9a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep("9b", "TH reads OptOutState. Verify value is 0x03 (OptOut)"),
-            TestStep("9c", "TH reads Forecast. Value has to include ForecastUpdateReason=Internal Optimization"),
-            TestStep("10", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear"),
-            TestStep("10a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep("10b", "TH reads OptOutState. Verify value is 0x00 (NoOptOut)"),
-            TestStep(
-                "11", "TH sends PauseRequest with Duration=MinPauseDuration from Forecast for slot[0], Cause=LocalOptimization. Event {PICS_S}.E02(Paused) sent"),
-            TestStep("11a", "TH reads ESAState. Verify value is 0x05 (Paused)"),
-            TestStep("11b", "TH reads Forecast. Value has to include ForecastUpdateReason=Local Optimization"),
-            TestStep("12", "TH sends ResumeRequest. Event {PICS_S}.E03(Resumed) sent with Cause=4 (Cancelled)"),
-            TestStep("12a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep(
-                "12b", "TH reads Forecast. Value has to include IsPausable=True, slot[0].SlotIsPausable=True, slot[0].MinPauseDuration>1, slot[0].MaxPauseDuration>1, slot[1].SlotIsPausable=False, ActiveSlotNumber=0, ForecastUpdateReason=Internal Optimization"),
-            TestStep(
-                "13", "TH sends PauseRequest with Duration=MinPauseDuration from Forecast for slot[0], Cause=LocalOptimization. Event {PICS_S}.E02(Paused) sent"),
-            TestStep("13a", "TH reads ESAState. Verify value is 0x05 (Paused)"),
-            TestStep("13b", "TH reads Forecast. Value has to include ForecastUpdateReason=Local Optimization"),
-            TestStep("14", "TH sends ResumeRequest. Event {PICS_S}.E03(Resumed) sent with Cause=4 (Cancelled)"),
-            TestStep("14a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep(
-                "15", "TH sends PauseRequest with Duration=MinPauseDuration from Forecast for slot[0], Cause=LocalOptimization. Event {PICS_S}.E02(Paused) sent"),
-            TestStep("15a", "TH reads ESAState. Verify value is 0x05 (Paused)"),
-            TestStep("16", "Wait for minPauseDuration. Event {PICS_S}.E03(Resumed) sent with Cause=0 (NormalCompletion)"),
-            TestStep("16a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Pausable Test Event Next Slot."),
-            TestStep("17a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep("17b", "TH reads Forecast. Value has to include ActiveSlotNumber=1"),
-            TestStep(
-                "18", "TH sends PauseRequest with Duration=MinPauseDuration from Forecast for slot[0], Cause=LocalOptimization. Command rejected"),
-            TestStep("18a", "TH reads ESAState. Verify value is 0x01 (Online)"),
-            TestStep("19", "TH sends ResumeRequest. Command rejected"),
-            TestStep("20", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Pausable Test Event Clear."),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
+                     "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Pausable Test Event",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("3a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("3b", "TH reads Forecast.",
+                     "Value has to include IsPausable=True, slot[0].SlotIsPausable=True, slot[0].MinPauseDuration>1, slot[0].MaxPauseDuration>1, slot[1].SlotIsPausable=False, ActiveSlotNumber=0, and ForecastUpdateReason=Internal Optimization"),
+            TestStep("3c", "TH reads OptOutState.",
+                     "Verify value is 0x00 (NoOptOut)"),
+            TestStep("4", "TH sends PauseRequest with Duration=Forecast.slots[0].MinPauseDuration-1, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("4a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("5", "TH sends PauseRequest with Duration=Forecast.slots[0].MaxPauseDuration+1, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("5a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("6a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("6b", "TH reads OptOutState.",
+                     "Verify value is 0x02 (GridOptOut)"),
+            TestStep("7", "TH sends PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=GridOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("7a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("8", "TH sends PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00) and event DEM.S.E02(Paused) sent"),
+            TestStep("8a", "TH reads ESAState.",
+                     "Verify value is 0x05 (Paused)"),
+            TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event.",
+                     "Verify DUT responds with status SUCCESS(0x00) and event DEM.S.E03(Resumed) sent with Cause=3 (UserOptOut)"),
+            TestStep("9a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("9b", "TH reads OptOutState.",
+                     "Verify value is 0x03 (OptOut)"),
+            TestStep("9c", "TH reads Forecast.",
+                     "Value has to include ForecastUpdateReason=Internal Optimization"),
+            TestStep("10", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("10a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("10b", "TH reads OptOutState.",
+                     "Verify value is 0x00 (NoOptOut)"),
+            TestStep("11", "TH sends PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00) and event DEM.S.E02(Paused) sent"),
+            TestStep("11a", "TH reads ESAState.",
+                     "Verify value is 0x05 (Paused)"),
+            TestStep("11b", "TH reads Forecast.",
+                     "Value has to include ForecastUpdateReason=Local Optimization"),
+            TestStep("12", "TH sends ResumeRequest.",
+                     "Verify DUT responds with status SUCCESS(0x00) and event DEM.S.E03(Resumed) sent with Cause=4 (Cancelled)"),
+            TestStep("12a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("12b", "TH reads Forecast.",
+                     "Value has to include IsPausable=True, slots[0].SlotIsPausable=True, slots[0].MinPauseDuration>1, slots[0].MaxPauseDuration>1, slots[1].SlotIsPausable=False, ActiveSlotNumber=0, ForecastUpdateReason=Internal Optimization"),
+            TestStep("13", "TH sends PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00) and event DEM.S.E02(Paused) sent"),
+            TestStep("13a", "TH reads ESAState.",
+                     "Verify value is 0x05 (Paused)"),
+            TestStep("13b", "TH reads Forecast.",
+                     "Value has to include ForecastUpdateReason=Local Optimization"),
+            TestStep("14", "TH sends ResumeRequest.",
+                     "Verify DUT responds with status SUCCESS(0x00) and event DEM.S.E03(Resumed) sent with Cause=4 (Cancelled)"),
+            TestStep("14a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("15", "TH sends PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00) and event DEM.S.E02(Paused) sent"),
+            TestStep("15a", "TH reads ESAState.",
+                     "Verify value is 0x05 (Paused)"),
+            TestStep("16", "Wait for minPauseDuration.",
+                     "Event DEM.S.E03(Resumed) sent with Cause=0 (NormalCompletion)"),
+            TestStep("16a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Pausable Test Event Next Slot.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("17a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("17b", "TH reads Forecast.",
+                     "Value has to include ActiveSlotNumber=1"),
+            TestStep("18", "TH sends PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization.",
+                     "Verify DUT responds with status FAILURE(0x01)"),
+            TestStep("18a", "TH reads ESAState.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("19", "TH sends ResumeRequest.",
+                     "Verify DUT responds with status INVALID_IN_STATE(0xcb)"),
+            TestStep("20", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Pausable Test Event Clear.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
         ]
 
         return steps
