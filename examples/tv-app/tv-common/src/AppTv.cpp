@@ -801,22 +801,8 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
 CHIP_ERROR AppTvInit()
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    // test data for apps
-    constexpr uint16_t kApp1VendorId  = 1;
-    constexpr uint16_t kApp1ProductId = 11;
-    constexpr uint16_t kApp2VendorId  = 65521;
-    constexpr uint16_t kApp2ProductId = 32769;
-    constexpr uint16_t kApp3VendorId  = 9050;
-    constexpr uint16_t kApp3ProductId = 22;
-    constexpr uint16_t kApp4VendorId  = 1111;
-    constexpr uint16_t kApp4ProductId = 22;
-
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
-    gFactory.InstallContentApp(kApp1VendorId, kApp1ProductId);
-    gFactory.InstallContentApp(kApp2VendorId, kApp2ProductId);
-    gFactory.InstallContentApp(kApp3VendorId, kApp3ProductId);
-    gFactory.InstallContentApp(kApp4VendorId, kApp4ProductId);
     uint16_t value;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {
