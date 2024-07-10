@@ -33,7 +33,7 @@ class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
 
     def desc_TC_DEM_2_6(self) -> str:
         """Return a description of this test."""
-        return "4.1.3. [TC-DEM-2.2] Forecast Adjustment with State Forecast Reporting feature functionality with DUT as Server"
+        return "4.1.3. [TC-DEM-2.6] Forecast Adjustment with State Forecast Reporting feature functionality with DUT as Server"
 
     def pics_TC_DEM_2_6(self):
         """Return the PICS definitions associated with this test."""
