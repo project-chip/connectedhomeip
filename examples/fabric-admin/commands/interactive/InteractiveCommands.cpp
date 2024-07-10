@@ -40,7 +40,10 @@ namespace {
 constexpr char kInteractiveModePrompt[]          = ">>> ";
 constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
 constexpr char kInteractiveModeStopCommand[]     = "quit()";
-constexpr uint16_t kRetryIntervalS               = 5;
+
+#if defined(PW_RPC_ENABLED)
+constexpr uint16_t kRetryIntervalS = 5;
+#endif
 
 // File pointer for the log file
 FILE * sLogFile = nullptr;

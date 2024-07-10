@@ -1328,6 +1328,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(IcdManagement::ClientTypeEnum val)
+{
+    using EnumType = IcdManagement::ClientTypeEnum;
+    switch (val)
+    {
+    case EnumType::kPermanent:
+    case EnumType::kEphemeral:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(IcdManagement::OperatingModeEnum val)
 {
     using EnumType = IcdManagement::OperatingModeEnum;
@@ -1554,6 +1566,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ElectricalPowerMeasurem
     case EnumType::kUnknown:
     case EnumType::kDc:
     case EnumType::kAc:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(WaterHeaterManagement::BoostStateEnum val)
+{
+    using EnumType = WaterHeaterManagement::BoostStateEnum;
+    switch (val)
+    {
+    case EnumType::kInactive:
+    case EnumType::kActive:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -1848,6 +1873,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
     case EnumType::kDischargingEnabled:
     case EnumType::kDisabledError:
     case EnumType::kDisabledDiagnostics:
+    case EnumType::kEnabled:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

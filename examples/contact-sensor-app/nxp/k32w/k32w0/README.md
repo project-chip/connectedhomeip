@@ -14,36 +14,42 @@ network.
 
 <hr>
 
--   [CHIP K32W0 Contact Sensor Example Application](#chip-k32w061-contact-sensor-example-application)
--   [Introduction](#introduction)
-    -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
--   [Device UI](#device-ui)
--   [Building](#building)
-    -   [Overwrite board config files](#overwrite-board-config-files)
-    -   [Known issues building](#known-issues-building)
--   [Long Idle Time ICD Support](#long-idle-time-icd-support)
--   [Manufacturing data](#manufacturing-data)
--   [Flashing and debugging](#flashing-and-debugging)
--   [Pigweed Tokenizer](#pigweed-tokenizer)
-    -   [Detokenizer script](#detokenizer-script)
-    -   [Notes](#notes)
-    -   [Known issues tokenizer](#known-issues-tokenizer)
--   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
-    -   [Building steps](#building-steps)
--   [Tinycrypt ECC library](#tinycrypt-ecc-library)
-    -   [Building steps](#building-steps-1)
--   [OTA](#ota)
-    -   [Writing the SSBL](#writing-the-ssbl)
-    -   [Writing the PSECT](#writing-the-psect)
-    -   [Writing the application](#writing-the-application)
-    -   [OTA Testing](#ota-testing)
-    -   [Known issues ota](#known-issues-ota)
--   [Low power](#low-power)
-    -   [Known issues low power](#known-issues-low-power)
--   [Removing SSBL Upgrade region](#removing-ssbl-upgrade-region)
-
-    </hr>
+-   [CHIP K32W061 Contact Sensor Example Application](#chip-k32w061-contact-sensor-example-application)
+    -   [Introduction](#introduction)
+        -   [SE051H Secure Element](#se051h-secure-element)
+        -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
+    -   [LIT ICD Active Mode](#lit-icd-active-mode)
+        -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
+        -   [Thread Provisioning](#thread-provisioning)
+    -   [Device UI](#device-ui)
+        -   [No expansion board](#no-expansion-board)
+    -   [Building](#building)
+    -   [Long Idle Time ICD Support](#long-idle-time-icd-support)
+        -   [Overwrite board config files](#overwrite-board-config-files)
+        -   [Known issues building](#known-issues-building)
+    -   [Rotating device id](#rotating-device-id)
+    -   [Manufacturing data](#manufacturing-data)
+    -   [Flashing and debugging](#flashing-and-debugging)
+    -   [Pigweed tokenizer](#pigweed-tokenizer)
+        -   [Detokenizer script](#detokenizer-script)
+        -   [Notes](#notes)
+        -   [Known issues tokenizer](#known-issues-tokenizer)
+    -   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
+        -   [Building steps](#building-steps)
+    -   [Tinycrypt ECC library](#tinycrypt-ecc-library)
+        -   [Building steps](#building-steps-1)
+    -   [OTA](#ota)
+        -   [Writing the SSBL](#writing-the-ssbl)
+        -   [Features](#features)
+            -   [Multi image](#multi-image)
+            -   [Simple hash verification](#simple-hash-verification)
+        -   [Writing the PSECT](#writing-the-psect)
+        -   [Writing the application](#writing-the-application)
+        -   [OTA Testing](#ota-testing)
+        -   [Known issues ota](#known-issues-ota)
+    -   [Low power](#low-power)
+        -   [Known issues low power](#known-issues-low-power)
+    -   [Removing SSBL Upgrade Region](#removing-ssbl-upgrade-region)
 
 ## Introduction
 
@@ -179,44 +185,47 @@ contact status.
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (the demo-application was compiled on Ubuntu 20.04).
+distribution (supported Operating Systems are listed in
+[BUILDING.md](../../../../../docs/guides/BUILDING.md#tested-operating systems)).
 
-Activate the Matter environment:
+-   Make sure that below prerequisites are correctly installed (as described in
+    [BUILDING.md](../../../../../docs/guides/BUILDING.md#prerequisites)))
 
-```bash
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+```
+sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+     libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
 ```
 
-To bring the SDK in the environment, the user can:
+-   Step 1: checkout NXP specific submodules only
 
--   download it with west tool, in which case it will be handled automatically
-    by gn:
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
+```
 
-    ```bash
-    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
-    ```
+-   Step 2: activate local environment
 
-    In case there are local modification to the already installed github NXP
-    SDK, use the below `west forall` command instead of the `west init` command
-    to reset the west workspace. Warning: all local changes will be lost after
-    running this command.
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
+```
 
-    ```bash
-    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
-    ```
+If the script says the environment is out of date, you can update it by running
+the following command:
 
--   set up a custom path to the SDK, in which case
-    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
-    command:
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
+```
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
-    ```
+-   Step 3: Init NXP SDK(s)
 
-Start building the application:
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/setup/nxp/update_nxp_sdk.py --platform k32w0
+```
+
+Note: By default setup/nxp/update_nxp_sdk.py will try to initialize all NXP
+SDKs. Arg "-- help" could be used to view all available options.
+
+-   Start building the application:
 
 ```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
@@ -721,8 +730,13 @@ Please see more in the
 Here is an example that generates an OTA image with application update TLV:
 
 ```
-./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 42021 -vs "1.0" -da sha256 --app-input-file chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota
+./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 2 -vs "2.0" -da sha256 --enc_enable --input_ota_key "1234567890ABCDEFA1B2C3D4E5F6F1B4" --app-input-file chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota
 ```
+
+Please note the two options `--enc_enable` and `--input_ota_key`, which are
+mandatory when `chip_with_ota_encryption=1`. The value of `--input_ota_key` must
+match the value of `chip_with_ota_key`. See `args.gni` for the default gn
+configuration.
 
 A note regarding OTA image header version (`-vn` option). An application binary
 has its own software version, given by

@@ -4896,6 +4896,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::WaterHeaterManagement::Id: {
+        using namespace app::Clusters::WaterHeaterManagement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::DemandResponseLoadControl::Id: {
         using namespace app::Clusters::DemandResponseLoadControl;
         switch (aPath.mEventId)
@@ -5862,6 +5872,25 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                         value_maximumCurrentCtorSignature.c_str(),
                                                                         jnivalue_maximumCurrent, value_maximumCurrent);
 
+            jobject value_maximumDischargeCurrent;
+            if (!cppValue.maximumDischargeCurrent.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_maximumDischargeCurrent);
+            }
+            else
+            {
+                jobject value_maximumDischargeCurrentInsideOptional;
+                std::string value_maximumDischargeCurrentInsideOptionalClassName     = "java/lang/Long";
+                std::string value_maximumDischargeCurrentInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_maximumDischargeCurrentInsideOptional = static_cast<jlong>(cppValue.maximumDischargeCurrent.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_maximumDischargeCurrentInsideOptionalClassName.c_str(),
+                    value_maximumDischargeCurrentInsideOptionalCtorSignature.c_str(),
+                    jnivalue_maximumDischargeCurrentInsideOptional, value_maximumDischargeCurrentInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_maximumDischargeCurrentInsideOptional,
+                                                                  value_maximumDischargeCurrent);
+            }
+
             jclass energyTransferStartedStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEnergyTransferStartedEvent",
@@ -5873,9 +5902,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jmethodID energyTransferStartedStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(env, energyTransferStartedStructClass, "<init>",
-                                                                "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;)V",
-                                                                &energyTransferStartedStructCtor);
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, energyTransferStartedStructClass, "<init>",
+                "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/util/Optional;)V", &energyTransferStartedStructCtor);
             if (err != CHIP_NO_ERROR || energyTransferStartedStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$EnergyEvseClusterEnergyTransferStartedEvent constructor");
@@ -5883,7 +5912,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(energyTransferStartedStructClass, energyTransferStartedStructCtor, value_sessionID,
-                                           value_state, value_maximumCurrent);
+                                           value_state, value_maximumCurrent, value_maximumDischargeCurrent);
 
             return value;
         }
@@ -5923,6 +5952,24 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                         value_energyTransferredCtorSignature.c_str(),
                                                                         jnivalue_energyTransferred, value_energyTransferred);
 
+            jobject value_energyDischarged;
+            if (!cppValue.energyDischarged.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyDischarged);
+            }
+            else
+            {
+                jobject value_energyDischargedInsideOptional;
+                std::string value_energyDischargedInsideOptionalClassName     = "java/lang/Long";
+                std::string value_energyDischargedInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_energyDischargedInsideOptional = static_cast<jlong>(cppValue.energyDischarged.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_energyDischargedInsideOptionalClassName.c_str(),
+                    value_energyDischargedInsideOptionalCtorSignature.c_str(), jnivalue_energyDischargedInsideOptional,
+                    value_energyDischargedInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_energyDischargedInsideOptional, value_energyDischarged);
+            }
+
             jclass energyTransferStoppedStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEnergyTransferStoppedEvent",
@@ -5936,7 +5983,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jmethodID energyTransferStoppedStructCtor;
             err = chip::JniReferences::GetInstance().FindMethod(
                 env, energyTransferStoppedStructClass, "<init>",
-                "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;)V", &energyTransferStoppedStructCtor);
+                "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/util/Optional;)V",
+                &energyTransferStoppedStructCtor);
             if (err != CHIP_NO_ERROR || energyTransferStoppedStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$EnergyEvseClusterEnergyTransferStoppedEvent constructor");
@@ -5944,7 +5992,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(energyTransferStoppedStructClass, energyTransferStoppedStructCtor, value_sessionID,
-                                           value_state, value_reason, value_energyTransferred);
+                                           value_state, value_reason, value_energyTransferred, value_energyDischarged);
 
             return value;
         }

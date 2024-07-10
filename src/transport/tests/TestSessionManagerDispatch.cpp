@@ -36,7 +36,7 @@
 #include <transport/TransportMgr.h>
 #include <transport/tests/LoopbackTransportManager.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <errno.h>
 
