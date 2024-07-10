@@ -323,6 +323,7 @@ void CommandHandlerImpl::InvalidateHandles()
     {
         handle->Invalidate();
     }
+    mpHandleList.Clear();
 }
 
 void CommandHandlerImpl::IncrementHoldOff(Handle * apHandle)
