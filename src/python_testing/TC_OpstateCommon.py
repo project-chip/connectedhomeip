@@ -228,10 +228,10 @@ class TC_OPSTATE_BASE():
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_accptcmd_list)
         generated_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_gencmd_list)
         pause_cmd_id = commands.Pause.command_id
-        start_cmd_id = commands.Start.command_id 
+        start_cmd_id = commands.Start.command_id
         stop_cmd_id = commands.Stop.command_id
         resume_cmd_id = commands.Resume.command_id
-        ocr_cmd_id = commands.OperationalCommandResponse.command_id 
+        ocr_cmd_id = commands.OperationalCommandResponse.command_id
 
         # Gathers Event id for OperationCompletion event, if available then returns true
         events = cluster.Events
@@ -357,7 +357,7 @@ class TC_OPSTATE_BASE():
                  ]
         return steps
 
-    async def TEST_TC_OPSTATE_BASE_2_1(self, endpoint=1):  
+    async def TEST_TC_OPSTATE_BASE_2_1(self, endpoint=1):
         cluster = self.test_info.cluster
 
         # Gathering Available Attributes and associated ids
@@ -408,7 +408,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 5: TH reads from the DUT the OperationalStateList attribute
         self.step(5)
-        if oprtnlstate_list_attr_id in attribute_list:    
+        if oprtnlstate_list_attr_id in attribute_list:
             operational_state_list = await self.read_expect_success(endpoint=endpoint,
                                                                     attribute=attributes.OperationalStateList)
             defined_states = [state.value for state in cluster.Enums.OperationalStateEnum
@@ -616,11 +616,11 @@ class TC_OPSTATE_BASE():
         OPSTATE_gencmd_list = attributes.GeneratedCommandList
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_accptcmd_list)
         generated_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_gencmd_list)
-        pause_cmd_id = commands.Pause.command_id # 0
-        start_cmd_id = commands.Start.command_id # 2
-        stop_cmd_id = commands.Stop.command_id # 1
-        resume_cmd_id = commands.Resume.command_id # 3
-        ocr_cmd_id = commands.OperationalCommandResponse.command_id # 4
+        pause_cmd_id = commands.Pause.command_id  # 0
+        start_cmd_id = commands.Start.command_id  # 2
+        stop_cmd_id = commands.Stop.command_id  # 1
+        resume_cmd_id = commands.Resume.command_id  # 3
+        ocr_cmd_id = commands.OperationalCommandResponse.command_id  # 4
 
         self.init_test()
 
@@ -770,7 +770,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 17: TH sends Start command to the DUT
         self.step(17)
-        if self.pics_guard((self.check_pics(f"{self.test_info.pics_code}.S.M.ERR_UNABLE_TO_START_OR_RESUME")) and 
+        if self.pics_guard((self.check_pics(f"{self.test_info.pics_code}.S.M.ERR_UNABLE_TO_START_OR_RESUME")) and
                            ((start_cmd_id in accepted_cmd_list) and
                            (ocr_cmd_id in generated_cmd_list))):
             await self.send_cmd_expect_response(endpoint=endpoint,
@@ -820,8 +820,8 @@ class TC_OPSTATE_BASE():
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_accptcmd_list)
         generated_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_gencmd_list)
         pause_cmd_id = commands.Pause.command_id
-        resume_cmd_id = commands.Resume.command_id # 3
-        ocr_cmd_id = commands.OperationalCommandResponse.command_id # 4
+        resume_cmd_id = commands.Resume.command_id  # 3
+        ocr_cmd_id = commands.OperationalCommandResponse.command_id  # 4
 
         self.init_test()
 
@@ -984,7 +984,7 @@ class TC_OPSTATE_BASE():
 
     async def TEST_TC_OPSTATE_BASE_2_4(self, endpoint=1):
         cluster = self.test_info.cluster
-        
+
         # Gathering Available Attributes and associated ids
         attributes = cluster.Attributes
         OPSTATE_attr_list = attributes.AttributeList
@@ -1037,7 +1037,7 @@ class TC_OPSTATE_BASE():
             # STEP 4: TH reads from the DUT the OperationalState attribute
             self.step(4)
 
-            if oprtnlstate_attr_id in attribute_list:    
+            if oprtnlstate_attr_id in attribute_list:
                 await self.read_and_expect_value(endpoint=endpoint,
                                                  attribute=attributes.OperationalState,
                                                  expected_value=cluster.Enums.OperationalStateEnum.kError)
@@ -1093,15 +1093,15 @@ class TC_OPSTATE_BASE():
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_accptcmd_list)
         generated_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_gencmd_list)
         pause_cmd_id = commands.Pause.command_id
-        start_cmd_id = commands.Start.command_id 
+        start_cmd_id = commands.Start.command_id
         stop_cmd_id = commands.Stop.command_id
         resume_cmd_id = commands.Resume.command_id
-        ocr_cmd_id = commands.OperationalCommandResponse.command_id 
+        ocr_cmd_id = commands.OperationalCommandResponse.command_id
 
         # Gathering Available Event and associated id
         events = cluster.Events
         Oprtcmplt_event = bool(events.OperationCompletion.event_id)
-    
+
         self.init_test()
 
         asserts.assert_true('PIXIT.WAITTIME.REBOOT' in self.matter_test_config.global_test_params,
