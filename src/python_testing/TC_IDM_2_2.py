@@ -39,17 +39,13 @@ class TC_IDM_2_2(MatterBaseTest):
     async def test_TC_IDM_2_2(self):
         # Test Setup
         cluster_rev_attr = Clusters.BasicInformation.Attributes.ClusterRevision  # Global attribute
-        cluster_rev_attr_path = [(cluster_rev_attr)]
+
         server_list_attr = Clusters.Objects.Descriptor.Attributes.ServerList
         server_list_attr_path = [(0, server_list_attr)]
         descriptor_obj = Clusters.Objects.Descriptor
         descriptor_obj_path = [(0, descriptor_obj)]
         attribute_list = Clusters.Objects.Descriptor.Attributes.AttributeList
         attribute_list_path = [0, attribute_list]
-        data_version = Clusters.Attribute.DataVersion
-        basic_info = Clusters.BasicInformation
-        attribute_list_attr = Clusters.Objects.BasicInformation.Attributes.AttributeList
-        network_diagnostics_attr = Clusters.Objects.ThreadNetworkDiagnostics
         
         self.print_step(0, "Commissioning - already done")
 
@@ -167,7 +163,6 @@ class TC_IDM_2_2(MatterBaseTest):
         # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
         self.print_step(8, "Send Request Message to read all attributes from all clusters at one endpoint")
         read_request_8 = await self.default_controller.ReadAttribute(self.dut_node_id, [0])
-        attributes = read_request_8[0]
         returned_endpoints = read_request_8[0].keys()
 
         # Check if chip.clusters.Objects.Descriptor is in output
