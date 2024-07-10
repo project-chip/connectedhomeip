@@ -21,7 +21,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from DEMTestBase import DEMTestBase
+from TC_DEMTestBase import DEMTestBase
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -33,65 +33,89 @@ class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
 
     def desc_TC_DEM_2_6(self) -> str:
         """Return a description of this test."""
-        return "4.1.3. [TC-DEM-2.2] Power Adjustment feature functionality with DUT as Server"
+        return "4.1.3. [TC-DEM-2.2] Forecast Adjustment with State Forecast Reporting feature functionality with DUT as Server"
 
     def pics_TC_DEM_2_6(self):
         """Return the PICS definitions associated with this test."""
         pics = [
-            "DEM.S.F00",  # Depends on Feature 00 (PowerAdjustment)
+            # Depends on Feature 05 (ForecastAdjustment) & Feature 01 (StateForecastReporting)
+            "DEM.S.F05 & DEM.S.F02"
         ]
         return pics
 
     def steps_TC_DEM_2_6(self) -> list[TestStep]:
         """Execute the test steps."""
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Adjustment Test Event"),
-            TestStep("3a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep(
-                "3b", "TH reads Forecast attribute. Value has to include slots[0].MinDurationAdjustment, slots[0].MaxDurationAdjustment"),
-            TestStep("3c", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            TestStep(
-                "4", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID+1, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization. Verify Command response is Failure"),
-            TestStep(
-                "5", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=4, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization. Verify Command response is Failure"),
-            TestStep(
-                "6", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment+1}, Cause=GridOptimization. Verify Command response is ConstraintError"),
-            TestStep(
-                "7", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MinDurationAdjustment-1}, Cause=GridOptimization. Verify Command response is ConstraintError"),
-            TestStep(
-                "8", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, SlotAdjustments[1].{SlotIndex=4, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization. Verify Command response is Failure"),
-            TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event"),
-            TestStep("9a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("9b", "TH reads OptOutState attribute. Verify value is 0x02 (LocalOptOut)"),
-            TestStep(
-                "10", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep(
-                "11", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization. Verify Command response is Success"),
-            TestStep("11a", "TH reads Forecast attribute. Value has to include ForecastUpdateReason=GridOptimization"),
-            TestStep("12", "TH sends CancelRequest. Verify Command response is Success"),
-            TestStep("12a", "TH reads Forecast attribute. Value has to include ForecastUpdateReason=InternalOptimization"),
-            TestStep(
-                "13", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization. Verify Command response is Success"),
-            TestStep("13a", "TH reads Forecast attribute. Value has to include ForecastUpdateReason=GridOptimization"),
-            TestStep("14", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event"),
-            TestStep("14a", "TH reads OptOutState attribute. Verify value is 0x03 (OptOut)"),
-            TestStep("14b", "TH reads Forecast attribute. Value has to include ForecastUpdateReason=Internal Optimization"),
-            TestStep(
-                "15", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization. Verify Command response is ConstraintError"),
-            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear"),
-            TestStep("16a", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            TestStep(
-                "17", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MinDurationAdjustment}, Cause=LocalOptimization. Verify Command response is Success"),
-            TestStep("17a", "TH reads Forecast attribute. Value has to include ForecastUpdateReason=LocalOptimization"),
-            TestStep("18", "TH sends CancelRequest. Verify Command response is Success"),
-            TestStep("18a", "TH reads Forecast attribute. Value has to include ForecastUpdateReason=InternalOptimization"),
-            TestStep("19", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Adjustment Test Event Next Slot"),
-            TestStep(
-                "20", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MinDurationAdjustment}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("21", "TH sends CancelRequest. Verify Command response is InvalidInStateError"),
-            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Adjustment Test Event Clear"),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
+                     "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Adjustment Test Event",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("3a", "TH reads ESAState attribute.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("3b", "TH reads Forecast attribute.",
+                     "Value has to include slots[0].MinDurationAdjustment, slots[0].MaxDurationAdjustment"),
+            TestStep("3c", "TH reads OptOutState attribute.",
+                     "Verify value is 0x00 (NoOptOut)"),
+            TestStep("4", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID+1, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization.",
+                     "Verify DUT responds with status FAILURE(0x01)"),
+            TestStep("5", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=4, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization.",
+                     "Verify DUT responds with status FAILURE(0x01)"),
+            TestStep("6", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment+1}, Cause=GridOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("7", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MinDurationAdjustment-1}, Cause=GridOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("8", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, SlotAdjustments[1].{SlotIndex=4, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization.",
+                     "Verify DUT responds with status FAILURE(0x01)"),
+            TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("9a", "TH reads ESAState attribute.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("9b", "TH reads OptOutState attribute.",
+                     "Verify value is 0x02 (LocalOptOut)"),
+            TestStep("10", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("11", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("11a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=GridOptimization"),
+            TestStep("12", "TH sends CancelRequest.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("12a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=InternalOptimization"),
+            TestStep("13", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("13a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=GridOptimization"),
+            TestStep("14", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("14a", "TH reads OptOutState attribute.",
+                     "Verify value is 0x03 (OptOut)"),
+            TestStep("14b", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=Internal Optimization"),
+            TestStep("15", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear"",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("16a", "TH reads OptOutState attribute.",
+                     "Verify value is 0x00 (NoOptOut)"),
+            TestStep("17", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MinDurationAdjustment}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("17a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=LocalOptimization"),
+            TestStep("18", "TH sends CancelRequest.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("18a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=InternalOptimization"),
+            TestStep("19", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Adjustment Test Event Next Slot",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("20", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MinDurationAdjustment}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("21", "TH sends CancelRequest.",
+                     "Verify DUT responds with status INVALID_IN_STATE(0xcb)"),
+            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Forecast Adjustment Test Event Clear",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
         ]
 
         return steps
