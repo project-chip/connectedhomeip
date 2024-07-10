@@ -19,8 +19,8 @@
 #pragma once
 
 #include <functional>
-#include <type_traits>
 #include <stdbool.h>
+#include <type_traits>
 
 #include <app/data-model/Nullable.h>
 #include <lib/support/BitFlags.h>
@@ -43,7 +43,6 @@ namespace detail {
 using Timestamp = System::Clock::Milliseconds64;
 template <typename T>
 using Nullable = DataModel::Nullable<T>;
-
 
 /**
  * This class helps track reporting state of an attribute to properly keep track of whether
@@ -120,12 +119,12 @@ public:
         // New (`now`) timestamp passed in `SetValue()`.
         Timestamp nowTimestamp;
         // Value last marked as dirty.
-        const Nullable<T>& lastDirtyValue;
+        const Nullable<T> & lastDirtyValue;
         // New value passed in `SetValue()`, to compare against lastDirtyValue for sufficient change if needed.
-        const Nullable<T>& newValue;
+        const Nullable<T> & newValue;
     };
 
-    using SufficientChangePredicate = std::function<bool(const SufficientChangePredicateCandidate&)>;
+    using SufficientChangePredicate = std::function<bool(const SufficientChangePredicateCandidate &)>;
 
     /**
      * @brief Factory to generate a functor for "attribute was last reported" at least `minimumDurationMillis` ago.
@@ -136,8 +135,9 @@ public:
     static SufficientChangePredicate
     GetPredicateForSufficientTimeSinceLastDirty(System::Clock::Milliseconds64 minimumDurationMillis)
     {
-        return [minimumDurationMillis](const SufficientChangePredicateCandidate& candidate) -> bool {
-            return (candidate.lastDirtyValue != candidate.newValue) && ((candidate.nowTimestamp - candidate.lastDirtyTimestamp) >= minimumDurationMillis);
+        return [minimumDurationMillis](const SufficientChangePredicateCandidate & candidate) -> bool {
+            return (candidate.lastDirtyValue != candidate.newValue) &&
+                ((candidate.nowTimestamp - candidate.lastDirtyTimestamp) >= minimumDurationMillis);
         };
     }
 
@@ -199,10 +199,10 @@ public:
         mIsDirty = mIsDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement) && isIncrement);
 
         SufficientChangePredicateCandidate candidate{
-          mLastDirtyTimestampMillis, // lastDirtyTimestamp
-          now, // nowTimestamp
-          mLastDirtyValue, // lastDirtyValue
-          newValue // newValue
+            mLastDirtyTimestampMillis, // lastDirtyTimestamp
+            now,                       // nowTimestamp
+            mLastDirtyValue,           // lastDirtyValue
+            newValue                   // newValue
         };
         mIsDirty = mIsDirty || changedPredicate(candidate);
 
@@ -225,7 +225,7 @@ public:
      */
     void SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now)
     {
-        SetValue(newValue, now, [](const SufficientChangePredicateCandidate&) -> bool { return false; });
+        SetValue(newValue, now, [](const SufficientChangePredicateCandidate &) -> bool { return false; });
     }
 
 protected:
