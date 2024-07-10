@@ -386,7 +386,6 @@ void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 {
     ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
-    LogErrorOnFailure(err);
 }
 
 void SetUpCodePairer::OnWiFiPAFSubscribeComplete(void * appState)
