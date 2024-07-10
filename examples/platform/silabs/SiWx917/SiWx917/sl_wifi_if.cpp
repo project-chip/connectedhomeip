@@ -681,7 +681,7 @@ static sl_status_t wfx_rsi_do_join(void)
 
     // failure only happens when the firmware returns an error
     ChipLogError(DeviceLayer, "wfx_rsi_do_join: sl_wifi_connect failed: 0x%lx", static_cast<uint32_t>(status));
-    VerifyOrReturnError((is_wifi_disconnection_event || wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
+    VerifyOrReturnError((wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT), status);
 
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
     ChipLogProgress(DeviceLayer, "wfx_rsi_do_join: retry attempt %d", wfx_rsi.join_retries);
