@@ -520,7 +520,6 @@ def main():
             os.execv(launcher, [launcher, shlex.join(what_to_run)])
         sys.exit(1)
 
-
     checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()
