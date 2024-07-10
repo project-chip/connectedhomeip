@@ -5635,6 +5635,15 @@ public class ChipClusters {
         }, DEVICE_LOCATION_ATTRIBUTE_ID, true);
     }
 
+    public void writeDeviceLocationAttribute(DefaultClusterCallback callback, ChipStructs.BasicInformationClusterHomeLocationStruct value) {
+      writeDeviceLocationAttribute(callback, value, 0);
+    }
+
+    public void writeDeviceLocationAttribute(DefaultClusterCallback callback, ChipStructs.BasicInformationClusterHomeLocationStruct value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? value.encodeTlv() : new NullType();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), DEVICE_LOCATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
     public void subscribeDeviceLocationAttribute(
         DeviceLocationAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEVICE_LOCATION_ATTRIBUTE_ID);
