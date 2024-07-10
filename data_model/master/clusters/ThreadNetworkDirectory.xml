@@ -82,19 +82,19 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="PreferredExtendedPanID" type="uint64" default="null">
       <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="ThreadNetworks" type="list">
       <entry type="ThreadNetwork"/>
       <access read="true" readPrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="ThreadNetworkTableSize"/>
     </attribute>
     <attribute id="0x0002" name="ThreadNetworkTableSize" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="min" value="SupportedFabrics*2"/>
     </attribute>

@@ -152,26 +152,26 @@ Davis, CA 95616, USA
     <attribute id="0x0001" name="SupportedMaps" type="list" default="MS">
       <entry type="MapStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="countBetween" from="1" to="255"/>
     </attribute>
     <attribute id="0x0002" name="SelectedLocations" type="list" default="null">
       <entry type="uint32"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0003" name="CurrentLocation" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0004" name="EstimatedEndTime" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
       <optionalConform>
         <attribute name="CurrentLocation"/>
       </optionalConform>
@@ -179,7 +179,7 @@ Davis, CA 95616, USA
     <attribute id="0x0005" name="Progress" type="list" default="null">
       <entry type="ProgressStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
       <constraint type="countBetween" from="1" to="255"/>
     </attribute>
@@ -196,7 +196,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="SelectLocationsResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <command name="SelectLocations"/>
       </mandatoryConform>
@@ -215,7 +214,6 @@ Davis, CA 95616, USA
       </optionalConform>
     </command>
     <command id="0x03" name="SkipCurrentLocationResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <command name="SkipCurrentLocation"/>
       </mandatoryConform>

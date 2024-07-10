@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="TBRM" scope="Node"/>
   <features>
-    <feature bit="0" code="PC" name="PAN Change" summary="The ability to change PAN configuration with pending dataset setting request.">
+    <feature bit="0" code="PC" name="PAN" summary="The ability to change PAN configuration with pending dataset setting request.">
       <optionalConform/>
     </feature>
   </features>
@@ -82,17 +82,17 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="ThreadVersion" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="InterfaceEnabled" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="ActiveDatasetTimestamp" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
   </attributes>

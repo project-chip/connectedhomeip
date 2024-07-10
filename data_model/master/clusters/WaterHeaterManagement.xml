@@ -112,7 +112,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="HeaterTypes" type="WaterHeaterTypeBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="HeatDemand" type="WaterHeaterDemandBitmap" default="0">
