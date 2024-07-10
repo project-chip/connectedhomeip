@@ -665,6 +665,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
         mContentApps.emplace_back(std::move(ptr));
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     // Get the list of node ids
     std::set<NodeId> nodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForContentApp(vendorId, productId);
 
@@ -673,12 +674,12 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
     {
         auto app = contentApp.get();
 
-        // if (app->MatchesPidVid(productId, vendorId))
-        // {
-        //     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
+        if (app->MatchesPidVid(productId, vendorId))
+        {
+            CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
-        //     GetContentAppFactoryImpl()->LoadContentApp(vendorApp);
-        // }
+            GetContentAppFactoryImpl()->LoadContentApp(vendorApp);
+        }
 
         // update the list of node ids with content apps allowed vendor list
         for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
@@ -688,7 +689,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
             nodeIds.insert(tempNodeIds.begin(), tempNodeIds.end());
         }
     }
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
     // refresh ACLs
     for (const auto & nodeId : nodeIds)
     {
