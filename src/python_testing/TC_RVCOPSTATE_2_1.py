@@ -312,5 +312,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7x", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
