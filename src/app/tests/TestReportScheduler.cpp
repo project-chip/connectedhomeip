@@ -27,8 +27,6 @@
 #include <pw_unit_test/framework.h>
 namespace {
 
-using TestContext = chip::Test::AppContext;
-
 class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallback
 {
 public:
@@ -53,39 +51,9 @@ using Milliseconds64      = System::Clock::Milliseconds64;
 
 static const size_t kNumMaxReadHandlers = 16;
 
-class TestReportScheduler : public ::testing::Test
+class TestReportScheduler : public chip::Test::AppContext
 {
 public:
-    static void SetUpTestSuite()
-    {
-        mpTestContext = new chip::Test::AppContext;
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        if (mpTestContext != nullptr)
-        {
-            delete mpTestContext;
-        }
-    }
-
-    void SetUp() override
-    {
-
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->SetUp();
-        }
-    }
-    void TearDown() override
-    {
-        if (mpTestContext != nullptr)
-        {
-            mpTestContext->TearDown();
-        }
-    }
-
     void TestReadHandlerList();
     void TestReportTiming();
     void TestObserverCallbacks();
@@ -126,11 +94,7 @@ public:
 
         return ret;
     }
-
-    static chip::Test::AppContext * mpTestContext;
 };
-
-chip::Test::AppContext * TestReportScheduler::mpTestContext = nullptr;
 
 class TestTimerDelegate : public ReportScheduler::TimerDelegate
 {
@@ -301,7 +265,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReadHandlerList)
 
     NullReadHandlerCallback nullCallback;
     // exchange context
-    Messaging::ExchangeContext * exchangeCtx = mpTestContext->NewExchangeToAlice(nullptr, false);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     // Read handler pool
     ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
@@ -320,7 +284,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReadHandlerList)
 
     EXPECT_EQ(readHandlerPool.Allocated(), kNumMaxReadHandlers);
     EXPECT_EQ(sScheduler.GetNumReadHandlers(), kNumMaxReadHandlers);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 1u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 1u);
 
     // Test unregister first ReadHandler
     uint32_t target                = 0;
@@ -357,7 +321,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReadHandlerList)
 
     readHandlerPool.ReleaseAll();
     exchangeCtx->Close();
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportTiming)
@@ -365,7 +329,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportTiming)
 
     NullReadHandlerCallback nullCallback;
     // exchange context
-    Messaging::ExchangeContext * exchangeCtx = mpTestContext->NewExchangeToAlice(nullptr, false);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     // Read handler pool
     ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
@@ -425,7 +389,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportTiming)
     sScheduler.UnregisterAllHandlers();
     readHandlerPool.ReleaseAll();
     exchangeCtx->Close();
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F_FROM_FIXTURE(TestReportScheduler, TestObserverCallbacks)
@@ -433,7 +397,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestObserverCallbacks)
 
     NullReadHandlerCallback nullCallback;
     // exchange context
-    Messaging::ExchangeContext * exchangeCtx = mpTestContext->NewExchangeToAlice(nullptr, false);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     // Read handler pool
     ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
@@ -500,7 +464,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestObserverCallbacks)
 
     readHandlerPool.ReleaseAll();
     exchangeCtx->Close();
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
@@ -508,7 +472,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
 
     NullReadHandlerCallback nullCallback;
     // exchange context
-    Messaging::ExchangeContext * exchangeCtx = mpTestContext->NewExchangeToAlice(nullptr, false);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
 
     // First test: ReadHandler 2 merge on ReadHandler 1 max interval
     // Read handler pool
@@ -840,7 +804,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
     syncScheduler.UnregisterAllHandlers();
     readHandlerPool.ReleaseAll();
     exchangeCtx->Close();
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 } // namespace reporting

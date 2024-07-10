@@ -50,7 +50,6 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
-using TestContext = chip::Test::AppContext;
 using namespace chip::Protocols;
 
 namespace {
@@ -355,25 +354,9 @@ public:
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;
 
-class TestCommandInteraction : public ::testing::Test
+class TestCommandInteraction : public chip::Test::AppContext
 {
 public:
-    static void SetUpTestSuite()
-    {
-        mpTestContext = new TestContext;
-        mpTestContext->SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        mpTestContext->TearDownTestSuite();
-        delete mpTestContext;
-    }
-
-    void SetUp() override { mpTestContext->SetUp(); }
-    void TearDown() override { mpTestContext->TearDown(); }
-
-    static TestContext * mpTestContext;
-
     static size_t GetNumActiveCommandResponderObjects()
     {
         return chip::app::InteractionModelEngine::GetInstance()->mCommandResponderObjs.Allocated();
@@ -441,7 +424,6 @@ public:
                                                 const ConcreteCommandPath & aRequestCommandPath, uint32_t aSizeToLeaveInBuffer);
     static void ValidateCommandHandlerEncodeInvokeResponseMessage(bool aNeedStatusCode);
 };
-TestContext * TestCommandInteraction::mpTestContext = nullptr;
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
@@ -684,19 +666,19 @@ void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(b
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = false;
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
@@ -716,19 +698,19 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
-    chip::Test::MessageCapturer messageLog(*mpTestContext);
+    chip::Test::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
     // MRP state to look like what it would have looked like if the packet had
     // not gotten dropped.
 
-    PretendWeGotReplyFromServer(*mpTestContext, commandSender.mExchangeCtx.Get());
+    PretendWeGotReplyFromServer(*this, commandSender.mExchangeCtx.Get());
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
 
     EXPECT_EQ(commandSender.OnMessageReceived(commandSender.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
               CHIP_IM_GLOBAL_STATUS(Busy));
@@ -738,16 +720,16 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
     EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
     CheckForInvalidAction(messageLog);
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects unknown message to client,
@@ -755,19 +737,19 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = false;
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
@@ -786,19 +768,19 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
-    chip::Test::MessageCapturer messageLog(*mpTestContext);
+    chip::Test::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
     // MRP state to look like what it would have looked like if the packet had
     // not gotten dropped.
 
-    PretendWeGotReplyFromServer(*mpTestContext, commandSender.mExchangeCtx.Get());
+    PretendWeGotReplyFromServer(*this, commandSender.mExchangeCtx.Get());
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
 
     EXPECT_EQ(commandSender.OnMessageReceived(commandSender.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
               CHIP_ERROR_INVALID_MESSAGE_TYPE);
@@ -807,16 +789,16 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
     CheckForInvalidAction(messageLog);
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects malformed invoke response
@@ -824,19 +806,19 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = false;
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
@@ -855,18 +837,18 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandResponse);
-    chip::Test::MessageCapturer messageLog(*mpTestContext);
+    chip::Test::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
     // MRP state to look like what it would have looked like if the packet had
     // not gotten dropped.
-    PretendWeGotReplyFromServer(*mpTestContext, commandSender.mExchangeCtx.Get());
+    PretendWeGotReplyFromServer(*this, commandSender.mExchangeCtx.Get());
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
 
     EXPECT_EQ(commandSender.OnMessageReceived(commandSender.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
               CHIP_ERROR_END_OF_TLV);
@@ -875,16 +857,16 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
     CheckForInvalidAction(messageLog);
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects malformed status response to
@@ -892,19 +874,19 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = false;
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
-    mpTestContext->DrainAndServiceIO();
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    DrainAndServiceIO();
 
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(mpTestContext->GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
@@ -922,18 +904,18 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
-    chip::Test::MessageCapturer messageLog(*mpTestContext);
+    chip::Test::MessageCapturer messageLog(*this);
     messageLog.mCaptureStandaloneAcks = false;
 
     // Since we are dropping packets, things are not getting acked.  Set up our
     // MRP state to look like what it would have looked like if the packet had
     // not gotten dropped.
-    PretendWeGotReplyFromServer(*mpTestContext, commandSender.mExchangeCtx.Get());
+    PretendWeGotReplyFromServer(*this, commandSender.mExchangeCtx.Get());
 
-    mpTestContext->GetLoopback().mSentMessageCount                 = 0;
-    mpTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    mpTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    mpTestContext->GetLoopback().mDroppedMessageCount              = 0;
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
 
     EXPECT_EQ(commandSender.OnMessageReceived(commandSender.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
               CHIP_ERROR_END_OF_TLV);
@@ -942,24 +924,24 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
-    EXPECT_EQ(mpTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
     CheckForInvalidAction(messageLog);
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    mpTestContext->ExpireSessionAliceToBob();
-    mpTestContext->ExpireSessionBobToAlice();
-    mpTestContext->CreateSessionAliceToBob();
-    mpTestContext->CreateSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    CreateSessionAliceToBob();
+    CreateSessionBobToAlice();
 }
 
 TEST_F(TestCommandInteraction, TestCommandSender_WithWrongState)
 {
 
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_ERROR_INCORRECT_STATE);
 }
 
 TEST_F(TestCommandInteraction, TestCommandHandler_WithWrongState)
@@ -984,14 +966,14 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithWrongState)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_WithSendCommand)
 {
 
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     AddInvokeRequestData(&commandSender);
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     GenerateInvokeResponse(buf, kTestCommandIdWithData);
     bool moreChunkedMessages = false;
@@ -1022,7 +1004,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_WithSendEmptyCommand)
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_WithProcessReceivedMsg)
 {
 
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -1038,8 +1020,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
 
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
-                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
 
     uint16_t mockCommandRef = 1;
     pendingResponseTracker.Add(mockCommandRef);
@@ -1065,8 +1047,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
 
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
-                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
 
     uint16_t mockCommandRef = 1;
     pendingResponseTracker.Add(mockCommandRef);
@@ -1094,8 +1076,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ValidateSecondLarg
 {
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
-                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
 
     app::CommandSender::AddRequestDataParameters addRequestDataParams;
 
@@ -1121,10 +1103,10 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ValidateSecondLarg
     EXPECT_EQ(commandSender.AddRequestData(commandPathParams, requestData, addRequestDataParams), CHIP_ERROR_NO_MEMORY);
 
     // Confirm that we can still send out a request with the first command.
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
     EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onResponseCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onFinalCalledTimes, 1);
@@ -1174,13 +1156,13 @@ TEST_F(TestCommandInteraction, TestCommandHandlerInvalidMessageSync)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     chip::isCommandDispatched = false;
     AddInvalidInvokeRequestData(&commandSender);
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_FALSE(chip::isCommandDispatched);
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
@@ -1188,7 +1170,7 @@ TEST_F(TestCommandInteraction, TestCommandHandlerInvalidMessageSync)
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandHandlerCommandEncodeExternalFailure)
@@ -1316,18 +1298,18 @@ TEST_F(TestCommandInteraction, TestCommandSenderLegacyCallbackUnsupportedCommand
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender, kTestNonExistCommandId);
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 // Because UnsupportedCommand is a path specific error we will expect it to come via on response when using Extended Path.
@@ -1335,25 +1317,25 @@ TEST_F(TestCommandInteraction, TestCommandSender_ExtendableCallbackUnsupportedCo
 {
 
     mockCommandSenderExtendedDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderExtendedDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderExtendedDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender, kTestNonExistCommandId);
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onResponseCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onFinalCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onErrorCalledTimes, 0);
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSenderLegacyCallbackBuildingBatchCommandFails)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
     app::CommandSender::PrepareCommandParameters prepareCommandParams;
     app::CommandSender::FinishCommandParameters finishCommandParams;
     prepareCommandParams.SetStartDataStruct(true).SetCommandRef(0);
@@ -1375,15 +1357,15 @@ TEST_F(TestCommandInteraction, TestCommandSenderLegacyCallbackBuildingBatchComma
     EXPECT_EQ(commandSender.PrepareCommand(commandPathParams, prepareCommandParams), CHIP_ERROR_INCORRECT_STATE);
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSender_ExtendableCallbackBuildingBatchDuplicateCommandRefFails)
 {
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
-                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
     app::CommandSender::PrepareCommandParameters prepareCommandParams;
     app::CommandSender::FinishCommandParameters finishCommandParams;
 
@@ -1403,15 +1385,15 @@ TEST_F(TestCommandInteraction, TestCommandSender_ExtendableCallbackBuildingBatch
     EXPECT_EQ(commandSender.PrepareCommand(commandPathParams, prepareCommandParams), CHIP_ERROR_INVALID_ARGUMENT);
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSender_ExtendableCallbackBuildingBatchCommandSuccess)
 {
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
-                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
     app::CommandSender::PrepareCommandParameters prepareCommandParams;
     app::CommandSender::FinishCommandParameters finishCommandParams;
 
@@ -1439,20 +1421,20 @@ TEST_F(TestCommandInteraction, TestCommandSender_ExtendableCallbackBuildingBatch
     EXPECT_EQ(commandSender.FinishCommand(finishCommandParams), CHIP_NO_ERROR);
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSenderCommandSuccessResponseFlow)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender);
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
     EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
@@ -1461,76 +1443,76 @@ TEST_F(TestCommandInteraction, TestCommandSenderCommandSuccessResponseFlow)
     EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 1u);
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSenderCommandAsyncSuccessResponseFlow)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender);
     asyncCommand = true;
 
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 1u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 2u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 2u);
 
     // Decrease CommandHandler refcount and send response
     asyncCommandHandle = nullptr;
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSenderCommandSpecificResponseFlow)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender, kTestCommandIdCommandSpecificResponse);
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSenderCommandFailureResponseFlow)
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender, kTestNonExistCommandId);
 
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
     EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
     EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestCommandInteraction, TestCommandSenderAbruptDestruction)
@@ -1545,13 +1527,13 @@ TEST_F(TestCommandInteraction, TestCommandSenderAbruptDestruction)
     mockCommandSenderDelegate.ResetCounter();
 
     {
-        app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+        app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
         AddInvokeRequestData(&commandSender, kTestCommandIdCommandSpecificResponse);
 
-        EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+        EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-        mpTestContext->DrainAndServiceIO();
+        DrainAndServiceIO();
 
         //
         // No callbacks should be invoked yet - let's validate that.
@@ -1560,13 +1542,13 @@ TEST_F(TestCommandInteraction, TestCommandSenderAbruptDestruction)
         EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
         EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
 
-        EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 1u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 1u);
     }
 
     //
     // Upon the sender being destructed by the application, our exchange should get cleaned up too.
     //
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
 }
@@ -1577,8 +1559,8 @@ TEST_F(TestCommandInteraction, TestCommandHandler_RejectMultipleIdenticalCommand
     isCommandDispatched = false;
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
-                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
@@ -1601,9 +1583,9 @@ TEST_F(TestCommandInteraction, TestCommandHandler_RejectMultipleIdenticalCommand
         EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
     }
 
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onResponseCalledTimes, 0);
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onFinalCalledTimes, 1);
@@ -1611,7 +1593,7 @@ TEST_F(TestCommandInteraction, TestCommandHandler_RejectMultipleIdenticalCommand
     EXPECT_FALSE(chip::isCommandDispatched);
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    EXPECT_EQ(mpTestContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -1622,8 +1604,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectsMultipleCo
     isCommandDispatched = false;
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
-                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
@@ -1682,8 +1664,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_RejectMultipleCom
 
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
-                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
@@ -1735,8 +1717,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_AcceptMultipleCom
 
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate,
-                                     &mpTestContext->GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
 
     app::CommandSender::ConfigParameters configParameters;
     configParameters.SetRemoteMaxPathsPerInvoke(2);
@@ -1875,15 +1857,15 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_FillUpInvokeRespo
 TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReleaseWithExchangeClosed)
 {
 
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &mpTestContext->GetExchangeManager());
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
 
     AddInvokeRequestData(&commandSender);
     asyncCommandHandle = nullptr;
     asyncCommand       = true;
 
-    EXPECT_EQ(commandSender.SendCommandRequest(mpTestContext->GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
 
-    mpTestContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     // Verify that async command handle has been allocated
     ASSERT_NE(asyncCommandHandle.Get(), nullptr);
