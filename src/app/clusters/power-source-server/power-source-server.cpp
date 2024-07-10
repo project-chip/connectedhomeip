@@ -67,8 +67,6 @@ struct PowerSourceClusterInfo
     Span<EndpointId> mEndpointList;
 };
 
-PowerSourceServer gPowerSourceServer;
-
 PowerSourceAttrAccess gAttrAccess;
 
 #ifdef ZCL_USING_POWER_SOURCE_CLUSTER_SERVER
@@ -141,7 +139,8 @@ PowerSourceAttrAccess & TestOnlyGetPowerSourceAttrAccess()
 
 PowerSourceServer & PowerSourceServer::Instance()
 {
-    return gPowerSourceServer;
+    static PowerSourceServer sPowerSourceServer;
+    return sPowerSourceServer;
 }
 
 // Caller does not need to retain the span past the call point as these are copied into an internal storage

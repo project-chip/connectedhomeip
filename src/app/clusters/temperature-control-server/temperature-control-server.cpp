@@ -47,7 +47,6 @@ public:
 };
 
 } // namespace
-TemperatureControlAttrAccess gAttrAccess;
 
 namespace chip {
 namespace app {
@@ -228,5 +227,6 @@ void emberAfTemperatureControlClusterServerInitCallback(EndpointId endpoint) {}
 
 void MatterTemperatureControlPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    static TemperatureControlAttrAccess sAttrAccess;
+    registerAttributeAccessOverride(&sAttrAccess);
 }

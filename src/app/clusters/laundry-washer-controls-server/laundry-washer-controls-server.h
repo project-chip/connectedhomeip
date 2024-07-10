@@ -62,8 +62,6 @@ private:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSupportedRinses(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
-
-    static LaundryWasherControlsServer sInstance;
 };
 
 } // namespace LaundryWasherControls
