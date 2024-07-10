@@ -567,6 +567,7 @@ void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
     mAdminVendorIds.push_back(vendorId);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 class DevicePairedCommand : public Controller::DevicePairingDelegate
 {
 public:
@@ -597,12 +598,8 @@ public:
                             " and vendor id: %d and product id: %d",
                             ChipLogValueX64(cbContext->nodeId), cbContext->vendorId, cbContext->productId);
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-
             GetCommissionerDiscoveryController()->CommissioningSucceeded(cbContext->vendorId, cbContext->productId,
                                                                          cbContext->nodeId, exchangeMgr, sessionHandle);
-
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         }
     }
 
@@ -625,6 +622,7 @@ public:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
     std::shared_ptr<CallbackContext> mContext;
 };
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t productId)
 {
@@ -690,7 +688,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
             nodeIds.insert(tempNodeIds.begin(), tempNodeIds.end());
         }
     }
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     // refresh ACLs
     for (const auto & nodeId : nodeIds)
     {
@@ -704,7 +702,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
         GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
                                                     &pairingCommand->mOnDeviceConnectionFailureCallback);
     }
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 }
 
 bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)
