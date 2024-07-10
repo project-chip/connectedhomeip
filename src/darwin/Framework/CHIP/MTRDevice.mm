@@ -64,6 +64,8 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 // Disabling pending crashes
 #define ENABLE_CONNECTIVITY_MONITORING 0
 
+#define USE_DEVICE_CONTROLLER_DATA_STORE 1
+
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 
@@ -3962,27 +3964,35 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (NSArray *)supportedClientDataClasses
 {
+    // TODO: KMO: check this list, maybe use list from controller DS
     return @[ [NSData class], [NSString class], [NSNumber class], [NSDictionary class], [NSArray class] ];
 }
 
 - (NSArray * _Nullable)clientDataKeys
 {
+    // TODO: KMO: check this list, maybe use list from controller DS
     return [self.temporaryMetaDataCache allKeys];
 }
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
 {
+#if USE_DEVICE_CONTROLLER_DATA_STORE
+    // TODO: KMO: implement
+    // [self.deviceController ]
+    return nil;
+#else
     if (key == nil)
         return nil;
 
     return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:-1", key]];
+#endif // USE_DEVICE_CONTROLLER_DATA_STORE
 }
 
 - (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
 {
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
     // TODO: Need to add a delegate method, so when this value changes we call back to the client
-
+    // TODO: KMO: SET: implement / check the above
     if (key == nil || value == nil)
         return;
 
@@ -3995,6 +4005,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)removeClientDataForKey:(NSString *)key
 {
+    // TODO: KMO: SET: implement
     if (key == nil)
         return;
 
@@ -4003,6 +4014,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
 {
+    // TODO: KMO: GET: implement
     if (endpointID == nil)
         return nil;
     // TODO: When hooked up to storage, enumerate this better
@@ -4012,6 +4024,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
+    // TODO: KMO: GET: implement
     if (key == nil || endpointID == nil)
         return nil;
 
@@ -4020,6 +4033,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
 {
+    // TODO: KMO: GET: implement
     if (key == nil || value == nil || endpointID == nil)
         return;
 
@@ -4032,6 +4046,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
+    // TODO: KMO: implement
     if (key == nil || endpointID == nil)
         return;
 
