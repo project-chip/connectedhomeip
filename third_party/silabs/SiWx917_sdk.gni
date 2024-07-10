@@ -291,6 +291,14 @@ template("siwx917_sdk") {
     if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
+
+    if (chip_enable_icd_server || !disable_lcd) {
+      defines += [
+        "SL_SLEEP_TIMER=1",
+        "SI91X_SYSRTC_COUNT=1",
+      ]
+    }
+
     if (!disable_lcd) {
       defines += [
         "CONFIG_ENABLE_UART",
@@ -310,12 +318,6 @@ template("siwx917_sdk") {
       ]
     }
 
-    if (chip_enable_icd_server || !disable_lcd) {
-      defines += [
-        "SL_SLEEP_TIMER=1",
-        "SI91X_SYSRTC_COUNT=1",
-      ]
-    }
     if (chip_enable_icd_server) {
       defines += [
         "SL_ICD_ENABLED=1",
@@ -759,6 +761,14 @@ template("siwx917_sdk") {
       ]
     }
 
+    if (chip_enable_icd_server || !disable_lcd) {
+      sources += [
+        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
+      ]
+    }
+
     if (!disable_lcd) {
       sources += [
         "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
@@ -791,14 +801,6 @@ template("siwx917_sdk") {
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sli_si91x_power_manager_wakeup_init.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
         "${wifi_sdk_root}/third_party/silicon_labs/freertos/src/sl_si91x_low_power_tickless_mode.c",
-      ]
-    }
-
-    if (chip_enable_icd_server || !disable_lcd) {
-      sources += [
-        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
       ]
     }
 
