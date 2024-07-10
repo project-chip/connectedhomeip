@@ -5176,6 +5176,8 @@ enum class StatusEnum : uint8_t
 };
 } // namespace ContentAppObserver
 
+namespace EcosystemInformation {} // namespace EcosystemInformation
+
 namespace CommissionerControl {
 
 // Bitmap for SupportedDeviceCategoryBitmap

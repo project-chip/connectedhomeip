@@ -16942,6 +16942,192 @@ static id _Nullable DecodeAttributeValueForContentAppObserverCluster(AttributeId
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::EcosystemInformation;
+    switch (aAttributeId) {
+    case Attributes::RemovedOn::Id: {
+        using TypeInfo = Attributes::RemovedOn::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::DeviceDirectory::Id: {
+        using TypeInfo = Attributes::DeviceDirectory::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTREcosystemInformationClusterEcosystemDeviceStruct * newElement_1;
+                    newElement_1 = [MTREcosystemInformationClusterEcosystemDeviceStruct new];
+                    if (entry_1.deviceName.HasValue()) {
+                        newElement_1.deviceName = AsString(entry_1.deviceName.Value());
+                        if (newElement_1.deviceName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    } else {
+                        newElement_1.deviceName = nil;
+                    }
+                    if (entry_1.deviceNameLastEdit.HasValue()) {
+                        newElement_1.deviceNameLastEdit = [NSNumber numberWithUnsignedLongLong:entry_1.deviceNameLastEdit.Value()];
+                    } else {
+                        newElement_1.deviceNameLastEdit = nil;
+                    }
+                    if (entry_1.bridgedEndpoint.HasValue()) {
+                        newElement_1.bridgedEndpoint = [NSNumber numberWithUnsignedShort:entry_1.bridgedEndpoint.Value()];
+                    } else {
+                        newElement_1.bridgedEndpoint = nil;
+                    }
+                    if (entry_1.originalEndpoint.HasValue()) {
+                        newElement_1.originalEndpoint = [NSNumber numberWithUnsignedShort:entry_1.originalEndpoint.Value()];
+                    } else {
+                        newElement_1.originalEndpoint = nil;
+                    }
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.deviceTypes.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            MTREcosystemInformationClusterDeviceTypeStruct * newElement_3;
+                            newElement_3 = [MTREcosystemInformationClusterDeviceTypeStruct new];
+                            newElement_3.deviceType = [NSNumber numberWithUnsignedInt:entry_3.deviceType];
+                            newElement_3.revision = [NSNumber numberWithUnsignedShort:entry_3.revision];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_1.deviceTypes = array_3;
+                    }
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.uniqueLocationIDs.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSString * newElement_3;
+                            newElement_3 = AsString(entry_3);
+                            if (newElement_3 == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_1.uniqueLocationIDs = array_3;
+                    }
+                    newElement_1.uniqueLocationIDsLastEdit = [NSNumber numberWithUnsignedLongLong:entry_1.uniqueLocationIDsLastEdit];
+                    newElement_1.fabricIndex = [NSNumber numberWithUnsignedChar:entry_1.fabricIndex];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::LocationDirectory::Id: {
+        using TypeInfo = Attributes::LocationDirectory::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTREcosystemInformationClusterEcosystemLocationStruct * newElement_1;
+                    newElement_1 = [MTREcosystemInformationClusterEcosystemLocationStruct new];
+                    newElement_1.uniqueLocationID = AsString(entry_1.uniqueLocationID);
+                    if (newElement_1.uniqueLocationID == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                    if (entry_1.homeLocation.HasValue()) {
+                        newElement_1.homeLocation = [MTREcosystemInformationClusterHomeLocationStruct new];
+                        newElement_1.homeLocation.locationName = AsString(entry_1.homeLocation.Value().locationName);
+                        if (newElement_1.homeLocation.locationName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                        if (entry_1.homeLocation.Value().floorNumber.IsNull()) {
+                            newElement_1.homeLocation.floorNumber = nil;
+                        } else {
+                            newElement_1.homeLocation.floorNumber = [NSNumber numberWithShort:entry_1.homeLocation.Value().floorNumber.Value()];
+                        }
+                        if (entry_1.homeLocation.Value().areaType.IsNull()) {
+                            newElement_1.homeLocation.areaType = nil;
+                        } else {
+                            newElement_1.homeLocation.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.homeLocation.Value().areaType.Value())];
+                        }
+                    } else {
+                        newElement_1.homeLocation = nil;
+                    }
+                    if (entry_1.homeLocationLastEdit.HasValue()) {
+                        newElement_1.homeLocationLastEdit = [NSNumber numberWithUnsignedLongLong:entry_1.homeLocationLastEdit.Value()];
+                    } else {
+                        newElement_1.homeLocationLastEdit = nil;
+                    }
+                    newElement_1.fabricIndex = [NSNumber numberWithUnsignedChar:entry_1.fabricIndex];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForCommissionerControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::CommissionerControl;
@@ -20185,6 +20371,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::ContentAppObserver::Id: {
         return DecodeAttributeValueForContentAppObserverCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::EcosystemInformation::Id: {
+        return DecodeAttributeValueForEcosystemInformationCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::CommissionerControl::Id: {
         return DecodeAttributeValueForCommissionerControlCluster(aPath.mAttributeId, aReader, aError);

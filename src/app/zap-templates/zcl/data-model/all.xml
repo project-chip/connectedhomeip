@@ -34,6 +34,7 @@
    <xi:include href="chip/microwave-oven-mode-cluster.xml" />
    <xi:include href="chip/microwave-oven-control-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />
+   <xi:include href="chip/ecosystem-information-cluster.xml" />
    <xi:include href="chip/energy-evse-cluster.xml" />
    <xi:include href="chip/energy-evse-mode-cluster.xml" />   
    <xi:include href="chip/energy-preference-cluster.xml" />

@@ -1145,6 +1145,15 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInEcosystemInformationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EcosystemInformation;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInCommissionerControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommissionerControl;
@@ -1538,6 +1547,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::EcosystemInformation::Id: {
+        return CommandNeedsTimedInvokeInEcosystemInformationCluster(commandID);
     }
     case Clusters::CommissionerControl::Id: {
         return CommandNeedsTimedInvokeInCommissionerControlCluster(commandID);

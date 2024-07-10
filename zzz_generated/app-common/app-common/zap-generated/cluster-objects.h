@@ -173,6 +173,54 @@ public:
 };
 
 } // namespace MeasurementAccuracyStruct
+namespace HomeLocationStruct {
+enum class Fields : uint8_t
+{
+    kLocationName = 0,
+    kFloorNumber  = 1,
+    kAreaType     = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan locationName;
+    DataModel::Nullable<int16_t> floorNumber;
+    DataModel::Nullable<AreaTypeTag> areaType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace HomeLocationStruct
+namespace DeviceTypeStruct {
+enum class Fields : uint8_t
+{
+    kDeviceType = 0,
+    kRevision   = 1,
+};
+
+struct Type
+{
+public:
+    chip::DeviceTypeId deviceType = static_cast<chip::DeviceTypeId>(0);
+    uint16_t revision             = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DeviceTypeStruct
 namespace ApplicationStruct {
 enum class Fields : uint8_t
 {
@@ -2307,29 +2355,7 @@ struct TypeInfo
 } // namespace PulseWidthModulation
 namespace Descriptor {
 namespace Structs {
-namespace DeviceTypeStruct {
-enum class Fields : uint8_t
-{
-    kDeviceType = 0,
-    kRevision   = 1,
-};
-
-struct Type
-{
-public:
-    chip::DeviceTypeId deviceType = static_cast<chip::DeviceTypeId>(0);
-    uint16_t revision             = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace DeviceTypeStruct
+namespace DeviceTypeStruct = Clusters::detail::Structs::DeviceTypeStruct;
 namespace SemanticTagStruct {
 enum class Fields : uint8_t
 {
@@ -27530,31 +27556,7 @@ struct TypeInfo
 } // namespace BarrierControl
 namespace ServiceArea {
 namespace Structs {
-namespace HomeLocationStruct {
-enum class Fields : uint8_t
-{
-    kLocationName = 0,
-    kFloorNumber  = 1,
-    kAreaType     = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan locationName;
-    DataModel::Nullable<int16_t> floorNumber;
-    DataModel::Nullable<AreaTypeTag> areaType;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace HomeLocationStruct
+namespace HomeLocationStruct = Clusters::detail::Structs::HomeLocationStruct;
 namespace LocationInfoStruct {
 enum class Fields : uint8_t
 {
@@ -40989,6 +40991,209 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ContentAppObserver
+namespace EcosystemInformation {
+namespace Structs {
+namespace HomeLocationStruct = Clusters::detail::Structs::HomeLocationStruct;
+namespace EcosystemLocationStruct {
+enum class Fields : uint8_t
+{
+    kUniqueLocationID     = 0,
+    kHomeLocation         = 1,
+    kHomeLocationLastEdit = 2,
+    kFabricIndex          = 254,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan uniqueLocationID;
+    Optional<Structs::HomeLocationStruct::Type> homeLocation;
+    Optional<uint64_t> homeLocationLastEdit;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+using DecodableType = Type;
+
+} // namespace EcosystemLocationStruct
+namespace DeviceTypeStruct = Clusters::detail::Structs::DeviceTypeStruct;
+namespace EcosystemDeviceStruct {
+enum class Fields : uint8_t
+{
+    kDeviceName                = 0,
+    kDeviceNameLastEdit        = 1,
+    kBridgedEndpoint           = 2,
+    kOriginalEndpoint          = 3,
+    kDeviceTypes               = 4,
+    kUniqueLocationIDs         = 5,
+    kUniqueLocationIDsLastEdit = 6,
+    kFabricIndex               = 254,
+};
+
+struct Type
+{
+public:
+    Optional<chip::CharSpan> deviceName;
+    Optional<uint64_t> deviceNameLastEdit;
+    Optional<chip::EndpointId> bridgedEndpoint;
+    Optional<chip::EndpointId> originalEndpoint;
+    DataModel::List<const Structs::DeviceTypeStruct::Type> deviceTypes;
+    DataModel::List<const chip::CharSpan> uniqueLocationIDs;
+    uint64_t uniqueLocationIDsLastEdit = static_cast<uint64_t>(0);
+    chip::FabricIndex fabricIndex      = static_cast<chip::FabricIndex>(0);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+struct DecodableType
+{
+public:
+    Optional<chip::CharSpan> deviceName;
+    Optional<uint64_t> deviceNameLastEdit;
+    Optional<chip::EndpointId> bridgedEndpoint;
+    Optional<chip::EndpointId> originalEndpoint;
+    DataModel::DecodableList<Structs::DeviceTypeStruct::DecodableType> deviceTypes;
+    DataModel::DecodableList<chip::CharSpan> uniqueLocationIDs;
+    uint64_t uniqueLocationIDsLastEdit = static_cast<uint64_t>(0);
+    chip::FabricIndex fabricIndex      = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+};
+
+} // namespace EcosystemDeviceStruct
+} // namespace Structs
+
+namespace Attributes {
+
+namespace RemovedOn {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RemovedOn::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RemovedOn
+namespace DeviceDirectory {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+           chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceDirectory::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DeviceDirectory
+namespace LocationDirectory {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+           chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocationDirectory::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LocationDirectory
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::RemovedOn::TypeInfo::DecodableType removedOn;
+        Attributes::DeviceDirectory::TypeInfo::DecodableType deviceDirectory;
+        Attributes::LocationDirectory::TypeInfo::DecodableType locationDirectory;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace EcosystemInformation
 namespace CommissionerControl {
 
 namespace Commands {
