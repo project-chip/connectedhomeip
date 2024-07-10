@@ -35,36 +35,37 @@ enum class QuieterReportingPolicyEnum
     kMarkDirtyOnIncrement        = (1u << 2),
 };
 
-using QuieterReportingPolicyFlags = ::chip::BitFlags<QuieterReportingPolicyEnum>;
+using QuieterReportingPolicyFlags = BitFlags<QuieterReportingPolicyEnum>;
 
 namespace detail {
 
-using Timestamp = chip::System::Clock::Milliseconds64;
+using Timestamp = System::Clock::Milliseconds64;
 template <typename T>
-using Nullable = chip::app::DataModel::Nullable<T>;
+using Nullable = DataModel::Nullable<T>;
 
 /**
  * This class helps track reporting state of an attribute to properly keep track of whether
- * it needs to be marked as dirty or not for purposes of reporting using Q quality.
+ * it needs to be marked as dirty or not for purposes of reporting using
+ * "7.7.9 Quieter Reporting Quality" (Q quality)
  *
  * The class can be configured via `SetPolicy` to have some/all of the common reasons
  * for reporting (e.g. increment only, decrement only, change to/from zero).
  *
  * Changes of null to non-null or non-null to null are always considered dirty.
  *
- * It is possible to force mark the attribute as dirty (see `ForceMarkAsDirty`) such as
+ * It is possible to force mark the attribute as dirty (see `ForceDirty`) such as
  * for conditions like "When there is any increase or decrease in the estimated time
  * remaining that was due to progressing insight of the server's control logic".
  *
- * Usage is simple:
+ * Usage:
  *
  * - Call `SetValue()` with the new value and current monotonic system timestamp
  *   - There is an overload with a `SufficientChangePredicate` which will apply externally
  *     provided checks between old/new value and time last marked dirty to allow for complex
  *     rules like marking dirty less than once per second, etc.
- * - *Maybe* call `ForceMarkAsDirty()` in some choice situations (e.g. know for sure it's
+ * - *Maybe* call `ForceDirty()` in some choice situations (e.g. know for sure it's
  *    an important update, like at the edge of an operational state change).
- * - Call `GetThenResetDirtyState()`. If it returns true, mark the attribute dirty, with the
+ * - Call `WasJustMarkedDirty()`. If it returns true, mark the attribute dirty, with the
  *   method most suitable at the call site (e.g. `MatterReportingAttributeChangeCallback` call
  *   or similar methods).
  *
@@ -84,7 +85,7 @@ template <typename T>
 class QuieterReportingAttribute
 {
 public:
-    explicit QuieterReportingAttribute(const chip::app::DataModel::Nullable<T> & initialValue) :
+    explicit QuieterReportingAttribute(const Nullable<T> & initialValue) :
         mValue(initialValue), mLastDirtyValue(initialValue)
     {}
 
@@ -99,7 +100,7 @@ public:
      * @return a functor usable for the `changedPredicate` arg of `SetValue()`
      */
     static SufficientChangePredicate
-    GetPredicateForSufficientTimeSinceLastDirty(chip::System::Clock::Milliseconds64 minimumDurationMillis)
+    GetPredicateForSufficientTimeSinceLastDirty(System::Clock::Milliseconds64 minimumDurationMillis)
     {
         return [minimumDurationMillis](Timestamp previousDirtyTime, Timestamp now, const Nullable<T> & oldDirtyValue,
                                        const Nullable<T> & newValue) -> bool {
@@ -107,15 +108,16 @@ public:
         };
     }
 
-    chip::app::DataModel::Nullable<T> value() const { return mValue; }
-    QuieterReportingPolicyFlags policy() const { return mPolicyFlags; }
+    Nullable<T> value() const { return mValue; }
+    QuieterReportingPolicyFlags & policy() { return mPolicyFlags; }
+    const QuieterReportingPolicyFlags & policy() const { return mPolicyFlags; }
 
     void SetPolicy(QuieterReportingPolicyFlags policyFlags) { mPolicyFlags = policyFlags; }
 
     /**
      * When this returns true, attribute should be marked for reporting. Auto-resets to false after call.
      */
-    bool GetThenResetDirtyState()
+    bool WasJustMarkedDirty()
     {
         bool wasDirty = mIsDirty;
         mIsDirty      = false;
@@ -125,9 +127,9 @@ public:
     /**
      * Force marking this attribute as dirty, with the `now` timestamp given as the reference point.
      *
-     * WARNING: Only call `ForceMarkAsDirty` after a `SetValue` call.
+     * WARNING: Only call `ForceDirty` after a `SetValue` call.
      */
-    void ForceMarkAsDirty(Timestamp now)
+    void ForceDirty(Timestamp now)
     {
         mIsDirty                  = true;
         mLastDirtyTimestampMillis = now;

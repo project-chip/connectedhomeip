@@ -19,6 +19,6 @@ source_set("cluster-building-blocks") {
   public_deps = [
     "${chip_root}/src/app/data-model:nullable",
     "${chip_root}/src/system",
-    "${chip_root}src//lib/support:support",
+    "${chip_root}/src/lib/support:support",
   ]
 }
