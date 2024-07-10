@@ -1,7 +1,7 @@
 #!/bin/bash
 
-FABRIC_ADMIN_PATH="./fabric-admin"
-FABRIC_BRIDGE_APP_PATH="./fabric-bridge-app"
+FABRIC_ADMIN_PATH="/fabric-admin"
+FABRIC_BRIDGE_APP_PATH="/fabric-bridge-app"
 
 # Kill fabric-admin if it is running
 fabric_admin_pid=$(pgrep -f "$FABRIC_ADMIN_PATH")
