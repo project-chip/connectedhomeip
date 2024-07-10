@@ -22,7 +22,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from DEMTestBase import DEMTestBase
+from TC_DEMTestBase import DEMTestBase
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -34,68 +34,97 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
 
     def desc_TC_DEM_2_7(self) -> str:
         """Return a description of this test."""
-        return "4.1.3. [TC-DEM-2.2] Power Adjustment feature functionality with DUT as Server"
+        return "4.1.3. [TC-DEM-2.7] Constraints-based Adjustment with Power Forecast Reporting feature functionality with DUT as Server"
 
     def pics_TC_DEM_2_7(self):
         """Return the PICS definitions associated with this test."""
         pics = [
-            "DEM.S.F00",  # Depends on Feature 00 (PowerAdjustment)
+            # Depends on Feature 06 (ConstraintBasedAdjustment) & Feature 01 (PowerForecastReporting)
+            "DEM.S.F06 & DEM.S.F01"
         ]
         return pics
 
     def steps_TC_DEM_2_7(self) -> list[TestStep]:
         """Execute the test steps."""
         steps = [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify value is 1 (True)"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Constraints-based Adjustment Test Event. Verify Command response is Success"),
-            TestStep("3a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep(
-                "3b", "TH reads Forecast attribute. {valincludes} valid slots[0].NominalPower, slots[0].MinPower, slots[0].MaxPower, slots[0].NominalEnergy"),
-            TestStep("3c", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            TestStep(
-                "4", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()-10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("5", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[1].{StartTime=now()+20, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[2].{StartTime=now()+40, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("6", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[1].{StartTime=now()+30, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[2].{StartTime=now()+40, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("7", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+30, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[1].{StartTime=now()+10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[2].{StartTime=now()+50, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("8", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[1].{StartTime=now()+50, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[2].{StartTime=now()+30, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("9", "TH reads AbsMaxPower attribute attribute.. Save the value"),
-            TestStep(
-                "9a", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=AbsMaxPower+1, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep("10", "TH reads AbsMinPower attribute attribute.. Save the value"),
-            TestStep(
-                "10a", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=AbsMinPower-1, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep(
-                "11", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower}, Cause=LocalOptimization. Verify Command response is InvalidCommand"),
-            TestStep(
-                "12", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is InvalidCommand"),
-            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event. Verify Command response is Success"),
-            TestStep("13a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("13b", "TH reads OptOutState attribute. Verify value is 0x02 (LocalOptOut)"),
-            TestStep(
-                "14", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is ConstraintError"),
-            TestStep(
-                "15", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=GridOptimization. Verify Command response is Success"),
-            TestStep("15a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=GridOptimization"),
-            TestStep("16", "TH sends CancelRequest. Verify Command response is Success"),
-            TestStep("16a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=InternalOptimization"),
-            TestStep(
-                "17", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=GridOptimization. Verify Command response is Success"),
-            TestStep("17a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=GridOptimization"),
-            TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event. Verify Command response is Success"),
-            TestStep("18a", "TH reads OptOutState attribute. Verify value is 0x03 (OptOut)"),
-            TestStep("18b", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=InternalOptimization"),
-            TestStep(
-                "19", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=GridOptimization. Verify Command response is ConstraintError"),
-            TestStep("20", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear. Verify Command response is Success"),
-            TestStep("20a", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            TestStep(
-                "21", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization. Verify Command response is Success"),
-            TestStep("21a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=LocalOptimization"),
-            TestStep("22", "TH sends CancelRequest. Verify Command response is Success"),
-            TestStep("22a", "TH reads Forecast attribute. {valincludes} ForecastUpdateReason=InternalOptimization"),
-            TestStep("23", "TH sends CancelRequest. Verify Command response is InvalidInStateError"),
-            TestStep("24", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Constraints-based Adjustment Adjustment Test Event Clear. Verify Command response is Success"),
+            TestStep("1", "Commissioning, already done",
+                     is_commissioning=True),
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
+                     "Verify value is 1 (True)"),
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Constraints-based Adjustment Test Event.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("3a", "TH reads ESAState attribute.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("3b", "TH reads Forecast attribute.",
+                     "Value has to include valid slots[0].NominalPower, slots[0].MinPower, slots[0].MaxPower, slots[0].NominalEnergy"),
+            TestStep("3c", "TH reads OptOutState attribute.",
+                     "Verify value is 0x00 (NoOptOut)"),
+            TestStep("4", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()-10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("5", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[1].{StartTime=now()+20, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[2].{StartTime=now()+40, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("6", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[1].{StartTime=now()+30, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[2].{StartTime=now()+40, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("7", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+30, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[1].{StartTime=now()+10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[2].{StartTime=now()+50, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("8", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=now()+10, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[1].{StartTime=now()+50, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, constraints[2].{StartTime=now()+30, Duration=20, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("9", "TH reads AbsMaxPower attribute attribute.",
+                     "Save the value"),
+            TestStep("9a", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=AbsMaxPower+1, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("10", "TH reads AbsMinPower attribute attribute.",
+                     "Save the value"),
+            TestStep("10a", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=AbsMinPower-1, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("11", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status InvalidCommand"),
+            TestStep("12", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status InvalidCommand"),
+            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("13a", "TH reads ESAState attribute.",
+                     "Verify value is 0x01 (Online)"),
+            TestStep("13b", "TH reads OptOutState attribute.",
+                     "Verify value is 0x02 (LocalOptOut)"),
+            TestStep("14", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("15", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=GridOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("15a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=GridOptimization"),
+            TestStep("16", "TH sends CancelRequest.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("16a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=InternalOptimization"),
+            TestStep("17", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=GridOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("17a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=GridOptimization"),
+            TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("18a", "TH reads OptOutState attribute.",
+                     "Verify value is 0x03 (OptOut)"),
+            TestStep("18b", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=InternalOptimization"),
+            TestStep("19", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=GridOptimization.",
+                     "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
+            TestStep("20", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("20a", "TH reads OptOutState attribute.",
+                     "Verify value is 0x00 (NoOptOut)"),
+            TestStep("21", "TH sends RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("21a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=LocalOptimization"),
+            TestStep("22", "TH sends CancelRequest.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
+            TestStep("22a", "TH reads Forecast attribute.",
+                     "Value has to include ForecastUpdateReason=InternalOptimization"),
+            TestStep("23", "TH sends CancelRequest.",
+                     "Verify DUT responds with status INVALID_IN_STATE(0xcb)"),
+            TestStep("24", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Constraints-based Adjustment Adjustment Test Event Clear.",
+                     "Verify DUT responds with status SUCCESS(0x00)"),
         ]
 
         return steps
