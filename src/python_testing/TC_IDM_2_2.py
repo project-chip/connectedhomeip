@@ -27,7 +27,7 @@ class TC_IDM_2_2(MatterBaseTest):
     ROOT_NODE_ENDPOINT_ID = 0
 
     @staticmethod
-    def get_typed_attribute_path(attribute, ep=ROOT_NODE_ENDPOINT_ID):
+    def get_typed_attribute_path(attribute: Clusters, ep: int=ROOT_NODE_ENDPOINT_ID):
         return TypedAttributePath(
             Path=AttributePath(
                 EndpointId=ep,
@@ -40,116 +40,140 @@ class TC_IDM_2_2(MatterBaseTest):
         # Test Setup
         cluster_rev_attr = Clusters.BasicInformation.Attributes.ClusterRevision  # Global attribute
         cluster_rev_attr_path = [(cluster_rev_attr)]
-        node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel  # Borrowed from TC_IDM_4_2
-        node_label_attr_path = [(0, node_label_attr)]
-        node_label_attr_all = Clusters.BasicInformation
-        node_label_attr_all_path = [(0, node_label_attr_all)]
-        data_version_attr = Clusters.Attribute.DataVersion
-        basic_info_attr = Clusters.Objects.BasicInformation
+        server_list_attr = Clusters.Objects.Descriptor.Attributes.ServerList
+        server_list_attr_path = [(0, server_list_attr)]
+        descriptor_obj = Clusters.Objects.Descriptor
+        descriptor_obj_path = [(0, descriptor_obj)]
+        attribute_list = Clusters.Objects.Descriptor.Attributes.AttributeList
+        attribute_list_path = [0, attribute_list]
+        data_version = Clusters.Attribute.DataVersion
+        basic_info = Clusters.BasicInformation
         attribute_list_attr = Clusters.Objects.BasicInformation.Attributes.AttributeList
-        cluster_revision_attr = Clusters.Objects.BasicInformation.Attributes.ClusterRevision
         network_diagnostics_attr = Clusters.Objects.ThreadNetworkDiagnostics
-        unit_testing_attr = Clusters.Objects.UnitTesting
-
+        
         self.print_step(0, "Commissioning - already done")
-        self.print_step(1, "Send Request Message to read one attribute on a given cluster and endpoint")
 
+        # Step 1
+        
         # TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint.
         # AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID, Attribute = Specific Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value to the DUT
 
-        # [(0, Clusters.BasicInformation.Attributes.NodeLabel)]
-        read_request_1 = await self.default_controller.ReadAttribute(self.dut_node_id, node_label_attr_path)
-        attributes = read_request_1[0]
-        basic_information = attributes[basic_info_attr]
+        self.print_step(1, "Send Request Message to read one attribute on a given cluster and endpoint")
 
-        asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
-        asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
+        # endpoint = [(0, Clusters.Objects.Descriptor.Attributes.ServerList)]
+        read_request_1 = await self.default_controller.ReadAttribute(self.dut_node_id, server_list_attr_path)
+        returned_endpoints = read_request_1[0].keys()
+        # returned_endpoints = dict_keys([<class 'chip.clusters.Objects.Descriptor'>])
+        # Check if chip.clusters.Objects.Descriptor is in output
+        asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
+        # Check if ServerList is in nested output
+        asserts.assert_in(server_list_attr, read_request_1[0][descriptor_obj], "ServerList not in output")
 
+        # Step 2
         # TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint
         # AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID]]
         # On receipt of this message, DUT should send a report data action with the attribute value to the DUT.
 
         self.print_step(2, "Send Request Message to read all attributes on a given cluster and endpoint")
-        asserts.assert_in(node_label_attr, basic_information, "AttributeList not in attributes")
-        # [(0, Clusters.BasicInformation)]
-        read_request_2 = await self.default_controller.ReadAttribute(self.dut_node_id, node_label_attr_all_path)
-        attributes = read_request_2[0]
-        basic_information = attributes[basic_info_attr]
-        asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
-        asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
-        # The output from this command gets many more values from basic_info_attr compared to the first test -- get attribute list, expand test if needed
-        asserts.assert_in(attribute_list_attr, basic_information, "AttributeList not in BasicInformation")
+        # endpoint = [(0, Clusters.Objects.Descriptor)]
+        read_request_2 = await self.default_controller.ReadAttribute(self.dut_node_id, descriptor_obj_path)
+        returned_endpoints = read_request_2[0].keys()
+        # returned_endpoints = dict_keys([<class 'chip.clusters.Objects.Descriptor'>])
+        # Check if chip.clusters.Objects.Descriptor is in output
+        asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
+
+        # Step 3
 
         # TH sends the Read Request Message to the DUT to read an attribute from a cluster at all Endpoints
         # AttributePath = [[Cluster = Specific ClusterID, Attribute = Specific Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
         self.print_step(3, "Send Request Message to read one attribute on a given cluster at all endpoints")
-        # [Clusters.BasicInformation.Attributes.NodeLabel]
-        read_request_3 = await self.default_controller.ReadAttribute(self.dut_node_id, [node_label_attr])
-        attributes = read_request_3[0]
-        asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
+        # endpoint = [Clusters.Objects.Descriptor.Attributes.ServerList]
+        read_request_3 = await self.default_controller.ReadAttribute(self.dut_node_id, [server_list_attr])
+        for i in range(3):
+            returned_endpoints = read_request_3[i].keys()
+
+            # returned_endpoints = dict_keys([<class 'chip.clusters.Objects.Descriptor'>])
+            # Check if chip.clusters.Objects.Descriptor is in output
+            asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
+            # Check if ServerList is in nested output
+            asserts.assert_in(server_list_attr, read_request_3[i][descriptor_obj], "ServerList not in output")
+
+        # Step 4
 
         # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at that Endpoint
         # AttributePath = [[Endpoint = Specific Endpoint, Attribute = Specific Global Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(4, "Send Request Message to read one global attribute from all clusters at that endpoint")
-        # The output from this command gets many more values from unit_testing_attr compared to the some other tests
-        # [(Clusters.BasicInformation.Attributes.ClusterRevision)]
-        read_request_4 = await self.default_controller.ReadAttribute(self.dut_node_id, cluster_rev_attr_path)
-        attributes = read_request_4[0]
-        basic_information = attributes[basic_info_attr]
-        asserts.assert_true(basic_information[cluster_revision_attr], 3)
 
+        # endpoint = [0, Clusters.Objects.Descriptor.Attributes.AttributeList] # Is this a global attribute? Trial and error, but looks like it
+        read_request_4 = await self.default_controller.ReadAttribute(self.dut_node_id, attribute_list_path)
+        for i in range(3):
+            returned_endpoints = read_request_4[i].keys()
+            # Check if chip.clusters.Objects.Descriptor is in output
+            asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
+            # Check if AttributeList is in nested output
+            asserts.assert_in(attribute_list, read_request_4[i][descriptor_obj], "AttributeList not in output")
+
+        # Step 5
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
         ### AttributePath = [[]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(5, "Send Request Message to read all attributes from all clusters on all endpoints")
-        # This returns a dataclass key of 1, unlike 0 for the earlier ones
         read_request_5 = await self.default_controller.ReadAttribute(self.dut_node_id, [()])
-        attributes = read_request_5[1]
-        unit_testing = attributes[unit_testing_attr]
+        
+        for i in range(3):
+            returned_endpoints = read_request_5[i].keys()
+            # Check if chip.clusters.Objects.Descriptor is in output
+            asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
+            # Check if AttributeList is in nested output
+            asserts.assert_in(attribute_list, read_request_5[i][descriptor_obj], "AttributeList not in output")
 
-        # asserts.assert_in(node_label_attr, unit_testing, "NodeLabel not in UnitTesting")
-        asserts.assert_in(data_version_attr, unit_testing, "DataVersion not in UnitTesting")
+        # Step 6
         # TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
         # AttributePath = [[Attribute = Specific Global Attribute]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the clusters to the DUT.
         self.print_step(6, "Send Request Message to read one global attribute from all clusters on all endpoints")
-        # Clusters.BasicInformation.Attributes.ClusterRevision
-        read_request_6 = await self.default_controller.ReadAttribute(self.dut_node_id, [cluster_rev_attr])
+        # endpoint = [Clusters.Objects.Descriptor.Attributes.AttributeList]
+        read_request_6 = await self.default_controller.ReadAttribute(self.dut_node_id, [attribute_list])
+        returned_endpoints = read_request_6[0].keys()
+        for i in range(3):
+            returned_endpoints = read_request_6[i].keys()
+            # Check if chip.clusters.Objects.Descriptor is in output
+            asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
+            # Check if AttributeList is in nested output
+            asserts.assert_in(attribute_list, read_request_6[i][descriptor_obj], "AttributeList not in output")
 
-        attributes = read_request_6[0]
-        basic_information = attributes[basic_info_attr]
-        # asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
-        asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
-        asserts.assert_true(basic_information[cluster_revision_attr], 3)
-
+        # Step 7
         # TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
         # AttributePath = [[Cluster = Specific ClusterID]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
         self.print_step(7, "Send Request Message to read all attributes from one cluster at all endpoints")
-        # [Clusters.BasicInformation]
-        read_request_7 = await self.default_controller.ReadAttribute(self.dut_node_id, [node_label_attr_all])
+        # endpoint = [Clusters.Objects.Descriptor]
+        read_request_7 = await self.default_controller.ReadAttribute(self.dut_node_id, [descriptor_obj])
         attributes = read_request_7[0]
-        basic_information = attributes[basic_info_attr]
-        asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
-        asserts.assert_in(data_version_attr, basic_information, "DataVersion not in BasicInformation")
-        # The output from this command gets many more values from basic_info_attr compared to the first test -- get attribute list, expand test if needed
-        asserts.assert_in(attribute_list_attr, basic_information, "AttributeList not in BasicInformation")
+        returned_endpoints = read_request_7[0].keys()
+        for i in range(3):
+            returned_endpoints = read_request_7[i].keys()
+            # Check if chip.clusters.Objects.Descriptor is in output
+            asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
+            # Check if AttributeList is in nested output
+            asserts.assert_in(attribute_list, read_request_7[i][descriptor_obj], "AttributeList not in output")
 
+        # Step 8
         # TH sends the Read Request Message to the DUT to read all attributes from all clusters at one Endpoint
         # AttributePath = [[Endpoint = Specific Endpoint]]
         # On receipt of this message, DUT should send a report data action with the attribute value from all the Endpoints to the DUT.
         self.print_step(8, "Send Request Message to read all attributes from all clusters at one endpoint")
         read_request_8 = await self.default_controller.ReadAttribute(self.dut_node_id, [0])
         attributes = read_request_8[0]
-        network_diagnostics = attributes[network_diagnostics_attr]
+        returned_endpoints = read_request_8[0].keys()
 
-        asserts.assert_in(node_label_attr, basic_information, "NodeLabel not in BasicInformation")
-        asserts.assert_in(data_version_attr, network_diagnostics, "DataVersion not in ThreadNetworkDiagnostics")
-        asserts.assert_in(attribute_list_attr, basic_information, "AttributeList not in BasicInformation")
-
+        # Check if chip.clusters.Objects.Descriptor is in output
+        asserts.assert_in(descriptor_obj, returned_endpoints, "Descriptor cluster not in output")
+        # Check if ServerList is in nested output
+        asserts.assert_in(server_list_attr, read_request_1[0][descriptor_obj], "ServerList not in output")
 
 if __name__ == "__main__":
     default_matter_test_main()
