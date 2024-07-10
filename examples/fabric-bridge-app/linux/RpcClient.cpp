@@ -19,9 +19,11 @@
 #include "RpcClient.h"
 #include "RpcClientProcessor.h"
 
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
 #include <string>
 #include <thread>
-#include <unistd.h>
 
 #include "fabric_admin_service/fabric_admin_service.rpc.pb.h"
 #include "pw_assert/check.h"
@@ -43,31 +45,37 @@ constexpr uint32_t kDefaultChannelId = 1;
 rpc::pw_rpc::nanopb::FabricAdmin::Client fabricAdminClient(rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
 pw::rpc::NanopbUnaryReceiver<::chip_rpc_OperationStatus> openCommissioningWindowCall;
 
+std::mutex responseMutex;
+std::condition_variable responseCv;
+bool responseReceived    = false;
+CHIP_ERROR responseError = CHIP_NO_ERROR;
+
 template <typename CallType>
 CHIP_ERROR WaitForResponse(CallType & call)
 {
-    // Wait for the response or timeout
-    uint32_t elapsedTimeMs     = 0;
-    const uint32_t sleepTimeMs = 100;
+    std::unique_lock<std::mutex> lock(responseMutex);
+    responseReceived = false;
+    responseError    = CHIP_NO_ERROR;
 
-    while (call.active() && elapsedTimeMs < kRpcTimeoutMs)
+    if (responseCv.wait_for(lock, std::chrono::milliseconds(kRpcTimeoutMs), [] { return responseReceived; }))
     {
-        usleep(sleepTimeMs * 1000);
-        elapsedTimeMs += sleepTimeMs;
+        return responseError;
     }
-
-    if (elapsedTimeMs >= kRpcTimeoutMs)
+    else
     {
         ChipLogError(NotSpecified, "RPC Response timed out!");
         return CHIP_ERROR_TIMEOUT;
     }
-
-    return CHIP_NO_ERROR;
 }
 
 // Callback function to be called when the RPC response is received
 void OnOpenCommissioningWindowCompleted(const chip_rpc_OperationStatus & response, pw::Status status)
 {
+    std::lock_guard<std::mutex> lock(responseMutex);
+    responseReceived = true;
+    responseError    = status.ok() ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    responseCv.notify_one();
+
     if (status.ok())
     {
         ChipLogProgress(NotSpecified, "OpenCommissioningWindow received operation status: %d", response.success);
