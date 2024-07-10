@@ -219,19 +219,15 @@ class TC_OPSTATE_BASE():
         OPSTATE_attr_list = attributes.AttributeList
         attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_attr_list)
         countdown_time_attr_id = attributes.CountdownTime.attribute_id
-        oprtnlstate_attr_id = attributes.OperationalState.attribute_id
 
         # Gathering Available Commands and associated ids
         commands = cluster.Commands
         OPSTATE_accptcmd_list = attributes.AcceptedCommandList
-        OPSTATE_gencmd_list = attributes.GeneratedCommandList
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_accptcmd_list)
-        generated_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_gencmd_list)
         pause_cmd_id = commands.Pause.command_id
         start_cmd_id = commands.Start.command_id
         stop_cmd_id = commands.Stop.command_id
         resume_cmd_id = commands.Resume.command_id
-        ocr_cmd_id = commands.OperationalCommandResponse.command_id
 
         # Gathers Event id for OperationCompletion event, if available then returns true
         events = cluster.Events
@@ -616,10 +612,8 @@ class TC_OPSTATE_BASE():
         OPSTATE_gencmd_list = attributes.GeneratedCommandList
         accepted_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_accptcmd_list)
         generated_cmd_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_gencmd_list)
-        pause_cmd_id = commands.Pause.command_id  # 0
         start_cmd_id = commands.Start.command_id  # 2
         stop_cmd_id = commands.Stop.command_id  # 1
-        resume_cmd_id = commands.Resume.command_id  # 3
         ocr_cmd_id = commands.OperationalCommandResponse.command_id  # 4
 
         self.init_test()
@@ -810,7 +804,6 @@ class TC_OPSTATE_BASE():
         OPSTATE_attr_list = attributes.AttributeList
         attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=OPSTATE_attr_list)
         countdown_time_attr_id = attributes.CountdownTime.attribute_id
-        oprtnlstate_list_attr_id = attributes.OperationalStateList.attribute_id
         oprtnlstate_attr_id = attributes.OperationalState.attribute_id
 
         # Gathering Available Commands and associated ids
