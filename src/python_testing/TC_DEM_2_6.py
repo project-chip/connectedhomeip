@@ -96,7 +96,7 @@ class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
                      "Value has to include ForecastUpdateReason=Internal Optimization"),
             TestStep("15", "TH sends ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization.",
                      "Verify DUT responds with status CONSTRAINT_ERROR(0x87)"),
-            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear"",
+            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear",
                      "Verify DUT responds with status SUCCESS(0x00)"),
             TestStep("16a", "TH reads OptOutState attribute.",
                      "Verify value is 0x00 (NoOptOut)"),
