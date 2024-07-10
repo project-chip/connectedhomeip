@@ -673,12 +673,12 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
     {
         auto app = contentApp.get();
 
-        if (app->MatchesPidVid(productId, vendorId))
-        {
-            CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
+        // if (app->MatchesPidVid(productId, vendorId))
+        // {
+        //     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
-            GetContentAppFactoryImpl()->LoadContentApp(vendorApp);
-        }
+        //     GetContentAppFactoryImpl()->LoadContentApp(vendorApp);
+        // }
 
         // update the list of node ids with content apps allowed vendor list
         for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
