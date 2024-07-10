@@ -50,6 +50,10 @@ private:
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSerialNumber(CharSpan serialNumber) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreVendorName(CharSpan vendorName) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreProductName(CharSpan productName) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreHardwareVersionString(CharSpan hardwareVersionString) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreSoftwareVersionString(CharSpan softwareVersionString) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
