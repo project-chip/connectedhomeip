@@ -85,9 +85,7 @@ template <typename T>
 class QuieterReportingAttribute
 {
 public:
-    explicit QuieterReportingAttribute(const Nullable<T> & initialValue) :
-        mValue(initialValue), mLastDirtyValue(initialValue)
-    {}
+    explicit QuieterReportingAttribute(const Nullable<T> & initialValue) : mValue(initialValue), mLastDirtyValue(initialValue) {}
 
     using SufficientChangePredicate =
         std::function<bool(Timestamp /* previousDirtyTime */, Timestamp /* now */, const Nullable<T> & /* previousDirtyValue */,
