@@ -294,11 +294,11 @@ template("siwx917_sdk") {
     if (!disable_lcd) {
       defines += [
         "CONFIG_ENABLE_UART",
-        "SI91X_SYSRTC_COUNT=1",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
         "SL_ULP_TIMER",
-        "SL_SLEEP_TIMER",
+        "SL_SLEEP_TIMER=1",
+        "SI91X_SYSRTC_COUNT=1",
       ]
     }
 
@@ -322,6 +322,8 @@ template("siwx917_sdk") {
         "SL_SI91X_NPSS_GPIO_BTN_HANDLER=1",
         "SL_SI91X_POWER_MANAGER_UC_AVAILABLE=1",
         "SL_SI91X_TICKLESS_MODE=1",
+        "SL_SLEEP_TIMER=1",
+        "SI91X_SYSRTC_COUNT=1",
       ]
 
       if (si91x_alarm_based_periodic_wakeup) {
@@ -790,6 +792,9 @@ template("siwx917_sdk") {
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sli_si91x_power_manager_wakeup_init.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
         "${wifi_sdk_root}/third_party/silicon_labs/freertos/src/sl_si91x_low_power_tickless_mode.c",
+        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
       ]
     }
 
