@@ -350,7 +350,8 @@ def setupArgumentsParser():
 
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.set_defaults(parallel=True)
+    parser.add_argument('--no-rerun-in-env', action='store_false', dest='rerun_in_env')
+    parser.set_defaults(parallel=True, rerun_in_env=True)
 
     args = parser.parse_args()
 
@@ -495,6 +496,31 @@ def main():
         level=logging.INFO,
         format='%(asctime)s %(name)s %(levelname)-7s %(message)s'
     )
+
+    # The scripts executed by this generally MUST be within a bootstrapped environment because
+    # we need:
+    #    - zap-cli in PATH
+    #    - scripts/codegen.py uses click (can be in current pyenv, but guaranteed in bootstrap)
+    #    - formatting is using bootstrapped clang-format
+    # Figure out if bootstrapped. For now assume `PW_ROOT` is such a marker in the environment
+    if not "PW_ROOT" in os.environ:
+        logging.error("Script MUST be run in a bootstrapped environment.")
+
+        # using the `--no-rerun-in-env` to avoid recursive infinite calls
+        if '--no-rerun-in-env' not in sys.argv:
+            import shlex
+            logging.info("Will re-try running in a build environment....")
+
+            what_to_run = sys.argv + ['--no-rerun-in-env']
+            launcher = os.path.join(CHIP_ROOT_DIR, 'scripts', 'run_in_build_env.sh')
+
+            logging.error("ARGV:    %r", sys.argv)
+            logging.error("Running: %r", shlex.join(what_to_run))
+
+            os.execv(launcher, [launcher, shlex.join(what_to_run)])
+        sys.exit(1)
+
+
     checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()
