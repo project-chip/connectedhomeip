@@ -39,7 +39,7 @@ enum class QuieterReportingPolicyEnum
 enum class AttributeDirtyState
 {
     kNoReportNeeded = 0,
-    kMustReport = 1,
+    kMustReport     = 1,
 };
 
 using QuieterReportingPolicyFlags = BitFlags<QuieterReportingPolicyEnum>;
@@ -169,9 +169,11 @@ public:
      * @param newValue - new value to set for the attribute
      * @param now - system monotonic timestamp at the time of the call
      * @param changedPredicate - functor to possibly override dirty state
-     * @return AttributeDirtyState::kMustReport if attribute must be marked dirty right away, or AttributeDirtyState::kNoReportNeeded otherwise.
+     * @return AttributeDirtyState::kMustReport if attribute must be marked dirty right away, or
+     * AttributeDirtyState::kNoReportNeeded otherwise.
      */
-    AttributeDirtyState SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now, SufficientChangePredicate changedPredicate)
+    AttributeDirtyState SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now,
+                                 SufficientChangePredicate changedPredicate)
     {
         bool isChangeOfNull       = newValue.IsNull() ^ mValue.IsNull();
         bool areBothValuesNonNull = !newValue.IsNull() && !mValue.IsNull();
@@ -181,7 +183,8 @@ public:
         bool isDecrement      = areBothValuesNonNull && (*newValue < *mValue);
 
         bool isNewlyDirty = isChangeOfNull;
-        isNewlyDirty = isNewlyDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero) && changeToFromZero);
+        isNewlyDirty =
+            isNewlyDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero) && changeToFromZero);
         isNewlyDirty = isNewlyDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnDecrement) && isDecrement);
         isNewlyDirty = isNewlyDirty || (mPolicyFlags.Has(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement) && isIncrement);
 
@@ -211,7 +214,8 @@ public:
      *
      * @param newValue - new value to set for the attribute
      * @param now - system monotonic timestamp at the time of the call
-     * @return AttributeDirtyState::kMustReport if attribute must be marked dirty right away, or AttributeDirtyState::kNoReportNeeded otherwise.
+     * @return AttributeDirtyState::kMustReport if attribute must be marked dirty right away, or
+     * AttributeDirtyState::kNoReportNeeded otherwise.
      */
     AttributeDirtyState SetValue(const chip::app::DataModel::Nullable<T> & newValue, Timestamp now)
     {
