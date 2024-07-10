@@ -38,8 +38,8 @@ class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
     def pics_TC_DEM_2_5(self):
         """Return the PICS definitions associated with this test."""
         pics = [
-            "DEM.S.F05",  # Depends on Feature (ForecastAdjustment)
-            "DEM.S.F01"   # & (PowerForecastReporting)
+            # Depends on Feature 05 (ForecastAdjustment) & Feature 01 (PowerForecastReporting)
+            "DEM.S.F05 & DEM.S.F01"
         ]
         return pics
 
