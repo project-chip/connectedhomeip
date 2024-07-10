@@ -31,7 +31,6 @@
 #include "access/SubjectDescriptor.h"
 #include <app/AppConfig.h>
 #include <app/RequiredPrivilege.h>
-#include <app/codegen-data-model/Instance.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/ember-compatibility-functions.h>
@@ -41,6 +40,10 @@
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
+
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
+#include <app/codegen-data-model/Instance.h>
+#endif
 
 namespace chip {
 namespace app {
@@ -1792,8 +1795,10 @@ CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId 
 
 InteractionModel::DataModel * InteractionModelEngine::GetDataModel() const
 {
+#if CHIP_CONFIG_USE_DATA_MODEL_INTERFACE
     // TODO: this should be temporary, we should fully inject the data model
     VerifyOrReturnValue(mDataModel != nullptr, CodegenDataModelInstance());
+#endif
     return mDataModel;
 }
 
