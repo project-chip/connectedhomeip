@@ -615,7 +615,10 @@ using namespace chip::Tracing::DarwinFramework;
             }
 
 #define kSecondsToWaitBeforeAPIClientRetainsMTRDevice 60
-            // Keep the devices retained for a while, in case API client doesn't immedieately retain them
+            // Keep the devices retained for a while, in case API client doesn't immediately retain them.
+            //
+            // Note that this is just an optimization to avoid throwing the information away and immediately
+            // re-reading it from storage.
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 MTR_LOG("MTRDeviceController: un-retain devices loaded at startup %lu", static_cast<unsigned long>(deviceList.count));
             });
