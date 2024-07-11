@@ -822,7 +822,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                     else
                     {
                         ChipLogError(Controller, "AccountLoginDelegate not found for app");
-                    }    
+                    }
                 }
             }
         }
