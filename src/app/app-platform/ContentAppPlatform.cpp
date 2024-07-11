@@ -809,7 +809,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                 // notify content app about this nodeId
                 bool isNodeAdded = app->AddClientNode(subjectNodeId);
 
-                if (isNodeAdded && passcode != 0 && rotatingId.size() != 0)
+                if (isNodeAdded && rotatingId.size() != 0)
                 {
                     // handle login
                     auto setupPIN             = std::to_string(passcode);
