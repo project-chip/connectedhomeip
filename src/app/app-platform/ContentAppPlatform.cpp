@@ -800,26 +800,29 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                         .cluster     = NullOptional,
                         .fabricIndex = kUndefinedFabricIndex,
                     });
+
+                    accessAllowed = true;
                 }
-                accessAllowed = true;
             }
             if (accessAllowed)
             {
                 // notify content app about this nodeId
-                app->AddClientNode(subjectNodeId);
+                bool isNodeAdded = app->AddClientNode(subjectNodeId);
 
-                // handle login
-                auto setupPIN             = std::to_string(passcode);
-                auto accountLoginDelegate = app->GetAccountLoginDelegate();
-                if (accountLoginDelegate != nullptr)
-                {
-                    auto status = accountLoginDelegate->HandleLogin(rotatingId, { setupPIN.data(), setupPIN.size() },
-                                                                    MakeOptional(subjectNodeId));
-                    ChipLogProgress(Controller, "AccountLogin::Login command sent and returned with status: %d", status);
-                }
-                else
-                {
-                    ChipLogError(Controller, "AccountLoginDelegate not found for app");
+                if (isNodeAdded) {
+                    // handle login
+                    auto setupPIN             = std::to_string(passcode);
+                    auto accountLoginDelegate = app->GetAccountLoginDelegate();
+                    if (accountLoginDelegate != nullptr)
+                    {
+                        auto status = accountLoginDelegate->HandleLogin(rotatingId, { setupPIN.data(), setupPIN.size() },
+                                                                        MakeOptional(subjectNodeId));
+                        ChipLogProgress(Controller, "AccountLogin::Login command sent and returned with status: %d", status);
+                    }
+                    else
+                    {
+                        ChipLogError(Controller, "AccountLoginDelegate not found for app");
+                    }    
                 }
             }
         }
