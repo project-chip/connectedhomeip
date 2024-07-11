@@ -24,7 +24,7 @@ nxp_use_mbedtls_port = false
 
 if (getenv("NXP_K32W0_SDK_ROOT") == "") {
   k32w0_sdk_root =
-      "${nxp_sdk_matter_support_root}/github_sdk/k32w0_sdk/repo"
+      "${nxp_sdk_matter_support_root}/github_sdk/k32w0/repo"
 } else {
   k32w0_sdk_root = getenv("NXP_K32W0_SDK_ROOT")
 }
@@ -72,6 +72,6 @@ openthread_external_mbedtls = mbedtls_target
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_platform_check_file =
     "openthread-core-k32w061-config-check.h"
-openthread_core_config_deps = [ "${chip_root}/examples/platform/nxp/k32w0:openthread_core_config_k32w0_chip_examples" ]
+openthread_core_config_deps = [ "${nxp_sdk_matter_support_root}/examples/platform/k32w0:openthread_core_config_k32w0_chip_examples" ]
 
 openthread_external_platform = "${chip_root}/third_party/openthread/platforms/nxp/k32w0:libopenthread-k32w0"

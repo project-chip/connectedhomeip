@@ -47,7 +47,7 @@ network.
 
 ## Introduction
 
-![K32W061 DK6](../../../platform/nxp/k32w0/doc/images/k32w-dk6.jpg)
+![K32W061 DK6](../../../../third_party/nxp/nxp_matter_support/examples/platform//k32w0/doc/images/k32w-dk6.jpg)
 
 The K32W061 lighting example application provides a working demonstration of a
 light bulb device, built using the Project CHIP codebase and the NXP K32W061
@@ -77,7 +77,7 @@ Deployment of this firmware configuration requires the K32W061 board setups
 using the K32W061 module board, SE051 Expansion board and Generic Expansion
 board as shown below:
 
-![SE051H  + K32W061 DK6](../../../platform/nxp/k32w0/doc/images/k32w-se.jpg)
+![SE051H  + K32W061 DK6](../../../../third_party/nxp/nxp_matter_support/examples/platform//k32w0/doc/images/k32w-se.jpg)
 
 The SE051H Secure Element extension may be used for best in class security and
 offloading some of the Project CHIP cryptographic operations. Depending on your
@@ -332,17 +332,17 @@ See
 [Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 
 There are factory data generated binaries available in
-examples/platform/nxp/k32w0/scripts/demo_generated_factory_data folder.
+`third_party/nxp/nxp_matter_support/examples/platform/k32w0/scripts/demo_generated_factory_data` folder.
 These are based on the DAC, PAI and PAA certificates found in
 scripts/tools/nxp/demo_generated_certs folder. The demo_factory_data_dut1.bin
 uses the DAC certificate and private key found in
-examples/platform/nxp/k32w0/scripts/demo_generated_factory_data/dac/dut1
+`third_party/nxp/nxp_matter_support/examples/platform/k32w0/scripts/demo_generated_factory_data/dac/dut1`
 folder. The demo_factory_data_dut2.bin uses the DAC certificate and private key
 found in
-examples/platform/nxp/k32w0/scripts/demo_generated_factory_data/dac/dut2
+`third_party/nxp/nxp_matter_support/examples/platform/k32w0/scripts/demo_generated_factory_data/dac/dut2`
 folder. These two factory data binaries can be used for testing topologies with
 2 DUTS. They contain the corresponding DACs/PAIs generated using
-generate_nxp_chip_factory_bin.py script. The discriminator is 14014 and the
+`generate_nxp_chip_factory_bin.py` script. The discriminator is 14014 and the
 passcode is 1000. These demo certificates are working with the CDs installed in
 CHIPProjectConfig.h.
 
@@ -351,7 +351,7 @@ Regarding factory data provider, there are two options:
 -   use the default factory data provider: `FactoryDataProviderImpl` by setting
     `chip_with_factory_data=1` in the gn build command.
 -   use a custom factory data provider: please see
-    [Guide for implementing a custom factory data provider](../../../platform/nxp/k32w0/common/README.md).
+    [Guide for implementing a custom factory data provider](../../../../third_party/nxp/nxp_matter_support/examples/platform//k32w0/common/README.md).
     This can be enabled when `chip_with_factory_data=1` by setting
     `use_custom_factory_provider=1` in the gn build command.
 
@@ -485,7 +485,7 @@ needed for parsing the hashed scripts.
 
 The python3 script detokenizer.py is a script that decodes the tokenized logs
 either from a file or from a serial port. It is located in the following path
-`examples/platform/nxp/k32w0/scripts/detokenizer.py`.
+`third_party/nxp/nxp_matter_support/examples/platform/k32w0/scripts/detokenizer.py`.
 
 The script can be used in the following ways:
 
@@ -520,7 +520,7 @@ by the script is loaded by the environment. An example of running the
 detokenizer script to see logs of a lighting app:
 
 ```
-python3 ../../../../examples/platform/nxp/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-light-example-database.bin -o device.txt
+python3 ../../../../third_party/nxp/nxp_matter_support/examples/platform/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-light-example-database.bin -o device.txt
 ```
 
 ### Known issues tokenizer
@@ -592,7 +592,7 @@ is done.
 The OTA topology used for OTA testing is illustrated in the figure below.
 Topology is similar with the one used for Matter Test Events.
 
-![OTA_TOPOLOGY](../../../platform/nxp/k32w0/doc/images/ota_topology.JPG)
+![OTA_TOPOLOGY](../../../../third_party/nxp/nxp_matter_support/examples/platform//k32w0/doc/images/ota_topology.JPG)
 
 The concept for OTA is the next one:
 

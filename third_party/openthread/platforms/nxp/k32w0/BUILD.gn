@@ -30,7 +30,7 @@ config("openthread_k32w0_config") {
     "${openthread_nxp_root}/src/k32w0/platform",
     "${openthread_nxp_root}/src/common",
   ]
-  include_dirs += [ "${chip_root}/examples/platform/nxp/k32w0" ]
+  include_dirs += [ "${nxp_sdk_matter_support_root}/examples/platform/k32w0" ]
 
   if (is_clang) {
     cflags = [ "-Wno-format-nonliteral" ]
@@ -46,7 +46,7 @@ config("openthread_k32w0_config") {
 
 source_set("openthread_core_config_k32w0") {
   sources = [
-    "${chip_root}/examples/platform/nxp/k32w0/app/project_include/OpenThreadConfig.h",
+    "${nxp_sdk_matter_support_root}/examples/platform/k32w0/app/project_include/OpenThreadConfig.h",
     "${openthread_nxp_root}/src/k32w0/k32w061/openthread-core-k32w061-config-check.h",
   ]
 

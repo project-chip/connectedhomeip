@@ -40,7 +40,7 @@ if (chip_pw_tokenizer_logging) {
 
 assert(current_os == "freertos")
 
-k32w0_platform_dir = "${chip_root}/examples/platform/nxp/k32w0"
+k32w0_platform_dir = "${nxp_sdk_matter_support_root}/examples/platform/k32w0"
 
 k32w0_sdk("sdk") {
   sources = [
