@@ -30,16 +30,16 @@ public class CommandResponseHolder {
     setResponseValue(
         Clusters.AccountLogin.Id,
         Clusters.AccountLogin.Commands.GetSetupPIN.ID,
-        "{\"0\":\"0\"}");
+        "{\"0\":\"20202021\"}");
     setResponseValue(
         Clusters.AccountLogin.Id,
         Clusters.AccountLogin.Commands.Login.ID,
-        // Status 0 is for success, you can use Status 1 for failure
+        // 0 is for success, you can return 1 for failure
         "{\"Status\":0}");
     setResponseValue(
         Clusters.AccountLogin.Id,
         Clusters.AccountLogin.Commands.Logout.ID,
-        // Status 0 is for success, you can use Status 1 for failure
+        // 0 is for success, you can return 1 for failure
         "{\"Status\":0}");
   };
 
