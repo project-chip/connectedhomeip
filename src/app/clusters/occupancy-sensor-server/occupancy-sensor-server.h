@@ -25,7 +25,6 @@
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -37,19 +36,19 @@ namespace OccupancySensing {
 class HoldTimeLimitsManager : public AttributeAccessInterface
 {
 public:
-	static constexpr size_t kOccupancySensingServerMaxEndpointCount =
+    static constexpr size_t kOccupancySensingServerMaxEndpointCount =
         MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
     static_assert(kOccupancySensingServerMaxEndpointCount <= kInvalidEndpointId, "Occupancy Sensing endpoint count error");
 
-	//HoldTimeLimits
+    // HoldTimeLimits
     class HoldTimeLimits
     {
     public:
-		Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsStruct(EndpointId endpoint);
+        Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsStruct(EndpointId endpoint);
         CHIP_ERROR SetHoldTimeLimitsStruct(EndpointId endpoint, Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct);
 
     private:
-		/// @brief Returns the index of the HoldTimeLimits associated to an endpoint
+        /// @brief Returns the index of the HoldTimeLimits associated to an endpoint
         /// @param[in] endpoint target endpoint
         /// @param[out] endpointIndex index of the corresponding HoldTimeLimits for an endpoint
         /// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid endpoint
@@ -58,27 +57,27 @@ public:
         Structs::HoldTimeLimitsStruct::Type mHoldTimeLimitsStructs[kOccupancySensingServerMaxEndpointCount];
     };
 
-	static HoldTimeLimitsManager & Instance();
+    static HoldTimeLimitsManager & Instance();
 
-	CHIP_ERROR Init();
+    CHIP_ERROR Init();
 
-	// AttributeAccessInterface
+    // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-	// HoldTimeLimitsStruct Accessors
+    // HoldTimeLimitsStruct Accessors
     Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsStruct(EndpointId endpoint);
     CHIP_ERROR SetHoldTimeLimitsStruct(EndpointId endpoint, Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct);
 
 private:
     HoldTimeLimitsManager() : AttributeAccessInterface(Optional<EndpointId>(), Id) {}
-    ~HoldTimeLimitsManager() { }
+    ~HoldTimeLimitsManager() {}
 
     bool mIsInitialized = false;
 
-	// HoldTimeLimits
+    // HoldTimeLimits
     HoldTimeLimits mHoldTimeLimits;
 
-	// Instance
+    // Instance
     static HoldTimeLimitsManager mInstance;
 };
 

@@ -15,16 +15,14 @@
  *    limitations under the License.
  */
 
-#include "occupancy-hal.h"
 #include "occupancy-sensor-server.h"
+#include "occupancy-hal.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/data-model/Encode.h>
 #include <app/EventLogging.h>
+#include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
-
-
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -35,19 +33,19 @@ namespace OccupancySensing {
 
 Structs::HoldTimeLimitsStruct::Type * HoldTimeLimitsManager::HoldTimeLimits::GetHoldTimeLimitsStruct(EndpointId endpoint)
 {
-	size_t endpointIndex = 0;
-	Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct = nullptr;
-	CHIP_ERROR status = FindHoldTimeLimitsIndex(endpoint, endpointIndex);
-	if (CHIP_NO_ERROR == status)
+    size_t endpointIndex                                       = 0;
+    Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct = nullptr;
+    CHIP_ERROR status                                          = FindHoldTimeLimitsIndex(endpoint, endpointIndex);
+    if (CHIP_NO_ERROR == status)
     {
         holdTimeLimitsStruct = &mHoldTimeLimitsStructs[endpointIndex];
     }
     return holdTimeLimitsStruct;
 }
 
-
-CHIP_ERROR HoldTimeLimitsManager::HoldTimeLimits::SetHoldTimeLimitsStruct(EndpointId endpoint,
-                                                             Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct)
+CHIP_ERROR
+HoldTimeLimitsManager::HoldTimeLimits::SetHoldTimeLimitsStruct(EndpointId endpoint,
+                                                               Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct)
 {
     VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -67,8 +65,8 @@ CHIP_ERROR HoldTimeLimitsManager::HoldTimeLimits::FindHoldTimeLimitsIndex(Endpoi
 {
     VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, OccupancySensing::Id, MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, OccupancySensing::Id,
+                                                          MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (index < ArraySize(mHoldTimeLimitsStructs))
     {
@@ -90,41 +88,41 @@ CHIP_ERROR HoldTimeLimitsManager::Init()
     // Prevents re-initializing
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    for(size_t  i = 0; i <= kOccupancySensingServerMaxEndpointCount; i++)
+    for (size_t i = 0; i <= kOccupancySensingServerMaxEndpointCount; i++)
     {
-        if(emberAfContainsServer(EndpointId(i), OccupancySensing::Id))
-		{
-			Structs::HoldTimeLimitsStruct::Type holdTimeLimitsInit;
+        if (emberAfContainsServer(EndpointId(i), OccupancySensing::Id))
+        {
+            Structs::HoldTimeLimitsStruct::Type holdTimeLimitsInit;
 
-      // Set up some sane initial values for hold time limits structures
-			holdTimeLimitsInit.holdTimeMin = 1;
-			holdTimeLimitsInit.holdTimeMax = 300;
-			holdTimeLimitsInit.holdTimeDefault = 10;
+            // Set up some sane initial values for hold time limits structures
+            holdTimeLimitsInit.holdTimeMin     = 1;
+            holdTimeLimitsInit.holdTimeMax     = 300;
+            holdTimeLimitsInit.holdTimeDefault = 10;
 
-			HoldTimeLimitsManager::Instance().SetHoldTimeLimitsStruct(EndpointId(i),holdTimeLimitsInit);
-		}
-	}
+            HoldTimeLimitsManager::Instance().SetHoldTimeLimitsStruct(EndpointId(i), holdTimeLimitsInit);
+        }
+    }
 
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-
 
     mIsInitialized = true;
     return CHIP_NO_ERROR;
 }
 
-//AttributeAccessInterface
+// AttributeAccessInterface
 CHIP_ERROR HoldTimeLimitsManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
     case Attributes::HoldTimeLimits::Id: {
 
-		Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct = HoldTimeLimitsManager::Instance().mHoldTimeLimits.GetHoldTimeLimitsStruct(aPath.mEndpointId);
-		Structs::HoldTimeLimitsStruct::Type res;
-		res.holdTimeMin = holdTimeLimitsStruct->holdTimeMin;
-		res.holdTimeMax = holdTimeLimitsStruct->holdTimeMax;
-		res.holdTimeDefault = holdTimeLimitsStruct->holdTimeDefault;
-		return aEncoder.Encode(res);
+        Structs::HoldTimeLimitsStruct::Type * holdTimeLimitsStruct =
+            HoldTimeLimitsManager::Instance().mHoldTimeLimits.GetHoldTimeLimitsStruct(aPath.mEndpointId);
+        Structs::HoldTimeLimitsStruct::Type res;
+        res.holdTimeMin     = holdTimeLimitsStruct->holdTimeMin;
+        res.holdTimeMax     = holdTimeLimitsStruct->holdTimeMax;
+        res.holdTimeDefault = holdTimeLimitsStruct->holdTimeDefault;
+        return aEncoder.Encode(res);
     }
     default:
         return CHIP_NO_ERROR;
@@ -138,7 +136,7 @@ Structs::HoldTimeLimitsStruct::Type * HoldTimeLimitsManager::GetHoldTimeLimitsSt
 }
 
 CHIP_ERROR HoldTimeLimitsManager::SetHoldTimeLimitsStruct(EndpointId endpoint,
-                                            Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct)
+                                                          Structs::HoldTimeLimitsStruct::Type & holdTimeLimitsStruct)
 {
     ReturnErrorOnFailure(mHoldTimeLimits.SetHoldTimeLimitsStruct(endpoint, holdTimeLimitsStruct));
     return CHIP_NO_ERROR;
@@ -214,7 +212,6 @@ void halOccupancyStateChangedCallback(EndpointId endpoint, HalOccupancyState occ
     Attributes::Occupancy::Set(endpoint, occupancyState);
 }
 
-
 HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointId endpoint)
 {
     return HAL_OCCUPANCY_SENSOR_TYPE_PIR;
@@ -222,7 +219,7 @@ HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointI
 
 void MatterOccupancySensingPluginServerInitCallback()
 {
-	CHIP_ERROR err = HoldTimeLimitsManager::Instance().Init();
+    CHIP_ERROR err = HoldTimeLimitsManager::Instance().Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HoldTimeLimitsManager::Instance().Init() error: %" CHIP_ERROR_FORMAT, err.Format());
