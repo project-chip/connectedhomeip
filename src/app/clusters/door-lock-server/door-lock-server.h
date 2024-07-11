@@ -118,7 +118,7 @@ public:
     void InitServer(chip::EndpointId endpointid);
 
     /**
-     * Delegate is not supposed to be null.  Removing a delegate
+     * Delegate is not supposed to be null. Removing a delegate
      * should only happen when shutting down the door lock cluster on the
      * endpoint, via ShutdownEndpoint.
      */
@@ -499,7 +499,7 @@ private:
                                     chip::Protocols::InteractionModel::ClusterStatusCode status);
 
     /**
-     * Get the DoorLock::Delegate for the given endpoint, if any.  Will return
+     * Get the DoorLock::Delegate for the given endpoint, if any. Will return
      * null if there is no door lock server initialized on that endpoint or if
      * there is no delegate associated with the initialized server.
      */
