@@ -66,8 +66,10 @@ Status ContentApp::HandleWriteAttribute(ClusterId clusterId, AttributeId attribu
 
 bool ContentApp::AddClientNode(NodeId subjectNodeId)
 {
-    for (int i = 0; i < kMaxClientNodes; ++i) {
-        if (mClientNodes[i] == subjectNodeId) {
+    for (int i = 0; i < kMaxClientNodes; ++i)
+    {
+        if (mClientNodes[i] == subjectNodeId)
+        {
             // avoid storing duplicate nodes
             return false;
         }
