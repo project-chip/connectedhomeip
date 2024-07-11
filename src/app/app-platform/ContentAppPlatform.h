@@ -165,7 +165,7 @@ public:
     std::set<NodeId> GetNodeIdsForContentApp(uint16_t vendorId, uint16_t productId);
 
     // returns set of connected nodes for a given allowed vendor id
-    std::set<NodeId> GetNodeIdsForAllowVendorId(uint16_t vendorId);
+    std::set<NodeId> GetNodeIdsForAllowedVendorId(uint16_t vendorId);
 
     // store node id for content app after commissioning
     // node id can be used later on to update ACL

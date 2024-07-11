@@ -417,7 +417,7 @@ void refreshConnectedClientsAcl(uint16_t vendorId, uint16_t productId, ContentAp
 
     for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
     {
-        std::set<NodeId> tempNodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForAllowVendorId(allowedVendor);
+        std::set<NodeId> tempNodeIds = ContentAppPlatform::GetInstance().GetNodeIdsForAllowedVendorId(allowedVendor);
 
         nodeIds.insert(tempNodeIds.begin(), tempNodeIds.end());
     }

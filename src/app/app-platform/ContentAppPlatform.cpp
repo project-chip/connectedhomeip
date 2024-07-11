@@ -420,7 +420,7 @@ std::set<NodeId> ContentAppPlatform::GetNodeIdsForContentApp(uint16_t vendorId, 
     return {};
 }
 
-std::set<NodeId> ContentAppPlatform::GetNodeIdsForAllowVendorId(uint16_t vendorId)
+std::set<NodeId> ContentAppPlatform::GetNodeIdsForAllowedVendorId(uint16_t vendorId)
 {
     std::set<NodeId> result;
     std::string vendorPrefix = std::to_string(vendorId) + ":";
