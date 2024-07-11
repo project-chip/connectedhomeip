@@ -258,6 +258,8 @@ class MyPostCommissioningListener : public PostCommissioningListener
         // read current binding list
         chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
+        ContentAppPlatform::GetInstance().StoreNodeIdForContentApp(vendorId, productId, nodeId);
+
         cacheContext(vendorId, productId, nodeId, rotatingId, passcode, exchangeMgr, sessionHandle);
 
         CHIP_ERROR err =
