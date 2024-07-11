@@ -291,14 +291,20 @@ template("siwx917_sdk") {
     if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
+
+    if (chip_enable_icd_server || !disable_lcd) {
+      defines += [
+        "SL_SLEEP_TIMER=1",
+        "SI91X_SYSRTC_COUNT=1",
+      ]
+    }
+
     if (!disable_lcd) {
       defines += [
         "CONFIG_ENABLE_UART",
-        "SI91X_SYSRTC_COUNT=1",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
         "SL_ULP_TIMER",
-        "SL_SLEEP_TIMER",
       ]
     }
 
@@ -755,6 +761,14 @@ template("siwx917_sdk") {
       ]
     }
 
+    if (chip_enable_icd_server || !disable_lcd) {
+      sources += [
+        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
+      ]
+    }
+
     if (!disable_lcd) {
       sources += [
         "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
@@ -769,13 +783,10 @@ template("siwx917_sdk") {
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_polygon.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
-        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/SPI.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/memlcd_917/sl_memlcd_spi.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/sl_memlcd.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/sl_memlcd_display.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_ulp_timer.c",
       ]
     }
