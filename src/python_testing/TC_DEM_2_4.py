@@ -181,21 +181,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
                                          f"Expected forecast latestEndTime {forecast.latestEndTime} to be >= endTime {forecast.endTime}")
             asserts.assert_equal(forecast.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
                                  f"Expected forecast forecastUpdateReason {forecast.forecastUpdateReason} to be == Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization")
-            for index, slot in enumerate(forecast.slots):
-                logging.info(
-                    f"   [{index}] MinDuration: {slot.minDuration} MaxDuration: {slot.maxDuration} DefaultDuration: {slot.defaultDuration}")
-                logging.info(f"       ElapseSlotTime: {slot.elapsedSlotTime} RemainingSlotTime: {slot.remainingSlotTime}")
-                logging.info(
-                    f"       SlotIsPausable: {slot.slotIsPausable} MinPauseDuration: {slot.minPauseDuration} MaxPauseDuration: {slot.maxPauseDuration}")
-                logging.info(f"       ManufacturerESAState: {slot.manufacturerESAState}")
-                logging.info(f"       NominalPower: {slot.nominalPower} MinPower: {slot.minPower} MaxPower: {slot.maxPower}")
-                logging.info(f"       MinPowerAdjustment: {slot.minPowerAdjustment} MaxPowerAdjustment: {slot.maxPowerAdjustment}")
-                logging.info(
-                    f"       MinDurationAdjustment: {slot.minDurationAdjustment} MaxDurationAdjustment: {slot.maxDurationAdjustment}")
-                if slot.costs is not None:
-                    for cost_index, cost in enumerate(slot):
-                        logging.info(
-                            f"   Cost: [{cost_index}]  CostType:{cost.costType} Value: {cost.value} DecimalPoints: {cost.decimalPoints} Currency: {cost.currency}")
+            self.print_forecast(forecast)
 
         self.step("3c")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
@@ -333,6 +319,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
         self.step("16")
         logging.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
         time.sleep(forecast.slots[0].minPauseDuration)
+        event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.Resumed)
 
         self.step("16a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
@@ -345,19 +332,18 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
 
         self.step("17b")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        print(forecast)
         asserts.assert_equal(forecast.activeSlotNumber, 1)
 
         self.step("18")
         await self.send_pause_request_command(forecast.slots[0].minPauseDuration,
                                               Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
-                                              expected_status=Status.ConstraintError)
+                                              expected_status=Status.Failure)
 
         self.step("18a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
 
         self.step("19")
-        await self.send_resume_request_command(expected_status=Status.Failure)
+        await self.send_resume_request_command(expected_status=Status.InvalidInState)
 
         self.step("20")
         await self.send_test_event_trigger_user_opt_out_clear_all()
