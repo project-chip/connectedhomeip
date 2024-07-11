@@ -590,47 +590,53 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFailSafeArmed(bool v
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceLocation(DeviceLocatioType &location)
 {
-    char locationNameBuffer[kMaxDeviceLocationNameLength] = { 0 };
-    CharSpan locationName(locationNameBuffer);
-
-    chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::TypeInfo::DecodableType loc({
-        .locationName = locationName,
-        .floorNumber = app::DataModel::NullNullable,
-        .areaType = app::DataModel::NullNullable});
-
-    uint8_t locationData[128 + 8 + 10];
+    uint8_t locationData[kMaxDeviceLocationNameLength + sizeof(DeviceLocatioType)];
     MutableByteSpan locationSpan(locationData);
 
     size_t outLen = 0;
-    ReadConfigValueBin(
+    ReturnErrorOnFailure(ReadConfigValueBin(
         ConfigClass::kConfigKey_DeviceLocation, 
-        locationSpan.data(), 
-        locationSpan.size(),
-        outLen
-        );
+        locationSpan.data(), locationSpan.size(),
+        outLen));
 
     TLV::TLVReader tlvReader;
     tlvReader.Init(locationSpan);
 
-    loc->Decode(tlvReader);
+    char locationNameBuffer[DeviceLayer::ConfigurationManager::kMaxDeviceLocationNameLength] = { 0 };
+    DeviceLocatioType loc({
+        .locationName = MutableCharSpan(locationNameBuffer),
+    });
 
-    location = loc;
+    ReturnErrorOnFailure(tlvReader.Next(TLV::AnonymousTag()));
+    ReturnErrorOnFailure(loc->Decode(tlvReader));
+
+    if (loc.IsNull()) {
+        location.SetNull();
+        return CHIP_NO_ERROR;
+    }
+
+    memcpy((void *)location.Value().locationName.data(), loc.Value().locationName.data(), loc.Value().locationName.size());
+    location.Value().locationName.reduce_size(loc.Value().locationName.size());
+    location.Value().floorNumber = loc.Value().floorNumber;
+    location.Value().areaType = loc.Value().areaType;
 
     return CHIP_NO_ERROR;
 }
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetDeviceLocation(DeviceLocatioType location)
 {
-    uint8_t locationData[128 + 8 + 10];
+    uint8_t locationData[kMaxDeviceLocationNameLength + sizeof(DeviceLocatioType)];
     MutableByteSpan locationSpan(locationData);
-    const uint8_t* p = locationSpan.data();
 
     TLV::TLVWriter tlvWriter;
     tlvWriter.Init(locationSpan);
 
-    location->Encode(tlvWriter, TLV::AnonymousTag());
+    ReturnErrorOnFailure(location->Encode(tlvWriter, TLV::AnonymousTag()));
 
-    WriteConfigValueBin(ConfigClass::kConfigKey_DeviceLocation, p, sizeof(locationData));
+    ReturnErrorOnFailure(WriteConfigValueBin(
+        ConfigClass::kConfigKey_DeviceLocation, 
+        static_cast<const uint8_t *>(locationSpan.data()), 
+        tlvWriter.GetLengthWritten()));
 
     return CHIP_NO_ERROR;
 }
