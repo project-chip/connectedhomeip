@@ -2923,28 +2923,6 @@ Status DoorLockServer::clearCredential(chip::EndpointId endpointId, chip::Fabric
         return Status::Failure;
     }
 
-    uint8_t maxCredentialsPerUser;
-    if (!GetNumberOfCredentialsSupportedPerUser(endpointId, maxCredentialsPerUser))
-    {
-        ChipLogError(Zcl,
-                     "[clearCredential] Unable to get the number of available credentials per user: internal error "
-                     "[endpointId=%d,credentialType=%d,credentialIndex=%d]",
-                     endpointId, to_underlying(credentialType), credentialIndex);
-        return Status::Failure;
-    }
-
-    // Should never happen, only possible if the implementation of application is incorrect
-    if (relatedUser.credentials.size() > maxCredentialsPerUser)
-    {
-        ChipLogError(Zcl,
-                     "[clearCredential] Unable to clear credential for related user - user has too many credentials associated"
-                     "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=%d,userIndex=%d,credentialsCount=%u]",
-                     endpointId, to_underlying(credentialType), credentialIndex, modifier, relatedUserIndex,
-                     static_cast<unsigned int>(relatedUser.credentials.size()));
-
-        return Status::Failure;
-    }
-
     chip::Platform::ScopedMemoryBuffer<CredentialStruct> newCredentials;
     if (!newCredentials.Alloc(relatedUser.credentials.size()))
     {
