@@ -214,6 +214,9 @@ source_set("system_config_header") {
 
   if(chip_platform_sdk_target != "") {
     public_deps += [ chip_platform_sdk_target ]
+
+  if (chip_device_platform == "mt793x") {
+    public_deps += [ "${mt793x_sdk_build_root}:mt793x_sdk" ]
   }
 }
 
