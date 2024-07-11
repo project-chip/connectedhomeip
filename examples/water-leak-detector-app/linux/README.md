@@ -12,11 +12,11 @@ details.
 
 <hr>
 
--   [Matter Linux Water Leak Detector Example](#matter-linux-water-leak-detector-app-example)
+-   [Matter Linux Water Leak Detector Example](#matter-linux-water-leak-detector-example)
     -   [Building](#building)
-    -   [Commandline Arguments](#commandline-arguments)
+    -   [Commandline arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-    -   [Running RPC console](#running-rpc-console)
+    -   [Running RPC Console](#running-rpc-console)
     -   [Device Tracing](#device-tracing)
 
 <hr>
@@ -107,7 +107,7 @@ details.
                       RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
                       TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
 
-        -   Run Linux Contact Sensor App
+        -   Run Linux Water Leak DetectorApp
 
                   $ cd ~/connectedhomeip/examples/water-leak-detector-app-app/linux
                   $ sudo out/debug/chip-water-leak-detector-app-app --ble-device [bluetooth device number]
@@ -128,7 +128,7 @@ details.
 -   To use the chip-rpc console after it has been installed run:
     `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
 
--   Then you can Get the contact sensor status using the RPCs:
+-   Then you can Get the water leak detector status using the RPCs:
     `rpcs.chip.rpc.BooleanState.Get()`
 
 ## Device Tracing

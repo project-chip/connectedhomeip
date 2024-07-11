@@ -42,8 +42,7 @@ int main(int argc, char * argv[])
     example::Ui::ImguiUi ui;
 
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
-    ui.AddWindow(std::make_unique<example::Ui::Windows::BooleanState>(chip::EndpointId(1), "Contact Sensor"));
-    ui.AddWindow(std::make_unique<example::Ui::Windows::OccupancySensing>(chip::EndpointId(1), "Occupancy"));
+    ui.AddWindow(std::make_unique<example::Ui::Windows::BooleanState>(chip::EndpointId(1), "Water Leak Detector"));
 
     ChipLinuxAppMainLoop(&ui);
 #else
