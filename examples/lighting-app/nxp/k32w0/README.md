@@ -227,10 +227,10 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
 -   Step 3: Init NXP SDK(s)
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/setup/nxp/update_nxp_sdk.py --platform k32w0
+user@ubuntu:~/Desktop/git/connectedhomeip$ third_party/nxp/nxp_matter_support/scripts/update_nxp_sdk.py --platform k32w0
 ```
 
-Note: By default setup/nxp/update_nxp_sdk.py will try to initialize all NXP
+Note: By default update_nxp_sdk.py will try to initialize all NXP
 SDKs. Arg "-- help" could be used to view all available options.
 
 -   Start building the application:
