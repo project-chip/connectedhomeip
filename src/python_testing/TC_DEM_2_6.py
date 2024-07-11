@@ -153,12 +153,12 @@ class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
         self.step("4")
         slotAdjustments = [Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(
             slotIndex=0, duration=forecast.slots[0].maxDurationAdjustment)]
-        await self.send_modify_forecast_request_command(forecast.forecastID + 1, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.ConstraintError)
+        await self.send_modify_forecast_request_command(forecast.forecastID + 1, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.Failure)
 
         self.step("5")
         slotAdjustments = [Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(
             slotIndex=4, duration=forecast.slots[0].maxDurationAdjustment)]
-        await self.send_modify_forecast_request_command(forecast.forecastID, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.ConstraintError)
+        await self.send_modify_forecast_request_command(forecast.forecastID, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.Failure)
 
         self.step("6")
         slotAdjustments = [Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(
@@ -173,7 +173,7 @@ class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
         self.step("8")
         slotAdjustments = [Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(slotIndex=0, duration=forecast.slots[0].maxDurationAdjustment),
                            Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(slotIndex=4, duration=forecast.slots[0].maxDurationAdjustment)]
-        await self.send_modify_forecast_request_command(forecast.forecastID, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.ConstraintError)
+        await self.send_modify_forecast_request_command(forecast.forecastID, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.Failure)
 
         self.step("9")
         await self.send_test_event_trigger_user_opt_out_local()

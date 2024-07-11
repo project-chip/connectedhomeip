@@ -81,19 +81,25 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
         await self.send_test_event_trigger_forecast()
 
         self.step("3a")
-
-        forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_greater_equal(len(forecast.slots), 1)
-        asserts.assert_is_not_none(forecast.slots[0].manufacturerESAState)
+        feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
+        if feature_map & Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting:
+            forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
+            asserts.assert_greater_equal(len(forecast.slots), 1)
+            asserts.assert_is_not_none(forecast.slots[0].manufacturerESAState)
+        else:
+            logging.info('Device does not support StateForecastReporting. Skipping step 3a')
 
         self.step("3b")
-        forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        asserts.assert_greater_equal(len(forecast.slots), 1)
+        if feature_map & Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting:
+            forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
+            asserts.assert_greater_equal(len(forecast.slots), 1)
 
-        asserts.assert_is_not_none(forecast.slots[0].nominalPower)
-        asserts.assert_is_not_none(forecast.slots[0].minPower)
-        asserts.assert_is_not_none(forecast.slots[0].maxPower)
-        asserts.assert_is_not_none(forecast.slots[0].nominalEnergy)
+            asserts.assert_is_not_none(forecast.slots[0].nominalPower)
+            asserts.assert_is_not_none(forecast.slots[0].minPower)
+            asserts.assert_is_not_none(forecast.slots[0].maxPower)
+            asserts.assert_is_not_none(forecast.slots[0].nominalEnergy)
+        else:
+            logging.info('Device does not support StateForecastReporting. Skipping step 3b')
 
         self.step("4")
         await self.send_test_event_trigger_forecast_clear()
