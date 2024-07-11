@@ -355,7 +355,7 @@ Status ContentAppCommandDelegate::FormatStatusResponse(Json::Value value)
 {
     // check if JSON has "Status" key
     if (!value[RESPONSE_STATUS_KEY].empty() && !value[RESPONSE_STATUS_KEY].isUInt())
-    {   
+    {
         return static_cast<Protocols::InteractionModel::Status>(value.asUInt())
     }
     else
