@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
-chip_data_model("contact-sensor-common") {
+chip_data_model("water-leak-detector-common") {
   zap_file = "water-leak-detector-app.zap"
   is_server = true
 }
