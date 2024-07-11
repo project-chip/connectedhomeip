@@ -616,10 +616,6 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        // Qs:
-        // * Is it right to use mPasscode here?
-        // * Would it not be zero if HandleContentAppPasscodeResponse returns zero passcode?
-        // * Which client/app does the passcode refer to? Same question for Rotating ID.
         mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, GetRotatingIdSpan(), mPasscode, exchangeMgr,
                                                            sessionHandle);
     }
