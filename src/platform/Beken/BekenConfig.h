@@ -55,6 +55,7 @@ public:
     static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
+    static const Key kConfigKey_DeviceLocation;
     static const Key kConfigKey_OperationalDeviceId;
     static const Key kConfigKey_OperationalDeviceCert;
     static const Key kConfigKey_OperationalDeviceICACerts;

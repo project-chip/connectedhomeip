@@ -81,6 +81,7 @@ const MbedConfig::Key MbedConfig::kConfigKey_PairedAccountId    = { CONFIG_KEY("
 const MbedConfig::Key MbedConfig::kConfigKey_ServiceId          = { CONFIG_KEY("service-id") };
 const MbedConfig::Key MbedConfig::kConfigKey_LastUsedEpochKeyId = { CONFIG_KEY("last-ek-id") };
 const MbedConfig::Key MbedConfig::kConfigKey_FailSafeArmed      = { CONFIG_KEY("fail-safe-armed") };
+const MbedConfig::Key MbedConfig::kConfigKey_DeviceLocation     = { CONFIG_KEY("device-location") };
 const MbedConfig::Key MbedConfig::kConfigKey_RegulatoryLocation = { CONFIG_KEY("regulatory-location") };
 const MbedConfig::Key MbedConfig::kConfigKey_CountryCode        = { CONFIG_KEY("country-code") };
 const MbedConfig::Key MbedConfig::kConfigKey_UniqueId           = { CONFIG_KEY("unique-id") };

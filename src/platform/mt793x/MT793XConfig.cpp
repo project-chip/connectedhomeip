@@ -72,6 +72,8 @@ const MT793XConfig::Key MT793XConfig::kConfigKey_LastUsedEpochKeyId = { .Namespa
                                                                         .Name      = "last-ek-id" };
 const MT793XConfig::Key MT793XConfig::kConfigKey_FailSafeArmed      = { .Namespace = kConfigNamespace_ChipConfig,
                                                                         .Name      = "fail-safe-armed" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_DeviceLocation     = { .Namespace = kConfigNamespace_ChipConfig,
+                                                                        .Name      = "device-location" };
 const MT793XConfig::Key MT793XConfig::kConfigKey_GroupKey = { .Namespace = kConfigNamespace_ChipConfig, .Name = "group-key" };
 const MT793XConfig::Key MT793XConfig::kConfigKey_HardwareVersion    = { .Namespace = kConfigNamespace_ChipConfig,
                                                                         .Name      = "hardware-ver" };

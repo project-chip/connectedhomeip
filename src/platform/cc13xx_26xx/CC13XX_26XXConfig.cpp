@@ -122,6 +122,9 @@ const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_CountryCode = {
 const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_UniqueId = {
     { .systemID = kCC13XX_26XXMatter_SysID, .itemID = kCC13XX_26XXMatter_ItemID_ChipConfig, .subID = 0x0001d }
 };
+const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_DeviceLocation = {
+    { .systemID = kCC13XX_26XXMatter_SysID, .itemID = kCC13XX_26XXMatter_ItemID_ChipConfig, .subID = 0x0001e }
+};
 
 /* Internal for the KVS interface. */
 const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_KVS_key   = { { .systemID = kCC13XX_26XXMatter_SysID,

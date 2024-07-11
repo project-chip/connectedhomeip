@@ -68,6 +68,7 @@ const P6Config::Key P6Config::kConfigKey_PairedAccountId    = { kConfigNamespace
 const P6Config::Key P6Config::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
 const P6Config::Key P6Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const P6Config::Key P6Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const P6Config::Key P6Config::kConfigKey_DeviceLocation     = { kConfigNamespace_ChipConfig, "device-location" };
 const P6Config::Key P6Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const P6Config::Key P6Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const P6Config::Key P6Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };

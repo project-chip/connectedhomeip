@@ -69,6 +69,7 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_PairedAccountId    = CONFIG_KEY
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceId          = CONFIG_KEY(NAMESPACE_CONFIG "service-id");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_LastUsedEpochKeyId = CONFIG_KEY(NAMESPACE_CONFIG "last-ek-id");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_FailSafeArmed      = CONFIG_KEY(NAMESPACE_CONFIG "fail-safe-armed");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_DeviceLocation     = CONFIG_KEY(NAMESPACE_CONFIG "device-location");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_UniqueId           = CONFIG_KEY(NAMESPACE_CONFIG "unique-id");

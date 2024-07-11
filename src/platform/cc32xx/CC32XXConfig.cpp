@@ -309,6 +309,7 @@ const CC32XXConfig::Key CC32XXConfig::kConfigKey_FabricSecret       = { "TI_kCon
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_GroupKeyIndex      = { "TI_kConfigKey_GroupKeyIndex" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_LastUsedEpochKeyId = { "TI_kConfigKey_LastUsedEpochKeyId" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_FailSafeArmed      = { "TI_kConfigKey_FailSafeArmed" };
+const CC32XXConfig::Key CC32XXConfig::kConfigKey_DeviceLocation     = { "TI_kConfigKey_DeviceLocation" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_RegulatoryLocation = { "TI_kConfigKey_RegulatoryLocation" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_CountryCode        = { "TI_kConfigKey_CountryCode" };
 const CC32XXConfig::Key CC32XXConfig::kConfigKey_Breadcrumb         = { "TI_kConfigKey_Breadcrumb" };
