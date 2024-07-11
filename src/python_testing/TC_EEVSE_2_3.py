@@ -70,7 +70,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("8b", "TH reads NextChargeTargetTime attribute.",
                      "Verify value is null."),
             TestStep("8c", "TH reads NextChargeRequiredEnergy attribute.",
-                     "Verify value is AddedEnergy above."),
+                     "Verify value is null."),
             TestStep("8d", "TH reads NextChargeTargetSoC attribute.",
                      "Verify value is null."),
             TestStep("9", "TH sends EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000.",
@@ -241,8 +241,6 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("NextChargeTargetTime", NullValue)
 
         self.step("8c")
-        # await self.check_evse_attribute("NextChargeRequiredEnergy", 25000000)
-        # TODO
         await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)
 
         self.step("8d")
