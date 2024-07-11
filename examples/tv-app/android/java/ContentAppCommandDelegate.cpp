@@ -41,6 +41,7 @@ namespace AppPlatform {
 
 const std::string FAILURE_KEY        = "PlatformError";
 const std::string FAILURE_STATUS_KEY = "Status";
+const std::string RESPONSE_STATUS_KEY = "Status";
 
 void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext)
 {
@@ -352,9 +353,20 @@ GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(Jso
 
 Status ContentAppCommandDelegate::FormatStatusResponse(Json::Value value)
 {
-    if (value.isUInt())
+
+    // handle errors from platform-app
+    if (!value[RESPONSE_STATUS_KEY].empty())
     {
-        return static_cast<Protocols::InteractionModel::Status>(value.asUInt());
+        value = value[RESPONSE_STATUS_KEY];
+        if (!value.empty() && value.isUInt())
+        {
+            return static_cast<Protocols::InteractionModel::Status>(value.asUInt());
+        }
+
+        else
+        {
+            return chip::Protocols::InteractionModel::Status::Failure;
+        }
     }
     else
     {
