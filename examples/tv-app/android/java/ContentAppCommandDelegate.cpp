@@ -353,20 +353,10 @@ GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(Jso
 
 Status ContentAppCommandDelegate::FormatStatusResponse(Json::Value value)
 {
-
-    // handle errors from platform-app
-    if (!value[RESPONSE_STATUS_KEY].empty())
-    {
-        value = value[RESPONSE_STATUS_KEY];
-        if (!value.empty() && value.isUInt())
-        {
-            return static_cast<Protocols::InteractionModel::Status>(value.asUInt());
-        }
-
-        else
-        {
-            return chip::Protocols::InteractionModel::Status::Failure;
-        }
+    // check if JSON has "Status" key
+    if (!value[RESPONSE_STATUS_KEY].empty() && !value[RESPONSE_STATUS_KEY].isUInt())
+    {   
+        return static_cast<Protocols::InteractionModel::Status>(value.asUInt())
     }
     else
     {
