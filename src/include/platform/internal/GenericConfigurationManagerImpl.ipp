@@ -586,18 +586,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFailSafeArmed(bool v
     return WriteConfigValue(ConfigClass::kConfigKey_FailSafeArmed, val);
 }
 
-
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceLocation(DeviceLocatioType &location)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceLocation(DeviceLocatioType & location)
 {
     uint8_t locationData[kMaxDeviceLocationNameLength + sizeof(DeviceLocatioType)];
     MutableByteSpan locationSpan(locationData);
 
     size_t outLen = 0;
-    ReturnErrorOnFailure(ReadConfigValueBin(
-        ConfigClass::kConfigKey_DeviceLocation,
-        locationSpan.data(), locationSpan.size(),
-        outLen));
+    ReturnErrorOnFailure(
+        ReadConfigValueBin(ConfigClass::kConfigKey_DeviceLocation, locationSpan.data(), locationSpan.size(), outLen));
 
     TLV::TLVReader tlvReader;
     tlvReader.Init(locationSpan);
@@ -610,15 +607,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceLocation(Devic
     ReturnErrorOnFailure(tlvReader.Next(TLV::AnonymousTag()));
     ReturnErrorOnFailure(loc->Decode(tlvReader));
 
-    if (loc.IsNull()) {
+    if (loc.IsNull())
+    {
         location.SetNull();
         return CHIP_NO_ERROR;
     }
 
-    memcpy((void *)location.Value().locationName.data(), loc.Value().locationName.data(), loc.Value().locationName.size());
+    memcpy((void *) location.Value().locationName.data(), loc.Value().locationName.data(), loc.Value().locationName.size());
     location.Value().locationName.reduce_size(loc.Value().locationName.size());
     location.Value().floorNumber = loc.Value().floorNumber;
-    location.Value().areaType = loc.Value().areaType;
+    location.Value().areaType    = loc.Value().areaType;
 
     return CHIP_NO_ERROR;
 }
@@ -633,10 +631,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetDeviceLocation(Devic
 
     ReturnErrorOnFailure(location->Encode(tlvWriter, TLV::AnonymousTag()));
 
-    ReturnErrorOnFailure(WriteConfigValueBin(
-        ConfigClass::kConfigKey_DeviceLocation,
-        static_cast<const uint8_t *>(locationSpan.data()),
-        tlvWriter.GetLengthWritten()));
+    ReturnErrorOnFailure(WriteConfigValueBin(ConfigClass::kConfigKey_DeviceLocation,
+                                             static_cast<const uint8_t *>(locationSpan.data()), tlvWriter.GetLengthWritten()));
 
     return CHIP_NO_ERROR;
 }

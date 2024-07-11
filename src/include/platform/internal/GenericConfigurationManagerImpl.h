@@ -85,8 +85,8 @@ public:
      * @brief Update location with the current device location.
      *
      * Expects that location is initialised with a locationName CharSpan pointing to a buffer of size kMaxDeviceLocationNameLength.
-    */
-    CHIP_ERROR GetDeviceLocation(DeviceLocatioType &location) override;
+     */
+    CHIP_ERROR GetDeviceLocation(DeviceLocatioType & location) override;
     CHIP_ERROR SetDeviceLocation(DeviceLocatioType location) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
     bool IsCommissionableDeviceTypeEnabled() override;

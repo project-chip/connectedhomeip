@@ -32,12 +32,12 @@
 #include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 #endif
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/Nullable.h>
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/Span.h>
 #include <platform/PersistedStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <app/data-model/Nullable.h>
-#include <app-common/zap-generated/cluster-objects.h>
 
 using DeviceLocatioType = chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::TypeInfo::Type;
 
@@ -136,8 +136,8 @@ public:
     virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;
     virtual CHIP_ERROR GetFailSafeArmed(bool & val)                                    = 0;
     virtual CHIP_ERROR SetFailSafeArmed(bool val)                                      = 0;
-    virtual CHIP_ERROR GetDeviceLocation(DeviceLocatioType &location)  = 0;
-    virtual CHIP_ERROR SetDeviceLocation(DeviceLocatioType location)  = 0;
+    virtual CHIP_ERROR GetDeviceLocation(DeviceLocatioType & location)                 = 0;
+    virtual CHIP_ERROR SetDeviceLocation(DeviceLocatioType location)                   = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 

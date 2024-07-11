@@ -445,8 +445,10 @@ CHIP_ERROR BasicAttrAccess::WriteDeviceLocation(AttributeValueDecoder & aDecoder
 
     ReturnErrorOnFailure(aDecoder.Decode(deviceLocation));
 
-    if (!deviceLocation.IsNull()) {
-        if (deviceLocation.Value().locationName.empty() && deviceLocation.Value().floorNumber.IsNull() && deviceLocation.Value().areaType.IsNull())
+    if (!deviceLocation.IsNull())
+    {
+        if (deviceLocation.Value().locationName.empty() && deviceLocation.Value().floorNumber.IsNull() &&
+            deviceLocation.Value().areaType.IsNull())
         {
             ChipLogError(Zcl, "At least one of the fields should not be null or an empty string.");
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
