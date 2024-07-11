@@ -86,19 +86,8 @@ struct EmberAfDoorLockEndpointContext
 {
     chip::System::Clock::Timestamp lockoutEndTimestamp;
     int wrongCodeEntryAttempts;
+    chip::app::Clusters::DoorLock::Delegate * delegate = nullptr;
 };
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DoorLock {
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
-
-} // namespace DoorLock
-} // namespace Clusters
-} // namespace app
-} // namespace chip
 
 /**
  * @brief Door Lock Server Plugin class.
@@ -112,7 +101,28 @@ public:
     using Feature                       = chip::app::Clusters::DoorLock::Feature;
     using OnFabricRemovedCustomCallback = void (*)(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
-    void InitServer(chip::EndpointId endpointId);
+    /**
+     * Multiple InitEndpoint calls can happen for different endpoints.  Calling
+     * InitEndpoint twice for the same endpoint requires a ShutdownEndpoint call
+     * for that endpoint in between.
+     *
+     * A DoorLock::Delegate is optional, but needs to be provided in either
+     * InitEndpoint or in a separate SetDelegate call for Aliro features, and
+     * possibly other new features, to work.
+     */
+    CHIP_ERROR InitEndpoint(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::Delegate * delegate = nullptr);
+
+    void ShutdownEndpoint(chip::EndpointId endpointId);
+
+    // InitServer is a deprecated alias for InitEndpoint with no delegate.
+    void InitServer(chip::EndpointId endpointid);
+
+    /**
+     * Delegate is not supposed to be null. Removing a delegate
+     * should only happen when shutting down the door lock cluster on the
+     * endpoint, via ShutdownEndpoint.
+     */
+    CHIP_ERROR SetDelegate(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::Delegate * delegate);
 
     /**
      * Updates the LockState attribute with new value and sends LockOperation event.
@@ -487,6 +497,13 @@ private:
 
     static void sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                     chip::Protocols::InteractionModel::ClusterStatusCode status);
+
+    /**
+     * Get the DoorLock::Delegate for the given endpoint, if any. Will return
+     * null if there is no door lock server initialized on that endpoint or if
+     * there is no delegate associated with the initialized server.
+     */
+    chip::app::Clusters::DoorLock::Delegate * GetDelegate(chip::EndpointId endpointId);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands

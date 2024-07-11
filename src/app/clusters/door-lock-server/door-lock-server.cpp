@@ -51,39 +51,6 @@ static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE = 65;
 
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
 
-static constexpr size_t kDoorLockDelegateTableSize =
-    MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-static_assert(kDoorLockDelegateTableSize <= kEmberInvalidEndpointIndex, "Door Lock Delegate table size error");
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DoorLock {
-
-Delegate * gDelegateTable[kDoorLockDelegateTableSize] = { nullptr };
-
-Delegate * GetDelegate(EndpointId endpoint)
-{
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kDoorLockDelegateTableSize ? nullptr : gDelegateTable[ep]);
-}
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
-{
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < ArraySize(gDelegateTable))
-    {
-        gDelegateTable[ep] = delegate;
-    }
-}
-
-} // namespace DoorLock
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
 DoorLockServer DoorLockServer::instance;
 
 class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
@@ -117,7 +84,18 @@ DoorLockServer & DoorLockServer::Instance()
  *
  * @param endpointId
  */
-void DoorLockServer::InitServer(chip::EndpointId endpointId)
+void DoorLockServer::InitServer(EndpointId endpointId)
+{
+    CHIP_ERROR err = InitEndpoint(endpointId);
+
+    // We have no way to communicate this error, so just log it.
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Door Lock cluster initialization on endpoint %d failed: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+    }
+}
+
+CHIP_ERROR DoorLockServer::InitEndpoint(EndpointId endpointId, Delegate * delegate)
 {
     ChipLogProgress(Zcl, "Door Lock cluster initialized at endpoint #%u", endpointId);
 
@@ -128,11 +106,48 @@ void DoorLockServer::InitServer(chip::EndpointId endpointId)
     }
     SetActuatorEnabled(endpointId, true);
 
-    for (auto & ep : mEndpointCtx)
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
     {
-        ep.lockoutEndTimestamp    = ep.lockoutEndTimestamp.zero();
-        ep.wrongCodeEntryAttempts = 0;
+        ChipLogError(Zcl, "Invalid endpoint %d for initializing lock server: no endpoint context available", endpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    endpointContext->lockoutEndTimestamp    = endpointContext->lockoutEndTimestamp.zero();
+    endpointContext->wrongCodeEntryAttempts = 0;
+    endpointContext->delegate               = delegate;
+    return CHIP_NO_ERROR;
+}
+
+void DoorLockServer::ShutdownEndpoint(EndpointId endpointId)
+{
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
+    {
+        ChipLogError(Zcl, "Invalid endpoint %d for shutting down lock server: no endpoint context available", endpointId);
+        return;
+    }
+
+    endpointContext->delegate = nullptr;
+}
+
+CHIP_ERROR DoorLockServer::SetDelegate(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::Delegate * delegate)
+{
+    if (!delegate)
+    {
+        ChipLogError(Zcl, "Trying to set a null DoorLock::Delegate on endpoint %d", endpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
+    {
+        ChipLogError(Zcl, "Invalid endpoint %d for setting a delegate: no endpoint context available", endpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    endpointContext->delegate = delegate;
+    return CHIP_NO_ERROR;
 }
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
@@ -3443,6 +3458,17 @@ EmberAfDoorLockEndpointContext * DoorLockServer::getContext(chip::EndpointId end
         return &mEndpointCtx[index];
     }
     return nullptr;
+}
+
+Delegate * DoorLockServer::GetDelegate(EndpointId endpointId)
+{
+    auto * endpointContext = getContext(endpointId);
+    if (!endpointContext)
+    {
+        return nullptr;
+    }
+
+    return endpointContext->delegate;
 }
 
 bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * commandObj,
