@@ -22,7 +22,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, utc_time_in_matter_epoch
+from matter_testing_support import (EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
+                                    utc_time_in_matter_epoch)
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
