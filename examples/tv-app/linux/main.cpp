@@ -46,6 +46,7 @@ void ApplicationInit()
     // Can't disable this without breaking CI unit tests that act upon account login cluster (only available on ep3)
     // emberAfEndpointEnableDisable(3, false);
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     // Install Content Apps
     ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
 
@@ -68,6 +69,7 @@ void ApplicationInit()
     constexpr uint16_t kApp4VendorId  = 1111;
     constexpr uint16_t kApp4ProductId = 22;
     factory->InstallContentApp(kApp4VendorId, kApp4ProductId);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 }
 
 void ApplicationShutdown() {}
