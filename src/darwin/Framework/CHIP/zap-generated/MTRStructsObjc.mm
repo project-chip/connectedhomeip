@@ -8391,6 +8391,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRCommissionerControlClusterCommissioningRequestResultEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _requestId = @(0);
+
+        _clientNodeId = @(0);
+
+        _statusCode = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCommissionerControlClusterCommissioningRequestResultEvent alloc] init];
+
+    other.requestId = self.requestId;
+    other.clientNodeId = self.clientNodeId;
+    other.statusCode = self.statusCode;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestId:%@; clientNodeId:%@; statusCode:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _requestId, _clientNodeId, _statusCode, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRUnitTestingClusterSimpleStruct
 - (instancetype)init
 {
