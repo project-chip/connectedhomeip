@@ -26,6 +26,7 @@
 #include "em_usart.h"
 
 #include "sl_status.h"
+#include "FreeRTOS.h"
 #include <cmsis_os2.h>
 // TODO Fix include order issue #33120
 #include "wfx_host_events.h"

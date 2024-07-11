@@ -47,13 +47,13 @@ namespace DeviceLayer {
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
-sys_mutex_t PlatformManagerImpl::rngMutexHandle = NULL;
+sys_mutex_t PlatformManagerImpl::rngMutexHandle = nullptr;
 
 int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
 {
-    sys_mutex_lock(&rngMutexHandle);
+    osMutexAcquire(rngMutexHandle, osWaitForever);
     int res = (chip::Crypto::DRBG_get_bytes(dest, size) == CHIP_NO_ERROR) ? size : 0;
-    sys_mutex_unlock(&rngMutexHandle);
+    osMutexRelease(rngMutexHandle);
 
     return res;
 }
@@ -97,7 +97,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 #endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
-    VerifyOrExit(sys_mutex_new(&rngMutexHandle) == ERR_OK, err = CHIP_ERROR_NO_MEMORY);
+    rngMutexHandle = osMutexNew(nullptr);
+    VerifyOrExit((&rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
