@@ -428,12 +428,13 @@ public:
         return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;
     }
 
-    static Server & GetInstance() { return sServer; }
+    static Server & GetInstance() { return sServer.get(); }
 
 private:
     Server() {}
 
-    static Server sServer;
+    friend class Global<Server>;
+    static Global<Server> sServer;
 
     void InitFailSafe();
     void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event);

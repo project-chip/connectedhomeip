@@ -91,7 +91,7 @@ public:
 
 namespace chip {
 
-Server Server::sServer;
+Global<Server> Server::sServer;
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_NUM_EVENT_LOGGING_BUFFERS 3
