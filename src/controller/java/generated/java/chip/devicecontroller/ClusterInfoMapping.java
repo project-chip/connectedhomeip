@@ -19968,7 +19968,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> valueList) {
+    public void onSuccess(List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct>");
       responseValues.put(commandResponseInfo, valueList);
@@ -19989,7 +19989,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> valueList) {
+    public void onSuccess(List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct>");
       responseValues.put(commandResponseInfo, valueList);

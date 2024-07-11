@@ -26621,11 +26621,11 @@ void registerClusterEcosystemInformation(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(
             Id, "removed-on", 0, UINT64_MAX, Attributes::RemovedOn::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
-            chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type>>>>(
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type>>>(
             Id, "device-directory", Attributes::DeviceDirectory::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
-            chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type>>>>(
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type>>>(
             Id, "location-directory", Attributes::LocationDirectory::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,

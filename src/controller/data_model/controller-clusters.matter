@@ -9327,8 +9327,8 @@ provisional cluster EcosystemInformation = 1872 {
   }
 
   readonly attribute access(read: manage) optional nullable epoch_us removedOn = 0;
-  readonly attribute access(read: manage) nullable EcosystemDeviceStruct deviceDirectory[] = 1;
-  readonly attribute access(read: manage) nullable EcosystemLocationStruct locationDirectory[] = 2;
+  readonly attribute access(read: manage) EcosystemDeviceStruct deviceDirectory[] = 1;
+  readonly attribute access(read: manage) EcosystemLocationStruct locationDirectory[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

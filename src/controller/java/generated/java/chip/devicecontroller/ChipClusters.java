@@ -60186,11 +60186,11 @@ public class ChipClusters {
     }
 
     public interface DeviceDirectoryAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> value);
+      void onSuccess(List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> value);
     }
 
     public interface LocationDirectoryAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> value);
+      void onSuccess(List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -60247,7 +60247,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, DEVICE_DIRECTORY_ATTRIBUTE_ID, isFabricFiltered);
@@ -60260,7 +60260,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.EcosystemInformationClusterEcosystemDeviceStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, DEVICE_DIRECTORY_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -60278,7 +60278,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, LOCATION_DIRECTORY_ATTRIBUTE_ID, isFabricFiltered);
@@ -60291,7 +60291,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.EcosystemInformationClusterEcosystemLocationStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, LOCATION_DIRECTORY_ATTRIBUTE_ID, minInterval, maxInterval);

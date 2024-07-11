@@ -46379,8 +46379,8 @@ class EcosystemInformation(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="removedOn", Tag=0x00000000, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="deviceDirectory", Tag=0x00000001, Type=typing.Union[Nullable, typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]]),
-                ClusterObjectFieldDescriptor(Label="locationDirectory", Tag=0x00000002, Type=typing.Union[Nullable, typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]]),
+                ClusterObjectFieldDescriptor(Label="deviceDirectory", Tag=0x00000001, Type=typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]),
+                ClusterObjectFieldDescriptor(Label="locationDirectory", Tag=0x00000002, Type=typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -46390,8 +46390,8 @@ class EcosystemInformation(Cluster):
             ])
 
     removedOn: 'typing.Union[None, Nullable, uint]' = None
-    deviceDirectory: 'typing.Union[Nullable, typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]]' = None
-    locationDirectory: 'typing.Union[Nullable, typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]]' = None
+    deviceDirectory: 'typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]' = None
+    locationDirectory: 'typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -46602,9 +46602,9 @@ class EcosystemInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct])
 
-            value: 'typing.Union[Nullable, typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]]' = NullValue
+            value: 'typing.List[EcosystemInformation.Structs.EcosystemDeviceStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class LocationDirectory(ClusterAttributeDescriptor):
@@ -46618,9 +46618,9 @@ class EcosystemInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.List[EcosystemInformation.Structs.EcosystemLocationStruct])
 
-            value: 'typing.Union[Nullable, typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]]' = NullValue
+            value: 'typing.List[EcosystemInformation.Structs.EcosystemLocationStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

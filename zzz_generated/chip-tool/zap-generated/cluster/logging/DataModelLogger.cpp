@@ -17703,15 +17703,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("RemovedOn", 1, value);
         }
         case EcosystemInformation::Attributes::DeviceDirectory::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DeviceDirectory", 1, value);
         }
         case EcosystemInformation::Attributes::LocationDirectory::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType>>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LocationDirectory", 1, value);

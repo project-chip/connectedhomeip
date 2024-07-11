@@ -48,11 +48,11 @@ limitations under the License.
       <description>RemovedOn</description>
       <access op="read" privilege="manage"/>
     </attribute>
-    <attribute code="0x0001" side="server" define="DEVICE_DIRECTORY" type="array" entryType="EcosystemDeviceStruct" isNullable="true" reportable="true" length="256" minLength="1">
+    <attribute code="0x0001" side="server" define="DEVICE_DIRECTORY" type="array" entryType="EcosystemDeviceStruct" reportable="true" length="256" minLength="1">
       <description>DeviceDirectory</description>
       <access op="read" privilege="manage"/>
     </attribute>
-    <attribute code="0x0002" side="server" define="LOCATION_DIRECTORY" type="array" entryType="EcosystemLocationStruct" isNullable="true" reportable="true" length="64" minLength="1">
+    <attribute code="0x0002" side="server" define="LOCATION_DIRECTORY" type="array" entryType="EcosystemLocationStruct" reportable="true" length="64" minLength="1">
       <description>LocationDirectory</description>
       <access op="read" privilege="manage"/>
     </attribute>

@@ -41109,12 +41109,11 @@ struct TypeInfo
 namespace DeviceDirectory {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<
-        chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type>>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-           chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-        chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DeviceDirectory::Id; }
@@ -41124,12 +41123,12 @@ struct TypeInfo
 namespace LocationDirectory {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<
-        chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type>>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-           chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-        chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType>> &;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::EcosystemInformation::Structs::EcosystemLocationStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EcosystemInformation::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocationDirectory::Id; }

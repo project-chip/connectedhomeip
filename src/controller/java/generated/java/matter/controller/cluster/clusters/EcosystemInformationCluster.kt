@@ -48,12 +48,10 @@ class EcosystemInformationCluster(
     object SubscriptionEstablished : RemovedOnAttributeSubscriptionState()
   }
 
-  class DeviceDirectoryAttribute(
-    val value: List<EcosystemInformationClusterEcosystemDeviceStruct>?
-  )
+  class DeviceDirectoryAttribute(val value: List<EcosystemInformationClusterEcosystemDeviceStruct>)
 
   sealed class DeviceDirectoryAttributeSubscriptionState {
-    data class Success(val value: List<EcosystemInformationClusterEcosystemDeviceStruct>?) :
+    data class Success(val value: List<EcosystemInformationClusterEcosystemDeviceStruct>) :
       DeviceDirectoryAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : DeviceDirectoryAttributeSubscriptionState()
@@ -62,11 +60,11 @@ class EcosystemInformationCluster(
   }
 
   class LocationDirectoryAttribute(
-    val value: List<EcosystemInformationClusterEcosystemLocationStruct>?
+    val value: List<EcosystemInformationClusterEcosystemLocationStruct>
   )
 
   sealed class LocationDirectoryAttributeSubscriptionState {
-    data class Success(val value: List<EcosystemInformationClusterEcosystemLocationStruct>?) :
+    data class Success(val value: List<EcosystemInformationClusterEcosystemLocationStruct>) :
       LocationDirectoryAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : LocationDirectoryAttributeSubscriptionState()
@@ -241,18 +239,13 @@ class EcosystemInformationCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<EcosystemInformationClusterEcosystemDeviceStruct>? =
-      if (!tlvReader.isNull()) {
-        buildList<EcosystemInformationClusterEcosystemDeviceStruct> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(EcosystemInformationClusterEcosystemDeviceStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<EcosystemInformationClusterEcosystemDeviceStruct> =
+      buildList<EcosystemInformationClusterEcosystemDeviceStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(EcosystemInformationClusterEcosystemDeviceStruct.fromTlv(AnonymousTag, tlvReader))
         }
-      } else {
-        tlvReader.getNull(AnonymousTag)
-        null
+        tlvReader.exitContainer()
       }
 
     return DeviceDirectoryAttribute(decodedValue)
@@ -299,26 +292,18 @@ class EcosystemInformationCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<EcosystemInformationClusterEcosystemDeviceStruct>? =
-            if (!tlvReader.isNull()) {
-              buildList<EcosystemInformationClusterEcosystemDeviceStruct> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(
-                    EcosystemInformationClusterEcosystemDeviceStruct.fromTlv(
-                      AnonymousTag,
-                      tlvReader,
-                    )
-                  )
-                }
-                tlvReader.exitContainer()
+          val decodedValue: List<EcosystemInformationClusterEcosystemDeviceStruct> =
+            buildList<EcosystemInformationClusterEcosystemDeviceStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(
+                  EcosystemInformationClusterEcosystemDeviceStruct.fromTlv(AnonymousTag, tlvReader)
+                )
               }
-            } else {
-              tlvReader.getNull(AnonymousTag)
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let { emit(DeviceDirectoryAttributeSubscriptionState.Success(it)) }
+          emit(DeviceDirectoryAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(DeviceDirectoryAttributeSubscriptionState.SubscriptionEstablished)
@@ -353,18 +338,13 @@ class EcosystemInformationCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<EcosystemInformationClusterEcosystemLocationStruct>? =
-      if (!tlvReader.isNull()) {
-        buildList<EcosystemInformationClusterEcosystemLocationStruct> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(EcosystemInformationClusterEcosystemLocationStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<EcosystemInformationClusterEcosystemLocationStruct> =
+      buildList<EcosystemInformationClusterEcosystemLocationStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(EcosystemInformationClusterEcosystemLocationStruct.fromTlv(AnonymousTag, tlvReader))
         }
-      } else {
-        tlvReader.getNull(AnonymousTag)
-        null
+        tlvReader.exitContainer()
       }
 
     return LocationDirectoryAttribute(decodedValue)
@@ -411,26 +391,21 @@ class EcosystemInformationCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<EcosystemInformationClusterEcosystemLocationStruct>? =
-            if (!tlvReader.isNull()) {
-              buildList<EcosystemInformationClusterEcosystemLocationStruct> {
-                tlvReader.enterArray(AnonymousTag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(
-                    EcosystemInformationClusterEcosystemLocationStruct.fromTlv(
-                      AnonymousTag,
-                      tlvReader,
-                    )
+          val decodedValue: List<EcosystemInformationClusterEcosystemLocationStruct> =
+            buildList<EcosystemInformationClusterEcosystemLocationStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(
+                  EcosystemInformationClusterEcosystemLocationStruct.fromTlv(
+                    AnonymousTag,
+                    tlvReader,
                   )
-                }
-                tlvReader.exitContainer()
+                )
               }
-            } else {
-              tlvReader.getNull(AnonymousTag)
-              null
+              tlvReader.exitContainer()
             }
 
-          decodedValue?.let { emit(LocationDirectoryAttributeSubscriptionState.Success(it)) }
+          emit(LocationDirectoryAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(LocationDirectoryAttributeSubscriptionState.SubscriptionEstablished)
