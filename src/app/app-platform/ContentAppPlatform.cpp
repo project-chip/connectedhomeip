@@ -817,8 +817,9 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                     if (accountLoginDelegate != nullptr)
                     {
                         bool condition = accountLoginDelegate->HandleLogin(rotatingId, { setupPIN.data(), setupPIN.size() },
-                                                                        MakeOptional(subjectNodeId));
-                        ChipLogProgress(Controller, "AccountLogin::Login command sent and returned: %s", condition ? "success" : "failure");
+                                                                           MakeOptional(subjectNodeId));
+                        ChipLogProgress(Controller, "AccountLogin::Login command sent and returned: %s",
+                                        condition ? "success" : "failure");
                     }
                     else
                     {

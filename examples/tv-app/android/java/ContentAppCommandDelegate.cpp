@@ -39,8 +39,8 @@
 namespace chip {
 namespace AppPlatform {
 
-const std::string FAILURE_KEY        = "PlatformError";
-const std::string FAILURE_STATUS_KEY = "Status";
+const std::string FAILURE_KEY         = "PlatformError";
+const std::string FAILURE_STATUS_KEY  = "Status";
 const std::string RESPONSE_STATUS_KEY = "Status";
 
 void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext)
