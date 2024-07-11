@@ -595,7 +595,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceLocation(Devic
 
     size_t outLen = 0;
     ReturnErrorOnFailure(ReadConfigValueBin(
-        ConfigClass::kConfigKey_DeviceLocation, 
+        ConfigClass::kConfigKey_DeviceLocation,
         locationSpan.data(), locationSpan.size(),
         outLen));
 
@@ -634,8 +634,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetDeviceLocation(Devic
     ReturnErrorOnFailure(location->Encode(tlvWriter, TLV::AnonymousTag()));
 
     ReturnErrorOnFailure(WriteConfigValueBin(
-        ConfigClass::kConfigKey_DeviceLocation, 
-        static_cast<const uint8_t *>(locationSpan.data()), 
+        ConfigClass::kConfigKey_DeviceLocation,
+        static_cast<const uint8_t *>(locationSpan.data()),
         tlvWriter.GetLengthWritten()));
 
     return CHIP_NO_ERROR;

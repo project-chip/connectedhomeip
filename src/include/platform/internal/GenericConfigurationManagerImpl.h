@@ -83,7 +83,7 @@ public:
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     /**
      * @brief Update location with the current device location.
-     * 
+     *
      * Expects that location is initialised with a locationName CharSpan pointing to a buffer of size kMaxDeviceLocationNameLength.
     */
     CHIP_ERROR GetDeviceLocation(DeviceLocatioType &location) override;
