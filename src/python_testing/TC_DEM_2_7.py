@@ -17,7 +17,6 @@
 """Define Matter test case TC_DEM_2_7."""
 
 
-import datetime
 import logging
 
 import chip.clusters as Clusters
