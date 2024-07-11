@@ -21,7 +21,7 @@
  *      one) for a fabric.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include "messaging/ExchangeDelegate.h"
 #include "system/SystemClock.h"
@@ -68,16 +68,7 @@ using namespace chip::Messaging;
 using namespace chip::System;
 using namespace chip::Protocols;
 
-struct TestExchangeHolder : public chip::Test::LoopbackMessagingContext, public ::testing::Test
-{
-    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
-
-    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
-
-    void SetUp() override { chip::Test::LoopbackMessagingContext::SetUp(); }
-
-    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
-};
+using TestExchangeHolder = chip::Test::LoopbackMessagingContext;
 
 class MockProtocolResponder : public ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
 {
