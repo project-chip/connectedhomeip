@@ -245,12 +245,6 @@ public:
     // when new fabric is created, this list needs to be updated,
     // when client init DefaultICDClientStorage, this table needs to be loaded.
     static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst("g/icdfl"); }
-
-    // Energy EVSE cluster
-    // Need a key to store the Charging Preference Targets which is a TLV of list of lists
-    // Note not fabric scoped
-    static StorageKeyName EVSETargets() { return StorageKeyName::FromConst("g/ev/targ"); }
-    static StorageKeyName EvseTargetEntryCounter() { return StorageKeyName::FromConst("g/ev/targc"); }
 };
 
 } // namespace chip

@@ -73,7 +73,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
     ReturnErrorCodeIf(!backingBuffer.Calloc(length), CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err =
-        mpTargetStore->SyncGetKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName(), backingBuffer.Get(), length);
+        mpTargetStore->SyncGetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), length);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // Targets does not exist persistent storage -> initialise mChargingTargetSchedulesList as empty
@@ -414,7 +414,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
 
     writer.Finalize(backingBuffer);
 
-    ReturnErrorOnFailure(mpTargetStore->SyncSetKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName(), backingBuffer.Get(),
+    ReturnErrorOnFailure(mpTargetStore->SyncSetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(),
                                                         static_cast<uint16_t>(len)));
 
     return CHIP_NO_ERROR;
@@ -423,7 +423,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
 CHIP_ERROR EvseTargetsDelegate::ClearTargets()
 {
     /* We simply delete the data from the persistent store */
-    mpTargetStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName());
+    mpTargetStore->SyncDeleteKeyValue(spEvseTargetsKeyName);
 
     // Now reload from persistent storage so that mChargingTargetSchedulesList gets updated (it will be empty)
     CHIP_ERROR err = LoadTargets();
