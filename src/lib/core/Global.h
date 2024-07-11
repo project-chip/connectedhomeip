@@ -86,6 +86,17 @@ public:
     T & get() { return _get(); }
     T * operator->() { return &_get(); }
 
+    template <class U = typename std::remove_extent<T>::type>
+    U & operator[](std::size_t i)
+    {
+        return _get()[i];
+    }
+    template <std::size_t N = std::extent<T>::value>
+    constexpr std::size_t size() const
+    {
+        return N;
+    }
+
     // Globals are not copyable or movable
     Global(const Global &)             = delete;
     Global(const Global &&)            = delete;
@@ -115,7 +126,19 @@ private:
         CHIP_CXA_ATEXIT(&destroy, value);
 #endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
     }
-    static void destroy(void * value) { static_cast<T *>(value)->~T(); }
+
+    template <class U, std::size_t N>
+    static void destroy(U (*value)[N])
+    {
+        for (std::size_t i = 0; i < N; ++i)
+            destroy(value[i]);
+    }
+    template <class U>
+    static void destroy(U * value)
+    {
+        value->~U();
+    }
+    static void destroy(void * value) { destroy(static_cast<T *>(value)); }
 
 #else // CHIP_CONFIG_GLOBALS_LAZY_INIT
 public:

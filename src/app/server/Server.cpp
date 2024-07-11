@@ -32,6 +32,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/Global.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
@@ -94,11 +95,11 @@ Server Server::sServer;
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_NUM_EVENT_LOGGING_BUFFERS 3
-static uint8_t sInfoEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE];
-static uint8_t sDebugEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE];
-static uint8_t sCritEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE];
-static ::chip::PersistedCounter<chip::EventNumber> sGlobalEventIdCounter;
-static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
+static Global<uint8_t[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE]> sInfoEventBuffer;
+static Global<uint8_t[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE]> sDebugEventBuffer;
+static Global<uint8_t[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE]> sCritEventBuffer;
+static Global<::chip::PersistedCounter<chip::EventNumber>> sGlobalEventIdCounter;
+static Global<::chip::app::CircularEventBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS]> sLoggingBuffer;
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
@@ -253,19 +254,19 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
-    err = sGlobalEventIdCounter.Init(mDeviceStorage, DefaultStorageKeyAllocator::IMEventNumber(),
-                                     CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
+    err = sGlobalEventIdCounter->Init(mDeviceStorage, DefaultStorageKeyAllocator::IMEventNumber(),
+                                      CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
     SuccessOrExit(err);
 
     {
         ::chip::app::LogStorageResources logStorageResources[] = {
-            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), ::chip::app::PriorityLevel::Debug },
-            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), ::chip::app::PriorityLevel::Info },
-            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), ::chip::app::PriorityLevel::Critical }
+            { sDebugEventBuffer.get(), sDebugEventBuffer.size(), ::chip::app::PriorityLevel::Debug },
+            { sInfoEventBuffer.get(), sInfoEventBuffer.size(), ::chip::app::PriorityLevel::Info },
+            { sCritEventBuffer.get(), sCritEventBuffer.size(), ::chip::app::PriorityLevel::Critical }
         };
 
         chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                       &logStorageResources[0], &sGlobalEventIdCounter,
+                                                       &logStorageResources[0], &sGlobalEventIdCounter.get(),
                                                        std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
