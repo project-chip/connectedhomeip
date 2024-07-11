@@ -189,9 +189,16 @@ public:
         BitFlags<ReadHandlerNodeFlags> mFlags;
     };
 
+    ReportScheduler() : mTimerDelegate(nullptr) {}
     ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
 
     virtual ~ReportScheduler() = default;
+
+    void Init(TimerDelegate * aTimerDelegate)
+    {
+        mTimerDelegate = aTimerDelegate;
+        VerifyOrDie(nullptr != mTimerDelegate);
+    }
 
     virtual void ReportTimerCallback() = 0;
 

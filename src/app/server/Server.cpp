@@ -762,23 +762,22 @@ void Server::ResumeSubscriptions()
 
 Credentials::IgnoreCertificateValidityPeriodPolicy Server::sDefaultCertValidityPolicy;
 
-KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
-PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
-Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
-Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
-app::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
-app::reporting::ReportSchedulerImpl
-    CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);
+Global<KvsPersistentStorageDelegate> CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
+Global<PersistentStorageOperationalKeystore> CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
+Global<Credentials::PersistentStorageOpCertStore> CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
+Global<Credentials::GroupDataProviderImpl> CommonCaseDeviceServerInitParams::sGroupDataProvider;
+Global<app::DefaultTimerDelegate> CommonCaseDeviceServerInitParams::sTimerDelegate;
+Global<app::reporting::ReportSchedulerImpl> CommonCaseDeviceServerInitParams::sReportScheduler;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
+Global<SimpleSessionResumptionStorage> CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
 #endif
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubscriptionResumptionStorage;
+Global<app::SimpleSubscriptionResumptionStorage> CommonCaseDeviceServerInitParams::sSubscriptionResumptionStorage;
 #endif
-app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
-Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
+Global<app::DefaultAclStorage> CommonCaseDeviceServerInitParams::sAclStorage;
+Global<Crypto::DefaultSessionKeystore> CommonCaseDeviceServerInitParams::sSessionKeystore;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
+Global<app::DefaultICDCheckInBackOffStrategy> CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
 #endif
 
 } // namespace chip

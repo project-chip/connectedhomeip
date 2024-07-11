@@ -44,6 +44,7 @@
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/Global.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -225,8 +226,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager =
                 DeviceLayer::PersistedStorage::KeyValueStoreMgr();
-            ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
-            this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
+            ReturnErrorOnFailure(sKvsPersistenStorageDelegate->Init(&kvsManager));
+            this->persistentStorageDelegate = &sKvsPersistenStorageDelegate.get();
         }
 
         // PersistentStorageDelegate "software-based" operational key access injection
@@ -234,8 +235,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             // WARNING: PersistentStorageOperationalKeystore::Finish() is never called. It's fine for
             //          for examples and for now.
-            ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
-            this->operationalKeystore = &sPersistentStorageOperationalKeystore;
+            ReturnErrorOnFailure(sPersistentStorageOperationalKeystore->Init(this->persistentStorageDelegate));
+            this->operationalKeystore = &sPersistentStorageOperationalKeystore.get();
         }
 
         // OpCertStore can be injected but default to persistent storage default
@@ -244,8 +245,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             // WARNING: PersistentStorageOpCertStore::Finish() is never called. It's fine for
             //          for examples and for now, since all storage is immediate for that impl.
-            ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
-            this->opCertStore = &sPersistentStorageOpCertStore;
+            ReturnErrorOnFailure(sPersistentStorageOpCertStore->Init(this->persistentStorageDelegate));
+            this->opCertStore = &sPersistentStorageOpCertStore.get();
         }
 
         // Injection of report scheduler WILL lead to two schedulers being allocated. As recommended above, this should only be used
@@ -253,21 +254,22 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         // CommonCaseDeviceServerInitParams should not be allocated.
         if (this->reportScheduler == nullptr)
         {
-            reportScheduler = &sReportScheduler;
+            sReportScheduler->Init(&sTimerDelegate.get());
+            reportScheduler = &sReportScheduler.get();
         }
 
         // Session Keystore injection
-        this->sessionKeystore = &sSessionKeystore;
+        this->sessionKeystore = &sSessionKeystore.get();
 
         // Group Data provider injection
-        sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
-        sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
-        ReturnErrorOnFailure(sGroupDataProvider.Init());
-        this->groupDataProvider = &sGroupDataProvider;
+        sGroupDataProvider->SetStorageDelegate(this->persistentStorageDelegate);
+        sGroupDataProvider->SetSessionKeystore(this->sessionKeystore);
+        ReturnErrorOnFailure(sGroupDataProvider->Init());
+        this->groupDataProvider = &sGroupDataProvider.get();
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-        ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
-        this->sessionResumptionStorage = &sSessionResumptionStorage;
+        ReturnErrorOnFailure(sSessionResumptionStorage->Init(this->persistentStorageDelegate));
+        this->sessionResumptionStorage = &sSessionResumptionStorage.get();
 #else
         this->sessionResumptionStorage = nullptr;
 #endif
@@ -276,12 +278,12 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         this->accessDelegate = Access::Examples::GetAccessControlDelegate();
 
         // Inject ACL storage. (Don't initialize it.)
-        this->aclStorage = &sAclStorage;
+        this->aclStorage = &sAclStorage.get();
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         ChipLogProgress(AppServer, "Initializing subscription resumption storage...");
-        ReturnErrorOnFailure(sSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
-        this->subscriptionResumptionStorage = &sSubscriptionResumptionStorage;
+        ReturnErrorOnFailure(sSubscriptionResumptionStorage->Init(this->persistentStorageDelegate));
+        this->subscriptionResumptionStorage = &sSubscriptionResumptionStorage.get();
 #else
         ChipLogProgress(AppServer, "Subscription persistence not supported");
 #endif
@@ -289,7 +291,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         if (this->icdCheckInBackOffStrategy == nullptr)
         {
-            this->icdCheckInBackOffStrategy = &sDefaultICDCheckInBackOffStrategy;
+            this->icdCheckInBackOffStrategy = &sDefaultICDCheckInBackOffStrategy.get();
         }
 #endif
 
@@ -297,23 +299,23 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     }
 
 private:
-    static KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
-    static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
-    static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
-    static Credentials::GroupDataProviderImpl sGroupDataProvider;
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static app::reporting::ReportSchedulerImpl sReportScheduler;
+    static Global<KvsPersistentStorageDelegate> sKvsPersistenStorageDelegate;
+    static Global<PersistentStorageOperationalKeystore> sPersistentStorageOperationalKeystore;
+    static Global<Credentials::PersistentStorageOpCertStore> sPersistentStorageOpCertStore;
+    static Global<Credentials::GroupDataProviderImpl> sGroupDataProvider;
+    static Global<chip::app::DefaultTimerDelegate> sTimerDelegate;
+    static Global<app::reporting::ReportSchedulerImpl> sReportScheduler;
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-    static SimpleSessionResumptionStorage sSessionResumptionStorage;
+    static Global<SimpleSessionResumptionStorage> sSessionResumptionStorage;
 #endif
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    static app::SimpleSubscriptionResumptionStorage sSubscriptionResumptionStorage;
+    static Global<app::SimpleSubscriptionResumptionStorage> sSubscriptionResumptionStorage;
 #endif
-    static app::DefaultAclStorage sAclStorage;
-    static Crypto::DefaultSessionKeystore sSessionKeystore;
+    static Global<app::DefaultAclStorage> sAclStorage;
+    static Global<Crypto::DefaultSessionKeystore> sSessionKeystore;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    static app::DefaultICDCheckInBackOffStrategy sDefaultICDCheckInBackOffStrategy;
+    static Global<app::DefaultICDCheckInBackOffStrategy> sDefaultICDCheckInBackOffStrategy;
 #endif
 };
 
