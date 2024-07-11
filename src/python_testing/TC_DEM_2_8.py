@@ -193,11 +193,13 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("9")
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=101)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=101)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("10")
-        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=-101)]
+        constraintList = [Clusters.DeviceEnergyManagement.Structs.ConstraintsStruct(
+            startTime=forecast.startTime, duration=forecast.slots[0].defaultDuration, loadControl=-101)]
         await self.send_request_constraint_based_forecast(constraintList, cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization, expected_status=Status.ConstraintError)
 
         self.step("11")
