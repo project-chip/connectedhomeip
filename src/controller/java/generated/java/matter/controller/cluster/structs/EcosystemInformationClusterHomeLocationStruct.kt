@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class EcosystemInformationClusterHomeLocationStruct(
   val locationName: String,
   val floorNumber: Short?,
-  val areaType: Any?,
+  val areaType: UByte?,
 ) {
   override fun toString(): String = buildString {
     append("EcosystemInformationClusterHomeLocationStruct {\n")
@@ -70,7 +70,7 @@ class EcosystemInformationClusterHomeLocationStruct(
         }
       val areaType =
         if (!tlvReader.isNull()) {
-          tlvReader.getAny(ContextSpecificTag(TAG_AREA_TYPE))
+          tlvReader.getUByte(ContextSpecificTag(TAG_AREA_TYPE))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_AREA_TYPE))
           null

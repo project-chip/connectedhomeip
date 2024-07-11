@@ -12195,7 +12195,7 @@ public static class ContentControlClusterRatingNameStruct {
 public static class EcosystemInformationClusterHomeLocationStruct {
   public String locationName;
   public @Nullable Integer floorNumber;
-  public @Nullable Object areaType;
+  public @Nullable Integer areaType;
   private static final long LOCATION_NAME_ID = 0L;
   private static final long FLOOR_NUMBER_ID = 1L;
   private static final long AREA_TYPE_ID = 2L;
@@ -12203,7 +12203,7 @@ public static class EcosystemInformationClusterHomeLocationStruct {
   public EcosystemInformationClusterHomeLocationStruct(
     String locationName,
     @Nullable Integer floorNumber,
-    @Nullable Object areaType
+    @Nullable Integer areaType
   ) {
     this.locationName = locationName;
     this.floorNumber = floorNumber;
@@ -12214,7 +12214,7 @@ public static class EcosystemInformationClusterHomeLocationStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(LOCATION_NAME_ID, new StringType(locationName)));
     values.add(new StructElement(FLOOR_NUMBER_ID, floorNumber != null ? new IntType(floorNumber) : new NullType()));
-    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new AnyType(areaType) : new NullType()));
+    values.add(new StructElement(AREA_TYPE_ID, areaType != null ? new UIntType(areaType) : new NullType()));
 
     return new StructType(values);
   }
@@ -12225,7 +12225,7 @@ public static class EcosystemInformationClusterHomeLocationStruct {
     }
     String locationName = null;
     @Nullable Integer floorNumber = null;
-    @Nullable Object areaType = null;
+    @Nullable Integer areaType = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == LOCATION_NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -12238,9 +12238,9 @@ public static class EcosystemInformationClusterHomeLocationStruct {
           floorNumber = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == AREA_TYPE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
-          AnyType castingValue = element.value(AnyType.class);
-          areaType = castingValue.value(Object.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          areaType = castingValue.value(Integer.class);
         }
       }
     }
