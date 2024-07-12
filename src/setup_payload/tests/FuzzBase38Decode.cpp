@@ -17,9 +17,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
     std::vector<uint8_t> decodedData;
     CHIP_ERROR err = chip::base38Decode(base38EncodedString, decodedData);
 
-    if (err != CHIP_NO_ERROR)
-    {
-        __builtin_trap();
-    }
     return 0;
 }
