@@ -25,6 +25,7 @@
 #include <app/CommandHandler.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/FailSafeContext.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
@@ -38,9 +39,9 @@ class ServerInstance : public CommandHandlerInterface, public AttributeAccessInt
 {
 public:
     using Status = Protocols::InteractionModel::Status;
-    ServerInstance(EndpointId endpointId, Delegate * delegate) :
+    ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext) :
         CommandHandlerInterface(Optional<EndpointId>(endpointId), Id),
-        AttributeAccessInterface(Optional<EndpointId>(endpointId), Id), mDelegate(delegate)
+        AttributeAccessInterface(Optional<EndpointId>(endpointId), Id), mDelegate(delegate), mFailsafeContext(failSafeContext)
     {}
     virtual ~ServerInstance() = default;
 
@@ -56,6 +57,7 @@ public:
     void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) override;
 
 private:
+    // TODO: Split the business logic from the unit test class
     friend class TestThreadBorderRouterManagementCluster;
     // Command Handlers
     Status HandleGetActiveDatasetRequest(bool isOverCASESession, Thread::OperationalDataset & dataset)
@@ -66,17 +68,16 @@ private:
     {
         return HandleGetDatasetRequest(isOverCASESession, Delegate::DatasetType::kPending, dataset);
     }
-    Status HandleSetActiveDatasetRequest(bool failSafeArmed, const Commands::SetActiveDatasetRequest::DecodableType & req);
+    Status HandleSetActiveDatasetRequest(CommandHandler * commandHandler,
+                                         const Commands::SetActiveDatasetRequest::DecodableType & req);
     Status HandleSetPendingDatasetRequest(const Commands::SetPendingDatasetRequest::DecodableType & req);
     Status HandleGetDatasetRequest(bool isOverCASESession, Delegate::DatasetType type, Thread::OperationalDataset & dataset);
 
-    // Attribute Read handler
-    CHIP_ERROR ReadFeatureMap(BitFlags<Feature> & feature);
+    // Attribute Read handlers
+    void ReadFeatureMap(BitFlags<Feature> & feature);
+    Optional<uint64_t> ReadActiveDatasetTimestamp();
     CHIP_ERROR ReadBorderRouterName(MutableCharSpan & borderRouterName);
     CHIP_ERROR ReadBorderAgentID(MutableByteSpan & borderAgentId);
-    CHIP_ERROR ReadThreadVersion(uint16_t & threadVersion);
-    CHIP_ERROR ReadInterfaceEnabled(bool & interfaceEnable);
-    CHIP_ERROR ReadActiveDatasetTimestamp(Optional<uint64_t> & activeDatasetTimestamp);
 
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void OnFailSafeTimerExpired();
@@ -87,11 +88,8 @@ private:
     ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
     Optional<uint64_t> mBreadcrumb;
     uint32_t mSetActiveDatasetSequenceNumber = 0;
+    FailSafeContext & mFailsafeContext;
 };
-
-bool IsFailSafeArmed(FabricIndex accessingFabricIndex);
-
-void DisarmFailSafeTimer();
 
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters

@@ -21,6 +21,7 @@
 #include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -32,40 +33,29 @@ namespace ThreadBorderRouterManagement {
 class GenericOpenThreadBorderRouterDelegate : public Delegate
 {
 public:
-    static constexpr char kFailsafeThreadBorderRouterCommissioned[] = "g/fs/tbrc";
-
-    GenericOpenThreadBorderRouterDelegate(const char * name) { strncpy(mThreadBorderRouterName, name, kBorderRouterNameMaxLength); }
+    static constexpr char kFailsafeActiveDatasetConfigured[] = "g/fs/tbradc";
+    GenericOpenThreadBorderRouterDelegate(PersistentStorageDelegate * storage) : mStorage(storage) {}
     ~GenericOpenThreadBorderRouterDelegate() = default;
 
     CHIP_ERROR Init() override;
 
-    CHIP_ERROR GetPanChangeSupported(bool & panChangeSupported) override
-    {
-        panChangeSupported = true;
-        return CHIP_NO_ERROR;
-    }
+    bool GetPanChangeSupported() override { return true; }
 
-    CHIP_ERROR GetBorderRouterName(MutableCharSpan & borderRouterName) override
+    void GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
-        if (borderRouterName.size() < strlen(mThreadBorderRouterName))
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        strcpy(borderRouterName.data(), mThreadBorderRouterName);
-        borderRouterName.reduce_size(strlen(mThreadBorderRouterName));
-        return CHIP_NO_ERROR;
+        CopyCharSpanToMutableCharSpan(CharSpan(mThreadBorderRouterName, strlen(mThreadBorderRouterName)), borderRouterName);
     }
 
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override;
 
-    CHIP_ERROR GetThreadVersion(uint16_t & threadVersion) override;
+    uint16_t GetThreadVersion() override;
 
-    CHIP_ERROR GetInterfaceEnabled(bool & interfaceEnabled) override;
+    bool GetInterfaceEnabled() override;
 
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
 
-    CHIP_ERROR SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                                ActivateDatasetCallback * callback) override;
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
+                          ActivateDatasetCallback * callback) override;
 
     CHIP_ERROR RevertActiveDataset() override;
 
@@ -73,11 +63,18 @@ public:
 
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
+    void SetThreadBorderRouterName(const CharSpan & name)
+    {
+        MutableCharSpan borderRouterName(mThreadBorderRouterName);
+        CopyCharSpanToMutableCharSpan(name, borderRouterName);
+    }
+
 private:
-    CHIP_ERROR SaveThreadBorderRouterCommissioned(bool commissioned);
+    CHIP_ERROR SaveActiveDatasetConfigured(bool configured);
     ActivateDatasetCallback * mCallback = nullptr;
-    uint32_t mSequenceNum;
+    uint32_t mSequenceNum = 0;
     char mThreadBorderRouterName[kBorderRouterNameMaxLength + 1];
+    PersistentStorageDelegate * mStorage;
 };
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters

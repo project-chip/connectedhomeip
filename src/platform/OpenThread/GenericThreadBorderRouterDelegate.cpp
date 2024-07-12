@@ -36,6 +36,7 @@
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
 
@@ -57,7 +58,7 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::Init()
     mCallback = nullptr;
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     // When the Thread Border Router is reboot during SetActiveDataset, we need to revert the active dateset.
-    ReturnErrorOnFailure(RevertActiveDataset());
+    RevertActiveDataset();
     return CHIP_NO_ERROR;
 }
 
@@ -66,34 +67,34 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSp
     otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
     otBorderAgentId borderAgentId;
-    if (borderAgentIdSpan.size() < sizeof(borderAgentId.mId))
+    if (borderAgentIdSpan.size() != sizeof(borderAgentId.mId))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    ScopedThreadLock threadLock;
-    otError err = otBorderAgentGetId(otInst, &borderAgentId);
-    if (err == OT_ERROR_NONE)
+    otError otErr = OT_ERROR_NONE;
     {
-        memcpy(borderAgentIdSpan.data(), borderAgentId.mId, sizeof(borderAgentId.mId));
-        borderAgentIdSpan.reduce_size(sizeof(borderAgentId.mId));
+        ScopedThreadLock threadLock;
+        otErr = otBorderAgentGetId(otInst, &borderAgentId);
+    }
+    if (otErr == OT_ERROR_NONE)
+    {
+        CopySpanToMutableSpan(ByteSpan(borderAgentId.mId), borderAgentIdSpan);
         return CHIP_NO_ERROR;
     }
-    return CHIP_ERROR_INTERNAL;
+    return DeviceLayer::Internal::MapOpenThreadError(otErr);
 }
 
-CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetThreadVersion(uint16_t & threadVersion)
+uint16_t GenericOpenThreadBorderRouterDelegate::GetThreadVersion()
 {
-    threadVersion = otThreadGetVersion();
-    return CHIP_NO_ERROR;
+    return otThreadGetVersion();
 }
 
-CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetInterfaceEnabled(bool & interfaceEnabled)
+bool GenericOpenThreadBorderRouterDelegate::GetInterfaceEnabled()
 {
     otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnValue(otInst, false);
     ScopedThreadLock threadLock;
-    interfaceEnabled = otIp6IsEnabled(otInst);
-    return CHIP_NO_ERROR;
+    return otIp6IsEnabled(otInst);
 }
 
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetDataset(Thread::OperationalDataset & dataset, DatasetType type)
@@ -101,41 +102,42 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetDataset(Thread::Operational
     otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
 
-    ScopedThreadLock threadLock;
     otError otErr = OT_ERROR_NONE;
     otOperationalDatasetTlvs datasetTlvs;
-    if (type == DatasetType::kActive)
     {
-        otErr = otDatasetGetActiveTlvs(otInst, &datasetTlvs);
-    }
-    else
-    {
-        otErr = otDatasetGetPendingTlvs(otInst, &datasetTlvs);
+        ScopedThreadLock threadLock;
+        if (type == DatasetType::kActive)
+        {
+            otErr = otDatasetGetActiveTlvs(otInst, &datasetTlvs);
+        }
+        else
+        {
+            otErr = otDatasetGetPendingTlvs(otInst, &datasetTlvs);
+        }
     }
     if (otErr == OT_ERROR_NONE)
     {
         return dataset.Init(ByteSpan(datasetTlvs.mTlvs, datasetTlvs.mLength));
     }
-    return CHIP_ERROR_NOT_FOUND;
+    return DeviceLayer::Internal::MapOpenThreadError(otErr);
 }
 
-CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
-                                                                   uint32_t sequenceNum, ActivateDatasetCallback * callback)
+void GenericOpenThreadBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
+                                                             ActivateDatasetCallback * callback)
 {
     // This function will never be invoked when there is an Active Dataset already configured.
-    CHIP_ERROR err = SaveThreadBorderRouterCommissioned(false);
+    CHIP_ERROR err = SaveActiveDatasetConfigured(false);
     if (err == CHIP_NO_ERROR)
     {
         err = DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(activeDataset, nullptr);
     }
-    if (err == CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        // We can change the stored sequence number because OnActivateDatasetComplete executed later must be called for this
-        // SetActiveDataset request
-        mSequenceNum = sequenceNum;
-        mCallback    = callback;
+        callback->OnActivateDatasetComplete(sequenceNum, err);
+        return;
     }
-    return err;
+    mSequenceNum = sequenceNum;
+    mCallback    = callback;
 }
 
 void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -147,31 +149,36 @@ void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceL
             event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established)
         {
             delegate->mCallback->OnActivateDatasetComplete(delegate->mSequenceNum, CHIP_NO_ERROR);
-            SaveThreadBorderRouterCommissioned(true);
+            delegate->SaveActiveDatasetConfigured(true);
             delegate->mCallback = nullptr;
         }
     }
 }
 
-CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SaveThreadBorderRouterCommissioned(bool commissioned)
+CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SaveActiveDatasetConfigured(bool configured)
 {
-    return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFailsafeThreadBorderRouterCommissioned, commissioned);
+    VerifyOrReturnError(mStorage, CHIP_ERROR_INTERNAL);
+    return mStorage->SyncSetKeyValue(kFailsafeActiveDatasetConfigured, &configured, sizeof(bool));
 }
 
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::RevertActiveDataset()
 {
     // The FailSafe Timer is triggered and the previous command request should be handled, so reset the callback.
-    mCallback               = nullptr;
-    bool threadCommissioned = true;
-    DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kFailsafeThreadBorderRouterCommissioned, &threadCommissioned);
-    if (!threadCommissioned)
+    mCallback                           = nullptr;
+    bool activeDatasetConfigured        = true;
+    uint16_t activeDatasetConfiguredLen = sizeof(bool);
+    VerifyOrReturnError(mStorage, CHIP_ERROR_INTERNAL);
+    mStorage->SyncGetKeyValue(kFailsafeActiveDatasetConfigured, &activeDatasetConfigured, activeDatasetConfiguredLen);
+    VerifyOrDie(activeDatasetConfiguredLen == sizeof(bool));
+    if (!activeDatasetConfigured)
     {
-        // If Thread is not commissioned, we will try to attach an empty Thread dataset and that will clear the one stored in the
-        // Thread stack since the SetActiveDataset operation fails and FailSafe timer is triggered.
+        // The active dataset should be no configured after calling this function, so we will try to attach an empty Thread dataset
+        // and that will clear the one stored in the Thread stack since the SetActiveDataset operation fails and FailSafe timer is
+        // triggered.
         Thread::OperationalDataset emptyDataset = {};
         return DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(emptyDataset, nullptr);
+        SaveActiveDatasetConfigured(false)
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SetPendingDataset(const Thread::OperationalDataset & pendingDataset)
@@ -179,11 +186,13 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::SetPendingDataset(const Thread
     otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
     VerifyOrReturnError(otInst, CHIP_ERROR_INCORRECT_STATE);
 
-    ScopedThreadLock threadLock;
     otOperationalDatasetTlvs datasetTlvs;
     memcpy(datasetTlvs.mTlvs, pendingDataset.AsByteSpan().data(), pendingDataset.AsByteSpan().size());
     datasetTlvs.mLength = pendingDataset.AsByteSpan().size();
-    ReturnErrorCodeIf(otDatasetSetPendingTlvs(otInst, &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
+    {
+        ScopedThreadLock threadLock;
+        ReturnErrorCodeIf(otDatasetSetPendingTlvs(otInst, &datasetTlvs) != OT_ERROR_NONE, CHIP_ERROR_INTERNAL);
+    }
     return CHIP_NO_ERROR;
 }
 
