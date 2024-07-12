@@ -53,13 +53,13 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (enable_fuzz_test_targets) {
     group("fuzz_tests") {
       deps = [
-        "${chip_root}/examples/all-clusters-app/linux:fuzz-chip-all-clusters-app",
         "${chip_root}/src/credentials/tests:fuzz-chip-cert",
         "${chip_root}/src/lib/core/tests:fuzz-tlv-reader",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing",
         "${chip_root}/src/lib/format/tests:fuzz-payload-decoder",
         "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38",
         "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-decode",
+        "${chip_root}/examples/all-clusters-app/linux:fuzz-chip-all-clusters-app",
       ]
     }
   }
