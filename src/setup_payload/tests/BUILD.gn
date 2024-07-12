@@ -44,15 +44,15 @@ if (enable_fuzz_test_targets) {
   chip_fuzz_target("fuzz-setup-payload-base38") {
     sources = [ "FuzzBase38.cpp" ]
     public_deps = [
-      "${chip_root}/src/setup_payload",
       "${chip_root}/src/platform/logging:stdio",
+      "${chip_root}/src/setup_payload",
     ]
   }
   chip_fuzz_target("fuzz-setup-payload-base38-decode") {
     sources = [ "FuzzBase38Decode.cpp" ]
     public_deps = [
-      "${chip_root}/src/setup_payload",
       "${chip_root}/src/platform/logging:stdio",
+      "${chip_root}/src/setup_payload",
     ]
   }
 }
